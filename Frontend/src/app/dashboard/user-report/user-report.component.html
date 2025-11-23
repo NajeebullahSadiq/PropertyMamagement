@@ -1,0 +1,39 @@
+<div class="container">
+    <div class="row mt-4">
+    
+     <h2>راپور املاک به اساس شرکت های ثبت شده</h2>
+     <hr>
+      <div class="col-lg-4" *ngFor="let user of topUsers">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="col-auto" style="text-align: left;">
+                <i  class="fas fa-money-bill fa-2x"></i>
+            </div>
+            <h5 class="card-title">{{ user.createdBy }}</h5>
+            <p class="card-text">  تعداد معامله ثبت شده: <strong>{{ user.totalPropertiesCreated }}</strong></p>
+            <p class="card-text">مقدار پول معامله شده: <strong> {{ user.totalPriceOfProperties }}</strong></p>
+            <p class="card-text">نام شرکت راهنمایی معاملات:  <strong>{{ user.companyTitle }}</strong></p>
+        </div>
+      </div>
+    </div>
+   
+    <div class="row mt-4">
+    
+      <h2>راپور وسایط به اساس شرکت های ثبت شده</h2>
+      <hr>
+       <div class="col-lg-4" *ngFor="let user of vehicleTopUsers">
+         <div class="card mb-3">
+           <div class="card-body">
+             <div class="col-auto" style="text-align: left;">
+                 <i  class="fas fa-money-bill fa-2x"></i>
+             </div>
+             <h5 class="card-title">{{ user.createdBy }}</h5>
+             <p class="card-text">  تعداد معامله ثبت شده: <strong>{{ user.totalPropertiesCreated }}</strong></p>
+             <p class="card-text">مقدار پول معامله شده: <strong> {{ user.totalPriceOfProperties }}</strong></p>
+             <p class="card-text">نام شرکت راهنمایی معاملات:  <strong>{{ user.companyTitle }}</strong></p>
+         </div>
+       </div>
+     </div>
+
+  </div>
+  </div>

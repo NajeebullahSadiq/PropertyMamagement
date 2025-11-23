@@ -1,0 +1,126 @@
+<section>
+    <div class="container">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-12 col-xl-11">
+                <div class="card text-black" style="border-radius: 25px;">
+                    <div class="card-body p-md-5">
+                        <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات شاهدین</p>
+                        <form [formGroup]="withnessForm"
+                            (ngSubmit)="withnessForm.valid ? selectedId ? updateWitnessDetails() : addwithnessDetails() : null">
+                            <div class="form-group">
+                                <input type="hidden" formControlName="id">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="firstName" class="form-label">نام </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                        <input type="text" id="firstName" class="form-control"
+                                            formControlName="firstName">
+                                        <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+                                            <small class="text-danger" *ngIf="firstName?.errors?.['required']">این فیلد
+                                                الزامی است</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="fatherName" class="form-label">نام پدر </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                        <input type="text" id="fatherName" class="form-control"
+                                            formControlName="fatherName">
+                                        <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
+                                            <small class="text-danger" *ngIf="fatherName?.errors?.['required']">این فیلد
+                                                الزامی است</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="indentityCardNumber" class="form-label"> شماره تذکره</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                        <input type="text" (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="form-control"
+                                            formControlName="indentityCardNumber">
+                                        <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
+                                            <small class="text-danger" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد
+                                                الزامی است</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                           
+                            <div class="row">
+                               
+                               
+                                <div class="col-md-4">
+                                    <label for="phoneNumber" class="form-label"> شماره موبایل</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                        <input type="text" (keypress)="onlyNumberKey($event)" id="phoneNumber" class="form-control"
+                                            formControlName="phoneNumber">
+                                        <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
+                                            <small class="text-danger" *ngIf="phoneNumber?.errors?.['required']">این فیلد
+                                                الزامی است</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <h5 style="font-weight: bold; color: #007bff;">آپلود تذکره ملی شاهد (الزامی)</h5>
+                                        <app-vehicle-nationalid-upload #nationalIdComponent (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-vehicle-nationalid-upload>
+                                        <div *ngIf="nationalIdCardPath?.invalid && (nationalIdCardPath?.dirty || nationalIdCardPath?.touched)">
+                                            <small class="text-danger" *ngIf="nationalIdCardPath?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                               
+                        <br>
+                        <br>
+                        <button type="submit" [disabled]="withnessForm.invalid" class="btn btn-success">{{selectedId ?
+                          'تغیر معلومات' : 'ثبت معلومات'}}</button>
+                        <button type="reset"  class="btn btn-primary"
+                        style="margin-right: 5px;" (click)="resetChild()">جدید</button>
+                        
+                        <button type="reset" class="btn btn-primary" style="margin-right: 5px; background-color: gray;" (click)="reset()">
+                            <i class="fas fa-arrow-alt-circle-left"></i>
+                            برگشت به فورم اصلی
+                          </button>
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <div class="container">
+                <table class="table table-bordered">
+                    <thead>
+                      <tr style="text-align: center;">
+                        <th> آی دی</th>
+                        <th>نام</th>
+                        <th>نام پدر</th>
+                        <th>شماره تذکره</th>
+                        <th>شماره موبایل</th>
+                      
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="
+                      let w of witnessDetails" style="text-align: center;">
+                        <td (click)="BindValu(w.id)">{{ w.id }}</td>
+                        <td (click)="BindValu(w.id)">{{ w.firstName }}</td>
+                        <td (click)="BindValu(w.id)">{{ w.fatherName }}</td>
+                        <td (click)="BindValu(w.id)">{{ w.indentityCardNumber }}</td>
+                        <td (click)="BindValu(w.id)">{{ w.phoneNumber }}</td>
+                        
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+

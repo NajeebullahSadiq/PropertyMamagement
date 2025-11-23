@@ -1,0 +1,16 @@
+<div>
+  <div>
+    <input type="file" #file placeholder="Choose National ID file" (change)="uploadFile(file.files)" style="display:none;" accept="image/*,application/pdf">
+    <button type="button" class="btn btn-outline-primary" (click)="file.click()">
+      <i class="fas fa-id-card"></i> انتخاب تذکره ملی
+    </button>
+    <div class="col-md-12 mt-2">
+      <span class="upload text-primary" *ngIf="progress > 0">
+        <i class="fas fa-spinner fa-spin"></i> {{progress}}%
+      </span>
+      <span class="upload text-success" *ngIf="message">
+        <i class="fas fa-check-circle"></i> {{message}}
+      </span>
+    </div>
+  </div>
+</div>

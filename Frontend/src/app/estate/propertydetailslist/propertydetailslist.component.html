@@ -1,0 +1,67 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="input-group mb-3" style="padding-top: 35px;">
+        <input type="text" class="form-control" [(ngModel)]="searchTerm" aria-label="Search" aria-describedby="button-addon2">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">جستجو</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6" style="padding-top: 35px;">
+      <div class="d-flex justify-content-end">
+        <label for="tableSize" class="fontstyle">تعداد ردیف ها:</label>
+        <select id="tableSize" class="form-control" [(ngModel)]="tableSize" (change)="onTableSizeChange($event)">
+          <option *ngFor="let size of tableSizes" [value]="size">{{ size }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-bordered mt-3 ">
+    <thead>
+      <tr class="text-center">
+        <th>شماره مسلسل</th>
+        <th>نمبر قباله</th>
+        <th>نوع ملکیت</th>
+        <th>نوع معامله</th>
+        <th>فروشنده</th>
+        <th>خریدار</th>
+        <th>حالت</th>
+        <th>جزئیات و تغیر</th>
+        <th>چاپ رسید</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let property of filteredProperties | paginate: { itemsPerPage: tableSize, currentPage: page, totalItems: count }; let i = index" class="text-center">
+        <td>{{ (page - 1) * tableSize + i + 1 }}</td>
+        <td>{{ property.pnumber }}</td>
+        <td>{{ property.propertyTypeText }}</td>
+        <td>{{ property.transactionTypeText }}</td>
+        <td [ngStyle]="{'color': property.sellerName ? 'inherit' : 'red'}">{{ property.sellerName ? property.sellerName : 'تکیمل ناشده' }}</td>
+        <td [ngStyle]="{'color': property.buyerName ? 'inherit' : 'red'}">{{ property.buyerName ? property.buyerName : 'تکیمل ناشده' }}</td>
+        <td>
+          <span *ngIf="property.iscomplete; else notCompleted">
+            <i class="fas fa-check-circle text-success"></i>
+          </span>
+          <ng-template #notCompleted>
+            <i class="fas fa-times-circle text-danger"></i>
+          </ng-template>
+        </td>
+        <td>
+          <button class="btn btn-outline-secondary" (click)="onEdit(property.id)">
+            <i class="fas fa-edit"></i>
+          </button>
+        </td>
+        <td>
+          <button [disabled]="!property.iscomplete" class="btn btn-outline-secondary" (click)="onPrint(property.id)">
+            <i class="fas fa-print"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pagination-container d-flex justify-content-center mt-3">
+    <pagination-controls (pageChange)="onTableDataChange($event)" [previousLabel]="'قبلی'" [nextLabel]="'بعدی'"></pagination-controls>
+  </div>
+</div>

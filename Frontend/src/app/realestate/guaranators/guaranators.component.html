@@ -1,0 +1,208 @@
+<section>
+    <div class="card-body p-md-5">
+        <div class="heading-wrapper">
+            <img [src]="imagePath" class="seller-image" alt="Buyer Image">
+          
+            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4"> ثبت مشخصات تضمین کننده ها شرکت</p>
+        </div>
+        <app-fileupload #childComponent (sendMessage)="uploadFinished($event)" style="text-align:left;"></app-fileupload>
+        <form [formGroup]="guaranatorForm"  (ngSubmit)="guaranatorForm.valid ? selectedId ? updateData() : addData() : null">
+            <div class="form-group">
+                <input type="hidden" formControlName="id">
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="firstName" class="form-label">اسم </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="firstName" formControlName="firstName" class="form-control">
+                    </div>
+                    <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+                        <small class="text-danger" *ngIf="firstName?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label  class="form-label">ولد</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="fatherName"  formControlName="fatherName" class="form-control">
+                    </div>
+                    <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
+                        <small class="text-danger" *ngIf="fatherName?.errors?.['required']"> این فیلد الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label me-3"> نوعیت تذکره</label>
+                    <ng-select [items]="IdTypes" [selectOnTab]="true"
+                    bindLabel="name" bindValue="id" (change)="onPropertyTypeChange()" formControlName="identityCardTypeId">
+                    </ng-select>
+                  
+                  </div>
+                
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <label  class="form-label">شماره تذکره </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="indentityCardNumber" formControlName="indentityCardNumber" class="form-control">
+                    </div>
+                    <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
+                        <small class="text-danger" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label  class="form-label">جلد</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="jild" formControlName="jild" class="form-control">
+                    </div>
+                    <div *ngIf="jild?.invalid && (jild?.dirty || jild?.touched)">
+                        <small class="text-danger" *ngIf="jild?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label  class="form-label"> صفحه</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="safha" formControlName="safha" class="form-control">
+                    </div>
+                    <div *ngIf="safha?.invalid && (safha?.dirty || safha?.touched)">
+                        <small class="text-danger" *ngIf="safha?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+               
+                <div class="col-md-4">
+                    <label  class="form-label"> نمبر ثبت</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="sabtNumber" formControlName="sabtNumber" class="form-control">
+                    </div>
+                    <div *ngIf="sabtNumber?.invalid && (sabtNumber?.dirty || sabtNumber?.touched)">
+                        <small class="text-danger" *ngIf="sabtNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label"> شماره تماس</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="text" id="phoneNumber" formControlName="phoneNumber" class="form-control">
+                    </div>
+                    <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
+                        <small class="text-danger" *ngIf="phoneNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+            </div>
+            <br>
+        
+            <section>
+                <div class="row d-flex justify-content-center align-items-center h-100">  
+                                    <h3 style="font-weight: bold;"> سکونت اصلی</h3>
+            <div class="row">
+           
+            <div class="col-md-4">
+                <label class="form-label me-3"> ولایت</label>
+                <ng-select formControlName="paddressProvinceId" [items]="province" [selectOnTab]="true"
+                  bindLabel="dari" bindValue="id" (change)="filterResults($event)">
+                </ng-select>
+              
+              </div>
+           
+            <div class="col-md-4">
+                <label class="form-label me-3"> ناحیه/ولسوالی</label>
+                <ng-select formControlName="paddressDistrictId" [items]="district" [selectOnTab]="true"
+                  bindLabel="dari" bindValue="id">
+                </ng-select>
+              
+              </div>
+            <div class="col-md-4">
+                <label for="paddressVillage" class="form-label"> قریه</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                    <input type="text" id="paddressVillage" class="form-control"
+                        formControlName="paddressVillage">
+                    <div *ngIf="paddressVillage?.invalid && (paddressVillage?.dirty || paddressVillage?.touched)">
+                        <small class="text-danger" *ngIf="paddressVillage?.errors?.['required']">این فیلد
+                            الزامی است</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+  
+      </div>    
+    </section>
+    <br>
+    <section>
+       
+        <div class="row">
+            <div class="row d-flex justify-content-center align-items-center h-100">  
+                <h3 style="font-weight: bold;"> سکونت فعلی</h3>
+          
+            
+            <div class="col-md-4">
+                <label class="form-label me-3"> ولایت </label>
+                <ng-select formControlName="taddressProvinceId" [items]="province" [selectOnTab]="true"
+                  bindLabel="dari" bindValue="id" (change)="filterResults2($event)">
+                </ng-select>
+              
+              </div>
+          
+            <div class="col-md-4">
+                <label class="form-label me-3"> ناحیه/ولسوالی</label>
+                <ng-select formControlName="taddressDistrictId" [items]="district2" [selectOnTab]="true"
+                  bindLabel="dari" bindValue="id">
+                </ng-select>
+              
+              </div>
+            <div class="col-md-4">
+                <label for="taddressVillage" class="form-label"> قریه </label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                    <input type="text" id="taddressVillage" class="form-control"
+                        formControlName="taddressVillage">
+                    <div *ngIf="taddressVillage?.invalid && (taddressVillage?.dirty || taddressVillage?.touched)">
+                        <small class="text-danger" *ngIf="taddressVillage?.errors?.['required']">این فیلد
+                            الزامی است</small>
+                    </div>
+                </div>
+            </div>       
+        </div>
+    </div>
+   
+    </section>
+    <br>
+    <br>
+    <button type="submit" [disabled]="guaranatorForm.invalid" class="btn btn-success"> {{selectedId ?
+        'تغیر معلومات' : 'ثبت معلومات'}}</button>
+      <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
+        style="margin-right: 5px;">جدید</button>
+        </form>
+    </div>
+    <div class="container">
+        <table class="table table-bordered">
+            <thead>
+              <tr style="text-align: center;">
+                <th> نوع آدرس</th>
+                <th>ولایت</th>
+                <th>ولسوالی</th>
+                <th>قریه</th>
+                
+              
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="
+              let w of guaranatorDetails" style="text-align: center;">
+                <td (click)="BindValu(w.id)">{{ w.firstName }}</td>
+                <td (click)="BindValu(w.id)">{{ w.firstName }}</td>
+                <td (click)="BindValu(w.id)">{{ w.firstName }}</td>
+                <td (click)="BindValu(w.id)">{{ w.firstName }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+</section>

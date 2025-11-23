@@ -1,0 +1,77 @@
+/* Style for the container table */
+.container {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Style for the table rows */
+tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Style for the left column (table cell) */
+.col-left {
+    width: 25%;
+    text-align: right;
+}
+
+/* Style for the middle column (table cell) */
+.col-middle {
+    width: 50%;
+    text-align: center;
+    
+}
+
+/* Style for the right column (table cell) */
+.col-right {
+    width: 25%;
+    text-align: left;
+}
+
+/* Style for the image within the right column (table cell) */
+.col-right img {
+    height: 100px;
+    width: 90px;
+}
+.col-left img  {
+    height:170px;
+    width: 150px;
+}
+/* Style for the bold text paragraphs within table cells */
+td p {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    padding: 5px;
+    font-size: 20px;
+}
+
+
+/* Additional styles for printing */
+@media print {
+    body {
+        margin: 0; /* Remove default page margin */
+    }
+
+    .container {
+        width: 100%; /* Ensure the table expands to the full page width */
+    }
+
+    .col-left, .col-middle, .col-right {
+        width: 33.33%; /* Equal width for columns in print */
+        
+    }
+
+    /* Adjust image size for print */
+    .col-right img {
+        height: 100px;
+        width: 90px;
+    }
+    .col-left img {
+        height: 170px;
+        width: 160px;
+    }
+}

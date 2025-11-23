@@ -1,0 +1,64 @@
+<div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group mb-3" style="padding-top: 35px;">
+          <input type="text" class="form-control" [(ngModel)]="searchTerm" aria-label="Search" aria-describedby="button-addon2">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">جستجو</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" style="padding-top: 35px;">
+        <div class="d-flex justify-content-end">
+          <label for="tableSize" class="fontstyle">تعداد ردیف ها:</label>
+          <select id="tableSize" class="form-control" [(ngModel)]="tableSize" (change)="onTableSizeChange($event)">
+            <option *ngFor="let size of tableSizes" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+        
+      
+      <table class="table table-bordered">
+        <thead>
+          <tr style="text-align: center;">
+            <th>شماره مسلسل</th>
+            <th>عنوان راهنمایی معاملات</th>
+            <th>نام مالک شرکت</th>
+            <th>نام پدر مالک شرکت</th>
+            <th>شماره تذکره مالک شرکت</th>
+            <th>نمبر جواز شرکت</th>
+            <th>شماره تماس شرکت</th>
+            <th>تضمین کننده شرکت</th>
+            <th>جزئیات دیگر</th>
+      
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let property of filteredProperties | paginate: { itemsPerPage: tableSize, currentPage: page, totalItems: count }; let i = index" class="text-center">
+        <td>{{ (page - 1) * tableSize + i + 1 }}</td>
+            <td>{{ property.title }}</td>
+            <td>{{ property.ownerFullName }}</td>
+            <td>{{ property.ownerFatherName }}</td>
+            <td>{{ property.ownerIdNumber }}</td>
+            <td>{{ property.licenseNumber }}</td>
+            <td>{{ property.phoneNumber }}</td>
+            <td>{{ property.granator }}</td>
+            <td>
+              <button class="btn btn-outline-secondary" (click)="onEdit(property.id)">
+              <i class="fas fa-edit"></i>
+            </button></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="pagination-container">
+        <pagination-controls
+        (pageChange)="onTableDataChange($event)"
+        [previousLabel]="'قبلی'"
+        [nextLabel]="'بعدی'"
+        
+      ></pagination-controls>
+      </div>
+      </div>
+  

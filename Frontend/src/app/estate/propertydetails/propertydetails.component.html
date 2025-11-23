@@ -1,0 +1,260 @@
+<!-- <form (submit)="onSubmit()">
+    <label for="pnumber">First name:</label>
+    <input type="text" name="pnumber" [(ngModel)]="PropertyDetail.pnumber">
+  
+    <label for="pnumber">Last name:</label>
+    <input type="text" name="pnumber" [(ngModel)]="PropertyDetail.pnumber">
+  
+    <label for="pnumber">Position:</label>
+    <input type="text" name="pnumber" [(ngModel)]="PropertyDetail.pnumber">
+  
+    <button type="submit">Save and Generate ID</button>
+  </form>
+  
+  <p>Generated main table ID: {{ mainTableId }}</p> -->
+
+<section>
+  <div class="container">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-lg-12 col-xl-11">
+        <div class="card text-black" style="border-radius: 25px;">
+          <div class="card-body p-md-5">
+
+            <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات ملکیت</p>
+            <form [formGroup]="propertyForm"
+              (ngSubmit)="propertyForm.valid ? selectedPropertyId ? updatePropertyDetails() : addPropertyDetails() : null">
+              <div class="form-group">
+                <input type="hidden" formControlName="id">
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <label class="form-label me-3">نوع سند ملکیت</label>
+                  <ng-select  formControlName="doctype">
+                    <ng-option value="رسمی">رسمی</ng-option>
+                    <ng-option value="عرفی">عرفی</ng-option>
+                  </ng-select>
+                </div>
+                <div class="col-md-4">
+                  <label for="pnumber" class="form-label">شماره قباله</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                    <input type="number" (keypress)="onlyNumberKey($event)" id="pnumber" class="form-control"
+                      formControlName="pnumber">
+                    </div>
+                    <div *ngIf="pnumber?.invalid && (pnumber?.dirty || pnumber?.touched)">
+                      <small class="text-danger" *ngIf="pnumber?.errors?.['required']">شماره قباله الزامی است</small>
+                    </div>
+                  
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label me-3"> نوعیت ملکیت</label>
+                  <ng-select formControlName="propertyTypeId" [items]="propertypetype" [selectOnTab]="true"
+                    bindLabel="name" bindValue="id" (change)="onPropertyTypeChange()">
+                  </ng-select>
+                </div>
+              
+              </div>
+              <br>
+              <div class="row">
+                <div class="col-md-4">
+                  <label for="pnumber" class="form-label"> مساحت ملکیت</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="far fa-square"></i></span>
+                    <input type="number" (keypress)="onlyNumberKey($event)" id="parea" class="form-control" formControlName="parea">
+                  </div>
+                    <div *ngIf="parea?.invalid && (parea?.dirty || parea?.touched)">
+                      <small class="text-danger" *ngIf="parea?.errors?.['required']"> مساحت ملکیت الزامی است</small>
+                    </div>
+                  
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label me-3">واحد اندازه گیری</label>
+                  <ng-select formControlName="punitTypeId" [items]="unittypes" [selectOnTab]="true" bindLabel="name"
+                    bindValue="id">
+                  </ng-select>
+                  <!-- <div *ngIf="propertyForm.get('punitTypeId')?.invalid && propertyForm.get('punitTypeId')?.touched">
+                                    <small class="text-danger"> انتخاب این فیلد  الزامی است</small>
+                                  </div> -->
+                </div>
+                <div class="col-md-4">
+                  <label for="firstName" class="form-label">تعداد منزل</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                    <input type="number" (keypress)="onlyNumberKey($event)" id="numofFloor" class="form-control" formControlName="numofFloor">
+                  </div>
+                  <div *ngIf="numofFloor?.invalid && (numofFloor?.dirty || numofFloor?.touched)">
+                    <small class="text-danger" *ngIf="numofFloor?.errors?.['required']"> این فیلد  الزامی است</small>
+                  </div>
+                </div>
+              </div>
+              <br />
+              <div class="row">
+                
+                <div class="col-md-4">
+                  <label for="firstName" class="form-label">تعداد اطاق</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-bed"></i></span>
+                    <input type="number" (keypress)="onlyNumberKey($event)" id="numofRooms" class="form-control" formControlName="numofRooms">
+                  </div>
+                  <div *ngIf="numofRooms?.invalid && (numofRooms?.dirty || numofRooms?.touched)">
+                    <small class="text-danger" *ngIf="numofRooms?.errors?.['required']"> این فیلد  الزامی است</small>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label me-3"> نوعیت معامله</label>
+                  <ng-select formControlName="transactionTypeId" [items]="transactiontype" [selectOnTab]="true"
+                    bindLabel="name" bindValue="id">
+                  </ng-select>
+                  <!-- <div *ngIf="propertyForm.get('transactionTypeId')?.invalid && propertyForm.get('transactionTypeId')?.touched">
+                                  <small class="text-danger"> انتخاب نوعیت معامله  الزامی است</small>
+                                </div> -->
+                </div>
+                <div class="col-md-4">
+                  <label for="firstName" class="form-label"> قیمت به عدد</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                    <input type="number" (keypress)="onlyNumberKey($event)" id="price" class="form-control" formControlName="price" (input)="updateOnePercent()">
+                  </div>
+                  <div *ngIf="price?.invalid && (price?.dirty || price?.touched)">
+                    <small class="text-danger" *ngIf="price?.errors?.['required']"> این فیلد الزامی است</small>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <div class="row">
+               
+                <div class="col-md-4">
+                  <label for="firstName" class="form-label"> قیمت به حروف</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                    <input type="text" id="priceText" class="form-control" formControlName="priceText">
+                  </div>
+                  <div *ngIf="priceText?.invalid && (priceText?.dirty || priceText?.touched)">
+                    <small class="text-danger" *ngIf="priceText?.errors?.['required']"> این فیلد الزامی است</small>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="firstName" class="form-label"> مبلغ حق المتیاز </label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                    <input type="number" id="royaltyAmount"  [value]="onePercent"  class="form-control" disabled>
+                  </div>
+                  <!-- <div *ngIf="royaltyAmount?.invalid && (royaltyAmount?.dirty || royaltyAmount?.touched)">
+                    <small class="text-danger" *ngIf="royaltyAmount?.errors?.['required']"> این فیلد الزامی است</small>
+                  </div> -->
+                </div>
+              </div>
+              <br>
+              
+              <div class="row">
+               
+                <div class="col-md-6">
+                  <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
+                  <div class="col-md-9">
+                    <div class="form-group col-md-12">
+
+                      <app-upload #childComponent (sendMessage)="uploadFinished($event)"></app-upload>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <ng-container *ngIf="propertyForm.get('id')?.value && propertyForm.get('filePath')?.value">
+                    <h3 class="download-link" (click)="downloadFiles()">
+                      <i class="fas fa-arrow-alt-circle-down me-2"></i> 
+                      <div class="form-group col-md-12">
+                        دانلود اسناد
+                      </div>
+                    </h3>
+                  </ng-container>
+                </div>
+
+              </div>
+           
+              <br>
+              <div class="row">
+                <section>
+                  <div class="row d-flex justify-content-center align-items-center h-100">  
+                                      <h3 style="font-weight: bold;"> حدود اربعه </h3>
+              <div class="row">
+             
+                <div class="col-md-6">
+                  <label  class="form-label"> شمالا</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                    <input type="text"  id="north" class="form-control" formControlName="north">
+                  </div>
+                    <div *ngIf="north?.invalid && (north?.dirty || north?.touched)">
+                      <small class="text-danger" *ngIf="north?.errors?.['required']"> این فیلد الزامی است</small>
+                    </div>
+                  
+                </div>
+                <div class="col-md-6">
+                  <label  class="form-label"> شرقا</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                    <input type="text"  id="east" class="form-control" formControlName="east">
+                  </div>
+                    <div *ngIf="east?.invalid && (east?.dirty || east?.touched)">
+                      <small class="text-danger" *ngIf="east?.errors?.['required']">  این فیلد الزامی است</small>
+                    </div>
+                  
+                </div>
+          </div>
+          <div class="row">
+             
+            <div class="col-md-6">
+              <label class="form-label"> جنوبا</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                <input type="text"  id="south" class="form-control" formControlName="south">
+              </div>
+                <div *ngIf="south?.invalid && (south?.dirty || south?.touched)">
+                  <small class="text-danger" *ngIf="south?.errors?.['required']">  این فیلد الزامی است</small>
+                </div>
+              
+            </div>
+            <div class="col-md-6">
+              <label  class="form-label"> غربا</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                <input type="text"  id="west" class="form-control" formControlName="west">
+              </div>
+                <div *ngIf="west?.invalid && (west?.dirty || west?.touched)">
+                  <small class="text-danger" *ngIf="west?.errors?.['required']">  این فیلد الزامی است</small>
+                </div>
+              
+            </div>
+         </div>
+        </div>   
+      </section>
+              </div>
+              <br>
+              <div class="row">
+                <div class="col-md-10">
+
+                  <div class="form-group">
+                    <label>جزئیات دیگر</label>
+                    <textarea id="des" class="form-control" formControlName="des" name="des" rows="3"
+                      required></textarea>
+                  </div>
+                  <div *ngIf="des?.invalid && (des?.dirty || des?.touched)">
+                    <small class="text-danger" *ngIf="des?.errors?.['required']"> این فیلد الزامی است</small>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <button type="submit" [disabled]="propertyForm.invalid" class="btn btn-success">{{selectedPropertyId ?
+                'تغیر معلومات' : 'ثبت معلومات'}}</button>
+              <button type="reset" (click)="resetForms()" class="btn btn-primary"
+                style="margin-right: 5px;">جدید</button>
+               
+            </form>
+        
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

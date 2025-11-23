@@ -1,0 +1,62 @@
+
+.fontstyle{
+font-size: medium;
+font-weight: bold;
+text-align: right;
+
+}
+.fonttitle{
+    font-size: large;
+    font-weight: bold;
+    text-align: right;
+    margin-right: 20px;
+    color: rgb(128, 125, 125);
+ 
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+  hr {
+    margin: 1rem 0;
+    color: inherit;
+    background-color: currentColor;
+    border: 0;
+    opacity: 0.25;
+  }
+  .marginset{
+    margin-top: 15px;
+  }
+  .content{
+    height: calc(100vh - 98px);
+  }
+  //List View
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #002b5c;
+    color: #fff;
+    font-weight: bold;
+    padding: 0.75rem;
+    vertical-align: top;
+  }
+  
+  td {
+    padding: 0.75rem;
+    vertical-align: top;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  

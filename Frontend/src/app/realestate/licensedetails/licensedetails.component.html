@@ -1,0 +1,117 @@
+<section style="height: 800px;">
+    <div class="card-body p-md-5">
+        <div class="heading-wrapper">
+            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات شرکت راهنمایی معاملات </p>
+        </div>
+        <form [formGroup]="licenseForm"  (ngSubmit)="licenseForm.valid ? selectedId ? updateData() : addData() : null">
+            <div class="form-group">
+                <input type="hidden" formControlName="id">
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="title" class="form-label">شماره جواز</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                        <input type="text" id="licenseNumber" formControlName="licenseNumber" class="form-control">
+                    </div>
+                    <div *ngIf="licenseNumber?.invalid && (licenseNumber?.dirty || licenseNumber?.touched)">
+                        <small class="text-danger" *ngIf="licenseNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                      </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">نوع جواز</label>
+                    <ng-select [items]="licenseTypes" [selectOnTab]="true"
+                    bindLabel="dari" bindValue="id" formControlName="licenseType">
+                    </ng-select>
+                    <div *ngIf="licenseType?.invalid && (licenseType?.dirty || licenseType?.touched)">
+                        <small class="text-danger" *ngIf="licenseType?.errors?.['required']">این فیلد الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="issueDate" class="form-label">تاریخ  صدور</label>
+                    <div class="input-group"  style="direction: ltr; ">
+                      <input class="form-control"
+                        id="issueDate"
+                        name="issueDate"
+                        [(ngModel)]="selectedDateIssue"
+                        formControlName="issueDate"
+                        [maxDate]="maxDate"  [minDate]="minDate"
+                        ngbDatepicker
+                        #d="ngbDatepicker"
+                      />
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="expireDate" class="form-label">تاریخ  ختم جواز</label>
+                    <div class="input-group"  style="direction: ltr; ">
+                      <input class="form-control"
+                        id="expireDate"
+                        name="expireDate"
+                        [(ngModel)]="selectedDateExpire"
+                        formControlName="expireDate"
+                        [maxDate]="maxDate"  [minDate]="minDate"
+                        ngbDatepicker
+                        #end="ngbDatepicker"
+                      />
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" (click)="end.toggle()" type="button">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+
+            <br>
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label me-3">ناحیه مربوطه</label>
+                    <ng-select [items]="Areas" [selectOnTab]="true"
+                    bindLabel="name" bindValue="id"  formControlName="areaId">
+                    </ng-select>
+                  
+                  </div>
+                  <div class="col-md-4">
+                    <label for="title" class="form-label"> آدرس دقیق دفتر</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                        <input type="text" id="officeAddress" formControlName="officeAddress" class="form-control">
+                    </div>
+                    <div *ngIf="officeAddress?.invalid && (officeAddress?.dirty || officeAddress?.touched)">
+                        <small class="text-danger" *ngIf="officeAddress?.errors?.['required']">این فیلد  الزامی است</small>
+                      </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
+                    <div class="col-md-9">
+                        <div class="form-group col-md-12">
+                            <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                      <ng-container *ngIf="licenseForm.get('id')?.value && licenseForm.get('docPath')?.value">
+                        <h3 class="download-link" (click)="downloadFiles()">
+                          <i class="fas fa-arrow-alt-circle-down me-2"></i> 
+                          <div class="form-group col-md-12">
+                            دانلود اسناد
+                          </div>
+                        </h3>
+                      </ng-container>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <button type="submit" [disabled]="licenseForm.invalid" class="btn btn-success"> {{selectedId ?
+                'تغیر معلومات' : 'ثبت معلومات'}}</button>
+              <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
+                style="margin-right: 5px;">جدید</button>
+                <button type="button" (click)="navigateToPrint()" class="btn btn-secondary print">چاپ جواز</button>
+        </form>
+    </div>
+</section>
+

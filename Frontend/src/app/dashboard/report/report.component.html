@@ -1,0 +1,386 @@
+
+
+<div class="container">
+
+<div class="container-fluid">
+
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+      <label for="petitionDate" class="form-label">از تاریخ</label>
+      <div class="input-group" style="direction: ltr; ">
+        <input class="form-control"
+          id="start-date"
+          name="start-date"
+          [(ngModel)]="startDate"
+          ngbDatepicker
+          #d="ngbDatepicker" />
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+            <i class="fa fa-calendar"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <label for="petitionDate" class="form-label">الی تاریخ</label>
+      <div class="input-group" style="direction: ltr; ">
+        <input class="form-control"
+          id="end-date"
+          name="end-date"
+          [(ngModel)]="endDate"
+          ngbDatepicker
+          #end="ngbDatepicker" />
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" (click)="end.toggle()" type="button">
+            <i class="fa fa-calendar"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <label for="petitionDate" class="form-label" style="opacity: 0;">جستجو</label>
+      <div class="input-group">
+        <button class="btn btn-outline-secondary" (click)="fetchDashboardData()">جستجو</button>
+      </div>
+    </div>
+  </div>
+<br>
+<div class="row">
+  
+  <h3 class="designation" style="text-align: center;">راپور املاک به اساس شرکت های ثبت شده</h3>
+  <hr>
+   <div class="col-lg-4" *ngFor="let user of topUsers">
+     <div class="card mb-3">
+       <div class="card-body">
+         <div class="col-auto" style="text-align: left;">
+             <i  class="fas fa-money-bill fa-2x"></i>
+         </div>
+         <h5 class="card-title">{{ user.createdBy }}</h5>
+         <p class="card-text">  تعداد معامله ثبت شده: <strong>{{ user.totalPropertiesCreated }}</strong></p>
+         <p class="card-text">مقدار پول معامله شده: <strong> {{ user.totalPriceOfProperties }}</strong></p>
+         <p class="card-text">نام شرکت راهنمایی معاملات:  <strong>{{ user.companyTitle }}</strong></p>
+     </div>
+   </div>
+ </div>
+
+</div>
+<div class="row mt-4">
+  
+  <h3 class="designation" style="text-align: center;">راپور وسایط به اساس شرکت های ثبت شده</h3>
+  <hr>
+   <div class="col-lg-4" *ngFor="let user of vehicleTopUsers">
+     <div class="card mb-3">
+       <div class="card-body">
+         <div class="col-auto" style="text-align: left;">
+             <i  class="fas fa-money-bill fa-2x"></i>
+         </div>
+         <h5 class="card-title">{{ user.createdBy }}</h5>
+         <p class="card-text">  تعداد معامله ثبت شده: <strong>{{ user.totalPropertiesCreated }}</strong></p>
+         <p class="card-text">مقدار پول معامله شده: <strong> {{ user.totalPriceOfProperties }}</strong></p>
+         <p class="card-text">نام شرکت راهنمایی معاملات:  <strong>{{ user.companyTitle }}</strong></p>
+     </div>
+   </div>
+ </div>
+
+</div>
+  <br>
+    <h3 class="designation" style="text-align: center;">راپور عمومی معاملات املاک</h3>
+      <div class="row">
+          <ng-container>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله شده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmountProperty }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-money-bill fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع پول معامله تکمیل ناشده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmountPropertyNotCompleted }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-money-bill fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل شده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmountPropertyCompleted }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-money-bill fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!--Second Section-->
+          <ng-container>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله انجام شده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalPropertyTransaction }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-exchange-alt fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع  معامله تکمیل ناشده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalPropertyTransactionNotCompleted }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-exchange-alt fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله تکمیل شده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalPropertyTransactionCompleted }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-exchange-alt fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <!--Third Section-->
+          <ng-container>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن تمام معاملات </div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalPropertyRoyaltyAmount }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-money-bill fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل ناشده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalPropertyRoyaltyAmountNotCompleted }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-money-bill fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل شده</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalPropertyRoyaltyAmountCompleted }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i  class="fas fa-money-bill fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+  
+  
+        <hr class="divider" />
+
+        <h3 class="designation" style="text-align: center;">راپور عمومی معاملات وسایط</h3>
+        <div class="row">
+            <ng-container>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله شده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmount }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i class="fas fa-money-bill fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل ناشده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmountNotCompleted }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-money-bill fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل شده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmountCompleted }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-money-bill fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <!--Second Section-->
+            <ng-container>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله انجام شده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalTransaction }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-exchange-alt fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع  معامله تکمیل ناشده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalTransactionNotCompleted }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-exchange-alt fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع معامله تکمیل شده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalTransactionCompleted }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-exchange-alt fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <!--Third Section-->
+            <ng-container>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن تمام معاملات </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalRoyaltyAmount }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-money-bill fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل ناشده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalRoyaltyAmountNotCompleted }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-money-bill fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل شده</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalRoyaltyAmountCompleted }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i  class="fas fa-money-bill fa-2x"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+     <br>
+  
+  
+  </div>

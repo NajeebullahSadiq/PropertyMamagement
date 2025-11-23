@@ -1,0 +1,39 @@
+<div class="container">
+<mat-tab-group #tabGroup>
+    <mat-tab class="blue-tab">
+        <ng-template matTabLabel>
+            <mat-icon class="large-icon">home</mat-icon>
+                 جایداد
+          </ng-template>
+          <app-propertydetails   #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-propertydetails>
+      </mat-tab>
+      <mat-tab [disabled]="propertyService.mainTableId === 0" >
+        <ng-template matTabLabel  >
+            <mat-icon class="large-icon">person</mat-icon>
+                 مالک
+          </ng-template>
+        <app-sellerdetail  #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
+      </mat-tab>
+    <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.sellerId===0" >
+        <ng-template matTabLabel>
+            <mat-icon class="large-icon">person</mat-icon>
+                 مشتری
+          </ng-template>
+      <app-buyerdetail  #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
+    </mat-tab>
+    <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.buyerId===0">
+        <ng-template matTabLabel>
+            <mat-icon class="large-icon">person</mat-icon>
+                 شاهدین
+          </ng-template>
+      <app-witnessdetail  #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
+    </mat-tab>
+    <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.withnessId===0">
+        <ng-template matTabLabel>
+            <mat-icon class="large-icon">location_on</mat-icon>
+                 آدرس
+          </ng-template>
+      <app-propertyaddress #propertyAddress [id]="PropertyId"></app-propertyaddress>
+    </mat-tab>
+  </mat-tab-group>
+</div>

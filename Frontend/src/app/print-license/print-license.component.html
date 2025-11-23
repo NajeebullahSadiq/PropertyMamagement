@@ -1,0 +1,45 @@
+<table class="container" id="pdf-content">
+    <tr>
+      <td class="col-left">
+        <img src="/assets/img/10.png" alt="Logo">
+        <br><br>
+        <p>نمبر جواز: <span> &nbsp; {{data.licenseNumber}}</span></p>
+        <p>تاریخ صدور: <span>{{data.issueDateShamsi}}</span></p>
+        <p>تاریخ ختم:  &nbsp; &nbsp;<span>{{data.expireDateShamsi}}</span> </p>
+      </td>
+      <td class="col-middle">
+        <p>امارت اسلامی افغانستان</p>
+        <p>وزارت عدلیه</p>
+        <p>ریاست عمومی انسجام</p>
+        <p>ریاست رهنمای معاملات و عریضه نویسان</p>
+        <br><br><br>
+        <p>جواز نامه فعالیت</p>
+        <p> ( <span>{{data.title}}</span>)</p>
+      </td>
+      <td class="col-right">
+        <img src="/assets/img/mojlogo.png" style="margin-top: 50px;" alt="Logo"><br><br><br>
+        <img [src]="filePath" style="width:170px !important; height: 160px !important; text-align: left !important; margin-left: -30px;" alt="userimage">
+       
+      </td>
+    </tr>
+    <br>
+    <br>
+    <br>
+   <p style="font-size:18px;font-weight: bold;">این جواز مطابق احکام مندرج فقره 4 ماده 13 قانون رهنمای معاملات برای محترم <span>( {{data.firstName}})</span> ولد<span>( {{data.fatherName}}  ) </span> ولدیت <span>( {{data.grandFatherName}} )</span>متولد  <span>({{data.dateofBirthShamsi}})</span>دارنده شماره تذکره <span>({{data.indentityCardNumber}})</span>اعطاء گردید و به اساس آن میتواند در حدود احکام قانون در عقود و معاملات (عقار)/ (وسایط نقلیه) بین اشخاص وساطت نماید.</p>
+   <br><br>
+   <br>
+   <p style="font-size:18px;font-weight: bold;">آدرس دقیق دفتر رهنمای معاملات: <span> (  {{data.officeAddress}}  )</span></p>
+   <br>
+   <p style="font-size:18px;font-weight: bold;"> شماره تماس دارنده جواز :<span>{{data.phoneNumber}}</span> شماره تشخصیه مالیه دهی: <span> {{data.tin}}</span></p>
+   <br>
+   <p style="font-size:18px;font-weight: bold;">یاداشت: این جواز نامه برای مدت سه سال پس از تاریخ صدور آن قابل اعتبار میباشد. و هرگونه استفاده خلاف قانون از این جواز پیگرد قانونی دارد.</p>
+
+   <br>
+   <br>
+   <br>
+   <p style="font-size:25px;font-weight: bold; text-align: center;">با احترام</p>
+   <p style="font-size:25px;font-weight: bold; text-align: center;">رئیس عمومی انسجام</p>
+  </table>
+
+
+  

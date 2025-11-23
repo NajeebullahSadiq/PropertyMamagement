@@ -1,0 +1,38 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { VehiclesDetailsList } from '../models/PropertyDetail';
+import { VehicleDetails } from '../models/vehicle';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class VehicleService {
+  mainTableId: number=0;
+  private baseUrl = 'http://localhost:5143/api/Vehicles';
+  constructor(private http: HttpClient) { }
+
+  updateMainTableId(id: number) {
+    this.mainTableId = id;
+  }
+  addVehicles(propertyDetails: VehicleDetails): Observable<VehicleDetails> {
+    return this.http.post<VehicleDetails>(this.baseUrl, propertyDetails);
+  }
+  updateVehicleDetails(propertyDetails: VehicleDetails): Observable<VehicleDetails> {
+    const url = `${this.baseUrl}/${propertyDetails.id}`;
+    return this.http.put<VehicleDetails>(url, propertyDetails);
+  }
+  getPropertyDetails(): Observable<VehiclesDetailsList[]> {
+    return this.http.get<VehiclesDetailsList[]>(this.baseUrl);
+  }
+  getPropertyDetailsById(id: number): Observable<VehicleDetails[]> {
+    return this.http.get<VehicleDetails[]>(this.baseUrl +'/'+ id);
+  }
+  downloadFile(file:any) {
+    return this.http.get('http://localhost:5143/'+file, { responseType: 'blob' });
+  }
+  getVehiclePropertyPrintData(id: any): Observable<any> {
+    const url = `${this.baseUrl}/GetPrintRecord/${id}`;
+    return this.http.get(url);
+  }
+}

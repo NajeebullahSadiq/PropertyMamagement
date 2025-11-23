@@ -1,0 +1,110 @@
+@import '/src/styles.scss';
+
+/* Define global styles */
+$primary-color: #004a9f;
+$secondary-color: blueviolet;
+
+/* Styles for mat-toolbar */
+mat-toolbar {
+  background: $primary-color;
+  color: white;
+
+  .title {
+    margin-left: 10px;
+  }
+}
+
+/* Styles for mat-sidenav */
+.mat-sidenav {
+  margin: 16px;
+  width: 200px;
+  border-right: none;
+  background: #002b5c;
+  color: white;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+
+  .avatar {
+    margin-top: 16px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover; /* Added to ensure the image fits within the circle */
+  }
+
+  .name {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    font-family: 'PersianFont', sans-serif;
+  }
+
+  .designation {
+    font-family: 'PersianFont', sans-serif;
+  }
+
+  .menu-button {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  
+    mat-icon {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+
+    .text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 16px;
+      font-weight: bold;
+      margin-left: 5px; /* Adjust the margin value as per your requirement */
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+/* Styles for mat-sidenav-container */
+mat-sidenav-container {
+  height: calc(100vh - 65px);
+  display: flex;
+  flex-direction: column;
+}
+
+.mat-sidenav-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Styles for content area */
+.content {
+  border-radius: 10px;
+  margin: 16px;
+  margin-left: 16px;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.toolbar-item-spacer {
+    flex: 1 1 auto;
+}
+.text2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  font-weight: bold;
+  margin-left: 5px; /* Adjust the margin value as per your requirement */
+}
+

@@ -1,0 +1,178 @@
+
+<section>
+  <div class="row d-flex justify-content-center align-items-center h-100 content">
+    <div class="col-lg-12 col-xl-11 content">
+
+
+      <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">فورم ایجاد اکونت ها</p>
+      <form [formGroup]="service.formModel" autocomplete="off" (submit)="onSubmit()">
+        <div class="form-group">
+          <input type="hidden" formControlName="id">
+        </div>
+        <div class="row">
+        <div class="col-md-10">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label"> نام</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-user"></i></span>
+              <input type="text" class="form-control" formControlName="FirstName">
+            </div>
+            <div
+            *ngIf="service.formModel.get('FirstName')?.touched && service.formModel.get('FirstName')?.errors?.['required']">
+            <small class="text-danger">این فیلد الزامی است</small>
+          </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label"> تخلص </label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-user"></i></span>
+              <input type="text" class="form-control" formControlName="LastName">
+            </div>
+            <div
+            *ngIf="service.formModel.get('LastName')?.touched && service.formModel.get('LastName')?.errors?.['required']">
+            <small class="text-danger">این فیلد الزامی است</small>
+          </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">نام کاربر به انگلیسی</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-user"></i></span>
+              <input type="text" class="form-control" formControlName="UserName">
+            </div>
+            <div *ngIf="service.formModel.get('UserName')?.touched && service.formModel.get('UserName')?.errors?.['required']">
+            <small class="text-danger">این فیلد الزامی است</small>
+            </div>
+          </div>
+        </div>
+            <div  class="row">
+              <div class="col-md-4">
+                <label class="form-label">ایمیل آدرس </label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-user"></i></span>
+                  <input type="text" class="form-control" formControlName="Email">
+                </div>
+                <div *ngIf="service.formModel.get('Email')?.touched && service.formModel.get('Email')?.errors?.['email']">
+                  <small class="text-danger">ایمیل آدرس درست نیست</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">شماره موبایل</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-user"></i></span>
+                  <input type="text" class="form-control" formControlName="PhoneNumber">
+                </div>
+                <div *ngIf="service.formModel.get('PhoneNumber')?.touched && service.formModel.get('PhoneNumber')?.errors?.['required']">
+                  <small class="text-danger">این فیلد الزامی است</small>
+                  </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label me-3">نقش</label>
+                <ng-select  formControlName="Role" [items]="roles" [selectOnTab]="true" bindLabel="name"
+                  bindValue="name" (change)="onPropertyTypeChange()">
+                </ng-select>
+              </div>
+            </div>
+         
+            <div formGroupName="Passwords" class="row">
+            <div class="form-group col-md-4">
+              <label class="form-label">پسورد</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input type="password" class="form-control" formControlName="Password">
+              </div>
+              <div
+              *ngIf="service.formModel.get('Passwords.Password')?.touched && service.formModel.get('Passwords.Password')?.errors?.['required']">
+                <small class="text-danger">   این فیلد الزامی است</small>
+              </div>
+            </div>
+           
+            <div class="form-group col-md-4">
+              <label class="form-label">تکرار پسورد</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input type="password" class="form-control" formControlName="ConfirmPassword">
+              </div>
+              <div
+              *ngIf="service.formModel.get('Passwords.ConfirmPassword')?.touched && service.formModel.get('Passwords.ConfirmPassword')?.errors?.['required']">
+                <small class="text-danger">این فیلد الزامی است</small>
+              </div>
+              <div
+              *ngIf="service.formModel.get('Passwords.ConfirmPassword')?.touched && service.formModel.get('Passwords.ConfirmPassword')?.errors?.['passwordMismatch']">
+                <small class="text-danger"> پسورد با تکرار آن مطابقت ندارد</small>
+              </div>
+            </div>
+           
+          </div>
+          <div class="row">
+            <div #secondDiv style="display:none;" class="col-md-4">
+              <label class="form-label me-3">عنوان راهنمایی معاملات</label>
+              <ng-select formControlName="CompanyId" [items]="companylist" [selectOnTab]="true" bindLabel="title" bindValue="id">
+              </ng-select>
+            </div>
+          </div>
+          </div>
+            <div class="col-md-2">
+              <div class="form-group col-md-12" >
+                <img src='{{filePath}}' alt="Avatar" class="avatar">
+                <app-upload (sendMessage)="uploadFinished($event)"></app-upload>
+            </div>
+            </div>
+          </div>
+          
+        <br />
+        <button class="btn btn-outline-primary" [disabled]="!service.formModel.valid" type="submit">ثبت</button>
+        <button type="reset" class="btn btn-outline-primary">جدید</button>
+
+      </form>
+      <br>
+      <div>
+        <table class="table table-bordered">
+          <thead>
+            <tr style="text-align: center;">
+              <th>شماره مسلسل</th>
+              <th>نام</th>
+              <th>تخلص</th>
+              <th>نام کاربری</th>
+              <th>آدرس ایمیل</th>
+              <th>حالت</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="text-align: center;" *ngFor="let userDetails of userDetails; let i = index">
+              <td>{{i + 1}} </td>
+              <td>{{userDetails.firstName}}</td>
+              <td>{{userDetails.lastName}}</td>
+              <td>{{userDetails.userName}}</td>
+              <td>{{userDetails.email}}</td>
+              <td>
+                <span *ngIf="userDetails.isLocked; else notLocked">
+                  <i class="fas fa-times-circle text-danger"></i>
+                </span>
+                <ng-template #notLocked>
+                
+                  <i class="fas fa-check-circle text-success"></i>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- <div class="card m-5" style="width:25rem" *ngIf="userRole=='ADMIN'" >
+  <ul class="list-group">
+    <li class="list-group-item"><strong>Username : </strong>{{userDetails.userName}}</li>
+    <li class="list-group-item"><strong>FullName : </strong>{{userDetails.firstName}} {{userDetails.lastName}}</li>
+    <li class="list-group-item"><strong>Email : </strong>{{userDetails.email}}</li>
+    <li class="list-group-item"><strong>Role : </strong>{{userDetails.userroles}}</li>
+    <li class="list-group-item"><strong>Role : </strong>{{userRole}}</li>
+    <li class="list-group-item"><strong>claimValue : </strong>{{userDetails.claimValue}}</li>
+    <li class="list-group-item"><strong>claimType : </strong>{{userDetails.claimType}}</li>
+  </ul>
+</div>
+<div *ngIf="userRole=='ADMIN'">
+  <h1>Hello Mr. {{userRole}}</h1>
+</div> -->

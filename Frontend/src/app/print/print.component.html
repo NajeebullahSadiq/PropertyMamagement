@@ -1,0 +1,493 @@
+
+<div class="container">
+    <br>
+    <div class="dot-line"></div>
+    <br>
+    <table>
+        <tr >
+          <td  colspan="4">
+            <img [src]="SellerfilePath" alt="Seller Photo" style="height: 100px; width:95px;">
+            <p><strong>عکس مالک</strong></p>
+            <p><strong>تاریخ معامله: &nbsp;{{documentData.createdAtShamsi}}</strong></p>
+          </td>
+          <td style="text-align: center;" colspan="4">
+            <p><u><b style="font-size: 20px;">ای کسانیکه ایمان آورده اید به قراردادها وفا کنید. </b></u><span ><b> (مایده آیه اول) </b></span></p>
+           
+            <h3  style="font-size: 24px;font-weight: bold;">دفتر راهنمایی معاملات <span>(</span><span>  {{userDetails.companyName}}</span><span>)</span></h3>
+            <h3 ><b style="font-size: 24px;">شماره تماس دفتر:</b> <span style="font-size: 22px; font-weight: bold;">  {{userDetails.phoneNumber}}  </span></h3>
+            <br>
+            <h3 *ngIf="documentData.transactionType === 'معامله فروش'" style="font-size: 22px;font-weight: bold;">سته/سند معامله بیع قطعی (خرید و فروش جایداد)</h3>
+            <h3 *ngIf="documentData.transactionType === 'معامله گرویی'" style="font-size: 22px;font-weight: bold;">سته/سند معامله بیع وفا ( گرویی)</h3>
+            <h3 *ngIf="documentData.transactionType === 'معامله کرایی'" style="font-size: 22px;font-weight: bold;">سته/سند معامله(کرایی)</h3>
+          </td>
+          <td  colspan="4">
+            <img [src]="BuyerfilePath" style="height: 100px; width:95px;">
+            <p><strong>عکس مشتری</strong></p>
+          </td>
+        </tr> 
+        </table>
+    
+        <div class="container">
+            <div dir="rtl" style="text-align:center">
+                <table cellspacing="0" cellpadding="0" style="width:100%; border-collapse:collapse;">
+                    <tbody>
+                       
+                        <tr style="height:2.5pt;">
+                            <td colspan="13" style="width:555.15pt; border-top-style:solid; border-top-width:1.5pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; font-size:1pt;"><span dir="ltr">&nbsp;</span></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:21pt;">
+                            <td colspan="4" style="width:160.65pt; border-style:solid; border-width:1pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مالک ملکیت</span></strong></p>
+                            </td>
+                            <td colspan="6" style="width:223.15pt; border-style:solid; border-width:1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">مشخصات، حدود اربعه و قیمت ملکیت</span></strong></p>
+                            </td>
+                            <td colspan="3" style="width:149.75pt; border-style:solid; border-width:1pt 0.75pt 0.75pt 1pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مشتری</span></strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:18.75pt;">
+                            <td rowspan="3" style="width:18.15pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">اسم</span></strong></p>
+                            </td>
+                            <td colspan="3" rowspan="3" style="width:131.7pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr"><strong>{{documentData.sellerFirstName}}</strong></span></p>
+                            </td>
+                            <td colspan="3" style="width:75.95pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">نوعیت سند</span></strong></p>
+                            </td>
+                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.doctype}}</span></strong></p>
+                            </td>
+                            <td rowspan="3" style="width:18.1pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">اسم</span></strong></p>
+                            </td>
+                            <td colspan="2" rowspan="3" style="width:120.85pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:1pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr"><strong>{{documentData.buyerFirstName}}</strong></span></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:5.45pt;">
+                            <td colspan="3" style="width:75.95pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">نمبر قباله</span></strong></p>
+                            </td>
+                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><span style="font-weight:bold;" dir="ltr">&nbsp;{{documentData.pNumber}}</span></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:23pt;">
+                            <td colspan="3" style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">مساحت ملکیت</span></strong></p>
+                            </td>
+                            <td colspan="3" style="width:136.4pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>{{documentData.pArea}}&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;</strong><strong><span style="font-family:'B Nazanin';">{{documentData.unitType}}</span></strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:11.75pt;">
+                            <td rowspan="3" style="width:18.15pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">ولد</span></strong></p>
+                            </td>
+                            <td colspan="3" rowspan="3" style="width:131.7pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong>{{documentData.sellerFatherName}}</strong></p>
+                            </td>
+                            <td colspan="3" rowspan="2" style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">موقعیت ملکیت</span></strong><strong>:&nbsp;</strong></p>
+                            </td>
+                            <td colspan="3" style="width:136.4pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">ولایت</span></strong><strong>(</strong><strong>&nbsp;{{documentData.province}}&nbsp;</strong><strong>)</strong><strong><span style="font-family:'B Nazanin';">ناحیه</span></strong><strong>/</strong><strong><span style="font-family:'B Nazanin';">ولسوالی</span></strong><strong>(</strong><strong>&nbsp;&nbsp;{{documentData.district}}&nbsp;&nbsp;</strong><strong>)</strong></p>
+                            </td>
+                            <td rowspan="3" style="width:18.1pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">ولد</span></strong></p>
+                            </td>
+                            <td colspan="2" rowspan="3" style="width:120.85pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:1pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong>{{documentData.buyerFatherName}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:17.6pt;">
+                            <td colspan="3" style="width:136.4pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">قریه</span></strong><strong>/&nbsp;</strong><strong><span style="font-family:'B Nazanin';">گذر</span></strong><strong>/</strong><strong><span style="font-family:'B Nazanin';">کوچه</span></strong><strong>:</strong><strong>&nbsp;{{documentData.village}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:17.5pt;">
+                            <td colspan="3" style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">نوعیت ملکیت</span></strong><strong>:</strong></p>
+                            </td>
+                            <td colspan="3" style="width:136.4pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong><span style="font-family:'B Nazanin';">{{documentData.propertypeType}}</span></strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:18.75pt;">
+                            <td rowspan="4" style="width:18.15pt; height:18.75pt; margin-right:auto; margin-left:auto; writing-mode:tb-rl; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle; overflow:hidden;">
+                                <div>
+                                    <p dir="rtl" style="margin:0pt 5.65pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">شماره تذکره</span></strong></p>
+                                </div>
+                            </td>
+                            <td colspan="3" rowspan="4">
+                                <div>
+                                    <p><strong>{{documentData.sellerIndentityCardNumber}}</strong></p>
+                                </div>
+                            </td>
+                            <td colspan="6" style="width:223.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">تعداد اطاق به شمول آشپزخانه،حمام و تشناب: </span></strong><strong>(</strong><strong>&nbsp;&nbsp;{{documentData.numofRooms}}&nbsp;&nbsp;</strong><strong>)</strong></p>
+                            </td>
+                            <td rowspan="4" style="width:18.1pt; height:18.75pt; margin-right:auto; margin-left:auto; writing-mode:tb-rl; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle; overflow:hidden;">
+                                <div>
+                                    <p dir="rtl" style="margin:0pt 5.65pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">شماره تذکره</span></strong></p>
+                                </div>
+                            </td>
+                            <td colspan="2" rowspan="4" style="width:120.85pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:1pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong>{{documentData.buyerIndentityCardNumber}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:8.15pt;">
+                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شمالآ</span></strong><strong>:&nbsp;</strong></p>
+                            </td>
+                            <td colspan="4" style="width:182.9pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;{{documentData.north}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:16.1pt;">
+                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">جنوبا</span></strong><strong>:</strong></p>
+                            </td>
+                            <td colspan="4" style="width:182.9pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;{{documentData.south}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:21.45pt;">
+                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شرقا</span></strong><strong>:</strong></p>
+                            </td>
+                            <td colspan="4" style="width:182.9pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;{{documentData.east}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:3.55pt;">
+                            <td colspan="4" style="width:160.65pt; border-style:solid; border-width:0.75pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت اصلی</span></strong></p>
+                            </td>
+                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">غربا</span></strong><strong>:</strong></p>
+                            </td>
+                            <td colspan="4" style="width:182.9pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;{{documentData.west}}</strong></p>
+                            </td>
+                            <td colspan="3" style="width:149.75pt; border-style:solid; border-width:0.75pt 0.75pt 0.75pt 1pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت اصلی</span></strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:15.5pt;">
+                            <td colspan="4" rowspan="5" style="width:160.65pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.sellerProvince}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.sellerDistrict}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.sellerVillage}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr">&nbsp;</span></p>
+                            </td>
+                            <td colspan="4" style="width:82.2pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">قیمت به حروف</span></strong></p>
+                            </td>
+                            <td colspan="2" style="width:130.15pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong>&nbsp;{{documentData.priceText}}</strong></p>
+                            </td>
+                            <td colspan="3" rowspan="5" style="width:149.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.buyerProvince}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.buyerDistrict}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.buyerVillage}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr">&nbsp;</span></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:18.4pt;">
+                            <td colspan="4" style="width:82.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">قیمت به عدد</span></strong></p>
+                            </td>
+                            <td colspan="2" style="width:130.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;{{documentData.price}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:16.85pt;">
+                            <td colspan="4" style="width:82.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">مناصفه قیمت&nbsp;</span></strong></p>
+                            </td>
+                            <td colspan="2" style="width:130.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;{{documentData.price/2}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:13.05pt;">
+                            <td colspan="4" style="width:82.2pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">حق العمل رهنما</span></strong></p>
+                            </td>
+                            <td colspan="2" style="width:130.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;{{documentData.royaltyAmount}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:38.2pt;">
+                            <td colspan="6" rowspan="2" style="width:223.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت شهود</span></strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:4.9pt;">
+                            <td colspan="4" style="width:160.65pt; border-style:solid; border-width:0.75pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت فعلی</span></strong></p>
+                            </td>
+                            <td colspan="3" style="width:149.75pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت فعلی</span></strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:19.95pt;">
+                            <td colspan="4" rowspan="2" style="width:160.65pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.tSellerProvince}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.tSellerDistrict}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.tSellerVillage}}</strong></p>
+         
+                            </td>
+                            <td style="width:24.9pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شماره</span></strong></p>
+                            </td>
+                            <td colspan="3" style="width:46.5pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">اسم</span></strong></p>
+                            </td>
+                            <td style="width:47.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">ولد</span></strong></p>
+                            </td>
+                            <td style="width:71.65pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شماره تذکره</span></strong></p>
+                            </td>
+                            <td colspan="3" rowspan="2" style="width:149.75pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.tBuyerProvince}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.tBuyerDistrict}}</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.tBuyerVillage}}</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:50.7pt;">
+                            <td style="width:24.9pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;">1</p>
+                            </td>
+                            <td colspan="3" style="width:46.5pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessOneFirstName}}&nbsp;</strong></p>
+                            </td>
+                            <td style="width:47.7pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessOneFatherName}}&nbsp;</strong></p>
+                            </td>
+                            <td style="width:71.65pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessOneIndentityCardNumber}}&nbsp;</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:5.4pt;">
+                            <td colspan="4" style="width:160.65pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                               
+                            </td>
+                            <td style="width:24.9pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-left:5.65pt; margin-bottom:0pt; font-size:12pt;">2</p>
+                            </td>
+                            <td colspan="3" style="width:46.5pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-right:5.65pt; margin-bottom:0pt; font-size:12pt;"><span dir="ltr">&nbsp;<strong>{{documentData.witnessTwoFirstName}}</strong></span></p>
+                            </td>
+                            <td style="width:47.7pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-right:5.65pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessTwoFatherName}}&nbsp;</strong></p>
+                            </td>
+                            <td style="width:71.65pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-right:5.65pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessTwoIndentityCardNumber}}&nbsp;</strong></p>
+                            </td>
+                            <td colspan="3" style="width:149.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
+                              
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:15.6pt;">
+                            <td colspan="13" style="width:555.15pt; border-style:solid; border-width:0.75pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>معامله هذا به شماره</strong><strong>&nbsp;(&nbsp;{{documentData.id}}&nbsp;)&nbsp;</strong><strong>ثبت سیستم مدیریت راهنمایی معاملات گردید.</strong></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+
+
+                <table>
+                    <tbody>
+                        <tr>
+                            <td colspan="13" style="width:100%;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><strong><u><span style="font-family:'B Nazanin';">حقوق و مکلفیت های بایع و مشتری&nbsp;</span></u></strong></p>
+                                <ol type="1" style="margin:0pt; padding-right:0pt;">
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-size:12pt;">&nbsp;</span><span style="font-family:'B Nazanin';">حق العمل رهنمای معاملات&nbsp;</span><span style="font-family:'B Nazanin';">یک فیصد بوده که با المناصفه توسط فروشنده و خریدار قابل پرداخت می باشد</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">اینجانب فروشنده که شهرتم در این سند درج می باشد ملکیت مندرج این سند از شخص بنده بوده و هیچ دعوای در رابطه به آن از طرف افراد و اشخاص موجود نمی باشد در صورت بروز، مسول و جوابگو می باشم</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">فروشنده و خریدار مكلف اند به رویت تذکره و اسناد یکدیگر را شناسایی و تضمين خط معتبر را اخذ نمایند تا آینده باعث سرگردانی و دچار مشکل نگردند و یک کاپی تضمین خط در دفتر رهنمای معاملات ثبت و قید می گردد</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">تکس و مالیه جایداد بر عهده فروشنده می باشد</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">فروشنده و خریدار می توانند این سند را جهت صحت آن در مرکز به وزارت عدلیه و در ولایات به ریاست عدلیه مربوط ارایه دارند</span>.</li>
+                                </ol>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-right:18pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><strong><u><span style="font-family:'B Nazanin';">مکلفیت های دارنده جواز رهنمای معاملات</span></u></strong></p>
+                                <ol start="6" type="1" style="margin:0pt; padding-right:0pt;">
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">هرگاه معامله بر اثر عیب، غبن، فریب و سایر تخلفات مطابق احکام قانون فسخ گردد، دارنده جواز نامه مکلف اسن، حق العمل اخذ شده را به متضرر معامله مسترد نماید و هرگاه به توافق طرفین انجام ولی فسخ گردد مسترد نمی گردد</span>.</li>
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">متصدی رهنمای معاملات مسئول و مکلف است تا معاملات خویش را به ملاحظه اسناد مدار اعتبار به حضور داشت مالک جایداد یا وکیل قانونی آنها در حضور دو نفر شاهد انجام دهد</span>.</li>
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">اين سند به داخل چهار نقل مي باشدکه يك نقل نزد فروشنده، یک نقل نزد خریدار یک نقل به شعبات مالیاتی و نقل دیگر آن بعد از درج در کتاب ثبت معاملات به حیث کنده در دفتر رهنمای معاملات حفظ می گردد</span>.</li>
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام و ثبت معاملات درسته های کاپی،جعلی وخودساخته وسته های بدون مهرو نشانی شد اداره انسجام،</span></li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">ایجاد یک دفتر مشخص جهت فعالیت و اجتناب از حق العمل&nbsp;</span>(<span style="font-family:'B Nazanin';">کمیشن</span>) <span style="font-family:'B Nazanin';">اضافه خلاف اصول و مقررات</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">دارنده جواز نمی تواند بر اساس جواز تاریخ گذشته، معاملات را ثبت و یا فعالیت نماید و مکلف است یک ماه قبل از تاریخ ختم، جواز نامه رهنمای معاملات را تمدید نماید</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">تحریر سند بعد از حصول اطمینان از سند مدار اعتبار در حضور و بعد از موافقه طرفین معامله، نصب عکس، اخذ شصت و امضای آنها و درج مهر و امضای دفتر رهنمای معاملات در سته، و ثبت آن در کتاب ثبت معاملات</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;">&nbsp;<span style="font-family:'B Nazanin';">اجتناب از اخذ شصت و امضای اشخاص دیگر بجای فروشنده و خریدار</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:11pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق کتاب ثبت</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:11pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق سته و کتاب ثبت معاملات</span></li>
+                                    <li dir="rtl" style="margin-right:36pt; margin-bottom:10pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام معاملات و ثبت ملکیت های، دولتی، عامه، غصبی، تحت استملاک و یا جایداد های که تحت تضمین باشند</span></li>
+                                </ol>
+                            </td>
+                            <td colspan="2" style="width:100.65pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:10pt; line-height:115%; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:10pt; line-height:115%; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+                        <tr style="height:14.65pt;">
+                            <td colspan="13" rowspan="2" style="width:555.15pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">مایان فروشنده، خریدار در حالیکه دارای اهلیت کامل شرعی و حقوقی هستیم، با قبول حقوق و مکلفیت های خویش مندرج در این سند با هم به موافقه رسیده و در اقرار خویش صادق مي باشیم</span>.</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';"> شصت و امضای بایع  &nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای مشتری</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد&nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
+                                <br>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>مهر و امضای دارنده جواز راهنمایی معاملات</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><span dir="ltr">&nbsp;</span></p>
+                            </td>
+                            <td style="width:94.75pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
+                                <p dir="ltr" style="margin-top:0pt; margin-bottom:10pt; line-height:115%; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>
+                            </td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                            <td style="vertical-align:top;"><br></td>
+                        </tr>
+        
+                    
+                       
+                       
+                    </tbody>
+                </table>
+            </div>
+          
+        </div>
+</div>

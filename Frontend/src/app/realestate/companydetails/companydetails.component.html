@@ -1,0 +1,112 @@
+<section style="height: 800px;">
+    <div class="card-body p-md-5">
+        <div class="heading-wrapper">
+            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات شرکت راهنمایی معاملات </p>
+        </div>
+        <form [formGroup]="companyForm"  (ngSubmit)="companyForm.valid ? selectedId ? updateCompanyDetails() : addCompanyDetails() : null">
+            <div class="form-group">
+                <input type="hidden" formControlName="id">
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="title" class="form-label">عنوان راهنمایی معاملات</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                        <input type="text" id="title" formControlName="title" class="form-control">
+                    </div>
+                    <div *ngIf="title?.invalid && (title?.dirty || title?.touched)">
+                        <small class="text-danger" *ngIf="title?.errors?.['required']">این فیلد  الزامی است</small>
+                      </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="phoneNumber" class="form-label"> شماره تماس</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="text" id="phoneNumber" formControlName="phoneNumber" class="form-control">
+                    </div>
+                    <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
+                        <small class="text-danger" *ngIf="phoneNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="licenseNumber" class="form-label">جواز نمبر</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                        <input type="text" id="licenseNumber" formControlName="licenseNumber" class="form-control">
+                    </div>
+                    <div *ngIf="licenseNumber?.invalid && (licenseNumber?.dirty || licenseNumber?.touched)">
+                        <small class="text-danger" *ngIf="licenseNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="petitionDate" class="form-label">تاریخ ارائه عریضه</label>
+                    <div class="input-group"  style="direction: ltr; ">
+                      <input class="form-control"
+                        id="petitionDate"
+                        name="petitionDate"
+                        [(ngModel)]="selectedDate"
+                        formControlName="petitionDate"
+                        ngbDatepicker
+                         [maxDate]="maxDate"  [minDate]="minDate"
+                        #d="ngbDatepicker"
+
+                      />
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                <div class="col-md-4">
+                    <label for="petitionNumber" class="form-label"> نمبر عریضه</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-sort-numeric-down"></i></span>
+                        <input type="text" id="petitionNumber" formControlName="petitionNumber" class="form-control">
+                    </div>
+                    <div *ngIf="petitionNumber?.invalid && (petitionNumber?.dirty || petitionNumber?.touched)">
+                        <small class="text-danger" *ngIf="petitionNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="tin" class="form-label"> نمبر تشخصیه مالیه دهی</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-sort-numeric-down"></i></span>
+                        <input type="text" id="tin" formControlName="tin" class="form-control">
+                    </div>
+                    <div *ngIf="tin?.invalid && (tin?.dirty || tin?.touched)">
+                        <small class="text-danger" *ngIf="tin?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
+                    <div class="col-md-9">
+                        <div class="form-group col-md-12">
+                            <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <ng-container *ngIf="companyForm.get('id')?.value && companyForm.get('docPath')?.value">
+                          <h3 class="download-link" (click)="downloadFiles()">
+                            <i class="fas fa-arrow-alt-circle-down me-2"></i> 
+                            <div class="form-group col-md-12">
+                              دانلود اسناد
+                            </div>
+                          </h3>
+                        </ng-container>
+                      </div>
+                </div>
+            </div>
+            <br>
+            <button type="submit" [disabled]="companyForm.invalid" class="btn btn-success"> {{selectedId ?
+                'تغیر معلومات' : 'ثبت معلومات'}}</button>
+              <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
+                style="margin-right: 5px;">جدید</button>
+        </form>
+    </div>
+</section>

@@ -1,0 +1,17 @@
+table {
+    width: 100%;
+    text-align: center;
+    border: none;
+  }
+  .dot-line {
+    border: none;
+    border-top: 1px dotted black;
+    width: 100%;
+    height: 0;
+    
+  }
+  hr {
+    border: 0;
+    border-top: 3px solid #000; /* Adjust the width of the line by changing the '3px' value */
+    width: 100%;
+  }

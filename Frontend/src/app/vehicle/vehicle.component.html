@@ -1,0 +1,34 @@
+<div class="container">
+    <mat-tab-group #tabGroup>
+        <mat-tab class="blue-tab">
+            <ng-template matTabLabel>
+              <mat-icon class="large-icon">directions_car</mat-icon>
+                       وسایط
+              </ng-template>
+              <app-vehicle-submit #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-vehicle-submit>
+          </mat-tab>
+          <mat-tab  [disabled]="vehicleService.mainTableId === 0">
+            <ng-template matTabLabel  >
+                <mat-icon class="large-icon">person</mat-icon>
+                     فروشنده
+              </ng-template>
+            <app-sellerdetail  #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
+          </mat-tab>
+        <mat-tab [disabled]="vehicleService.mainTableId === 0 || vehicleSubservice.sellerId===0">
+            <ng-template matTabLabel>
+                <mat-icon class="large-icon">person</mat-icon>
+                     خریدار
+              </ng-template>
+          <app-buyerdetail  #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
+        </mat-tab>
+        <mat-tab [disabled]="vehicleService.mainTableId === 0 || vehicleSubservice.buyerId===0">
+            <ng-template matTabLabel>
+                <mat-icon class="large-icon">person</mat-icon>
+                     شاهدین
+              </ng-template>
+          <app-witnessdetail #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+

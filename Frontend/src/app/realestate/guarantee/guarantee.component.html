@@ -1,0 +1,188 @@
+<section style="height: 800px;">
+    <div class="card-body p-md-5">
+        <div class="heading-wrapper">
+            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات تضمین شرکت   </p>
+        </div>
+        <form [formGroup]="gauranteeForm"  (ngSubmit)="gauranteeForm.valid ? selectedId ? updateData() : addData() : null">
+            <div class="form-group">
+                <input type="hidden" formControlName="id">
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label me-3">نوعیت تضمین</label>
+                    <ng-select [items]="GuaranteeTypes" [selectOnTab]="true"
+                    bindLabel="name" bindValue="id"  formControlName="guaranteeTypeId">
+                    </ng-select>
+                  
+                  </div>
+                <div class="col-md-4">
+                    <label  class="form-label"> نمبر سند(تضمین)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                        <input type="text" id="propertyDocumentNumber" formControlName="propertyDocumentNumber" class="form-control">
+                    </div>
+                    <div *ngIf="propertyDocumentNumber?.invalid && (propertyDocumentNumber?.dirty || propertyDocumentNumber?.touched)">
+                        <small class="text-danger" *ngIf="propertyDocumentNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="propertyDocumentDate" class="form-label">تاریخ  سند(تضمین)</label>
+                    <div class="input-group"  style="direction: ltr; ">
+                      <input class="form-control"
+                        id="propertyDocumentDate"
+                        name="propertyDocumentDate"
+                        [(ngModel)]="selectedDate"
+                        formControlName="propertyDocumentDate"
+                        [maxDate]="maxDate"  [minDate]="minDate"
+                        ngbDatepicker
+                        #d="ngbDatepicker"
+                      />
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+           <br>
+           <div class="row">
+            <div class="col-md-4">
+                <label  class="form-label">	شماره مکتوب ارسالی به مرجع  تضمین</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                    <input type="text" id="senderMaktobNumber" formControlName="senderMaktobNumber" class="form-control">
+                </div>
+                <div *ngIf="senderMaktobNumber?.invalid && (senderMaktobNumber?.dirty || senderMaktobNumber?.touched)">
+                    <small class="text-danger" *ngIf="senderMaktobNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="senderMaktobDate" class="form-label"> 	تاریخ مکتوب ارسالی  به مرجع تضمین</label>
+                <div class="input-group"  style="direction: ltr; ">
+                  <input class="form-control"
+                    id="senderMaktobDate"
+                    name="senderMaktobDate"
+                    [(ngModel)]="senderselectedDate"
+                    formControlName="senderMaktobDate"
+                    [maxDate]="maxDate"  [minDate]="minDate"
+                    ngbDatepicker
+                    #sender="ngbDatepicker"
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" (click)="sender.toggle()" type="button">
+                      <i class="fa fa-calendar"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+             <div class="col-md-4">
+                <label  class="form-label">	شماره مکتوب جوابیه تضمین</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                    <input type="text" id="answerdMaktobNumber" formControlName="answerdMaktobNumber" class="form-control">
+                </div>
+                <div *ngIf="answerdMaktobNumber?.invalid && (answerdMaktobNumber?.dirty || answerdMaktobNumber?.touched)">
+                    <small class="text-danger" *ngIf="answerdMaktobNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                </div>
+            </div>
+           </div>
+           <div class="row">
+            <div class="col-md-4">
+                <label for="answerdMaktobDate" class="form-label">تاریخ مکتوب جوابیه تضمین</label>
+                <div class="input-group"  style="direction: ltr; ">
+                  <input class="form-control"
+                    id="answerdMaktobDate"
+                    name="answerdMaktobDate"
+                    [(ngModel)]="answerselectedDate"
+                    formControlName="answerdMaktobDate"
+                    [maxDate]="maxDate"  [minDate]="minDate"
+                    ngbDatepicker
+                    #answer="ngbDatepicker"
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" (click)="answer.toggle()" type="button">
+                      <i class="fa fa-calendar"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+          
+              <div class="col-md-4">
+                <label for="dateofGuarantee" class="form-label">تاریخ ارایه تضمین خط</label>
+                <div class="input-group"  style="direction: ltr; ">
+                  <input class="form-control"
+                    id="dateofGuarantee"
+                    name="dateofGuarantee"
+                    [(ngModel)]="dateofGuaranteeSelectedDate"
+                    formControlName="dateofGuarantee"
+                    [maxDate]="maxDate"  [minDate]="minDate"
+                    ngbDatepicker
+                    #pdate="ngbDatepicker"
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" (click)="pdate.toggle()" type="button">
+                      <i class="fa fa-calendar"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label  class="form-label">		شماره تضمین خط   </label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                    <input type="text" id="guaranteeDocNumber" formControlName="guaranteeDocNumber" class="form-control">
+                </div>
+                <div *ngIf="guaranteeDocNumber?.invalid && (guaranteeDocNumber?.dirty || guaranteeDocNumber?.touched)">
+                    <small class="text-danger" *ngIf="guaranteeDocNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                </div>
+            </div>
+           </div>
+           <div class="row">
+            <div class="col-md-4">
+              <label for="guaranteeDate" class="form-label">تاریخ تضمین خط</label>
+              <div class="input-group"  style="direction: ltr; ">
+                <input class="form-control"
+                  id="guaranteeDate"
+                  name="guaranteeDate"
+                  [(ngModel)]="guaranteeDateSelectedDate"
+                  formControlName="guaranteeDate"
+                  [maxDate]="maxDate"  [minDate]="minDate"
+                  ngbDatepicker
+                  #gdate="ngbDatepicker"
+                />
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" (click)="gdate.toggle()" type="button">
+                    <i class="fa fa-calendar"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
+              <div class="col-md-9">
+                  <div class="form-group col-md-12">
+                      <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
+                  </div>
+              </div>
+              <div class="col-md-2">
+                <ng-container *ngIf="gauranteeForm.get('id')?.value && gauranteeForm.get('docPath')?.value">
+                  <h3 class="download-link" (click)="downloadFiles()">
+                    <i class="fas fa-arrow-alt-circle-down me-2"></i> 
+                    <div class="form-group col-md-12">
+                      دانلود اسناد
+                    </div>
+                  </h3>
+                </ng-container>
+              </div>
+          </div>
+           </div>
+            <br>
+            <button type="submit" [disabled]="gauranteeForm.invalid" class="btn btn-success"> {{selectedId ?
+                'تغیر معلومات' : 'ثبت معلومات'}}</button>
+              <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
+                style="margin-right: 5px;">جدید</button>
+        </form>
+    </div>
+</section>

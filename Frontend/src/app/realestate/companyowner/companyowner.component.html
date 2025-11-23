@@ -1,0 +1,136 @@
+<section style="height: 800px;">
+    <div class="card-body p-md-5">
+        <div class="heading-wrapper">
+            <img [src]="imagePath" class="seller-image" alt="Buyer Image">
+          
+            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات مالک(متقاضی) شرکت  </p>
+        </div>
+        <app-fileupload #childComponent (sendMessage)="uploadFinished($event)" style="text-align:left;"></app-fileupload>
+        <form [formGroup]="ownerForm"  (ngSubmit)="ownerForm.valid ? selectedId ? updateOwner() : addOwner() : null">
+            <div class="form-group">
+                <input type="hidden" formControlName="id">
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="firstName" class="form-label">اسم </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="firstName" formControlName="firstName" class="form-control">
+                    </div>
+                    <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+                        <small class="text-danger" *ngIf="firstName?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label  class="form-label">ولد</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="fatherName"  formControlName="fatherName" class="form-control">
+                    </div>
+                    <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
+                        <small class="text-danger" *ngIf="fatherName?.errors?.['required']"> این فیلد الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label  class="form-label"> ولدیت</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="grandFatherName"  formControlName="grandFatherName" class="form-control">
+                    </div>
+                    <div *ngIf="grandFatherName?.invalid && (grandFatherName?.dirty || grandFatherName?.touched)">
+                        <small class="text-danger" *ngIf="grandFatherName?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label me-3"> نوعیت تذکره</label>
+                    <ng-select [items]="filteredIdTypes" [selectOnTab]="true"
+                    bindLabel="displayName" bindValue="id" (change)="onPropertyTypeChange()" formControlName="identityCardTypeId">
+                    </ng-select>
+                    <div *ngIf="identityCardTypeId?.invalid && (identityCardTypeId?.dirty || identityCardTypeId?.touched)">
+                        <small class="text-danger" *ngIf="identityCardTypeId?.errors?.['required']">این فیلد الزامی است</small>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label  class="form-label">شماره تذکره </label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="indentityCardNumber" formControlName="indentityCardNumber" class="form-control">
+                    </div>
+                    <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
+                        <small class="text-danger" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4" *ngIf="!isElectricIdSelected()">
+                    <label  class="form-label">جلد</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="jild" formControlName="jild" class="form-control">
+                    </div>
+                    <div *ngIf="jild?.invalid && (jild?.dirty || jild?.touched)">
+                        <small class="text-danger" *ngIf="jild?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-4" *ngIf="!isElectricIdSelected()">
+                    <label  class="form-label"> صفحه</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="safha" formControlName="safha" class="form-control">
+                    </div>
+                    <div *ngIf="safha?.invalid && (safha?.dirty || safha?.touched)">
+                        <small class="text-danger" *ngIf="safha?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4" *ngIf="!isElectricIdSelected()">
+                    <label  class="form-label"> نمبر ثبت</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" id="sabtNumber" formControlName="sabtNumber" class="form-control">
+                    </div>
+                    <div *ngIf="sabtNumber?.invalid && (sabtNumber?.dirty || sabtNumber?.touched)">
+                        <small class="text-danger" *ngIf="sabtNumber?.errors?.['required']">این فیلد  الزامی است</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label  class="form-label">تاریخ تولد</label>
+                    <div class="input-group"  style="direction: ltr; ">
+                      <input class="form-control"
+                        id="start-date"
+                        name="start-date"
+                        [(ngModel)]="selectedDate"
+                        formControlName="dateofBirth"
+                        [maxDate]="maxDate"  [minDate]="minDate"
+                        ngbDatepicker
+                        #d="ngbDatepicker"
+                      />
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+                          <i class="fa fa-calendar"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label me-3"> درجه تحصیل </label>
+                    <ng-select [items]="EducationLevel" [selectOnTab]="true"
+                    bindLabel="name" bindValue="id"  formControlName="educationLevelId">
+                    </ng-select>
+                  
+                  </div>
+            </div>
+    <br>
+    <button type="submit" [disabled]="ownerForm.invalid" class="btn btn-success"> {{selectedId ?
+        'تغیر معلومات' : 'ثبت معلومات'}}</button>
+      <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
+        style="margin-right: 5px;">جدید</button>
+        </form>
+    </div>
+</section>

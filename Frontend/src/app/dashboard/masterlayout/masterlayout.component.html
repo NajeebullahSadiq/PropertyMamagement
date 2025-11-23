@@ -1,0 +1,113 @@
+<mat-toolbar class="mat-elevation-z8">
+    <button mat-icon-button *ngIf="sidenav.mode === 'over'" (click)="sidenav.toggle()">
+        <mat-icon *ngIf="!sidenav.opened">
+            menu
+        </mat-icon>
+        <mat-icon *ngIf="sidenav.opened">
+            close
+        </mat-icon>
+    </button>
+        <img src="assets/img/mcitlogo.png" style="width:60px; align-items: center;" />
+        <h4 style="color:lightgray">{{'title2' | translate}}</h4>
+        <h3 style="margin-right: 10px; font-weight: bold;">{{'title1' | translate}}</h3>
+    <span class="toolbar-item-spacer"></span>
+    <button mat-icon-button matTooltip="My Account" [matMenuTriggerFor]="userAccountMenu">
+        <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #userAccountMenu [overlapTrigger]="false" yPosition="below">
+        <button mat-menu-item routerLink="/dashboard/Auth/Register" *ngIf="userRole=='ADMIN'"  >
+            <mat-icon>people</mat-icon> <h3 class="text2">ایجاد کاربر</h3>
+        </button>
+        <button mat-menu-item (click)="openDialog()" >
+            <mat-icon class="changepassword-icon" >lock</mat-icon> <h3 class="text2">تغیر پسورد</h3>
+        </button>
+        <button mat-menu-item (click)="openReset()" *ngIf="userRole=='ADMIN'">
+            <mat-icon class="changepassword-icon" >lock</mat-icon><h3 class="text2">باز نشانی پسورد</h3>
+        </button>
+        <button mat-menu-item (click)="openLockuser()" *ngIf="userRole=='ADMIN'">
+          <mat-icon class="changepassword-icon" >lock</mat-icon><h3 class="text2">قفل حساب کابران</h3>
+      </button>
+        <button mat-menu-item (click)="onLogout()">
+            <mat-icon >exit_to_app</mat-icon><h3 class="text2"> خروج </h3>
+        </button>
+    </mat-menu>
+    <button mat-icon-button matTooltip="Languages" [matMenuTriggerFor]="lang" >
+        <mat-icon>language</mat-icon>
+    </button>
+    <mat-menu #lang [overlapTrigger]="false" yPosition="below">
+        <button mat-menu-item (click)="setlang()" >
+            <mat-icon>flag</mat-icon><h3 class="text2">دری</h3>
+        </button>
+        <button mat-menu-item  (click)="setlangen()">
+            <mat-icon>flag</mat-icon><h3 class="text2">پشتو</h3>
+        </button>
+    </mat-menu>
+  </mat-toolbar>
+
+<mat-sidenav-container>
+    <mat-sidenav #sidenav="matSidenav" class="mat-elevation-z8">
+        <img class="avatar mat-elevation-z8" [src]="filePath" (error)="handleImageError()" />
+        <h4 class="name">{{userDetails.firstName}} {{userDetails.lastName}}</h4>
+        <!-- <p class="designation">متخصص تلفیق دیتابیس</p> -->
+        <hr class="divider" />
+        <div class="menu-item" *ngIf="userRole=='ADMIN'">
+          <button mat-button  class="menu-button" routerLink="/dashboard/dashboard">
+            <mat-icon>home</mat-icon>
+            <h3 class="text">{{'dashboard' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-button class="menu-button" routerLink="/dashboard/estate">
+            <mat-icon class="mat-icon-notranslate">apartment</mat-icon>
+            <h3 class="text">{{'property' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-button class="menu-button" routerLink="/dashboard/estate/list">
+            <mat-icon class="bill-icon">receipt</mat-icon>
+            <h3 class="text">{{'propertylist' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-button class="menu-button" routerLink="/dashboard/vehicle">
+            <mat-icon class="mat-icon-notranslate">directions_car</mat-icon>
+            <h3 class="text">{{'vehicle' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-button class="menu-button" routerLink="/dashboard/vehicle/list">
+            <mat-icon class="bill-icon">receipt</mat-icon>
+            <h3 class="text">{{'vehiclelist' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item" *ngIf="userRole=='ADMIN'">
+          <button mat-button class="menu-button" routerLink="/dashboard/realestate">
+            <mat-icon>business</mat-icon>
+            <h3 class="text">{{'company' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item" *ngIf="userRole=='ADMIN'">
+          <button mat-button class="menu-button" routerLink="/dashboard/realestate/list">
+            <mat-icon class="mat-icon-notranslate">description</mat-icon>
+            <h3 class="text">{{'companylist' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-button class="menu-button" routerLink="/dashboard/report" *ngIf="userRole=='ADMIN'">
+            <mat-icon>insert_chart</mat-icon>
+            <h3 class="text">{{'report' | translate}}</h3>
+          </button>
+        </div>
+        <div class="menu-item">
+          <button mat-button class="menu-button" routerLink="/dashboard/userreport" *ngIf="userRole=='ADMIN'">
+            <mat-icon>insert_chart</mat-icon>
+            <h3 class="text">{{'reportbycompany' | translate}}</h3>
+          </button>
+        </div>
+      </mat-sidenav>
+<mat-sidenav-content>
+    <div class="content mat-elevation-z8">
+        <router-outlet></router-outlet>
+    </div>
+</mat-sidenav-content>
+</mat-sidenav-container>

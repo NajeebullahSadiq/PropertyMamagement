@@ -1,0 +1,656 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebAPI.Models;
+using WebAPIBackend.Configuration;
+using WebAPIBackend.Models;
+using WebAPIBackend.Models.RequestData;
+
+namespace WebAPIBackend.Controllers
+{
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SellerDetailsController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+        private UserManager<ApplicationUser> _userManager;
+        public SellerDetailsController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        {
+            _context = context;
+            _userManager = userManager;
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var sellers = await _context.SellerDetails.ToListAsync();
+
+                return Ok(sellers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("Action/{id}")]
+        public async Task<IActionResult> GetSellerById(int id)
+        {
+            try
+            {
+                var Pro = await _context.SellerDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+
+                return Ok(Pro);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("Buyer/{id}")]
+        public async Task<IActionResult> GetByerById(int id)
+        {
+            try
+            {
+                var Pro = await _context.BuyerDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+
+                return Ok(Pro);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("Witness/{id}")]
+        public async Task<IActionResult> GetWitnessById(int id)
+        {
+            try
+            {
+                var Pro = await _context.WitnessDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+
+                return Ok(Pro);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("paddress/{id}")]
+        public async Task<IActionResult> GetPaddressById(int id)
+        {
+            try
+            {
+                var Pro = await _context.PropertyAddresses.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+
+                return Ok(Pro);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+
+
+        [HttpPost]
+        public async Task<ActionResult<int>> SaveSeller([FromBody] SellerDetail request)
+        {
+
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+            // Check if there are already 2 PropertyDetails associated with the current WitnessDetail
+            int propertyCount = _context.SellerDetails.Count(s => s.PropertyDetailsId == request.PropertyDetailsId && s.PropertyDetailsId != null);
+            if (propertyCount >= 1)
+            {
+                return StatusCode(400, "You cannot add more than one");
+            }
+            if (request.PropertyDetailsId.Equals(0))
+            {
+                return StatusCode(312, "Main Table is Empty");
+            }
+            //var user = await _userManager.GetUserAsync(User);
+           
+            var seller = new SellerDetail
+            {
+                FirstName = request.FirstName,
+                FatherName = request.FatherName,
+                GrandFather = request.GrandFather,
+                IndentityCardNumber = request.IndentityCardNumber,
+                PhoneNumber = request.PhoneNumber,
+                PaddressProvinceId = request.PaddressProvinceId,
+                PaddressDistrictId = request.PaddressDistrictId,
+                PaddressVillage = request.PaddressVillage,
+                TaddressProvinceId = request.TaddressProvinceId,
+                TaddressDistrictId = request.TaddressDistrictId,
+                TaddressVillage = request.TaddressVillage,
+                CreatedAt = DateTime.Now,
+                CreatedBy = userId.ToString(),
+                PropertyDetailsId = request.PropertyDetailsId,
+                Photo=request.Photo,
+                NationalIdCard=request.NationalIdCard,
+                RoleType=request.RoleType ?? "Seller",
+                AuthorizationLetter=request.AuthorizationLetter,
+            };
+            _context.Add(seller);
+            await _context.SaveChangesAsync();
+            var result = new { Id = seller.Id};
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSeller(int id, [FromBody] SellerDetail request)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+
+            var existingProperty = await _context.SellerDetails.FindAsync(id);
+            if (existingProperty == null)
+            {
+                return NotFound();
+            }
+
+            // Store the original values of the CreatedBy and CreatedOn properties
+            var createdBy = existingProperty.CreatedBy;
+            var createdAt = existingProperty.CreatedAt;
+
+            // Update the entity with the new values
+            _context.Entry(existingProperty).CurrentValues.SetValues(request);
+
+            // Restore the original values of the CreatedBy and CreatedOn properties
+            existingProperty.CreatedBy = createdBy;
+            existingProperty.CreatedAt = createdAt;
+
+            var entry = _context.Entry(existingProperty);
+            entry.State = EntityState.Modified;
+
+            var changes = _context.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified)
+                .SelectMany(e => e.Properties)
+                .Where(p => p.IsModified)
+                .ToDictionary(p => p.Metadata.Name, p => new
+                {
+                    OldValue = p.OriginalValue,
+                    NewValue = p.CurrentValue
+                });
+
+            await _context.SaveChangesAsync();
+
+            foreach (var change in changes)
+            {
+                // Only add an entry to the vehicleaudit table if the property has been modified
+                if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
+                {
+                    _context.Propertyselleraudits.Add(new Propertyselleraudit
+                    {
+                        SellerId = existingProperty.Id,
+                        UpdatedBy = userId,
+                        UpdatedAt = DateTime.Now,
+                        ColumnName = change.Key,
+                        OldValue = change.Value.OldValue?.ToString(),
+                        NewValue = change.Value.NewValue?.ToString()
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            var result = new { Id = request.Id };
+            return Ok(result);
+        }
+        
+        
+        [HttpPost("addBuyerDetails")]
+        public async Task<ActionResult<int>> SaveBuyer([FromBody] BuyerDetail request)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+            // Check if there are already 2 PropertyDetails associated with the current WitnessDetail
+            int propertyCount = _context.BuyerDetails.Count(b => b.PropertyDetailsId == request.PropertyDetailsId && b.PropertyDetailsId != null);
+            if (propertyCount >= 1)
+            {
+                return StatusCode(400, "You cannot add more than one");
+            }
+            if (request.PropertyDetailsId.Equals(0))
+            {
+                return StatusCode(312, "Main Table is Empty");
+            }
+            //var user = await _userManager.GetUserAsync(User);
+           
+            var seller = new BuyerDetail
+            {
+                FirstName = request.FirstName,
+                FatherName = request.FatherName,
+                GrandFather = request.GrandFather,
+                IndentityCardNumber = request.IndentityCardNumber,
+                PhoneNumber = request.PhoneNumber,
+                PaddressProvinceId = request.PaddressProvinceId,
+                PaddressDistrictId = request.PaddressDistrictId,
+                PaddressVillage = request.PaddressVillage,
+                TaddressProvinceId = request.TaddressProvinceId,
+                TaddressDistrictId = request.TaddressDistrictId,
+                TaddressVillage = request.TaddressVillage,
+                CreatedAt = DateTime.Now,
+                CreatedBy = userId.ToString(),
+                PropertyDetailsId = request.PropertyDetailsId,
+                Photo=request.Photo,
+                NationalIdCard=request.NationalIdCard,
+                RoleType=request.RoleType ?? "Buyer",
+                AuthorizationLetter=request.AuthorizationLetter
+            };
+            try
+            {
+                _context.Add(seller);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+            }
+            var result = new { Id = seller.Id };
+            return Ok(result);
+        }
+
+
+        [HttpPut("UpdateBuyer/{id}")]
+        public async Task<IActionResult> UpdateBuyer(int id, [FromBody] BuyerDetail request)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+
+            var existingProperty = await _context.BuyerDetails.FindAsync(id);
+            if (existingProperty == null)
+            {
+                return NotFound();
+            }
+
+            // Store the original values of the CreatedBy and CreatedOn properties
+            var createdBy = existingProperty.CreatedBy;
+            var createdAt = existingProperty.CreatedAt;
+
+            // Update the entity with the new values
+            _context.Entry(existingProperty).CurrentValues.SetValues(request);
+
+            // Restore the original values of the CreatedBy and CreatedOn properties
+            existingProperty.CreatedBy = createdBy;
+            existingProperty.CreatedAt = createdAt;
+
+            var entry = _context.Entry(existingProperty);
+            entry.State = EntityState.Modified;
+
+            var changes = _context.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified)
+                .SelectMany(e => e.Properties)
+                .Where(p => p.IsModified)
+                .ToDictionary(p => p.Metadata.Name, p => new
+                {
+                    OldValue = p.OriginalValue,
+                    NewValue = p.CurrentValue
+                });
+
+            await _context.SaveChangesAsync();
+
+            foreach (var change in changes)
+            {
+                // Only add an entry to the vehicleaudit table if the property has been modified
+                if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
+                {
+                    _context.Propertybuyeraudits.Add(new Propertybuyeraudit
+                    {
+                        BuyerId = existingProperty.Id,
+                        UpdatedBy = userId,
+                        UpdatedAt = DateTime.Now,
+                        ColumnName = change.Key,
+                        OldValue = change.Value.OldValue?.ToString(),
+                        NewValue = change.Value.NewValue?.ToString()
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            var result = new { Id = request.Id };
+            return Ok(result);
+        }
+
+        [HttpPost("addWitnessdetails")]
+        public async Task<ActionResult<int>> Savewithness([FromBody] WitnessDetailRequest request)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+            // Check if there are already 2 PropertyDetails associated with the current WitnessDetail
+            int propertyCount = _context.WitnessDetails.Count(wd => wd.PropertyDetailsId == request.PropertyDetailsId && wd.PropertyDetailsId != null);
+            if (propertyCount >= 2)
+            {
+                return StatusCode(400, "You cannot add more than two");
+            }
+            if (request.PropertyDetailsId.Equals(0))
+            {
+                return StatusCode(312, "Main Table is Empty");
+            }
+            //var user = await _userManager.GetUserAsync(User);
+          
+            // Parse identity card number safely from string input
+            double? identityCardNumber = null;
+            if (!string.IsNullOrEmpty(request.IndentityCardNumber))
+            {
+                string idString = request.IndentityCardNumber.Trim();
+                // Take first 15 digits to fit in double precision (double can handle up to ~15-17 significant digits)
+                if (idString.Length > 15)
+                {
+                    idString = idString.Substring(0, 15);
+                }
+                if (double.TryParse(idString, out double parsedId))
+                {
+                    identityCardNumber = parsedId;
+                }
+                else
+                {
+                    return StatusCode(400, "Invalid identity card number format");
+                }
+            }
+
+            var witness = new WitnessDetail
+            {
+                FirstName = request.FirstName,
+                FatherName = request.FatherName,
+                IndentityCardNumber = identityCardNumber,
+                PhoneNumber = request.PhoneNumber,
+                CreatedAt = DateTime.Now,
+                CreatedBy = userId.ToString(),
+                PropertyDetailsId = request.PropertyDetailsId,
+                NationalIdCard = request.NationalIdCard,
+            };
+            try
+            {
+                _context.WitnessDetails.Add(witness);
+                await _context.SaveChangesAsync();
+                
+                // Verify the witness was saved and has an ID
+                if (witness.Id <= 0)
+                {
+                    return StatusCode(500, "Failed to save witness details - ID not generated");
+                }
+                
+                var result = new { Id = witness.Id };
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error saving witness details: {ex.Message}");
+            }
+        }
+
+        [HttpPut("Updatewitness/{id}")]
+        public async Task<IActionResult> UpdateWitness(int id, [FromBody] WitnessDetail request)
+        {
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+           
+
+            _context.Entry(request).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.WitnessDetails.Any(i => i.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            var result = new { Id = request.Id };
+            return Ok(result);
+        }
+
+        [HttpPost("addPaddress")]
+        public async Task<ActionResult<int>> SavePaddress([FromBody] PropertyAddress request)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
+            if (request == null)
+            {
+                return BadRequest("Request is null");
+            }
+            if (request.PropertyDetailsId == null)
+            {
+                return StatusCode(400, "MainTable is empty");
+            }
+            // Check if there are already 2 PropertyDetails associated with the current WitnessDetail
+            int propertyCount = _context.PropertyAddresses.Count(ad => ad.PropertyDetailsId == request.PropertyDetailsId && ad.PropertyDetailsId != null);
+            if (propertyCount >= 1)
+            {
+                return StatusCode(400, "You cannot add more than one");
+            }
+          
+            var seller = new PropertyAddress
+            {
+                ProvinceId = request.ProvinceId,
+                DistrictId = request.DistrictId,
+                Village = request.Village,
+                CreatedAt = DateTime.Now,
+                CreatedBy = userId.ToString(),
+                PropertyDetailsId = request.PropertyDetailsId.Value,
+            };
+            try
+            {
+                _context.Add(seller);
+                await _context.SaveChangesAsync();
+
+                // Update the IsComplete column of the PropertyDetails entity to true
+                var propertyDetails = await _context.PropertyDetails.FindAsync(request.PropertyDetailsId.Value);
+                if (propertyDetails == null)
+                {
+                    return NotFound("PropertyDetails not found");
+                }
+                propertyDetails.iscomplete = true;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception
+            }
+            var result = new { Id = seller.Id };
+            return Ok(result);
+        }
+
+        [HttpPut("updatePaddress/{id}")]
+        public async Task<IActionResult> UpdatePaddress(int id, [FromBody] PropertyAddress request)
+        {
+            if (id != request.Id)
+            {
+                return BadRequest();
+            }
+
+
+            _context.Entry(request).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.PropertyAddresses.Any(i => i.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            var result = new { Id = request.Id };
+            return Ok(result);
+        }
+        [HttpGet("getProvince")]
+        public async Task<IActionResult> GetAlllocation()
+        {
+            try
+            {
+                var locations = await _context.Locations.Where(x=>x.TypeId.Equals(2)).ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+        [HttpGet("getDistrict")]
+        public async Task<IActionResult> GetAllDistrict()
+        {
+            try
+            {
+                var locations = await _context.Locations.Where(x => x.TypeId.Equals(3)).ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDistrict(int id)
+        {
+            try
+            {
+                var locations = await _context.Locations.Where(x => x.ParentId.Equals(id)).ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+        [HttpGet("getIdentityCardType")]
+        public async Task<IActionResult> GetIdCardTypes()
+        {
+            try
+            {
+                var locations = await _context.IdentityCardTypes.ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("getEducationLevel")]
+        public async Task<IActionResult> GetEducationLevel()
+        {
+            try
+            {
+                var locations = await _context.EducationLevels.ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+        [HttpGet("getAddressType")]
+        public async Task<IActionResult> GetAddressType()
+        {
+            try
+            {
+                var locations = await _context.AddressTypes.ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+        [HttpGet("getArea")]
+        public async Task<IActionResult> GetArea()
+        {
+            try
+            {
+                var locations = await _context.Areas.ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("getGuaranteeType")]
+        public async Task<IActionResult> GetGuaranteeType()
+        {
+            try
+            {
+                var locations = await _context.GuaranteeTypes.ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+
+    }
+}

@@ -1,0 +1,28 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~bootstrap/dist/css/bootstrap.css";
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@import "~select2/dist/css/select2.css";
+
+.select2-container .select2-selection--single  {
+    height: 38px; /* set the height to match other Bootstrap inputs */
+  }
+  @font-face {
+    font-family: 'PersianFont';
+    src: url('./assets/fonts/NotoNastaliqUrdu-Regular.ttf') format('truetype');
+    /* If you have other font file formats, add them here in the desired order */
+  }
+  
+  /* Apply the Persian font to the desired elements */
+html,
+body {
+  font-family: 'PersianFont', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  direction: rtl;
+}
+
+
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
