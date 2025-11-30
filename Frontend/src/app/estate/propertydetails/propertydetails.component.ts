@@ -10,6 +10,7 @@ import { PunittypeService } from 'src/app/shared/punittype.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { EstateComponent } from '../estate.component';
 import { UploadComponent } from '../upload/upload.component';
+import { LocalizationService } from 'src/app/shared/localization.service';
 
 @Component({
   selector: 'app-propertydetails',
@@ -20,10 +21,13 @@ export class PropertydetailsComponent  implements AfterViewInit {
   propertyForm: FormGroup = new FormGroup({});
   propertyDetails!: PropertyDetails[];
   unittypes!: PunitType[];
+  localizedUnitTypes:any;
   selectedPropertyId: number=0;
   mainTableId: number =0;
   transactiontype:any;
   propertypetype:any;
+  localizedPropertyTypes:any;
+  localizedTransactionTypes:any;
   properties!: PropertyDetails[];
   onePercent:number=0;
   imageName:string='';
@@ -43,7 +47,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
   constructor(private http: HttpClient,private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, 
     private unittypeService: PunittypeService,private route: ActivatedRoute,private router: Router,
-    private parentComponent: EstateComponent,private selerService:SellerService) {
+    private parentComponent: EstateComponent,private selerService:SellerService,
+    private localizationService: LocalizationService) {
       this.propertyForm = this.fb.group({
         id: [0],
         pnumber: ['', Validators.required],
@@ -80,9 +85,13 @@ export class PropertydetailsComponent  implements AfterViewInit {
     this.selectedPropertyId=this.id;
     this.propertyDetailsService.getPropertyType().subscribe(res => {
       this.propertypetype = res;
+      // Map backend property types to localized versions
+      this.localizedPropertyTypes = this.mapPropertyTypesToLocalized(res as any[]);
     });
     this.propertyDetailsService.getTransactionType().subscribe(res => {
       this.transactiontype = res;
+      // Map backend transaction types to localized versions
+      this.localizedTransactionTypes = this.mapTransactionTypesToLocalized(res as any[]);
   });
   if (this.id > 0) {
     this.propertyDetailsService.getPropertyDetailsById(this.id)
@@ -136,6 +145,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
   loadDepartments(): void {
     this.unittypeService.getUnitTypes().subscribe(unittypes => {
       this.unittypes = unittypes;
+      // Map unit types to localized versions with Dari labels
+      this.localizedUnitTypes = this.mapUnitTypesToLocalized(unittypes);
       //$('#unittype').select2();
     });
   }
@@ -235,6 +246,52 @@ export class PropertydetailsComponent  implements AfterViewInit {
   resetForms(): void {
    this.parentComponent.resetChild();
   }
+
+  /**
+   * Map backend property types to localized versions with Dari labels
+   */
+  mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
+    return backendTypes.map(type => {
+      const localized = this.localizationService.propertyTypes.find(
+        pt => pt.value.toLowerCase() === type.name.toLowerCase()
+      );
+      return {
+        id: type.id,
+        name: localized ? localized.label : type.name
+      };
+    });
+  }
+
+  /**
+   * Map backend transaction types to localized versions with Dari labels
+   */
+  mapTransactionTypesToLocalized(backendTypes: any[]): any[] {
+    return backendTypes.map(type => {
+      const localized = this.localizationService.transactionTypes.find(
+        tt => tt.value.toLowerCase() === type.name.toLowerCase()
+      );
+      return {
+        id: type.id,
+        name: localized ? localized.label : type.name
+      };
+    });
+  }
+
+  /**
+   * Map backend unit types to localized versions with Dari labels
+   */
+  mapUnitTypesToLocalized(backendTypes: any[]): any[] {
+    return backendTypes.map(type => {
+      const localized = this.localizationService.propertyUnitTypes.find(
+        ut => ut.value.toLowerCase() === type.name.toLowerCase()
+      );
+      return {
+        id: type.id,
+        name: localized ? localized.label : type.name
+      };
+    });
+  }
+
   downloadFiles() {
     const filePath = this.propertyForm.get('filePath')?.value;
     console.log(filePath);

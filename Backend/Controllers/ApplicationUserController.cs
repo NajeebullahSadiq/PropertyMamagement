@@ -81,27 +81,34 @@ namespace WebAPI.Controllers
         //POST : /api/ApplicationUser/Login
         public async Task<IActionResult> Login(LoginModel model)
         {
-
-            var user = await _userManager.FindByNameAsync(model.UserName);
-           
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            try
             {
-                if (user.IsLocked.Equals(true))
+                var user = await _userManager.FindByNameAsync(model.UserName);
+               
+                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
-                    return StatusCode(418);
-                }
-                else
-                {
-                    //Get role assigned to the user
-                    var roles = await _userManager.GetRolesAsync(user);
-                    var userRoles = roles.Select(r => new Claim(ClaimTypes.Role, r)).ToArray();
-                    var userRoles2 = await _userManager.GetRolesAsync(user);
-                    var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
-                    foreach (var userRole in userRoles2)
+                    if (user.IsLocked.Equals(true))
                     {
-                        var role = await _roleManager.FindByNameAsync(userRole);
-                        var roleClaims = await _roleManager.GetClaimsAsync(role);
-                        //return Ok(roleClaims);
+                        return StatusCode(418);
+                    }
+                    else
+                    {
+                        //Get role assigned to the user
+                        var roles = await _userManager.GetRolesAsync(user);
+                        var userRoles = roles.Select(r => new Claim(ClaimTypes.Role, r)).ToArray();
+                        var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
+                        
+                        // Collect all role claims
+                        var allRoleClaims = new List<Claim>();
+                        foreach (var userRole in roles)
+                        {
+                            var role = await _roleManager.FindByNameAsync(userRole);
+                            if (role != null)
+                            {
+                                var roleClaims = await _roleManager.GetClaimsAsync(role);
+                                allRoleClaims.AddRange(roleClaims);
+                            }
+                        }
 
                         IdentityOptions _options = new IdentityOptions();
                         var tokenDescriptor = new SecurityTokenDescriptor
@@ -111,7 +118,7 @@ namespace WebAPI.Controllers
                         new Claim("UserID",user.Id.ToString()),
                         new Claim(ClaimTypes.Email, user.Email),
                         new Claim(ClaimTypes.Name, user.UserName)
-                            }.Union(userClaims).Union(userRoles).Union(roleClaims)),
+                            }.Union(userClaims).Union(userRoles).Union(allRoleClaims)),
                             Expires = DateTime.UtcNow.AddDays(1),
                             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256Signature)
                         };
@@ -122,12 +129,14 @@ namespace WebAPI.Controllers
 
                         return Ok(new { token });
                     }
-                     return StatusCode(420);
                 }
-               
+                else
+                    return BadRequest(new { message = "Username or password is incorrect." });
             }
-            else
-                return BadRequest(new { message = "Username or password is incorrect." });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred during login", error = ex.Message });
+            }
         }
 
         [HttpPost]

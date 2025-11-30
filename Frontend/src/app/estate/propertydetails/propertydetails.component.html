@@ -48,7 +48,7 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label me-3"> نوعیت ملکیت</label>
-                  <ng-select formControlName="propertyTypeId" [items]="propertypetype" [selectOnTab]="true"
+                  <ng-select formControlName="propertyTypeId" [items]="localizedPropertyTypes" [selectOnTab]="true"
                     bindLabel="name" bindValue="id" (change)="onPropertyTypeChange()">
                   </ng-select>
                 </div>
@@ -69,7 +69,7 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label me-3">واحد اندازه گیری</label>
-                  <ng-select formControlName="punitTypeId" [items]="unittypes" [selectOnTab]="true" bindLabel="name"
+                  <ng-select formControlName="punitTypeId" [items]="localizedUnitTypes" [selectOnTab]="true" bindLabel="name"
                     bindValue="id">
                   </ng-select>
                   <!-- <div *ngIf="propertyForm.get('punitTypeId')?.invalid && propertyForm.get('punitTypeId')?.touched">
@@ -102,7 +102,7 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label me-3"> نوعیت معامله</label>
-                  <ng-select formControlName="transactionTypeId" [items]="transactiontype" [selectOnTab]="true"
+                  <ng-select formControlName="transactionTypeId" [items]="localizedTransactionTypes" [selectOnTab]="true"
                     bindLabel="name" bindValue="id">
                   </ng-select>
                   <!-- <div *ngIf="propertyForm.get('transactionTypeId')?.invalid && propertyForm.get('transactionTypeId')?.touched">

@@ -15,6 +15,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { PropertyService } from 'src/app/shared/property.service';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
+import { LocalizationService } from 'src/app/shared/localization.service';
 const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
 const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
 @Injectable()
@@ -52,6 +53,7 @@ export class GuaranteeComponent {
   answerselectedDate!: NgbDate;
   dateofGuaranteeSelectedDate!: NgbDate;
   GuaranteeTypes:any;
+  localizedGuaranteeTypes:any;
   guaranteeDateSelectedDate!: NgbDate;
   imageName:string=''
   guaranteeDetails!: Guarantee[];
@@ -64,7 +66,8 @@ export class GuaranteeComponent {
     }
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,private selerService:SellerService,
-    private ngbDateParserFormatter: NgbDateParserFormatter,private propertyDetailsService: PropertyService){
+    private ngbDateParserFormatter: NgbDateParserFormatter,private propertyDetailsService: PropertyService,
+    private localizationService: LocalizationService){
     this.gauranteeForm = this.fb.group({
       id: [0],
       guaranteeTypeId: ['', Validators.required],
@@ -85,6 +88,8 @@ export class GuaranteeComponent {
   ngOnInit() {
     this.comservice.getGuaranteeType().subscribe(res => {
       this.GuaranteeTypes = res;
+      // Map guarantee types to localized versions with Dari labels
+      this.localizedGuaranteeTypes = this.mapGuaranteeTypesToLocalized(res as any[]);
     });
 
     if (this.id > 0) {
@@ -269,6 +274,21 @@ export class GuaranteeComponent {
   uploadFinished = (event:string) => { 
     this.imageName="Resources\\Images\\"+event;
   }
+  /**
+   * Map backend guarantee types to localized versions with Dari labels
+   */
+  mapGuaranteeTypesToLocalized(backendTypes: any[]): any[] {
+    return backendTypes.map(type => {
+      const localized = this.localizationService.guaranteeTypes.find(
+        gt => gt.value.toLowerCase() === type.name.toLowerCase()
+      );
+      return {
+        id: type.id,
+        name: localized ? localized.label : type.name
+      };
+    });
+  }
+
   downloadFiles() {
     const filePath = this.gauranteeForm.get('docPath')?.value;
     console.log(filePath);

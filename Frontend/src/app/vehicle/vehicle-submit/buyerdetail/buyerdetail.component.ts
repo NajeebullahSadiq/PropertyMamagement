@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { SellerDetail, VBuyerDetail } from 'src/app/models/SellerDetail';
+import { VBuyerDetail } from 'src/app/models/SellerDetail';
 import { SellerService } from 'src/app/shared/seller.service';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
+import { LocalizationService } from 'src/app/shared/localization.service';
 
 @Component({
   selector: 'app-buyerdetail',
@@ -24,17 +25,15 @@ export class BuyerdetailComponent {
   province:any;
   district:any;
   district2:any;
-  roleTypes = [
-    { value: 'Buyer', label: 'خریدار' },
-    { value: 'Authorized Agent (Buyer)', label: 'وکیل خریدار' }
-  ];
+  roleTypes: any;
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   onNextClick() {
     this.next.emit();
   }
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
-    ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService){
+    ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
+    private localizationService: LocalizationService){
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.buyerForm = this.fb.group({
@@ -69,6 +68,12 @@ export class BuyerdetailComponent {
     });
   }
   ngOnInit() {
+    // Initialize role types from localization service
+    this.roleTypes = [
+      this.localizationService.roleTypes.buyer,
+      this.localizationService.roleTypes.buyerAgent
+    ];
+    
     this.selerService.getprovince().subscribe(res => {
       this.province = res;
     });

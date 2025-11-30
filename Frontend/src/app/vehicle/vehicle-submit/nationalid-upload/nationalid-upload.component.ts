@@ -58,12 +58,14 @@ export class VehicleNationalidUploadComponent implements OnInit {
         this.progress = Math.round(100 * (event.loaded || 1) / (event.total || 1))
          if (event.type === HttpEventType.Response) {
           this.message = fileToUpload.name+' '+'موفقانه آپلود شد';
+          this.progress = 0;
           console.log('Vehicle National ID Upload: Upload completed, emitting event');
           this.sendMessage.emit(this.date+this.hour+this.minutes+this.second+fileToUpload.name);
         }
       },
       error: (err: HttpErrorResponse) => {
         console.error('Vehicle National ID Upload: API Error', err);
+        this.progress = 0;
         console.log(err);
       }
     });

@@ -7,6 +7,7 @@ import { VehicleDetails } from 'src/app/models/vehicle';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
 import { VehicleComponent } from '../vehicle.component';
+import { LocalizationService } from 'src/app/shared/localization.service';
 
 @Component({
   selector: 'app-vehicle-submit',
@@ -19,10 +20,7 @@ export class VehicleSubmitComponent implements AfterViewInit{
   selectedVehicleId:number=0;
   vehicleForm: FormGroup = new FormGroup({});
   properties!: VehicleDetails[];
-  vehicleHandOptions = [
-    { value: 'afghanistan_hand', label: 'دست افغانستان' },
-    { value: 'against_afghanistan_hand', label: 'دست خلاف افغانستان' }
-  ];
+  vehicleHandOptions: any;
   @ViewChild('childComponent') childComponent!: UploadComponent;
   ngAfterViewInit(): void {
     if (this.childComponent) {
@@ -36,7 +34,8 @@ export class VehicleSubmitComponent implements AfterViewInit{
     this.next.emit();
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private vehicleService: VehicleService,
-    private parentComponent: VehicleComponent,private router: Router,private vehiclesubservice:VehiclesubService){
+    private parentComponent: VehicleComponent,private router: Router,private vehiclesubservice:VehiclesubService,
+    private localizationService: LocalizationService){
     this.vehicleForm = this.fb.group({
       id: [0],
       permitNo: ['', Validators.required],
@@ -62,6 +61,9 @@ export class VehicleSubmitComponent implements AfterViewInit{
     this.vehiclesubservice.withnessId=0;
   }
   ngOnInit() {
+    // Initialize vehicle hand options from localization service
+    this.vehicleHandOptions = this.localizationService.vehicleHandOptions;
+    
     this.selectedVehicleId=this.id;
     this.vehicleService.getPropertyDetailsById(this.id)
     .subscribe(properties => {

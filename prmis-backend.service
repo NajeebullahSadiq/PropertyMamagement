@@ -1,0 +1,28 @@
+[Unit]
+Description=Property Management System - Backend
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=notify
+User=www-data
+WorkingDirectory=/var/www/prmis/backend/publish
+ExecStart=/usr/bin/dotnet /var/www/prmis/backend/publish/WebAPIBackend.dll
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=prmis-backend
+Environment="ASPNETCORE_ENVIRONMENT=Production"
+Environment="ASPNETCORE_URLS=http://localhost:5000"
+Environment="DOTNET_CLI_TELEMETRY_OPTOUT=1"
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/prmis/backend/publish/Resources
+
+[Install]
+WantedBy=multi-user.target

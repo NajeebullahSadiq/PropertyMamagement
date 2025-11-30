@@ -94,15 +94,9 @@ namespace WebAPI.Controllers
         //        user.Id,
         //        userroles,
         //        user.FirstName,
-        //        user.LastName,
-        //        user.PhotoPath
-        //    };
-
-        //}
-
         [HttpGet]
         [Route("getProfile")]
-        public async Task<Object> GetCurrentUserProfile()
+        public async Task<IActionResult> GetCurrentUserProfile()
         {
             string userId = User.Claims.First(c => c.Type == "UserID").Value;
             try
@@ -113,7 +107,7 @@ namespace WebAPI.Controllers
 
                 if (userProfile != null)
                 {
-                    return new
+                    return Ok(new
                     {
                         userProfile.Email,
                         userProfile.UserName,
@@ -123,36 +117,40 @@ namespace WebAPI.Controllers
                         userProfile.PhotoPath,
                         CompanyName = userProfile.CompanyName,
                         userProfile.PhoneNumber
-                    };
+                    });
                 }
 
-                // If the user profile is not found, return a default response
-                return new
+                // If UserProfileWithCompany not found, try to get from ApplicationUser
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
                 {
-                    Email = "User not found",
-                    UserName = "User not found",
-                    UserId = "User not found",
-                    FirstName = "User not found",
-                    LastName = "User not found",
-                    PhotoPath = "User not found",
-                    CompanyName = "User not found"
-                };
+                    return Ok(new
+                    {
+                        Email = user.Email ?? string.Empty,
+                        UserName = user.UserName ?? string.Empty,
+                        UserId = user.Id,
+                        FirstName = user.FirstName ?? string.Empty,
+                        LastName = user.LastName ?? string.Empty,
+                        PhotoPath = user.PhotoPath ?? string.Empty,
+                        CompanyName = string.Empty,
+                        PhoneNumber = user.PhoneNumber ?? string.Empty
+                    });
+                }
+
+                // If user not found in either table, return 404
+                return NotFound(new
+                {
+                    message = "User profile not found"
+                });
             }
             catch (Exception ex)
             {
-                return new
+                return StatusCode(500, new
                 {
-                    Email = "Error occurred",
-                    UserName = "Error occurred",
-                    UserId = "Error occurred",
-                    FirstName = "Error occurred",
-                    LastName = "Error occurred",
-                    PhotoPath = "Error occurred",
-                    CompanyName = "Error occurred"
-                };
+                    message = "An error occurred while retrieving user profile",
+                    error = ex.Message
+                });
             }
-           
-            
         }
 
         [HttpGet]
