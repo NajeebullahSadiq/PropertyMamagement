@@ -4,7 +4,7 @@ After=network.target postgresql.service
 Wants=postgresql.service
 
 [Service]
-Type=notify
+Type=simple
 User=www-data
 WorkingDirectory=/var/www/prmis/backend/publish
 ExecStart=/usr/bin/dotnet /var/www/prmis/backend/publish/WebAPIBackend.dll
