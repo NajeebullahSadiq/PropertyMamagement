@@ -45,7 +45,7 @@
     "@angular/cli": "~15.0.4",
     "@angular/compiler-cli": "^15.2.9",
     "@angular/localize": "^15.0.0",
-    "@types/chart.js": "^2.9.37",
+    "chart.js": "^4.3.3",
     "@types/jasmine": "^4.3.5",
     "@types/jquery": "^3.5.16",
     "@types/select2": "^4.0.57",
