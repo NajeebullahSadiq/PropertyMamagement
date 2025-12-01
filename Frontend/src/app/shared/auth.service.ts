@@ -3,11 +3,12 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { loginModel } from '../models/loginModel';
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  readonly BaseURI = 'http://localhost:5143/api';
+  readonly BaseURI = environment.apiUrl;
   photoPath='';
 
   constructor(private fb: FormBuilder, private http: HttpClient) { }
