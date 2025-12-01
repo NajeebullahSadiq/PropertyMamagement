@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables, ChartConfiguration } from 'chart.js';
 import { AuthService } from '../shared/auth.service';
 import { DashboardService } from '../shared/dashboard.service';
 Chart.register(...registerables);
@@ -35,7 +35,7 @@ interface BackendData {
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-  chart!: Chart;
+  chart!: Chart<any>;
   chartData: any[] = [];
   userDetails:any=[];
   dashboardData: any=[];
