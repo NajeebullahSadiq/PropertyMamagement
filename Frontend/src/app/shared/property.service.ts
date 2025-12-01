@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PropertyDetails, PropertyDetailsList } from '../models/PropertyDetail';
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class PropertyService {
 
-  private baseUrl = 'http://localhost:5143/api/PropertyDetails';
-  private baseUrl2 = 'http://localhost:5143/api';
+  private baseUrl = environment.apiUrl + '/PropertyDetails';
+  private baseUrl2 = environment.apiUrl;
   mainTableId: number=0;
   constructor(private http: HttpClient) { }
 
@@ -49,7 +50,7 @@ export class PropertyService {
     return this.http.get<PropertyDetails[]>(this.baseUrl +'/'+ id);
   }
   downloadFile(file:any) {
-    return this.http.get('http://localhost:5143/'+file, { responseType: 'blob' });
+    return this.http.get(environment.apiUrl + '/' + file, { responseType: 'blob' });
   }
   getPropertyPrintData(id: any): Observable<any> {
     const url = `${this.baseUrl}/GetPrintRecord/${id}`;

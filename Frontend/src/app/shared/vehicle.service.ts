@@ -3,13 +3,14 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { VehiclesDetailsList } from '../models/PropertyDetail';
 import { VehicleDetails } from '../models/vehicle';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VehicleService {
   mainTableId: number=0;
-  private baseUrl = 'http://localhost:5143/api/Vehicles';
+  private baseUrl = environment.apiUrl + '/Vehicles';
   constructor(private http: HttpClient) { }
 
   updateMainTableId(id: number) {
@@ -29,7 +30,7 @@ export class VehicleService {
     return this.http.get<VehicleDetails[]>(this.baseUrl +'/'+ id);
   }
   downloadFile(file:any) {
-    return this.http.get('http://localhost:5143/'+file, { responseType: 'blob' });
+    return this.http.get(environment.apiUrl + '/' + file, { responseType: 'blob' });
   }
   getVehiclePropertyPrintData(id: any): Observable<any> {
     const url = `${this.baseUrl}/GetPrintRecord/${id}`;

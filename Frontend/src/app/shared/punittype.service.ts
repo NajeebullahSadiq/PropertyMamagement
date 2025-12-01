@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PunitType } from '../models/PunitType';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PunittypeService {
-  private baseUrl = 'http://localhost:5143/api/PropertyDetails/getunitType';
+  private baseUrl = environment.apiUrl + '/PropertyDetails/getunitType';
   constructor(private http: HttpClient) { }
 
   getUnitTypes(): Observable<PunitType[]> {

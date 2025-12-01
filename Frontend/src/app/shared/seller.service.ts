@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { propertyAddress } from '../models/propertyAddress';
 import { SellerDetail } from '../models/SellerDetail';
 import { witnessDetail } from '../models/witnessDetail';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SellerService {
-  private baseUrl = 'http://localhost:5143/api/SellerDetails';
+  private baseUrl = environment.apiUrl + '/SellerDetails';
   sellerId:number=0;
   buyerId:number=0;
   withnessId:number=0;
