@@ -92,14 +92,19 @@ var app = builder.Build();
 await DatabaseSeeder.SeedDatabase(app.Services);
 
 // Configure the HTTP request pipeline.
-string Client_URL = builder.Configuration["ApplicationSettings:Client_URL"];
-app.UseCors(builder =>
-           builder.WithOrigins(Client_URL, "http://localhost:2400")
-           .AllowAnyHeader()
-           .AllowAnyMethod()
-           );
+// Configure CORS for production
+string[] allowedOrigins = new string[] 
+{
+    "http://103.132.98.92",  // Your server IP
+    "https://yourdomain.com", // Your domain if you have one
+    "http://localhost:2400"   // Local development
+};
 
-//app.UseHttpsRedirection();
+app.UseCors(builder => builder
+    .WithOrigins(allowedOrigins)
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+);
 
 app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions()
