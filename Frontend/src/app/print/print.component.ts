@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
-import { environment } from '../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-print',

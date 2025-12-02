@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@ang
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import {environment } from 'src/app/environments/environment';
+import {environment } from 'src/environments/environment';
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',

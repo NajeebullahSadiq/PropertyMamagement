@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { VBuyerDetail } from '../models/SellerDetail';
 import { VehicleDetails } from '../models/vehicle';
 import { witnessDetail } from '../models/witnessDetail';
-import { environment } from '../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'

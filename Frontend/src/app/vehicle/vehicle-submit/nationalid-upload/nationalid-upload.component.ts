@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
-import {environment } from 'src/app/environments/environment';
+import {environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-vehicle-nationalid-upload',

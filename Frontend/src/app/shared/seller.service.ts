@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { propertyAddress } from '../models/propertyAddress';
 import { SellerDetail } from '../models/SellerDetail';
 import { witnessDetail } from '../models/witnessDetail';
-import { environment } from '../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'

@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/shared/auth.service';
-import { environment } from 'src/app/environments/environment';
+import { environment } from 'src/environments/environment';
 
 import { UploadComponent } from './upload/upload.component';
 

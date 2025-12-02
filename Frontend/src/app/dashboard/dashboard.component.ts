@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
 import { AuthService } from '../shared/auth.service';
 import { DashboardService } from '../shared/dashboard.service';
-import { environment } from '../environments/environment';
+import { environment } from 'src/environments/environment';
 Chart.register(...registerables);
 interface PropertyTypeData {
   propertyType: string;

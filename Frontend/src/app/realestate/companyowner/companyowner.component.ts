@@ -14,7 +14,7 @@ import { companyowner } from 'src/app/models/companyowner';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
-import { environment } from 'src/app/environments/environment';
+import { environment } from 'src/environments/environment';
 
 
 const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];

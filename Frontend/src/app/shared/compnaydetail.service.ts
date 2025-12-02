@@ -7,7 +7,7 @@ import { companyOwnerAddress, companyOwnerAddressData } from '../models/companyO
 import { Guarantee } from '../models/Guarantee';
 import { Guarantor } from '../models/Guarantor';
 import { LicenseDetail } from '../models/LicenseDetail';
-import { environment } from '../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'

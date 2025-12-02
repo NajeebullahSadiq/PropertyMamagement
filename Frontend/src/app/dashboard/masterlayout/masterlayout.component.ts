@@ -9,7 +9,7 @@ import { ResetpasswordComponent } from 'src/app/auth/resetpassword/resetpassword
 import { LockuserComponent } from 'src/app/auth/lockuser/lockuser.component';
 import { AuthService } from 'src/app/shared/auth.service';
 import { PropertydetailsComponent } from 'src/app/estate/propertydetails/propertydetails.component';
-import { environment } from '../../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-masterlayout',

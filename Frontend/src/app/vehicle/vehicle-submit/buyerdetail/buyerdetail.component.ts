@@ -6,7 +6,7 @@ import { SellerService } from 'src/app/shared/seller.service';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
-import { environment } from 'src/app/environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-buyerdetail',
