@@ -14,6 +14,7 @@ import { companyowner } from 'src/app/models/companyowner';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
+import { environment } from 'src/app/environments/environment';
 
 
 const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
@@ -47,7 +48,7 @@ export class CompanyownerComponent {
 	maxDate ={year:1410,month: 12, day: 31}
 	minDate ={year:1320,month: 12, day: 31}
 	
-  baseUrl:string='http://localhost:5143/';
+  baseUrl:string=environment.apiURL+'/';
   imagePath:string='assets/img/avatar.png';
   imageName:string='';
   selectedId:number=0;

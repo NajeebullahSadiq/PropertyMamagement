@@ -9,6 +9,8 @@ import { ResetpasswordComponent } from 'src/app/auth/resetpassword/resetpassword
 import { LockuserComponent } from 'src/app/auth/lockuser/lockuser.component';
 import { AuthService } from 'src/app/shared/auth.service';
 import { PropertydetailsComponent } from 'src/app/estate/propertydetails/propertydetails.component';
+import { environment } from '../../environments/environment';
+
 @Component({
   selector: 'app-masterlayout',
   templateUrl: './masterlayout.component.html',
@@ -17,7 +19,7 @@ import { PropertydetailsComponent } from 'src/app/estate/propertydetails/propert
 export class MasterlayoutComponent implements AfterViewInit {
   filePath:string='assets/img/avatar.png';
   userDetails:any=[];
-  baseUrl='http://localhost:5143/';
+  baseUrl=environment.apiURL+'/';
   @ViewChild(MatSidenav)
   sidenav!: MatSidenav;
   userRole:any;

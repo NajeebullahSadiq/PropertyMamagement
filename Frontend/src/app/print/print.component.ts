@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-print',
@@ -12,7 +13,7 @@ export class PrintComponent {
   userDetails:any=[];
   SellerfilePath:string='assets/img/avatar2.png';
   BuyerfilePath:string='assets/img/avatar2.png';
-  baseUrl='http://localhost:5143/';
+  baseUrl=environment.apiURL+'/';
   documentData:any=[];
   constructor( public service: AuthService,private route: ActivatedRoute,private pservice:PropertyService) { 
   

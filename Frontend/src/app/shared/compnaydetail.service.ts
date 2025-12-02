@@ -7,6 +7,7 @@ import { companyOwnerAddress, companyOwnerAddressData } from '../models/companyO
 import { Guarantee } from '../models/Guarantee';
 import { Guarantor } from '../models/Guarantor';
 import { LicenseDetail } from '../models/LicenseDetail';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,9 @@ import { LicenseDetail } from '../models/LicenseDetail';
 export class CompnaydetailService {
   mainTableId: number=0;
   ownerId: number=0;
-  private baseUrlowner='http://localhost:5143/api/';
-  private baseUrl = 'http://localhost:5143/api/CompanyDetails';
-  private baseUrldropbdownlist = 'http://localhost:5143/api/SellerDetails';
+  private baseUrlowner=environment.apiURL+'/';
+  private baseUrl = environment.apiURL + '/CompanyDetails';
+  private baseUrldropbdownlist = environment.apiURL + '/SellerDetails';
   constructor(private http: HttpClient) { }
 
   updateMainTableId(id: number) {

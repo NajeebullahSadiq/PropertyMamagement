@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/shared/auth.service';
+import { environment } from 'src/app/environments/environment';
 
 import { UploadComponent } from './upload/upload.component';
 
@@ -12,7 +13,7 @@ import { UploadComponent } from './upload/upload.component';
 })
 export class RegisterComponent implements OnInit {
   filePath:string='assets/img/avatar.png';
-   baseUrl='http://localhost:5143/';
+   baseUrl=environment.apiURL+'/';
    imageName:string='';
    companylist:any;
    servicesDetails:any;

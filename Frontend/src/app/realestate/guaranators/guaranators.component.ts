@@ -5,6 +5,7 @@ import { Guarantor } from 'src/app/models/Guarantor';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-guaranators',
@@ -12,7 +13,7 @@ import { FileuploadComponent } from '../fileupload/fileupload.component';
   styleUrls: ['./guaranators.component.scss']
 })
 export class GuaranatorsComponent {
-  baseUrl:string='http://localhost:5143/';
+  baseUrl:string=environment.apiURL+'/';
   imagePath:string='assets/img/avatar.png';
   imageName:string='';
   selectedId:number=0;

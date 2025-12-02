@@ -6,6 +6,7 @@ import { PropertyService } from 'src/app/shared/property.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { UploadComponent } from '../../upload/upload.component';
 import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-upload.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-sellerdetail',
@@ -14,7 +15,7 @@ import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-up
 })
 export class SellerdetailComponent {
   imagePath:string='assets/img/avatar.png';
-  baseUrl:string='http://localhost:5143/';
+  baseUrl:string=environment.apiURL+'/';
   imageName:string='';
   nationalIdCardName:string='';
   authorizationLetterName:string='';

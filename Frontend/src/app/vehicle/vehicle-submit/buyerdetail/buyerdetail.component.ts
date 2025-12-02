@@ -6,6 +6,7 @@ import { SellerService } from 'src/app/shared/seller.service';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
+import { environment } from 'src/app/environments/environment';
 
 @Component({
   selector: 'app-buyerdetail',
@@ -13,7 +14,7 @@ import { LocalizationService } from 'src/app/shared/localization.service';
   styleUrls: ['./buyerdetail.component.scss']
 })
 export class BuyerdetailComponent {
-  baseUrl:string='http://localhost:5143/';
+  baseUrl:string=environment.apiURL+'/';
   imagePath:string='assets/img/avatar.png';
   imageName:string='';
   nationalIdFileName:string='';

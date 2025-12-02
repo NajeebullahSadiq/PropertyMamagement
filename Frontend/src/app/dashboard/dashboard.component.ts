@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
 import { AuthService } from '../shared/auth.service';
 import { DashboardService } from '../shared/dashboard.service';
+import { environment } from '../environments/environment';
 Chart.register(...registerables);
 interface PropertyTypeData {
   propertyType: string;
@@ -317,7 +318,7 @@ export class DashboardComponent {
   }
   getDataFromAPI() {
     this.http
-      .get<any[]>('http://localhost:5143/api/Dashboard/GetVehicleReportByMonth') // Replace with your API endpoint
+      .get<any[]>(environment.apiURL + '/Dashboard/GetVehicleReportByMonth') // Replace with your API endpoint
       .subscribe((data) => {
         this.chartData = data;
         this.createVehicleReportChart();
@@ -326,13 +327,13 @@ export class DashboardComponent {
   }
   loadChartData(): void {
     // Make an HTTP GET request to your ASP.NET Core Web API endpoint
-    this.http.get<BackendData[]>('http://localhost:5143/api/Dashboard/GetPropertyTypesByMonth').subscribe((data: BackendData[]) => {
+    this.http.get<BackendData[]>(environment.apiURL + '/Dashboard/GetPropertyTypesByMonth').subscribe((data: BackendData[]) => {
       this.displayChart(data);
     });
   }
   loadTransactionChartData(): void {
     // Make an HTTP GET request to your ASP.NET Core Web API endpoint
-    this.http.get<BackendData[]>('http://localhost:5143/api/Dashboard/GetTransactionTypesByMonth').subscribe((data: BackendData[]) => {
+    this.http.get<BackendData[]>(environment.apiURL + '/Dashboard/GetTransactionTypesByMonth').subscribe((data: BackendData[]) => {
       this.displayTransactionChart(data);
     });
   }
