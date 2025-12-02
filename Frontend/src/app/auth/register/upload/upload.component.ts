@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@ang
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { environment } from 'src/app/environments/environment';
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
@@ -20,7 +21,7 @@ export class UploadComponent implements OnInit {
   minutes:any;
   second:any;
   fileName = '';
-  apiURL= 'http://localhost:5143/api'
+  apiURL= environment.apiURL
   constructor(private http: HttpClient,private datePipe: DatePipe,private translateService: TranslateService) { 
    
   }
