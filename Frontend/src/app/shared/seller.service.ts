@@ -75,4 +75,10 @@ export class SellerService {
   getPaddressById(id: number): Observable<propertyAddress[]> {
     return this.http.get<propertyAddress[]>(this.baseUrl+'/paddress' +'/'+ id);
   }
+  deleteSeller(id: number): Observable<any> {
+    return this.http.delete(this.baseUrl + '/' + id);
+  }
+  deleteBuyer(id: number): Observable<any> {
+    return this.http.delete(this.baseUrl + '/Buyer/' + id);
+  }
 }

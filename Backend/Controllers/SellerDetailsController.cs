@@ -110,12 +110,7 @@ namespace WebAPIBackend.Controllers
             }
 
             var userId = userIdClaim.Value;
-            // Check if there are already 2 PropertyDetails associated with the current WitnessDetail
-            int propertyCount = _context.SellerDetails.Count(s => s.PropertyDetailsId == request.PropertyDetailsId && s.PropertyDetailsId != null);
-            if (propertyCount >= 1)
-            {
-                return StatusCode(400, "You cannot add more than one");
-            }
+            // Allow multiple sellers - removed restriction
             if (request.PropertyDetailsId.Equals(0))
             {
                 return StatusCode(312, "Main Table is Empty");
@@ -230,12 +225,7 @@ namespace WebAPIBackend.Controllers
             }
 
             var userId = userIdClaim.Value;
-            // Check if there are already 2 PropertyDetails associated with the current WitnessDetail
-            int propertyCount = _context.BuyerDetails.Count(b => b.PropertyDetailsId == request.PropertyDetailsId && b.PropertyDetailsId != null);
-            if (propertyCount >= 1)
-            {
-                return StatusCode(400, "You cannot add more than one");
-            }
+            // Allow multiple buyers - removed restriction
             if (request.PropertyDetailsId.Equals(0))
             {
                 return StatusCode(312, "Main Table is Empty");
@@ -448,6 +438,50 @@ namespace WebAPIBackend.Controllers
 
             var result = new { Id = request.Id };
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSeller(int id)
+        {
+            try
+            {
+                var seller = await _context.SellerDetails.FindAsync(id);
+                if (seller == null)
+                {
+                    return NotFound();
+                }
+
+                _context.SellerDetails.Remove(seller);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Seller deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("Buyer/{id}")]
+        public async Task<IActionResult> DeleteBuyer(int id)
+        {
+            try
+            {
+                var buyer = await _context.BuyerDetails.FindAsync(id);
+                if (buyer == null)
+                {
+                    return NotFound();
+                }
+
+                _context.BuyerDetails.Remove(buyer);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Buyer deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPost("addPaddress")]

@@ -72,8 +72,25 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 
-//CorsPolicy Settings
-builder.Services.AddCors();
+//CorsPolicy Settings - Define allowed origins
+string[] allowedOrigins = new string[] 
+{
+    "http://103.132.98.92",  // Your server IP
+    "https://yourdomain.com", // Your domain if you have one
+    "http://localhost:2400",   // Local development
+    "http://localhost:4200"    // Angular development server
+};
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 //Memory Managment for File Upload
 builder.Services.Configure<FormOptions>(o =>
@@ -92,19 +109,8 @@ var app = builder.Build();
 await DatabaseSeeder.SeedDatabase(app.Services);
 
 // Configure the HTTP request pipeline.
-// Configure CORS for production
-string[] allowedOrigins = new string[] 
-{
-    "http://103.132.98.92",  // Your server IP
-    "https://yourdomain.com", // Your domain if you have one
-    "http://localhost:2400"   // Local development
-};
-
-app.UseCors(builder => builder
-    .WithOrigins(allowedOrigins)
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-);
+// Use CORS (must be before UseAuthentication and UseAuthorization)
+app.UseCors();
 
 app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions()

@@ -200,6 +200,40 @@
                         </form>
                     </div>
                 </div>
+                <br>
+                <div class="container">
+                <table class="table table-bordered">
+                    <thead>
+                      <tr style="text-align: center;">
+                        <th> آی دی</th>
+                        <th>نام</th>
+                        <th>نام پدر</th>
+                        <th>نام پدر کلان</th>
+                        <th>شماره تذکره</th>
+                        <th>شماره موبایل</th>
+                        <th>نوع</th>
+                        <th>عملیات</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let b of sellerDetails" style="text-align: center;">
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.id }}</td>
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.firstName }}</td>
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.fatherName }}</td>
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.grandFather }}</td>
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.indentityCardNumber }}</td>
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.phoneNumber }}</td>
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.roleType }}</td>
+                        <td>
+                          <button class="btn btn-danger btn-sm" (click)="deleteBuyer(b.id)">حذف</button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="!sellerDetails || sellerDetails.length === 0">
+                        <td colspan="8" style="text-align: center;">هیچ خریداری ثبت نشده است</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
             </div>
         </div>
     </div>

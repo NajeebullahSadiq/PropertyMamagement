@@ -83,42 +83,57 @@ export class BuyerdetailComponent {
     this.selerService.getprovince().subscribe(res => {
       this.province = res;
     });
+    this.loadBuyerDetails();
+  }
+
+  loadBuyerDetails() {
     this.selerService.getBuyerById(this.id)
     .subscribe(sellers => {
-      this.sellerDetails = sellers;
-      this.sellerForm.setValue({
-        id: sellers[0].id,
-        firstName:sellers[0].firstName,
-        fatherName: sellers[0].fatherName,
-        grandFather: sellers[0].grandFather,
-        indentityCardNumber: sellers[0].indentityCardNumber,
-        phoneNumber: sellers[0].phoneNumber,
-        propertyDetailsId: sellers[0].propertyDetailsId,
-        paddressProvinceId: sellers[0].paddressProvinceId,
-        paddressDistrictId: sellers[0].paddressDistrictId,
-        paddressVillage: sellers[0].paddressVillage,
-        taddressProvinceId: sellers[0].taddressProvinceId,
-        taddressDistrictId: sellers[0].taddressDistrictId,
-        taddressVillage: sellers[0].taddressVillage,
-        photo:sellers[0].photo,
-        nationalIdCard:sellers[0].nationalIdCardPath || '',
-        roleType: sellers[0].roleType || 'Buyer',
-        authorizationLetter: sellers[0].authorizationLetter || '',
-      });
-      this.selectedSellerId=sellers[0].id;
-      this.imagePath=this.baseUrl+sellers[0].photo;
-      this.imageName=sellers.map(item => item.photo).toString();
-      this.nationalIdCardName=sellers[0].nationalIdCardPath || '';
-      this.authorizationLetterName=sellers[0].authorizationLetter || '';
-      this.selerService.getdistrict(sellers[0].paddressProvinceId.valueOf()).subscribe(res => {
-        this.district = res;
-      });
-      this.selerService.getdistrict(sellers[0].taddressProvinceId.valueOf()).subscribe(res => {
-        this.district2 = res;
-      });
-      this.selerService.buyerId=sellers[0].id;
+      this.sellerDetails = sellers || [];
+      if (sellers && sellers.length > 0) {
+        // Load first buyer for editing if exists
+        const firstBuyer = sellers[0];
+        this.sellerForm.setValue({
+          id: firstBuyer.id,
+          firstName:firstBuyer.firstName,
+          fatherName: firstBuyer.fatherName,
+          grandFather: firstBuyer.grandFather,
+          indentityCardNumber: firstBuyer.indentityCardNumber,
+          phoneNumber: firstBuyer.phoneNumber,
+          propertyDetailsId: firstBuyer.propertyDetailsId,
+          paddressProvinceId: firstBuyer.paddressProvinceId,
+          paddressDistrictId: firstBuyer.paddressDistrictId,
+          paddressVillage: firstBuyer.paddressVillage,
+          taddressProvinceId: firstBuyer.taddressProvinceId,
+          taddressDistrictId: firstBuyer.taddressDistrictId,
+          taddressVillage: firstBuyer.taddressVillage,
+          photo:firstBuyer.photo,
+          nationalIdCard:firstBuyer.nationalIdCardPath || '',
+          roleType: firstBuyer.roleType || 'Buyer',
+          authorizationLetter: firstBuyer.authorizationLetter || '',
+        });
+        this.selectedSellerId=firstBuyer.id;
+        this.imagePath=this.baseUrl+firstBuyer.photo;
+        this.imageName=firstBuyer.photo || '';
+        this.nationalIdCardName=firstBuyer.nationalIdCardPath || '';
+        this.authorizationLetterName=firstBuyer.authorizationLetter || '';
+        if (firstBuyer.paddressProvinceId) {
+          this.selerService.getdistrict(firstBuyer.paddressProvinceId.valueOf()).subscribe(res => {
+            this.district = res;
+          });
+        }
+        if (firstBuyer.taddressProvinceId) {
+          this.selerService.getdistrict(firstBuyer.taddressProvinceId.valueOf()).subscribe(res => {
+            this.district2 = res;
+          });
+        }
+        this.selerService.buyerId=firstBuyer.id;
+      } else {
+        // No buyers yet, reset form
+        this.sellerDetails = [];
+        this.selectedSellerId = 0;
+      }
     });
-   
   }
   addBuyerDetail(): void {
     const sellerDetails = this.sellerForm.value as SellerDetail;
@@ -135,12 +150,13 @@ export class BuyerdetailComponent {
           this.toastr.success("معلومات موفقانه ثبت شد");
           this.selerService.buyerId = result.id;
           this.selectedSellerId=result.id;
-          this.onNextClick();
+          this.loadBuyerDetails(); // Reload the list
+          this.resetChild(); // Reset form for next entry
         }
       },
       (error) => {
         if (error.status === 400) {
-          this.toastr.error("به این معامله یک خریدار قبلا ثبت شده");
+          this.toastr.error("خطا در ثبت معلومات");
         } else {
           this.toastr.error("An error occurred");
         }
@@ -158,11 +174,69 @@ updateBuyerDetails(): void {
     sellerDetails.propertyDetailsId=this.propertyDetailsService.mainTableId;
   }
   this.selerService.updateBuyerdetails(sellerDetails).subscribe(result => {
-    if(result.id!==0)
-    this.toastr.info("معلومات موفقانه تغیر کرد");
-    this.selerService.udateSellerId(result.id);
-    this.onNextClick();
+    if(result.id!==0) {
+      this.toastr.info("معلومات موفقانه تغیر کرد");
+      this.selerService.udateBuyerId(result.id);
+      this.loadBuyerDetails(); // Reload the list
+      this.resetChild(); // Reset form
+    }
  });
+}
+
+BindValue(id: number) {
+  const selectedBuyer = this.sellerDetails.find(b => b.id === id);
+  if (selectedBuyer) {
+    this.sellerForm.patchValue({
+      id: selectedBuyer.id,
+      firstName: selectedBuyer.firstName,
+      fatherName: selectedBuyer.fatherName,
+      grandFather: selectedBuyer.grandFather,
+      indentityCardNumber: selectedBuyer.indentityCardNumber,
+      phoneNumber: selectedBuyer.phoneNumber,
+      propertyDetailsId: selectedBuyer.propertyDetailsId,
+      paddressProvinceId: selectedBuyer.paddressProvinceId,
+      paddressDistrictId: selectedBuyer.paddressDistrictId,
+      paddressVillage: selectedBuyer.paddressVillage,
+      taddressProvinceId: selectedBuyer.taddressProvinceId,
+      taddressDistrictId: selectedBuyer.taddressDistrictId,
+      taddressVillage: selectedBuyer.taddressVillage,
+      photo: selectedBuyer.photo,
+      nationalIdCard: selectedBuyer.nationalIdCardPath || '',
+      roleType: selectedBuyer.roleType || 'Buyer',
+      authorizationLetter: selectedBuyer.authorizationLetter || '',
+    });
+    this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
+    this.imageName = selectedBuyer.photo || '';
+    this.nationalIdCardName = selectedBuyer.nationalIdCardPath || '';
+    this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
+    this.selectedSellerId = selectedBuyer.id;
+    
+    if (selectedBuyer.paddressProvinceId) {
+      this.selerService.getdistrict(selectedBuyer.paddressProvinceId.valueOf()).subscribe(res => {
+        this.district = res;
+      });
+    }
+    if (selectedBuyer.taddressProvinceId) {
+      this.selerService.getdistrict(selectedBuyer.taddressProvinceId.valueOf()).subscribe(res => {
+        this.district2 = res;
+      });
+    }
+  }
+}
+
+deleteBuyer(id: number) {
+  if (confirm('آیا مطمئن هستید که می‌خواهید این خریدار را حذف کنید؟')) {
+    this.selerService.deleteBuyer(id).subscribe(
+      () => {
+        this.toastr.success("خریدار با موفقیت حذف شد");
+        this.loadBuyerDetails();
+        this.resetChild();
+      },
+      (error) => {
+        this.toastr.error("خطا در حذف خریدار");
+      }
+    );
+  }
 }
   filterResults(getId:any) {
     

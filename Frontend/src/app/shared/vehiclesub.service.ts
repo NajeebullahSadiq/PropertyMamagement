@@ -56,5 +56,11 @@ export class VehiclesubService {
   getSellerById(id: number): Observable<VBuyerDetail[]> {
     return this.http.get<VBuyerDetail[]>(this.baseUrl+'/Seller' +'/'+ id);
   }
+  deleteSeller(id: number): Observable<any> {
+    return this.http.delete(this.baseUrl + '/Seller/' + id);
+  }
+  deleteBuyer(id: number): Observable<any> {
+    return this.http.delete(this.baseUrl + '/Buyer/' + id);
+  }
 
 }

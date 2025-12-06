@@ -14,14 +14,14 @@
           </ng-template>
         <app-sellerdetail  #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
       </mat-tab>
-    <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.sellerId===0" >
+    <mat-tab [disabled]="propertyService.mainTableId === 0" >
         <ng-template matTabLabel>
             <mat-icon class="large-icon">person</mat-icon>
                  مشتری
           </ng-template>
       <app-buyerdetail  #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
     </mat-tab>
-    <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.buyerId===0">
+    <mat-tab [disabled]="propertyService.mainTableId === 0">
         <ng-template matTabLabel>
             <mat-icon class="large-icon">person</mat-icon>
                  شاهدین
