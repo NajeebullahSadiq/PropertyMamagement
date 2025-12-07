@@ -38,19 +38,19 @@ export class WitnessdetailComponent {
       this.selerService.getWitnessById(this.id)
       .subscribe(witness => {
         this.witnessDetails = witness;
-        this.withnessForm.setValue({
-          id: witness[0].id,
-          firstName:witness[0].firstName,
-          fatherName: witness[0].fatherName,
-          indentityCardNumber: witness[0].indentityCardNumber,
-          phoneNumber: witness[0].phoneNumber,
-          nationalIdCardPath: witness[0].nationalIdCardPath || ''
-        });
-        this.nationalIdCardName = witness[0].nationalIdCardPath || '';
-        this.selerService.withnessId=witness[0].id;
-        this.selectedId=witness[0].id;
-        
-        
+        if (witness && witness.length > 0) {
+          this.withnessForm.setValue({
+            id: witness[0].id,
+            firstName:witness[0].firstName,
+            fatherName: witness[0].fatherName,
+            indentityCardNumber: witness[0].indentityCardNumber,
+            phoneNumber: witness[0].phoneNumber,
+            nationalIdCardPath: witness[0].nationalIdCardPath || ''
+          });
+          this.nationalIdCardName = witness[0].nationalIdCardPath || '';
+          this.selerService.withnessId=witness[0].id;
+          this.selectedId=witness[0].id;
+        }
       });
     }
     addwithnessDetails(): void {

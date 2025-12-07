@@ -232,7 +232,7 @@ namespace WebAPIBackend.Controllers
             }
             //var user = await _userManager.GetUserAsync(User);
            
-            var seller = new BuyerDetail
+            var buyer = new BuyerDetail
             {
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
@@ -251,20 +251,20 @@ namespace WebAPIBackend.Controllers
                 Photo=request.Photo,
                 NationalIdCard=request.NationalIdCard,
                 RoleType=request.RoleType ?? "Buyer",
-                AuthorizationLetter=request.AuthorizationLetter
+                AuthorizationLetter=request.AuthorizationLetter,
             };
             try
             {
-                _context.Add(seller);
+                _context.Add(buyer);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
+                return StatusCode(500, $"Error saving buyer: {ex.Message}");
             }
-            var result = new { Id = seller.Id };
+            var result = new { Id = buyer.Id};
             return Ok(result);
         }
-
 
         [HttpPut("UpdateBuyer/{id}")]
         public async Task<IActionResult> UpdateBuyer(int id, [FromBody] BuyerDetail request)

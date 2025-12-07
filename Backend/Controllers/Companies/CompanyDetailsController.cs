@@ -22,7 +22,7 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
             try
             {
@@ -46,7 +46,7 @@ namespace WebAPIBackend.Controllers.Companies
             }
         }
         [HttpGet("getexpired")]
-        public async Task<IActionResult> GetExpiredLicense()
+        public IActionResult GetExpiredLicense()
         {
             try
             {

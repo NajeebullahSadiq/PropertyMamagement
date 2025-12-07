@@ -67,6 +67,7 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
             catch (Exception ex)
             {
+                return StatusCode(500, $"Error saving buyer: {ex.Message}");
             }
             var result = new { Id = seller.Id };
             return Ok(result);
@@ -318,6 +319,7 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
             catch (Exception ex)
             {
+                return StatusCode(500, $"Error saving witness: {ex.Message}");
             }
             var result = new { Id = witness.Id };
             return Ok(result);

@@ -102,7 +102,8 @@ namespace WebAPIBackend.Configuration
                     new PropertyType { Name = "Warehouse", Des = "Storage facility" },
                     new PropertyType { Name = "Factory", Des = "Industrial facility" },
                     new PropertyType { Name = "Farm", Des = "Agricultural land" },
-                    new PropertyType { Name = "Villa", Des = "Luxury residential property" }
+                    new PropertyType { Name = "Villa", Des = "Luxury residential property" },
+                    new PropertyType { Name = "Block", Des = "Residential block" }
                 };
                 await context.PropertyTypes.AddRangeAsync(propertyTypes);
                 Console.WriteLine("✓ PropertyTypes seeded");

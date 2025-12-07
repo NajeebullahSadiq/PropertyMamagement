@@ -35,14 +35,14 @@
                   </ng-select>
                 </div>
                 <div class="col-md-4">
-                  <label for="pnumber" class="form-label">شماره قباله</label>
+                  <label for="pnumber" class="form-label">شماره سند</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
                     <input type="number" (keypress)="onlyNumberKey($event)" id="pnumber" class="form-control"
                       formControlName="pnumber">
                     </div>
                     <div *ngIf="pnumber?.invalid && (pnumber?.dirty || pnumber?.touched)">
-                      <small class="text-danger" *ngIf="pnumber?.errors?.['required']">شماره قباله الزامی است</small>
+                      <small class="text-danger" *ngIf="pnumber?.errors?.['required']">شماره سند الزامی است</small>
                     </div>
                   
                 </div>

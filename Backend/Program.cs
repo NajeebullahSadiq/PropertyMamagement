@@ -47,7 +47,7 @@ options.Password.RequireUppercase = false);
 builder.Services.Configure<IdentityOptions>(options =>
 options.Password.RequiredLength = 4);
 //JWT Token Setup
-var key = Encoding.UTF8.GetBytes(builder.Configuration["ApplicationSettings:JWT_Secret"]);
+var key = Encoding.UTF8.GetBytes(builder.Configuration["ApplicationSettings:JWT_Secret"] ?? throw new InvalidOperationException("JWT_Secret is not configured"));
 
 builder.Services.AddAuthentication(x =>
 {
@@ -77,7 +77,7 @@ string[] allowedOrigins = new string[]
 {
     "http://103.132.98.92",  // Your server IP
     "https://yourdomain.com", // Your domain if you have one
-    "http://localhost:2400",   // Local development
+    "http://localhost:2400",   // Local development  
     "http://localhost:4200"    // Angular development server
 };
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -33,11 +33,12 @@ export class MasterlayoutComponent implements AfterViewInit {
         this.sidenav.mode = 'side';
         this.sidenav.open();
       }
+      this.cdr.detectChanges();
     });
   
   }
   constructor(private observer: BreakpointObserver,private router: Router,public translate: TranslateService,public dialog: MatDialog,
-    public service: AuthService) { 
+    public service: AuthService, private cdr: ChangeDetectorRef) { 
     translate.addLangs(['English', 'دری']);
     translate.setDefaultLang('دری');
   }

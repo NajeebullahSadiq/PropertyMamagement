@@ -6,8 +6,7 @@ import { AuthService } from 'src/app/shared/auth.service';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: './login.component.html'
 })
 export class LoginComponent {
   formModel = {
@@ -15,11 +14,17 @@ export class LoginComponent {
     Password: ''
   }
   userRole:any='ADMIN';
+  showPassword: boolean = false;
+  
   constructor(private router: Router,private service: AuthService,private toastr: ToastrService) { }
 
   ngOnInit(): void {
     // if (localStorage.getItem('token') != null)
     //   this.router.navigateByUrl('/home');
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
   onSubmit(form: NgForm) {
     this.service.login(form.value).subscribe(

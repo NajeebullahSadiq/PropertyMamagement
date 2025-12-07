@@ -44,19 +44,21 @@ export class PropertyaddressComponent {
       this.selerService.getPaddressById(this.id)
       .subscribe(addr => {
         this.propertyAddressDetails = addr;
-        this.propertyAddressForm.setValue({
-          id: addr[0].id,
-          provinceId:addr[0].provinceId,
-          districtId:addr[0].districtId,
-          village:addr[0].village,
+        if (addr && addr.length > 0) {
+          this.propertyAddressForm.setValue({
+            id: addr[0].id,
+            provinceId:addr[0].provinceId,
+            districtId:addr[0].districtId,
+            village:addr[0].village,
+            
           
-        
-        });
-        this.selerService.getdistrict(addr[0].provinceId.valueOf()).subscribe(res => {
-          this.districts = res;
-          
-        });
-        this.selectedId=addr[0].id;
+          });
+          this.selerService.getdistrict(addr[0].provinceId.valueOf()).subscribe(res => {
+            this.districts = res;
+            
+          });
+          this.selectedId=addr[0].id;
+        }
       
       });
      

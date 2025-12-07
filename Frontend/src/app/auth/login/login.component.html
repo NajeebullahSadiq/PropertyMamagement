@@ -1,42 +1,74 @@
-<div class="bg">
-    <div
-        class="d-flex flex-column min-vh-100 justify-content-center align-items-center">
-        <div class="card p-4 text-light bg-light mb-5">
-            
-            <div style="text-align:center">
-                <img src="assets/img/mcitlogo.png" style="width:50px; align-items: center;" />
-              </div>
-             
-                <div class="d-flex justify-content-center">
-                    <div class="text-primary title"> وزارت عدلیه امارت اسلامی افغانستان</div>
-                </div>
-                <div class="d-flex justify-content-center">
-                    <div class="textcolor">سیستم مدیریت راهنمایی معاملات</div>
-                </div>
-            
-            <div class="card-body w-100">
-                <form #form='ngForm' class="mb-4" autocomplete="off" (submit)="onSubmit(form)" >
-                    <div class="input-group form-group mt-3">
-                        <div class="bg-secondary rounded-start">
-                            <span class="m-3"><i
-                                class="fas fa-user mt-2"></i></span>
-                        </div>
-                        <input class="form-control"  #UserName="ngModel" name="UserName" [(ngModel)]="formModel.UserName" placeholder="نام کاربر" required>
-                    </div>
-                    <div class="input-group form-group mt-3">
-                        <div class="bg-secondary rounded-start">
-                            <span class="m-3"><i class="fas fa-key mt-2"></i></span>
-                        </div>
-                        <input type="password" class="form-control" #Password="ngModel" name="Password" [(ngModel)]="formModel.Password" placeholder="پسورد" required>
-                    </div>
+<div class="min-h-screen w-full fixed inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 animate-gradient-shift z-50">
+    <!-- Main Card -->
+    <div class="w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
+        <!-- Header Section -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-12 text-center text-white">
+            <img src="assets/img/mcitlogo.png" alt="Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-lg animate-logo-float" />
+            <h1 class="text-2xl font-bold mb-2 leading-tight">وزارت عدلیه امارت اسلامی افغانستان</h1>
+            <p class="text-sm font-light opacity-90">سیستم مدیریت راهنمایی معاملات</p>
+        </div>
 
-                    <div class="form-group mt-3">
-                        <input type="submit" value="ورود به سیستم"
-                            class="btn bg-secondary float-end text-white w-100" [disabled]="form.invalid">
+        <!-- Form Section -->
+        <div class="p-8">
+            <form #form='ngForm' autocomplete="off" (submit)="onSubmit(form)" class="space-y-6">
+                <!-- Username Field -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-800">نام کاربر</label>
+                    <div class="relative flex items-center bg-white border-2 border-gray-300 rounded-xl transition-all duration-300 hover:border-blue-400 hover:shadow-md focus-within:border-blue-600 focus-within:shadow-lg focus-within:shadow-blue-200 group h-12 pr-14">
+                        <div class="absolute right-2 w-10 h-10 flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md group-focus-within:shadow-lg group-focus-within:scale-110 transition-all duration-300 flex-shrink-0">
+                            <i class="fas fa-user text-white text-base"></i>
+                        </div>
+                        <input 
+                            type="text"
+                            #UserName="ngModel" 
+                            name="UserName" 
+                            [(ngModel)]="formModel.UserName" 
+                            placeholder="نام کاربری خود را وارد کنید"
+                            required
+                            class="w-full px-4 text-right bg-transparent text-gray-800 placeholder-gray-400 outline-none font-medium h-full">
                     </div>
-                </form>
-                
-			</div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-800">پسورد</label>
+                    <div class="relative flex items-center bg-white border-2 border-gray-300 rounded-xl transition-all duration-300 hover:border-blue-400 hover:shadow-md focus-within:border-blue-600 focus-within:shadow-lg focus-within:shadow-blue-200 group h-12 pr-14 pl-14">
+                        <div class="absolute right-2 w-10 h-10 flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md group-focus-within:shadow-lg group-focus-within:scale-110 transition-all duration-300 flex-shrink-0">
+                            <i class="fas fa-lock text-white text-base"></i>
+                        </div>
+                        <input 
+                            [type]="showPassword ? 'text' : 'password'"
+                            #Password="ngModel" 
+                            name="Password" 
+                            [(ngModel)]="formModel.Password" 
+                            placeholder="پسورد خود را وارد کنید"
+                            required
+                            class="w-full px-4 text-right bg-transparent text-gray-800 placeholder-gray-400 outline-none font-medium h-full">
+                        <button 
+                            type="button" 
+                            (click)="togglePasswordVisibility()"
+                            class="absolute left-2 w-10 h-10 flex items-center justify-center text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 flex-shrink-0">
+                            <i [class]="showPassword ? 'fas fa-eye-slash text-base' : 'fas fa-eye text-base'"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    [disabled]="form.invalid"
+                    class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-blue-400 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95">
+                    ورود به سیستم
+                </button>
+            </form>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="bg-gray-50 px-8 py-4 text-center border-t border-gray-200">
+            <p class="text-sm text-gray-600">
+                مشکل در ورود؟ 
+                <a href="#" class="text-blue-600 font-semibold hover:text-blue-800 transition-colors duration-200">تماس با پشتیبانی</a>
+            </p>
         </div>
     </div>
 </div>

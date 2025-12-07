@@ -150,8 +150,11 @@ export class SellerdetailComponent {
           this.toastr.success("معلومات موفقانه ثبت شد");
           this.selerService.sellerId = result.id;
           this.selectedSellerId=result.id;
-          this.loadSellerDetails(); // Reload the list
-          this.resetChild(); // Reset form for next entry
+          // Small delay to ensure database commit
+          setTimeout(() => {
+            this.loadSellerDetails(); // Reload the list
+            this.resetChild(); // Reset form for next entry
+          }, 300);
         }
       },
       (error) => {

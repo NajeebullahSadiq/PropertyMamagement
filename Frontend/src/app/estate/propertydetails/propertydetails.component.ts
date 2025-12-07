@@ -232,10 +232,11 @@ export class PropertydetailsComponent  implements AfterViewInit {
     const numofFloorControl = this.propertyForm.get('numofFloor');
     const numofRoomControl = this.propertyForm.get('numofRooms');
     if (propertyType === 2) {
+      // For Apartment (ID 2): disable numofFloor but enable numofRooms
       numofFloorControl?.setValue(0);
       numofFloorControl?.disable();
-      numofRoomControl?.setValue(0);
-      numofRoomControl?.disable();
+      numofRoomControl?.enable();
+      numofRoomControl?.setValue(null);
     } else {
       numofFloorControl?.enable();
       numofFloorControl?.setValue(null);

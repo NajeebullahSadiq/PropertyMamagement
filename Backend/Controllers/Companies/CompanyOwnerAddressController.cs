@@ -19,7 +19,7 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet("ownerAddress/{id}")]
-        public async Task<IActionResult> GetOwnerAdressById(int id)
+        public IActionResult GetOwnerAdressById(int id)
         {
             try
             {

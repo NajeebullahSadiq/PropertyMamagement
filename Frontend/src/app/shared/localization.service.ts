@@ -39,7 +39,7 @@ export class LocalizationService {
 
   // Property Types (from backend lookup table)
   propertyTypes = [
-    { value: 'House', label: 'خانه' },
+    { value: 'House', label: 'خویلی' },
     { value: 'Apartment', label: 'آپارتمان' },
     { value: 'Land', label: 'زمین' },
     { value: 'Commercial Building', label: 'ساختمان تجاری' },
@@ -48,7 +48,8 @@ export class LocalizationService {
     { value: 'Warehouse', label: 'انبار' },
     { value: 'Factory', label: 'کارخانه' },
     { value: 'Farm', label: 'مزرعه' },
-    { value: 'Villa', label: 'ویلا' }
+    { value: 'Villa', label: 'ویلا' },
+    { value: 'Block', label: 'بلاک' }
   ];
 
   // Transaction Types (from backend lookup table)

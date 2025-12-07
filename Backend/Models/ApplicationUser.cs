@@ -12,9 +12,9 @@ namespace WebAPI.Models
     {
 
        
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PhotoPath { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? PhotoPath { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsLocked { get; set; }
         public int CompanyId { get; set; }

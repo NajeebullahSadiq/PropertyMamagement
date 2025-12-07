@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebAPIBackend.Configuration;
@@ -11,9 +12,11 @@ using WebAPIBackend.Configuration;
 namespace WebAPIBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251206074103_EnableMultipleSellersAndBuyers")]
+    partial class EnableMultipleSellersAndBuyers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1655,24 +1658,31 @@ namespace WebAPIBackend.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("CompanyName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhotoPath")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("UserId");
@@ -2516,6 +2526,7 @@ namespace WebAPIBackend.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsAdmin")
@@ -2525,9 +2536,11 @@ namespace WebAPIBackend.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhotoPath")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
