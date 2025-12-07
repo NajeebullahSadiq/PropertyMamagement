@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { PropertyDetails, PropertyDetailsList } from '../models/PropertyDetail';
 import { environment } from 'src/environments/environment';
 @Injectable({
@@ -11,6 +11,7 @@ export class PropertyService {
   private baseUrl = environment.apiUrl + '/PropertyDetails';
   private baseUrl2 = environment.apiUrl;
   mainTableId: number=0;
+  propertyAdded = new Subject<void>();
   constructor(private http: HttpClient) { }
 
   addProperty(propertyData: any): Observable<any> {

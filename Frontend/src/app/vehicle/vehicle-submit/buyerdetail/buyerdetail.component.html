@@ -198,6 +198,59 @@
                         </div>
                         </section>
                         <br>
+                        <section>
+                            <div class="row d-flex justify-content-center align-items-center h-100">
+                                <h3 style="font-weight: bold;">معلومات معاملہ</h3>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label me-3">نوعیت ملکیت</label>
+                                        <ng-select formControlName="propertyTypeId" [items]="localizedPropertyTypes" [selectOnTab]="true"
+                                          bindLabel="name" bindValue="id">
+                                        </ng-select>
+                                        <div *ngIf="propertyTypeId?.invalid && (propertyTypeId?.dirty || propertyTypeId?.touched)">
+                                            <small class="text-danger" *ngIf="propertyTypeId?.errors?.['required']">این فیلد الزامی است</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="price" class="form-label">قیمت به عدد</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                                            <input type="number" (keypress)="onlyNumberKey($event)" id="price" class="form-control" formControlName="price">
+                                        </div>
+                                        <div *ngIf="price?.invalid && (price?.dirty || price?.touched)">
+                                            <small class="text-danger" *ngIf="price?.errors?.['required']">این فیلد الزامی است</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="priceText" class="form-label">قیمت به حروف</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                                            <input type="text" id="priceText" class="form-control" formControlName="priceText">
+                                        </div>
+                                        <div *ngIf="priceText?.invalid && (priceText?.dirty || priceText?.touched)">
+                                            <small class="text-danger" *ngIf="priceText?.errors?.['required']">این فیلد الزامی است</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <label for="royaltyAmount" class="form-label">مبلغ حق المتیاز</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                                            <input type="number" id="royaltyAmount" class="form-control" formControlName="royaltyAmount">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="halfPrice" class="form-label">نیم قیمت (خودکار)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                                            <input type="number" id="halfPrice" class="form-control" formControlName="halfPrice" [disabled]="true">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <br>
                         <button type="submit" [disabled]="buyerForm.invalid" class="btn btn-success">{{selectedbuyerId ?
                           'تغیر معلومات' : 'ثبت معلومات'}}</button>
                         <button type="reset"  class="btn btn-primary"

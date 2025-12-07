@@ -39,6 +39,16 @@ public partial class VehiclesBuyerDetail
 
     public string? NationalIdCardPath { get; set; }
 
+    public int? PropertyTypeId { get; set; }
+
+    public double? Price { get; set; }
+
+    public string? PriceText { get; set; }
+
+    public double? RoyaltyAmount { get; set; }
+
+    public double? HalfPrice { get; set; }
+
     public virtual Location? PaddressDistrict { get; set; }
 
     public virtual Location? PaddressProvince { get; set; }

@@ -56,15 +56,11 @@ export class PropertydetailsComponent  implements AfterViewInit {
         punitTypeId: ['', Validators.required],
         numofFloor: ['', Validators.required],
         numofRooms: ['', Validators.required],
-        propertyTypeId: ['', Validators.required],
-        price: ['', Validators.required],
-        priceText: ['', Validators.required],
         north: ['', Validators.required],
         west: ['', Validators.required],
         east: ['', Validators.required],
         south: ['', Validators.required],
         doctype: ['', Validators.required],
-        royaltyAmount: [''],
         transactionTypeId: ['', Validators.required],
         des: ['', Validators.required],
         filePath: [''],
@@ -83,11 +79,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
   }
   ngOnInit() {
     this.selectedPropertyId=this.id;
-    this.propertyDetailsService.getPropertyType().subscribe(res => {
-      this.propertypetype = res;
-      // Map backend property types to localized versions
-      this.localizedPropertyTypes = this.mapPropertyTypesToLocalized(res as any[]);
-    });
     this.propertyDetailsService.getTransactionType().subscribe(res => {
       this.transactiontype = res;
       // Map backend transaction types to localized versions
@@ -104,10 +95,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
             punitTypeId: properties[0].punitTypeId,
             numofFloor: properties[0].numofFloor,
             numofRooms: properties[0].numofRooms,
-            propertyTypeId: properties[0].propertyTypeId,
-            price: properties[0].price,
-            priceText: properties[0].priceText,
-            royaltyAmount: properties[0].royaltyAmount,
             transactionTypeId: properties[0].transactionTypeId,
             des: properties[0].des,
             filePath: properties[0].filePath,
@@ -119,27 +106,15 @@ export class PropertydetailsComponent  implements AfterViewInit {
             south:properties[0].south,
             doctype:properties[0].doctype,
           });
-          this.onePercent = properties[0].price * 0.01;
           this.imageName=properties.map(item => item.filePath).toString();
           // this.selerService.sellerId=0;
           // this.selerService.buyerId=0;
           // this.selerService.withnessId=0;
           this.propertyDetailsService.updateMainTableId(this.id);
-          if(properties[0].propertyTypeId===2){
-            this.onPropertyTypeChange();
-          }
        
         });
   }
       
-  }
-  updateOnePercent() {
-    const priceControl = this.price;
-    if (priceControl && priceControl.value) {
-      this.onePercent = priceControl.value * 0.01;
-    } else {
-      this.onePercent = 0;
-    }
   }
 
   loadDepartments(): void {
@@ -152,25 +127,25 @@ export class PropertydetailsComponent  implements AfterViewInit {
   }
   addPropertyDetails(): void {
     const propertyDetails = this.propertyForm.value as PropertyDetails;
-    propertyDetails.royaltyAmount=this.onePercent;
     propertyDetails.filePath=this.imageName;
      if(propertyDetails.id===null){
       propertyDetails.id=0;
     }
     this.propertyDetailsService.addPropertyDetails(propertyDetails).subscribe(result => {
-      if(result.id!==0)
+      if(result.id!==0) {
        this.propertyDetailsService.updateMainTableId(result.id);
        this.selectedPropertyId=result.id;
-       
        this.toastr.success("معلومات موفقانه ثبت شد");
+       // Notify property list to reload
+       this.propertyDetailsService.propertyAdded.next();
        this.onNextClick();
+      }
     });
 }
 
   updatePropertyDetails(): void {
     const propertyDetails = this.propertyForm.value as PropertyDetails;
     propertyDetails.filePath=this.imageName;
-    propertyDetails.royaltyAmount=this.onePercent;
     if(propertyDetails.id===0 && this.selectedPropertyId!==0 || this.selectedPropertyId!==null){
       propertyDetails.id=this.selectedPropertyId;
     }
@@ -209,18 +184,18 @@ export class PropertydetailsComponent  implements AfterViewInit {
     this.propertyForm.reset({
       id: 0,
       pnumber:'',
-      parea: '',
-      punitTypeId: '',
-      numofFloor: '',
-      numofRooms: '',
-      propertyTypeId: '',
-      price: '',
-      priceText: '',
-      royaltyAmount: '',
-      transactionTypeId: '',
-      des: '',
-      filePath: '',
-      departmentId: ''
+      parea:'',
+      punitTypeId:'',
+      numofFloor:'',
+      numofRooms:'',
+      transactionTypeId:'',
+      des:'',
+      filePath:'',
+      north:'',
+      west:'',
+      east:'',
+      south:'',
+      doctype:'',
     });
     const numofFloorControl = this.propertyForm.get('numofFloor');
     const numofRoomControl = this.propertyForm.get('numofRooms');
@@ -328,10 +303,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
   get punitTypeId() { return this.propertyForm.get('punitTypeId'); }
   get numofFloor() { return this.propertyForm.get('numofFloor'); }
   get numofRooms() { return this.propertyForm.get('numofRooms'); }
-  get propertyTypeId() { return this.propertyForm.get('propertyTypeId'); }
-  get price() { return this.propertyForm.get('price'); }
-  get priceText() { return this.propertyForm.get('priceText'); }
-  get royaltyAmount() { return this.propertyForm.get('royaltyAmount'); }
   get transactionTypeId() { return this.propertyForm.get('transactionTypeId'); }
   get des() { return this.propertyForm.get('des'); }
   get filePath() { return this.propertyForm.get('filePath'); }

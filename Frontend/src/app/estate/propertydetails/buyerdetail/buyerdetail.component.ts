@@ -6,6 +6,7 @@ import { PropertyService } from 'src/app/shared/property.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { UploadComponent } from '../../upload/upload.component';
 import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-upload.component';
+import { LocalizationService } from 'src/app/shared/localization.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -26,6 +27,8 @@ export class BuyerdetailComponent {
   province:any;
   district:any;
   district2:any;
+  propertyTypes:any;
+  localizedPropertyTypes:any;
   roleTypes = [
     { value: 'Buyer', label: 'خریدار' },
     { value: 'Authorized Agent (Buyer)', label: 'وکیل خریدار' }
@@ -45,7 +48,7 @@ export class BuyerdetailComponent {
     }
   }
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
-    ,private fb: FormBuilder, private selerService:SellerService){
+    ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService){
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.sellerForm = this.fb.group({
@@ -65,7 +68,12 @@ export class BuyerdetailComponent {
       photo:[''],
       nationalIdCard:['', Validators.required],
       roleType: ['Buyer', Validators.required],
-      authorizationLetter: ['']
+      authorizationLetter: [''],
+      propertyTypeId: ['', Validators.required],
+      price: ['', Validators.required],
+      priceText: ['', Validators.required],
+      royaltyAmount: [''],
+      halfPrice: ['']
     });
 
     // Add dynamic validation for authorization letter
@@ -82,6 +90,18 @@ export class BuyerdetailComponent {
   ngOnInit() {
     this.selerService.getprovince().subscribe(res => {
       this.province = res;
+    });
+    // Load property types
+    this.propertyDetailsService.getPropertyType().subscribe(res => {
+      this.propertyTypes = res;
+      this.localizedPropertyTypes = this.mapPropertyTypesToLocalized(res as any[]);
+    });
+    // Add price change listener for half-price calculation
+    this.sellerForm.get('price')?.valueChanges.subscribe(price => {
+      if (price) {
+        const calculatedHalfPrice = price / 2;
+        this.sellerForm.patchValue({ halfPrice: calculatedHalfPrice }, { emitEvent: false });
+      }
     });
     this.loadBuyerDetails();
   }
@@ -111,6 +131,11 @@ export class BuyerdetailComponent {
           nationalIdCard:firstBuyer.nationalIdCardPath || '',
           roleType: firstBuyer.roleType || 'Buyer',
           authorizationLetter: firstBuyer.authorizationLetter || '',
+          propertyTypeId: firstBuyer.propertyTypeId || '',
+          price: firstBuyer.price || '',
+          priceText: firstBuyer.priceText || '',
+          royaltyAmount: firstBuyer.royaltyAmount || '',
+          halfPrice: firstBuyer.halfPrice || '',
         });
         this.selectedSellerId=firstBuyer.id;
         this.imagePath=this.baseUrl+firstBuyer.photo;
@@ -186,7 +211,7 @@ updateBuyerDetails(): void {
  });
 }
 
-BindValue(id: number) {
+ BindValue(id: number) {
   const selectedBuyer = this.sellerDetails.find(b => b.id === id);
   if (selectedBuyer) {
     this.sellerForm.patchValue({
@@ -207,6 +232,11 @@ BindValue(id: number) {
       nationalIdCard: selectedBuyer.nationalIdCardPath || '',
       roleType: selectedBuyer.roleType || 'Buyer',
       authorizationLetter: selectedBuyer.authorizationLetter || '',
+      propertyTypeId: selectedBuyer.propertyTypeId || '',
+      price: selectedBuyer.price || '',
+      priceText: selectedBuyer.priceText || '',
+      royaltyAmount: selectedBuyer.royaltyAmount || '',
+      halfPrice: selectedBuyer.halfPrice || '',
     });
     this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
     this.imageName = selectedBuyer.photo || '';
@@ -306,6 +336,21 @@ isAuthorizedAgent(): boolean {
   return roleType && roleType.includes('Agent');
 }
 
+/**
+ * Map backend property types to localized versions with Dari labels
+ */
+mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
+  return backendTypes.map(type => {
+    const localized = this.localizationService.propertyTypes.find(
+      pt => pt.value.toLowerCase() === type.name.toLowerCase()
+    );
+    return {
+      id: type.id,
+      name: localized ? localized.label : type.name
+    };
+  });
+}
+
   get firstName() { return this.sellerForm.get('firstName'); }
   get fatherName() { return this.sellerForm.get('fatherName'); }
   get grandFather() { return this.sellerForm.get('grandFather'); }
@@ -323,4 +368,9 @@ isAuthorizedAgent(): boolean {
   get nationalIdCard() { return this.sellerForm.get('nationalIdCard'); }
   get roleType() { return this.sellerForm.get('roleType'); }
   get authorizationLetter() { return this.sellerForm.get('authorizationLetter'); }
+  get propertyTypeId() { return this.sellerForm.get('propertyTypeId'); }
+  get price() { return this.sellerForm.get('price'); }
+  get priceText() { return this.sellerForm.get('priceText'); }
+  get royaltyAmount() { return this.sellerForm.get('royaltyAmount'); }
+  get halfPrice() { return this.sellerForm.get('halfPrice'); }
 }

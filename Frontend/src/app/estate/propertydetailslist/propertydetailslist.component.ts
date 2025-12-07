@@ -24,7 +24,10 @@ export class PropertydetailslistComponent {
 
   ngOnInit() {
     this.loadData();
-   
+    // Subscribe to property added event to reload list immediately
+    this.propertyService.propertyAdded.subscribe(() => {
+      this.loadData();
+    });
   }
 
   loadData(){

@@ -47,12 +47,14 @@
                   
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label me-3"> نوعیت ملکیت</label>
-                  <ng-select formControlName="propertyTypeId" [items]="localizedPropertyTypes" [selectOnTab]="true"
-                    bindLabel="name" bindValue="id" (change)="onPropertyTypeChange()">
+                  <label class="form-label me-3"> واحد اندازه گیری</label>
+                  <ng-select formControlName="punitTypeId" [items]="localizedUnitTypes" [selectOnTab]="true" bindLabel="name"
+                    bindValue="id">
                   </ng-select>
+                  <!-- <div *ngIf="propertyForm.get('punitTypeId')?.invalid && propertyForm.get('punitTypeId')?.touched">
+                                    <small class="text-danger"> انتخاب این فیلد  الزامی است</small>
+                                  </div> -->
                 </div>
-              
               </div>
               <br>
               <div class="row">
@@ -68,15 +70,6 @@
                   
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label me-3">واحد اندازه گیری</label>
-                  <ng-select formControlName="punitTypeId" [items]="localizedUnitTypes" [selectOnTab]="true" bindLabel="name"
-                    bindValue="id">
-                  </ng-select>
-                  <!-- <div *ngIf="propertyForm.get('punitTypeId')?.invalid && propertyForm.get('punitTypeId')?.touched">
-                                    <small class="text-danger"> انتخاب این فیلد  الزامی است</small>
-                                  </div> -->
-                </div>
-                <div class="col-md-4">
                   <label for="firstName" class="form-label">تعداد منزل</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-building"></i></span>
@@ -86,10 +79,6 @@
                     <small class="text-danger" *ngIf="numofFloor?.errors?.['required']"> این فیلد  الزامی است</small>
                   </div>
                 </div>
-              </div>
-              <br />
-              <div class="row">
-                
                 <div class="col-md-4">
                   <label for="firstName" class="form-label">تعداد اطاق</label>
                   <div class="input-group">
@@ -100,6 +89,10 @@
                     <small class="text-danger" *ngIf="numofRooms?.errors?.['required']"> این فیلد  الزامی است</small>
                   </div>
                 </div>
+              </div>
+              <br />
+              <div class="row">
+                
                 <div class="col-md-4">
                   <label class="form-label me-3"> نوعیت معامله</label>
                   <ng-select formControlName="transactionTypeId" [items]="localizedTransactionTypes" [selectOnTab]="true"
@@ -109,45 +102,6 @@
                                   <small class="text-danger"> انتخاب نوعیت معامله  الزامی است</small>
                                 </div> -->
                 </div>
-                <div class="col-md-4">
-                  <label for="firstName" class="form-label"> قیمت به عدد</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                    <input type="number" (keypress)="onlyNumberKey($event)" id="price" class="form-control" formControlName="price" (input)="updateOnePercent()">
-                  </div>
-                  <div *ngIf="price?.invalid && (price?.dirty || price?.touched)">
-                    <small class="text-danger" *ngIf="price?.errors?.['required']"> این فیلد الزامی است</small>
-                  </div>
-                </div>
-              </div>
-              <br>
-              <div class="row">
-               
-                <div class="col-md-4">
-                  <label for="firstName" class="form-label"> قیمت به حروف</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                    <input type="text" id="priceText" class="form-control" formControlName="priceText">
-                  </div>
-                  <div *ngIf="priceText?.invalid && (priceText?.dirty || priceText?.touched)">
-                    <small class="text-danger" *ngIf="priceText?.errors?.['required']"> این فیلد الزامی است</small>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <label for="firstName" class="form-label"> مبلغ حق المتیاز </label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                    <input type="number" id="royaltyAmount"  [value]="onePercent"  class="form-control" disabled>
-                  </div>
-                  <!-- <div *ngIf="royaltyAmount?.invalid && (royaltyAmount?.dirty || royaltyAmount?.touched)">
-                    <small class="text-danger" *ngIf="royaltyAmount?.errors?.['required']"> این فیلد الزامی است</small>
-                  </div> -->
-                </div>
-              </div>
-              <br>
-              
-              <div class="row">
-               
                 <div class="col-md-6">
                   <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
                   <div class="col-md-9">
@@ -258,3 +212,6 @@
     </div>
   </div>
 </section>
+
+<br>
+<app-propertydetailslist></app-propertydetailslist>

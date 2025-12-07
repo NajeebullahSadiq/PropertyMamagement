@@ -16,6 +16,11 @@ export interface SellerDetail {
     nationalIdCardPath:string;
     roleType:string; // "Seller" or "Authorized Agent (Seller)"
     authorizationLetter:string; // Path to authorization letter file
+    propertyTypeId?:number;
+    price?:number;
+    priceText?:string;
+    royaltyAmount?:number;
+    halfPrice?:number;
 }
 
 export interface VBuyerDetail {
@@ -36,4 +41,9 @@ export interface VBuyerDetail {
     nationalIdCardPath:string;
     roleType:string; // "Buyer" or "Authorized Agent (Buyer)"
     authorizationLetter:string; // Path to authorization letter file
+    propertyTypeId?:number;
+    price?:number;
+    priceText?:string;
+    royaltyAmount?:number;
+    halfPrice?:number;
 }

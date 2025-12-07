@@ -146,11 +146,9 @@ export class SellerdetailComponent {
           this.toastr.success("معلومات موفقانه ثبت شد");
           this.selectedSellerId=result.id;
           this.vehiclesubservice.udateSellerId(result.id);
-          // Small delay to ensure database commit
-          setTimeout(() => {
-            this.loadSellerDetails(); // Reload the list
-            this.resetChild(); // Reset form for next entry
-          }, 300);
+          // Reload the list immediately
+          this.loadSellerDetails();
+          this.resetChild(); // Reset form for next entry
         }
       },
       (error) => {
