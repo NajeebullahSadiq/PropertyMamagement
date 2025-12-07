@@ -41,8 +41,12 @@
 # ============================================
 # RESOURCES - Images and Media
 # ============================================
-/Backend/Resources/Images/
-/Resources/Images/
+# Note: Resources directory structure is kept in git via .gitkeep files
+# Only ignore actual image/media files, not the directory structure
+/Backend/Resources/Images/*
+!/Backend/Resources/Images/.gitkeep
+/Resources/Images/*
+!/Resources/Images/.gitkeep
 
 # ============================================
 # IDE & Editor
