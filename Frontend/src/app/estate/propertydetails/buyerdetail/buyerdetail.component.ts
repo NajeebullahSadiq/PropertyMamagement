@@ -29,10 +29,7 @@ export class BuyerdetailComponent {
   district2:any;
   propertyTypes:any;
   localizedPropertyTypes:any;
-  roleTypes = [
-    { value: 'Buyer', label: 'خریدار' },
-    { value: 'Authorized Agent (Buyer)', label: 'وکیل خریدار' }
-  ];
+  roleTypes: any = [];
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   onNextClick() {
@@ -76,10 +73,17 @@ export class BuyerdetailComponent {
       halfPrice: ['']
     });
 
-    // Add dynamic validation for authorization letter
+    // Add dynamic validation for authorization letter based on agent roles
     this.sellerForm.get('roleType')?.valueChanges.subscribe(roleType => {
       const authLetterControl = this.sellerForm.get('authorizationLetter');
-      if (roleType && roleType.includes('Agent')) {
+      // Agent roles that require Power of Attorney (وکالت‌نامه)
+      const agentRoles = [
+        'Purchase Agent',
+        'Agent for buyer in a revocable sale',
+        'Agent for lessee'
+      ];
+      
+      if (roleType && agentRoles.includes(roleType)) {
         authLetterControl?.setValidators([Validators.required]);
       } else {
         authLetterControl?.clearValidators();
@@ -88,6 +92,16 @@ export class BuyerdetailComponent {
     });
   }
   ngOnInit() {
+    // Initialize role types from localization service
+    this.roleTypes = [
+      this.localizationService.roleTypes.buyer,
+      this.localizationService.roleTypes.revocableSaleBuyer,
+      this.localizationService.roleTypes.lessee,
+      this.localizationService.roleTypes.buyerAgent,
+      this.localizationService.roleTypes.revocableSaleBuyerAgent,
+      this.localizationService.roleTypes.leaseReceiverAgent
+    ];
+    
     this.selerService.getprovince().subscribe(res => {
       this.province = res;
     });
@@ -333,7 +347,13 @@ authorizationLetterUploadFinished = (event:string) => {
 
 isAuthorizedAgent(): boolean {
   const roleType = this.sellerForm.get('roleType')?.value;
-  return roleType && roleType.includes('Agent');
+  // Agent roles that require Power of Attorney (وکالت‌نامه)
+  const agentRoles = [
+    'Purchase Agent',
+    'Agent for buyer in a revocable sale',
+    'Agent for lessee'
+  ];
+  return roleType && agentRoles.includes(roleType);
 }
 
 /**
