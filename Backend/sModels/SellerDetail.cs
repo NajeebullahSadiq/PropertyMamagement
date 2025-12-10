@@ -37,6 +37,14 @@ public partial class SellerDetail
 
     public string? Photo { get; set; }
 
+    public string? NationalIdCardPath { get; set; }
+
+    public string? RoleType { get; set; }
+
+    public string? AuthorizationLetter { get; set; }
+
+    public string? HeirsLetter { get; set; }
+
     public int? PropertyTypeId { get; set; }
 
     public double? Price { get; set; }

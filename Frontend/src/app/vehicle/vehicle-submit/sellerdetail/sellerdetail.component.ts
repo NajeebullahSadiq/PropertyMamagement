@@ -19,6 +19,7 @@ export class SellerdetailComponent {
   imageName:string='';
   nationalIdFileName:string='';
   authorizationLetterName:string='';
+  heirsLetterName:string='';
   mainTableId:number=0;
   SellerForm: FormGroup = new FormGroup({});
   selectedSellerId: number=0;
@@ -26,7 +27,7 @@ export class SellerdetailComponent {
   province:any;
   district:any;
   district2:any;
-  roleTypes: any;
+  roleTypes: any[] = [];
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   onNextClick() {
@@ -55,25 +56,51 @@ export class SellerdetailComponent {
       photo:[''],
       nationalIdCardPath:['', Validators.required],
       roleType: ['Seller', Validators.required],
-      authorizationLetter: ['']
+      authorizationLetter: [''],
+      heirsLetter: ['']
     });
 
-    // Add dynamic validation for authorization letter
+    // Add dynamic validation for authorization letter and heirs letter based on roleType
     this.SellerForm.get('roleType')?.valueChanges.subscribe(roleType => {
       const authLetterControl = this.SellerForm.get('authorizationLetter');
-      if (roleType && roleType.includes('Agent')) {
+      const heirsLetterControl = this.SellerForm.get('heirsLetter');
+      
+      // Check if it's an agent role (Sales Agent, Lease Agent, Agent for revocable sale)
+      const agentRoles = ['Sales Agent', 'Lease Agent', 'Agent for a revocable sale'];
+      const isAgent = agentRoles.includes(roleType);
+      
+      // Check if it's heirs role
+      const isHeirs = roleType === 'Heirs';
+      
+      // Set validation for authorization letter (required for agents)
+      if (isAgent) {
         authLetterControl?.setValidators([Validators.required]);
       } else {
         authLetterControl?.clearValidators();
       }
+      
+      // Set validation for heirs letter (required for heirs)
+      if (isHeirs) {
+        heirsLetterControl?.setValidators([Validators.required]);
+      } else {
+        heirsLetterControl?.clearValidators();
+      }
+      
       authLetterControl?.updateValueAndValidity();
+      heirsLetterControl?.updateValueAndValidity();
     });
   }
   ngOnInit() {
     // Initialize role types from localization service
     this.roleTypes = [
       this.localizationService.roleTypes.seller,
-      this.localizationService.roleTypes.sellerAgent
+      this.localizationService.roleTypes.sellers,
+      this.localizationService.roleTypes.lessor,
+      this.localizationService.roleTypes.revocableSaleSeller,
+      this.localizationService.roleTypes.heirs,
+      this.localizationService.roleTypes.sellerAgent,
+      this.localizationService.roleTypes.leaseAgent,
+      this.localizationService.roleTypes.revocableSaleAgent
     ];
     
     this.selerService.getprovince().subscribe(res => {
@@ -107,11 +134,13 @@ export class SellerdetailComponent {
           nationalIdCardPath: firstSeller.nationalIdCardPath || '',
           roleType: firstSeller.roleType || 'Seller',
           authorizationLetter: firstSeller.authorizationLetter || '',
+          heirsLetter: firstSeller.heirsLetter || '',
         });
         this.imagePath=this.baseUrl+firstSeller.photo;
         this.imageName=firstSeller.photo || '';
         this.nationalIdFileName=firstSeller.nationalIdCardPath || '';
         this.authorizationLetterName=firstSeller.authorizationLetter || '';
+        this.heirsLetterName=firstSeller.heirsLetter || '';
         this.selectedSellerId=firstSeller.id;
         if (firstSeller.paddressProvinceId) {
           this.selerService.getdistrict(firstSeller.paddressProvinceId.valueOf()).subscribe(res => {
@@ -136,6 +165,7 @@ export class SellerdetailComponent {
     vbuyerdetails.photo=this.imageName;
     vbuyerdetails.nationalIdCardPath=this.nationalIdFileName;
     vbuyerdetails.authorizationLetter=this.authorizationLetterName;
+    vbuyerdetails.heirsLetter=this.heirsLetterName;
     vbuyerdetails.propertyDetailsId=this.vehicleService.mainTableId;
     if (vbuyerdetails.id === null) {
       vbuyerdetails.id = 0;
@@ -166,6 +196,7 @@ updateSellerDetails(): void {
   sellerDetails.photo=this.imageName;
   sellerDetails.nationalIdCardPath=this.nationalIdFileName;
   sellerDetails.authorizationLetter=this.authorizationLetterName;
+  sellerDetails.heirsLetter=this.heirsLetterName;
   if(sellerDetails.id===0 && this.selectedSellerId!==0 || this.selectedSellerId!==null){
     sellerDetails.id=this.selectedSellerId;
     sellerDetails.propertyDetailsId=this.vehicleService.mainTableId;
@@ -180,7 +211,7 @@ updateSellerDetails(): void {
  });
 }
 
-BindValue(id: number) {
+ BindValue(id: number) {
   const selectedSeller = this.SellerDetails.find(s => s.id === id);
   if (selectedSeller) {
     this.SellerForm.patchValue({
@@ -201,11 +232,13 @@ BindValue(id: number) {
       nationalIdCardPath: selectedSeller.nationalIdCardPath || '',
       roleType: selectedSeller.roleType || 'Seller',
       authorizationLetter: selectedSeller.authorizationLetter || '',
+      heirsLetter: selectedSeller.heirsLetter || '',
     });
     this.imagePath = this.baseUrl + (selectedSeller.photo || 'assets/img/avatar.png');
     this.imageName = selectedSeller.photo || '';
     this.nationalIdFileName = selectedSeller.nationalIdCardPath || '';
     this.authorizationLetterName = selectedSeller.authorizationLetter || '';
+    this.heirsLetterName = selectedSeller.heirsLetter || '';
     this.selectedSellerId = selectedSeller.id;
     
     if (selectedSeller.paddressProvinceId) {
@@ -255,6 +288,7 @@ deleteSeller(id: number) {
       this.selectedSellerId=0;
       this.nationalIdFileName='';
       this.authorizationLetterName='';
+      this.heirsLetterName='';
 }
 onlyNumberKey(event:any) {
   const keyCode = event.which || event.keyCode;
@@ -282,9 +316,21 @@ authorizationLetterUploadFinished = (event:string) => {
   console.log('Authorization Letter uploaded: '+event);
 }
 
+heirsLetterUploadFinished = (event:string) => {
+  this.heirsLetterName="Resources\\Images\\"+event;
+  this.SellerForm.patchValue({ heirsLetter: this.heirsLetterName });
+  console.log('Heirs Letter uploaded: '+event);
+}
+
 isAuthorizedAgent(): boolean {
   const roleType = this.SellerForm.get('roleType')?.value;
-  return roleType && roleType.includes('Agent');
+  const agentRoles = ['Sales Agent', 'Lease Agent', 'Agent for a revocable sale'];
+  return agentRoles.includes(roleType);
+}
+
+isHeirs(): boolean {
+  const roleType = this.SellerForm.get('roleType')?.value;
+  return roleType === 'Heirs';
 }
 
   get firstName() { return this.SellerForm.get('firstName'); }
@@ -303,4 +349,5 @@ isAuthorizedAgent(): boolean {
   get nationalIdCardPath() { return this.SellerForm.get('nationalIdCardPath'); }
   get roleType() { return this.SellerForm.get('roleType'); }
   get authorizationLetter() { return this.SellerForm.get('authorizationLetter'); }
+  get heirsLetter() { return this.SellerForm.get('heirsLetter'); }
 }

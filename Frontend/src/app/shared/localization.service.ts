@@ -13,7 +13,13 @@ export class LocalizationService {
   // Role Types Translations
   roleTypes = {
     seller: { value: 'Seller', label: 'فروشنده' },
-    sellerAgent: { value: 'Authorized Agent (Seller)', label: 'وکیل فروشنده' },
+    sellers: { value: 'Sellers', label: 'فروشندگان' },
+    lessor: { value: 'Lessor', label: 'کرایه‌دهنده' },
+    revocableSaleSeller: { value: 'Seller in a revocable sale', label: 'بایع بیع جایزی' },
+    heirs: { value: 'Heirs', label: 'ورثه' },
+    sellerAgent: { value: 'Sales Agent', label: 'وکیل فروش' },
+    leaseAgent: { value: 'Lease Agent', label: 'وکیل کرایه' },
+    revocableSaleAgent: { value: 'Agent for a revocable sale', label: 'وکیل بیع جایزی' },
     buyer: { value: 'Buyer', label: 'خریدار' },
     buyerAgent: { value: 'Authorized Agent (Buyer)', label: 'وکیل خریدار' }
   };

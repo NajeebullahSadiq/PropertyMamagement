@@ -158,6 +158,23 @@ namespace WebAPIBackend.Controllers.Vehicles
             {
                 return StatusCode(312, "Main Table is Empty");
             }
+
+            // Validate conditional document requirements based on role type
+            var roleType = request.RoleType ?? "Seller";
+            var agentRoles = new[] { "Sales Agent", "Lease Agent", "Agent for a revocable sale" };
+            
+            // If agent role, authorization letter is required
+            if (agentRoles.Contains(roleType) && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            {
+                return StatusCode(400, "Authorization letter is required for agent roles");
+            }
+            
+            // If heirs role, heirs letter is required
+            if (roleType == "Heirs" && string.IsNullOrWhiteSpace(request.HeirsLetter))
+            {
+                return StatusCode(400, "Heirs letter is required for heirs role");
+            }
+
             //var user = await _userManager.GetUserAsync(User);
 
             var seller = new VehiclesSellerDetail
@@ -178,8 +195,9 @@ namespace WebAPIBackend.Controllers.Vehicles
                 PropertyDetailsId = request.PropertyDetailsId,
                 Photo = request.Photo,
                 NationalIdCardPath = request.NationalIdCardPath,
-                RoleType=request.RoleType ?? "Seller",
+                RoleType=roleType,
                 AuthorizationLetter=request.AuthorizationLetter,
+                HeirsLetter=request.HeirsLetter,
             };
             try
             {
@@ -219,6 +237,22 @@ namespace WebAPIBackend.Controllers.Vehicles
             if (existingProperty == null)
             {
                 return NotFound();
+            }
+
+            // Validate conditional document requirements based on role type
+            var roleType = request.RoleType ?? "Seller";
+            var agentRoles = new[] { "Sales Agent", "Lease Agent", "Agent for a revocable sale" };
+            
+            // If agent role, authorization letter is required
+            if (agentRoles.Contains(roleType) && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            {
+                return StatusCode(400, "Authorization letter is required for agent roles");
+            }
+            
+            // If heirs role, heirs letter is required
+            if (roleType == "Heirs" && string.IsNullOrWhiteSpace(request.HeirsLetter))
+            {
+                return StatusCode(400, "Heirs letter is required for heirs role");
             }
 
             // Store the original values of the CreatedBy and CreatedOn properties

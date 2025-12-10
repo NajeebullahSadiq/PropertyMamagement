@@ -42,6 +42,8 @@ public partial class VehiclesSellerDetail
     public string? RoleType { get; set; } // "Seller" or "Authorized Agent (Seller)"
 
     public string? AuthorizationLetter { get; set; } // Path to authorization letter file
+
+    public string? HeirsLetter { get; set; } // Path to heirs letter file
     
     public virtual Location? PaddressDistrict { get; set; }
 

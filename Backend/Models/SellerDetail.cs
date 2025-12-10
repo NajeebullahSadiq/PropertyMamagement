@@ -43,6 +43,8 @@ public partial class SellerDetail
 
     public string? AuthorizationLetter { get; set; } // Path to authorization letter file
 
+    public string? HeirsLetter { get; set; } // Path to heirs letter file
+
     public virtual Location? PaddressDistrict { get; set; }
 
     public virtual Location? PaddressProvince { get; set; }

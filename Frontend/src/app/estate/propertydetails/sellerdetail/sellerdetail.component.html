@@ -32,7 +32,7 @@
                             <!-- Role Type Selection -->
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label for="roleType" class="form-label">نوع</label>
+                                    <label for="roleType" class="form-label">نوعیت عاقد</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                         <select id="roleType" class="form-control" formControlName="roleType">
@@ -45,13 +45,24 @@
                                 </div>
                             </div>
 
-                            <!-- Conditional Authorization Letter Upload -->
+                            <!-- Conditional Authorization Letter Upload (for agents) -->
                             <div class="row mt-3" *ngIf="isAuthorizedAgent()">
                                 <div class="col-md-12">
                                     <h5 style="font-weight: bold; color: #dc3545;">آپلود وکالت نامه (الزامی)</h5>
                                     <app-upload #authLetterComponent (sendMessage)="authorizationLetterUploadFinished($event)" style="text-align:left;"></app-upload>
                                     <div *ngIf="authorizationLetter?.invalid && (authorizationLetter?.dirty || authorizationLetter?.touched)">
                                         <small class="text-danger" *ngIf="authorizationLetter?.errors?.['required']">آپلود وکالت نامه الزامی است</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Conditional Heirs Letter Upload (for heirs) -->
+                            <div class="row mt-3" *ngIf="isHeirs()">
+                                <div class="col-md-12">
+                                    <h5 style="font-weight: bold; color: #dc3545;">آپلود نامه ورثه (الزامی)</h5>
+                                    <app-upload #heirsLetterComponent (sendMessage)="heirsLetterUploadFinished($event)" style="text-align:left;"></app-upload>
+                                    <div *ngIf="heirsLetter?.invalid && (heirsLetter?.dirty || heirsLetter?.touched)">
+                                        <small class="text-danger" *ngIf="heirsLetter?.errors?.['required']">آپلود نامه ورثه الزامی است</small>
                                     </div>
                                 </div>
                             </div>
@@ -222,7 +233,7 @@
                         <th>نام پدر کلان</th>
                         <th>شماره تذکره</th>
                         <th>شماره موبایل</th>
-                        <th>نوع</th>
+                        <th>نوعیت عاقد</th>
                         <th>عملیات</th>
                       </tr>
                     </thead>

@@ -14,8 +14,9 @@ export interface SellerDetail {
     propertyDetailsId:number;
     photo:string;
     nationalIdCardPath:string;
-    roleType:string; // "Seller" or "Authorized Agent (Seller)"
-    authorizationLetter:string; // Path to authorization letter file
+    roleType:string; // Seller role type
+    authorizationLetter?:string; // Path to authorization letter file (for agents)
+    heirsLetter?:string; // Path to heirs letter file (for heirs)
     propertyTypeId?:number;
     price?:number;
     priceText?:string;
@@ -39,8 +40,9 @@ export interface VBuyerDetail {
     propertyDetailsId:number;
     photo:string;
     nationalIdCardPath:string;
-    roleType:string; // "Buyer" or "Authorized Agent (Buyer)"
-    authorizationLetter:string; // Path to authorization letter file
+    roleType:string; // Seller role type
+    authorizationLetter?:string; // Path to authorization letter file (for agents)
+    heirsLetter?:string; // Path to heirs letter file (for heirs)
     propertyTypeId?:number;
     price?:number;
     priceText?:string;
