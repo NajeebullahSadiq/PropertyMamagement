@@ -43,6 +43,10 @@ public partial class VehiclesBuyerDetail
 
     public string? AuthorizationLetter { get; set; } // Path to authorization letter file
 
+    public DateTime? RentStartDate { get; set; }
+
+    public DateTime? RentEndDate { get; set; }
+
     public virtual ICollection<Vehiclebuyeraudit> Vehiclebuyeraudits { get; } = new List<Vehiclebuyeraudit>();
 
     public virtual Location? PaddressDistrict { get; set; }

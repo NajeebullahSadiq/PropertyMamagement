@@ -47,6 +47,10 @@ public partial class BuyerDetail
 
     public double? HalfPrice { get; set; }
 
+    public DateTime? RentStartDate { get; set; }
+
+    public DateTime? RentEndDate { get; set; }
+
     public virtual Location? PaddressDistrict { get; set; }
 
     public virtual Location? PaddressProvince { get; set; }

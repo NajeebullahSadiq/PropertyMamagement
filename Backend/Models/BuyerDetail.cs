@@ -42,6 +42,10 @@ public partial class BuyerDetail
 
     public string? AuthorizationLetter { get; set; } // Path to authorization letter file
 
+    public DateTime? RentStartDate { get; set; }
+
+    public DateTime? RentEndDate { get; set; }
+
     public virtual Location? PaddressDistrict { get; set; }
 
     public virtual Location? PaddressProvince { get; set; }

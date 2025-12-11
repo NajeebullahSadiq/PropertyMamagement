@@ -62,16 +62,27 @@ export class BuyerdetailComponent {
       price: ['', Validators.required],
       priceText: ['', Validators.required],
       royaltyAmount: [''],
-      halfPrice: ['']
+      halfPrice: [''],
+      rentStartDate: [''],
+      rentEndDate: ['']
     });
 
     // Add dynamic validation for authorization letter based on agent roles
     this.buyerForm.get('roleType')?.valueChanges.subscribe(roleType => {
       const authLetterControl = this.buyerForm.get('authorizationLetter');
+      const rentStartDateControl = this.buyerForm.get('rentStartDate');
+      const rentEndDateControl = this.buyerForm.get('rentEndDate');
+      
       // Agent roles that require Power of Attorney (وکالت‌نامه)
       const agentRoles = [
         'Purchase Agent',
         'Agent for buyer in a revocable sale',
+        'Agent for lessee'
+      ];
+      
+      // Lessee roles that require rental dates
+      const lesseeRoles = [
+        'Lessee',
         'Agent for lessee'
       ];
       
@@ -81,6 +92,19 @@ export class BuyerdetailComponent {
         authLetterControl?.clearValidators();
       }
       authLetterControl?.updateValueAndValidity();
+
+      // Set rental date validation based on lessee roles
+      if (roleType && lesseeRoles.includes(roleType)) {
+        rentStartDateControl?.setValidators([Validators.required]);
+        rentEndDateControl?.setValidators([Validators.required]);
+      } else {
+        rentStartDateControl?.clearValidators();
+        rentEndDateControl?.clearValidators();
+        rentStartDateControl?.reset();
+        rentEndDateControl?.reset();
+      }
+      rentStartDateControl?.updateValueAndValidity();
+      rentEndDateControl?.updateValueAndValidity();
     });
   }
   ngOnInit() {
@@ -142,6 +166,8 @@ export class BuyerdetailComponent {
           priceText: firstBuyer.priceText || '',
           royaltyAmount: firstBuyer.royaltyAmount || '',
           halfPrice: firstBuyer.halfPrice || '',
+          rentStartDate: firstBuyer.rentStartDate || '',
+          rentEndDate: firstBuyer.rentEndDate || '',
         });
         this.imagePath=this.baseUrl+firstBuyer.photo;
         this.imageName=firstBuyer.photo || '';
@@ -241,6 +267,8 @@ updateBuyerDetails(): void {
       priceText: selectedBuyer.priceText || '',
       royaltyAmount: selectedBuyer.royaltyAmount || '',
       halfPrice: selectedBuyer.halfPrice || '',
+      rentStartDate: selectedBuyer.rentStartDate || '',
+      rentEndDate: selectedBuyer.rentEndDate || '',
     });
     this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
     this.imageName = selectedBuyer.photo || '';
@@ -370,4 +398,12 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   get priceText() { return this.buyerForm.get('priceText'); }
   get royaltyAmount() { return this.buyerForm.get('royaltyAmount'); }
   get halfPrice() { return this.buyerForm.get('halfPrice'); }
+  get rentStartDate() { return this.buyerForm.get('rentStartDate'); }
+  get rentEndDate() { return this.buyerForm.get('rentEndDate'); }
+
+  isLesseeRole(): boolean {
+    const roleType = this.buyerForm.get('roleType')?.value;
+    const lesseeRoles = ['Lessee', 'Agent for lessee'];
+    return roleType && lesseeRoles.includes(roleType);
+  }
 }

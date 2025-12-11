@@ -59,6 +59,8 @@ namespace WebAPIBackend.Controllers.Vehicles
                 NationalIdCardPath = request.NationalIdCardPath,
                 RoleType=request.RoleType ?? "Buyer",
                 AuthorizationLetter=request.AuthorizationLetter,
+                RentStartDate = request.RentStartDate,
+                RentEndDate = request.RentEndDate,
             };
             try
             {

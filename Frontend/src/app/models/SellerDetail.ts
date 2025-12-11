@@ -22,6 +22,8 @@ export interface SellerDetail {
     priceText?:string;
     royaltyAmount?:number;
     halfPrice?:number;
+    rentStartDate?:Date; // Rental start date for lessee roles
+    rentEndDate?:Date; // Rental end date for lessee roles
 }
 
 export interface VBuyerDetail {
@@ -48,4 +50,6 @@ export interface VBuyerDetail {
     priceText?:string;
     royaltyAmount?:number;
     halfPrice?:number;
+    rentStartDate?:Date; // Rental start date for lessee roles
+    rentEndDate?:Date; // Rental end date for lessee roles
 }

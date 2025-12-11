@@ -285,6 +285,8 @@ namespace WebAPIBackend.Controllers
                 Photo=request.Photo,
                 RoleType=request.RoleType ?? "Buyer",
                 AuthorizationLetter=request.AuthorizationLetter,
+                RentStartDate = request.RentStartDate,
+                RentEndDate = request.RentEndDate,
             };
             try
             {
