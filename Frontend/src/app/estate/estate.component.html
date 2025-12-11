@@ -1,13 +1,19 @@
 <div class="container">
-<mat-tab-group #tabGroup>
+  <div class="page-actions">
+    <button class="btn-cancellation" routerLink="/estate/cancellation" title="صفحهٔ ابطال معاملات">
+      <mat-icon>block</mat-icon>
+      صفحهٔ ابطال معاملات
+    </button>
+  </div>
+  <mat-tab-group #tabGroup>
     <mat-tab class="blue-tab">
-        <ng-template matTabLabel>
-            <mat-icon class="large-icon">home</mat-icon>
-                 جایداد
-          </ng-template>
-          <app-propertydetails   #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-propertydetails>
-      </mat-tab>
-      <mat-tab [disabled]="propertyService.mainTableId === 0" >
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">home</mat-icon>
+        جایداد
+      </ng-template>
+      <app-propertydetails   #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-propertydetails>
+    </mat-tab>
+    <mat-tab [disabled]="propertyService.mainTableId === 0" >
         <ng-template matTabLabel  >
             <mat-icon class="large-icon">person</mat-icon>
                  مالک

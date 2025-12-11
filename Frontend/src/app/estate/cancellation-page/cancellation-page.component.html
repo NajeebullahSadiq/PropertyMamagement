@@ -1,0 +1,204 @@
+<div class="cancellation-container">
+  <div class="page-header">
+    <h1>صفحهٔ ابطال معاملات</h1>
+    <p>مدیریت و ثبت معاملات ملکی ابطال شده</p>
+  </div>
+
+  <div class="tabs-container">
+    <div class="tabs">
+      <button 
+        class="tab-button" 
+        [class.active]="selectedTab === 'active'"
+        (click)="switchTab('active')">
+        معاملات فعال
+        <span class="badge">{{ activeTransactions.length }}</span>
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="selectedTab === 'cancelled'"
+        (click)="switchTab('cancelled')">
+        معاملات ابطال شده
+        <span class="badge">{{ cancelledTransactions.length }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-container" *ngIf="selectedTab === 'active'">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="جستجو بر اساس نام مالک یا شماره ملک"
+        [(ngModel)]="searchText"
+        class="search-input">
+    </div>
+    <div class="filter-box">
+      <select [(ngModel)]="filterTransactionType" class="filter-select">
+        <option value="">تمام انواع معاملات</option>
+        <option *ngFor="let type of transactionTypes" [value]="type.value">
+          {{ type.label }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="filters-container" *ngIf="selectedTab === 'cancelled'">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="جستجو بر اساس نام مالک یا شماره ملک"
+        [(ngModel)]="searchText"
+        class="search-input">
+    </div>
+    <div class="filter-box">
+      <select [(ngModel)]="filterTransactionType" class="filter-select">
+        <option value="">تمام انواع معاملات</option>
+        <option *ngFor="let type of transactionTypes" [value]="type.value">
+          {{ type.label }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>در حال بارگیری...</p>
+  </div>
+
+  <div class="transactions-container" *ngIf="!loading && selectedTab === 'active'">
+    <div *ngIf="getFilteredActiveTransactions().length === 0" class="empty-state">
+      <p>هیچ معاملهٔ فعالی وجود ندارد</p>
+    </div>
+
+    <div *ngFor="let transaction of getFilteredActiveTransactions()" class="transaction-card">
+      <div class="card-header">
+        <div class="transaction-info">
+          <h3>شماره ملک: {{ transaction.propertyDetails.pnumber }}</h3>
+          <p class="transaction-type">{{ getTransactionTypeLabel(transaction.transactionTypeName) }}</p>
+        </div>
+        <div class="transaction-date">
+          <span>{{ formatDate(transaction.createdAt) }}</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row">
+          <div class="info-item">
+            <label>نام فروشنده:</label>
+            <span>{{ transaction.sellerName }}</span>
+          </div>
+          <div class="info-item">
+            <label>نام خریدار:</label>
+            <span>{{ transaction.buyerName }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item">
+            <label>مساحت:</label>
+            <span>{{ transaction.propertyDetails.parea }} متر مربع</span>
+          </div>
+          <div class="info-item">
+            <label>توضیحات:</label>
+            <span>{{ transaction.propertyDetails.des || 'ندارد' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button 
+          class="btn btn-danger"
+          (click)="openCancellationModal(transaction)">
+          ابطال معامله
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="transactions-container" *ngIf="!loading && selectedTab === 'cancelled'">
+    <div *ngIf="getFilteredCancelledTransactions().length === 0" class="empty-state">
+      <p>هیچ معاملهٔ ابطال شدهٔ وجود ندارد</p>
+    </div>
+
+    <div *ngFor="let transaction of getFilteredCancelledTransactions()" class="transaction-card cancelled">
+      <div class="card-header">
+        <div class="transaction-info">
+          <h3>شماره ملک: {{ transaction.propertyNumber }}</h3>
+          <p class="transaction-type">{{ getTransactionTypeLabel(transaction.transactionTypeName) }}</p>
+          <span class="status-badge">ابطال شده</span>
+        </div>
+        <div class="transaction-date">
+          <span>{{ formatDate(transaction.cancellationDate) }}</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row">
+          <div class="info-item">
+            <label>نام فروشنده:</label>
+            <span>{{ transaction.sellerName }}</span>
+          </div>
+          <div class="info-item">
+            <label>نام خریدار:</label>
+            <span>{{ transaction.buyerName }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item">
+            <label>دلیل ابطال:</label>
+            <span>{{ transaction.cancellationReason || 'مشخص نشده' }}</span>
+          </div>
+          <div class="info-item">
+            <label>ابطال شده توسط:</label>
+            <span>{{ transaction.cancelledBy }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancellation Modal -->
+  <div class="modal-overlay" *ngIf="showCancellationModal" (click)="closeCancellationModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>تایید ابطال معامله</h2>
+        <button class="close-btn" (click)="closeCancellationModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="transaction-summary" *ngIf="selectedTransaction">
+          <p><strong>شماره ملک:</strong> {{ selectedTransaction.propertyDetails.pnumber }}</p>
+          <p><strong>نوع معامله:</strong> {{ getTransactionTypeLabel(selectedTransaction.transactionTypeName) }}</p>
+          <p><strong>نام فروشنده:</strong> {{ selectedTransaction.sellerName }}</p>
+          <p><strong>نام خریدار:</strong> {{ selectedTransaction.buyerName }}</p>
+        </div>
+
+        <div class="form-group">
+          <label for="reason">دلیل ابطال (اختیاری):</label>
+          <textarea 
+            id="reason"
+            [(ngModel)]="cancellationReason"
+            placeholder="دلیل ابطال معامله را وارد کنید"
+            class="form-control"
+            rows="4"></textarea>
+        </div>
+
+        <div class="warning-message">
+          <p>⚠️ پس از ابطال، این معامله دیگر فعال نخواهد بود و مالک می‌تواند ملک را دوباره ثبت کند.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          class="btn btn-secondary"
+          (click)="closeCancellationModal()">
+          لغو
+        </button>
+        <button 
+          class="btn btn-danger"
+          (click)="confirmCancellation()"
+          [disabled]="loading">
+          تایید ابطال
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

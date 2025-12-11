@@ -57,6 +57,8 @@ namespace WebAPIBackend.Configuration
 
         public virtual DbSet<PropertyDetail> PropertyDetails { get; set; }
 
+        public virtual DbSet<PropertyCancellation> PropertyCancellations { get; set; }
+
         public virtual DbSet<PropertyType> PropertyTypes { get; set; }
 
         public virtual DbSet<PunitType> PunitTypes { get; set; }
@@ -396,6 +398,22 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.PropertyDetails).WithMany(p => p.PropertyAddresses)
                     .HasForeignKey(d => d.PropertyDetailsId)
                     .HasConstraintName("PropertyAddress_PropertyDetailsId_fkey");
+            });
+
+            modelBuilder.Entity<PropertyCancellation>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PropertyCancellations_pkey");
+
+                entity.ToTable("PropertyCancellations", "tr");
+
+                entity.Property(e => e.CancellationDate).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CancelledBy).HasMaxLength(50);
+                entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasOne(d => d.PropertyDetails).WithMany()
+                    .HasForeignKey(d => d.PropertyDetailsId)
+                    .HasConstraintName("PropertyCancellations_PropertyDetailsId_fkey");
             });
 
             modelBuilder.Entity<PropertyDetail>(entity =>

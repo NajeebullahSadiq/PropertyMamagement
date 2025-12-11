@@ -49,7 +49,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     return Ok(new { isDuplicate = false, message = "" });
                 }
 
-                // Find all active registrations with same seller identity
+                // Find all active registrations with same seller identity (excluding cancelled ones)
                 var duplicates = await _context.VehiclesSellerDetails
                     .Where(s => 
                         s.FirstName.Trim() == firstName &&
@@ -58,6 +58,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                         s.PropertyDetails != null &&
                         s.PropertyDetails.TransactionTypeId.HasValue &&
                         restrictedTransactionTypeIds.Contains(s.PropertyDetails.TransactionTypeId.Value) &&
+                        !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == s.PropertyDetailsId) &&
                         s.Id != request.SellerId) // Exclude current seller if editing
                     .Include(s => s.PropertyDetails)
                     .ThenInclude(p => p.TransactionType)
@@ -107,7 +108,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     return Ok(new { isDuplicate = false, message = "" });
                 }
 
-                // Find all active registrations with same buyer identity
+                // Find all active registrations with same buyer identity (excluding cancelled ones)
                 var duplicates = await _context.VehiclesBuyerDetails
                     .Where(b => 
                         b.FirstName.Trim() == firstName &&
@@ -116,6 +117,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                         b.PropertyDetails != null &&
                         b.PropertyDetails.TransactionTypeId.HasValue &&
                         restrictedTransactionTypeIds.Contains(b.PropertyDetails.TransactionTypeId.Value) &&
+                        !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == b.PropertyDetailsId) &&
                         b.Id != request.SellerId) // Exclude current buyer if editing
                     .Include(b => b.PropertyDetails)
                     .ThenInclude(p => p.TransactionType)

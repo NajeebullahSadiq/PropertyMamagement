@@ -125,7 +125,7 @@ namespace WebAPIBackend.Controllers
                     return Ok(new { isDuplicate = false, message = "" });
                 }
 
-                // Find all active registrations with same owner identity
+                // Find all active registrations with same owner identity (excluding cancelled ones)
                 var duplicates = await _context.SellerDetails
                     .Where(s => 
                         s.FirstName.Trim() == firstName &&
@@ -134,6 +134,7 @@ namespace WebAPIBackend.Controllers
                         s.PropertyDetails != null &&
                         s.PropertyDetails.TransactionTypeId.HasValue &&
                         restrictedTransactionTypeIds.Contains(s.PropertyDetails.TransactionTypeId.Value) &&
+                        !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == s.PropertyDetailsId) &&
                         s.Id != request.SellerId) // Exclude current seller if editing
                     .Include(s => s.PropertyDetails)
                     .ThenInclude(p => p.TransactionType)

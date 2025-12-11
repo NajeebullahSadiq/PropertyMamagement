@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { EstateRoutingModule } from './estate-routing.module';
 import { EstateComponent } from './estate.component';
@@ -28,6 +29,7 @@ import { PropertydetailslistComponent } from './propertydetailslist/propertydeta
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableModule} from '@angular/material/table';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { CancellationPageComponent } from './cancellation-page/cancellation-page.component';
 
 @NgModule({
   declarations: [
@@ -39,11 +41,13 @@ import { NgxPaginationModule } from 'ngx-pagination';
     PropertyaddressComponent,
     UploadComponent,
     NationalidUploadComponent,
-    PropertydetailslistComponent
+    PropertydetailslistComponent,
+    CancellationPageComponent
   ],
   imports: [
     CommonModule,
     EstateRoutingModule,
+    RouterModule,
     MatButtonModule,
     MatSidenavModule,
     MatMenuModule,
