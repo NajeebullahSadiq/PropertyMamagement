@@ -66,5 +66,6 @@ namespace WebAPIBackend.Models.ViewModels
         // PropertyUnitType and TransactionType
         public string UnitType { get; set; }
         public string TransactionType { get; set; }
+        public DateTime? DeedDate { get; set; }
     }
 }

@@ -47,6 +47,10 @@ public partial class PropertyDetail
 
     public string? Doctype { get; set; }
 
+    public DateTime? DeedDate { get; set; }
+
+    public string? PrivateNumber { get; set; }
+
     public virtual ICollection<BuyerDetail> BuyerDetails { get; } = new List<BuyerDetail>();
 
     public virtual ICollection<PropertyAddress> PropertyAddresses { get; } = new List<PropertyAddress>();

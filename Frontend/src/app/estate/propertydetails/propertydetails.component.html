@@ -27,14 +27,14 @@
                 <input type="hidden" formControlName="id">
               </div>
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label class="form-label me-3">نوع سند ملکیت</label>
                   <ng-select  formControlName="doctype">
                     <ng-option value="رسمی">رسمی</ng-option>
                     <ng-option value="عرفی">عرفی</ng-option>
                   </ng-select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="pnumber" class="form-label">شماره سند</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
@@ -46,6 +46,30 @@
                     </div>
                   
                 </div>
+                <div class="col-md-3">
+                  <label for="privateNumber" class="form-label">نمبر خصوصی</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                    <input type="text" id="privateNumber" class="form-control"
+                      formControlName="privateNumber">
+                    </div>
+                  
+                </div>
+                <div class="col-md-3">
+                  <label for="deedDate" class="form-label">تاریخ سند</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                    <input type="date" id="deedDate" class="form-control"
+                      formControlName="deedDate">
+                    </div>
+                    <div *ngIf="deedDate?.invalid && (deedDate?.dirty || deedDate?.touched)">
+                      <small class="text-danger" *ngIf="deedDate?.errors?.['required']">تاریخ سند الزامی است</small>
+                    </div>
+                  
+                </div>
+              </div>
+              <br>
+              <div class="row">
                 <div class="col-md-4">
                   <label class="form-label me-3"> واحد اندازه گیری</label>
                   <ng-select formControlName="punitTypeId" [items]="localizedUnitTypes" [selectOnTab]="true" bindLabel="name"
@@ -55,11 +79,8 @@
                                     <small class="text-danger"> انتخاب این فیلد  الزامی است</small>
                                   </div> -->
                 </div>
-              </div>
-              <br>
-              <div class="row">
                 <div class="col-md-4">
-                  <label for="pnumber" class="form-label"> مساحت ملکیت</label>
+                  <label for="parea" class="form-label"> مساحت ملکیت</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="far fa-square"></i></span>
                     <input type="number" (keypress)="onlyNumberKey($event)" id="parea" class="form-control" formControlName="parea">

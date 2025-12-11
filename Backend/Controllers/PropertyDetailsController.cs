@@ -127,7 +127,9 @@ namespace WebAPIBackend.Controllers
                 East=request.East,
                 North=request.North,
                 South=request.South,
-                Doctype=request.Doctype
+                Doctype=request.Doctype,
+                DeedDate=request.DeedDate,
+                PrivateNumber=request.PrivateNumber
                 
             };
             _context.Add(property);
@@ -289,6 +291,7 @@ namespace WebAPIBackend.Controllers
                 RoyaltyAmount = data.RoyaltyAmount,
                 PropertypeType = data.PropertypeType,
                 CreatedAt = data.CreatedAt,
+                DeedDate = data.DeedDate,
                 // Location - Province and District
                 Province = data.Province,
                 District = data.District,

@@ -266,6 +266,18 @@ namespace WebAPIBackend.Controllers
             }
             //var user = await _userManager.GetUserAsync(User);
            
+            // Convert rental dates to UTC if they exist
+            var rentStartDate = request.RentStartDate;
+            var rentEndDate = request.RentEndDate;
+            if (rentStartDate.HasValue)
+            {
+                rentStartDate = rentStartDate.Value.ToUniversalTime();
+            }
+            if (rentEndDate.HasValue)
+            {
+                rentEndDate = rentEndDate.Value.ToUniversalTime();
+            }
+
             var buyer = new BuyerDetail
             {
                 FirstName = request.FirstName,
@@ -285,8 +297,8 @@ namespace WebAPIBackend.Controllers
                 Photo=request.Photo,
                 RoleType=request.RoleType ?? "Buyer",
                 AuthorizationLetter=request.AuthorizationLetter,
-                RentStartDate = request.RentStartDate,
-                RentEndDate = request.RentEndDate,
+                RentStartDate = rentStartDate,
+                RentEndDate = rentEndDate,
             };
             try
             {
@@ -325,6 +337,16 @@ namespace WebAPIBackend.Controllers
             // Store the original values of the CreatedBy and CreatedOn properties
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
+
+            // Convert rental dates to UTC if they exist
+            if (request.RentStartDate.HasValue)
+            {
+                request.RentStartDate = request.RentStartDate.Value.ToUniversalTime();
+            }
+            if (request.RentEndDate.HasValue)
+            {
+                request.RentEndDate = request.RentEndDate.Value.ToUniversalTime();
+            }
 
             // Update the entity with the new values
             _context.Entry(existingProperty).CurrentValues.SetValues(request);

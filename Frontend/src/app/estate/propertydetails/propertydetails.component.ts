@@ -61,6 +61,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
         east: ['', Validators.required],
         south: ['', Validators.required],
         doctype: ['', Validators.required],
+        deedDate: ['', Validators.required],
+        privateNumber: [''],
         transactionTypeId: ['', Validators.required],
         des: ['', Validators.required],
         filePath: [''],
@@ -105,6 +107,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
             east:properties[0].east,
             south:properties[0].south,
             doctype:properties[0].doctype,
+            deedDate:properties[0].deedDate,
+            privateNumber:properties[0].privateNumber,
           });
           this.imageName=properties.map(item => item.filePath).toString();
           // this.selerService.sellerId=0;
@@ -131,6 +135,11 @@ export class PropertydetailsComponent  implements AfterViewInit {
      if(propertyDetails.id===null){
       propertyDetails.id=0;
     }
+    // Convert deedDate to UTC if it exists
+    if(propertyDetails.deedDate) {
+      const date = new Date(propertyDetails.deedDate);
+      propertyDetails.deedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    }
     this.propertyDetailsService.addPropertyDetails(propertyDetails).subscribe(result => {
       if(result.id!==0) {
        this.propertyDetailsService.updateMainTableId(result.id);
@@ -148,6 +157,11 @@ export class PropertydetailsComponent  implements AfterViewInit {
     propertyDetails.filePath=this.imageName;
     if(propertyDetails.id===0 && this.selectedPropertyId!==0 || this.selectedPropertyId!==null){
       propertyDetails.id=this.selectedPropertyId;
+    }
+    // Convert deedDate to UTC if it exists
+    if(propertyDetails.deedDate) {
+      const date = new Date(propertyDetails.deedDate);
+      propertyDetails.deedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
     }
     this.propertyDetailsService.updatePropertyDetails(propertyDetails).subscribe(result => {
       if(result.id!==0)
@@ -312,6 +326,7 @@ export class PropertydetailsComponent  implements AfterViewInit {
   get east() { return this.propertyForm.get('east'); }
   get south() { return this.propertyForm.get('south'); }
   get doctype() { return this.propertyForm.get('doctype'); }
+  get deedDate() { return this.propertyForm.get('deedDate'); }
 
 
 }

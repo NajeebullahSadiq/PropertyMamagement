@@ -21,6 +21,8 @@ export interface PropertyDetails {
     east:string;
     north:string;
     doctype:string;
+    deedDate?:Date;
+    privateNumber?:string;
 
   }
 
