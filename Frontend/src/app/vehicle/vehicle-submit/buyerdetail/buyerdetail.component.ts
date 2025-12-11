@@ -5,6 +5,7 @@ import { VBuyerDetail } from 'src/app/models/SellerDetail';
 import { SellerService } from 'src/app/shared/seller.service';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
+import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { PropertyService } from 'src/app/shared/property.service';
 import { environment } from 'src/environments/environment';
@@ -30,6 +31,8 @@ export class BuyerdetailComponent {
   propertyTypes:any;
   localizedPropertyTypes:any;
   roleTypes: any = [];
+  duplicateError: string = '';
+  isDuplicateCheckLoading: boolean = false;
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   onNextClick() {
@@ -37,7 +40,8 @@ export class BuyerdetailComponent {
   }
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
-    private localizationService: LocalizationService, private propertyDetailsService: PropertyService){
+    private localizationService: LocalizationService, private propertyDetailsService: PropertyService,
+    private duplicateCheckService: DuplicateCheckService){
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.buyerForm = this.fb.group({
@@ -201,23 +205,52 @@ export class BuyerdetailComponent {
     if (vbuyerdetails.id === null) {
       vbuyerdetails.id = 0;
     }
-    this.vehiclesubservice.addBuyerdetails(vbuyerdetails).subscribe(
-      (result) => {
-        if (result.id !== 0) {
-          this.toastr.success("معلومات موفقانه ثبت شد");
-          this.vehiclesubservice.buyerId = result.id;
-          this.selectedbuyerId=result.id;
-          // Reload the list immediately
-          this.loadBuyerDetails();
-          this.resetChild(); // Reset form for next entry
+
+    // Check for duplicate property registration
+    this.isDuplicateCheckLoading = true;
+    this.duplicateError = '';
+    
+    this.duplicateCheckService.checkDuplicateVehicleBuyer(
+      vbuyerdetails.firstName,
+      vbuyerdetails.fatherName,
+      vbuyerdetails.grandFather,
+      vbuyerdetails.propertyDetailsId,
+      vbuyerdetails.id
+    ).subscribe(
+      (response) => {
+        this.isDuplicateCheckLoading = false;
+        
+        if (response.isDuplicate) {
+          this.duplicateError = response.message;
+          this.toastr.error(response.message);
+          return;
         }
+
+        // No duplicate found, proceed with saving
+        this.vehiclesubservice.addBuyerdetails(vbuyerdetails).subscribe(
+          (result) => {
+            if (result.id !== 0) {
+              this.toastr.success("معلومات موفقانه ثبت شد");
+              this.vehiclesubservice.buyerId = result.id;
+              this.selectedbuyerId=result.id;
+              this.duplicateError = '';
+              // Reload the list immediately
+              this.loadBuyerDetails();
+              this.resetChild(); // Reset form for next entry
+            }
+          },
+          (error) => {
+            if (error.status === 400) {
+              this.toastr.error("خطا در ثبت معلومات");
+            } else {
+              this.toastr.error("An error occurred");
+            }
+          }
+        );
       },
       (error) => {
-        if (error.status === 400) {
-          this.toastr.error("خطا در ثبت معلومات");
-        } else {
-          this.toastr.error("An error occurred");
-        }
+        this.isDuplicateCheckLoading = false;
+        this.toastr.error("خطا در بررسی تکراری");
       }
     );
 }

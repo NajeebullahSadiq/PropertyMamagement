@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SellerDetail } from 'src/app/models/SellerDetail';
 import { PropertyService } from 'src/app/shared/property.service';
 import { SellerService } from 'src/app/shared/seller.service';
+import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 import { UploadComponent } from '../../upload/upload.component';
 import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-upload.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
@@ -30,6 +31,8 @@ export class BuyerdetailComponent {
   propertyTypes:any;
   localizedPropertyTypes:any;
   roleTypes: any = [];
+  duplicateError: string = '';
+  isDuplicateCheckLoading: boolean = false;
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   onNextClick() {
@@ -45,7 +48,8 @@ export class BuyerdetailComponent {
     }
   }
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
-    ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService){
+    ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
+    private duplicateCheckService: DuplicateCheckService){
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.sellerForm = this.fb.group({
@@ -209,25 +213,54 @@ export class BuyerdetailComponent {
     if (sellerDetails.id === null) {
       sellerDetails.id = 0;
     }
-    this.selerService.addBuyerdetails(sellerDetails).subscribe(
-      (result) => {
-        if (result.id !== 0) {
-          this.toastr.success("معلومات موفقانه ثبت شد");
-          this.selerService.buyerId = result.id;
-          this.selectedSellerId=result.id;
-          // Small delay to ensure database commit
-          setTimeout(() => {
-            this.loadBuyerDetails(); // Reload the list
-            this.resetChild(); // Reset form for next entry
-          }, 300);
+
+    // Check for duplicate property registration
+    this.isDuplicateCheckLoading = true;
+    this.duplicateError = '';
+    
+    this.duplicateCheckService.checkDuplicateBuyer(
+      sellerDetails.firstName,
+      sellerDetails.fatherName,
+      sellerDetails.grandFather,
+      sellerDetails.propertyDetailsId,
+      sellerDetails.id
+    ).subscribe(
+      (response) => {
+        this.isDuplicateCheckLoading = false;
+        
+        if (response.isDuplicate) {
+          this.duplicateError = response.message;
+          this.toastr.error(response.message);
+          return;
         }
+
+        // No duplicate found, proceed with saving
+        this.selerService.addBuyerdetails(sellerDetails).subscribe(
+          (result) => {
+            if (result.id !== 0) {
+              this.toastr.success("معلومات موفقانه ثبت شد");
+              this.selerService.buyerId = result.id;
+              this.selectedSellerId=result.id;
+              this.duplicateError = '';
+              // Small delay to ensure database commit
+              setTimeout(() => {
+                this.loadBuyerDetails(); // Reload the list
+                this.resetChild(); // Reset form for next entry
+              }, 300);
+            }
+          },
+          (error) => {
+            if (error.status === 400) {
+              this.toastr.error("خطا در ثبت معلومات");
+            } else {
+              this.toastr.error("An error occurred");
+            }
+          }
+        );
       },
       (error) => {
-        if (error.status === 400) {
-          this.toastr.error("خطا در ثبت معلومات");
-        } else {
-          this.toastr.error("An error occurred");
-        }
+        this.isDuplicateCheckLoading = false;
+        this.toastr.error("خطا در بررسی تکراری");
       }
     );
 }

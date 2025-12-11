@@ -16,6 +16,17 @@
                                 <input type="hidden" formControlName="id">
                             </div>
 
+                            <!-- Duplicate Error Message -->
+                            <div class="row" *ngIf="duplicateError">
+                                <div class="col-md-12">
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 4px solid #dc3545; font-weight: 500;">
+                                        <i class="fas fa-exclamation-circle" style="margin-left: 8px;"></i>
+                                        {{ duplicateError }}
+                                        <button type="button" class="btn-close" (click)="duplicateError = ''" aria-label="Close"></button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Role Type Selection -->
                             <div class="row">
                                 <div class="col-md-6">

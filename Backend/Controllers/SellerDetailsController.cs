@@ -99,6 +99,75 @@ namespace WebAPIBackend.Controllers
 
 
 
+        [HttpPost("CheckDuplicateOwner")]
+        public async Task<IActionResult> CheckDuplicateOwner([FromBody] DuplicateOwnerCheckRequest request)
+        {
+            try
+            {
+                var firstName = request.FirstName?.Trim() ?? "";
+                var fatherName = request.FatherName?.Trim() ?? "";
+                var grandFather = request.GrandFather?.Trim() ?? "";
+                var propertyDetailsId = request.PropertyDetailsId;
+
+                // Get the property to find its transaction type
+                var property = await _context.PropertyDetails.FindAsync(propertyDetailsId);
+                if (property == null)
+                {
+                    return Ok(new { isDuplicate = false, message = "" });
+                }
+
+                // Transaction types that trigger duplicate check: Sale, Rent, Revocable Sale
+                var restrictedTransactionTypeIds = new[] { 1, 2, 3 }; // Adjust based on your DB
+                
+                // Check if current property has a restricted transaction type
+                if (property.TransactionTypeId.HasValue && !restrictedTransactionTypeIds.Contains(property.TransactionTypeId.Value))
+                {
+                    return Ok(new { isDuplicate = false, message = "" });
+                }
+
+                // Find all active registrations with same owner identity
+                var duplicates = await _context.SellerDetails
+                    .Where(s => 
+                        s.FirstName.Trim() == firstName &&
+                        s.FatherName.Trim() == fatherName &&
+                        s.GrandFather.Trim() == grandFather &&
+                        s.PropertyDetails != null &&
+                        s.PropertyDetails.TransactionTypeId.HasValue &&
+                        restrictedTransactionTypeIds.Contains(s.PropertyDetails.TransactionTypeId.Value) &&
+                        s.Id != request.SellerId) // Exclude current seller if editing
+                    .Include(s => s.PropertyDetails)
+                    .ThenInclude(p => p.TransactionType)
+                    .ToListAsync();
+
+                if (duplicates.Count > 0)
+                {
+                    var existingTransaction = duplicates.First();
+                    var transactionTypeName = existingTransaction.PropertyDetails?.TransactionType?.Name ?? "Unknown";
+                    
+                    var message = $"این ملک قبلاً توسط همین مالک برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
+                    
+                    return Ok(new { isDuplicate = true, message = message, transactionType = transactionTypeName });
+                }
+
+                return Ok(new { isDuplicate = false, message = "" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        private string GetDariTransactionType(string transactionTypeName)
+        {
+            return transactionTypeName switch
+            {
+                "Sale" => "فروش",
+                "Rent" => "کرایه",
+                "Revocable Sale" => "بیع جایزی",
+                _ => transactionTypeName
+            };
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> SaveSeller([FromBody] SellerDetail request)
         {
@@ -249,6 +318,64 @@ namespace WebAPIBackend.Controllers
         }
         
         
+        [HttpPost("CheckDuplicateBuyer")]
+        public async Task<IActionResult> CheckDuplicateBuyer([FromBody] DuplicateOwnerCheckRequest request)
+        {
+            try
+            {
+                var firstName = request.FirstName?.Trim() ?? "";
+                var fatherName = request.FatherName?.Trim() ?? "";
+                var grandFather = request.GrandFather?.Trim() ?? "";
+                var propertyDetailsId = request.PropertyDetailsId;
+
+                // Get the property to find its transaction type
+                var property = await _context.PropertyDetails.FindAsync(propertyDetailsId);
+                if (property == null)
+                {
+                    return Ok(new { isDuplicate = false, message = "" });
+                }
+
+                // Transaction types that trigger duplicate check: Sale, Rent, Revocable Sale
+                var restrictedTransactionTypeIds = new[] { 1, 2, 3 }; // Adjust based on your DB
+                
+                // Check if current property has a restricted transaction type
+                if (property.TransactionTypeId.HasValue && !restrictedTransactionTypeIds.Contains(property.TransactionTypeId.Value))
+                {
+                    return Ok(new { isDuplicate = false, message = "" });
+                }
+
+                // Find all active registrations with same buyer identity
+                var duplicates = await _context.BuyerDetails
+                    .Where(b => 
+                        b.FirstName.Trim() == firstName &&
+                        b.FatherName.Trim() == fatherName &&
+                        b.GrandFather.Trim() == grandFather &&
+                        b.PropertyDetails != null &&
+                        b.PropertyDetails.TransactionTypeId.HasValue &&
+                        restrictedTransactionTypeIds.Contains(b.PropertyDetails.TransactionTypeId.Value) &&
+                        b.Id != request.SellerId) // Exclude current buyer if editing
+                    .Include(b => b.PropertyDetails)
+                    .ThenInclude(p => p.TransactionType)
+                    .ToListAsync();
+
+                if (duplicates.Count > 0)
+                {
+                    var existingTransaction = duplicates.First();
+                    var transactionTypeName = existingTransaction.PropertyDetails?.TransactionType?.Name ?? "Unknown";
+                    
+                    var message = $"این ملک قبلاً توسط همین خریدار برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
+                    
+                    return Ok(new { isDuplicate = true, message = message, transactionType = transactionTypeName });
+                }
+
+                return Ok(new { isDuplicate = false, message = "" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
         [HttpPost("addBuyerDetails")]
         public async Task<ActionResult<int>> SaveBuyer([FromBody] BuyerDetail request)
         {
