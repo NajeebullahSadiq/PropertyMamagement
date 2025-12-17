@@ -4,3 +4,200 @@
     margin-left: 15px;
     line-height: 36px;
   }
+
+.upload-container {
+  width: 100%;
+  margin: 10px 0;
+
+  .upload-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    button {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 16px;
+      }
+    }
+
+    .upload-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .progress-bar-container {
+        flex: 1;
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+
+        .progress-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+          transition: width 0.3s ease;
+          border-radius: 3px;
+        }
+      }
+
+      .progress-text {
+        min-width: 40px;
+        font-weight: 600;
+        color: #667eea;
+        font-size: 14px;
+      }
+    }
+
+    .upload-message {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 6px;
+      color: #155724;
+      font-weight: 500;
+
+      i {
+        font-size: 18px;
+        color: #28a745;
+      }
+    }
+
+    .uploaded-file {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .file-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+
+        i {
+          font-size: 24px;
+          color: #667eea;
+          min-width: 30px;
+          text-align: center;
+        }
+
+        .file-details {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          .file-name {
+            margin: 0;
+            font-weight: 600;
+            color: #212529;
+            word-break: break-word;
+            font-size: 14px;
+          }
+
+          .file-type {
+            margin: 0;
+            font-size: 12px;
+            color: #6c757d;
+          }
+        }
+      }
+
+      .file-actions {
+        display: flex;
+        gap: 8px;
+
+        .btn {
+          padding: 6px 10px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+          transition: all 0.3s ease;
+
+          &.btn-primary {
+            background: #667eea;
+            color: white;
+
+            &:hover {
+              background: #5568d3;
+              transform: translateY(-2px);
+              box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+            }
+          }
+
+          &.btn-info {
+            background: #17a2b8;
+            color: white;
+
+            &:hover {
+              background: #138496;
+              transform: translateY(-2px);
+              box-shadow: 0 2px 6px rgba(23, 162, 184, 0.4);
+            }
+          }
+
+          &.btn-danger {
+            background: #dc3545;
+            color: white;
+
+            &:hover {
+              background: #c82333;
+              transform: translateY(-2px);
+              box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+            }
+          }
+
+          i {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .upload-container {
+    .upload-section {
+      .uploaded-file {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .file-actions {
+          width: 100%;
+          margin-top: 10px;
+
+          .btn {
+            flex: 1;
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}

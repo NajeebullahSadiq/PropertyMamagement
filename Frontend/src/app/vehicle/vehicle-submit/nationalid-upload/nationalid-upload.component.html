@@ -1,16 +1,41 @@
-<div>
-  <div>
-    <input type="file" #file placeholder="Choose National ID file" (change)="uploadFile(file.files)" style="display:none;" accept="image/*,application/pdf">
-    <button type="button" class="btn btn-outline-primary" (click)="file.click()">
+<div class="upload-container">
+  <div class="upload-section">
+    <input type="file" #file placeholder="Choose National ID file" (change)="uploadFile(file.files)" style="display:none;" accept="image/*,.pdf,.doc,.docx">
+    <button type="button" class="btn btn-outline-primary" (click)="file.click()" [disabled]="isUploading">
       <i class="fas fa-id-card"></i> انتخاب تذکره ملی
     </button>
-    <div class="col-md-12 mt-2">
-      <span class="upload text-primary" *ngIf="progress > 0">
-        <i class="fas fa-spinner fa-spin"></i> {{progress}}%
-      </span>
-      <span class="upload text-success" *ngIf="message">
-        <i class="fas fa-check-circle"></i> {{message}}
-      </span>
+    
+    <div class="upload-progress" *ngIf="progress > 0 && isUploading">
+      <div class="progress-bar-container">
+        <div class="progress-bar" [style.width.%]="progress"></div>
+      </div>
+      <span class="progress-text">{{ progress }}%</span>
+    </div>
+
+    <div class="upload-message" *ngIf="message && !isUploading">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ message }}</span>
+    </div>
+
+    <div class="uploaded-file" *ngIf="uploadedFilePath && !isUploading">
+      <div class="file-info">
+        <i [class]="'fas ' + getFileIcon(uploadedFileName)"></i>
+        <div class="file-details">
+          <p class="file-name">{{ uploadedFileName }}</p>
+          <p class="file-type">{{ getFileTypeLabel(uploadedFileName) }}</p>
+        </div>
+      </div>
+      <div class="file-actions">
+        <button type="button" class="btn btn-sm btn-primary" (click)="viewFile()" title="مشاهده">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-info" (click)="downloadFile()" title="دانلود">
+          <i class="fas fa-download"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-danger" (click)="deleteFile()" title="حذف">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>
   </div>
 </div>
