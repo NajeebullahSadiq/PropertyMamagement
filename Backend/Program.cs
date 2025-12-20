@@ -121,6 +121,9 @@ Directory.CreateDirectory(documentsPath);
 Directory.CreateDirectory(Path.Combine(documentsPath, "Identity"));
 Directory.CreateDirectory(Path.Combine(documentsPath, "Profile"));
 Directory.CreateDirectory(Path.Combine(documentsPath, "Property"));
+Directory.CreateDirectory(Path.Combine(documentsPath, "Vehicle"));
+Directory.CreateDirectory(Path.Combine(documentsPath, "Company"));
+Directory.CreateDirectory(Path.Combine(documentsPath, "License"));
 app.UseStaticFiles(new StaticFileOptions()
 {
     FileProvider = new PhysicalFileProvider(resourcesPath),

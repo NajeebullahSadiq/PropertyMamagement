@@ -39,6 +39,9 @@
     <MakeDir Directories="$(PublishDir)Resources\Documents\Identity" />
     <MakeDir Directories="$(PublishDir)Resources\Documents\Profile" />
     <MakeDir Directories="$(PublishDir)Resources\Documents\Property" />
+    <MakeDir Directories="$(PublishDir)Resources\Documents\Vehicle" />
+    <MakeDir Directories="$(PublishDir)Resources\Documents\Company" />
+    <MakeDir Directories="$(PublishDir)Resources\Documents\License" />
   </Target>
 
 </Project>

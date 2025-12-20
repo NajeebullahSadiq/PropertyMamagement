@@ -22,9 +22,9 @@ namespace UploadFilesServer.Controllers
             {
                 filePath = System.Net.WebUtility.UrlDecode(filePath);
                 filePath = filePath.Replace("\\", "/");
-                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+                var fullPath = Path.Combine(AppContext.BaseDirectory, filePath);
                 var realPath = Path.GetFullPath(fullPath);
-                var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Resources"));
+                var basePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Resources"));
 
                 return Ok(new
                 {
@@ -62,7 +62,7 @@ namespace UploadFilesServer.Controllers
 
                 // Determine folder based on document type
                 string folderName = GetFolderPath(documentType);
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                var pathToSave = Path.Combine(AppContext.BaseDirectory, folderName);
 
                 // Create directory if it doesn't exist
                 if (!Directory.Exists(pathToSave))
@@ -123,9 +123,9 @@ namespace UploadFilesServer.Controllers
                 // Convert forward slashes to OS-specific separators for Path.Combine
                 var normalizedPath = filePath.Replace("/", Path.DirectorySeparatorChar.ToString());
                 
-                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), normalizedPath);
+                var fullPath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
                 var realPath = Path.GetFullPath(fullPath);
-                var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Resources"));
+                var basePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Resources"));
 
                 // Ensure the file is within the Resources directory
                 if (!realPath.StartsWith(basePath))
@@ -188,9 +188,9 @@ namespace UploadFilesServer.Controllers
                 filePath = System.Net.WebUtility.UrlDecode(filePath);
 
                 filePath = filePath.Replace("\\", "/");
-                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+                var fullPath = Path.Combine(AppContext.BaseDirectory, filePath);
                 var realPath = Path.GetFullPath(fullPath);
-                var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Resources"));
+                var basePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Resources"));
 
                 if (!realPath.StartsWith(basePath))
                 {
@@ -226,9 +226,9 @@ namespace UploadFilesServer.Controllers
                 filePath = System.Net.WebUtility.UrlDecode(filePath);
 
                 filePath = filePath.Replace("\\", "/");
-                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+                var fullPath = Path.Combine(AppContext.BaseDirectory, filePath);
                 var realPath = Path.GetFullPath(fullPath);
-                var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Resources"));
+                var basePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Resources"));
 
                 if (!realPath.StartsWith(basePath))
                 {
