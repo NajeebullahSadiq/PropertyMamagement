@@ -1,7 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { MatDialog } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
+import { ProfileImageCropperDialogComponent, ProfileImageCropperDialogResult } from './profile-image-cropper-dialog.component';
 
 @Component({
   selector: 'app-profile-image-cropper',
@@ -16,11 +17,10 @@ export class ProfileImageCropperComponent {
   @Output() imageUploaded = new EventEmitter<string>();
   @Output() imageChanged = new EventEmitter<string>();
 
-  imageChangedEvent: Event | null = null;
   croppedImageUrl: string = '';
   croppedBlob: Blob | null = null;
 
-  zoom: number = 1;
+  private localPreviewObjectUrl: string = '';
 
   isUploading: boolean = false;
   progress: number = 0;
@@ -28,24 +28,53 @@ export class ProfileImageCropperComponent {
   error: string = '';
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private dialog: MatDialog
   ) {}
 
   onFileSelected(event: Event): void {
     this.error = '';
     this.message = '';
     this.progress = 0;
-    this.croppedBlob = null;
-    this.croppedImageUrl = '';
-    this.zoom = 1;
-    this.imageChangedEvent = event;
-  }
 
-  imageCropped(event: ImageCroppedEvent): void {
-    this.croppedImageUrl = event.objectUrl || '';
-    this.croppedBlob = event.blob || null;
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (!file) {
+      return;
+    }
 
-    this.imageChanged.emit(this.croppedImageUrl);
+    const dialogRef = this.dialog.open(ProfileImageCropperDialogComponent, {
+      width: '720px',
+      maxWidth: '95vw',
+      data: {
+        file,
+        roundCropper: this.roundCropper,
+        resizeToWidth: 512
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: ProfileImageCropperDialogResult | null | undefined) => {
+      if (!result) {
+        return;
+      }
+
+      this.croppedBlob = result.blob;
+
+      if (this.localPreviewObjectUrl) {
+        URL.revokeObjectURL(this.localPreviewObjectUrl);
+        this.localPreviewObjectUrl = '';
+      }
+
+      this.localPreviewObjectUrl = URL.createObjectURL(this.croppedBlob);
+      this.croppedImageUrl = this.localPreviewObjectUrl;
+      this.imageChanged.emit(this.croppedImageUrl);
+
+      this.uploadCroppedImage();
+    });
+
+    if (input) {
+      input.value = '';
+    }
   }
 
   uploadCroppedImage(): void {
@@ -89,10 +118,13 @@ export class ProfileImageCropperComponent {
   }
 
   reset(): void {
-    this.imageChangedEvent = null;
+    if (this.localPreviewObjectUrl) {
+      URL.revokeObjectURL(this.localPreviewObjectUrl);
+      this.localPreviewObjectUrl = '';
+    }
+
     this.croppedImageUrl = '';
     this.croppedBlob = null;
-    this.zoom = 1;
     this.progress = 0;
     this.message = '';
     this.error = '';

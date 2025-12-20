@@ -1,0 +1,43 @@
+.cropper-dialog {
+  display: flex;
+  flex-direction: column;
+}
+
+.cropper-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.preview-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview-title {
+  font-weight: 600;
+}
+
+.preview-img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.preview-img.round {
+  border-radius: 9999px;
+}
+
+.dialog-actions {
+  gap: 8px;
+}

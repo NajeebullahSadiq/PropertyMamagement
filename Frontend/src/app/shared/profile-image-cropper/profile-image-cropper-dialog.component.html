@@ -1,0 +1,41 @@
+<div class="cropper-dialog" dir="rtl">
+  <h2 mat-dialog-title>برش عکس</h2>
+
+  <div mat-dialog-content>
+    <div *ngIf="error" class="text-danger mb-2">
+      <small>{{ error }}</small>
+    </div>
+
+    <div *ngIf="!imageBase64" class="text-muted">
+      <small>در حال آماده‌سازی تصویر...</small>
+    </div>
+
+    <div *ngIf="imageBase64" class="cropper-area">
+      <div class="zoom-row">
+        <label class="form-label">زوم</label>
+        <input type="range" class="form-range" min="1" max="3" step="0.05" [(ngModel)]="zoom" />
+      </div>
+
+      <image-cropper
+        [imageBase64]="imageBase64"
+        [maintainAspectRatio]="true"
+        [aspectRatio]="1 / 1"
+        [roundCropper]="data.roundCropper"
+        [transform]="{ scale: zoom }"
+        [resizeToWidth]="data.resizeToWidth || 512"
+        format="jpeg"
+        (imageCropped)="imageCropped($event)"
+      ></image-cropper>
+
+      <div class="preview-row" *ngIf="croppedPreviewUrl">
+        <div class="preview-title">پیش‌نمایش</div>
+        <img class="preview-img" [class.round]="data.roundCropper" [src]="croppedPreviewUrl" alt="Preview" />
+      </div>
+    </div>
+  </div>
+
+  <div mat-dialog-actions align="end" class="dialog-actions">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()">لغو</button>
+    <button type="button" class="btn btn-success" (click)="save()" [disabled]="!croppedBlob">ذخیره</button>
+  </div>
+</div>

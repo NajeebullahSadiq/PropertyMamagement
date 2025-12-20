@@ -6,11 +6,13 @@ import { ImageCropperModule } from 'ngx-image-cropper';
 
 import { DocumentViewerComponent } from './document-viewer/document-viewer.component';
 import { ProfileImageCropperComponent } from './profile-image-cropper/profile-image-cropper.component';
+import { ProfileImageCropperDialogComponent } from './profile-image-cropper/profile-image-cropper-dialog.component';
 
 @NgModule({
   declarations: [
     DocumentViewerComponent,
-    ProfileImageCropperComponent
+    ProfileImageCropperComponent,
+    ProfileImageCropperDialogComponent
   ],
   imports: [
     CommonModule,
