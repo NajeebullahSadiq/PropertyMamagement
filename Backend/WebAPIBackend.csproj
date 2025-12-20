@@ -19,6 +19,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="bin\\**" />
+    <Content Remove="obj\\**" />
+    <Content Remove="publish\\**" />
+
+    <None Remove="bin\\**" />
+    <None Remove="obj\\**" />
+    <None Remove="publish\\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Resources\Images\" />
   </ItemGroup>
 
