@@ -52,7 +52,7 @@ export class LocalizationService {
 
   // Property Types (from backend lookup table)
   propertyTypes = [
-    { value: 'House', label: 'خانه / مجتمع رهایشی' },
+    { value: 'House', label: 'حویلی' },
     { value: 'Apartment', label: 'آپارتمان' },
     { value: 'Shop', label: 'دکان' },
     { value: 'Block', label: 'بلاک' },

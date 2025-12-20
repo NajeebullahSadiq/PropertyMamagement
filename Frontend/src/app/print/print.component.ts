@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
+import { LocalizationService } from '../shared/localization.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -15,7 +16,12 @@ export class PrintComponent {
   BuyerfilePath:string='assets/img/avatar2.png';
   baseUrl=environment.apiURL+'/';
   documentData:any=[];
-  constructor( public service: AuthService,private route: ActivatedRoute,private pservice:PropertyService) { 
+  constructor(
+    public service: AuthService,
+    private route: ActivatedRoute,
+    private pservice:PropertyService,
+    private localizationService: LocalizationService
+  ) { 
   
   }
   ngOnInit(): void {
@@ -33,9 +39,17 @@ export class PrintComponent {
         this.documentData = res;
         this.SellerfilePath=this.baseUrl+res.sellerPhoto;
         this.BuyerfilePath=this.baseUrl+res.buyerPhoto;
+
+        this.documentData.propertypeType = this.getDariPropertyTypeLabel(this.documentData.propertypeType);
        
       });
     } 
+  }
+
+  private getDariPropertyTypeLabel(propertyTypeValue: any): string {
+    const value = (propertyTypeValue ?? '').toString();
+    const match = this.localizationService.propertyTypes.find(pt => pt.value === value);
+    return match?.label || 'سایر';
   }
 
 }

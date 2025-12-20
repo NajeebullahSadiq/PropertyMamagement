@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PropertyDetails, PropertyDetailsList } from 'src/app/models/PropertyDetail';
 import { PropertyService } from 'src/app/shared/property.service';
+import { LocalizationService } from 'src/app/shared/localization.service';
 
 @Component({
   selector: 'app-propertydetailslist',
@@ -20,7 +21,13 @@ export class PropertydetailslistComponent {
   tableSize: number = 10;
   tableSizes: any = [10,50,100];
 
-  constructor(private http: HttpClient, private propertyService: PropertyService, private toastr: ToastrService, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private propertyService: PropertyService,
+    private toastr: ToastrService,
+    private router: Router,
+    private localizationService: LocalizationService
+  ) {}
 
   ngOnInit() {
     this.loadData();
@@ -32,9 +39,20 @@ export class PropertydetailslistComponent {
 
   loadData(){
     this.propertyService.getPropertyDetails().subscribe(properties => {
-      this.properties = properties;
-      this.filteredProperties = properties;
+      // Ensure no English is visible in UI for property type.
+      const mapped = (properties || []).map(p => ({
+        ...p,
+        propertyTypeText: this.getDariPropertyTypeLabel(p.propertyTypeText)
+      }));
+      this.properties = mapped;
+      this.filteredProperties = mapped;
     });
+  }
+
+  private getDariPropertyTypeLabel(propertyTypeValue: any): string {
+    const value = (propertyTypeValue ?? '').toString();
+    const match = this.localizationService.propertyTypes.find(pt => pt.value === value);
+    return match?.label || 'سایر';
   }
 
   onEdit(propertyId: number) {

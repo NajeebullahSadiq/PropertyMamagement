@@ -42,6 +42,22 @@ public partial class BuyerDetail
 
     public string? AuthorizationLetter { get; set; } // Path to authorization letter file
 
+    public int? PropertyTypeId { get; set; }
+
+    public string? CustomPropertyType { get; set; }
+
+    public double? Price { get; set; }
+
+    public string? PriceText { get; set; }
+
+    public double? RoyaltyAmount { get; set; }
+
+    public double? HalfPrice { get; set; }
+
+    public string? TransactionType { get; set; }
+
+    public string? TransactionTypeDescription { get; set; }
+
     public DateTime? RentStartDate { get; set; }
 
     public DateTime? RentEndDate { get; set; }

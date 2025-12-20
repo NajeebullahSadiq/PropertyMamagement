@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models;
@@ -22,6 +25,18 @@ namespace WebAPIBackend.Controllers
             _context = context;
             _userManager = userManager;
         }
+
+        private static readonly HashSet<string> AllowedPropertyTypeNames = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "House",
+            "Apartment",
+            "Shop",
+            "Block",
+            "Land",
+            "Garden",
+            "Hill",
+            "Other"
+        };
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -392,6 +407,31 @@ namespace WebAPIBackend.Controllers
             {
                 return StatusCode(312, "Main Table is Empty");
             }
+
+            if (!request.PropertyTypeId.HasValue)
+            {
+                return StatusCode(400, "انتخاب نوعیت ملکیت الزامی است");
+            }
+
+            var propertyType = await _context.PropertyTypes.FindAsync(request.PropertyTypeId.Value);
+            if (propertyType == null || string.IsNullOrWhiteSpace(propertyType.Name) || !AllowedPropertyTypeNames.Contains(propertyType.Name))
+            {
+                return StatusCode(400, "نوعیت ملکیت انتخاب‌شده درست نیست");
+            }
+
+            var isOtherPropertyType = propertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase);
+            if (isOtherPropertyType)
+            {
+                if (string.IsNullOrWhiteSpace(request.CustomPropertyType))
+                {
+                    return StatusCode(400, "نوشتن نوع ملکیت (سایر) الزامی است");
+                }
+                request.CustomPropertyType = request.CustomPropertyType.Trim();
+            }
+            else
+            {
+                request.CustomPropertyType = null;
+            }
             //var user = await _userManager.GetUserAsync(User);
            
             // Convert rental dates to UTC if they exist
@@ -425,6 +465,14 @@ namespace WebAPIBackend.Controllers
                 Photo=request.Photo,
                 RoleType=request.RoleType ?? "Buyer",
                 AuthorizationLetter=request.AuthorizationLetter,
+                PropertyTypeId = request.PropertyTypeId,
+                CustomPropertyType = request.CustomPropertyType,
+                Price = request.Price,
+                PriceText = request.PriceText,
+                RoyaltyAmount = request.RoyaltyAmount,
+                HalfPrice = request.HalfPrice,
+                TransactionType = request.TransactionType,
+                TransactionTypeDescription = request.TransactionTypeDescription,
                 RentStartDate = rentStartDate,
                 RentEndDate = rentEndDate,
             };
@@ -460,6 +508,31 @@ namespace WebAPIBackend.Controllers
             if (existingProperty == null)
             {
                 return NotFound();
+            }
+
+            if (!request.PropertyTypeId.HasValue)
+            {
+                return StatusCode(400, "انتخاب نوعیت ملکیت الزامی است");
+            }
+
+            var propertyType = await _context.PropertyTypes.FindAsync(request.PropertyTypeId.Value);
+            if (propertyType == null || string.IsNullOrWhiteSpace(propertyType.Name) || !AllowedPropertyTypeNames.Contains(propertyType.Name))
+            {
+                return StatusCode(400, "نوعیت ملکیت انتخاب‌شده درست نیست");
+            }
+
+            var isOtherPropertyType = propertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase);
+            if (isOtherPropertyType)
+            {
+                if (string.IsNullOrWhiteSpace(request.CustomPropertyType))
+                {
+                    return StatusCode(400, "نوشتن نوع ملکیت (سایر) الزامی است");
+                }
+                request.CustomPropertyType = request.CustomPropertyType.Trim();
+            }
+            else
+            {
+                request.CustomPropertyType = null;
             }
 
             // Store the original values of the CreatedBy and CreatedOn properties

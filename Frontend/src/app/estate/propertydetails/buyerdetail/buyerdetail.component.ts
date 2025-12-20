@@ -72,7 +72,7 @@ export class BuyerdetailComponent {
       nationalIdCard:['', Validators.required],
       roleType: ['Buyer', Validators.required],
       authorizationLetter: [''],
-      propertyTypeId: [''],
+      propertyTypeId: ['', Validators.required],
       customPropertyType: [''],
       price: [''],
       priceText: [''],
@@ -137,20 +137,9 @@ export class BuyerdetailComponent {
       descriptionControl?.updateValueAndValidity();
     });
 
-    // Add dynamic validation for custom property type when "Other" is selected
+    // Add dynamic validation for custom property type when "سایر" is selected
     this.sellerForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
-      const customPropertyTypeControl = this.sellerForm.get('customPropertyType');
-      
-      // Find if the selected property type is "Other"
-      const selectedPropertyType = this.localizedPropertyTypes?.find((pt: any) => pt.id === propertyTypeId);
-      
-      if (selectedPropertyType && selectedPropertyType.name === 'سایر') {
-        customPropertyTypeControl?.setValidators([Validators.required]);
-      } else {
-        customPropertyTypeControl?.clearValidators();
-        customPropertyTypeControl?.reset();
-      }
-      customPropertyTypeControl?.updateValueAndValidity();
+      this.applyCustomPropertyTypeValidation(propertyTypeId);
     });
   }
   ngOnInit() {
@@ -173,7 +162,11 @@ export class BuyerdetailComponent {
     // Load property types
     this.propertyDetailsService.getPropertyType().subscribe(res => {
       this.propertyTypes = res;
-      this.localizedPropertyTypes = this.mapPropertyTypesToLocalized(res as any[]);
+      this.localizedPropertyTypes = this.mapPropertyTypesToStandardizedDari(res as any[]);
+
+      // Re-apply validation in case form values were patched before property types loaded
+      const currentPropertyTypeId = this.sellerForm.get('propertyTypeId')?.value;
+      this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
     });
     // Add price change listener for half-price calculation
     this.sellerForm.get('price')?.valueChanges.subscribe(price => {
@@ -494,6 +487,56 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
     };
   });
 }
+
+  /**
+   * Standardize property types to the required 8 options with Dari labels only.
+   * Any backend values outside the supported list are ignored to prevent English/extra options.
+   */
+  mapPropertyTypesToStandardizedDari(backendTypes: any[]): any[] {
+    const supportedOrder = ['House', 'Apartment', 'Shop', 'Block', 'Land', 'Garden', 'Hill', 'Other'];
+    const byNameLower = new Map<string, any>();
+    (backendTypes || []).forEach(t => {
+      if (t?.name) {
+        const normalized = String(t.name).toLowerCase() === 'othert' ? 'other' : String(t.name).toLowerCase();
+        byNameLower.set(normalized, t);
+      }
+    });
+
+    return supportedOrder
+      .map(value => {
+        const backend = byNameLower.get(value.toLowerCase());
+        if (!backend) {
+          return null;
+        }
+        const localized = this.localizationService.propertyTypes.find(pt => pt.value === value);
+        if (!localized?.label) {
+          return null;
+        }
+        return { id: backend.id, name: localized.label };
+      })
+      .filter(Boolean);
+  }
+
+  private applyCustomPropertyTypeValidation(propertyTypeId: any, emitEvent: boolean = false): void {
+    const customPropertyTypeControl = this.sellerForm.get('customPropertyType');
+    if (!customPropertyTypeControl) {
+      return;
+    }
+
+    // If property types haven't loaded yet, do not clear user-entered value.
+    if (!this.localizedPropertyTypes || this.localizedPropertyTypes.length === 0) {
+      return;
+    }
+
+    const selectedPropertyType = this.localizedPropertyTypes.find((pt: any) => pt.id === propertyTypeId);
+    if (selectedPropertyType && selectedPropertyType.name === 'سایر') {
+      customPropertyTypeControl.setValidators([Validators.required]);
+    } else {
+      customPropertyTypeControl.clearValidators();
+      customPropertyTypeControl.reset();
+    }
+    customPropertyTypeControl.updateValueAndValidity({ emitEvent });
+  }
 
   get firstName() { return this.sellerForm.get('firstName'); }
   get fatherName() { return this.sellerForm.get('fatherName'); }
