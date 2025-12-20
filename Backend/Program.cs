@@ -113,7 +113,7 @@ await DatabaseSeeder.SeedDatabase(app.Services);
 app.UseCors();
 
 app.UseStaticFiles();
-var resourcesPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+var resourcesPath = Path.Combine(AppContext.BaseDirectory, "Resources");
 Directory.CreateDirectory(resourcesPath);
 Directory.CreateDirectory(Path.Combine(resourcesPath, "Images"));
 var documentsPath = Path.Combine(resourcesPath, "Documents");
