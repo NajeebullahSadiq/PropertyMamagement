@@ -1,27 +1,31 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
+import { FileService } from '../file.service';
 
 @Component({
   selector: 'app-document-viewer',
   templateUrl: './document-viewer.component.html',
   styleUrls: ['./document-viewer.component.scss']
 })
-export class DocumentViewerComponent implements OnInit {
+export class DocumentViewerComponent implements OnInit, OnDestroy {
   isLoading = true;
   error: string | null = null;
   fileUrl: SafeResourceUrl | null = null;
   rawFileUrl: string = '';
+  imageUrl: SafeUrl | null = null;
   isImage = false;
   isPdf = false;
   fileName = '';
   fileExtension = '';
+  private objectUrl: string | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<DocumentViewerComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { filePath: string; fileName: string },
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private fileService: FileService
   ) {}
 
   ngOnInit(): void {
@@ -54,15 +58,26 @@ export class DocumentViewerComponent implements OnInit {
     
     console.log('Generated file URL:', this.rawFileUrl);
 
-    // Sanitize the URL for Angular security
     if (this.isPdf) {
       this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawFileUrl);
+      this.isLoading = false;
+    } else if (this.isImage) {
+      this.fileService.viewFile(cleanPath).subscribe({
+        next: (blob) => {
+          this.objectUrl = URL.createObjectURL(blob);
+          this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(this.objectUrl);
+          this.isLoading = false;
+          this.error = null;
+        },
+        error: (err) => {
+          console.error('✗ Image failed to load (blob request):', err);
+          this.error = 'خطا در بارگذاری تصویر. لطفا فایل را دانلود کنید.';
+          this.isLoading = false;
+        }
+      });
     } else {
-      this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawFileUrl);
+      this.isLoading = false;
     }
-
-    // Stop loading immediately - let the browser handle the rest
-    this.isLoading = false;
     
     console.log('DocumentViewer: State after init', {
       isLoading: this.isLoading,
@@ -113,5 +128,12 @@ export class DocumentViewerComponent implements OnInit {
 
   closeDialog(): void {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy(): void {
+    if (this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = null;
+    }
   }
 }
