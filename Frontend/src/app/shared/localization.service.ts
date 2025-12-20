@@ -35,10 +35,12 @@ export class LocalizationService {
     { value: 'against_afghanistan_hand', label: 'دست خلاف افغانستان' }
   ];
 
-  // Document Type Options
-  docTypes = [
-    { value: 'رسمی', label: 'رسمی' },
-    { value: 'عرفی', label: 'عرفی' }
+  // Document Type Options (Dynamic Deed Types)
+  documentTypes = [
+    { value: 'قباله شرعی', label: 'قباله شرعی' },
+    { value: 'سند ملکیت', label: 'سند ملکیت' },
+    { value: 'سټه رهنمای معاملات', label: 'سټه رهنمای معاملات' },
+    { value: 'سند دست‌نویس', label: 'سند دست‌نویس' }
   ];
 
   // Table Size Options
@@ -50,28 +52,22 @@ export class LocalizationService {
 
   // Property Types (from backend lookup table)
   propertyTypes = [
-    { value: 'House', label: 'حویلی' },
+    { value: 'House', label: 'خانه / مجتمع رهایشی' },
     { value: 'Apartment', label: 'آپارتمان' },
-    { value: 'Land', label: 'زمین' },
-    { value: 'Commercial Building', label: 'ساختمان تجاری' },
-    { value: 'Office', label: 'دفتر' },
     { value: 'Shop', label: 'دکان' },
-    { value: 'Warehouse', label: 'انبار' },
-    { value: 'Factory', label: 'کارخانه' },
-    { value: 'Farm', label: 'مزرعه' },
-    { value: 'Villa', label: 'ویلا' },
-    { value: 'Block', label: 'بلاک' }
+    { value: 'Block', label: 'بلاک' },
+    { value: 'Land', label: 'زمین' },
+    { value: 'Garden', label: 'باغ' },
+    { value: 'Hill', label: 'تپه' },
+    { value: 'Other', label: 'سایر' }
   ];
 
-  // Transaction Types (from backend lookup table)
+  // Transaction Types (limited to 4 options for buyer details)
   transactionTypes = [
-    { value: 'Sale', label: 'فروخت' },
-    { value: 'Rent', label: 'اجاره' },
-    { value: 'Lease', label: 'اجاره دراز مدت' },
-    { value: 'Mortgage', label: 'رہن' },
-    { value: 'Exchange', label: 'تبادله' },
-    { value: 'Gift', label: 'هدیه' },
-    { value: 'Inheritance', label: 'وراثت' }
+    { value: 'Purchase', label: 'خرید و فروش' },
+    { value: 'Rent', label: 'کرایه' },
+    { value: 'Revocable Sale', label: 'بیع جایزی' },
+    { value: 'Other', label: 'سایر' }
   ];
 
   // Education Levels (from backend lookup table)

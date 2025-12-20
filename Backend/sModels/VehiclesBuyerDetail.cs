@@ -41,6 +41,8 @@ public partial class VehiclesBuyerDetail
 
     public int? PropertyTypeId { get; set; }
 
+    public string? CustomPropertyType { get; set; }
+
     public double? Price { get; set; }
 
     public string? PriceText { get; set; }
@@ -52,6 +54,10 @@ public partial class VehiclesBuyerDetail
     public DateTime? RentStartDate { get; set; }
 
     public DateTime? RentEndDate { get; set; }
+
+    public string? TransactionType { get; set; }
+
+    public string? TransactionTypeDescription { get; set; }
 
     public virtual Location? PaddressDistrict { get; set; }
 

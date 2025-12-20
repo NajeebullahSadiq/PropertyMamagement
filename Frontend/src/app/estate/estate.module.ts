@@ -30,6 +30,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableModule} from '@angular/material/table';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { CancellationPageComponent } from './cancellation-page/cancellation-page.component';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import { CancellationPageComponent } from './cancellation-page/cancellation-page
     NgSelectModule,
     MatPaginatorModule,
     MatTableModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    SharedModule
 
 
   ]

@@ -10,7 +10,15 @@
 
                             <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات مشتری ملکیت</p>
                         </div>
-                        <app-upload #childComponent (sendMessage)="uploadFinished($event)" style="text-align:left;"></app-upload>
+                        <app-profile-image-cropper
+                          #childComponent
+                          [initialImageUrl]="imagePath"
+                          documentType="profile"
+                          [roundCropper]="true"
+                          (imageChanged)="profilePreviewChanged($event)"
+                          (imageUploaded)="profileImageUploaded($event)"
+                          style="text-align:left;"
+                        ></app-profile-image-cropper>
                         
                         <div class="row mt-3">
                             <div class="col-md-12">
@@ -241,7 +249,36 @@
                                             <small class="text-danger" *ngIf="propertyTypeId?.errors?.['required']">این فیلد الزامی است</small>
                                         </div>
                                     </div>
+                                    <div class="col-md-4" *ngIf="isOtherPropertyType()">
+                                        <label for="customPropertyType" class="form-label">نوع ملکیت (سایر)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-edit"></i></span>
+                                            <input type="text" id="customPropertyType" class="form-control" formControlName="customPropertyType" placeholder="نوع ملکیت را وارد کنید">
+                                        </div>
+                                        <div *ngIf="customPropertyType?.invalid && (customPropertyType?.dirty || customPropertyType?.touched)">
+                                            <small class="text-danger" *ngIf="customPropertyType?.errors?.['required']">این فیلد الزامی است</small>
+                                        </div>
+                                    </div>
                                     <div class="col-md-4">
+                                        <label class="form-label me-3">نوعیت معامله</label>
+                                        <ng-select formControlName="transactionType" [items]="transactionTypes" [selectOnTab]="true"
+                                          bindLabel="label" bindValue="value">
+                                        </ng-select>
+                                        <div *ngIf="transactionType?.invalid && (transactionType?.dirty || transactionType?.touched)">
+                                            <small class="text-danger" *ngIf="transactionType?.errors?.['required']">این فیلد الزامی است</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4" *ngIf="isOtherTransactionType()">
+                                        <label for="transactionTypeDescription" class="form-label">توضیح سایر</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-edit"></i></span>
+                                            <input type="text" id="transactionTypeDescription" class="form-control" formControlName="transactionTypeDescription">
+                                        </div>
+                                        <div *ngIf="transactionTypeDescription?.invalid && (transactionTypeDescription?.dirty || transactionTypeDescription?.touched)">
+                                            <small class="text-danger" *ngIf="transactionTypeDescription?.errors?.['required']">این فیلد الزامی است</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4" *ngIf="!isOtherTransactionType()">
                                         <label for="price" class="form-label">قیمت به عدد</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>

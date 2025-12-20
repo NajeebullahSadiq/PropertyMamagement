@@ -47,6 +47,8 @@ public partial class SellerDetail
 
     public int? PropertyTypeId { get; set; }
 
+    public string? CustomPropertyType { get; set; }
+
     public double? Price { get; set; }
 
     public string? PriceText { get; set; }

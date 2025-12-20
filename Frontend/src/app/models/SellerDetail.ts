@@ -18,12 +18,15 @@ export interface SellerDetail {
     authorizationLetter?:string; // Path to authorization letter file (for agents)
     heirsLetter?:string; // Path to heirs letter file (for heirs)
     propertyTypeId?:number;
+    customPropertyType?:string;
     price?:number;
     priceText?:string;
     royaltyAmount?:number;
     halfPrice?:number;
     rentStartDate?:Date; // Rental start date for lessee roles
     rentEndDate?:Date; // Rental end date for lessee roles
+    transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
+    transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
 }
 
 export interface VBuyerDetail {
@@ -46,10 +49,13 @@ export interface VBuyerDetail {
     authorizationLetter?:string; // Path to authorization letter file (for agents)
     heirsLetter?:string; // Path to heirs letter file (for heirs)
     propertyTypeId?:number;
+    customPropertyType?:string;
     price?:number;
     priceText?:string;
     royaltyAmount?:number;
     halfPrice?:number;
     rentStartDate?:Date; // Rental start date for lessee roles
     rentEndDate?:Date; // Rental end date for lessee roles
+    transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
+    transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
 }

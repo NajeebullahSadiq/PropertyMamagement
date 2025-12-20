@@ -146,12 +146,18 @@ namespace UploadFilesServer.Controllers
                 
                 System.Diagnostics.Debug.WriteLine($"ViewFile: Serving {fileName} ({fileBytes.Length} bytes) with content-type: {contentType}");
                 
+                // Set proper headers for CORS and caching
+                Response.Headers["Access-Control-Allow-Origin"] = "*";
+                Response.Headers["Access-Control-Allow-Methods"] = "GET, OPTIONS";
+                Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
+                Response.Headers["Cache-Control"] = "public, max-age=3600";
+                
                 // For PDFs and images, serve inline so they display in the browser
                 // For other files, serve as attachment for download
-                if (fileExtension == ".pdf" || fileExtension.StartsWith(".jp") || fileExtension == ".png" || fileExtension == ".gif" || fileExtension == ".bmp" || fileExtension == ".webp")
+                if (fileExtension == ".pdf" || fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png" || fileExtension == ".gif" || fileExtension == ".bmp" || fileExtension == ".webp")
                 {
-                    // Serve inline for viewing
-                    Response.Headers["Content-Disposition"] = "inline; filename=" + fileName;
+                    // Serve inline for viewing with proper Content-Disposition header
+                    Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
                     return File(fileBytes, contentType);
                 }
                 else
@@ -162,7 +168,8 @@ namespace UploadFilesServer.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"خطای سرور: {ex.Message}" });
+                System.Diagnostics.Debug.WriteLine($"ViewFile Error: {ex.Message}");
+                return StatusCode(500, new { message = $"خطای سرور: {ex.Message}", details = ex.StackTrace });
             }
         }
 

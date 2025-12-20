@@ -7,7 +7,11 @@ namespace WebAPIBackend.Models.ViewModels
         // PropertyDetails
         [Key]
         public int Id { get; set; }
-        public string doctype { get; set; }
+        public string? DocumentType { get; set; }
+        public string? IssuanceNumber { get; set; }
+        public DateTime? IssuanceDate { get; set; }
+        public string? SerialNumber { get; set; }
+        public DateTime? TransactionDate { get; set; }
         public int PNumber { get; set; }
         public int PArea { get; set; }
         public int? NumofRooms { get; set; }
@@ -66,6 +70,5 @@ namespace WebAPIBackend.Models.ViewModels
         // PropertyUnitType and TransactionType
         public string UnitType { get; set; }
         public string TransactionType { get; set; }
-        public DateTime? DeedDate { get; set; }
     }
 }

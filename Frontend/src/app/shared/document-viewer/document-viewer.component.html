@@ -1,44 +1,98 @@
-<div class="document-viewer-container">
-  <div class="viewer-header">
-    <h2>{{ fileName }}</h2>
-    <button class="close-btn" (click)="closeDialog()" title="بستن">
-      <i class="fas fa-times"></i>
+<div class="flex flex-col h-full max-h-[90vh] bg-gray-50 rounded-lg overflow-hidden">
+  <!-- Header -->
+  <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+    <h2 class="text-lg font-semibold truncate flex-1">{{ fileName }}</h2>
+    <button 
+      (click)="closeDialog()" 
+      class="w-10 h-10 flex items-center justify-center rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all ml-3"
+      title="بستن"
+    >
+      <i class="fas fa-times text-lg"></i>
     </button>
   </div>
 
-  <div class="viewer-content">
-    <div *ngIf="isLoading" class="loading-spinner">
-      <div class="spinner"></div>
-      <p>در حال بارگذاری...</p>
+  <!-- Content Area -->
+  <div class="flex-1 overflow-auto flex items-center justify-center p-6 bg-white">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center gap-4">
+      <div class="w-12 h-12 border-4 border-gray-200 border-t-purple-600 rounded-full animate-spin"></div>
+      <p class="text-gray-600 text-base">در حال بارگذاری...</p>
     </div>
 
-    <div *ngIf="error && !isLoading" class="error-message">
-      <i class="fas fa-exclamation-circle"></i>
-      <p>{{ error }}</p>
-      <button class="btn btn-primary" (click)="downloadFile()">
-        <i class="fas fa-download"></i> دانلود فایل
+    <!-- Error State -->
+    <div *ngIf="error" class="flex flex-col items-center justify-center gap-4 p-8 text-center">
+      <i class="fas fa-exclamation-circle text-5xl text-red-500"></i>
+      <p class="text-gray-700 text-base">{{ error }}</p>
+      <button 
+        (click)="downloadFile()" 
+        class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+      >
+        <i class="fas fa-download"></i>
+        <span>دانلود فایل</span>
       </button>
     </div>
 
-    <div *ngIf="isImage && imageUrl && !isLoading" class="flex items-center justify-center w-full h-full min-h-96">
-      <img [src]="imageUrl" alt="{{ fileName }}" class="max-w-full max-h-full min-h-48 object-contain rounded shadow-lg bg-white" (error)="onImageError()" (load)="onImageLoad()">
+    <!-- Image Display -->
+    <div *ngIf="!isLoading && !error && isImage" class="w-full h-full flex items-center justify-center min-h-[400px]">
+      <img 
+        [src]="rawFileUrl" 
+        [alt]="fileName" 
+        (load)="onImageLoad()" 
+        (error)="onImageError($event)"
+        class="max-w-full max-h-[70vh] w-auto h-auto object-contain rounded-lg shadow-xl bg-white"
+      />
     </div>
 
-    <div *ngIf="isPdf && pdfUrl && !isLoading" class="w-full h-full flex flex-col">
-      <div class="mb-2 text-center">
-        <a [href]="pdfUrl" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-          <i class="fas fa-external-link-alt ml-2"></i>
-          باز کردن PDF در تب جدید
+    <!-- PDF Display -->
+    <div *ngIf="!isLoading && !error && isPdf" class="w-full h-full flex flex-col min-h-[500px]">
+      <div class="flex justify-center p-3 bg-gray-100 rounded-lg mb-3">
+        <a 
+          [href]="rawFileUrl" 
+          target="_blank" 
+          class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 hover:shadow-lg transition-all text-sm"
+        >
+          <i class="fas fa-external-link-alt text-xs"></i>
+          <span>باز کردن در تب جدید</span>
         </a>
       </div>
-      <iframe [src]="pdfUrl" class="flex-1 w-full border-0 rounded min-h-96" sandbox="allow-same-origin allow-scripts allow-popups" allowfullscreen (load)="onPdfLoad()" (error)="onPdfError()" frameborder="0"></iframe>
+      <iframe 
+        [src]="fileUrl" 
+        (load)="onPdfLoad()" 
+        (error)="onPdfError($event)"
+        class="flex-1 w-full min-h-[500px] border-0 rounded-lg bg-white shadow-lg"
+        frameborder="0"
+      ></iframe>
+    </div>
+
+    <!-- Unsupported File Type -->
+    <div *ngIf="!isLoading && !error && !isImage && !isPdf" class="flex flex-col items-center justify-center gap-4 p-8 text-center">
+      <i class="fas fa-file text-5xl text-gray-400"></i>
+      <p class="text-gray-700 text-base">نوع فایل پشتیبانی نشده است</p>
+      <button 
+        (click)="downloadFile()" 
+        class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+      >
+        <i class="fas fa-download"></i>
+        <span>دانلود فایل</span>
+      </button>
     </div>
   </div>
 
-  <div class="viewer-footer">
-    <button class="btn btn-secondary" (click)="closeDialog()">بستن</button>
-    <button class="btn btn-primary" (click)="downloadFile()">
-      <i class="fas fa-download"></i> دانلود
+  <!-- Footer -->
+  <div class="flex justify-end gap-3 px-6 py-4 bg-gray-100 border-t border-gray-200">
+    <button 
+      (click)="closeDialog()" 
+      class="inline-flex items-center gap-2 px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
+    >
+      <i class="fas fa-times"></i>
+      <span>بستن</span>
+    </button>
+    <button 
+      (click)="downloadFile()" 
+      class="inline-flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+    >
+      <i class="fas fa-download"></i>
+      <span>دانلود</span>
     </button>
   </div>
 </div>

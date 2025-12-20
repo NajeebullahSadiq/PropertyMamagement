@@ -8,6 +8,7 @@ import { LocalizationService } from 'src/app/shared/localization.service';
 import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 import { UploadComponent } from '../../upload/upload.component';
 import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-upload.component';
+import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -37,7 +38,7 @@ export class SellerdetailComponent {
   onNextClick() {
     this.next.emit();
   }
-  @ViewChild('childComponent') childComponent!: UploadComponent;
+  @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
   @ViewChild('nationalIdComponent') nationalIdComponent!: NationalidUploadComponent;
   @ViewChild('authLetterComponent') authLetterComponent!: UploadComponent;
   @ViewChild('heirsLetterComponent') heirsLetterComponent!: UploadComponent;
@@ -346,6 +347,8 @@ export class SellerdetailComponent {
       this.sellerForm.patchValue({ roleType: 'Seller' });
       this.selectedSellerId=0;
       this.imagePath='assets/img/avatar.png';
+      this.imageName='';
+      this.sellerForm.patchValue({ photo: '' });
       this.nationalIdCardName='';
       this.authorizationLetterName='';
       this.heirsLetterName='';
@@ -358,12 +361,6 @@ export class SellerdetailComponent {
       event.preventDefault();
     }
   }
-  uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
-    this.imagePath=this.baseUrl+this.imageName;
-    console.log(event+'=======================');
-  }
-
   nationalIdUploadFinished = (event:string) => { 
     this.nationalIdCardName="Resources\\Images\\"+event;
     this.sellerForm.patchValue({ nationalIdCard: this.nationalIdCardName });
@@ -380,6 +377,26 @@ export class SellerdetailComponent {
     this.heirsLetterName="Resources\\Images\\"+event;
     this.sellerForm.patchValue({ heirsLetter: this.heirsLetterName });
     console.log('Heirs Letter uploaded: '+event+'=======================');
+  }
+
+  profilePreviewChanged = (localObjectUrl: string) => {
+    if (localObjectUrl) {
+      this.imagePath = localObjectUrl;
+      return;
+    }
+
+    if (this.imageName) {
+      this.imagePath = this.baseUrl + this.imageName;
+      return;
+    }
+
+    this.imagePath = 'assets/img/avatar.png';
+  }
+
+  profileImageUploaded = (dbPath: string) => {
+    this.imageName = dbPath || '';
+    this.sellerForm.patchValue({ photo: this.imageName });
+    this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
   }
 
   isAuthorizedAgent(): boolean {

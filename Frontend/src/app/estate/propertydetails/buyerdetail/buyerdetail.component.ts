@@ -7,6 +7,7 @@ import { SellerService } from 'src/app/shared/seller.service';
 import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 import { UploadComponent } from '../../upload/upload.component';
 import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-upload.component';
+import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { environment } from 'src/environments/environment';
 
@@ -30,6 +31,7 @@ export class BuyerdetailComponent {
   district2:any;
   propertyTypes:any;
   localizedPropertyTypes:any;
+  transactionTypes:any;
   roleTypes: any = [];
   duplicateError: string = '';
   isDuplicateCheckLoading: boolean = false;
@@ -38,7 +40,7 @@ export class BuyerdetailComponent {
   onNextClick() {
     this.next.emit();
   }
-  @ViewChild('childComponent') childComponent!: UploadComponent;
+  @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
   @ViewChild('nationalIdComponent') nationalIdComponent!: NationalidUploadComponent;
   @ViewChild('authLetterComponent') authLetterComponent!: UploadComponent;
   ngAfterViewInit(): void {
@@ -71,12 +73,15 @@ export class BuyerdetailComponent {
       roleType: ['Buyer', Validators.required],
       authorizationLetter: [''],
       propertyTypeId: [''],
+      customPropertyType: [''],
       price: [''],
       priceText: [''],
       royaltyAmount: [''],
       halfPrice: [''],
       rentStartDate: [''],
-      rentEndDate: ['']
+      rentEndDate: [''],
+      transactionType: [''],
+      transactionTypeDescription: ['']
     });
 
     // Add dynamic validation for authorization letter based on agent roles
@@ -118,6 +123,35 @@ export class BuyerdetailComponent {
       rentStartDateControl?.updateValueAndValidity();
       rentEndDateControl?.updateValueAndValidity();
     });
+
+    // Add dynamic validation for transaction type description when "Other" is selected
+    this.sellerForm.get('transactionType')?.valueChanges.subscribe(transactionType => {
+      const descriptionControl = this.sellerForm.get('transactionTypeDescription');
+      
+      if (transactionType === 'Other') {
+        descriptionControl?.setValidators([Validators.required]);
+      } else {
+        descriptionControl?.clearValidators();
+        descriptionControl?.reset();
+      }
+      descriptionControl?.updateValueAndValidity();
+    });
+
+    // Add dynamic validation for custom property type when "Other" is selected
+    this.sellerForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
+      const customPropertyTypeControl = this.sellerForm.get('customPropertyType');
+      
+      // Find if the selected property type is "Other"
+      const selectedPropertyType = this.localizedPropertyTypes?.find((pt: any) => pt.id === propertyTypeId);
+      
+      if (selectedPropertyType && selectedPropertyType.name === 'سایر') {
+        customPropertyTypeControl?.setValidators([Validators.required]);
+      } else {
+        customPropertyTypeControl?.clearValidators();
+        customPropertyTypeControl?.reset();
+      }
+      customPropertyTypeControl?.updateValueAndValidity();
+    });
   }
   ngOnInit() {
     // Initialize role types from localization service
@@ -133,6 +167,9 @@ export class BuyerdetailComponent {
     this.selerService.getprovince().subscribe(res => {
       this.province = res;
     });
+    
+    // Load transaction types from localization service
+    this.transactionTypes = this.localizationService.transactionTypes;
     // Load property types
     this.propertyDetailsService.getPropertyType().subscribe(res => {
       this.propertyTypes = res;
@@ -174,12 +211,15 @@ export class BuyerdetailComponent {
           roleType: firstBuyer.roleType || 'Buyer',
           authorizationLetter: firstBuyer.authorizationLetter || '',
           propertyTypeId: firstBuyer.propertyTypeId || '',
+          customPropertyType: firstBuyer.customPropertyType || '',
           price: firstBuyer.price || '',
           priceText: firstBuyer.priceText || '',
           royaltyAmount: firstBuyer.royaltyAmount || '',
           halfPrice: firstBuyer.halfPrice || '',
           rentStartDate: firstBuyer.rentStartDate || '',
           rentEndDate: firstBuyer.rentEndDate || '',
+          transactionType: firstBuyer.transactionType || '',
+          transactionTypeDescription: firstBuyer.transactionTypeDescription || '',
         });
         this.selectedSellerId=firstBuyer.id;
         this.imagePath=this.baseUrl+firstBuyer.photo;
@@ -306,12 +346,15 @@ updateBuyerDetails(): void {
       roleType: selectedBuyer.roleType || 'Buyer',
       authorizationLetter: selectedBuyer.authorizationLetter || '',
       propertyTypeId: selectedBuyer.propertyTypeId || '',
+      customPropertyType: selectedBuyer.customPropertyType || '',
       price: selectedBuyer.price || '',
       priceText: selectedBuyer.priceText || '',
       royaltyAmount: selectedBuyer.royaltyAmount || '',
       halfPrice: selectedBuyer.halfPrice || '',
       rentStartDate: selectedBuyer.rentStartDate || '',
       rentEndDate: selectedBuyer.rentEndDate || '',
+      transactionType: selectedBuyer.transactionType || '',
+      transactionTypeDescription: selectedBuyer.transactionTypeDescription || '',
     });
     this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
     this.imageName = selectedBuyer.photo || '';
@@ -406,6 +449,26 @@ authorizationLetterUploadFinished = (event:string) => {
   console.log('Authorization Letter uploaded: '+event+'=======================');
 }
 
+profilePreviewChanged = (localObjectUrl: string) => {
+  if (localObjectUrl) {
+    this.imagePath = localObjectUrl;
+    return;
+  }
+
+  if (this.imageName) {
+    this.imagePath = this.baseUrl + this.imageName;
+    return;
+  }
+
+  this.imagePath = 'assets/img/avatar.png';
+}
+
+profileImageUploaded = (dbPath: string) => {
+  this.imageName = dbPath || '';
+  this.sellerForm.patchValue({ photo: this.imageName });
+  this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
+}
+
 isAuthorizedAgent(): boolean {
   const roleType = this.sellerForm.get('roleType')?.value;
   // Agent roles that require Power of Attorney (وکالت‌نامه)
@@ -456,6 +519,19 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   get halfPrice() { return this.sellerForm.get('halfPrice'); }
   get rentStartDate() { return this.sellerForm.get('rentStartDate'); }
   get rentEndDate() { return this.sellerForm.get('rentEndDate'); }
+  get transactionType() { return this.sellerForm.get('transactionType'); }
+  get transactionTypeDescription() { return this.sellerForm.get('transactionTypeDescription'); }
+  get customPropertyType() { return this.sellerForm.get('customPropertyType'); }
+
+  isOtherTransactionType(): boolean {
+    return this.sellerForm.get('transactionType')?.value === 'Other';
+  }
+
+  isOtherPropertyType(): boolean {
+    const propertyTypeId = this.sellerForm.get('propertyTypeId')?.value;
+    const selectedPropertyType = this.localizedPropertyTypes?.find((pt: any) => pt.id === propertyTypeId);
+    return selectedPropertyType && selectedPropertyType.name === 'سایر';
+  }
 
   isLesseeRole(): boolean {
     const roleType = this.sellerForm.get('roleType')?.value;

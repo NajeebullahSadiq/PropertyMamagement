@@ -9,7 +9,15 @@
                           
                             <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات فروشنده</p> 
                         </div>
-                        <app-vehicle-fileupload #childComponent (sendMessage)="uploadFinished($event)" style="text-align:left;"></app-vehicle-fileupload>
+                        <app-profile-image-cropper
+                          #childComponent
+                          [initialImageUrl]="imagePath"
+                          documentType="profile"
+                          [roundCropper]="true"
+                          (imageChanged)="profilePreviewChanged($event)"
+                          (imageUploaded)="profileImageUploaded($event)"
+                          style="text-align:left;"
+                        ></app-profile-image-cropper>
                         <form [formGroup]="SellerForm"
                             (ngSubmit)="SellerForm.valid ? selectedSellerId ? updateSellerDetails() : addSellerDetail() : null">
                             <div class="form-group">

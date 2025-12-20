@@ -373,7 +373,6 @@ public partial class PrmisContext : DbContext
             entity.Property(e => e.BuyerProvince).HasMaxLength(255);
             entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
             entity.Property(e => e.District).HasMaxLength(255);
-            entity.Property(e => e.Doctype).HasColumnName("doctype");
             entity.Property(e => e.Parea).HasColumnName("PArea");
             entity.Property(e => e.Pnumber).HasColumnName("PNumber");
             entity.Property(e => e.Province).HasMaxLength(255);
@@ -624,7 +623,11 @@ public partial class PrmisContext : DbContext
 
             entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
             entity.Property(e => e.CreatedBy).HasMaxLength(50);
-            entity.Property(e => e.Doctype).HasColumnName("doctype");
+            entity.Property(e => e.DocumentType).HasColumnName("DocumentType");
+            entity.Property(e => e.IssuanceNumber).HasColumnName("IssuanceNumber");
+            entity.Property(e => e.IssuanceDate).HasColumnType("timestamp with time zone");
+            entity.Property(e => e.SerialNumber).HasColumnName("SerialNumber");
+            entity.Property(e => e.TransactionDate).HasColumnType("timestamp with time zone");
             entity.Property(e => e.East).HasColumnName("east");
             entity.Property(e => e.Iscomplete)
                 .HasDefaultValueSql("false")

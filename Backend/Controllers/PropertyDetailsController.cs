@@ -123,13 +123,19 @@ namespace WebAPIBackend.Controllers
                 CreatedAt=DateTime.Now,
                 CreatedBy= userId,
                 FilePath=request.FilePath,
+                PreviousDocumentsPath = request.PreviousDocumentsPath,
+                ExistingDocumentsPath = request.ExistingDocumentsPath,
                 West=request.West,
                 East=request.East,
                 North=request.North,
                 South=request.South,
-                Doctype=request.Doctype,
-                DeedDate=request.DeedDate,
-                PrivateNumber=request.PrivateNumber
+                DocumentType=request.DocumentType,
+                IssuanceNumber=request.IssuanceNumber,
+                IssuanceDate=request.IssuanceDate,
+                SerialNumber=request.SerialNumber,
+                TransactionDate=request.TransactionDate,
+                iscomplete = false,
+                iseditable = false
                 
             };
             _context.Add(property);
@@ -278,7 +284,11 @@ namespace WebAPIBackend.Controllers
             var result = new
             {
                 Id = data.Id,
-                doctype = data.doctype,
+                DocumentType = data.DocumentType,
+                IssuanceNumber = data.IssuanceNumber,
+                IssuanceDate = data.IssuanceDate,
+                SerialNumber = data.SerialNumber,
+                TransactionDate = data.TransactionDate,
                 PNumber = data.PNumber,
                 PArea = data.PArea,
                 NumofRooms = data.NumofRooms,
@@ -291,7 +301,6 @@ namespace WebAPIBackend.Controllers
                 RoyaltyAmount = data.RoyaltyAmount,
                 PropertypeType = data.PropertypeType,
                 CreatedAt = data.CreatedAt,
-                DeedDate = data.DeedDate,
                 // Location - Province and District
                 Province = data.Province,
                 District = data.District,

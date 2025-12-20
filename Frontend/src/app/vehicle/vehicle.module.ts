@@ -26,6 +26,7 @@ import { WitnessdetailComponent } from './vehicle-submit/witnessdetail/witnessde
 import { VehicleFileuploadComponent } from './vehicle-submit/vehicle-fileupload/vehicle-fileupload.component';
 import { VehiclelistComponent } from './vehiclelist/vehiclelist.component';
 import { VehicleNationalidUploadComponent } from './vehicle-submit/nationalid-upload/nationalid-upload.component';
+import { SharedModule } from '../shared/shared.module';
 
 
 
@@ -60,7 +61,8 @@ import { VehicleNationalidUploadComponent } from './vehicle-submit/nationalid-up
     NgSelectModule,
     MatPaginatorModule,
     MatTableModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    SharedModule
   ]
 })
 export class VehicleModule { }

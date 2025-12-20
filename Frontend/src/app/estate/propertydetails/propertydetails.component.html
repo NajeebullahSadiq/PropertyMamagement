@@ -26,46 +26,91 @@
               <div class="form-group">
                 <input type="hidden" formControlName="id">
               </div>
+              <!-- مشخصات سند (Document Details Section) -->
               <div class="row">
-                <div class="col-md-3">
-                  <label class="form-label me-3">نوع سند ملکیت</label>
-                  <ng-select  formControlName="doctype">
-                    <ng-option value="رسمی">رسمی</ng-option>
-                    <ng-option value="عرفی">عرفی</ng-option>
-                  </ng-select>
+                <div class="col-md-12">
+                  <h5 class="mb-3" style="font-weight: bold; color: #2563eb;">مشخصات سند</h5>
                 </div>
+              </div>
+              
+              <div class="row">
+                <!-- نوع سند (Document Type Dropdown) -->
                 <div class="col-md-3">
-                  <label for="pnumber" class="form-label">شماره سند</label>
+                  <label class="form-label me-3">نوع سند</label>
+                  <ng-select formControlName="documentType" (change)="onDocumentTypeChange()">
+                    <ng-option value="قباله شرعی">قباله شرعی</ng-option>
+                    <ng-option value="سند ملکیت">سند ملکیت</ng-option>
+                    <ng-option value="سټه رهنمای معاملات">سټه رهنمای معاملات</ng-option>
+                    <ng-option value="سند دست‌نویس">سند دست‌نویس</ng-option>
+                  </ng-select>
+                  <div *ngIf="documentType?.invalid && (documentType?.dirty || documentType?.touched)">
+                    <small class="text-danger" *ngIf="documentType?.errors?.['required']">انتخاب نوع سند الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- نمبر صدور (Issuance Number) - For قباله شرعی and سند ملکیت -->
+                <div class="col-md-3" *ngIf="requiresIssuanceFields()">
+                  <label for="issuanceNumber" class="form-label">نمبر صدور</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                    <input type="text" id="issuanceNumber" class="form-control"
+                      formControlName="issuanceNumber">
+                  </div>
+                  <div *ngIf="issuanceNumber?.invalid && (issuanceNumber?.dirty || issuanceNumber?.touched)">
+                    <small class="text-danger" *ngIf="issuanceNumber?.errors?.['required']">نمبر صدور الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- تاریخ صدور (Issuance Date) - For قباله شرعی and سند ملکیت -->
+                <div class="col-md-3" *ngIf="requiresIssuanceFields()">
+                  <label for="issuanceDate" class="form-label">تاریخ صدور</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                    <input type="date" id="issuanceDate" class="form-control"
+                      formControlName="issuanceDate">
+                  </div>
+                  <div *ngIf="issuanceDate?.invalid && (issuanceDate?.dirty || issuanceDate?.touched)">
+                    <small class="text-danger" *ngIf="issuanceDate?.errors?.['required']">تاریخ صدور الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- سریال نمبر سته (Serial Number) - For سټه رهنمای معاملات -->
+                <div class="col-md-3" *ngIf="requiresSerialNumber()">
+                  <label for="serialNumber" class="form-label">سریال نمبر سته</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                    <input type="text" id="serialNumber" class="form-control"
+                      formControlName="serialNumber">
+                  </div>
+                  <div *ngIf="serialNumber?.invalid && (serialNumber?.dirty || serialNumber?.touched)">
+                    <small class="text-danger" *ngIf="serialNumber?.errors?.['required']">سریال نمبر سته الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- تاریخ معامله (Transaction Date) - For سټه رهنمای معاملات and سند دست‌نویس -->
+                <div class="col-md-3" *ngIf="requiresTransactionDate()">
+                  <label for="transactionDate" class="form-label">تاریخ معامله</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
+                    <input type="date" id="transactionDate" class="form-control"
+                      formControlName="transactionDate">
+                  </div>
+                  <div *ngIf="transactionDate?.invalid && (transactionDate?.dirty || transactionDate?.touched)">
+                    <small class="text-danger" *ngIf="transactionDate?.errors?.['required']">تاریخ معامله الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- شماره سند (Property Number) - Always visible -->
+                <div class="col-md-3">
+                  <label for="pnumber" class="form-label">شماره ملکیت</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
                     <input type="number" (keypress)="onlyNumberKey($event)" id="pnumber" class="form-control"
                       formControlName="pnumber">
-                    </div>
-                    <div *ngIf="pnumber?.invalid && (pnumber?.dirty || pnumber?.touched)">
-                      <small class="text-danger" *ngIf="pnumber?.errors?.['required']">شماره سند الزامی است</small>
-                    </div>
-                  
-                </div>
-                <div class="col-md-3">
-                  <label for="privateNumber" class="form-label">نمبر خصوصی</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
-                    <input type="text" id="privateNumber" class="form-control"
-                      formControlName="privateNumber">
-                    </div>
-                  
-                </div>
-                <div class="col-md-3">
-                  <label for="deedDate" class="form-label">تاریخ سند</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                    <input type="date" id="deedDate" class="form-control"
-                      formControlName="deedDate">
-                    </div>
-                    <div *ngIf="deedDate?.invalid && (deedDate?.dirty || deedDate?.touched)">
-                      <small class="text-danger" *ngIf="deedDate?.errors?.['required']">تاریخ سند الزامی است</small>
-                    </div>
-                  
+                  </div>
+                  <div *ngIf="pnumber?.invalid && (pnumber?.dirty || pnumber?.touched)">
+                    <small class="text-danger" *ngIf="pnumber?.errors?.['required']">شماره ملکیت الزامی است</small>
+                  </div>
                 </div>
               </div>
               <br>
@@ -112,56 +157,51 @@
                 </div>
               </div>
               <br />
+              <!-- آپلود اسناد ملکیت Section -->
               <div class="row">
-                
-                <div class="col-md-4">
-                  <label class="form-label me-3"> نوعیت معامله</label>
-                  <ng-select formControlName="transactionTypeId" [items]="localizedTransactionTypes" [selectOnTab]="true"
-                    bindLabel="name" bindValue="id">
-                  </ng-select>
-                  <!-- <div *ngIf="propertyForm.get('transactionTypeId')?.invalid && propertyForm.get('transactionTypeId')?.touched">
-                                  <small class="text-danger"> انتخاب نوعیت معامله  الزامی است</small>
-                                </div> -->
+                <div class="col-md-12">
+                  <h5 class="mb-3" style="font-weight: bold; color: #2563eb;">آپلود اسناد ملکیت</h5>
                 </div>
-                <div class="col-md-6">
-                  <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
-                  <div class="col-md-9">
-                    <div class="form-group col-md-12">
+              </div>
 
-                      <app-upload #childComponent (sendMessage)="uploadFinished($event)"></app-upload>
-                    </div>
+              <!-- آپلود اسناد قبلی (Previous Documents) -->
+              <div class="row mb-4">
+                <div class="col-md-12">
+                  <h6 class="mb-2" style="font-weight: 600; color: #1e293b;">آپلود اسناد قبلی</h6>
+                  <div class="form-group">
+                    <app-upload #previousDocsComponent (sendMessage)="previousDocumentsUploadFinished($event)"></app-upload>
                   </div>
                 </div>
-                <div class="col-md-2">
-                  <ng-container *ngIf="propertyForm.get('id')?.value && propertyForm.get('filePath')?.value">
-                    <h3 class="download-link" (click)="downloadFiles()">
-                      <i class="fas fa-arrow-alt-circle-down me-2"></i> 
-                      <div class="form-group col-md-12">
-                        دانلود اسناد
-                      </div>
-                    </h3>
-                  </ng-container>
-                </div>
-
               </div>
-           
+
+              <!-- آپلود اسناد موجوده (Existing Documents) -->
+              <div class="row mb-4">
+                <div class="col-md-12">
+                  <h6 class="mb-2" style="font-weight: 600; color: #1e293b;">آپلود اسناد موجوده</h6>
+                  <div class="form-group">
+                    <app-upload #existingDocsComponent (sendMessage)="existingDocumentsUploadFinished($event)"></app-upload>
+                  </div>
+                </div>
+              </div>
+
               <br>
+              <!-- حدود اربعه Section -->
               <div class="row">
-                <section>
-                  <div class="row d-flex justify-content-center align-items-center h-100">  
-                                      <h3 style="font-weight: bold;"> حدود اربعه </h3>
+                <div class="col-md-12">
+                  <h5 class="mb-3" style="font-weight: bold; color: #2563eb;">حدود اربعه</h5>
+                </div>
+              </div>
+
               <div class="row">
-             
                 <div class="col-md-6">
                   <label  class="form-label"> شمالا</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
                     <input type="text"  id="north" class="form-control" formControlName="north">
                   </div>
-                    <div *ngIf="north?.invalid && (north?.dirty || north?.touched)">
-                      <small class="text-danger" *ngIf="north?.errors?.['required']"> این فیلد الزامی است</small>
-                    </div>
-                  
+                  <div *ngIf="north?.invalid && (north?.dirty || north?.touched)">
+                    <small class="text-danger" *ngIf="north?.errors?.['required']"> این فیلد الزامی است</small>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <label  class="form-label"> شرقا</label>
@@ -169,40 +209,35 @@
                     <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
                     <input type="text"  id="east" class="form-control" formControlName="east">
                   </div>
-                    <div *ngIf="east?.invalid && (east?.dirty || east?.touched)">
-                      <small class="text-danger" *ngIf="east?.errors?.['required']">  این فیلد الزامی است</small>
-                    </div>
-                  
+                  <div *ngIf="east?.invalid && (east?.dirty || east?.touched)">
+                    <small class="text-danger" *ngIf="east?.errors?.['required']">  این فیلد الزامی است</small>
+                  </div>
                 </div>
-          </div>
-          <div class="row">
-             
-            <div class="col-md-6">
-              <label class="form-label"> جنوبا</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
-                <input type="text"  id="south" class="form-control" formControlName="south">
               </div>
-                <div *ngIf="south?.invalid && (south?.dirty || south?.touched)">
-                  <small class="text-danger" *ngIf="south?.errors?.['required']">  این فیلد الزامی است</small>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label"> جنوبا</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                    <input type="text"  id="south" class="form-control" formControlName="south">
+                  </div>
+                  <div *ngIf="south?.invalid && (south?.dirty || south?.touched)">
+                    <small class="text-danger" *ngIf="south?.errors?.['required']">  این فیلد الزامی است</small>
+                  </div>
                 </div>
-              
-            </div>
-            <div class="col-md-6">
-              <label  class="form-label"> غربا</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
-                <input type="text"  id="west" class="form-control" formControlName="west">
-              </div>
-                <div *ngIf="west?.invalid && (west?.dirty || west?.touched)">
-                  <small class="text-danger" *ngIf="west?.errors?.['required']">  این فیلد الزامی است</small>
+                <div class="col-md-6">
+                  <label  class="form-label"> غربا</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
+                    <input type="text"  id="west" class="form-control" formControlName="west">
+                  </div>
+                  <div *ngIf="west?.invalid && (west?.dirty || west?.touched)">
+                    <small class="text-danger" *ngIf="west?.errors?.['required']">  این فیلد الزامی است</small>
+                  </div>
                 </div>
-              
-            </div>
-         </div>
-        </div>   
-      </section>
               </div>
+
               <br>
               <div class="row">
                 <div class="col-md-10">

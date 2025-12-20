@@ -47,11 +47,15 @@ public partial class PropertyDetail
 
     public string? North { get; set; }
 
-    public string? Doctype { get; set; }
+    public string? DocumentType { get; set; }
 
-    public DateTime? DeedDate { get; set; }
+    public string? IssuanceNumber { get; set; }
 
-    public string? PrivateNumber { get; set; }
+    public DateTime? IssuanceDate { get; set; }
+
+    public string? SerialNumber { get; set; }
+
+    public DateTime? TransactionDate { get; set; }
 
     public virtual BuyerDetail? BuyerDetail { get; set; }
 

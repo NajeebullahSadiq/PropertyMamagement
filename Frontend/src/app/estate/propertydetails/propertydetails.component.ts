@@ -24,13 +24,13 @@ export class PropertydetailsComponent  implements AfterViewInit {
   localizedUnitTypes:any;
   selectedPropertyId: number=0;
   mainTableId: number =0;
-  transactiontype:any;
   propertypetype:any;
   localizedPropertyTypes:any;
-  localizedTransactionTypes:any;
   properties!: PropertyDetails[];
   onePercent:number=0;
   imageName:string='';
+  previousDocumentsPath:string='';
+  existingDocumentsPath:string='';
   @ViewChild('childComponent') childComponent!: UploadComponent;
   ngAfterViewInit(): void {
 
@@ -60,12 +60,15 @@ export class PropertydetailsComponent  implements AfterViewInit {
         west: ['', Validators.required],
         east: ['', Validators.required],
         south: ['', Validators.required],
-        doctype: ['', Validators.required],
-        deedDate: ['', Validators.required],
-        privateNumber: [''],
-        transactionTypeId: ['', Validators.required],
+        documentType: ['', Validators.required],
+        issuanceNumber: [''],
+        issuanceDate: [''],
+        serialNumber: [''],
+        transactionDate: [''],
         des: ['', Validators.required],
         filePath: [''],
+        previousDocumentsPath: [''],
+        existingDocumentsPath: [''],
         iscomplete: [false],
         iseditable: [false],
 
@@ -81,11 +84,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
   }
   ngOnInit() {
     this.selectedPropertyId=this.id;
-    this.propertyDetailsService.getTransactionType().subscribe(res => {
-      this.transactiontype = res;
-      // Map backend transaction types to localized versions
-      this.localizedTransactionTypes = this.mapTransactionTypesToLocalized(res as any[]);
-  });
   if (this.id > 0) {
     this.propertyDetailsService.getPropertyDetailsById(this.id)
         .subscribe(properties => {
@@ -97,25 +95,25 @@ export class PropertydetailsComponent  implements AfterViewInit {
             punitTypeId: properties[0].punitTypeId,
             numofFloor: properties[0].numofFloor,
             numofRooms: properties[0].numofRooms,
-            transactionTypeId: properties[0].transactionTypeId,
             des: properties[0].des,
             filePath: properties[0].filePath,
+            previousDocumentsPath: properties[0].previousDocumentsPath || '',
+            existingDocumentsPath: properties[0].existingDocumentsPath || '',
             iscomplete: properties[0].iscomplete,
             iseditable:properties[0].iseditable,
             north:properties[0].north,
             west:properties[0].west,
             east:properties[0].east,
             south:properties[0].south,
-            doctype:properties[0].doctype,
-            deedDate:properties[0].deedDate,
-            privateNumber:properties[0].privateNumber,
+            documentType:properties[0].documentType || '',
+            issuanceNumber:properties[0].issuanceNumber || '',
+            issuanceDate:properties[0].issuanceDate || '',
+            serialNumber:properties[0].serialNumber || '',
+            transactionDate:properties[0].transactionDate || '',
           });
           this.imageName=properties.map(item => item.filePath).toString();
-          // this.selerService.sellerId=0;
-          // this.selerService.buyerId=0;
-          // this.selerService.withnessId=0;
           this.propertyDetailsService.updateMainTableId(this.id);
-       
+          this.updateDocumentFieldValidation();
         });
   }
       
@@ -132,13 +130,25 @@ export class PropertydetailsComponent  implements AfterViewInit {
   addPropertyDetails(): void {
     const propertyDetails = this.propertyForm.value as PropertyDetails;
     propertyDetails.filePath=this.imageName;
+    propertyDetails.previousDocumentsPath=this.previousDocumentsPath;
+    propertyDetails.existingDocumentsPath=this.existingDocumentsPath;
      if(propertyDetails.id===null){
       propertyDetails.id=0;
     }
-    // Convert deedDate to UTC if it exists
-    if(propertyDetails.deedDate) {
-      const date = new Date(propertyDetails.deedDate);
-      propertyDetails.deedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    // Convert empty strings to null for optional fields
+    if (!propertyDetails.serialNumber || (propertyDetails.serialNumber as any) === '') {
+      propertyDetails.serialNumber = null as any;
+    }
+    // Convert dates to UTC if they exist
+    if(propertyDetails.issuanceDate) {
+      const date = new Date(propertyDetails.issuanceDate);
+      propertyDetails.issuanceDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    }
+    if(propertyDetails.transactionDate && (propertyDetails.transactionDate as any) !== '') {
+      const date = new Date(propertyDetails.transactionDate);
+      propertyDetails.transactionDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    } else {
+      propertyDetails.transactionDate = null as any;
     }
     this.propertyDetailsService.addPropertyDetails(propertyDetails).subscribe(result => {
       if(result.id!==0) {
@@ -155,13 +165,25 @@ export class PropertydetailsComponent  implements AfterViewInit {
   updatePropertyDetails(): void {
     const propertyDetails = this.propertyForm.value as PropertyDetails;
     propertyDetails.filePath=this.imageName;
+    propertyDetails.previousDocumentsPath=this.previousDocumentsPath;
+    propertyDetails.existingDocumentsPath=this.existingDocumentsPath;
     if(propertyDetails.id===0 && this.selectedPropertyId!==0 || this.selectedPropertyId!==null){
       propertyDetails.id=this.selectedPropertyId;
     }
-    // Convert deedDate to UTC if it exists
-    if(propertyDetails.deedDate) {
-      const date = new Date(propertyDetails.deedDate);
-      propertyDetails.deedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    // Convert empty strings to null for optional fields
+    if (!propertyDetails.serialNumber || (propertyDetails.serialNumber as any) === '') {
+      propertyDetails.serialNumber = null as any;
+    }
+    // Convert dates to UTC if they exist
+    if(propertyDetails.issuanceDate) {
+      const date = new Date(propertyDetails.issuanceDate);
+      propertyDetails.issuanceDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    }
+    if(propertyDetails.transactionDate && (propertyDetails.transactionDate as any) !== '') {
+      const date = new Date(propertyDetails.transactionDate);
+      propertyDetails.transactionDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    } else {
+      propertyDetails.transactionDate = null as any;
     }
     this.propertyDetailsService.updatePropertyDetails(propertyDetails).subscribe(result => {
       if(result.id!==0)
@@ -186,6 +208,14 @@ export class PropertydetailsComponent  implements AfterViewInit {
   uploadFinished = (event:string) => { 
     this.imageName="Resources\\Images\\"+event;
   }
+  
+  previousDocumentsUploadFinished = (event:string) => { 
+    this.previousDocumentsPath="Resources\\Images\\"+event;
+  }
+  
+  existingDocumentsUploadFinished = (event:string) => { 
+    this.existingDocumentsPath="Resources\\Images\\"+event;
+  }
   resetChild(): void {
     if (this.childComponent) {
       // Child component is available, reset it
@@ -202,14 +232,19 @@ export class PropertydetailsComponent  implements AfterViewInit {
       punitTypeId:'',
       numofFloor:'',
       numofRooms:'',
-      transactionTypeId:'',
       des:'',
       filePath:'',
+      previousDocumentsPath:'',
+      existingDocumentsPath:'',
       north:'',
       west:'',
       east:'',
       south:'',
-      doctype:'',
+      documentType:'',
+      issuanceNumber:'',
+      issuanceDate:'',
+      serialNumber:'',
+      transactionDate:'',
     });
     const numofFloorControl = this.propertyForm.get('numofFloor');
     const numofRoomControl = this.propertyForm.get('numofRooms');
@@ -244,21 +279,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
     return backendTypes.map(type => {
       const localized = this.localizationService.propertyTypes.find(
         pt => pt.value.toLowerCase() === type.name.toLowerCase()
-      );
-      return {
-        id: type.id,
-        name: localized ? localized.label : type.name
-      };
-    });
-  }
-
-  /**
-   * Map backend transaction types to localized versions with Dari labels
-   */
-  mapTransactionTypesToLocalized(backendTypes: any[]): any[] {
-    return backendTypes.map(type => {
-      const localized = this.localizationService.transactionTypes.find(
-        tt => tt.value.toLowerCase() === type.name.toLowerCase()
       );
       return {
         id: type.id,
@@ -317,7 +337,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
   get punitTypeId() { return this.propertyForm.get('punitTypeId'); }
   get numofFloor() { return this.propertyForm.get('numofFloor'); }
   get numofRooms() { return this.propertyForm.get('numofRooms'); }
-  get transactionTypeId() { return this.propertyForm.get('transactionTypeId'); }
   get des() { return this.propertyForm.get('des'); }
   get filePath() { return this.propertyForm.get('filePath'); }
   get departmentId() { return this.propertyForm.get('departmentId'); }
@@ -325,8 +344,91 @@ export class PropertydetailsComponent  implements AfterViewInit {
   get north() { return this.propertyForm.get('north'); }
   get east() { return this.propertyForm.get('east'); }
   get south() { return this.propertyForm.get('south'); }
-  get doctype() { return this.propertyForm.get('doctype'); }
-  get deedDate() { return this.propertyForm.get('deedDate'); }
+  get documentType() { return this.propertyForm.get('documentType'); }
+  get issuanceNumber() { return this.propertyForm.get('issuanceNumber'); }
+  get issuanceDate() { return this.propertyForm.get('issuanceDate'); }
+  get serialNumber() { return this.propertyForm.get('serialNumber'); }
+  get transactionDate() { return this.propertyForm.get('transactionDate'); }
+
+  /**
+   * Check if document type requires issuance number and date
+   * قباله شرعی and سند ملکیت
+   */
+  requiresIssuanceFields(): boolean {
+    const docType = this.propertyForm.get('documentType')?.value;
+    return docType === 'قباله شرعی' || docType === 'سند ملکیت';
+  }
+
+  /**
+   * Check if document type requires serial number
+   * سټه رهنمای معاملات
+   */
+  requiresSerialNumber(): boolean {
+    const docType = this.propertyForm.get('documentType')?.value;
+    return docType === 'سټه رهنمای معاملات';
+  }
+
+  /**
+   * Check if document type requires transaction date
+   * سټه رهنمای معاملات and سند دست‌نویس
+   */
+  requiresTransactionDate(): boolean {
+    const docType = this.propertyForm.get('documentType')?.value;
+    return docType === 'سټه رهنمای معاملات' || docType === 'سند دست‌نویس';
+  }
+
+  /**
+   * Update document field validation based on selected document type
+   */
+  onDocumentTypeChange(): void {
+    this.updateDocumentFieldValidation();
+  }
+
+  /**
+   * Update validators for document fields based on selected type
+   */
+  updateDocumentFieldValidation(): void {
+    const issuanceNumberControl = this.propertyForm.get('issuanceNumber');
+    const issuanceDateControl = this.propertyForm.get('issuanceDate');
+    const serialNumberControl = this.propertyForm.get('serialNumber');
+    const transactionDateControl = this.propertyForm.get('transactionDate');
+
+    // Clear all validators first
+    issuanceNumberControl?.clearValidators();
+    issuanceDateControl?.clearValidators();
+    serialNumberControl?.clearValidators();
+    transactionDateControl?.clearValidators();
+
+    // Reset values for fields that are not visible
+    if (!this.requiresIssuanceFields()) {
+      issuanceNumberControl?.setValue('');
+      issuanceDateControl?.setValue('');
+    }
+    if (!this.requiresSerialNumber()) {
+      serialNumberControl?.setValue('');
+    }
+    if (!this.requiresTransactionDate()) {
+      transactionDateControl?.setValue('');
+    }
+
+    // Add validators based on document type
+    if (this.requiresIssuanceFields()) {
+      issuanceNumberControl?.setValidators([Validators.required]);
+      issuanceDateControl?.setValidators([Validators.required]);
+    }
+    if (this.requiresSerialNumber()) {
+      serialNumberControl?.setValidators([Validators.required]);
+    }
+    if (this.requiresTransactionDate()) {
+      transactionDateControl?.setValidators([Validators.required]);
+    }
+
+    // Update validity
+    issuanceNumberControl?.updateValueAndValidity();
+    issuanceDateControl?.updateValueAndValidity();
+    serialNumberControl?.updateValueAndValidity();
+    transactionDateControl?.updateValueAndValidity();
+  }
 
 
 }

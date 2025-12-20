@@ -14,15 +14,19 @@ export interface PropertyDetails {
     transactionTypeId:number;
     des:string;
     filePath:string;
+    previousDocumentsPath?:string;
+    existingDocumentsPath?:string;
     iscomplete:boolean;
     iseditable:boolean;
     west:string;
     south:string;
     east:string;
     north:string;
-    doctype:string;
-    deedDate?:Date;
-    privateNumber?:string;
+    documentType?:string;
+    issuanceNumber?:string;
+    issuanceDate?:Date;
+    serialNumber?:string;
+    transactionDate?:Date;
 
   }
 

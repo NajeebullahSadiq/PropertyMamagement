@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { VBuyerDetail } from 'src/app/models/SellerDetail';
@@ -7,6 +7,7 @@ import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
 import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
+import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -36,6 +37,14 @@ export class SellerdetailComponent {
   onNextClick() {
     console.log('onNextClick called - emitting next event');
     this.next.emit();
+  }
+
+  @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
+
+  ngAfterViewInit(): void {
+    if (this.childComponent) {
+      this.childComponent.reset();
+    }
   }
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
@@ -321,6 +330,13 @@ deleteSeller(id: number) {
       this.nationalIdFileName='';
       this.authorizationLetterName='';
       this.heirsLetterName='';
+
+      this.imageName='';
+      this.imagePath='assets/img/avatar.png';
+
+      if (this.childComponent) {
+        this.childComponent.reset();
+      }
 }
 onlyNumberKey(event:any) {
   const keyCode = event.which || event.keyCode;
@@ -330,12 +346,6 @@ onlyNumberKey(event:any) {
     event.preventDefault();
   }
 }
-uploadFinished = (event:string) => { 
-  this.imageName="Resources\\Images\\"+event;
-  this.imagePath=this.baseUrl+this.imageName;
-  console.log(event+'=======================');
-}
-
 nationalIdUploadFinished = (event:string) => { 
   this.nationalIdFileName="Resources\\Images\\"+event;
   this.SellerForm.patchValue({nationalIdCardPath: this.nationalIdFileName});
@@ -352,6 +362,26 @@ heirsLetterUploadFinished = (event:string) => {
   this.heirsLetterName="Resources\\Images\\"+event;
   this.SellerForm.patchValue({ heirsLetter: this.heirsLetterName });
   console.log('Heirs Letter uploaded: '+event);
+}
+
+profilePreviewChanged = (localObjectUrl: string) => {
+  if (localObjectUrl) {
+    this.imagePath = localObjectUrl;
+    return;
+  }
+
+  if (this.imageName) {
+    this.imagePath = this.baseUrl + this.imageName;
+    return;
+  }
+
+  this.imagePath = 'assets/img/avatar.png';
+}
+
+profileImageUploaded = (dbPath: string) => {
+  this.imageName = dbPath || '';
+  this.SellerForm.patchValue({ photo: this.imageName });
+  this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
 }
 
 isAuthorizedAgent(): boolean {
