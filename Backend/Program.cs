@@ -113,9 +113,17 @@ await DatabaseSeeder.SeedDatabase(app.Services);
 app.UseCors();
 
 app.UseStaticFiles();
+var resourcesPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+Directory.CreateDirectory(resourcesPath);
+Directory.CreateDirectory(Path.Combine(resourcesPath, "Images"));
+var documentsPath = Path.Combine(resourcesPath, "Documents");
+Directory.CreateDirectory(documentsPath);
+Directory.CreateDirectory(Path.Combine(documentsPath, "Identity"));
+Directory.CreateDirectory(Path.Combine(documentsPath, "Profile"));
+Directory.CreateDirectory(Path.Combine(documentsPath, "Property"));
 app.UseStaticFiles(new StaticFileOptions()
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+    FileProvider = new PhysicalFileProvider(resourcesPath),
     RequestPath = new PathString("/Resources")
 });
 

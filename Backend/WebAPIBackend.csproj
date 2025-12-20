@@ -32,4 +32,13 @@
     <Folder Include="Resources\Images\" />
   </ItemGroup>
 
+  <Target Name="EnsureResourcesFolder" AfterTargets="Publish">
+    <MakeDir Directories="$(PublishDir)Resources" />
+    <MakeDir Directories="$(PublishDir)Resources\Images" />
+    <MakeDir Directories="$(PublishDir)Resources\Documents" />
+    <MakeDir Directories="$(PublishDir)Resources\Documents\Identity" />
+    <MakeDir Directories="$(PublishDir)Resources\Documents\Profile" />
+    <MakeDir Directories="$(PublishDir)Resources\Documents\Property" />
+  </Target>
+
 </Project>
