@@ -17,7 +17,7 @@ namespace WebAPIBackend.Migrations
                         AND table_name = 'SellerDetails' 
                         AND column_name = 'AdditionalDetails'
                     ) THEN
-                        ALTER TABLE tr.\"SellerDetails\" ADD COLUMN \"AdditionalDetails\" text NULL;
+                        ALTER TABLE tr.""SellerDetails"" ADD COLUMN ""AdditionalDetails"" text NULL;
                     END IF;
                 END $$;
             ");
@@ -31,7 +31,7 @@ namespace WebAPIBackend.Migrations
                         AND table_name = 'SellerDetails' 
                         AND column_name = 'TaxIdentificationNumber'
                     ) THEN
-                        ALTER TABLE tr.\"SellerDetails\" ADD COLUMN \"TaxIdentificationNumber\" text NULL;
+                        ALTER TABLE tr.""SellerDetails"" ADD COLUMN ""TaxIdentificationNumber"" text NULL;
                     END IF;
                 END $$;
             ");
@@ -45,7 +45,7 @@ namespace WebAPIBackend.Migrations
                         AND table_name = 'VehiclesSellerDetails' 
                         AND column_name = 'NationalIdCardPath'
                     ) THEN
-                        ALTER TABLE tr.\"VehiclesSellerDetails\" ADD COLUMN \"NationalIdCardPath\" text NULL;
+                        ALTER TABLE tr.""VehiclesSellerDetails"" ADD COLUMN ""NationalIdCardPath"" text NULL;
                     END IF;
                 END $$;
             ");
@@ -62,7 +62,7 @@ namespace WebAPIBackend.Migrations
                         AND table_name = 'SellerDetails' 
                         AND column_name = 'AdditionalDetails'
                     ) THEN
-                        ALTER TABLE tr.\"SellerDetails\" DROP COLUMN \"AdditionalDetails\";
+                        ALTER TABLE tr.""SellerDetails"" DROP COLUMN ""AdditionalDetails"";
                     END IF;
                 END $$;
             ");
@@ -76,7 +76,7 @@ namespace WebAPIBackend.Migrations
                         AND table_name = 'SellerDetails' 
                         AND column_name = 'TaxIdentificationNumber'
                     ) THEN
-                        ALTER TABLE tr.\"SellerDetails\" DROP COLUMN \"TaxIdentificationNumber\";
+                        ALTER TABLE tr.""SellerDetails"" DROP COLUMN ""TaxIdentificationNumber"";
                     END IF;
                 END $$;
             ");
@@ -90,7 +90,7 @@ namespace WebAPIBackend.Migrations
                         AND table_name = 'VehiclesSellerDetails' 
                         AND column_name = 'NationalIdCardPath'
                     ) THEN
-                        ALTER TABLE tr.\"VehiclesSellerDetails\" DROP COLUMN \"NationalIdCardPath\";
+                        ALTER TABLE tr.""VehiclesSellerDetails"" DROP COLUMN ""NationalIdCardPath"";
                     END IF;
                 END $$;
             ");
