@@ -59,6 +59,10 @@ export class SellerdetailComponent {
       fatherName: ['', Validators.required],
       grandFather: ['', Validators.required],
       indentityCardNumber: ['', Validators.required],
+      tazkiraType: ['', Validators.required],
+      tazkiraVolume: [''],
+      tazkiraPage: [''],
+      tazkiraNumber: [''],
       phoneNumber: ['', Validators.required],
       paddressProvinceId: ['', Validators.required],
       paddressDistrictId: ['', Validators.required],
@@ -71,7 +75,9 @@ export class SellerdetailComponent {
       nationalIdCard:['', Validators.required],
       roleType: ['Seller', Validators.required],
       authorizationLetter: [''],
-      heirsLetter: ['']
+      heirsLetter: [''],
+      taxIdentificationNumber: [''],
+      additionalDetails: ['']
     });
 
     // Add dynamic validation for authorization letter and heirs letter based on roleType
@@ -103,6 +109,29 @@ export class SellerdetailComponent {
       authLetterControl?.updateValueAndValidity();
       heirsLetterControl?.updateValueAndValidity();
     });
+
+    this.sellerForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
+      const volumeControl = this.sellerForm.get('tazkiraVolume');
+      const pageControl = this.sellerForm.get('tazkiraPage');
+      const numberControl = this.sellerForm.get('tazkiraNumber');
+      
+      if (tazkiraType === 'Paper') {
+        volumeControl?.setValidators([Validators.required]);
+        pageControl?.setValidators([Validators.required]);
+        numberControl?.setValidators([Validators.required]);
+      } else {
+        volumeControl?.clearValidators();
+        pageControl?.clearValidators();
+        numberControl?.clearValidators();
+        volumeControl?.reset();
+        pageControl?.reset();
+        numberControl?.reset();
+      }
+      
+      volumeControl?.updateValueAndValidity();
+      pageControl?.updateValueAndValidity();
+      numberControl?.updateValueAndValidity();
+    });
   }
   ngOnInit() {
     // Initialize role types from localization service
@@ -110,7 +139,9 @@ export class SellerdetailComponent {
       this.localizationService.roleTypes.seller,
       this.localizationService.roleTypes.sellers,
       this.localizationService.roleTypes.lessor,
+      this.localizationService.roleTypes.lessors,
       this.localizationService.roleTypes.revocableSaleSeller,
+      this.localizationService.roleTypes.revocableSaleSellers,
       this.localizationService.roleTypes.heirs,
       this.localizationService.roleTypes.sellerAgent,
       this.localizationService.roleTypes.leaseAgent,
@@ -136,6 +167,10 @@ export class SellerdetailComponent {
           fatherName: firstSeller.fatherName,
           grandFather: firstSeller.grandFather,
           indentityCardNumber: firstSeller.indentityCardNumber,
+          tazkiraType: firstSeller.tazkiraType || '',
+          tazkiraVolume: firstSeller.tazkiraVolume || '',
+          tazkiraPage: firstSeller.tazkiraPage || '',
+          tazkiraNumber: firstSeller.tazkiraNumber || '',
           phoneNumber: firstSeller.phoneNumber,
           propertyDetailsId: firstSeller.propertyDetailsId,
           paddressProvinceId: firstSeller.paddressProvinceId,
@@ -149,6 +184,8 @@ export class SellerdetailComponent {
           roleType: firstSeller.roleType || 'Seller',
           authorizationLetter: firstSeller.authorizationLetter || '',
           heirsLetter: firstSeller.heirsLetter || '',
+          taxIdentificationNumber: firstSeller.taxIdentificationNumber || '',
+          additionalDetails: firstSeller.additionalDetails || ''
         });
         this.imagePath=this.baseUrl+firstSeller.photo;
         this.imageName=firstSeller.photo || '';
@@ -156,6 +193,11 @@ export class SellerdetailComponent {
         this.authorizationLetterName=firstSeller.authorizationLetter || '';
         this.heirsLetterName=firstSeller.heirsLetter || '';
         this.selectedSellerId=firstSeller.id;
+        
+        if (this.childComponent && firstSeller.photo) {
+          this.childComponent.setExistingImage(this.baseUrl + firstSeller.photo);
+        }
+        
         if (firstSeller.paddressProvinceId) {
           this.selerService.getdistrict(firstSeller.paddressProvinceId.valueOf()).subscribe(res => {
             this.district = res;
@@ -217,6 +259,11 @@ export class SellerdetailComponent {
               setTimeout(() => {
                 this.loadSellerDetails(); // Reload the list
                 this.resetChild(); // Reset form for next entry
+                
+                // Auto-redirect to next step for singular roles
+                if (this.isSingularRole()) {
+                  this.onNextClick();
+                }
               }, 300);
             }
           },
@@ -264,6 +311,10 @@ export class SellerdetailComponent {
         fatherName: selectedSeller.fatherName,
         grandFather: selectedSeller.grandFather,
         indentityCardNumber: selectedSeller.indentityCardNumber,
+        tazkiraType: selectedSeller.tazkiraType || '',
+        tazkiraVolume: selectedSeller.tazkiraVolume || '',
+        tazkiraPage: selectedSeller.tazkiraPage || '',
+        tazkiraNumber: selectedSeller.tazkiraNumber || '',
         phoneNumber: selectedSeller.phoneNumber,
         propertyDetailsId: selectedSeller.propertyDetailsId,
         paddressProvinceId: selectedSeller.paddressProvinceId,
@@ -277,6 +328,8 @@ export class SellerdetailComponent {
         roleType: selectedSeller.roleType || 'Seller',
         authorizationLetter: selectedSeller.authorizationLetter || '',
         heirsLetter: selectedSeller.heirsLetter || '',
+        taxIdentificationNumber: selectedSeller.taxIdentificationNumber || '',
+        additionalDetails: selectedSeller.additionalDetails || ''
       });
       this.imagePath = this.baseUrl + (selectedSeller.photo || 'assets/img/avatar.png');
       this.imageName = selectedSeller.photo || '';
@@ -284,6 +337,10 @@ export class SellerdetailComponent {
       this.authorizationLetterName = selectedSeller.authorizationLetter || '';
       this.heirsLetterName = selectedSeller.heirsLetter || '';
       this.selectedSellerId = selectedSeller.id;
+      
+      if (this.childComponent && selectedSeller.photo) {
+        this.childComponent.setExistingImage(this.baseUrl + selectedSeller.photo);
+      }
       
       if (selectedSeller.paddressProvinceId) {
         this.selerService.getdistrict(selectedSeller.paddressProvinceId.valueOf()).subscribe(res => {
@@ -410,10 +467,34 @@ export class SellerdetailComponent {
     return roleType === 'Heirs';
   }
 
+  isPaperTazkira(): boolean {
+    const tazkiraType = this.sellerForm.get('tazkiraType')?.value;
+    return tazkiraType === 'Paper';
+  }
+
+  allowsMultipleSellers(): boolean {
+    const roleType = this.sellerForm.get('roleType')?.value;
+    const pluralRoles = ['Sellers', 'Lessors', 'Sellers in a revocable sale'];
+    return pluralRoles.includes(roleType);
+  }
+
+  isSingularRole(): boolean {
+    return !this.allowsMultipleSellers();
+  }
+
+  getRoleTypeLabel(roleType: string): string {
+    const role = this.roleTypes.find(r => r.value === roleType);
+    return role ? role.label : roleType;
+  }
+
   get firstName() { return this.sellerForm.get('firstName'); }
   get fatherName() { return this.sellerForm.get('fatherName'); }
   get grandFather() { return this.sellerForm.get('grandFather'); }
   get indentityCardNumber() { return this.sellerForm.get('indentityCardNumber'); }
+  get tazkiraType() { return this.sellerForm.get('tazkiraType'); }
+  get tazkiraVolume() { return this.sellerForm.get('tazkiraVolume'); }
+  get tazkiraPage() { return this.sellerForm.get('tazkiraPage'); }
+  get tazkiraNumber() { return this.sellerForm.get('tazkiraNumber'); }
   get phoneNumber() { return this.sellerForm.get('phoneNumber'); }
   get paddressProvinceId() { return this.sellerForm.get('paddressProvinceId'); }
   get paddressDistrictId() { return this.sellerForm.get('paddressDistrictId'); }
@@ -428,4 +509,6 @@ export class SellerdetailComponent {
   get roleType() { return this.sellerForm.get('roleType'); }
   get authorizationLetter() { return this.sellerForm.get('authorizationLetter'); }
   get heirsLetter() { return this.sellerForm.get('heirsLetter'); }
+  get taxIdentificationNumber() { return this.sellerForm.get('taxIdentificationNumber'); }
+  get additionalDetails() { return this.sellerForm.get('additionalDetails'); }
 }

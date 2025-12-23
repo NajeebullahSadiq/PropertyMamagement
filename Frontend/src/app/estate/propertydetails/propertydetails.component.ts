@@ -51,7 +51,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
     private localizationService: LocalizationService) {
       this.propertyForm = this.fb.group({
         id: [0],
-        pnumber: ['', Validators.required],
         parea: ['', Validators.required],
         punitTypeId: ['', Validators.required],
         numofFloor: ['', Validators.required],
@@ -90,7 +89,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
           this.properties = properties;
           this.propertyForm.setValue({
             id: properties[0].id,
-            pnumber: properties[0].pnumber,
             parea: properties[0].parea,
             punitTypeId: properties[0].punitTypeId,
             numofFloor: properties[0].numofFloor,
@@ -143,6 +141,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
     if(propertyDetails.issuanceDate) {
       const date = new Date(propertyDetails.issuanceDate);
       propertyDetails.issuanceDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    } else {
+      propertyDetails.issuanceDate = null as any;
     }
     if(propertyDetails.transactionDate && (propertyDetails.transactionDate as any) !== '') {
       const date = new Date(propertyDetails.transactionDate);
@@ -178,6 +178,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
     if(propertyDetails.issuanceDate) {
       const date = new Date(propertyDetails.issuanceDate);
       propertyDetails.issuanceDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    } else {
+      propertyDetails.issuanceDate = null as any;
     }
     if(propertyDetails.transactionDate && (propertyDetails.transactionDate as any) !== '') {
       const date = new Date(propertyDetails.transactionDate);
@@ -227,7 +229,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
     }
     this.propertyForm.reset({
       id: 0,
-      pnumber:'',
       parea:'',
       punitTypeId:'',
       numofFloor:'',
@@ -332,7 +333,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
     );
   }
 
-  get pnumber() { return this.propertyForm.get('pnumber'); }
   get parea() { return this.propertyForm.get('parea'); }
   get punitTypeId() { return this.propertyForm.get('punitTypeId'); }
   get numofFloor() { return this.propertyForm.get('numofFloor'); }

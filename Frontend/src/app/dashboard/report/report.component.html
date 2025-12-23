@@ -6,36 +6,16 @@
 
   <div class="row justify-content-center mt-5">
     <div class="col-md-4">
-      <label for="petitionDate" class="form-label">از تاریخ</label>
-      <div class="input-group" style="direction: ltr; ">
-        <input class="form-control"
-          id="start-date"
-          name="start-date"
+      <app-multi-calendar-datepicker
           [(ngModel)]="startDate"
-          ngbDatepicker
-          #d="ngbDatepicker" />
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-            <i class="fa fa-calendar"></i>
-          </button>
-        </div>
-      </div>
+          label="از تاریخ">
+      </app-multi-calendar-datepicker>
     </div>
     <div class="col-md-4">
-      <label for="petitionDate" class="form-label">الی تاریخ</label>
-      <div class="input-group" style="direction: ltr; ">
-        <input class="form-control"
-          id="end-date"
-          name="end-date"
+      <app-multi-calendar-datepicker
           [(ngModel)]="endDate"
-          ngbDatepicker
-          #end="ngbDatepicker" />
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" (click)="end.toggle()" type="button">
-            <i class="fa fa-calendar"></i>
-          </button>
-        </div>
-      </div>
+          label="الی تاریخ">
+      </app-multi-calendar-datepicker>
     </div>
     <div class="col-md-4">
       <label for="petitionDate" class="form-label" style="opacity: 0;">جستجو</label>

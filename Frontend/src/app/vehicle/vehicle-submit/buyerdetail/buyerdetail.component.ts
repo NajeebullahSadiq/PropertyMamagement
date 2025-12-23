@@ -226,6 +226,11 @@ export class BuyerdetailComponent {
         this.nationalIdFileName=firstBuyer.nationalIdCardPath || '';
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
         this.selectedbuyerId=firstBuyer.id;
+        
+        if (this.childComponent && firstBuyer.photo) {
+          this.childComponent.setExistingImage(this.baseUrl + firstBuyer.photo);
+        }
+        
         if (firstBuyer.paddressProvinceId) {
           this.selerService.getdistrict(firstBuyer.paddressProvinceId.valueOf()).subscribe(res => {
             this.district = res;

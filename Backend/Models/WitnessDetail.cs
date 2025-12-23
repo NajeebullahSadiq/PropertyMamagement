@@ -13,6 +13,14 @@ public partial class WitnessDetail
 
     public double? IndentityCardNumber { get; set; }
 
+    public string? TazkiraType { get; set; }
+
+    public string? TazkiraVolume { get; set; }
+
+    public string? TazkiraPage { get; set; }
+
+    public string? TazkiraNumber { get; set; }
+
     public string? PhoneNumber { get; set; }
 
     public int? PropertyDetailsId { get; set; }

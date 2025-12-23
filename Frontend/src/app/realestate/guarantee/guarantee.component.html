@@ -26,23 +26,10 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label for="propertyDocumentDate" class="form-label">تاریخ  سند(تضمین)</label>
-                    <div class="input-group"  style="direction: ltr; ">
-                      <input class="form-control"
-                        id="propertyDocumentDate"
-                        name="propertyDocumentDate"
-                        [(ngModel)]="selectedDate"
+                    <app-multi-calendar-datepicker
                         formControlName="propertyDocumentDate"
-                        [maxDate]="maxDate"  [minDate]="minDate"
-                        ngbDatepicker
-                        #d="ngbDatepicker"
-                      />
-                      <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-                          <i class="fa fa-calendar"></i>
-                        </button>
-                      </div>
-                    </div>
+                        label="تاریخ  سند(تضمین)">
+                    </app-multi-calendar-datepicker>
                   </div>
             </div>
            <br>
@@ -58,23 +45,10 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <label for="senderMaktobDate" class="form-label"> 	تاریخ مکتوب ارسالی  به مرجع تضمین</label>
-                <div class="input-group"  style="direction: ltr; ">
-                  <input class="form-control"
-                    id="senderMaktobDate"
-                    name="senderMaktobDate"
-                    [(ngModel)]="senderselectedDate"
+                <app-multi-calendar-datepicker
                     formControlName="senderMaktobDate"
-                    [maxDate]="maxDate"  [minDate]="minDate"
-                    ngbDatepicker
-                    #sender="ngbDatepicker"
-                  />
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" (click)="sender.toggle()" type="button">
-                      <i class="fa fa-calendar"></i>
-                    </button>
-                  </div>
-                </div>
+                    label="تاریخ مکتوب ارسالی  به مرجع تضمین">
+                </app-multi-calendar-datepicker>
               </div>
              <div class="col-md-4">
                 <label  class="form-label">	شماره مکتوب جوابیه تضمین</label>
@@ -89,43 +63,17 @@
            </div>
            <div class="row">
             <div class="col-md-4">
-                <label for="answerdMaktobDate" class="form-label">تاریخ مکتوب جوابیه تضمین</label>
-                <div class="input-group"  style="direction: ltr; ">
-                  <input class="form-control"
-                    id="answerdMaktobDate"
-                    name="answerdMaktobDate"
-                    [(ngModel)]="answerselectedDate"
+                <app-multi-calendar-datepicker
                     formControlName="answerdMaktobDate"
-                    [maxDate]="maxDate"  [minDate]="minDate"
-                    ngbDatepicker
-                    #answer="ngbDatepicker"
-                  />
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" (click)="answer.toggle()" type="button">
-                      <i class="fa fa-calendar"></i>
-                    </button>
-                  </div>
-                </div>
+                    label="تاریخ مکتوب جوابیه تضمین">
+                </app-multi-calendar-datepicker>
               </div>
           
               <div class="col-md-4">
-                <label for="dateofGuarantee" class="form-label">تاریخ ارایه تضمین خط</label>
-                <div class="input-group"  style="direction: ltr; ">
-                  <input class="form-control"
-                    id="dateofGuarantee"
-                    name="dateofGuarantee"
-                    [(ngModel)]="dateofGuaranteeSelectedDate"
+                <app-multi-calendar-datepicker
                     formControlName="dateofGuarantee"
-                    [maxDate]="maxDate"  [minDate]="minDate"
-                    ngbDatepicker
-                    #pdate="ngbDatepicker"
-                  />
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" (click)="pdate.toggle()" type="button">
-                      <i class="fa fa-calendar"></i>
-                    </button>
-                  </div>
-                </div>
+                    label="تاریخ ارایه تضمین خط">
+                </app-multi-calendar-datepicker>
               </div>
 
               <div class="col-md-4">
@@ -141,23 +89,10 @@
            </div>
            <div class="row">
             <div class="col-md-4">
-              <label for="guaranteeDate" class="form-label">تاریخ تضمین خط</label>
-              <div class="input-group"  style="direction: ltr; ">
-                <input class="form-control"
-                  id="guaranteeDate"
-                  name="guaranteeDate"
-                  [(ngModel)]="guaranteeDateSelectedDate"
+              <app-multi-calendar-datepicker
                   formControlName="guaranteeDate"
-                  [maxDate]="maxDate"  [minDate]="minDate"
-                  ngbDatepicker
-                  #gdate="ngbDatepicker"
-                />
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" (click)="gdate.toggle()" type="button">
-                    <i class="fa fa-calendar"></i>
-                  </button>
-                </div>
-              </div>
+                  label="تاریخ تضمین خط">
+              </app-multi-calendar-datepicker>
             </div>
             <div class="col-md-4">
               <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>

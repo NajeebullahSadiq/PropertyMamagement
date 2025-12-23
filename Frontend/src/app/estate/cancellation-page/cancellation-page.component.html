@@ -72,7 +72,6 @@
     <div *ngFor="let transaction of getFilteredActiveTransactions()" class="transaction-card">
       <div class="card-header">
         <div class="transaction-info">
-          <h3>شماره ملک: {{ transaction.propertyDetails.pnumber }}</h3>
           <p class="transaction-type">{{ getTransactionTypeLabel(transaction.transactionTypeName) }}</p>
         </div>
         <div class="transaction-date">
@@ -165,7 +164,6 @@
 
       <div class="modal-body">
         <div class="transaction-summary" *ngIf="selectedTransaction">
-          <p><strong>شماره ملک:</strong> {{ selectedTransaction.propertyDetails.pnumber }}</p>
           <p><strong>نوع معامله:</strong> {{ getTransactionTypeLabel(selectedTransaction.transactionTypeName) }}</p>
           <p><strong>نام فروشنده:</strong> {{ selectedTransaction.sellerName }}</p>
           <p><strong>نام خریدار:</strong> {{ selectedTransaction.buyerName }}</p>

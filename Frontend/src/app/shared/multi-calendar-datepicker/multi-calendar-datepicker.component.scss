@@ -1,0 +1,49 @@
+.multi-calendar-datepicker {
+  margin-bottom: 1rem;
+
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .input-group {
+    position: relative;
+  }
+
+  .input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-right: none;
+    padding: 0.375rem 0.75rem;
+
+    i {
+      color: #6c757d;
+    }
+  }
+
+  .form-control {
+    border-left: none;
+    
+    &:focus {
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    &:disabled {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+    }
+  }
+
+  .calendar-hint {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  .text-danger {
+    color: #dc3545;
+  }
+}

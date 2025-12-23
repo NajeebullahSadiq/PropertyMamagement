@@ -104,8 +104,7 @@ export class CancellationPageComponent implements OnInit {
     return this.activeTransactions.filter(transaction => {
       const matchesSearch = !this.searchText || 
         transaction.sellerName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        transaction.buyerName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        transaction.propertyDetails.pnumber.toString().includes(this.searchText);
+        transaction.buyerName.toLowerCase().includes(this.searchText.toLowerCase());
 
       const matchesType = !this.filterTransactionType || 
         transaction.transactionTypeName === this.filterTransactionType;

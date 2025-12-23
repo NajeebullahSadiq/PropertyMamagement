@@ -637,7 +637,6 @@ public partial class PrmisContext : DbContext
                 .HasColumnName("iseditable");
             entity.Property(e => e.North).HasColumnName("north");
             entity.Property(e => e.Parea).HasColumnName("PArea");
-            entity.Property(e => e.Pnumber).HasColumnName("PNumber");
             entity.Property(e => e.PunitTypeId).HasColumnName("PUnitTypeId");
             entity.Property(e => e.South).HasColumnName("south");
             entity.Property(e => e.West).HasColumnName("west");

@@ -23,6 +23,7 @@ import { PropertydetailsComponent } from '../estate/propertydetails/propertydeta
 import { ReportComponent } from './report/report.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { UserReportComponent } from './user-report/user-report.component';
+import { SharedModule } from '../shared/shared.module';
 @NgModule({
   declarations: [
     DashboardComponent,
@@ -47,6 +48,7 @@ import { UserReportComponent } from './user-report/user-report.component';
     MatDividerModule,
     MatDialogModule,
     NgbModule,
+    SharedModule,
     TranslateModule.forRoot({
       loader: {
           provide: TranslateLoader,

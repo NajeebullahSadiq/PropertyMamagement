@@ -55,7 +55,6 @@ namespace WebAPIBackend.Controllers
                          select new
                          {
                              p.Id,
-                             p.Pnumber,
                              p.Parea,
                              p.PunitTypeId,
                              p.NumofFloor,
@@ -109,7 +108,7 @@ namespace WebAPIBackend.Controllers
             //  var userId = 25;
             var property = new PropertyDetail
             {
-                Pnumber = request.Pnumber,
+                Pnumber = request.Pnumber == 0 ? 0 : request.Pnumber,
                 Parea = request.Parea,
                 PunitTypeId = request.PunitTypeId,
                 NumofFloor=request.NumofFloor,
@@ -117,7 +116,7 @@ namespace WebAPIBackend.Controllers
                 PropertyTypeId=request.PropertyTypeId,
                 Price=request.Price,
                 PriceText=request.PriceText,
-                RoyaltyAmount= request.Price * 0.01,
+                RoyaltyAmount= (request.Price ?? 0) * 0.01,
                 TransactionTypeId=request.TransactionTypeId,
                 Des=request.Des,
                 CreatedAt=DateTime.Now,

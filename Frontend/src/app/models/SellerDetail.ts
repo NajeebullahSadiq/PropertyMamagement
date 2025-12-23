@@ -4,6 +4,10 @@ export interface SellerDetail {
     fatherName:string;
     grandFather:string;
     indentityCardNumber:number;
+    tazkiraType?:string;
+    tazkiraVolume?:string;
+    tazkiraPage?:string;
+    tazkiraNumber?:string;
     phoneNumber:string;
     paddressProvinceId:Number;
     paddressDistrictId:number;
@@ -27,6 +31,8 @@ export interface SellerDetail {
     rentEndDate?:Date; // Rental end date for lessee roles
     transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
     transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
+    taxIdentificationNumber?:string;
+    additionalDetails?:string;
 }
 
 export interface VBuyerDetail {
@@ -35,6 +41,10 @@ export interface VBuyerDetail {
     fatherName:string;
     grandFather:string;
     indentityCardNumber:number;
+    tazkiraType?:string;
+    tazkiraVolume?:string;
+    tazkiraPage?:string;
+    tazkiraNumber?:string;
     phoneNumber:string;
     paddressProvinceId:Number;
     paddressDistrictId:number;

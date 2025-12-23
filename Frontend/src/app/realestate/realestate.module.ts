@@ -26,6 +26,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RealestatelistComponent } from './realestatelist/realestatelist.component'; // Add this line
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ExpiredlicenselistComponent } from './expiredlicenselist/expiredlicenselist.component';
+import { SharedModule } from '../shared/shared.module';
 @NgModule({
   declarations: [
     RealestateComponent,
@@ -54,8 +55,8 @@ import { ExpiredlicenselistComponent } from './expiredlicenselist/expiredlicense
     FormsModule,
     NgbModule,
     NgxPaginationModule,
-    ReactiveFormsModule
-    
+    ReactiveFormsModule,
+    SharedModule
   ]
 })
 export class RealestateModule { }

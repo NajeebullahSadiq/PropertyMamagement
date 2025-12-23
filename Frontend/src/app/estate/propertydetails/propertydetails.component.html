@@ -63,12 +63,11 @@
 
                 <!-- تاریخ صدور (Issuance Date) - For قباله شرعی and سند ملکیت -->
                 <div class="col-md-3" *ngIf="requiresIssuanceFields()">
-                  <label for="issuanceDate" class="form-label">تاریخ صدور</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                    <input type="date" id="issuanceDate" class="form-control"
-                      formControlName="issuanceDate">
-                  </div>
+                  <app-multi-calendar-datepicker
+                    formControlName="issuanceDate"
+                    label="تاریخ صدور"
+                    [required]="true">
+                  </app-multi-calendar-datepicker>
                   <div *ngIf="issuanceDate?.invalid && (issuanceDate?.dirty || issuanceDate?.touched)">
                     <small class="text-danger" *ngIf="issuanceDate?.errors?.['required']">تاریخ صدور الزامی است</small>
                   </div>
@@ -89,29 +88,17 @@
 
                 <!-- تاریخ معامله (Transaction Date) - For سټه رهنمای معاملات and سند دست‌نویس -->
                 <div class="col-md-3" *ngIf="requiresTransactionDate()">
-                  <label for="transactionDate" class="form-label">تاریخ معامله</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
-                    <input type="date" id="transactionDate" class="form-control"
-                      formControlName="transactionDate">
-                  </div>
+                  <app-multi-calendar-datepicker
+                    formControlName="transactionDate"
+                    label="تاریخ معامله"
+                    [required]="true">
+                  </app-multi-calendar-datepicker>
                   <div *ngIf="transactionDate?.invalid && (transactionDate?.dirty || transactionDate?.touched)">
                     <small class="text-danger" *ngIf="transactionDate?.errors?.['required']">تاریخ معامله الزامی است</small>
                   </div>
                 </div>
 
-                <!-- شماره سند (Property Number) - Always visible -->
-                <div class="col-md-3">
-                  <label for="pnumber" class="form-label">شماره ملکیت</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                    <input type="number" (keypress)="onlyNumberKey($event)" id="pnumber" class="form-control"
-                      formControlName="pnumber">
-                  </div>
-                  <div *ngIf="pnumber?.invalid && (pnumber?.dirty || pnumber?.touched)">
-                    <small class="text-danger" *ngIf="pnumber?.errors?.['required']">شماره ملکیت الزامی است</small>
-                  </div>
-                </div>
+
               </div>
               <br>
               <div class="row">
@@ -169,7 +156,7 @@
                 <div class="col-md-12">
                   <h6 class="mb-2" style="font-weight: 600; color: #1e293b;">آپلود اسناد قبلی</h6>
                   <div class="form-group">
-                    <app-upload #previousDocsComponent (sendMessage)="previousDocumentsUploadFinished($event)"></app-upload>
+                    <app-upload #previousDocsComponent [existingFilePath]="previousDocumentsPath" (sendMessage)="previousDocumentsUploadFinished($event)"></app-upload>
                   </div>
                 </div>
               </div>
@@ -179,7 +166,7 @@
                 <div class="col-md-12">
                   <h6 class="mb-2" style="font-weight: 600; color: #1e293b;">آپلود اسناد موجوده</h6>
                   <div class="form-group">
-                    <app-upload #existingDocsComponent (sendMessage)="existingDocumentsUploadFinished($event)"></app-upload>
+                    <app-upload #existingDocsComponent [existingFilePath]="existingDocumentsPath" (sendMessage)="existingDocumentsUploadFinished($event)"></app-upload>
                   </div>
                 </div>
               </div>

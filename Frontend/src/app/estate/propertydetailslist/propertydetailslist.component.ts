@@ -80,7 +80,6 @@ export class PropertydetailslistComponent {
     return properties.filter(property =>
       property.propertyTypeText.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
       property.transactionTypeText.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.pnumber.toString().toLowerCase().includes(searchTerm.toLowerCase().toString()) ||
       (property.buyerName && property.buyerName.toString().toLowerCase().includes(searchTerm.toLowerCase())) || // add null check for buyerName
       (property.sellerName && property.sellerName.toString().toLowerCase().includes(searchTerm.toLowerCase()))
     );

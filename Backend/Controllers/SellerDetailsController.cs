@@ -240,6 +240,8 @@ namespace WebAPIBackend.Controllers
                 RoleType=roleType,
                 AuthorizationLetter=request.AuthorizationLetter,
                 HeirsLetter=request.HeirsLetter,
+                TaxIdentificationNumber=request.TaxIdentificationNumber,
+                AdditionalDetails=request.AdditionalDetails
             };
             _context.Add(seller);
             await _context.SaveChangesAsync();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPIBackend.Models;
 
@@ -7,6 +8,7 @@ public partial class PropertyDetail
 {
     public int Id { get; set; }
 
+    [Column("PNumber")]
     public int Pnumber { get; set; }
 
     public int Parea { get; set; }

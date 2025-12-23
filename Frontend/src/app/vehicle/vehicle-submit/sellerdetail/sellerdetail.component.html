@@ -55,7 +55,7 @@
                             <div class="row mt-3" *ngIf="isAuthorizedAgent()">
                                 <div class="col-md-12">
                                     <h5 style="font-weight: bold; color: #dc3545;">آپلود وکالت نامه (الزامی)</h5>
-                                    <app-vehicle-fileupload #authLetterComponent (sendMessage)="authorizationLetterUploadFinished($event)" style="text-align:left;"></app-vehicle-fileupload>
+                                    <app-vehicle-fileupload #authLetterComponent [existingFilePath]="authorizationLetterName" (sendMessage)="authorizationLetterUploadFinished($event)" style="text-align:left;"></app-vehicle-fileupload>
                                     <div *ngIf="authorizationLetter?.invalid && (authorizationLetter?.dirty || authorizationLetter?.touched)">
                                         <small class="text-danger" *ngIf="authorizationLetter?.errors?.['required']">آپلود وکالت نامه الزامی است</small>
                                     </div>
@@ -66,7 +66,7 @@
                             <div class="row mt-3" *ngIf="isHeirs()">
                                 <div class="col-md-12">
                                     <h5 style="font-weight: bold; color: #dc3545;">آپلود نامه ورثه (الزامی)</h5>
-                                    <app-vehicle-fileupload #heirsLetterComponent (sendMessage)="heirsLetterUploadFinished($event)" style="text-align:left;"></app-vehicle-fileupload>
+                                    <app-vehicle-fileupload #heirsLetterComponent [existingFilePath]="heirsLetterName" (sendMessage)="heirsLetterUploadFinished($event)" style="text-align:left;"></app-vehicle-fileupload>
                                     <div *ngIf="heirsLetter?.invalid && (heirsLetter?.dirty || heirsLetter?.touched)">
                                         <small class="text-danger" *ngIf="heirsLetter?.errors?.['required']">آپلود نامه ورثه الزامی است</small>
                                     </div>
@@ -116,7 +116,21 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="indentityCardNumber" class="form-label"> شماره تذکره</label>
+                                    <label for="tazkiraType" class="form-label">نوع تذکره</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                        <select id="tazkiraType" class="form-control" formControlName="tazkiraType">
+                                            <option value="">انتخاب کنید</option>
+                                            <option value="Electronic">تذکره الکترونیکی</option>
+                                            <option value="Paper">تذکره کاغذی</option>
+                                        </select>
+                                        <div *ngIf="tazkiraType?.invalid && (tazkiraType?.dirty || tazkiraType?.touched)">
+                                            <small class="text-danger" *ngIf="tazkiraType?.errors?.['required']">این فیلد الزامی است</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="indentityCardNumber" class="form-label">شماره تذکره</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
                                         <input type="text"  (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="form-control"
@@ -127,25 +141,62 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <label for="phoneNumber" class="form-label"> شماره موبایل</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text"  (keypress)="onlyNumberKey($event)" id="phoneNumber" class="form-control"
-                                            formControlName="phoneNumber">
-                                        <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
-                                            <small class="text-danger" *ngIf="phoneNumber?.errors?.['required']">این فیلد
-                                                الزامی است</small>
+                                </div>
+
+                                <!-- Conditional Paper Tazkira Fields -->
+                                <div class="row" *ngIf="isPaperTazkira()">
+                                    <div class="col-md-4">
+                                        <label for="tazkiraVolume" class="form-label">جلد</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-book"></i></span>
+                                            <input type="text" id="tazkiraVolume" class="form-control" formControlName="tazkiraVolume">
+                                            <div *ngIf="tazkiraVolume?.invalid && (tazkiraVolume?.dirty || tazkiraVolume?.touched)">
+                                                <small class="text-danger" *ngIf="tazkiraVolume?.errors?.['required']">این فیلد الزامی است</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="tazkiraPage" class="form-label">صفحه</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-file"></i></span>
+                                            <input type="text" id="tazkiraPage" class="form-control" formControlName="tazkiraPage">
+                                            <div *ngIf="tazkiraPage?.invalid && (tazkiraPage?.dirty || tazkiraPage?.touched)">
+                                                <small class="text-danger" *ngIf="tazkiraPage?.errors?.['required']">این فیلد الزامی است</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="tazkiraNumber" class="form-label">نمبر</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                            <input type="text" id="tazkiraNumber" class="form-control" formControlName="tazkiraNumber">
+                                            <div *ngIf="tazkiraNumber?.invalid && (tazkiraNumber?.dirty || tazkiraNumber?.touched)">
+                                                <small class="text-danger" *ngIf="tazkiraNumber?.errors?.['required']">این فیلد الزامی است</small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="phoneNumber" class="form-label"> شماره موبایل</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                            <input type="text"  (keypress)="onlyNumberKey($event)" id="phoneNumber" class="form-control"
+                                                formControlName="phoneNumber">
+                                            <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
+                                                <small class="text-danger" *ngIf="phoneNumber?.errors?.['required']">این فیلد
+                                                    الزامی است</small>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <br>
                                 <section>
                                     <div class="row d-flex justify-content-center align-items-center h-100">  
                                         <h3 style="font-weight: bold;"> آپلود تذکره ملی فروشنده</h3>
                                         <div class="col-md-12">
-                                            <app-vehicle-nationalid-upload #nationalIdComponent (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-vehicle-nationalid-upload>
+                                            <app-vehicle-nationalid-upload #nationalIdComponent [existingFilePath]="nationalIdFileName" (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-vehicle-nationalid-upload>
                                             <div *ngIf="nationalIdCardPath?.invalid && (nationalIdCardPath?.dirty || nationalIdCardPath?.touched)">
                                                 <small class="text-danger" *ngIf="nationalIdCardPath?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
                                             </div>

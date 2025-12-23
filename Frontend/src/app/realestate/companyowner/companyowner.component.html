@@ -97,23 +97,10 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label  class="form-label">تاریخ تولد</label>
-                    <div class="input-group"  style="direction: ltr; ">
-                      <input class="form-control"
-                        id="start-date"
-                        name="start-date"
-                        [(ngModel)]="selectedDate"
+                    <app-multi-calendar-datepicker
                         formControlName="dateofBirth"
-                        [maxDate]="maxDate"  [minDate]="minDate"
-                        ngbDatepicker
-                        #d="ngbDatepicker"
-                      />
-                      <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-                          <i class="fa fa-calendar"></i>
-                        </button>
-                      </div>
-                    </div>
+                        label="تاریخ تولد">
+                    </app-multi-calendar-datepicker>
                   </div>
             </div>
             <br>

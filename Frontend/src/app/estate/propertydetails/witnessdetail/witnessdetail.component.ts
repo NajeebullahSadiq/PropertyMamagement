@@ -30,8 +30,35 @@ export class WitnessdetailComponent {
         firstName: ['', Validators.required],
         fatherName: ['', Validators.required],
         indentityCardNumber: ['', Validators.required],
+        tazkiraType: ['', Validators.required],
+        tazkiraVolume: [''],
+        tazkiraPage: [''],
+        tazkiraNumber: [''],
         phoneNumber: ['', Validators.required],
         nationalIdCardPath: ['', Validators.required]
+      });
+
+      this.withnessForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
+        const volumeControl = this.withnessForm.get('tazkiraVolume');
+        const pageControl = this.withnessForm.get('tazkiraPage');
+        const numberControl = this.withnessForm.get('tazkiraNumber');
+        
+        if (tazkiraType === 'Paper') {
+          volumeControl?.setValidators([Validators.required]);
+          pageControl?.setValidators([Validators.required]);
+          numberControl?.setValidators([Validators.required]);
+        } else {
+          volumeControl?.clearValidators();
+          pageControl?.clearValidators();
+          numberControl?.clearValidators();
+          volumeControl?.reset();
+          pageControl?.reset();
+          numberControl?.reset();
+        }
+        
+        volumeControl?.updateValueAndValidity();
+        pageControl?.updateValueAndValidity();
+        numberControl?.updateValueAndValidity();
       });
     }
     ngOnInit() {
@@ -44,6 +71,10 @@ export class WitnessdetailComponent {
             firstName:witness[0].firstName,
             fatherName: witness[0].fatherName,
             indentityCardNumber: witness[0].indentityCardNumber,
+            tazkiraType: witness[0].tazkiraType || '',
+            tazkiraVolume: witness[0].tazkiraVolume || '',
+            tazkiraPage: witness[0].tazkiraPage || '',
+            tazkiraNumber: witness[0].tazkiraNumber || '',
             phoneNumber: witness[0].phoneNumber,
             nationalIdCardPath: witness[0].nationalIdCardPath || ''
           });
@@ -120,6 +151,10 @@ BindValu(id: number) {
       firstName: selectedWitness.firstName,
       fatherName: selectedWitness.fatherName,
       indentityCardNumber: selectedWitness.indentityCardNumber,
+      tazkiraType: selectedWitness.tazkiraType || '',
+      tazkiraVolume: selectedWitness.tazkiraVolume || '',
+      tazkiraPage: selectedWitness.tazkiraPage || '',
+      tazkiraNumber: selectedWitness.tazkiraNumber || '',
       phoneNumber: selectedWitness.phoneNumber,
       propertyDetailsId:selectedWitness.propertyDetailsId,
       nationalIdCardPath: selectedWitness.nationalIdCardPath || ''
@@ -146,7 +181,16 @@ onlyNumberKey(event:any) {
   get fatherName() { return this.withnessForm.get('fatherName'); }
   get grandFather() { return this.withnessForm.get('grandFather'); }
   get indentityCardNumber() { return this.withnessForm.get('indentityCardNumber'); }
+  get tazkiraType() { return this.withnessForm.get('tazkiraType'); }
+  get tazkiraVolume() { return this.withnessForm.get('tazkiraVolume'); }
+  get tazkiraPage() { return this.withnessForm.get('tazkiraPage'); }
+  get tazkiraNumber() { return this.withnessForm.get('tazkiraNumber'); }
   get phoneNumber() { return this.withnessForm.get('phoneNumber'); }
   get nationalIdCardPath() { return this.withnessForm.get('nationalIdCardPath'); }
+
+  isPaperTazkira(): boolean {
+    const tazkiraType = this.withnessForm.get('tazkiraType')?.value;
+    return tazkiraType === 'Paper';
+  }
  
 }

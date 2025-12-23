@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
@@ -13,13 +13,15 @@ import {environment } from 'src/environments/environment';
   styleUrls: ['./upload.component.scss'],
   providers: [DatePipe]
 })
-export class UploadComponent implements OnInit {
+export class UploadComponent implements OnInit, OnChanges {
 
   progress:number =0;
   message: string='';
   uploadedFilePath: string = '';
   uploadedFileName: string = '';
   isUploading: boolean = false;
+  @Input() existingFilePath: string = '';
+  @Input() existingFileName: string = '';
   @Output() sendMessage=new EventEmitter<string>();
   myDate=new Date();
   date:any;
@@ -43,6 +45,29 @@ export class UploadComponent implements OnInit {
     this.hour=date.getHours();
     this.minutes=date.getMinutes();
     this.second=date.getSeconds();
+    this.initializeExistingFile();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['existingFilePath'] || changes['existingFileName']) {
+      this.initializeExistingFile();
+    }
+  }
+
+  private initializeExistingFile(): void {
+    if (this.existingFilePath && !this.uploadedFilePath) {
+      this.uploadedFilePath = this.existingFilePath;
+      this.uploadedFileName = this.existingFileName || this.extractFileName(this.existingFilePath);
+      if (this.uploadedFileName) {
+        this.message = 'فایل موجود';
+      }
+    }
+  }
+
+  private extractFileName(filePath: string): string {
+    if (!filePath) return '';
+    const parts = filePath.split(/[\\\/]/);
+    return parts[parts.length - 1] || '';
   }
 
   uploadFile = (files:any) => {

@@ -60,6 +60,10 @@ export class BuyerdetailComponent {
       fatherName: ['', Validators.required],
       grandFather: ['', Validators.required],
       indentityCardNumber: ['', Validators.required],
+      tazkiraType: ['', Validators.required],
+      tazkiraVolume: [''],
+      tazkiraPage: [''],
+      tazkiraNumber: [''],
       phoneNumber: ['', Validators.required],
       paddressProvinceId: ['', Validators.required],
       paddressDistrictId: ['', Validators.required],
@@ -141,6 +145,29 @@ export class BuyerdetailComponent {
     this.sellerForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
       this.applyCustomPropertyTypeValidation(propertyTypeId);
     });
+
+    this.sellerForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
+      const volumeControl = this.sellerForm.get('tazkiraVolume');
+      const pageControl = this.sellerForm.get('tazkiraPage');
+      const numberControl = this.sellerForm.get('tazkiraNumber');
+      
+      if (tazkiraType === 'Paper') {
+        volumeControl?.setValidators([Validators.required]);
+        pageControl?.setValidators([Validators.required]);
+        numberControl?.setValidators([Validators.required]);
+      } else {
+        volumeControl?.clearValidators();
+        pageControl?.clearValidators();
+        numberControl?.clearValidators();
+        volumeControl?.reset();
+        pageControl?.reset();
+        numberControl?.reset();
+      }
+      
+      volumeControl?.updateValueAndValidity();
+      pageControl?.updateValueAndValidity();
+      numberControl?.updateValueAndValidity();
+    });
   }
   ngOnInit() {
     // Initialize role types from localization service
@@ -191,6 +218,10 @@ export class BuyerdetailComponent {
           fatherName: firstBuyer.fatherName,
           grandFather: firstBuyer.grandFather,
           indentityCardNumber: firstBuyer.indentityCardNumber,
+          tazkiraType: firstBuyer.tazkiraType || '',
+          tazkiraVolume: firstBuyer.tazkiraVolume || '',
+          tazkiraPage: firstBuyer.tazkiraPage || '',
+          tazkiraNumber: firstBuyer.tazkiraNumber || '',
           phoneNumber: firstBuyer.phoneNumber,
           propertyDetailsId: firstBuyer.propertyDetailsId,
           paddressProvinceId: firstBuyer.paddressProvinceId,
@@ -219,6 +250,11 @@ export class BuyerdetailComponent {
         this.imageName=firstBuyer.photo || '';
         this.nationalIdCardName=firstBuyer.nationalIdCardPath || '';
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
+        
+        if (this.childComponent && firstBuyer.photo) {
+          this.childComponent.setExistingImage(this.baseUrl + firstBuyer.photo);
+        }
+        
         if (firstBuyer.paddressProvinceId) {
           this.selerService.getdistrict(firstBuyer.paddressProvinceId.valueOf()).subscribe(res => {
             this.district = res;
@@ -326,6 +362,10 @@ updateBuyerDetails(): void {
       fatherName: selectedBuyer.fatherName,
       grandFather: selectedBuyer.grandFather,
       indentityCardNumber: selectedBuyer.indentityCardNumber,
+      tazkiraType: selectedBuyer.tazkiraType || '',
+      tazkiraVolume: selectedBuyer.tazkiraVolume || '',
+      tazkiraPage: selectedBuyer.tazkiraPage || '',
+      tazkiraNumber: selectedBuyer.tazkiraNumber || '',
       phoneNumber: selectedBuyer.phoneNumber,
       propertyDetailsId: selectedBuyer.propertyDetailsId,
       paddressProvinceId: selectedBuyer.paddressProvinceId,
@@ -354,6 +394,10 @@ updateBuyerDetails(): void {
     this.nationalIdCardName = selectedBuyer.nationalIdCardPath || '';
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
     this.selectedSellerId = selectedBuyer.id;
+    
+    if (this.childComponent && selectedBuyer.photo) {
+      this.childComponent.setExistingImage(this.baseUrl + selectedBuyer.photo);
+    }
     
     if (selectedBuyer.paddressProvinceId) {
       this.selerService.getdistrict(selectedBuyer.paddressProvinceId.valueOf()).subscribe(res => {
@@ -542,6 +586,10 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   get fatherName() { return this.sellerForm.get('fatherName'); }
   get grandFather() { return this.sellerForm.get('grandFather'); }
   get indentityCardNumber() { return this.sellerForm.get('indentityCardNumber'); }
+  get tazkiraType() { return this.sellerForm.get('tazkiraType'); }
+  get tazkiraVolume() { return this.sellerForm.get('tazkiraVolume'); }
+  get tazkiraPage() { return this.sellerForm.get('tazkiraPage'); }
+  get tazkiraNumber() { return this.sellerForm.get('tazkiraNumber'); }
   get phoneNumber() { return this.sellerForm.get('phoneNumber'); }
   get paddressProvinceId() { return this.sellerForm.get('paddressProvinceId'); }
   get paddressDistrictId() { return this.sellerForm.get('paddressDistrictId'); }
@@ -580,5 +628,10 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
     const roleType = this.sellerForm.get('roleType')?.value;
     const lesseeRoles = ['Lessee', 'Agent for lessee'];
     return roleType && lesseeRoles.includes(roleType);
+  }
+
+  isPaperTazkira(): boolean {
+    const tazkiraType = this.sellerForm.get('tazkiraType')?.value;
+    return tazkiraType === 'Paper';
   }
 }

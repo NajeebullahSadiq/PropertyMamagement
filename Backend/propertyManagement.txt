@@ -1,0 +1,71 @@
+propertyManagement 
+
+user: moj@103.132.98.92
+pass:moJ@321$%
+
+
+
+curl -X POST http://localhost:5000/api/ApplicationUser/Login \
+  -H "Content-Type: application/json" \
+  -d '{"UserName": "admin", "Password": "Admin@123"}' \
+  -v
+
+
+
+
+cd ~/PropertyMamagement/Frontend
+git pull origin main
+npm install --legacy-peer-deps
+npx ng build --configuration production
+sudo rm -rf /var/www/prmis/frontend/*
+sudo cp -r ~/PropertyMamagement/Frontend/dist/property-registeration-mis/* /var/www/prmis/frontend/
+sudo chown -R www-data:www-data /var/www/prmis/frontend
+sudo chmod -R 755 /var/www/prmis/frontend
+
+
+cd /var/www/prmis/Backend
+dotnet build WebAPIBackend.csproj --configuration Release
+dotnet publish WebAPIBackend.csproj --configuration Release --output ./publish
+sudo systemctl stop prmis-backend
+sudo rm -rf /var/www/prmis/backend/*
+sudo cp -r ./publish/* /var/www/prmis/backend/
+sudo chown -R www-data:www-data /var/www/prmis/backend
+sudo chmod -R 755 /var/www/prmis/backend
+sudo systemctl start prmis-backend
+sudo systemctl status prmis-backend
+
+cd ~/PropertyMamagement/Backend
+dotnet build WebAPIBackend.csproj --configuration Release
+dotnet publish WebAPIBackend.csproj --configuration Release --output ./publish
+
+sudo systemctl stop prmis-backend
+sudo rm -rf /var/www/prmis/backend/*
+sudo cp -r ./publish/* /var/www/prmis/backend/
+sudo chown -R www-data:www-data /var/www/prmis/backend
+sudo chmod -R 755 /var/www/prmis/backend
+sudo systemctl start prmis-backend
+sudo systemctl status prmis-backend --no-pager
+
+
+for Build
+dotnet build WebAPIBackend.csproj
+for migration
+dotnet ef database update --context AppDbContext
+
+
+
+# Create the missing Resources directory
+sudo mkdir -p /var/www/prmis/backend/Resources
+
+# Set proper permissions
+sudo chown -R www-data:www-data /var/www/prmis/backend
+sudo chmod -R 755 /var/www/prmis/backend
+
+# Restart the backend service
+sudo systemctl restart prmis-backend
+
+# Check if it's running now
+sudo systemctl status prmis-backend
+
+# Check the logs
+sudo journalctl -u prmis-backend -n 20 --no-pager

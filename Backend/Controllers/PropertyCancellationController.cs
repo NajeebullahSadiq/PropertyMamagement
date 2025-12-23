@@ -60,7 +60,6 @@ namespace WebAPIBackend.Controllers
                     .Select(p => new
                     {
                         p.Id,
-                        p.Pnumber,
                         p.CreatedAt,
                         TransactionTypeName = p.TransactionType.Name,
                         SellerName = p.SellerDetails.FirstOrDefault() != null ? 
@@ -69,7 +68,6 @@ namespace WebAPIBackend.Controllers
                             $"{p.BuyerDetails.First().FirstName} {p.BuyerDetails.First().FatherName} {p.BuyerDetails.First().GrandFather}" : "",
                         PropertyDetails = new
                         {
-                            p.Pnumber,
                             p.Parea,
                             p.Des
                         }
@@ -131,7 +129,6 @@ namespace WebAPIBackend.Controllers
                         c.CancelledBy,
                         c.Status,
                         c.CreatedAt,
-                        PropertyNumber = c.PropertyDetails.Pnumber,
                         TransactionTypeName = c.PropertyDetails.TransactionType.Name,
                         SellerName = c.PropertyDetails.SellerDetails.FirstOrDefault() != null ? 
                             $"{c.PropertyDetails.SellerDetails.First().FirstName} {c.PropertyDetails.SellerDetails.First().FatherName} {c.PropertyDetails.SellerDetails.First().GrandFather}" : "",

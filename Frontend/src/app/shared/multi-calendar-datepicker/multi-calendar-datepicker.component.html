@@ -1,0 +1,26 @@
+<div class="multi-calendar-datepicker">
+  <label *ngIf="label" class="form-label">
+    {{ label }}
+    <span *ngIf="required" class="text-danger">*</span>
+  </label>
+  <div class="input-group">
+    <span class="input-group-text">
+      <i class="fas fa-calendar-alt"></i>
+    </span>
+    <input
+      [type]="getInputType()"
+      class="form-control"
+      [value]="inputValue"
+      (input)="onInputChange($event)"
+      (blur)="onBlur()"
+      [disabled]="disabled"
+      [placeholder]="placeholder"
+      [pattern]="getPattern()"
+      [required]="required"
+    />
+  </div>
+  <small class="form-text text-muted calendar-hint">
+    {{ currentCalendar === CalendarType.GREGORIAN ? 'میلادی' : 
+       currentCalendar === CalendarType.HIJRI_SHAMSI ? 'هجری شمسی' : 'هجری قمری' }}
+  </small>
+</div>

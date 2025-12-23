@@ -1,0 +1,16 @@
+<div class="calendar-selector">
+  <label for="calendarType" class="calendar-label">
+    <i class="fas fa-calendar"></i>
+    <span>نوع تقویم:</span>
+  </label>
+  <select 
+    id="calendarType" 
+    class="calendar-select form-select form-select-sm" 
+    [value]="selectedCalendar"
+    (change)="onCalendarChange($event)"
+  >
+    <option *ngFor="let option of calendarOptions" [value]="option.value">
+      {{ option.labelFa }}
+    </option>
+  </select>
+</div>

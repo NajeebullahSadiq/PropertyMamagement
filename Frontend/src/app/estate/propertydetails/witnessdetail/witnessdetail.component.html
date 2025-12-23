@@ -38,7 +38,21 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="indentityCardNumber" class="form-label"> شماره تذکره</label>
+                                    <label for="tazkiraType" class="form-label">نوع تذکره</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                        <select id="tazkiraType" class="form-control" formControlName="tazkiraType">
+                                            <option value="">انتخاب کنید</option>
+                                            <option value="Electronic">تذکره الکترونیکی</option>
+                                            <option value="Paper">تذکره کاغذی</option>
+                                        </select>
+                                    </div>
+                                    <div *ngIf="tazkiraType?.invalid && (tazkiraType?.dirty || tazkiraType?.touched)">
+                                        <small class="text-danger" *ngIf="tazkiraType?.errors?.['required']">این فیلد الزامی است</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="indentityCardNumber" class="form-label">شماره تذکره</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
                                         <input type="text" (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="form-control"
@@ -48,6 +62,40 @@
                                     <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
                                         <small class="text-danger" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد
                                             الزامی است</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Conditional Paper Tazkira Fields -->
+                            <div class="row" *ngIf="isPaperTazkira()">
+                                <div class="col-md-4">
+                                    <label for="tazkiraVolume" class="form-label">جلد</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-book"></i></span>
+                                        <input type="text" id="tazkiraVolume" class="form-control" formControlName="tazkiraVolume">
+                                    </div>
+                                    <div *ngIf="tazkiraVolume?.invalid && (tazkiraVolume?.dirty || tazkiraVolume?.touched)">
+                                        <small class="text-danger" *ngIf="tazkiraVolume?.errors?.['required']">این فیلد الزامی است</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="tazkiraPage" class="form-label">صفحه</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-file"></i></span>
+                                        <input type="text" id="tazkiraPage" class="form-control" formControlName="tazkiraPage">
+                                    </div>
+                                    <div *ngIf="tazkiraPage?.invalid && (tazkiraPage?.dirty || tazkiraPage?.touched)">
+                                        <small class="text-danger" *ngIf="tazkiraPage?.errors?.['required']">این فیلد الزامی است</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="tazkiraNumber" class="form-label">نمبر</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                        <input type="text" id="tazkiraNumber" class="form-control" formControlName="tazkiraNumber">
+                                    </div>
+                                    <div *ngIf="tazkiraNumber?.invalid && (tazkiraNumber?.dirty || tazkiraNumber?.touched)">
+                                        <small class="text-danger" *ngIf="tazkiraNumber?.errors?.['required']">این فیلد الزامی است</small>
                                     </div>
                                 </div>
                             </div>

@@ -131,4 +131,12 @@ export class ProfileImageCropperComponent {
     this.isUploading = false;
     this.imageChanged.emit('');
   }
+
+  setExistingImage(imagePath: string): void {
+    if (imagePath) {
+      this.croppedImageUrl = '';
+      this.initialImageUrl = imagePath;
+      this.message = 'عکس موجود';
+    }
+  }
 }
