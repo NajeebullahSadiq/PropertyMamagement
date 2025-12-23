@@ -29,9 +29,9 @@
     <None Remove="publish\\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Resources\Images\" />
-  </ItemGroup>
+<ItemGroup>
+  <Content Include="Resources/**" CopyToOutputDirectory="Always" />
+</ItemGroup>
 
   <Target Name="EnsureResourcesFolder" AfterTargets="Publish">
     <MakeDir Directories="$(PublishDir)Resources" />
