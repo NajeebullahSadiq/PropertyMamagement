@@ -22,6 +22,8 @@ export class BuyerdetailComponent {
   imageName:string='';
   nationalIdCardName:string='';
   authorizationLetterName:string='';
+  private suppressTransactionTypeHandling: boolean = false;
+  private lastTransactionType: string | null = null;
   ainTableId:number=0;
   sellerForm: FormGroup = new FormGroup({});
   selectedSellerId: number=0;
@@ -84,7 +86,7 @@ export class BuyerdetailComponent {
       halfPrice: [''],
       rentStartDate: [''],
       rentEndDate: [''],
-      transactionType: [''],
+      transactionType: ['', Validators.required],
       transactionTypeDescription: ['']
     });
 
@@ -131,14 +133,44 @@ export class BuyerdetailComponent {
     // Add dynamic validation for transaction type description when "Other" is selected
     this.sellerForm.get('transactionType')?.valueChanges.subscribe(transactionType => {
       const descriptionControl = this.sellerForm.get('transactionTypeDescription');
+      const priceControl = this.sellerForm.get('price');
+      const priceTextControl = this.sellerForm.get('priceText');
+
+      const supportedTypes = ['Purchase', 'Rent', 'Revocable Sale'];
+      const shouldResetPricePair =
+        !this.suppressTransactionTypeHandling &&
+        transactionType &&
+        supportedTypes.includes(transactionType) &&
+        this.lastTransactionType !== null &&
+        this.lastTransactionType !== transactionType;
+
+      if (shouldResetPricePair) {
+        priceControl?.reset();
+        priceTextControl?.reset();
+        this.sellerForm.patchValue({ royaltyAmount: null, halfPrice: null }, { emitEvent: false });
+      }
+
+      this.updatePriceValidators(transactionType);
       
       if (transactionType === 'Other') {
         descriptionControl?.setValidators([Validators.required]);
+
+        if (!this.suppressTransactionTypeHandling) {
+          priceControl?.reset();
+          priceTextControl?.reset();
+          this.sellerForm.patchValue({ royaltyAmount: null, halfPrice: null }, { emitEvent: false });
+        }
       } else {
         descriptionControl?.clearValidators();
         descriptionControl?.reset();
       }
       descriptionControl?.updateValueAndValidity();
+
+      if (!this.suppressTransactionTypeHandling) {
+        this.calculateDerivedAmounts();
+      }
+
+      this.lastTransactionType = transactionType || null;
     });
 
     // Add dynamic validation for custom property type when "سایر" is selected
@@ -173,8 +205,11 @@ export class BuyerdetailComponent {
     // Initialize role types from localization service
     this.roleTypes = [
       this.localizationService.roleTypes.buyer,
+      this.localizationService.roleTypes.buyers,
       this.localizationService.roleTypes.revocableSaleBuyer,
+      this.localizationService.roleTypes.revocableSaleBuyers,
       this.localizationService.roleTypes.lessee,
+      this.localizationService.roleTypes.lessees,
       this.localizationService.roleTypes.buyerAgent,
       this.localizationService.roleTypes.revocableSaleBuyerAgent,
       this.localizationService.roleTypes.leaseReceiverAgent
@@ -195,13 +230,12 @@ export class BuyerdetailComponent {
       const currentPropertyTypeId = this.sellerForm.get('propertyTypeId')?.value;
       this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
     });
-    // Add price change listener for half-price calculation
-    this.sellerForm.get('price')?.valueChanges.subscribe(price => {
-      if (price) {
-        const calculatedHalfPrice = price / 2;
-        this.sellerForm.patchValue({ halfPrice: calculatedHalfPrice }, { emitEvent: false });
-      }
+
+    // Recalculate derived amounts whenever the numeric price changes
+    this.sellerForm.get('price')?.valueChanges.subscribe(() => {
+      this.calculateDerivedAmounts();
     });
+
     this.loadBuyerDetails();
   }
 
@@ -212,6 +246,7 @@ export class BuyerdetailComponent {
       if (sellers && sellers.length > 0) {
         // Load first buyer for editing if exists
         const firstBuyer = sellers[0];
+        this.suppressTransactionTypeHandling = true;
         this.sellerForm.setValue({
           id: firstBuyer.id,
           firstName:firstBuyer.firstName,
@@ -245,6 +280,9 @@ export class BuyerdetailComponent {
           transactionType: firstBuyer.transactionType || '',
           transactionTypeDescription: firstBuyer.transactionTypeDescription || '',
         });
+        this.suppressTransactionTypeHandling = false;
+        this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
+        this.calculateDerivedAmounts();
         this.selectedSellerId=firstBuyer.id;
         this.imagePath=this.baseUrl+firstBuyer.photo;
         this.imageName=firstBuyer.photo || '';
@@ -315,6 +353,11 @@ export class BuyerdetailComponent {
               setTimeout(() => {
                 this.loadBuyerDetails(); // Reload the list
                 this.resetChild(); // Reset form for next entry
+
+                // Auto-redirect to next step for singular roles
+                if (this.isSingularRole()) {
+                  this.onNextClick();
+                }
               }, 300);
             }
           },
@@ -356,6 +399,7 @@ updateBuyerDetails(): void {
  BindValue(id: number) {
   const selectedBuyer = this.sellerDetails.find(b => b.id === id);
   if (selectedBuyer) {
+    this.suppressTransactionTypeHandling = true;
     this.sellerForm.patchValue({
       id: selectedBuyer.id,
       firstName: selectedBuyer.firstName,
@@ -389,6 +433,9 @@ updateBuyerDetails(): void {
       transactionType: selectedBuyer.transactionType || '',
       transactionTypeDescription: selectedBuyer.transactionTypeDescription || '',
     });
+    this.suppressTransactionTypeHandling = false;
+    this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
+    this.calculateDerivedAmounts();
     this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
     this.imageName = selectedBuyer.photo || '';
     this.nationalIdCardName = selectedBuyer.nationalIdCardPath || '';
@@ -460,6 +507,97 @@ deleteBuyer(id: number) {
       this.nationalIdCardName='';
       this.authorizationLetterName='';
 }
+
+ private updatePriceValidators(transactionType: string): void {
+   const priceControl = this.sellerForm.get('price');
+   const priceTextControl = this.sellerForm.get('priceText');
+   if (!priceControl || !priceTextControl) {
+     return;
+   }
+
+   const supportedTypes = ['Purchase', 'Rent', 'Revocable Sale'];
+   if (transactionType && supportedTypes.includes(transactionType)) {
+     priceControl.setValidators([Validators.required]);
+     priceTextControl.setValidators([Validators.required]);
+   } else {
+     priceControl.clearValidators();
+     priceTextControl.clearValidators();
+
+     if (!this.suppressTransactionTypeHandling) {
+       priceControl.reset();
+       priceTextControl.reset();
+       this.sellerForm.patchValue({ royaltyAmount: null, halfPrice: null }, { emitEvent: false });
+     }
+   }
+
+   priceControl.updateValueAndValidity({ emitEvent: false });
+   priceTextControl.updateValueAndValidity({ emitEvent: false });
+ }
+
+ private calculateDerivedAmounts(): void {
+   const transactionType = this.sellerForm.get('transactionType')?.value;
+   const rawPrice = this.sellerForm.get('price')?.value;
+   const price = rawPrice === '' || rawPrice === null || rawPrice === undefined ? NaN : Number(rawPrice);
+
+   if (!transactionType || transactionType === 'Other' || Number.isNaN(price) || price <= 0) {
+     this.sellerForm.patchValue({ royaltyAmount: null, halfPrice: null }, { emitEvent: false });
+     return;
+   }
+
+   // Half price (مناصفه قیمت)
+   const halfPrice = price / 2;
+
+   // Commission (مبلغ حق‌العمل رهنمای معاملات)
+   // - Purchase / Revocable Sale: 1.5%
+   // - Rent: 50% of monthly rent
+   let royaltyAmount: number | null = null;
+   if (transactionType === 'Purchase' || transactionType === 'Revocable Sale') {
+     royaltyAmount = price * 0.015;
+   } else if (transactionType === 'Rent') {
+     royaltyAmount = halfPrice;
+   }
+
+   this.sellerForm.patchValue(
+     {
+       royaltyAmount: royaltyAmount,
+       halfPrice: halfPrice
+     },
+     { emitEvent: false }
+   );
+ }
+
+ showPriceFields(): boolean {
+   const transactionType = this.sellerForm.get('transactionType')?.value;
+   return transactionType === 'Purchase' || transactionType === 'Rent' || transactionType === 'Revocable Sale';
+ }
+
+ getPriceNumberLabel(): string {
+   const transactionType = this.sellerForm.get('transactionType')?.value;
+   if (transactionType === 'Purchase') {
+     return 'قیمت خرید ملکیت به عدد افغانی';
+   }
+   if (transactionType === 'Rent') {
+     return 'قیمت کرایه ماهانه ملکیت به عدد افغانی';
+   }
+   if (transactionType === 'Revocable Sale') {
+     return 'قیمت بیع جایزی ملکیت به عدد افغانی';
+   }
+   return 'قیمت به عدد';
+ }
+
+ getPriceTextLabel(): string {
+   const transactionType = this.sellerForm.get('transactionType')?.value;
+   if (transactionType === 'Purchase') {
+     return 'قیمت خرید ملکیت به حروف افغانی';
+   }
+   if (transactionType === 'Rent') {
+     return 'قیمت کرایه ماهانه ملکیت به حروف افغانی';
+   }
+   if (transactionType === 'Revocable Sale') {
+     return 'قیمت بیع جایزی ملکیت به حروف افغانی';
+   }
+   return 'قیمت به حروف';
+ }
 onlyNumberKey(event:any) {
   const keyCode = event.which || event.keyCode;
   const keyValue = String.fromCharCode(keyCode);
@@ -626,8 +764,23 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
 
   isLesseeRole(): boolean {
     const roleType = this.sellerForm.get('roleType')?.value;
-    const lesseeRoles = ['Lessee', 'Agent for lessee'];
+    const lesseeRoles = ['Lessee', 'Lessees', 'Agent for lessee'];
     return roleType && lesseeRoles.includes(roleType);
+  }
+
+  allowsMultipleBuyers(): boolean {
+    const roleType = this.sellerForm.get('roleType')?.value;
+    const pluralRoles = ['Buyers', 'Lessees', 'Buyers in a revocable sale'];
+    return roleType && pluralRoles.includes(roleType);
+  }
+
+  isSingularRole(): boolean {
+    return !this.allowsMultipleBuyers();
+  }
+
+  getRoleTypeLabel(roleType: string): string {
+    const role = this.roleTypes.find((r: any) => r.value === roleType);
+    return role ? role.label : roleType;
   }
 
   isPaperTazkira(): boolean {

@@ -61,6 +61,18 @@
                                         <small class="text-danger" *ngIf="roleType?.errors?.['required']">این فیلد الزامی است</small>
                                     </div>
                                 </div>
+                                <div class="col-md-6" *ngIf="allowsMultipleBuyers()">
+                                    <div class="alert alert-info" style="margin-top: 32px; padding: 8px 12px">
+                                        <i class="fas fa-info-circle" style="margin-left: 5px"></i>
+                                        <strong>می‌توانید چندین خریدار اضافه کنید</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" *ngIf="isSingularRole()">
+                                    <div class="alert alert-warning" style="margin-top: 32px; padding: 8px 12px">
+                                        <i class="fas fa-exclamation-triangle" style="margin-left: 5px"></i>
+                                        <strong>فقط یک خریدار مجاز است</strong>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Conditional Authorization Letter Upload -->
@@ -278,8 +290,8 @@
                                             <small class="text-danger" *ngIf="transactionTypeDescription?.errors?.['required']">این فیلد الزامی است</small>
                                         </div>
                                     </div>
-                                    <div class="col-md-4" *ngIf="!isOtherTransactionType()">
-                                        <label for="price" class="form-label">قیمت به عدد</label>
+                                    <div class="col-md-4" *ngIf="showPriceFields()">
+                                        <label for="price" class="form-label">{{ getPriceNumberLabel() }}</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
                                             <input type="number" (keypress)="onlyNumberKey($event)" id="price" class="form-control" formControlName="price">
@@ -288,8 +300,8 @@
                                             <small class="text-danger" *ngIf="price?.errors?.['required']">این فیلد الزامی است</small>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label for="priceText" class="form-label">قیمت به حروف</label>
+                                    <div class="col-md-4" *ngIf="showPriceFields()">
+                                        <label for="priceText" class="form-label">{{ getPriceTextLabel() }}</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
                                             <input type="text" id="priceText" class="form-control" formControlName="priceText">
@@ -304,14 +316,14 @@
                                         <label for="royaltyAmount" class="form-label">مبلغ حق ‌العمل رهنمای معاملات </label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                                            <input type="number" id="royaltyAmount" class="form-control" formControlName="royaltyAmount">
+                                            <input type="number" id="royaltyAmount" class="form-control" formControlName="royaltyAmount" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="halfPrice" class="form-label">نیم قیمت (خودکار)</label>
+                                        <label for="halfPrice" class="form-label">مناصفه قیمت</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                                            <input type="number" id="halfPrice" class="form-control" formControlName="halfPrice" [disabled]="true">
+                                            <input type="number" id="halfPrice" class="form-control" formControlName="halfPrice" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -322,6 +334,15 @@
                           'تغیر معلومات' : 'ثبت معلومات'}}</button>
                         <button type="reset"  class="btn btn-primary"
                         style="margin-right: 5px;" (click)="resetChild()">جدید</button>
+                        <button
+                          type="button"
+                          *ngIf="allowsMultipleBuyers() && sellerDetails && sellerDetails.length > 0"
+                          class="btn btn-info"
+                          style="margin-right: 5px"
+                          (click)="onNextClick()"
+                        >
+                          <i class="fas fa-arrow-left" style="margin-left: 5px"></i>مرحله بعدی
+                        </button>
                         </form>
                     </div>
                 </div>
@@ -348,7 +369,7 @@
                         <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.grandFather }}</td>
                         <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.indentityCardNumber }}</td>
                         <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.phoneNumber }}</td>
-                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ b.roleType }}</td>
+                        <td (click)="BindValue(b.id)" style="cursor: pointer;">{{ getRoleTypeLabel(b.roleType) }}</td>
                         <td>
                           <button class="btn btn-danger btn-sm" (click)="deleteBuyer(b.id)">حذف</button>
                         </td>

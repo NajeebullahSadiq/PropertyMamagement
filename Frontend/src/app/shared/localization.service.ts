@@ -24,8 +24,11 @@ export class LocalizationService {
     revocableSaleAgent: { value: 'Agent for a revocable sale', label: 'وکیل بیع جایزی' },
     // Buyer Role Types
     buyer: { value: 'Buyer', label: 'خریدار' },
+    buyers: { value: 'Buyers', label: 'خریداران' },
     revocableSaleBuyer: { value: 'Buyer in a revocable sale', label: 'مشتری بیع جایزی' },
+    revocableSaleBuyers: { value: 'Buyers in a revocable sale', label: 'مشتریان بیع جایزی' },
     lessee: { value: 'Lessee', label: 'کرایه‌گیرنده' },
+    lessees: { value: 'Lessees', label: 'کرایه‌گیرندگان' },
     buyerAgent: { value: 'Purchase Agent', label: 'وکیل خرید' },
     revocableSaleBuyerAgent: { value: 'Agent for buyer in a revocable sale', label: 'وکیل مشتری بیع جایزی' },
     leaseReceiverAgent: { value: 'Agent for lessee', label: 'وکیل کرایه‌گیرنده' }

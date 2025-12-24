@@ -404,15 +404,98 @@ namespace WebAPIBackend.Controllers
             }
 
             var userId = userIdClaim.Value;
-            // Allow multiple buyers - removed restriction
             if (request.PropertyDetailsId.Equals(0))
             {
                 return StatusCode(312, "Main Table is Empty");
             }
 
+            var roleType = request.RoleType ?? "Buyer";
+            var pluralBuyerRoles = new[] { "Buyers", "Lessees", "Buyers in a revocable sale" };
+            var allowsMultipleBuyers = pluralBuyerRoles.Contains(roleType);
+            if (!allowsMultipleBuyers)
+            {
+                var existingBuyerCount = await _context.BuyerDetails
+                    .CountAsync(x => x.PropertyDetailsId == request.PropertyDetailsId);
+
+                if (existingBuyerCount > 0)
+                {
+                    return StatusCode(400, "فقط یک خریدار مجاز است");
+                }
+            }
+
+            var agentBuyerRoles = new[] { "Purchase Agent", "Agent for buyer in a revocable sale", "Agent for lessee" };
+            if (agentBuyerRoles.Contains(roleType) && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            {
+                return StatusCode(400, "Authorization letter is required for agent roles");
+            }
+
+            var lesseeBuyerRoles = new[] { "Lessee", "Lessees", "Agent for lessee" };
+            if (lesseeBuyerRoles.Contains(roleType))
+            {
+                if (!request.RentStartDate.HasValue || !request.RentEndDate.HasValue)
+                {
+                    return StatusCode(400, "Rental dates are required for lessee roles");
+                }
+            }
+
             if (!request.PropertyTypeId.HasValue)
             {
                 return StatusCode(400, "انتخاب نوعیت ملکیت الزامی است");
+            }
+
+            // Transaction / price rules
+            var supportedTransactionTypes = new[] { "Purchase", "Rent", "Revocable Sale", "Other" };
+            if (!string.IsNullOrWhiteSpace(request.TransactionType) && !supportedTransactionTypes.Contains(request.TransactionType))
+            {
+                return StatusCode(400, "نوعیت معامله درست نیست");
+            }
+
+            if (request.TransactionType == "Other")
+            {
+                if (string.IsNullOrWhiteSpace(request.TransactionTypeDescription))
+                {
+                    return StatusCode(400, "توضیح سایر الزامی است");
+                }
+
+                request.TransactionTypeDescription = request.TransactionTypeDescription.Trim();
+                request.Price = null;
+                request.PriceText = null;
+                request.RoyaltyAmount = null;
+                request.HalfPrice = null;
+            }
+            else if (request.TransactionType == "Purchase" || request.TransactionType == "Rent" || request.TransactionType == "Revocable Sale")
+            {
+                if (!request.Price.HasValue || request.Price.Value <= 0)
+                {
+                    return StatusCode(400, "قیمت الزامی است");
+                }
+                if (string.IsNullOrWhiteSpace(request.PriceText))
+                {
+                    return StatusCode(400, "قیمت به حروف الزامی است");
+                }
+
+                request.PriceText = request.PriceText.Trim();
+                request.TransactionTypeDescription = null;
+
+                // Derived amounts (server authoritative)
+                request.HalfPrice = request.Price.Value / 2;
+                if (request.TransactionType == "Purchase" || request.TransactionType == "Revocable Sale")
+                {
+                    request.RoyaltyAmount = request.Price.Value * 0.015;
+                }
+                else if (request.TransactionType == "Rent")
+                {
+                    request.RoyaltyAmount = request.HalfPrice;
+                }
+            }
+            else
+            {
+                // No transaction type selected yet
+                request.Price = null;
+                request.PriceText = null;
+                request.TransactionTypeDescription = null;
+                request.RoyaltyAmount = null;
+                request.HalfPrice = null;
             }
 
             var propertyType = await _context.PropertyTypes.FindAsync(request.PropertyTypeId.Value);
@@ -465,7 +548,7 @@ namespace WebAPIBackend.Controllers
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 Photo=request.Photo,
-                RoleType=request.RoleType ?? "Buyer",
+                RoleType=roleType,
                 AuthorizationLetter=request.AuthorizationLetter,
                 PropertyTypeId = request.PropertyTypeId,
                 CustomPropertyType = request.CustomPropertyType,
@@ -512,9 +595,79 @@ namespace WebAPIBackend.Controllers
                 return NotFound();
             }
 
+            var roleType = request.RoleType ?? "Buyer";
+            var agentBuyerRoles = new[] { "Purchase Agent", "Agent for buyer in a revocable sale", "Agent for lessee" };
+            if (agentBuyerRoles.Contains(roleType) && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            {
+                return StatusCode(400, "Authorization letter is required for agent roles");
+            }
+
+            var lesseeBuyerRoles = new[] { "Lessee", "Lessees", "Agent for lessee" };
+            if (lesseeBuyerRoles.Contains(roleType))
+            {
+                if (!request.RentStartDate.HasValue || !request.RentEndDate.HasValue)
+                {
+                    return StatusCode(400, "Rental dates are required for lessee roles");
+                }
+            }
+
             if (!request.PropertyTypeId.HasValue)
             {
                 return StatusCode(400, "انتخاب نوعیت ملکیت الزامی است");
+            }
+
+            // Transaction / price rules
+            var supportedTransactionTypes = new[] { "Purchase", "Rent", "Revocable Sale", "Other" };
+            if (!string.IsNullOrWhiteSpace(request.TransactionType) && !supportedTransactionTypes.Contains(request.TransactionType))
+            {
+                return StatusCode(400, "نوعیت معامله درست نیست");
+            }
+
+            if (request.TransactionType == "Other")
+            {
+                if (string.IsNullOrWhiteSpace(request.TransactionTypeDescription))
+                {
+                    return StatusCode(400, "توضیح سایر الزامی است");
+                }
+
+                request.TransactionTypeDescription = request.TransactionTypeDescription.Trim();
+                request.Price = null;
+                request.PriceText = null;
+                request.RoyaltyAmount = null;
+                request.HalfPrice = null;
+            }
+            else if (request.TransactionType == "Purchase" || request.TransactionType == "Rent" || request.TransactionType == "Revocable Sale")
+            {
+                if (!request.Price.HasValue || request.Price.Value <= 0)
+                {
+                    return StatusCode(400, "قیمت الزامی است");
+                }
+                if (string.IsNullOrWhiteSpace(request.PriceText))
+                {
+                    return StatusCode(400, "قیمت به حروف الزامی است");
+                }
+
+                request.PriceText = request.PriceText.Trim();
+                request.TransactionTypeDescription = null;
+
+                // Derived amounts (server authoritative)
+                request.HalfPrice = request.Price.Value / 2;
+                if (request.TransactionType == "Purchase" || request.TransactionType == "Revocable Sale")
+                {
+                    request.RoyaltyAmount = request.Price.Value * 0.015;
+                }
+                else if (request.TransactionType == "Rent")
+                {
+                    request.RoyaltyAmount = request.HalfPrice;
+                }
+            }
+            else
+            {
+                request.Price = null;
+                request.PriceText = null;
+                request.TransactionTypeDescription = null;
+                request.RoyaltyAmount = null;
+                request.HalfPrice = null;
             }
 
             var propertyType = await _context.PropertyTypes.FindAsync(request.PropertyTypeId.Value);
@@ -550,6 +703,8 @@ namespace WebAPIBackend.Controllers
             {
                 request.RentEndDate = request.RentEndDate.Value.ToUniversalTime();
             }
+
+            request.RoleType = roleType;
 
             // Update the entity with the new values
             _context.Entry(existingProperty).CurrentValues.SetValues(request);

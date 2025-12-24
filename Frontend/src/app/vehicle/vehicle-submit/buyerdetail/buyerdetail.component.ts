@@ -176,13 +176,36 @@ export class BuyerdetailComponent {
       this.localizedPropertyTypes = this.mapPropertyTypesToLocalized(res as any[]);
     });
     // Add price change listener for half-price calculation
-    this.buyerForm.get('price')?.valueChanges.subscribe(price => {
-      if (price) {
-        const calculatedHalfPrice = price / 2;
-        this.buyerForm.patchValue({ halfPrice: calculatedHalfPrice }, { emitEvent: false });
-      }
+    this.buyerForm.get('price')?.valueChanges.subscribe(() => {
+      this.calculateDerivedAmounts();
+    });
+
+    this.buyerForm.get('transactionType')?.valueChanges.subscribe(() => {
+      this.calculateDerivedAmounts();
     });
     this.loadBuyerDetails();
+  }
+
+  private calculateDerivedAmounts(): void {
+    const transactionType = this.buyerForm.get('transactionType')?.value;
+    const rawPrice = this.buyerForm.get('price')?.value;
+    const price = rawPrice === '' || rawPrice === null || rawPrice === undefined ? NaN : Number(rawPrice);
+
+    if (!transactionType || transactionType === 'Other' || Number.isNaN(price) || price <= 0) {
+      this.buyerForm.patchValue({ royaltyAmount: null, halfPrice: null }, { emitEvent: false });
+      return;
+    }
+
+    const halfPrice = price / 2;
+
+    let royaltyAmount: number | null = null;
+    if (transactionType === 'Purchase' || transactionType === 'Revocable Sale') {
+      royaltyAmount = price * 0.015;
+    } else if (transactionType === 'Rent') {
+      royaltyAmount = halfPrice;
+    }
+
+    this.buyerForm.patchValue({ royaltyAmount, halfPrice }, { emitEvent: false });
   }
 
   loadBuyerDetails() {
