@@ -50,6 +50,10 @@ public partial class BuyerDetail
 
     public string? AuthorizationLetter { get; set; } // Path to authorization letter file
 
+    public string? TaxIdentificationNumber { get; set; }
+
+    public string? AdditionalDetails { get; set; }
+
     public int? PropertyTypeId { get; set; }
 
     public string? CustomPropertyType { get; set; }

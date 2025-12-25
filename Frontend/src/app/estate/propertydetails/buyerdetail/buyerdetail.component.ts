@@ -87,7 +87,9 @@ export class BuyerdetailComponent {
       rentStartDate: [''],
       rentEndDate: [''],
       transactionType: ['', Validators.required],
-      transactionTypeDescription: ['']
+      transactionTypeDescription: [''],
+      taxIdentificationNumber: [''],
+      additionalDetails: ['']
     });
 
     // Add dynamic validation for authorization letter based on agent roles
@@ -279,6 +281,8 @@ export class BuyerdetailComponent {
           rentEndDate: firstBuyer.rentEndDate || '',
           transactionType: firstBuyer.transactionType || '',
           transactionTypeDescription: firstBuyer.transactionTypeDescription || '',
+          taxIdentificationNumber: (firstBuyer as any).taxIdentificationNumber || '',
+          additionalDetails: (firstBuyer as any).additionalDetails || '',
         });
         this.suppressTransactionTypeHandling = false;
         this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
@@ -432,6 +436,8 @@ updateBuyerDetails(): void {
       rentEndDate: selectedBuyer.rentEndDate || '',
       transactionType: selectedBuyer.transactionType || '',
       transactionTypeDescription: selectedBuyer.transactionTypeDescription || '',
+      taxIdentificationNumber: (selectedBuyer as any).taxIdentificationNumber || '',
+      additionalDetails: (selectedBuyer as any).additionalDetails || '',
     });
     this.suppressTransactionTypeHandling = false;
     this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);

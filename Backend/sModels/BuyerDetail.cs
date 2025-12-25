@@ -37,6 +37,10 @@ public partial class BuyerDetail
 
     public string? Photo { get; set; }
 
+    public string? TaxIdentificationNumber { get; set; }
+
+    public string? AdditionalDetails { get; set; }
+
     public int? PropertyTypeId { get; set; }
 
     public string? CustomPropertyType { get; set; }

@@ -550,6 +550,8 @@ namespace WebAPIBackend.Controllers
                 Photo=request.Photo,
                 RoleType=roleType,
                 AuthorizationLetter=request.AuthorizationLetter,
+                TaxIdentificationNumber = request.TaxIdentificationNumber,
+                AdditionalDetails = request.AdditionalDetails,
                 PropertyTypeId = request.PropertyTypeId,
                 CustomPropertyType = request.CustomPropertyType,
                 Price = request.Price,
