@@ -18,7 +18,8 @@ export class CancellationPageComponent implements OnInit {
   loading: boolean = false;
   showCancellationModal: boolean = false;
   selectedTransaction: any = null;
-  cancellationReason: string = '';
+  cancellationReason: string[] = [];
+  otherCancellationReasonText: string = '';
   submitted: boolean = false;
   cancellationReasons: any[] = [];
   cancellationDocuments: Array<{
@@ -90,7 +91,8 @@ export class CancellationPageComponent implements OnInit {
 
   openCancellationModal(transaction: any): void {
     this.selectedTransaction = transaction;
-    this.cancellationReason = '';
+    this.cancellationReason = [];
+    this.otherCancellationReasonText = '';
     this.submitted = false;
     this.cancellationDocuments = [];
     this.showCancellationModal = true;
@@ -99,9 +101,28 @@ export class CancellationPageComponent implements OnInit {
   closeCancellationModal(): void {
     this.showCancellationModal = false;
     this.selectedTransaction = null;
-    this.cancellationReason = '';
+    this.cancellationReason = [];
+    this.otherCancellationReasonText = '';
     this.submitted = false;
     this.cancellationDocuments = [];
+  }
+
+  isOtherReasonSelected(): boolean {
+    return Array.isArray(this.cancellationReason) && this.cancellationReason.includes('Other');
+  }
+
+  private buildCancellationReasonString(): string {
+    const reasons = Array.isArray(this.cancellationReason) ? [...this.cancellationReason] : [];
+    const cleanedReasons = reasons
+      .map(r => (r || '').trim())
+      .filter(r => r.length > 0);
+
+    const otherText = (this.otherCancellationReasonText || '').trim();
+    if (cleanedReasons.includes('Other') && otherText.length > 0) {
+      return `${cleanedReasons.join(',')},Other|${otherText}`;
+    }
+
+    return cleanedReasons.join(',');
   }
 
   onCancellationFilesSelected(event: any): void {
@@ -177,10 +198,9 @@ export class CancellationPageComponent implements OnInit {
   }
 
   canConfirmCancellation(): boolean {
-    const hasReason = !!this.cancellationReason && this.cancellationReason.trim().length > 0;
-    const uploadedDocs = this.cancellationDocuments.filter(d => !!d.filePath);
+    const hasReason = Array.isArray(this.cancellationReason) && this.cancellationReason.length > 0;
     const isUploading = this.cancellationDocuments.some(d => d.uploading);
-    return hasReason && uploadedDocs.length > 0 && !isUploading;
+    return hasReason && !isUploading;
   }
 
   confirmCancellation(): void {
@@ -196,10 +216,12 @@ export class CancellationPageComponent implements OnInit {
       .filter(d => !!d.filePath)
       .map(d => ({ filePath: d.filePath, originalFileName: d.originalFileName }));
 
+    const cancellationReasonCsv = this.buildCancellationReasonString();
+
     this.loading = true;
     this.cancellationService.cancelTransaction(
       this.selectedTransaction.id,
-      this.cancellationReason,
+      cancellationReasonCsv,
       documents
     ).subscribe(
       (response) => {
@@ -220,6 +242,26 @@ export class CancellationPageComponent implements OnInit {
   getCancellationReasonLabel(value: string): string {
     const reason = this.cancellationReasons.find(r => r.value === value);
     return reason ? reason.label : value;
+  }
+
+  getCancellationReasonLabels(value: string | null | undefined): string {
+    if (!value) return '';
+    const parts = value
+      .split(',')
+      .map(v => v.trim())
+      .filter(v => v.length > 0);
+
+    if (parts.length === 0) return '';
+
+    return parts
+      .map(v => {
+        if (v.startsWith('Other|')) {
+          const otherText = v.substring('Other|'.length).trim();
+          return otherText.length > 0 ? `${this.getCancellationReasonLabel('Other')}: ${otherText}` : this.getCancellationReasonLabel('Other');
+        }
+        return this.getCancellationReasonLabel(v);
+      })
+      .join('، ');
   }
 
   getFilteredActiveTransactions(): any[] {

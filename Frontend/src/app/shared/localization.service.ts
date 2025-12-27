@@ -83,7 +83,8 @@ export class LocalizationService {
     { value: 'LackOfLegalCapacity', label: 'عدم اهلیت' },
     { value: 'LackOfCompetence', label: 'عدم صلاحیت' },
     { value: 'AbsenceOfDocuments', label: 'عدم موجودیت سند یا مدارک اعتباری' },
-    { value: 'MutualConsent', label: 'رضایت طرفین معامله' }
+    { value: 'MutualConsent', label: 'رضایت طرفین معامله' },
+    { value: 'Other', label: 'سایر' }
   ];
 
   // Education Levels (from backend lookup table)

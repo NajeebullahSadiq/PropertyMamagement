@@ -143,7 +143,7 @@
         <div class="info-row">
           <div class="info-item">
             <label>دلیل ابطال:</label>
-            <span>{{ transaction.cancellationReason ? getCancellationReasonLabel(transaction.cancellationReason) : 'مشخص نشده' }}</span>
+            <span>{{ transaction.cancellationReason ? getCancellationReasonLabels(transaction.cancellationReason) : 'مشخص نشده' }}</span>
           </div>
           <div class="info-item">
             <label>ابطال شده توسط:</label>
@@ -183,20 +183,30 @@
 
         <div class="form-group">
           <label for="reason">دلایل فسخ / لغو معامله:</label>
-          <select
-            id="reason"
-            [(ngModel)]="cancellationReason"
-            class="form-control">
-            <option value="">انتخاب کنید</option>
-            <option *ngFor="let r of cancellationReasons" [value]="r.value">{{ r.label }}</option>
-          </select>
-          <div class="validation-error" *ngIf="submitted && !cancellationReason">دلیل ابطال ضروری است</div>
+          <mat-form-field appearance="outline" class="mat-form-field-full">
+            <mat-select
+              id="reason"
+              [(ngModel)]="cancellationReason"
+              multiple>
+              <mat-option *ngFor="let r of cancellationReasons" [value]="r.value">{{ r.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="validation-error" *ngIf="submitted && cancellationReason.length === 0">حداقل یک دلیل ابطال ضروری است</div>
+        </div>
+
+        <div class="form-group" *ngIf="isOtherReasonSelected()">
+          <label for="otherReason">سایر (اختیاری):</label>
+          <input
+            id="otherReason"
+            type="text"
+            [(ngModel)]="otherCancellationReasonText"
+            class="form-control"
+            placeholder="جزئیات بیشتر را وارد کنید" />
         </div>
 
         <div class="form-group">
           <label>اسناد ابطال معامله:</label>
           <input type="file" multiple (change)="onCancellationFilesSelected($event)" class="form-control" />
-          <div class="validation-error" *ngIf="submitted && getUploadedCancellationDocumentsCount() === 0">حداقل یک سند ابطال ضروری است</div>
 
           <div class="uploaded-docs" *ngIf="cancellationDocuments.length">
             <div class="doc-item" *ngFor="let doc of cancellationDocuments">
