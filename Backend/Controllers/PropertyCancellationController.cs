@@ -177,11 +177,6 @@ namespace WebAPIBackend.Controllers
                     return BadRequest(new { error = "Cancellation reason is required" });
                 }
 
-                if (request.Documents == null || request.Documents.Count == 0)
-                {
-                    return BadRequest(new { error = "At least one cancellation document is required" });
-                }
-
                 var property = await _context.PropertyDetails.FindAsync(request.PropertyDetailsId);
                 if (property == null)
                 {
@@ -209,7 +204,8 @@ namespace WebAPIBackend.Controllers
                 _context.PropertyCancellations.Add(cancellation);
                 await _context.SaveChangesAsync();
 
-                foreach (var doc in request.Documents)
+                var documents = request.Documents ?? new List<CancellationDocumentRequest>();
+                foreach (var doc in documents)
                 {
                     if (doc == null || string.IsNullOrWhiteSpace(doc.FilePath))
                     {

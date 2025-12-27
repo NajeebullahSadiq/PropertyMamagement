@@ -28,6 +28,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PropertydetailslistComponent } from './propertydetailslist/propertydetailslist.component';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatTableModule} from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { CancellationPageComponent } from './cancellation-page/cancellation-page.component';
 import { SharedModule } from '../shared/shared.module';
@@ -65,6 +67,8 @@ import { SharedModule } from '../shared/shared.module';
     NgSelectModule,
     MatPaginatorModule,
     MatTableModule,
+    MatFormFieldModule,
+    MatSelectModule,
     NgxPaginationModule,
     SharedModule
 
