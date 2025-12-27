@@ -477,6 +477,61 @@
           color: #94a3b8;
         }
       }
+
+      .validation-error {
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #dc2626;
+      }
+
+      .uploaded-docs {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .doc-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 10px 12px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+
+          .doc-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .doc-name {
+              font-size: 13px;
+              font-weight: 700;
+              color: #1e293b;
+              word-break: break-word;
+            }
+
+            .doc-status {
+              font-size: 12px;
+              color: #475569;
+            }
+
+            .doc-error {
+              font-size: 12px;
+              font-weight: 600;
+              color: #dc2626;
+            }
+          }
+
+          .doc-actions {
+            display: flex;
+            gap: 8px;
+            flex-direction: row-reverse;
+          }
+        }
+      }
     }
 
     .warning-message {

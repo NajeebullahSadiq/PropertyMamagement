@@ -19,10 +19,18 @@ export class PropertyCancellationService {
     return this.http.get<any[]>(`${this.baseUrl}/GetCancelledTransactions`);
   }
 
-  cancelTransaction(propertyDetailsId: number, cancellationReason: string): Observable<any> {
+  cancelTransaction(
+    propertyDetailsId: number,
+    cancellationReason: string,
+    documents: Array<{ filePath: string; originalFileName?: string }> = []
+  ): Observable<any> {
     return this.http.post(`${this.baseUrl}/CancelTransaction`, {
       propertyDetailsId,
-      cancellationReason
+      cancellationReason,
+      documents: documents.map(d => ({
+        filePath: d.filePath,
+        originalFileName: d.originalFileName
+      }))
     });
   }
 

@@ -143,11 +143,23 @@
         <div class="info-row">
           <div class="info-item">
             <label>دلیل ابطال:</label>
-            <span>{{ transaction.cancellationReason || 'مشخص نشده' }}</span>
+            <span>{{ transaction.cancellationReason ? getCancellationReasonLabel(transaction.cancellationReason) : 'مشخص نشده' }}</span>
           </div>
           <div class="info-item">
             <label>ابطال شده توسط:</label>
             <span>{{ transaction.cancelledBy }}</span>
+          </div>
+        </div>
+
+        <div class="info-row" *ngIf="transaction.documents?.length">
+          <div class="info-item">
+            <label>اسناد ابطال:</label>
+            <span>
+              <ng-container *ngFor="let doc of transaction.documents; let i = index">
+                <a href="javascript:void(0)" (click)="viewDocument(doc.filePath, doc.fileName)">{{ doc.fileName || ('سند ' + (i + 1)) }}</a>
+                <span *ngIf="i < transaction.documents.length - 1">، </span>
+              </ng-container>
+            </span>
           </div>
         </div>
       </div>
@@ -170,13 +182,36 @@
         </div>
 
         <div class="form-group">
-          <label for="reason">دلیل ابطال (اختیاری):</label>
-          <textarea 
+          <label for="reason">دلایل فسخ / لغو معامله:</label>
+          <select
             id="reason"
             [(ngModel)]="cancellationReason"
-            placeholder="دلیل ابطال معامله را وارد کنید"
-            class="form-control"
-            rows="4"></textarea>
+            class="form-control">
+            <option value="">انتخاب کنید</option>
+            <option *ngFor="let r of cancellationReasons" [value]="r.value">{{ r.label }}</option>
+          </select>
+          <div class="validation-error" *ngIf="submitted && !cancellationReason">دلیل ابطال ضروری است</div>
+        </div>
+
+        <div class="form-group">
+          <label>اسناد ابطال معامله:</label>
+          <input type="file" multiple (change)="onCancellationFilesSelected($event)" class="form-control" />
+          <div class="validation-error" *ngIf="submitted && getUploadedCancellationDocumentsCount() === 0">حداقل یک سند ابطال ضروری است</div>
+
+          <div class="uploaded-docs" *ngIf="cancellationDocuments.length">
+            <div class="doc-item" *ngFor="let doc of cancellationDocuments">
+              <div class="doc-info">
+                <span class="doc-name">{{ doc.originalFileName }}</span>
+                <span class="doc-status" *ngIf="doc.uploading">در حال آپلود... ({{ doc.progress }}%)</span>
+                <span class="doc-status" *ngIf="!doc.uploading && doc.filePath">آپلود شد</span>
+                <span class="doc-error" *ngIf="doc.error">{{ doc.error }}</span>
+              </div>
+              <div class="doc-actions" *ngIf="doc.filePath">
+                <button type="button" class="btn btn-secondary" (click)="viewDocument(doc.filePath, doc.originalFileName)">نمایش</button>
+                <button type="button" class="btn btn-secondary" (click)="downloadDocument(doc.filePath)">دانلود</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="warning-message">
@@ -193,7 +228,7 @@
         <button 
           class="btn btn-danger"
           (click)="confirmCancellation()"
-          [disabled]="loading">
+          [disabled]="loading || !canConfirmCancellation()">
           تایید ابطال
         </button>
       </div>

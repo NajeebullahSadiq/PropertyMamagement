@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace WebAPIBackend.Models;
 
@@ -19,4 +20,6 @@ public partial class PropertyCancellation
     public DateTime CreatedAt { get; set; }
 
     public virtual PropertyDetail? PropertyDetails { get; set; }
+
+    public virtual ICollection<PropertyCancellationDocument> PropertyCancellationDocuments { get; } = new List<PropertyCancellationDocument>();
 }

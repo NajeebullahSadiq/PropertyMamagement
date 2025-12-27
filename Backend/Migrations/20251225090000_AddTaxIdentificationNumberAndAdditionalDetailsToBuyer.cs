@@ -1,10 +1,14 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using WebAPIBackend.Configuration;
 
 #nullable disable
 
 namespace WebAPIBackend.Migrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20251225090000_AddTaxIdentificationNumberAndAdditionalDetailsToBuyer")]
     public partial class AddTaxIdentificationNumberAndAdditionalDetailsToBuyer : Migration
     {
         /// <inheritdoc />

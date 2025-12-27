@@ -254,6 +254,7 @@ namespace UploadFilesServer.Controllers
             return documentType?.ToLower() switch
             {
                 "property" => Path.Combine("Resources", "Documents", "Property"),
+                "cancellation" => Path.Combine("Resources", "Documents", "Property", "Cancellation"),
                 "vehicle" => Path.Combine("Resources", "Documents", "Vehicle"),
                 "company" => Path.Combine("Resources", "Documents", "Company"),
                 "profile" => Path.Combine("Resources", "Documents", "Profile"),

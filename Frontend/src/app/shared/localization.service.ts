@@ -75,6 +75,17 @@ export class LocalizationService {
     { value: 'Other', label: 'سایر' }
   ];
 
+  cancellationReasons = [
+    { value: 'Coercion', label: 'اکراه' },
+    { value: 'Fraud', label: 'فریب' },
+    { value: 'Lesion', label: 'غبن' },
+    { value: 'Defect', label: 'عیب' },
+    { value: 'LackOfLegalCapacity', label: 'عدم اهلیت' },
+    { value: 'LackOfCompetence', label: 'عدم صلاحیت' },
+    { value: 'AbsenceOfDocuments', label: 'عدم موجودیت سند یا مدارک اعتباری' },
+    { value: 'MutualConsent', label: 'رضایت طرفین معامله' }
+  ];
+
   // Education Levels (from backend lookup table)
   educationLevels = [
     { value: 'Illiterate', label: 'بی سواد' },
