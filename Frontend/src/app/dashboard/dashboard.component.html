@@ -74,7 +74,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع پول معامله شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmount }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalAmount || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -89,7 +89,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmountNotCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalAmountNotCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -104,7 +104,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalAmountCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalAmountCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -122,7 +122,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله انجام شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalTransaction }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransaction || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-exchange-alt fa-2x"></i>
@@ -137,7 +137,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع  معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalTransactionNotCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransactionNotCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-exchange-alt fa-2x"></i>
@@ -152,7 +152,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalTransactionCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-exchange-alt fa-2x"></i>
@@ -170,7 +170,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع کمیشن تمام معاملات </div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalRoyaltyAmount }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalRoyaltyAmount || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -185,7 +185,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalRoyaltyAmountNotCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalRoyaltyAmountNotCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-money-bill fa-2x"></i>
@@ -200,7 +200,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData.totalRecord.totalRoyaltyAmountCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalRoyaltyAmountCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -215,7 +215,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" > تعداد رهنمایی معاملات ثبت شده </div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalCompany.totalCompanyRegisterd.totalTransaction }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalCompany?.totalCompanyRegisterd?.totalTransaction || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-building  fa-2x"></i>
@@ -230,7 +230,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2" routerLink="/dashboard/realestate/exlist" style="cursor: pointer;">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" > تعداد جواز تاریخ گذشته</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalexpiredLicense.totalLicenseExpired.totalTransaction }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalexpiredLicense?.totalLicenseExpired?.totalTransaction || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-building  fa-2x"></i>
@@ -255,7 +255,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalAmount }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalAmount || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -270,7 +270,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع پول معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalAmountNotCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalAmountNotCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -285,7 +285,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalAmountCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalAmountCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -303,7 +303,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله انجام شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalTransaction }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransaction || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-exchange-alt fa-2x"></i>
@@ -318,7 +318,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع  معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalTransactionNotCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransactionNotCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-exchange-alt fa-2x"></i>
@@ -333,7 +333,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalTransactionCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-exchange-alt fa-2x"></i>
@@ -351,7 +351,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن تمام معاملات </div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalRoyaltyAmount }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmount || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -366,7 +366,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع کمیشن معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalRoyaltyAmountNotCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmountNotCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>
@@ -381,7 +381,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData.totalRecord.totalRoyaltyAmountCompleted }}</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmountCompleted || 0 }}</div>
                   </div>
                   <div class="col-auto">
                     <i  class="fas fa-money-bill fa-2x"></i>

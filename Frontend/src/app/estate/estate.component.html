@@ -1,45 +1,67 @@
-<div class="container">
-  <div class="page-actions">
-    <button class="btn-cancellation" routerLink="/estate/cancellation" title="صفحهٔ ابطال معاملات">
-      <mat-icon>block</mat-icon>
-      صفحهٔ ابطال معاملات
+<div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="flex justify-end items-center mb-6">
+    <button class="btn-cancellation flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5" routerLink="/estate/cancellation" title="صفحهٔ ابطال معاملات">
+      <mat-icon class="text-lg">block</mat-icon>
+      <span>صفحهٔ ابطال معاملات</span>
     </button>
   </div>
-  <mat-tab-group #tabGroup>
-    <mat-tab class="blue-tab">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">home</mat-icon>
-        جایداد
-      </ng-template>
-      <app-propertydetails   #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-propertydetails>
-    </mat-tab>
-    <mat-tab [disabled]="propertyService.mainTableId === 0" >
-        <ng-template matTabLabel  >
-            <mat-icon class="large-icon">person</mat-icon>
-                 مالک
-          </ng-template>
-        <app-sellerdetail  #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+    <mat-tab-group #tabGroup class="modern-tabs">
+      <mat-tab class="blue-tab">
+        <ng-template matTabLabel>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">home</mat-icon>
+            <span class="font-semibold">جایداد</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-propertydetails #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-propertydetails>
+        </div>
       </mat-tab>
-    <mat-tab [disabled]="propertyService.mainTableId === 0" >
+      <mat-tab [disabled]="propertyService.mainTableId === 0">
         <ng-template matTabLabel>
-            <mat-icon class="large-icon">person</mat-icon>
-                 مشتری
-          </ng-template>
-      <app-buyerdetail  #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
-    </mat-tab>
-    <mat-tab [disabled]="propertyService.mainTableId === 0">
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">person</mat-icon>
+            <span class="font-semibold">مالک</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-sellerdetail #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
+        </div>
+      </mat-tab>
+      <mat-tab [disabled]="propertyService.mainTableId === 0">
         <ng-template matTabLabel>
-            <mat-icon class="large-icon">person</mat-icon>
-                 شاهدین
-          </ng-template>
-      <app-witnessdetail  #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
-    </mat-tab>
-    <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.withnessId===0">
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">person</mat-icon>
+            <span class="font-semibold">مشتری</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-buyerdetail #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
+        </div>
+      </mat-tab>
+      <mat-tab [disabled]="propertyService.mainTableId === 0">
         <ng-template matTabLabel>
-            <mat-icon class="large-icon">location_on</mat-icon>
-                 آدرس
-          </ng-template>
-      <app-propertyaddress #propertyAddress [id]="PropertyId"></app-propertyaddress>
-    </mat-tab>
-  </mat-tab-group>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">person</mat-icon>
+            <span class="font-semibold">شاهدین</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-witnessdetail #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
+        </div>
+      </mat-tab>
+      <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.withnessId===0">
+        <ng-template matTabLabel>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">location_on</mat-icon>
+            <span class="font-semibold">آدرس</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-propertyaddress #propertyAddress [id]="PropertyId"></app-propertyaddress>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>
