@@ -85,7 +85,7 @@
                                 <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">نوعیت سند</span></strong></p>
                             </td>
                             <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.doctype}}</span></strong></p>
+                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.documentType || documentData.doctype}}</span></strong></p>
                             </td>
                             <td rowspan="3" style="width:18.1pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
                                 <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">اسم</span></strong></p>
@@ -104,7 +104,7 @@
                                 <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">نمبر قباله</span></strong></p>
                             </td>
                             <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><span style="font-weight:bold;" dir="ltr">&nbsp;{{documentData.pNumber}}</span></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><span style="font-weight:bold;" dir="ltr">&nbsp;{{documentData.issuanceNumber || documentData.pNumber}}</span></p>
                             </td>
                             <td style="vertical-align:top;"><br></td>
                             <td style="vertical-align:top;"><br></td>
@@ -136,7 +136,7 @@
                                 <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">موقعیت ملکیت</span></strong><strong>:&nbsp;</strong></p>
                             </td>
                             <td colspan="3" style="width:136.4pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">ولایت</span></strong><strong>(</strong><strong>&nbsp;{{documentData.province}}&nbsp;</strong><strong>)</strong><strong><span style="font-family:'B Nazanin';">ناحیه</span></strong><strong>/</strong><strong><span style="font-family:'B Nazanin';">ولسوالی</span></strong><strong>(</strong><strong>&nbsp;&nbsp;{{documentData.district}}&nbsp;&nbsp;</strong><strong>)</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">ولایت:</span></strong><strong>&nbsp;{{documentData.provinceDari || documentData.province}}&nbsp;</strong><strong><span style="font-family:'B Nazanin';">ناحیه/ولسوالی:</span></strong><strong>&nbsp;{{documentData.districtDari || documentData.district}}&nbsp;</strong></p>
                             </td>
                             <td rowspan="3" style="width:18.1pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
                                 <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">ولد</span></strong></p>
@@ -439,37 +439,7 @@
                             <td style="vertical-align:top;"><br></td>
                         </tr>
                         
-                        <tr *ngIf="documentData.filePath || documentData.previousDocumentsPath || documentData.existingDocumentsPath" style="height:auto;">
-                            <td colspan="13" style="width:555.15pt; border-style:solid; border-width:0.75pt 1pt 0.75pt 0.75pt; padding:10pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:10pt; font-size:14pt; text-align:center;"><strong><u><span style="font-family:'B Nazanin';">تصاویر و اسناد ملکیت</span></u></strong></p>
-                                
-                                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 10px;">
-                                    <div *ngIf="documentData.filePath" style="text-align: center; min-width: 200px;">
-                                        <p dir="rtl" style="margin-bottom: 5px; font-size: 11pt;"><strong><span style="font-family:'B Nazanin';">تصویر ملکیت</span></strong></p>
-                                        <img [src]="baseUrl + documentData.filePath" alt="Property Image" style="max-width: 250px; max-height: 250px; border: 2px solid #333; border-radius: 4px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                        <p style="display: none; color: #999; font-size: 10pt;">تصویر موجود نیست</p>
-                                    </div>
-                                    
-                                    <div *ngIf="documentData.previousDocumentsPath" style="text-align: center; min-width: 200px;">
-                                        <p dir="rtl" style="margin-bottom: 5px; font-size: 11pt;"><strong><span style="font-family:'B Nazanin';">اسناد قبلی</span></strong></p>
-                                        <img [src]="baseUrl + documentData.previousDocumentsPath" alt="Previous Documents" style="max-width: 250px; max-height: 250px; border: 2px solid #333; border-radius: 4px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                        <p style="display: none; color: #999; font-size: 10pt;">سند موجود نیست</p>
-                                    </div>
-                                    
-                                    <div *ngIf="documentData.existingDocumentsPath" style="text-align: center; min-width: 200px;">
-                                        <p dir="rtl" style="margin-bottom: 5px; font-size: 11pt;"><strong><span style="font-family:'B Nazanin';">اسناد موجود</span></strong></p>
-                                        <img [src]="baseUrl + documentData.existingDocumentsPath" alt="Existing Documents" style="max-width: 250px; max-height: 250px; border: 2px solid #333; border-radius: 4px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                        <p style="display: none; color: #999; font-size: 10pt;">سند موجود نیست</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        
+
                     </tbody>
                 </table>
 

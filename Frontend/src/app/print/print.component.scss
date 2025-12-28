@@ -22,6 +22,26 @@ table {
   }
 
   @media print {
+    @page {
+      size: A4;
+      margin: 10mm;
+    }
+    
+    body {
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .container {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
     .no-print {
       display: none !important;
     }
@@ -34,11 +54,19 @@ table {
     
     table {
       page-break-inside: auto;
+      width: 100% !important;
+      border-collapse: collapse !important;
     }
     
     tr {
       page-break-inside: avoid;
       page-break-after: auto;
+    }
+
+    /* Ensure content stays on one page */
+    .container {
+      overflow: hidden;
+      page-break-after: avoid;
     }
   }
   

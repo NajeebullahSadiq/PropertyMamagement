@@ -42,7 +42,7 @@
               
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوع سند</label>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت سند</label>
                   <ng-select formControlName="documentType" (change)="onDocumentTypeChange()" class="custom-ng-select">
                     <ng-option value="قباله شرعی">قباله شرعی</ng-option>
                     <ng-option value="سند ملکیت">سند ملکیت</ng-option>
@@ -55,7 +55,7 @@
                 </div>
 
                 <div *ngIf="requiresIssuanceFields()">
-                  <label for="issuanceNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر صدور</label>
+                  <label for="issuanceNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر قباله</label>
                   <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                       <i class="fas fa-hashtag"></i>
