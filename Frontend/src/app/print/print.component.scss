@@ -12,7 +12,33 @@ table {
   }
   hr {
     border: 0;
-    border-top: 3px solid #000; /* Adjust the width of the line by changing the '3px' value */
+    border-top: 3px solid #000;
     width: 100%;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    img {
+      page-break-inside: avoid;
+      max-width: 100%;
+      height: auto;
+    }
+    
+    table {
+      page-break-inside: auto;
+    }
+    
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
   }
   

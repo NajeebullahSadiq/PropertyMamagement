@@ -63,7 +63,7 @@ export class LocalizationService {
     { value: 'Block', label: 'بلاک' },
     { value: 'Land', label: 'زمین' },
     { value: 'Garden', label: 'باغ' },
-    { value: 'Hill', label: 'تپه' },
+    { value: 'Hill', label: 'مارکیټ' },
     { value: 'Other', label: 'سایر' }
   ];
 

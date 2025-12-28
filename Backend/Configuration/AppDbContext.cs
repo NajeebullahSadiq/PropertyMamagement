@@ -838,6 +838,40 @@ namespace WebAPIBackend.Configuration
                 entity.ToTable("Area", "look");
             });
 
+            modelBuilder.Entity<GetPrintType>(entity =>
+            {
+                entity
+                    .HasNoKey()
+                    .ToView("GetPrintType");
+
+                entity.Property(e => e.North).HasColumnName("north");
+                entity.Property(e => e.South).HasColumnName("south");
+                entity.Property(e => e.West).HasColumnName("west");
+                entity.Property(e => e.East).HasColumnName("east");
+
+                entity.Property(e => e.tSellerVillage).HasColumnName("TSellerVillage");
+                entity.Property(e => e.tSellerProvince).HasColumnName("TSellerProvince");
+                entity.Property(e => e.tSellerDistrict).HasColumnName("TSellerDistrict");
+
+                entity.Property(e => e.tBuyerVillage).HasColumnName("TBuyerVillage");
+                entity.Property(e => e.tBuyerProvince).HasColumnName("TBuyerProvince");
+                entity.Property(e => e.tBuyerDistrict).HasColumnName("TBuyerDistrict");
+            });
+
+            modelBuilder.Entity<getVehiclePrintData>(entity =>
+            {
+                entity
+                    .HasNoKey()
+                    .ToView("getVehiclePrintData");
+            });
+
+            modelBuilder.Entity<UserProfileWithCompany>(entity =>
+            {
+                entity
+                    .HasNoKey()
+                    .ToView("UserProfileWithCompany");
+            });
+
         }
 
 

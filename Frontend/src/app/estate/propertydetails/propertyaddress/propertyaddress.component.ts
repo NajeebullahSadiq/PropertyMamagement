@@ -72,12 +72,29 @@ export class PropertyaddressComponent {
       this.selerService.addPaddress(paddress).subscribe(result => {
         if(result.id!==0){
           this.toastr.success("معلومات این این معامله موفقانه ثبت و تکمیل گردید");
-          
-          const url = this.router.createUrlTree(['print', paddress.PropertyDetailsId]).toString();
-          const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-          if (newWindow) {
-              newWindow.opener = null;
-          }
+
+          this.propertyDetailsService.getPropertyPrintData(paddress.PropertyDetailsId).subscribe({
+            next: () => {
+              const tree = this.router.createUrlTree(['/print', paddress.PropertyDetailsId]);
+              const url = tree.toString();
+              const absoluteUrl = `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
+              const newWindow = window.open(absoluteUrl, '_blank', 'noopener,noreferrer');
+              if (newWindow) {
+                newWindow.opener = null;
+              } else {
+                this.router.navigateByUrl(tree);
+              }
+            },
+            error: (err) => {
+              if (err?.status === 404) {
+                this.toastr.info('دیتای چاپ پیدا نشد. ممکن است این معامله هنوز تکمیل نشده باشد.');
+              } else if (err?.status === 401) {
+                this.toastr.warning('جلسه شما ختم شده است. لطفاً دوباره وارد شوید.');
+              } else {
+                this.toastr.error('خطا در دریافت معلومات چاپ. لطفاً دوباره تلاش کنید.');
+              }
+            }
+          });
         }
       });
       this.parentComponent.resetChild();

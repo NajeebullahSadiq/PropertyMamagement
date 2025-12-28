@@ -24,6 +24,84 @@ namespace WebAPIBackend.Controllers
             _context = context;
             _userManager = userManager;
         }
+
+        private static readonly HashSet<string> AllowedPropertyTypeNames = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "House",
+            "Apartment",
+            "Shop",
+            "Block",
+            "Land",
+            "Garden",
+            "Hill",
+            "Other"
+        };
+
+        private async Task<(bool IsValid, string? ErrorMessage, string? NormalizedCustomPropertyType)> ValidateAndNormalizePropertyTypeAsync(int? propertyTypeId, string? customPropertyType)
+        {
+            if (!propertyTypeId.HasValue)
+            {
+                return (false, "انتخاب نوعیت ملکیت الزامی است", null);
+            }
+
+            var propertyType = await _context.PropertyTypes.FindAsync(propertyTypeId.Value);
+            if (propertyType == null || string.IsNullOrWhiteSpace(propertyType.Name) || !AllowedPropertyTypeNames.Contains(propertyType.Name))
+            {
+                return (false, "نوعیت ملکیت انتخاب‌شده درست نیست", null);
+            }
+
+            var isOtherPropertyType = propertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase);
+            if (isOtherPropertyType)
+            {
+                if (string.IsNullOrWhiteSpace(customPropertyType))
+                {
+                    return (false, "نوشتن نوع ملکیت (سایر) الزامی است", null);
+                }
+
+                return (true, null, customPropertyType.Trim());
+            }
+
+            return (true, null, null);
+        }
+
+        private async Task UpsertPropertyAddressAsync(int propertyDetailsId, string userId, PropertyDetail request)
+        {
+            if (request?.PropertyAddresses == null)
+            {
+                return;
+            }
+
+            var incoming = request.PropertyAddresses.FirstOrDefault();
+            if (incoming == null)
+            {
+                return;
+            }
+
+            var existing = await _context.PropertyAddresses
+                .FirstOrDefaultAsync(x => x.PropertyDetailsId == propertyDetailsId);
+
+            if (existing == null)
+            {
+                var address = new PropertyAddress
+                {
+                    ProvinceId = incoming.ProvinceId,
+                    DistrictId = incoming.DistrictId,
+                    Village = incoming.Village,
+                    PropertyDetailsId = propertyDetailsId,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId
+                };
+                _context.PropertyAddresses.Add(address);
+            }
+            else
+            {
+                existing.ProvinceId = incoming.ProvinceId;
+                existing.DistrictId = incoming.DistrictId;
+                existing.Village = incoming.Village;
+            }
+
+            await _context.SaveChangesAsync();
+        }
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -66,9 +144,11 @@ namespace WebAPIBackend.Controllers
                              p.Des,
                              p.RoyaltyAmount,
                              p.FilePath,
-                             PropertyTypeText = p.PropertyType.Name,
-                             UnitTypeText = p.PunitType.Name,
-                             TransactionTypeText = p.TransactionType.Name,
+                             PropertyTypeText = p.PropertyType != null && p.PropertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase) && p.CustomPropertyType != null
+                                ? p.CustomPropertyType
+                                : p.PropertyType != null ? p.PropertyType.Name : null,
+                             UnitTypeText = p.PunitType != null ? p.PunitType.Name : null,
+                             TransactionTypeText = p.TransactionType != null ? p.TransactionType.Name : null,
                              p.iscomplete,
                              SellerName = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().FirstName : null,
                              BuyerName = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().FirstName : null,
@@ -105,6 +185,12 @@ namespace WebAPIBackend.Controllers
 
             var userId = userIdClaim.Value;
 
+            var (isValid, errorMessage, normalizedCustomPropertyType) = await ValidateAndNormalizePropertyTypeAsync(request.PropertyTypeId, request.CustomPropertyType);
+            if (!isValid)
+            {
+                return StatusCode(400, errorMessage);
+            }
+
             //  var userId = 25;
             var property = new PropertyDetail
             {
@@ -114,6 +200,7 @@ namespace WebAPIBackend.Controllers
                 NumofFloor=request.NumofFloor,
                 NumofRooms=request.NumofRooms,
                 PropertyTypeId=request.PropertyTypeId,
+                CustomPropertyType = normalizedCustomPropertyType,
                 Price=request.Price,
                 PriceText=request.PriceText,
                 RoyaltyAmount= (request.Price ?? 0) * 0.01,
@@ -139,6 +226,9 @@ namespace WebAPIBackend.Controllers
             };
             _context.Add(property);
             await _context.SaveChangesAsync();
+
+            await UpsertPropertyAddressAsync(property.Id, userId, request);
+
             var result = new { Id = property.Id, PropertyTypeId = property.PropertyTypeId };
             return Ok(result);
         }
@@ -213,6 +303,14 @@ namespace WebAPIBackend.Controllers
                 return NotFound();
             }
 
+            var (isValid, errorMessage, normalizedCustomPropertyType) = await ValidateAndNormalizePropertyTypeAsync(request.PropertyTypeId, request.CustomPropertyType);
+            if (!isValid)
+            {
+                return StatusCode(400, errorMessage);
+            }
+
+            request.CustomPropertyType = normalizedCustomPropertyType;
+
             // Store the original values of the CreatedBy and CreatedOn properties
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
@@ -258,6 +356,8 @@ namespace WebAPIBackend.Controllers
 
             await _context.SaveChangesAsync();
 
+            await UpsertPropertyAddressAsync(existingProperty.Id, userId, request);
+
             var result = new { Id = request.Id, PropertyTypeId = request.PropertyTypeId };
             return Ok(result);
         }
@@ -266,88 +366,114 @@ namespace WebAPIBackend.Controllers
         [HttpGet("GetPrintRecord/{id}")]
         public async Task<IActionResult> GetPrintRecordById(int id)
         {
-            // Call the DbContext to retrieve the data by ID
-            var data = await _context.GetPrintType
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (data == null)
+            try
             {
-                return NotFound(); // Return 404 if the data with the given ID is not found
+                // Call the DbContext to retrieve the data by ID
+                var data = await _context.GetPrintType
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (data == null)
+                {
+                    return NotFound(); // Return 404 if the data with the given ID is not found
+                }
+
+                // Convert the 'CreatedAt' property to Shamsi (Persian) date format
+                var persianCalendar = new PersianCalendar();
+                string shamsiDate = string.Empty;
+                if (data.CreatedAt.HasValue)
+                {
+                    var createdAt = data.CreatedAt.Value;
+                    shamsiDate = $"{persianCalendar.GetYear(createdAt)}/{persianCalendar.GetMonth(createdAt)}/{persianCalendar.GetDayOfMonth(createdAt)}";
+                }
+
+                // Create a custom result object with the desired properties
+                var result = new
+                {
+                    Id = data.Id,
+                    DocumentType = data.DocumentType,
+                    IssuanceNumber = data.IssuanceNumber,
+                    IssuanceDate = data.IssuanceDate,
+                    SerialNumber = data.SerialNumber,
+                    TransactionDate = data.TransactionDate,
+                    PNumber = data.PNumber,
+                    PArea = data.PArea,
+                    NumofRooms = data.NumofRooms,
+                    North = data.North,
+                    South = data.South,
+                    West = data.West,
+                    East = data.East,
+                    Price = data.Price,
+                    PriceText = data.PriceText ?? string.Empty,
+                    RoyaltyAmount = data.RoyaltyAmount,
+                    PropertypeType = data.PropertypeType,
+                    CreatedAt = data.CreatedAt,
+                    // Location - Province and District
+                    Province = data.Province,
+                    District = data.District,
+                    Village = data.Village,
+                    // SellerDetails
+                    SellerFirstName = data.SellerFirstName,
+                    SellerFatherName = data.SellerFatherName,
+                    SellerIndentityCardNumber = data.SellerIndentityCardNumber,
+                    SellerVillage = data.SellerVillage,
+                    tSellerVillage = data.tSellerVillage,
+                    SellerPhoto = data.SellerPhoto,
+
+                    // Location - SellerProvince and SellerDistrict
+                    SellerProvince = data.SellerProvince,
+                    SellerDistrict = data.SellerDistrict,
+                    tSellerProvince = data.tSellerProvince,
+                    tSellerDistrict = data.tSellerDistrict,
+
+                    // BuyerDetails
+                    BuyerFirstName = data.BuyerFirstName,
+                    BuyerFatherName = data.BuyerFatherName,
+                    BuyerIndentityCardNumber = data.BuyerIndentityCardNumber,
+                    BuyerVillage = data.BuyerVillage,
+                    tBuyerVillage = data.tBuyerVillage,
+                    BuyerPhoto = data.BuyerPhoto,
+
+                    // Location - BuyerProvince and BuyerDistrict
+                    BuyerProvince = data.BuyerProvince,
+                    BuyerDistrict = data.BuyerDistrict,
+                    tBuyerProvince = data.tBuyerProvince,
+                    tBuyerDistrict = data.tBuyerDistrict,
+
+                    // WitnessDetails
+                    WitnessOneFirstName = data.WitnessOneFirstName,
+                    WitnessOneFatherName = data.WitnessOneFatherName,
+                    WitnessOneIndentityCardNumber = data.WitnessOneIndentityCardNumber,
+
+                    WitnessTwoFirstName = data.WitnessTwoFirstName,
+                    WitnessTwoFatherName = data.WitnessTwoFatherName,
+                    WitnessTwoIndentityCardNumber = data.WitnessTwoIndentityCardNumber,
+
+                    // PropertyUnitType and TransactionType
+                    UnitType = data.UnitType,
+                    TransactionType = data.TransactionType,
+                    CreatedAtShamsi = shamsiDate,
+
+                    // Property Documents and Images
+                    FilePath = data.FilePath,
+                    PreviousDocumentsPath = data.PreviousDocumentsPath,
+                    ExistingDocumentsPath = data.ExistingDocumentsPath
+                };
+
+                return Ok(result); // Return the data as JSON if found
             }
-
-            // Convert the 'CreatedAt' property to Shamsi (Persian) date format
-            var persianCalendar = new PersianCalendar();
-            string shamsiDate = $"{persianCalendar.GetYear(data.CreatedAt)}/{persianCalendar.GetMonth(data.CreatedAt)}/{persianCalendar.GetDayOfMonth(data.CreatedAt)}";
-
-            // Create a custom result object with the desired properties
-            var result = new
+            catch (Exception ex)
             {
-                Id = data.Id,
-                DocumentType = data.DocumentType,
-                IssuanceNumber = data.IssuanceNumber,
-                IssuanceDate = data.IssuanceDate,
-                SerialNumber = data.SerialNumber,
-                TransactionDate = data.TransactionDate,
-                PNumber = data.PNumber,
-                PArea = data.PArea,
-                NumofRooms = data.NumofRooms,
-                North = data.North,
-                South = data.South,
-                West = data.West,
-                East = data.East,
-                Price = data.Price,
-                PriceText = data.PriceText,
-                RoyaltyAmount = data.RoyaltyAmount,
-                PropertypeType = data.PropertypeType,
-                CreatedAt = data.CreatedAt,
-                // Location - Province and District
-                Province = data.Province,
-                District = data.District,
-                Village=data.Village,
-                // SellerDetails
-                SellerFirstName = data.SellerFirstName,
-                SellerFatherName = data.SellerFatherName,
-                SellerIndentityCardNumber = data.SellerIndentityCardNumber,
-                SellerVillage = data.SellerVillage,
-                tSellerVillage = data.tSellerVillage,
-                SellerPhoto = data.SellerPhoto,
+                var hint = ex.Message != null && ex.Message.Contains("GetPrintType")
+                    ? "Database view 'GetPrintType' is missing. Apply the latest migrations / SQL view scripts."
+                    : string.Empty;
 
-                // Location - SellerProvince and SellerDistrict
-                SellerProvince = data.SellerProvince,
-                SellerDistrict = data.SellerDistrict,
-                tSellerProvince = data.tSellerProvince,
-                tSellerDistrict = data.tSellerDistrict,
-
-                // BuyerDetails
-                BuyerFirstName = data.BuyerFirstName,
-                BuyerFatherName = data.BuyerFatherName,
-                BuyerIndentityCardNumber = data.BuyerIndentityCardNumber,
-                BuyerVillage = data.BuyerVillage,
-                tBuyerVillage=data.tBuyerVillage,
-                BuyerPhoto = data.BuyerPhoto,
-
-                // Location - BuyerProvince and BuyerDistrict
-                BuyerProvince = data.BuyerProvince,
-                BuyerDistrict = data.BuyerDistrict,
-                tBuyerProvince = data.tBuyerProvince,
-                tBuyerDistrict = data.tBuyerDistrict,
-
-                // WitnessDetails
-                WitnessOneFirstName = data.WitnessOneFirstName,
-                WitnessOneFatherName = data.WitnessOneFatherName,
-                WitnessOneIndentityCardNumber = data.WitnessOneIndentityCardNumber,
-
-                WitnessTwoFirstName = data.WitnessTwoFirstName,
-                WitnessTwoFatherName = data.WitnessTwoFatherName,
-                WitnessTwoIndentityCardNumber = data.WitnessTwoIndentityCardNumber,
-
-                // PropertyUnitType and TransactionType
-                UnitType = data.UnitType,
-                TransactionType = data.TransactionType,
-                CreatedAtShamsi = shamsiDate // Add the converted Shamsi date to the result object
-            };
-
-            return Ok(result); // Return the data as JSON if found
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while retrieving print record",
+                    error = ex.Message,
+                    hint
+                });
+            }
         }
 
     }

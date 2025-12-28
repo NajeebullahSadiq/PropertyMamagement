@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PropertyDetails } from 'src/app/models/PropertyDetail';
 import { PunitType } from 'src/app/models/PunitType';
+import { propertyAddress } from 'src/app/models/propertyAddress';
 import { PropertyService } from 'src/app/shared/property.service';
 import { PunittypeService } from 'src/app/shared/punittype.service';
 import { SellerService } from 'src/app/shared/seller.service';
@@ -22,6 +23,9 @@ export class PropertydetailsComponent  implements AfterViewInit {
   propertyDetails!: PropertyDetails[];
   unittypes!: PunitType[];
   localizedUnitTypes:any;
+  province:any;
+  districts:any;
+  selectedAddressId: number = 0;
   selectedPropertyId: number=0;
   mainTableId: number =0;
   propertypetype:any;
@@ -51,10 +55,15 @@ export class PropertydetailsComponent  implements AfterViewInit {
     private localizationService: LocalizationService) {
       this.propertyForm = this.fb.group({
         id: [0],
+        propertyTypeId: ['', Validators.required],
+        customPropertyType: [''],
         parea: ['', Validators.required],
         punitTypeId: ['', Validators.required],
         numofFloor: ['', Validators.required],
         numofRooms: ['', Validators.required],
+        provinceId: ['', Validators.required],
+        districtId: ['', Validators.required],
+        village: ['', Validators.required],
         north: ['', Validators.required],
         west: ['', Validators.required],
         east: ['', Validators.required],
@@ -82,39 +91,84 @@ export class PropertydetailsComponent  implements AfterViewInit {
   this.selerService.withnessId=0;
   }
   ngOnInit() {
-    this.selectedPropertyId=this.id;
-  if (this.id > 0) {
-    this.propertyDetailsService.getPropertyDetailsById(this.id)
-        .subscribe(properties => {
-          this.properties = properties;
-          this.propertyForm.setValue({
-            id: properties[0].id,
-            parea: properties[0].parea,
-            punitTypeId: properties[0].punitTypeId,
-            numofFloor: properties[0].numofFloor,
-            numofRooms: properties[0].numofRooms,
-            des: properties[0].des,
-            filePath: properties[0].filePath,
-            previousDocumentsPath: properties[0].previousDocumentsPath || '',
-            existingDocumentsPath: properties[0].existingDocumentsPath || '',
-            iscomplete: properties[0].iscomplete,
-            iseditable:properties[0].iseditable,
-            north:properties[0].north,
-            west:properties[0].west,
-            east:properties[0].east,
-            south:properties[0].south,
-            documentType:properties[0].documentType || '',
-            issuanceNumber:properties[0].issuanceNumber || '',
-            issuanceDate:properties[0].issuanceDate || '',
-            serialNumber:properties[0].serialNumber || '',
-            transactionDate:properties[0].transactionDate || '',
-          });
-          this.imageName=properties.map(item => item.filePath).toString();
-          this.propertyDetailsService.updateMainTableId(this.id);
-          this.updateDocumentFieldValidation();
-        });
-  }
+    this.loadPropertyDetails();
       
+  this.propertyDetailsService.getPropertyType().subscribe(res => {
+    this.propertypetype = res;
+    this.localizedPropertyTypes = this.mapPropertyTypesToStandardizedDari(res as any[]);
+
+    const currentPropertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
+    this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
+  });
+
+  this.propertyForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
+    this.onPropertyTypeChange();
+    this.applyCustomPropertyTypeValidation(propertyTypeId);
+  });
+
+  }
+
+  loadPropertyDetails() {
+    this.selectedPropertyId = this.id;
+
+    this.selerService.getprovince().subscribe(res => {
+      this.province = res;
+    });
+
+    const effectiveId = this.id > 0 ? this.id : this.propertyDetailsService.mainTableId;
+
+    if (effectiveId > 0) {
+      this.propertyDetailsService.getPropertyDetailsById(effectiveId)
+          .subscribe(properties => {
+            this.properties = properties;
+            this.propertyForm.patchValue({
+              id: properties[0].id,
+              propertyTypeId: properties[0].propertyTypeId || '',
+              customPropertyType: (properties[0] as any).customPropertyType || '',
+              parea: properties[0].parea,
+              punitTypeId: properties[0].punitTypeId,
+              numofFloor: properties[0].numofFloor,
+              numofRooms: properties[0].numofRooms,
+              des: properties[0].des,
+              filePath: properties[0].filePath,
+              previousDocumentsPath: properties[0].previousDocumentsPath || '',
+              existingDocumentsPath: properties[0].existingDocumentsPath || '',
+              iscomplete: properties[0].iscomplete,
+              iseditable:properties[0].iseditable,
+              north:properties[0].north,
+              west:properties[0].west,
+              east:properties[0].east,
+              south:properties[0].south,
+              documentType:properties[0].documentType || '',
+              issuanceNumber:properties[0].issuanceNumber || '',
+              issuanceDate:properties[0].issuanceDate || '',
+              serialNumber:properties[0].serialNumber || '',
+              transactionDate:properties[0].transactionDate || '',
+            });
+            this.imageName=properties.map(item => item.filePath).toString();
+            this.previousDocumentsPath = properties[0].previousDocumentsPath || '';
+            this.existingDocumentsPath = properties[0].existingDocumentsPath || '';
+            this.propertyDetailsService.updateMainTableId(effectiveId);
+            this.updateDocumentFieldValidation();
+          });
+
+      this.selerService.getPaddressById(effectiveId)
+        .subscribe(addr => {
+          if (addr && addr.length > 0) {
+            this.selectedAddressId = addr[0].id;
+            this.propertyForm.patchValue({
+              provinceId: addr[0].provinceId,
+              districtId: addr[0].districtId,
+              village: addr[0].village
+            });
+            if (addr[0].provinceId) {
+              this.selerService.getdistrict(addr[0].provinceId.valueOf()).subscribe(res => {
+                this.districts = res;
+              });
+            }
+          }
+        });
+    }
   }
 
   loadDepartments(): void {
@@ -130,6 +184,16 @@ export class PropertydetailsComponent  implements AfterViewInit {
     propertyDetails.filePath=this.imageName;
     propertyDetails.previousDocumentsPath=this.previousDocumentsPath;
     propertyDetails.existingDocumentsPath=this.existingDocumentsPath;
+
+    const address: propertyAddress = {
+      id: this.selectedAddressId || 0,
+      provinceId: this.propertyForm.get('provinceId')?.value,
+      districtId: this.propertyForm.get('districtId')?.value,
+      PropertyDetailsId: 0,
+      village: this.propertyForm.get('village')?.value
+    };
+    (propertyDetails as any).propertyAddresses = [address];
+
      if(propertyDetails.id===null){
       propertyDetails.id=0;
     }
@@ -167,6 +231,16 @@ export class PropertydetailsComponent  implements AfterViewInit {
     propertyDetails.filePath=this.imageName;
     propertyDetails.previousDocumentsPath=this.previousDocumentsPath;
     propertyDetails.existingDocumentsPath=this.existingDocumentsPath;
+
+    const address: propertyAddress = {
+      id: this.selectedAddressId || 0,
+      provinceId: this.propertyForm.get('provinceId')?.value,
+      districtId: this.propertyForm.get('districtId')?.value,
+      PropertyDetailsId: this.selectedPropertyId || 0,
+      village: this.propertyForm.get('village')?.value
+    };
+    (propertyDetails as any).propertyAddresses = [address];
+
     if(propertyDetails.id===0 && this.selectedPropertyId!==0 || this.selectedPropertyId!==null){
       propertyDetails.id=this.selectedPropertyId;
     }
@@ -208,15 +282,15 @@ export class PropertydetailsComponent  implements AfterViewInit {
     }
   }
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName = event;
   }
   
   previousDocumentsUploadFinished = (event:string) => { 
-    this.previousDocumentsPath="Resources\\Images\\"+event;
+    this.previousDocumentsPath = event;
   }
   
   existingDocumentsUploadFinished = (event:string) => { 
-    this.existingDocumentsPath="Resources\\Images\\"+event;
+    this.existingDocumentsPath = event;
   }
   resetChild(): void {
     if (this.childComponent) {
@@ -224,15 +298,21 @@ export class PropertydetailsComponent  implements AfterViewInit {
       this.childComponent.reset();
       this.propertyDetailsService.mainTableId=0;
       this.selectedPropertyId=0;
+      this.selectedAddressId=0;
       this.id=0;
       this.router.navigate(['/dashboard/estate']);
     }
     this.propertyForm.reset({
       id: 0,
+      propertyTypeId: '',
+      customPropertyType: '',
       parea:'',
       punitTypeId:'',
       numofFloor:'',
       numofRooms:'',
+      provinceId:'',
+      districtId:'',
+      village:'',
       des:'',
       filePath:'',
       previousDocumentsPath:'',
@@ -287,6 +367,60 @@ export class PropertydetailsComponent  implements AfterViewInit {
       };
     });
   }
+
+  mapPropertyTypesToStandardizedDari(backendTypes: any[]): any[] {
+    const supportedOrder = ['House', 'Apartment', 'Shop', 'Block', 'Land', 'Garden', 'Hill', 'Other'];
+    const byNameLower = new Map<string, any>();
+    (backendTypes || []).forEach(t => {
+      if (t?.name) {
+        const normalized = String(t.name).toLowerCase() === 'othert' ? 'other' : String(t.name).toLowerCase();
+        byNameLower.set(normalized, t);
+      }
+    });
+
+    return supportedOrder
+      .map(value => {
+        const backend = byNameLower.get(value.toLowerCase());
+        if (!backend) {
+          return null;
+        }
+        const localized = this.localizationService.propertyTypes.find(pt => pt.value === value);
+        if (!localized?.label) {
+          return null;
+        }
+        return { id: backend.id, name: localized.label };
+      })
+      .filter(Boolean);
+  }
+
+  private applyCustomPropertyTypeValidation(propertyTypeId: any, emitEvent: boolean = false): void {
+    const customPropertyTypeControl = this.propertyForm.get('customPropertyType');
+    if (!customPropertyTypeControl) {
+      return;
+    }
+
+    if (!this.localizedPropertyTypes || this.localizedPropertyTypes.length === 0) {
+      return;
+    }
+
+    const selectedPropertyType = this.localizedPropertyTypes.find((pt: any) => pt.id === propertyTypeId);
+    if (selectedPropertyType && selectedPropertyType.name === 'سایر') {
+      customPropertyTypeControl.setValidators([Validators.required]);
+    } else {
+      customPropertyTypeControl.clearValidators();
+      customPropertyTypeControl.reset();
+    }
+    customPropertyTypeControl.updateValueAndValidity({ emitEvent });
+  }
+
+  isOtherPropertyType(): boolean {
+    const propertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
+    const selectedPropertyType = this.localizedPropertyTypes?.find((pt: any) => pt.id === propertyTypeId);
+    return selectedPropertyType && selectedPropertyType.name === 'سایر';
+  }
+
+  get propertyTypeId() { return this.propertyForm.get('propertyTypeId'); }
+  get customPropertyType() { return this.propertyForm.get('customPropertyType'); }
 
   /**
    * Map backend unit types to localized versions with Dari labels
@@ -349,6 +483,9 @@ export class PropertydetailsComponent  implements AfterViewInit {
   get issuanceDate() { return this.propertyForm.get('issuanceDate'); }
   get serialNumber() { return this.propertyForm.get('serialNumber'); }
   get transactionDate() { return this.propertyForm.get('transactionDate'); }
+  get provinceId() { return this.propertyForm.get('provinceId'); }
+  get districtId() { return this.propertyForm.get('districtId'); }
+  get village() { return this.propertyForm.get('village'); }
 
   /**
    * Check if document type requires issuance number and date
@@ -428,6 +565,12 @@ export class PropertydetailsComponent  implements AfterViewInit {
     issuanceDateControl?.updateValueAndValidity();
     serialNumberControl?.updateValueAndValidity();
     transactionDateControl?.updateValueAndValidity();
+  }
+
+  filterResults(getId:any) {
+    this.selerService.getdistrict(getId.id).subscribe(res => {
+      this.districts = res;
+    });
   }
 
 

@@ -25,18 +25,6 @@ namespace WebAPIBackend.Controllers
             _context = context;
             _userManager = userManager;
         }
-
-        private static readonly HashSet<string> AllowedPropertyTypeNames = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "House",
-            "Apartment",
-            "Shop",
-            "Block",
-            "Land",
-            "Garden",
-            "Hill",
-            "Other"
-        };
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -195,7 +183,6 @@ namespace WebAPIBackend.Controllers
             }
 
             var userId = userIdClaim.Value;
-            // Allow multiple sellers - removed restriction
             if (request.PropertyDetailsId.Equals(0))
             {
                 return StatusCode(312, "Main Table is Empty");
@@ -203,6 +190,18 @@ namespace WebAPIBackend.Controllers
 
             // Validate conditional document requirements based on role type
             var roleType = request.RoleType ?? "Seller";
+            var pluralSellerRoles = new[] { "Sellers", "Lessors", "Sellers in a revocable sale" };
+            var allowsMultipleSellers = pluralSellerRoles.Contains(roleType);
+            if (!allowsMultipleSellers)
+            {
+                var existingSellerCount = await _context.SellerDetails
+                    .CountAsync(x => x.PropertyDetailsId == request.PropertyDetailsId);
+
+                if (existingSellerCount > 0)
+                {
+                    return StatusCode(400, "فقد ثبت یک عاقد (فروشنده ، بایع بیعه جایزی و کریه)");
+                }
+            }
             var agentRoles = new[] { "Sales Agent", "Lease Agent", "Agent for a revocable sale" };
             
             // If agent role, authorization letter is required
@@ -438,11 +437,6 @@ namespace WebAPIBackend.Controllers
                 }
             }
 
-            if (!request.PropertyTypeId.HasValue)
-            {
-                return StatusCode(400, "انتخاب نوعیت ملکیت الزامی است");
-            }
-
             // Transaction / price rules
             var supportedTransactionTypes = new[] { "Purchase", "Rent", "Revocable Sale", "Other" };
             if (!string.IsNullOrWhiteSpace(request.TransactionType) && !supportedTransactionTypes.Contains(request.TransactionType))
@@ -498,25 +492,6 @@ namespace WebAPIBackend.Controllers
                 request.HalfPrice = null;
             }
 
-            var propertyType = await _context.PropertyTypes.FindAsync(request.PropertyTypeId.Value);
-            if (propertyType == null || string.IsNullOrWhiteSpace(propertyType.Name) || !AllowedPropertyTypeNames.Contains(propertyType.Name))
-            {
-                return StatusCode(400, "نوعیت ملکیت انتخاب‌شده درست نیست");
-            }
-
-            var isOtherPropertyType = propertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase);
-            if (isOtherPropertyType)
-            {
-                if (string.IsNullOrWhiteSpace(request.CustomPropertyType))
-                {
-                    return StatusCode(400, "نوشتن نوع ملکیت (سایر) الزامی است");
-                }
-                request.CustomPropertyType = request.CustomPropertyType.Trim();
-            }
-            else
-            {
-                request.CustomPropertyType = null;
-            }
             //var user = await _userManager.GetUserAsync(User);
            
             // Convert rental dates to UTC if they exist
@@ -552,8 +527,6 @@ namespace WebAPIBackend.Controllers
                 AuthorizationLetter=request.AuthorizationLetter,
                 TaxIdentificationNumber = request.TaxIdentificationNumber,
                 AdditionalDetails = request.AdditionalDetails,
-                PropertyTypeId = request.PropertyTypeId,
-                CustomPropertyType = request.CustomPropertyType,
                 Price = request.Price,
                 PriceText = request.PriceText,
                 RoyaltyAmount = request.RoyaltyAmount,
@@ -613,11 +586,6 @@ namespace WebAPIBackend.Controllers
                 }
             }
 
-            if (!request.PropertyTypeId.HasValue)
-            {
-                return StatusCode(400, "انتخاب نوعیت ملکیت الزامی است");
-            }
-
             // Transaction / price rules
             var supportedTransactionTypes = new[] { "Purchase", "Rent", "Revocable Sale", "Other" };
             if (!string.IsNullOrWhiteSpace(request.TransactionType) && !supportedTransactionTypes.Contains(request.TransactionType))
@@ -672,25 +640,6 @@ namespace WebAPIBackend.Controllers
                 request.HalfPrice = null;
             }
 
-            var propertyType = await _context.PropertyTypes.FindAsync(request.PropertyTypeId.Value);
-            if (propertyType == null || string.IsNullOrWhiteSpace(propertyType.Name) || !AllowedPropertyTypeNames.Contains(propertyType.Name))
-            {
-                return StatusCode(400, "نوعیت ملکیت انتخاب‌شده درست نیست");
-            }
-
-            var isOtherPropertyType = propertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase);
-            if (isOtherPropertyType)
-            {
-                if (string.IsNullOrWhiteSpace(request.CustomPropertyType))
-                {
-                    return StatusCode(400, "نوشتن نوع ملکیت (سایر) الزامی است");
-                }
-                request.CustomPropertyType = request.CustomPropertyType.Trim();
-            }
-            else
-            {
-                request.CustomPropertyType = null;
-            }
 
             // Store the original values of the CreatedBy and CreatedOn properties
             var createdBy = existingProperty.CreatedBy;

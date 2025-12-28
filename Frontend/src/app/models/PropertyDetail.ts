@@ -1,4 +1,3 @@
-
 export interface PropertyDetails {
    
     id: number;
@@ -7,6 +6,7 @@ export interface PropertyDetails {
     numofFloor:number;
     numofRooms:number;
     propertyTypeId:number;
+    customPropertyType?:string;
     price:number;
     priceText:string;
     royaltyAmount:number;
@@ -27,6 +27,8 @@ export interface PropertyDetails {
     serialNumber?:string;
     transactionDate?:Date;
 
+    propertyAddresses?: any[];
+
   }
 
   export interface PropertyDetailsList {
@@ -37,6 +39,7 @@ export interface PropertyDetails {
     numofFloor:number;
     numofRooms:number;
     propertyTypeId:number;
+    customPropertyType?:string;
     price:number;
     priceText:string;
     royaltyAmount:number;

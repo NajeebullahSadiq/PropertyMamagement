@@ -182,7 +182,7 @@
         </div>
 
         <div class="form-group">
-          <label for="reason">دلایل فسخ / لغو معامله:</label>
+          <label for="reason">دلایل فسخ / ابطال معامله:</label>
           <mat-form-field appearance="outline" class="mat-form-field-full">
             <mat-select
               id="reason"
@@ -205,7 +205,7 @@
         </div>
 
         <div class="form-group">
-          <label>اسناد ابطال معامله:</label>
+          <label>اسناد فسخ / ابطال معامله:</label>
           <input type="file" multiple (change)="onCancellationFilesSelected($event)" class="form-control" />
 
           <div class="uploaded-docs" *ngIf="cancellationDocuments.length">
@@ -225,7 +225,7 @@
         </div>
 
         <div class="warning-message">
-          <p>⚠️ پس از ابطال، این معامله دیگر فعال نخواهد بود و مالک می‌تواند ملک را دوباره ثبت کند.</p>
+          <p>⚠️ پس از ابطال، این معامله مدار اعتبار نمی باشد و مالک میتواند ملک را دوباره ثبت کند.</p>
         </div>
       </div>
 

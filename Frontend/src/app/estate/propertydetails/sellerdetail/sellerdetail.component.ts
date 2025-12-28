@@ -155,7 +155,13 @@ export class SellerdetailComponent {
   }
 
   loadSellerDetails() {
-    this.selerService.getSellerById(this.id)
+    const effectiveId = this.id > 0 ? this.id : this.propertyDetailsService.mainTableId;
+    if (effectiveId === 0) {
+      this.sellerDetails = [];
+      this.selectedSellerId = 0;
+      return;
+    }
+    this.selerService.getSellerById(effectiveId)
     .subscribe(sellers => {
       this.sellerDetails = sellers || [];
       if (sellers && sellers.length > 0) {

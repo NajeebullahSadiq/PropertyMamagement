@@ -85,10 +85,14 @@ export class PropertydetailslistComponent {
     );
   }
   onPrint(id:any):void{
-    const url = this.router.createUrlTree(['print', id]).toString();
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+    const tree = this.router.createUrlTree(['/print', id]);
+    const url = tree.toString();
+    const absoluteUrl = `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
+    const newWindow = window.open(absoluteUrl, '_blank', 'noopener,noreferrer');
     if (newWindow) {
-        newWindow.opener = null;
+      newWindow.opener = null;
+    } else {
+      this.router.navigateByUrl(tree);
     }
   }
 }

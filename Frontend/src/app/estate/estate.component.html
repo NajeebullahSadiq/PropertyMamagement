@@ -6,7 +6,7 @@
     </button>
   </div>
   <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-    <mat-tab-group #tabGroup class="modern-tabs">
+    <mat-tab-group #tabGroup class="modern-tabs" (selectedTabChange)="onTabChange($event)">
       <mat-tab class="blue-tab">
         <ng-template matTabLabel>
           <div class="flex items-center gap-2 px-3 py-2">
@@ -49,17 +49,6 @@
         </ng-template>
         <div class="p-6">
           <app-witnessdetail #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
-        </div>
-      </mat-tab>
-      <mat-tab [disabled]="propertyService.mainTableId === 0 || sellerService.withnessId===0">
-        <ng-template matTabLabel>
-          <div class="flex items-center gap-2 px-3 py-2">
-            <mat-icon class="large-icon text-blue-900">location_on</mat-icon>
-            <span class="font-semibold">آدرس</span>
-          </div>
-        </ng-template>
-        <div class="p-6">
-          <app-propertyaddress #propertyAddress [id]="PropertyId"></app-propertyaddress>
         </div>
       </mat-tab>
     </mat-tab-group>

@@ -54,10 +54,6 @@ public partial class BuyerDetail
 
     public string? AdditionalDetails { get; set; }
 
-    public int? PropertyTypeId { get; set; }
-
-    public string? CustomPropertyType { get; set; }
-
     public double? Price { get; set; }
 
     public string? PriceText { get; set; }

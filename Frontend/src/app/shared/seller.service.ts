@@ -16,6 +16,21 @@ export class SellerService {
   withnessId:number=0;
   constructor(private http: HttpClient) { }
 
+  private normalizeBuyerPayload<T extends any>(payload: T): T {
+    if (!payload) {
+      return payload;
+    }
+
+    const clone: any = { ...(payload as any) };
+    if (clone.rentStartDate === '') {
+      clone.rentStartDate = null;
+    }
+    if (clone.rentEndDate === '') {
+      clone.rentEndDate = null;
+    }
+    return clone as T;
+  }
+
   addSellerdetails(sellerdetails: SellerDetail): Observable<SellerDetail> {
     return this.http.post<SellerDetail>(this.baseUrl, sellerdetails);
   }
@@ -24,11 +39,13 @@ export class SellerService {
     return this.http.put<SellerDetail>(url, sellerdetails);
   }
   addBuyerdetails(sellerdetails: SellerDetail): Observable<SellerDetail> {
-    return this.http.post<SellerDetail>(this.baseUrl+'/addBuyerDetails', sellerdetails);
+    const payload = this.normalizeBuyerPayload(sellerdetails);
+    return this.http.post<SellerDetail>(this.baseUrl+'/addBuyerDetails', payload);
   }
   updateBuyerdetails(sellerdetails: SellerDetail): Observable<SellerDetail> {
     const url = `${this.baseUrl+"/UpdateBuyer"}/${sellerdetails.id}`;
-    return this.http.put<SellerDetail>(url, sellerdetails);
+    const payload = this.normalizeBuyerPayload(sellerdetails);
+    return this.http.put<SellerDetail>(url, payload);
   }
   addWitnessdetails(sellerdetails: witnessDetail): Observable<witnessDetail> {
     return this.http.post<witnessDetail>(this.baseUrl+'/addWitnessdetails', sellerdetails);

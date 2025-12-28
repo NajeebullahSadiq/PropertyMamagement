@@ -31,8 +31,6 @@ export class BuyerdetailComponent {
   province:any;
   district:any;
   district2:any;
-  propertyTypes:any;
-  localizedPropertyTypes:any;
   transactionTypes:any;
   roleTypes: any = [];
   duplicateError: string = '';
@@ -78,8 +76,6 @@ export class BuyerdetailComponent {
       nationalIdCard:['', Validators.required],
       roleType: ['Buyer', Validators.required],
       authorizationLetter: [''],
-      propertyTypeId: ['', Validators.required],
-      customPropertyType: [''],
       price: [''],
       priceText: [''],
       royaltyAmount: [''],
@@ -175,11 +171,6 @@ export class BuyerdetailComponent {
       this.lastTransactionType = transactionType || null;
     });
 
-    // Add dynamic validation for custom property type when "سایر" is selected
-    this.sellerForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
-      this.applyCustomPropertyTypeValidation(propertyTypeId);
-    });
-
     this.sellerForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
       const volumeControl = this.sellerForm.get('tazkiraVolume');
       const pageControl = this.sellerForm.get('tazkiraPage');
@@ -223,15 +214,6 @@ export class BuyerdetailComponent {
     
     // Load transaction types from localization service
     this.transactionTypes = this.localizationService.transactionTypes;
-    // Load property types
-    this.propertyDetailsService.getPropertyType().subscribe(res => {
-      this.propertyTypes = res;
-      this.localizedPropertyTypes = this.mapPropertyTypesToStandardizedDari(res as any[]);
-
-      // Re-apply validation in case form values were patched before property types loaded
-      const currentPropertyTypeId = this.sellerForm.get('propertyTypeId')?.value;
-      this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
-    });
 
     // Recalculate derived amounts whenever the numeric price changes
     this.sellerForm.get('price')?.valueChanges.subscribe(() => {
@@ -242,7 +224,13 @@ export class BuyerdetailComponent {
   }
 
   loadBuyerDetails() {
-    this.selerService.getBuyerById(this.id)
+    const effectiveId = this.id > 0 ? this.id : this.propertyDetailsService.mainTableId;
+    if (effectiveId === 0) {
+      this.sellerDetails = [];
+      this.selectedSellerId = 0;
+      return;
+    }
+    this.selerService.getBuyerById(effectiveId)
     .subscribe(sellers => {
       this.sellerDetails = sellers || [];
       if (sellers && sellers.length > 0) {
@@ -271,8 +259,6 @@ export class BuyerdetailComponent {
           nationalIdCard:firstBuyer.nationalIdCardPath || '',
           roleType: firstBuyer.roleType || 'Buyer',
           authorizationLetter: firstBuyer.authorizationLetter || '',
-          propertyTypeId: firstBuyer.propertyTypeId || '',
-          customPropertyType: firstBuyer.customPropertyType || '',
           price: firstBuyer.price || '',
           priceText: firstBuyer.priceText || '',
           royaltyAmount: firstBuyer.royaltyAmount || '',
@@ -426,8 +412,6 @@ updateBuyerDetails(): void {
       nationalIdCard: selectedBuyer.nationalIdCardPath || '',
       roleType: selectedBuyer.roleType || 'Buyer',
       authorizationLetter: selectedBuyer.authorizationLetter || '',
-      propertyTypeId: selectedBuyer.propertyTypeId || '',
-      customPropertyType: selectedBuyer.customPropertyType || '',
       price: selectedBuyer.price || '',
       priceText: selectedBuyer.priceText || '',
       royaltyAmount: selectedBuyer.royaltyAmount || '',
@@ -621,12 +605,18 @@ uploadFinished = (event:string) => {
 nationalIdUploadFinished = (event:string) => { 
   this.nationalIdCardName="Resources\\Images\\"+event;
   this.sellerForm.patchValue({ nationalIdCard: this.nationalIdCardName });
+  this.sellerForm.get('nationalIdCard')?.markAsTouched();
+  this.sellerForm.get('nationalIdCard')?.markAsDirty();
+  this.sellerForm.get('nationalIdCard')?.updateValueAndValidity();
   console.log('National ID uploaded: '+event+'=======================');
 }
 
 authorizationLetterUploadFinished = (event:string) => {
   this.authorizationLetterName="Resources\\Images\\"+event;
   this.sellerForm.patchValue({ authorizationLetter: this.authorizationLetterName });
+  this.sellerForm.get('authorizationLetter')?.markAsTouched();
+  this.sellerForm.get('authorizationLetter')?.markAsDirty();
+  this.sellerForm.get('authorizationLetter')?.updateValueAndValidity();
   console.log('Authorization Letter uploaded: '+event+'=======================');
 }
 
@@ -647,6 +637,9 @@ profilePreviewChanged = (localObjectUrl: string) => {
 profileImageUploaded = (dbPath: string) => {
   this.imageName = dbPath || '';
   this.sellerForm.patchValue({ photo: this.imageName });
+  this.sellerForm.get('photo')?.markAsTouched();
+  this.sellerForm.get('photo')?.markAsDirty();
+  this.sellerForm.get('photo')?.updateValueAndValidity();
   this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
 }
 
@@ -660,71 +653,6 @@ isAuthorizedAgent(): boolean {
   ];
   return roleType && agentRoles.includes(roleType);
 }
-
-/**
- * Map backend property types to localized versions with Dari labels
- */
-mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
-  return backendTypes.map(type => {
-    const localized = this.localizationService.propertyTypes.find(
-      pt => pt.value.toLowerCase() === type.name.toLowerCase()
-    );
-    return {
-      id: type.id,
-      name: localized ? localized.label : type.name
-    };
-  });
-}
-
-  /**
-   * Standardize property types to the required 8 options with Dari labels only.
-   * Any backend values outside the supported list are ignored to prevent English/extra options.
-   */
-  mapPropertyTypesToStandardizedDari(backendTypes: any[]): any[] {
-    const supportedOrder = ['House', 'Apartment', 'Shop', 'Block', 'Land', 'Garden', 'Hill', 'Other'];
-    const byNameLower = new Map<string, any>();
-    (backendTypes || []).forEach(t => {
-      if (t?.name) {
-        const normalized = String(t.name).toLowerCase() === 'othert' ? 'other' : String(t.name).toLowerCase();
-        byNameLower.set(normalized, t);
-      }
-    });
-
-    return supportedOrder
-      .map(value => {
-        const backend = byNameLower.get(value.toLowerCase());
-        if (!backend) {
-          return null;
-        }
-        const localized = this.localizationService.propertyTypes.find(pt => pt.value === value);
-        if (!localized?.label) {
-          return null;
-        }
-        return { id: backend.id, name: localized.label };
-      })
-      .filter(Boolean);
-  }
-
-  private applyCustomPropertyTypeValidation(propertyTypeId: any, emitEvent: boolean = false): void {
-    const customPropertyTypeControl = this.sellerForm.get('customPropertyType');
-    if (!customPropertyTypeControl) {
-      return;
-    }
-
-    // If property types haven't loaded yet, do not clear user-entered value.
-    if (!this.localizedPropertyTypes || this.localizedPropertyTypes.length === 0) {
-      return;
-    }
-
-    const selectedPropertyType = this.localizedPropertyTypes.find((pt: any) => pt.id === propertyTypeId);
-    if (selectedPropertyType && selectedPropertyType.name === 'سایر') {
-      customPropertyTypeControl.setValidators([Validators.required]);
-    } else {
-      customPropertyTypeControl.clearValidators();
-      customPropertyTypeControl.reset();
-    }
-    customPropertyTypeControl.updateValueAndValidity({ emitEvent });
-  }
 
   get firstName() { return this.sellerForm.get('firstName'); }
   get fatherName() { return this.sellerForm.get('fatherName'); }
@@ -747,7 +675,6 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   get nationalIdCard() { return this.sellerForm.get('nationalIdCard'); }
   get roleType() { return this.sellerForm.get('roleType'); }
   get authorizationLetter() { return this.sellerForm.get('authorizationLetter'); }
-  get propertyTypeId() { return this.sellerForm.get('propertyTypeId'); }
   get price() { return this.sellerForm.get('price'); }
   get priceText() { return this.sellerForm.get('priceText'); }
   get royaltyAmount() { return this.sellerForm.get('royaltyAmount'); }
@@ -756,16 +683,9 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   get rentEndDate() { return this.sellerForm.get('rentEndDate'); }
   get transactionType() { return this.sellerForm.get('transactionType'); }
   get transactionTypeDescription() { return this.sellerForm.get('transactionTypeDescription'); }
-  get customPropertyType() { return this.sellerForm.get('customPropertyType'); }
 
   isOtherTransactionType(): boolean {
     return this.sellerForm.get('transactionType')?.value === 'Other';
-  }
-
-  isOtherPropertyType(): boolean {
-    const propertyTypeId = this.sellerForm.get('propertyTypeId')?.value;
-    const selectedPropertyType = this.localizedPropertyTypes?.find((pt: any) => pt.id === propertyTypeId);
-    return selectedPropertyType && selectedPropertyType.name === 'سایر';
   }
 
   isLesseeRole(): boolean {

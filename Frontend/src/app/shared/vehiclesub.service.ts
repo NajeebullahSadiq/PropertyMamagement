@@ -15,13 +15,31 @@ export class VehiclesubService {
   buyerId:number=0;
   withnessId:number=0;
   constructor(private http: HttpClient) { }
+
+  private normalizeBuyerPayload<T extends any>(payload: T): T {
+    if (!payload) {
+      return payload;
+    }
+
+    const clone: any = { ...(payload as any) };
+    if (clone.rentStartDate === '') {
+      clone.rentStartDate = null;
+    }
+    if (clone.rentEndDate === '') {
+      clone.rentEndDate = null;
+    }
+    return clone as T;
+  }
+
   addBuyerdetails(buyerdetails: VBuyerDetail): Observable<VBuyerDetail> {
 
-    return this.http.post<VBuyerDetail>(this.baseUrl+'/addBuyerDetails', buyerdetails);
+    const payload = this.normalizeBuyerPayload(buyerdetails);
+    return this.http.post<VBuyerDetail>(this.baseUrl+'/addBuyerDetails', payload);
   }
   updateBuyerdetails(buyerdetails: VBuyerDetail): Observable<VBuyerDetail> {
     const url = `${this.baseUrl+"/UpdateBuyer"}/${buyerdetails.id}`;
-    return this.http.put<VBuyerDetail>(url, buyerdetails);
+    const payload = this.normalizeBuyerPayload(buyerdetails);
+    return this.http.put<VBuyerDetail>(url, payload);
   }
   addSellerdetails(sellerdetails: VBuyerDetail): Observable<VBuyerDetail> {
     return this.http.post<VBuyerDetail>(this.baseUrl+'/addSellerDetails', sellerdetails);

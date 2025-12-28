@@ -88,59 +88,52 @@ namespace WebAPI.Controllers
         //    var userroles = await _userManager.GetRolesAsync(user);
         //    return new
         //    {
-
-        //        user.Email,
-        //        user.UserName,
-        //        user.Id,
-        //        userroles,
-        //        user.FirstName,
         [HttpGet]
         [Route("getProfile")]
         public async Task<IActionResult> GetCurrentUserProfile()
         {
-            string userId = User.Claims.First(c => c.Type == "UserID").Value;
             try
             {
-                var userProfile = await _context.UserProfileWithCompany
-                                .Where(u => u.UserId == userId)
-                                .FirstOrDefaultAsync();
-
-                if (userProfile != null)
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+                if (string.IsNullOrWhiteSpace(userId))
                 {
-                    return Ok(new
+                    return Unauthorized(new
                     {
-                        userProfile.Email,
-                        userProfile.UserName,
-                        userProfile.UserId,
-                        userProfile.FirstName,
-                        userProfile.LastName,
-                        userProfile.PhotoPath,
-                        CompanyName = userProfile.CompanyName,
-                        userProfile.PhoneNumber
+                        message = "UserID claim not found"
                     });
                 }
 
-                // If UserProfileWithCompany not found, try to get from ApplicationUser
                 var user = await _userManager.FindByIdAsync(userId);
-                if (user != null)
+                if (user == null)
                 {
-                    return Ok(new
+                    return NotFound(new
                     {
-                        Email = user.Email ?? string.Empty,
-                        UserName = user.UserName ?? string.Empty,
-                        UserId = user.Id,
-                        FirstName = user.FirstName ?? string.Empty,
-                        LastName = user.LastName ?? string.Empty,
-                        PhotoPath = user.PhotoPath ?? string.Empty,
-                        CompanyName = string.Empty,
-                        PhoneNumber = user.PhoneNumber ?? string.Empty
+                        message = "User profile not found"
                     });
                 }
 
-                // If user not found in either table, return 404
-                return NotFound(new
+                var companyName = string.Empty;
+                string? companyPhone = null;
+                if (user.CompanyId > 0)
                 {
-                    message = "User profile not found"
+                    var company = await _context.CompanyDetails
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(c => c.Id == user.CompanyId);
+
+                    companyName = company?.Title ?? string.Empty;
+                    companyPhone = company?.PhoneNumber;
+                }
+
+                return Ok(new
+                {
+                    Email = user.Email ?? string.Empty,
+                    UserName = user.UserName ?? string.Empty,
+                    UserId = user.Id,
+                    FirstName = user.FirstName ?? string.Empty,
+                    LastName = user.LastName ?? string.Empty,
+                    PhotoPath = user.PhotoPath ?? string.Empty,
+                    CompanyName = companyName,
+                    PhoneNumber = companyPhone ?? user.PhoneNumber ?? string.Empty
                 });
             }
             catch (Exception ex)

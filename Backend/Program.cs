@@ -106,7 +106,14 @@ builder.Services.Configure<FormOptions>(o =>
 var app = builder.Build();
 
 // Seed database and create admin user
-await DatabaseSeeder.SeedDatabase(app.Services);
+try
+{
+    await DatabaseSeeder.SeedDatabase(app.Services);
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Database seeding/migration failed. The application will continue starting, but some features may not work until the database is fixed.");
+}
 
 // Configure the HTTP request pipeline.
 // Use CORS (must be before UseAuthentication and UseAuthorization)
@@ -128,6 +135,12 @@ app.UseStaticFiles(new StaticFileOptions()
 {
     FileProvider = new PhysicalFileProvider(resourcesPath),
     RequestPath = new PathString("/Resources")
+});
+
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(resourcesPath),
+    RequestPath = new PathString("/api/Resources")
 });
 
 //allow Authentication and Authorization

@@ -62,7 +62,17 @@ export class WitnessdetailComponent {
       });
     }
     ngOnInit() {
-      this.selerService.getWitnessById(this.id)
+      this.loadWitnessDetails();
+    }
+
+    loadWitnessDetails() {
+      const effectiveId = this.id > 0 ? this.id : this.propertyDetailsService.mainTableId;
+      if (effectiveId === 0) {
+        this.witnessDetails = [];
+        this.selectedId = 0;
+        return;
+      }
+      this.selerService.getWitnessById(effectiveId)
       .subscribe(witness => {
         this.witnessDetails = witness;
         if (witness && witness.length > 0) {
