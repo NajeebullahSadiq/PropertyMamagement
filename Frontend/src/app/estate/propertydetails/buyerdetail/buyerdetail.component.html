@@ -3,11 +3,6 @@
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="px-6 py-8 sm:px-8 sm:py-10">
 
-                <div class="flex flex-col items-center mb-8">
-                    <img [src]="imagePath" class="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-gray-200 mb-4" alt="Buyer Image">
-                    <h1 class="text-3xl font-bold text-center text-gray-800">ثبت مشخصات مشتری ملکیت</h1>
-                </div>
-
                 <div class="mb-6">
                     <app-profile-image-cropper
                       #childComponent
@@ -22,7 +17,7 @@
                 
                 <div class="mb-8">
                     <h2 class="text-lg font-bold text-blue-600 mb-3">آپلود تذکره ملی (الزامی)</h2>
-                    <app-nationalid-upload #nationalIdComponent (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-nationalid-upload>
+                    <app-nationalid-upload #nationalIdComponent [existingFilePath]="nationalIdCardName" (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-nationalid-upload>
                     <div *ngIf="nationalIdCard?.invalid && (nationalIdCard?.dirty || nationalIdCard?.touched)">
                         <small class="text-red-600 text-xs mt-1 block" *ngIf="nationalIdCard?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
                     </div>
@@ -83,7 +78,7 @@
 
                     <div class="mb-8" *ngIf="isAuthorizedAgent()">
                         <h2 class="text-lg font-bold text-red-600 mb-3">آپلود وکالت نامه (الزامی)</h2>
-                        <app-upload #authLetterComponent (sendMessage)="authorizationLetterUploadFinished($event)" style="text-align:left;"></app-upload>
+                        <app-upload #authLetterComponent [existingFilePath]="authorizationLetterName" (sendMessage)="authorizationLetterUploadFinished($event)" style="text-align:left;"></app-upload>
                         <div *ngIf="authorizationLetter?.invalid && (authorizationLetter?.dirty || authorizationLetter?.touched)">
                             <small class="text-red-600 text-xs mt-1 block" *ngIf="authorizationLetter?.errors?.['required']">آپلود وکالت نامه الزامی است</small>
                         </div>

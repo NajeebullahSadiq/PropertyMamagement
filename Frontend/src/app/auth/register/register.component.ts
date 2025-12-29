@@ -86,7 +86,7 @@ export class RegisterComponent implements OnInit {
   }
  
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName=event;
     this.filePath=this.baseUrl+this.imageName;
    
   }

@@ -143,7 +143,7 @@
                     <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
                     <div class="col-md-9">
                       <div class="form-group col-md-12">
-                        <app-vehicle-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-vehicle-fileupload>
+                        <app-vehicle-fileupload #childComponent [existingFilePath]="imageName" (sendMessage)="uploadFinished($event)"></app-vehicle-fileupload>
                      
                       </div>
                     </div>

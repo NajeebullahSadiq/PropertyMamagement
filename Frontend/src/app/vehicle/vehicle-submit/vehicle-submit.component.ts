@@ -146,7 +146,7 @@ updateVehicleDetails():void{
     }
   }
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName=event;
   }
   resetChild(): void {
     if (this.childComponent) {

@@ -121,7 +121,7 @@
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <h5 style="font-weight: bold; color: #007bff;">آپلود تذکره ملی شاهد (الزامی)</h5>
-                                        <app-nationalid-upload #nationalIdComponent (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-nationalid-upload>
+                                        <app-nationalid-upload #nationalIdComponent [existingFilePath]="nationalIdCardName" (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-nationalid-upload>
                                         <div *ngIf="nationalIdCard?.invalid && (nationalIdCard?.dirty || nationalIdCard?.touched)">
                                             <small class="text-danger" *ngIf="nationalIdCard?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
                                         </div>
