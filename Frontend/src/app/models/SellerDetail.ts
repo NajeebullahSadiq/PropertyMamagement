@@ -17,7 +17,7 @@ export interface SellerDetail {
     taddressVillage:string;
     propertyDetailsId:number;
     photo:string;
-    nationalIdCardPath:string;
+    nationalIdCard:string;
     roleType:string; // Seller role type
     authorizationLetter?:string; // Path to authorization letter file (for agents)
     heirsLetter?:string; // Path to heirs letter file (for heirs)
@@ -54,7 +54,7 @@ export interface VBuyerDetail {
     taddressVillage:string;
     propertyDetailsId:number;
     photo:string;
-    nationalIdCardPath:string;
+    nationalIdCard:string;
     roleType:string; // Seller role type
     authorizationLetter?:string; // Path to authorization letter file (for agents)
     heirsLetter?:string; // Path to heirs letter file (for heirs)

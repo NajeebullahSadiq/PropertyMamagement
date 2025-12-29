@@ -190,7 +190,7 @@ export class LicensedetailsComponent {
    this.licenseForm.reset();
   }
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName=event;
   }
   downloadFiles() {
     const filePath = this.licenseForm.get('docPath')?.value;

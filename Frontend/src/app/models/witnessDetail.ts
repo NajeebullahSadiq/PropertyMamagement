@@ -10,5 +10,6 @@ export interface witnessDetail {
     tazkiraNumber?:string;
     phoneNumber:string;
     propertyDetailsId:number;
-    nationalIdCardPath:string;
+    nationalIdCard:string;
+    nationalIdCardPath?:string;
 }

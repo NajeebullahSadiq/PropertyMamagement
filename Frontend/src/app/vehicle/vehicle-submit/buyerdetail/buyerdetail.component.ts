@@ -69,7 +69,7 @@ export class BuyerdetailComponent {
       taddressVillage: ['', Validators.required],
       propertyDetailsId:[''],
       photo:[''],
-      nationalIdCardPath:['', Validators.required],
+      nationalIdCard:['', Validators.required],
       roleType: ['Buyer', Validators.required],
       authorizationLetter: [''],
       propertyTypeId: [''],
@@ -230,7 +230,7 @@ export class BuyerdetailComponent {
           taddressDistrictId: firstBuyer.taddressDistrictId,
           taddressVillage: firstBuyer.taddressVillage,
           photo:firstBuyer.photo,
-          nationalIdCardPath: firstBuyer.nationalIdCardPath || '',
+          nationalIdCard: firstBuyer.nationalIdCard || '',
           roleType: firstBuyer.roleType || 'Buyer',
           authorizationLetter: firstBuyer.authorizationLetter || '',
           propertyTypeId: firstBuyer.propertyTypeId || '',
@@ -246,7 +246,7 @@ export class BuyerdetailComponent {
         });
         this.imagePath=this.baseUrl+firstBuyer.photo;
         this.imageName=firstBuyer.photo || '';
-        this.nationalIdFileName=firstBuyer.nationalIdCardPath || '';
+        this.nationalIdFileName=firstBuyer.nationalIdCard || '';
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
         this.selectedbuyerId=firstBuyer.id;
         
@@ -275,7 +275,7 @@ export class BuyerdetailComponent {
   addBuyerDetail(): void {
     const vbuyerdetails = this.buyerForm.value as VBuyerDetail;
     vbuyerdetails.photo=this.imageName;
-    vbuyerdetails.nationalIdCardPath=this.nationalIdFileName;
+    vbuyerdetails.nationalIdCard = this.nationalIdFileName;
     vbuyerdetails.authorizationLetter=this.authorizationLetterName;
     vbuyerdetails.propertyDetailsId=this.vehicleService.mainTableId;
     if (vbuyerdetails.id === null) {
@@ -334,7 +334,7 @@ export class BuyerdetailComponent {
 updateBuyerDetails(): void {
   const sellerDetails = this.buyerForm.value as VBuyerDetail;
    sellerDetails.photo=this.imageName;
-   sellerDetails.nationalIdCardPath=this.nationalIdFileName;
+   sellerDetails.nationalIdCard = this.nationalIdFileName;
    sellerDetails.authorizationLetter=this.authorizationLetterName;
   if(sellerDetails.id===0 && this.selectedbuyerId!==0 || this.selectedbuyerId!==null){
     sellerDetails.id=this.selectedbuyerId;
@@ -368,7 +368,7 @@ updateBuyerDetails(): void {
       taddressDistrictId: selectedBuyer.taddressDistrictId,
       taddressVillage: selectedBuyer.taddressVillage,
       photo: selectedBuyer.photo,
-      nationalIdCardPath: selectedBuyer.nationalIdCardPath || '',
+      nationalIdCard: selectedBuyer.nationalIdCard || '',
       roleType: selectedBuyer.roleType || 'Buyer',
       authorizationLetter: selectedBuyer.authorizationLetter || '',
       propertyTypeId: selectedBuyer.propertyTypeId || '',
@@ -384,7 +384,7 @@ updateBuyerDetails(): void {
     });
     this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
     this.imageName = selectedBuyer.photo || '';
-    this.nationalIdFileName = selectedBuyer.nationalIdCardPath || '';
+    this.nationalIdFileName = selectedBuyer.nationalIdCard || '';
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
     this.selectedbuyerId = selectedBuyer.id;
     
@@ -451,13 +451,13 @@ onlyNumberKey(event:any) {
   }
 }
 nationalIdUploadFinished = (event:string) => { 
-  this.nationalIdFileName="Resources\\Images\\"+event;
-  this.buyerForm.patchValue({nationalIdCardPath: this.nationalIdFileName});
+  this.nationalIdFileName=event;
+  this.buyerForm.patchValue({nationalIdCard: this.nationalIdFileName});
   console.log('National ID uploaded: '+event);
 }
 
 authorizationLetterUploadFinished = (event:string) => {
-  this.authorizationLetterName="Resources\\Images\\"+event;
+  this.authorizationLetterName=event;
   this.buyerForm.patchValue({ authorizationLetter: this.authorizationLetterName });
   console.log('Authorization Letter uploaded: '+event);
 }
@@ -522,7 +522,7 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   get taddressVillage() { return this.buyerForm.get('taddressVillage'); }
   get propertyDetailsId() { return this.buyerForm.get('propertyDetailsId'); }
   get photo() { return this.buyerForm.get('photo'); }
-  get nationalIdCardPath() { return this.buyerForm.get('nationalIdCardPath'); }
+  get nationalIdCard() { return this.buyerForm.get('nationalIdCard'); }
   get roleType() { return this.buyerForm.get('roleType'); }
   get authorizationLetter() { return this.buyerForm.get('authorizationLetter'); }
   get propertyTypeId() { return this.buyerForm.get('propertyTypeId'); }

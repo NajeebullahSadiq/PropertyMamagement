@@ -37,6 +37,8 @@ namespace WebAPIBackend.Models.ViewModels
         // Location - Province and District
         public string? Province { get; set; }
         public string? District { get; set; }
+        public string? ProvinceDari { get; set; }
+        public string? DistrictDari { get; set; }
         public string? Village { get; set; }
 
         // SellerDetails
@@ -52,12 +54,20 @@ namespace WebAPIBackend.Models.ViewModels
         // Location - SellerProvince and SellerDistrict
         public string? SellerProvince { get; set; }
         public string? SellerDistrict { get; set; }
+        public string? SellerProvinceDari { get; set; }
+        public string? SellerDistrictDari { get; set; }
 
         [Column("TSellerProvince")]
         public string? tSellerProvince { get; set; }
 
         [Column("TSellerDistrict")]
         public string? tSellerDistrict { get; set; }
+
+        [Column("TSellerProvinceDari")]
+        public string? tSellerProvinceDari { get; set; }
+
+        [Column("TSellerDistrictDari")]
+        public string? tSellerDistrictDari { get; set; }
 
         // BuyerDetails
         public string? BuyerFirstName { get; set; }
@@ -69,12 +79,20 @@ namespace WebAPIBackend.Models.ViewModels
         // Location - BuyerProvince and BuyerDistrict
         public string? BuyerProvince { get; set; }
         public string? BuyerDistrict { get; set; }
+        public string? BuyerProvinceDari { get; set; }
+        public string? BuyerDistrictDari { get; set; }
 
         [Column("TBuyerProvince")]
         public string? tBuyerProvince { get; set; }
 
         [Column("TBuyerDistrict")]
         public string? tBuyerDistrict { get; set; }
+
+        [Column("TBuyerProvinceDari")]
+        public string? tBuyerProvinceDari { get; set; }
+
+        [Column("TBuyerDistrictDari")]
+        public string? tBuyerDistrictDari { get; set; }
 
         [Column("TBuyerVillage")]
         public string? tBuyerVillage { get; set; }

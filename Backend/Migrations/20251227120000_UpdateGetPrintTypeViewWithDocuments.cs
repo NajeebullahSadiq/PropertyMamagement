@@ -45,6 +45,8 @@ namespace WebAPIBackend.Migrations
                     -- Property Address Information
                     pa_prov.""Name"" as ""Province"",
                     pa_dist.""Name"" as ""District"",
+                    pa_prov.""Dari"" as ""ProvinceDari"",
+                    pa_dist.""Dari"" as ""DistrictDari"",
                     pa.""Village"",
                     
                     -- Seller Details
@@ -58,8 +60,12 @@ namespace WebAPIBackend.Migrations
                     -- Seller Address Information
                     s_perm_prov.""Name"" as ""SellerProvince"",
                     s_perm_dist.""Name"" as ""SellerDistrict"",
+                    s_perm_prov.""Dari"" as ""SellerProvinceDari"",
+                    s_perm_dist.""Dari"" as ""SellerDistrictDari"",
                     s_temp_prov.""Name"" as ""TSellerProvince"",
                     s_temp_dist.""Name"" as ""TSellerDistrict"",
+                    s_temp_prov.""Dari"" as ""TSellerProvinceDari"",
+                    s_temp_dist.""Dari"" as ""TSellerDistrictDari"",
                     
                     -- Buyer Details
                     bd.""FirstName"" as ""BuyerFirstName"",
@@ -72,8 +78,12 @@ namespace WebAPIBackend.Migrations
                     -- Buyer Address Information
                     b_perm_prov.""Name"" as ""BuyerProvince"",
                     b_perm_dist.""Name"" as ""BuyerDistrict"",
+                    b_perm_prov.""Dari"" as ""BuyerProvinceDari"",
+                    b_perm_dist.""Dari"" as ""BuyerDistrictDari"",
                     b_temp_prov.""Name"" as ""TBuyerProvince"",
                     b_temp_dist.""Name"" as ""TBuyerDistrict"",
+                    b_temp_prov.""Dari"" as ""TBuyerProvinceDari"",
+                    b_temp_dist.""Dari"" as ""TBuyerDistrictDari"",
                     
                     -- Witness 1 Details
                     wd1.""FirstName"" as ""WitnessOneFirstName"",
@@ -142,7 +152,7 @@ namespace WebAPIBackend.Migrations
             migrationBuilder.Sql(@"
                 DROP VIEW IF EXISTS ""GetPrintType"";
                 
-                CREATE OR REPLACE VIEW ""GetPrintType"" AS
+                CREATE VIEW ""GetPrintType"" AS
                 SELECT 
                     pd.""Id"",
                     pd.""DocumentType"" as ""Doctype"",
@@ -176,8 +186,12 @@ namespace WebAPIBackend.Migrations
                     -- Seller Address Information
                     s_perm_prov.""Name"" as ""SellerProvince"",
                     s_perm_dist.""Name"" as ""SellerDistrict"",
+                    s_perm_prov.""Dari"" as ""SellerProvinceDari"",
+                    s_perm_dist.""Dari"" as ""SellerDistrictDari"",
                     s_temp_prov.""Name"" as ""TSellerProvince"",
                     s_temp_dist.""Name"" as ""TSellerDistrict"",
+                    s_temp_prov.""Dari"" as ""TSellerProvinceDari"",
+                    s_temp_dist.""Dari"" as ""TSellerDistrictDari"",
                     
                     -- Buyer Details
                     bd.""FirstName"" as ""BuyerFirstName"",
@@ -190,8 +204,12 @@ namespace WebAPIBackend.Migrations
                     -- Buyer Address Information
                     b_perm_prov.""Name"" as ""BuyerProvince"",
                     b_perm_dist.""Name"" as ""BuyerDistrict"",
+                    b_perm_prov.""Dari"" as ""BuyerProvinceDari"",
+                    b_perm_dist.""Dari"" as ""BuyerDistrictDari"",
                     b_temp_prov.""Name"" as ""TBuyerProvince"",
                     b_temp_dist.""Name"" as ""TBuyerDistrict"",
+                    b_temp_prov.""Dari"" as ""TBuyerProvinceDari"",
+                    b_temp_dist.""Dari"" as ""TBuyerDistrictDari"",
                     
                     -- Witness 1 Details
                     wd1.""FirstName"" as ""WitnessOneFirstName"",

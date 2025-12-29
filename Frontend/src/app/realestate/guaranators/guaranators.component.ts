@@ -102,7 +102,7 @@ export class GuaranatorsComponent {
       });
     }
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName=event;
     this.imagePath=this.baseUrl+this.imageName;
   }
   addData(): void {

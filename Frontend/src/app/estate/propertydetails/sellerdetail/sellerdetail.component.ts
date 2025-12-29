@@ -186,7 +186,7 @@ export class SellerdetailComponent {
           taddressDistrictId: firstSeller.taddressDistrictId,
           taddressVillage: firstSeller.taddressVillage,
           photo:firstSeller.photo,
-          nationalIdCard:firstSeller.nationalIdCardPath || '',
+          nationalIdCard:firstSeller.nationalIdCard || '',
           roleType: firstSeller.roleType || 'Seller',
           authorizationLetter: firstSeller.authorizationLetter || '',
           heirsLetter: firstSeller.heirsLetter || '',
@@ -195,7 +195,7 @@ export class SellerdetailComponent {
         });
         this.imagePath=this.baseUrl+firstSeller.photo;
         this.imageName=firstSeller.photo || '';
-        this.nationalIdCardName=firstSeller.nationalIdCardPath || '';
+        this.nationalIdCardName=firstSeller.nationalIdCard || '';
         this.authorizationLetterName=firstSeller.authorizationLetter || '';
         this.heirsLetterName=firstSeller.heirsLetter || '';
         this.selectedSellerId=firstSeller.id;
@@ -225,7 +225,7 @@ export class SellerdetailComponent {
   addSellerDetails(): void {
     const sellerDetails = this.sellerForm.value as SellerDetail;
     sellerDetails.photo=this.imageName;
-    sellerDetails.nationalIdCardPath=this.nationalIdCardName;
+    sellerDetails.nationalIdCard = this.nationalIdCardName;
     sellerDetails.authorizationLetter=this.authorizationLetterName;
     sellerDetails.heirsLetter=this.heirsLetterName;
     sellerDetails.propertyDetailsId=this.propertyDetailsService.mainTableId;
@@ -292,7 +292,7 @@ export class SellerdetailComponent {
   updateSellerDetails(): void {
     const sellerDetails = this.sellerForm.value as SellerDetail;
     sellerDetails.photo=this.imageName;
-    sellerDetails.nationalIdCardPath=this.nationalIdCardName;
+    sellerDetails.nationalIdCard = this.nationalIdCardName;
     sellerDetails.authorizationLetter=this.authorizationLetterName;
     sellerDetails.heirsLetter=this.heirsLetterName;
     if(sellerDetails.id===0 && this.selectedSellerId!==0 || this.selectedSellerId!==null){
@@ -330,7 +330,7 @@ export class SellerdetailComponent {
         taddressDistrictId: selectedSeller.taddressDistrictId,
         taddressVillage: selectedSeller.taddressVillage,
         photo: selectedSeller.photo,
-        nationalIdCard: selectedSeller.nationalIdCardPath || '',
+        nationalIdCard: selectedSeller.nationalIdCard || '',
         roleType: selectedSeller.roleType || 'Seller',
         authorizationLetter: selectedSeller.authorizationLetter || '',
         heirsLetter: selectedSeller.heirsLetter || '',
@@ -339,7 +339,7 @@ export class SellerdetailComponent {
       });
       this.imagePath = this.baseUrl + (selectedSeller.photo || 'assets/img/avatar.png');
       this.imageName = selectedSeller.photo || '';
-      this.nationalIdCardName = selectedSeller.nationalIdCardPath || '';
+      this.nationalIdCardName = selectedSeller.nationalIdCard || '';
       this.authorizationLetterName = selectedSeller.authorizationLetter || '';
       this.heirsLetterName = selectedSeller.heirsLetter || '';
       this.selectedSellerId = selectedSeller.id;
@@ -425,19 +425,19 @@ export class SellerdetailComponent {
     }
   }
   nationalIdUploadFinished = (event:string) => { 
-    this.nationalIdCardName="Resources\\Images\\"+event;
+    this.nationalIdCardName=event;
     this.sellerForm.patchValue({ nationalIdCard: this.nationalIdCardName });
     console.log('National ID uploaded: '+event+'=======================');
   }
 
   authorizationLetterUploadFinished = (event:string) => {
-    this.authorizationLetterName="Resources\\Images\\"+event;
+    this.authorizationLetterName=event;
     this.sellerForm.patchValue({ authorizationLetter: this.authorizationLetterName });
     console.log('Authorization Letter uploaded: '+event+'=======================');
   }
 
   heirsLetterUploadFinished = (event:string) => {
-    this.heirsLetterName="Resources\\Images\\"+event;
+    this.heirsLetterName=event;
     this.sellerForm.patchValue({ heirsLetter: this.heirsLetterName });
     console.log('Heirs Letter uploaded: '+event+'=======================');
   }

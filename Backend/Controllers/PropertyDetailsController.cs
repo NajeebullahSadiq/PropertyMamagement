@@ -410,6 +410,8 @@ namespace WebAPIBackend.Controllers
                     // Location - Province and District
                     Province = data.Province,
                     District = data.District,
+                    ProvinceDari = data.ProvinceDari,
+                    DistrictDari = data.DistrictDari,
                     Village = data.Village,
                     // SellerDetails
                     SellerFirstName = data.SellerFirstName,
@@ -422,8 +424,12 @@ namespace WebAPIBackend.Controllers
                     // Location - SellerProvince and SellerDistrict
                     SellerProvince = data.SellerProvince,
                     SellerDistrict = data.SellerDistrict,
+                    SellerProvinceDari = data.SellerProvinceDari,
+                    SellerDistrictDari = data.SellerDistrictDari,
                     tSellerProvince = data.tSellerProvince,
                     tSellerDistrict = data.tSellerDistrict,
+                    tSellerProvinceDari = data.tSellerProvinceDari,
+                    tSellerDistrictDari = data.tSellerDistrictDari,
 
                     // BuyerDetails
                     BuyerFirstName = data.BuyerFirstName,
@@ -436,8 +442,12 @@ namespace WebAPIBackend.Controllers
                     // Location - BuyerProvince and BuyerDistrict
                     BuyerProvince = data.BuyerProvince,
                     BuyerDistrict = data.BuyerDistrict,
+                    BuyerProvinceDari = data.BuyerProvinceDari,
+                    BuyerDistrictDari = data.BuyerDistrictDari,
                     tBuyerProvince = data.tBuyerProvince,
                     tBuyerDistrict = data.tBuyerDistrict,
+                    tBuyerProvinceDari = data.tBuyerProvinceDari,
+                    tBuyerDistrictDari = data.tBuyerDistrictDari,
 
                     // WitnessDetails
                     WitnessOneFirstName = data.WitnessOneFirstName,

@@ -177,7 +177,7 @@ export class CompanydetailsComponent {
 	  
 	}
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName=event;
   }
 
  downloadFiles() {

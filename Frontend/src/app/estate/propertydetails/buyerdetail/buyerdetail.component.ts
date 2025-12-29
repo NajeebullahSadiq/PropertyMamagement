@@ -256,7 +256,7 @@ export class BuyerdetailComponent {
           taddressDistrictId: firstBuyer.taddressDistrictId,
           taddressVillage: firstBuyer.taddressVillage,
           photo:firstBuyer.photo,
-          nationalIdCard:firstBuyer.nationalIdCardPath || '',
+          nationalIdCard: firstBuyer.nationalIdCard || '',
           roleType: firstBuyer.roleType || 'Buyer',
           authorizationLetter: firstBuyer.authorizationLetter || '',
           price: firstBuyer.price || '',
@@ -276,7 +276,7 @@ export class BuyerdetailComponent {
         this.selectedSellerId=firstBuyer.id;
         this.imagePath=this.baseUrl+firstBuyer.photo;
         this.imageName=firstBuyer.photo || '';
-        this.nationalIdCardName=firstBuyer.nationalIdCardPath || '';
+        this.nationalIdCardName=firstBuyer.nationalIdCard || '';
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
         
         if (this.childComponent && firstBuyer.photo) {
@@ -304,7 +304,7 @@ export class BuyerdetailComponent {
   addBuyerDetail(): void {
     const sellerDetails = this.sellerForm.value as SellerDetail;
     sellerDetails.photo=this.imageName;
-    sellerDetails.nationalIdCardPath=this.nationalIdCardName;
+    sellerDetails.nationalIdCard = this.nationalIdCardName;
     sellerDetails.authorizationLetter=this.authorizationLetterName;
     sellerDetails.propertyDetailsId=this.propertyDetailsService.mainTableId;
     if (sellerDetails.id === null) {
@@ -370,7 +370,7 @@ export class BuyerdetailComponent {
 updateBuyerDetails(): void {
   const sellerDetails = this.sellerForm.value as SellerDetail;
    sellerDetails.photo=this.imageName;
-   sellerDetails.nationalIdCardPath=this.nationalIdCardName;
+   sellerDetails.nationalIdCard = this.nationalIdCardName;
    sellerDetails.authorizationLetter=this.authorizationLetterName;
   if(sellerDetails.id===0 && this.selectedSellerId!==0 || this.selectedSellerId!==null){
     sellerDetails.id=this.selectedSellerId;
@@ -409,7 +409,7 @@ updateBuyerDetails(): void {
       taddressDistrictId: selectedBuyer.taddressDistrictId,
       taddressVillage: selectedBuyer.taddressVillage,
       photo: selectedBuyer.photo,
-      nationalIdCard: selectedBuyer.nationalIdCardPath || '',
+      nationalIdCard: selectedBuyer.nationalIdCard || '',
       roleType: selectedBuyer.roleType || 'Buyer',
       authorizationLetter: selectedBuyer.authorizationLetter || '',
       price: selectedBuyer.price || '',
@@ -428,7 +428,7 @@ updateBuyerDetails(): void {
     this.calculateDerivedAmounts();
     this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
     this.imageName = selectedBuyer.photo || '';
-    this.nationalIdCardName = selectedBuyer.nationalIdCardPath || '';
+    this.nationalIdCardName = selectedBuyer.nationalIdCard || '';
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
     this.selectedSellerId = selectedBuyer.id;
     
@@ -597,13 +597,13 @@ onlyNumberKey(event:any) {
   }
 }
 uploadFinished = (event:string) => { 
-  this.imageName="Resources\\Images\\"+event;
+  this.imageName=event;
   this.imagePath=this.baseUrl+this.imageName;
   console.log(event+'=======================');
 }
 
 nationalIdUploadFinished = (event:string) => { 
-  this.nationalIdCardName="Resources\\Images\\"+event;
+  this.nationalIdCardName=event;
   this.sellerForm.patchValue({ nationalIdCard: this.nationalIdCardName });
   this.sellerForm.get('nationalIdCard')?.markAsTouched();
   this.sellerForm.get('nationalIdCard')?.markAsDirty();
@@ -612,7 +612,7 @@ nationalIdUploadFinished = (event:string) => {
 }
 
 authorizationLetterUploadFinished = (event:string) => {
-  this.authorizationLetterName="Resources\\Images\\"+event;
+  this.authorizationLetterName=event;
   this.sellerForm.patchValue({ authorizationLetter: this.authorizationLetterName });
   this.sellerForm.get('authorizationLetter')?.markAsTouched();
   this.sellerForm.get('authorizationLetter')?.markAsDirty();

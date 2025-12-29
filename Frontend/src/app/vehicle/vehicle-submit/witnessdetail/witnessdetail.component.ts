@@ -142,7 +142,7 @@ onlyNumberKey(event:any) {
 }
 
   nationalIdUploadFinished = (event:string) => { 
-    this.nationalIdCardName="Resources\\Images\\"+event;
+    this.nationalIdCardName=event;
     this.withnessForm.patchValue({ nationalIdCardPath: this.nationalIdCardName });
     console.log('Vehicle Witness National ID uploaded: '+event+'=======================');
   }

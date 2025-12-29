@@ -35,7 +35,7 @@ export class WitnessdetailComponent {
         tazkiraPage: [''],
         tazkiraNumber: [''],
         phoneNumber: ['', Validators.required],
-        nationalIdCardPath: ['', Validators.required]
+        nationalIdCard: ['', Validators.required]
       });
 
       this.withnessForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
@@ -86,9 +86,9 @@ export class WitnessdetailComponent {
             tazkiraPage: witness[0].tazkiraPage || '',
             tazkiraNumber: witness[0].tazkiraNumber || '',
             phoneNumber: witness[0].phoneNumber,
-            nationalIdCardPath: witness[0].nationalIdCardPath || ''
+            nationalIdCard: witness[0].nationalIdCard || ''
           });
-          this.nationalIdCardName = witness[0].nationalIdCardPath || '';
+          this.nationalIdCardName = witness[0].nationalIdCard || '';
           this.selerService.withnessId=witness[0].id;
           this.selectedId=witness[0].id;
         }
@@ -96,7 +96,7 @@ export class WitnessdetailComponent {
     }
     addwithnessDetails(): void {
       const withnessDetails = this.withnessForm.value as witnessDetail;
-      withnessDetails.nationalIdCardPath = this.nationalIdCardName;
+      withnessDetails.nationalIdCard = this.nationalIdCardName;
       withnessDetails.propertyDetailsId = this.propertyDetailsService.mainTableId;
       if (withnessDetails.id === null) {
         withnessDetails.id = 0;
@@ -127,7 +127,7 @@ export class WitnessdetailComponent {
     }
   updateWitnessDetails(): void {
     const wDetails = this.withnessForm.value as witnessDetail;
-    wDetails.nationalIdCardPath = this.nationalIdCardName;
+    wDetails.nationalIdCard = this.nationalIdCardName;
     wDetails.propertyDetailsId=this.propertyDetailsService.mainTableId;
     this.selerService.updateWitnessDetails(wDetails).subscribe(result => {
       if(result.id!==0)
@@ -167,9 +167,9 @@ BindValu(id: number) {
       tazkiraNumber: selectedWitness.tazkiraNumber || '',
       phoneNumber: selectedWitness.phoneNumber,
       propertyDetailsId:selectedWitness.propertyDetailsId,
-      nationalIdCardPath: selectedWitness.nationalIdCardPath || ''
+      nationalIdCard: selectedWitness.nationalIdCard || ''
     });
-    this.nationalIdCardName = selectedWitness.nationalIdCardPath || '';
+    this.nationalIdCardName = selectedWitness.nationalIdCard || '';
     this.selectedId=selectedWitness.id;
   }
 }
@@ -182,8 +182,8 @@ onlyNumberKey(event:any) {
   }
 }
   nationalIdUploadFinished = (event:string) => { 
-    this.nationalIdCardName="Resources\\Images\\"+event;
-    this.withnessForm.patchValue({ nationalIdCardPath: this.nationalIdCardName });
+    this.nationalIdCardName=event;
+    this.withnessForm.patchValue({ nationalIdCard: this.nationalIdCardName });
     console.log('Witness National ID uploaded: '+event+'=======================');
   }
 
@@ -196,7 +196,7 @@ onlyNumberKey(event:any) {
   get tazkiraPage() { return this.withnessForm.get('tazkiraPage'); }
   get tazkiraNumber() { return this.withnessForm.get('tazkiraNumber'); }
   get phoneNumber() { return this.withnessForm.get('phoneNumber'); }
-  get nationalIdCardPath() { return this.withnessForm.get('nationalIdCardPath'); }
+  get nationalIdCard() { return this.withnessForm.get('nationalIdCard'); }
 
   isPaperTazkira(): boolean {
     const tazkiraType = this.withnessForm.get('tazkiraType')?.value;

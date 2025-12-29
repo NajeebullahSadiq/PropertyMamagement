@@ -197,8 +197,8 @@
                                         <h3 style="font-weight: bold;"> آپلود تذکره ملی فروشنده</h3>
                                         <div class="col-md-12">
                                             <app-vehicle-nationalid-upload #nationalIdComponent [existingFilePath]="nationalIdFileName" (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-vehicle-nationalid-upload>
-                                            <div *ngIf="nationalIdCardPath?.invalid && (nationalIdCardPath?.dirty || nationalIdCardPath?.touched)">
-                                                <small class="text-danger" *ngIf="nationalIdCardPath?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
+                                            <div *ngIf="nationalIdCard?.invalid && (nationalIdCard?.dirty || nationalIdCard?.touched)">
+                                                <small class="text-danger" *ngIf="nationalIdCard?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
                                             </div>
                                         </div>
                                     </div>

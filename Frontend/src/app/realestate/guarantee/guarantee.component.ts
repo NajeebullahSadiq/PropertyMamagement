@@ -272,7 +272,7 @@ export class GuaranteeComponent {
    this.gauranteeForm.reset();
   }
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName=event;
   }
   /**
    * Map backend guarantee types to localized versions with Dari labels

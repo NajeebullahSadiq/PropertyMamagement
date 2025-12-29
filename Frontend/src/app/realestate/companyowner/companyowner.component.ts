@@ -143,7 +143,7 @@ export class CompanyownerComponent {
 		});
 }
   uploadFinished = (event:string) => { 
-    this.imageName="Resources\\Images\\"+event;
+    this.imageName=event;
     this.imagePath=this.baseUrl+this.imageName;
     console.log(event+'=======================');
   }

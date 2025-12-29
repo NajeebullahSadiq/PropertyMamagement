@@ -70,7 +70,7 @@ export class SellerdetailComponent {
       taddressVillage: ['', Validators.required],
       propertyDetailsId:[''],
       photo:[''],
-      nationalIdCardPath:['', Validators.required],
+      nationalIdCard: ['', Validators.required],
       roleType: ['Seller', Validators.required],
       authorizationLetter: [''],
       heirsLetter: ['']
@@ -174,14 +174,14 @@ export class SellerdetailComponent {
           taddressDistrictId: firstSeller.taddressDistrictId,
           taddressVillage: firstSeller.taddressVillage,
           photo:firstSeller.photo,
-          nationalIdCardPath: firstSeller.nationalIdCardPath || '',
+          nationalIdCard: firstSeller.nationalIdCard || '',
           roleType: firstSeller.roleType || 'Seller',
           authorizationLetter: firstSeller.authorizationLetter || '',
           heirsLetter: firstSeller.heirsLetter || '',
         });
         this.imagePath=this.baseUrl+firstSeller.photo;
         this.imageName=firstSeller.photo || '';
-        this.nationalIdFileName=firstSeller.nationalIdCardPath || '';
+        this.nationalIdFileName=firstSeller.nationalIdCard || '';
         this.authorizationLetterName=firstSeller.authorizationLetter || '';
         this.heirsLetterName=firstSeller.heirsLetter || '';
         this.selectedSellerId=firstSeller.id;
@@ -211,7 +211,7 @@ export class SellerdetailComponent {
   addSellerDetail(): void {
     const vbuyerdetails = this.SellerForm.value as VBuyerDetail;
     vbuyerdetails.photo=this.imageName;
-    vbuyerdetails.nationalIdCardPath=this.nationalIdFileName;
+    vbuyerdetails.nationalIdCard = this.nationalIdFileName;
     vbuyerdetails.authorizationLetter=this.authorizationLetterName;
     vbuyerdetails.heirsLetter=this.heirsLetterName;
     vbuyerdetails.propertyDetailsId=this.vehicleService.mainTableId;
@@ -271,7 +271,7 @@ export class SellerdetailComponent {
 updateSellerDetails(): void {
   const sellerDetails = this.SellerForm.value as VBuyerDetail;
   sellerDetails.photo=this.imageName;
-  sellerDetails.nationalIdCardPath=this.nationalIdFileName;
+  sellerDetails.nationalIdCard = this.nationalIdFileName;
   sellerDetails.authorizationLetter=this.authorizationLetterName;
   sellerDetails.heirsLetter=this.heirsLetterName;
   if(sellerDetails.id===0 && this.selectedSellerId!==0 || this.selectedSellerId!==null){
@@ -310,14 +310,14 @@ updateSellerDetails(): void {
       taddressDistrictId: selectedSeller.taddressDistrictId,
       taddressVillage: selectedSeller.taddressVillage,
       photo: selectedSeller.photo,
-      nationalIdCardPath: selectedSeller.nationalIdCardPath || '',
+      nationalIdCard: selectedSeller.nationalIdCard || '',
       roleType: selectedSeller.roleType || 'Seller',
       authorizationLetter: selectedSeller.authorizationLetter || '',
       heirsLetter: selectedSeller.heirsLetter || '',
     });
     this.imagePath = this.baseUrl + (selectedSeller.photo || 'assets/img/avatar.png');
     this.imageName = selectedSeller.photo || '';
-    this.nationalIdFileName = selectedSeller.nationalIdCardPath || '';
+    this.nationalIdFileName = selectedSeller.nationalIdCard || '';
     this.authorizationLetterName = selectedSeller.authorizationLetter || '';
     this.heirsLetterName = selectedSeller.heirsLetter || '';
     this.selectedSellerId = selectedSeller.id;
@@ -391,19 +391,19 @@ onlyNumberKey(event:any) {
   }
 }
 nationalIdUploadFinished = (event:string) => { 
-  this.nationalIdFileName="Resources\\Images\\"+event;
-  this.SellerForm.patchValue({nationalIdCardPath: this.nationalIdFileName});
+  this.nationalIdFileName=event;
+  this.SellerForm.patchValue({nationalIdCard: this.nationalIdFileName});
   console.log('National ID uploaded: '+event);
 }
 
 authorizationLetterUploadFinished = (event:string) => {
-  this.authorizationLetterName="Resources\\Images\\"+event;
+  this.authorizationLetterName=event;
   this.SellerForm.patchValue({ authorizationLetter: this.authorizationLetterName });
   console.log('Authorization Letter uploaded: '+event);
 }
 
 heirsLetterUploadFinished = (event:string) => {
-  this.heirsLetterName="Resources\\Images\\"+event;
+  this.heirsLetterName=event;
   this.SellerForm.patchValue({ heirsLetter: this.heirsLetterName });
   console.log('Heirs Letter uploaded: '+event);
 }
@@ -461,7 +461,7 @@ isPaperTazkira(): boolean {
   get taddressDistrictId() { return this.SellerForm.get('taddressDistrictId'); }
   get taddressVillage() { return this.SellerForm.get('taddressVillage'); }
   get propertyDetailsId() { return this.SellerForm.get('propertyDetailsId'); }
-  get nationalIdCardPath() { return this.SellerForm.get('nationalIdCardPath'); }
+  get nationalIdCard() { return this.SellerForm.get('nationalIdCard'); }
   get roleType() { return this.SellerForm.get('roleType'); }
   get authorizationLetter() { return this.SellerForm.get('authorizationLetter'); }
   get heirsLetter() { return this.SellerForm.get('heirsLetter'); }
