@@ -5,7 +5,7 @@ $primary-color: #004a9f;
 $secondary-color: blueviolet;
 
 /* Styles for mat-toolbar */
-mat-toolbar {
+mat-toolbar.legacy-toolbar {
   background: $primary-color;
   color: white;
 
@@ -15,7 +15,7 @@ mat-toolbar {
 }
 
 /* Styles for mat-sidenav */
-.mat-sidenav {
+.mat-sidenav.legacy-sidenav {
   margin: 16px;
   width: 280px;
   border-right: none;
@@ -91,20 +91,20 @@ mat-toolbar {
   }
 }
 /* Styles for mat-sidenav-container */
-mat-sidenav-container {
+mat-sidenav-container.legacy-sidenav-container {
   height: calc(100vh - 65px);
   display: flex;
   flex-direction: column;
 }
 
-.mat-sidenav-content {
+.legacy-sidenav-content.mat-sidenav-content {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
 /* Styles for content area */
-.content {
+.legacy-content.content {
   border-radius: 10px;
   margin: 16px;
   margin-left: 16px;
@@ -114,15 +114,29 @@ mat-sidenav-container {
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.toolbar-item-spacer {
+.legacy-toolbar-item-spacer.toolbar-item-spacer {
     flex: 1 1 auto;
 }
-.text2 {
+.legacy-text2.text2 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 16px;
   font-weight: bold;
   margin-left: 5px; /* Adjust the margin value as per your requirement */
+}
+
+:host ::ng-deep .sidebar-nav .mat-button-wrapper {
+  width: 100%;
+  display: block;
+}
+
+:host ::ng-deep .sidebar-nav .mdc-button__label {
+  width: 100%;
+  display: block;
+}
+
+:host ::ng-deep .sidebar-nav .mat-mdc-button {
+  justify-content: flex-start;
 }
 
