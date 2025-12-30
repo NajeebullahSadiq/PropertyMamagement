@@ -66,41 +66,20 @@ export class ReportComponent {
   }
 
   fetchDashboardData(): void {
-    console.log(this.startDate,'---------------', this.endDate)
-    
-    // Extract year, month, and day from startDate object
-    const syear = this.startDate.year;
-    const smonth = this.startDate.month;
-    const sday = this.startDate.day;
+    const sDate = this.startDate ? new Date(this.startDate) : null;
+    const eDate = this.endDate ? new Date(this.endDate) : null;
+    if (!sDate || !eDate || Number.isNaN(sDate.getTime()) || Number.isNaN(eDate.getTime())) {
+      return;
+    }
 
-    // Extract year, month, and day from startDate object
-    const eyear = this.endDate.year;
-    const emonth = this.endDate.month;
-    const eday = this.endDate.day;
-  
-    // Create a new Date object with year, month, and day
-    const sDate = new Date(syear, smonth - 1, sday);
-    // Create a new Date object with year, month, and day
-    const eDate = new Date(eyear, emonth - 1, eday);
-  
-    // Format the new date as "DD-MM-YYYY"
-    const formattdsDate = sDate.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).split('/').join('-');
+    const start = this.toYmd(sDate);
+    const end = this.toYmd(eDate);
 
-     // Format the new date as "DD-MM-YYYY"
-     const formattedeDate = eDate.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).split('/').join('-');
-    this.dashService.getDashboardDataByDate(formattdsDate, formattedeDate)
+    this.dashService.getDashboardDataByDate(start, end)
       .subscribe((data) => {
         this.dashboardData = data;
       });
-      this.dashService.getTotalUserDataByDate(formattdsDate, formattedeDate)
+      this.dashService.getTotalUserDataByDate(start, end)
       .subscribe((data) => {
         console.log(data); // Check the response from the server in the browser console
         
@@ -110,7 +89,7 @@ export class ReportComponent {
           console.error("Invalid 'topUsers' data format:", data);
         }
       });
-      this.dashService.getVehicleTotalUserDataByDate(formattdsDate, formattedeDate)
+      this.dashService.getVehicleTotalUserDataByDate(start, end)
       .subscribe((data) => {
         console.log(data); // Check the response from the server in the browser console
         
@@ -120,6 +99,13 @@ export class ReportComponent {
           console.error("Invalid 'topUsers' data format:", data);
         }
       });
+  }
+
+  private toYmd(date: Date): string {
+    const y = date.getFullYear();
+    const m = `${date.getMonth() + 1}`.padStart(2, '0');
+    const d = `${date.getDate()}`.padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
   
 }

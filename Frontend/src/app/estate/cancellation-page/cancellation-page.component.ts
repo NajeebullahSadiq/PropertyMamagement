@@ -5,6 +5,8 @@ import { PropertyCancellationService } from 'src/app/shared/property-cancellatio
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
 import { FileService } from 'src/app/shared/file.service';
+import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 
 @Component({
   selector: 'app-cancellation-page',
@@ -37,7 +39,9 @@ export class CancellationPageComponent implements OnInit {
     private cancellationService: PropertyCancellationService,
     private localizationService: LocalizationService,
     private fileService: FileService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private calendarService: CalendarService,
+    private calendarConversionService: CalendarConversionService
   ) { }
 
   ngOnInit(): void {
@@ -299,6 +303,9 @@ export class CancellationPageComponent implements OnInit {
   formatDate(date: any): string {
     if (!date) return '';
     const d = new Date(date);
-    return d.toLocaleDateString('en-US');
+    if (Number.isNaN(d.getTime())) {
+      return '';
+    }
+    return this.calendarConversionService.formatDate(d, this.calendarService.getSelectedCalendar());
   }
 }

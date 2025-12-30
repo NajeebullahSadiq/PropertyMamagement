@@ -24,7 +24,7 @@
           <td  colspan="4">
             <img [src]="SellerfilePath" alt="Seller Photo" style="height: 100px; width:95px;">
             <p><strong>عکس مالک</strong></p>
-            <p><strong>تاریخ معامله: &nbsp;{{documentData.createdAtShamsi}}</strong></p>
+            <p><strong>تاریخ معامله: &nbsp;{{documentData.createdAt | calendarDate}}</strong></p>
           </td>
           <td style="text-align: center;" colspan="4">
             <p><u><b style="font-size: 20px;">ای کسانیکه ایمان آورده اید به قراردادها وفا کنید. </b></u><span ><b> (مایده آیه اول) </b></span></p>

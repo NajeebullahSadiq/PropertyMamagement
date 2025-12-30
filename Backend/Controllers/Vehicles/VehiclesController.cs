@@ -28,7 +28,13 @@ namespace WebAPIBackend.Controllers.Vehicles
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            string userId = User.Claims.First(c => c.Type == "UserID").Value;
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null || string.IsNullOrWhiteSpace(userIdClaim.Value))
+            {
+                return Unauthorized();
+            }
+
+            string userId = userIdClaim.Value;
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -51,28 +57,31 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
             try
             {
-                var query = (from p in propertyQuery
-                             select new
-                            {
-                                p.Id,
-                                p.PermitNo,
-                                p.PilateNo,
-                                p.TypeOfVehicle,
-                                p.Model,
-                                p.EnginNo,
-                                p.ShasiNo,
-                                p.Color,
-                                p.Price,
-                                p.PriceText,
-                                p.Des,
-                                p.RoyaltyAmount,
-                                p.FilePath,
-                                p.VehicleHand,
-                                p.iscomplete,
-                                SellerName = (p.VehiclesSellerDetails != null && p.VehiclesSellerDetails.Any()) ? p.VehiclesSellerDetails.First().FirstName : null,
-                                BuyerName = (p.VehiclesBuyerDetails != null && p.VehiclesBuyerDetails.Any()) ? p.VehiclesBuyerDetails.First().FirstName : null,
-                            }).ToList();
-                return Ok(query);
+                var result = await propertyQuery
+                    .AsNoTracking()
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.PermitNo,
+                        p.PilateNo,
+                        p.TypeOfVehicle,
+                        p.Model,
+                        p.EnginNo,
+                        p.ShasiNo,
+                        p.Color,
+                        p.Price,
+                        p.PriceText,
+                        p.Des,
+                        p.RoyaltyAmount,
+                        p.FilePath,
+                        p.VehicleHand,
+                        p.iscomplete,
+                        SellerName = p.VehiclesSellerDetails.Select(s => s.FirstName).FirstOrDefault(),
+                        BuyerName = p.VehiclesBuyerDetails.Select(b => b.FirstName).FirstOrDefault(),
+                    })
+                    .ToListAsync();
+
+                return Ok(result);
             }
             catch (Exception ex)
             {

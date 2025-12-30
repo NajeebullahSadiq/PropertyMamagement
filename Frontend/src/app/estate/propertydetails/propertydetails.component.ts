@@ -43,6 +43,28 @@ export class PropertydetailsComponent  implements AfterViewInit {
       this.childComponent.reset();
     }
   }
+
+  onSubmit(): void {
+    this.updateDocumentFieldValidation();
+
+    const currentPropertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
+    this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
+
+    if (this.propertyForm.invalid) {
+      this.propertyForm.markAllAsTouched();
+      const invalidControls = Object.keys(this.propertyForm.controls)
+        .filter(key => this.propertyForm.get(key)?.invalid);
+      console.log('Invalid propertyForm controls:', invalidControls);
+      this.toastr.error('لطفاً تمام فیلد های الزامی را خانه پُری کنید');
+      return;
+    }
+
+    if (this.selectedPropertyId) {
+      this.updatePropertyDetails();
+    } else {
+      this.addPropertyDetails();
+    }
+  }
   @Output() next = new EventEmitter<void>();
   onNextClick() {
     this.next.emit();
@@ -156,14 +178,25 @@ export class PropertydetailsComponent  implements AfterViewInit {
         .subscribe(addr => {
           if (addr && addr.length > 0) {
             this.selectedAddressId = addr[0].id;
+
+            const provinceId = addr[0].provinceId != null ? Number(addr[0].provinceId) : '';
+            const districtId = addr[0].districtId != null ? Number(addr[0].districtId) : '';
+
             this.propertyForm.patchValue({
-              provinceId: addr[0].provinceId,
-              districtId: addr[0].districtId,
+              provinceId: provinceId,
               village: addr[0].village
             });
-            if (addr[0].provinceId) {
-              this.selerService.getdistrict(addr[0].provinceId.valueOf()).subscribe(res => {
+
+            if (provinceId) {
+              this.selerService.getdistrict(provinceId).subscribe(res => {
                 this.districts = res;
+                this.propertyForm.patchValue({
+                  districtId: districtId
+                });
+              });
+            } else {
+              this.propertyForm.patchValue({
+                districtId: districtId
               });
             }
           }
@@ -568,7 +601,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
   }
 
   filterResults(getId:any) {
-    this.selerService.getdistrict(getId.id).subscribe(res => {
+    const provinceId = getId?.id ?? getId;
+    this.selerService.getdistrict(provinceId).subscribe(res => {
       this.districts = res;
     });
   }

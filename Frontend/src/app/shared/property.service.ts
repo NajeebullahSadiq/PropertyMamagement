@@ -50,6 +50,10 @@ export class PropertyService {
   getPropertyDetailsById(id: number): Observable<PropertyDetails[]> {
     return this.http.get<PropertyDetails[]>(this.baseUrl +'/'+ id);
   }
+
+  getPropertyViewById(id: number): Observable<any> {
+    return this.http.get<any>(this.baseUrl + '/GetView/' + id);
+  }
   downloadFile(file:any) {
     return this.http.get(environment.apiUrl + '/' + file, { responseType: 'blob' });
   }

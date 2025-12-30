@@ -9,6 +9,7 @@ import { ProfileImageCropperComponent } from './profile-image-cropper/profile-im
 import { ProfileImageCropperDialogComponent } from './profile-image-cropper/profile-image-cropper-dialog.component';
 import { MultiCalendarDatepickerComponent } from './multi-calendar-datepicker/multi-calendar-datepicker.component';
 import { CalendarSelectorComponent } from './calendar-selector/calendar-selector.component';
+import { CalendarDatePipe } from './calendar-date.pipe';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { CalendarSelectorComponent } from './calendar-selector/calendar-selector
     ProfileImageCropperComponent,
     ProfileImageCropperDialogComponent,
     MultiCalendarDatepickerComponent,
-    CalendarSelectorComponent
+    CalendarSelectorComponent,
+    CalendarDatePipe
   ],
   imports: [
     CommonModule,
@@ -29,7 +31,8 @@ import { CalendarSelectorComponent } from './calendar-selector/calendar-selector
     DocumentViewerComponent,
     ProfileImageCropperComponent,
     MultiCalendarDatepickerComponent,
-    CalendarSelectorComponent
+    CalendarSelectorComponent,
+    CalendarDatePipe
   ]
 })
 export class SharedModule {}

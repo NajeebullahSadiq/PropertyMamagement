@@ -1,0 +1,729 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">نمایش جزئیات ملکیت</h1>
+        <p class="text-sm text-gray-600 mt-2">مشاهده اطلاعات کامل ملکیت</p>
+      </div>
+      <a routerLink="/dashboard/estate/list" class="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-gray-950 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+        <i class="fas fa-arrow-right transition-transform group-hover:-translate-x-1"></i>
+        <span class="font-medium">بازگشت به لیست</span>
+      </a>
+    </div>
+
+    <div *ngIf="isLoading" class="bg-white rounded-2xl shadow-xl border border-gray-100 p-12">
+      <div class="flex flex-col items-center justify-center gap-4">
+        <div class="relative">
+          <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <i class="fas fa-building text-blue-600 text-lg"></i>
+          </div>
+        </div>
+        <p class="text-gray-700 font-semibold text-lg">در حال بارگذاری اطلاعات...</p>
+        <p class="text-gray-500 text-sm">لطفاً صبر کنید</p>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && error" class="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl shadow-xl border border-red-200 p-8">
+      <div class="flex items-start gap-4 text-red-700">
+        <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+          <i class="fas fa-exclamation-circle text-2xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-bold text-lg">خطا در بارگذاری</p>
+          <p class="mt-2 text-red-600">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+
+  <div *ngIf="!isLoading && !error && viewData" class="space-y-8">
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 border-b border-blue-500">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-building text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">مشخصات ملکیت</h2>
+        </div>
+      </div>
+      <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="group">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوعیت ملکیت</p>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+            <p class="text-gray-900 font-bold text-lg">{{ getDariPropertyTypeLabel(viewData.propertyTypeName) }}</p>
+          </div>
+        </div>
+        <div class="group">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع معامله</p>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+            <p class="text-gray-900 font-bold text-lg">{{ getDariTransactionTypeLabel(viewData.transactionTypeName) }}</p>
+          </div>
+        </div>
+        <div class="group">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">حالت</p>
+          <div class="mt-1">
+            <span *ngIf="viewData.iscomplete" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow-lg">
+              <i class="fas fa-check-circle text-lg"></i>
+              <span>تکمیل شده</span>
+            </span>
+            <span *ngIf="!viewData.iscomplete" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold shadow-lg">
+              <i class="fas fa-times-circle text-lg"></i>
+              <span>تکمیل ناشده</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:border-blue-300 transition-colors">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">مساحت</p>
+          <p class="text-gray-900 font-bold text-xl">{{ safeValue(viewData.parea) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:border-blue-300 transition-colors">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">واحد اندازه‌گیری</p>
+          <p class="text-gray-900 font-semibold text-lg">{{ getDariUnitTypeLabel(viewData.unitTypeName) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:border-blue-300 transition-colors">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تعداد منزل</p>
+          <p class="text-gray-900 font-bold text-xl">{{ safeValue(viewData.numofFloor) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:border-blue-300 transition-colors">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تعداد اطاق</p>
+          <p class="text-gray-900 font-bold text-xl">{{ safeValue(viewData.numofRooms) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 hover:border-green-300 transition-colors">
+          <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">قیمت</p>
+          <p class="text-green-900 font-bold text-xl">{{ safeValue(viewData.priceText || viewData.price) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200 hover:border-amber-300 transition-colors">
+          <p class="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2">حق‌الامتیاز</p>
+          <p class="text-amber-900 font-bold text-xl">{{ safeValue(viewData.royaltyAmount) }}</p>
+        </div>
+
+        <div class="md:col-span-3 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+          <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <i class="fas fa-align-right"></i>
+            <span>شرح / توضیحات</span>
+          </p>
+          <p class="text-gray-900 whitespace-pre-line leading-relaxed text-base">{{ safeValue(viewData.des) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-purple-600 to-pink-600 border-b border-purple-500">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-map-marker-alt text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">آدرس ملکیت</h2>
+        </div>
+      </div>
+      <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 hover:border-purple-400 transition-all">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+              <i class="fas fa-city text-white"></i>
+            </div>
+            <p class="text-xs font-bold text-purple-700 uppercase tracking-wide">ولایت</p>
+          </div>
+          <p class="text-gray-900 font-bold text-xl">{{ safeValue(viewData.address?.provinceDari) }}</p>
+        </div>
+        <div class="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-200 hover:border-blue-400 transition-all">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <i class="fas fa-map text-white"></i>
+            </div>
+            <p class="text-xs font-bold text-blue-700 uppercase tracking-wide">ناحیه/ولسوالی</p>
+          </div>
+          <p class="text-gray-900 font-bold text-xl">{{ safeValue(viewData.address?.districtDari) }}</p>
+        </div>
+        <div class="p-6 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200 hover:border-emerald-400 transition-all">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
+              <i class="fas fa-location-dot text-white"></i>
+            </div>
+            <p class="text-xs font-bold text-emerald-700 uppercase tracking-wide">گذر / قریه / بلاک</p>
+          </div>
+          <p class="text-gray-900 font-bold text-xl">{{ safeValue(viewData.address?.village) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-teal-600 to-cyan-600 border-b border-teal-500">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-border-all text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">حدود اربعه</h2>
+        </div>
+      </div>
+      <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-6 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border-2 border-red-300 hover:border-red-500 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-arrow-up text-white text-xl"></i>
+              </div>
+              <p class="text-sm font-bold text-red-700 uppercase tracking-wide">شمالا (بالا)</p>
+            </div>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.north) }}</p>
+          </div>
+          <div class="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-300 hover:border-blue-500 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-arrow-down text-white text-xl"></i>
+              </div>
+              <p class="text-sm font-bold text-blue-700 uppercase tracking-wide">جنوبا (پایین)</p>
+            </div>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.south) }}</p>
+          </div>
+          <div class="p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border-2 border-amber-300 hover:border-amber-500 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-arrow-right text-white text-xl"></i>
+              </div>
+              <p class="text-sm font-bold text-amber-700 uppercase tracking-wide">غربا (راست)</p>
+            </div>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.west) }}</p>
+          </div>
+          <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-300 hover:border-green-500 transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-arrow-left text-white text-xl"></i>
+              </div>
+              <p class="text-sm font-bold text-green-700 uppercase tracking-wide">شرقا (چپ)</p>
+            </div>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.east) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-orange-600 to-red-600 border-b border-orange-500">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-file-contract text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">مشخصات سند</h2>
+        </div>
+      </div>
+      <div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="p-5 bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 hover:border-orange-400 transition-all">
+          <p class="text-xs font-bold text-orange-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <i class="fas fa-tag"></i>
+            <span>نوعیت سند</span>
+          </p>
+          <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.documentType) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 hover:border-blue-400 transition-all">
+          <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <i class="fas fa-hashtag"></i>
+            <span>نمبر قباله</span>
+          </p>
+          <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.issuanceNumber) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 hover:border-green-400 transition-all">
+          <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <i class="fas fa-calendar-check"></i>
+            <span>تاریخ صدور</span>
+          </p>
+          <p class="text-gray-900 font-bold text-lg">{{ viewData.issuanceDate | calendarDate }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 hover:border-purple-400 transition-all">
+          <p class="text-xs font-bold text-purple-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <i class="fas fa-barcode"></i>
+            <span>سریال نمبر سته</span>
+          </p>
+          <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.serialNumber) }}</p>
+        </div>
+        <div class="p-5 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl border border-cyan-200 hover:border-cyan-400 transition-all">
+          <p class="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <i class="fas fa-calendar-day"></i>
+            <span>تاریخ معامله</span>
+          </p>
+          <p class="text-gray-900 font-bold text-lg">{{ viewData.transactionDate | calendarDate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-violet-600 to-purple-600 border-b border-violet-500">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-paperclip text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">اسناد و ضمایم</h2>
+        </div>
+      </div>
+      <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="group p-6 bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl border-2 border-purple-200 hover:border-purple-400 transition-all">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-500 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-folder-open text-white text-lg"></i>
+              </div>
+              <p class="text-base font-bold text-purple-900">اسناد قبلی</p>
+            </div>
+            <div class="mt-4" *ngIf="viewData.previousDocumentsPath; else noPrev">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-white rounded-xl border border-purple-200 shadow-sm">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <i class="fas fa-file-pdf text-purple-600 text-xl flex-shrink-0"></i>
+                  <span class="text-sm text-gray-800 break-all font-medium">{{ getFileName(viewData.previousDocumentsPath) }}</span>
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                  <button type="button" class="group/btn px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(viewData.previousDocumentsPath)">
+                    <i class="fas fa-eye group-hover/btn:scale-110 transition-transform"></i>
+                  </button>
+                  <button type="button" class="group/btn px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(viewData.previousDocumentsPath)">
+                    <i class="fas fa-download group-hover/btn:scale-110 transition-transform"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <ng-template #noPrev>
+              <div class="p-6 bg-white rounded-xl border-2 border-dashed border-gray-300 text-center">
+                <i class="fas fa-file-circle-xmark text-gray-400 text-3xl mb-2"></i>
+                <p class="text-sm text-gray-500 font-medium">فایل موجود نیست</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="group p-6 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl border-2 border-indigo-200 hover:border-indigo-400 transition-all">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-folder text-white text-lg"></i>
+              </div>
+              <p class="text-base font-bold text-indigo-900">اسناد موجوده</p>
+            </div>
+            <div class="mt-4" *ngIf="viewData.existingDocumentsPath; else noExist">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-white rounded-xl border border-indigo-200 shadow-sm">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <i class="fas fa-file-pdf text-indigo-600 text-xl flex-shrink-0"></i>
+                  <span class="text-sm text-gray-800 break-all font-medium">{{ getFileName(viewData.existingDocumentsPath) }}</span>
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                  <button type="button" class="group/btn px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(viewData.existingDocumentsPath)">
+                    <i class="fas fa-eye group-hover/btn:scale-110 transition-transform"></i>
+                  </button>
+                  <button type="button" class="group/btn px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(viewData.existingDocumentsPath)">
+                    <i class="fas fa-download group-hover/btn:scale-110 transition-transform"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <ng-template #noExist>
+              <div class="p-6 bg-white rounded-xl border-2 border-dashed border-gray-300 text-center">
+                <i class="fas fa-file-circle-xmark text-gray-400 text-3xl mb-2"></i>
+                <p class="text-sm text-gray-500 font-medium">فایل موجود نیست</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-emerald-600 to-green-600 border-b border-emerald-500">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-user-tie text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">معلومات فروشنده (عاقد)</h2>
+        </div>
+      </div>
+      <div class="p-8" *ngIf="viewData.sellers?.length; else noSellers">
+        <div class="space-y-6">
+          <div *ngFor="let s of viewData.sellers; let idx = index" class="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-2xl p-6 hover:border-emerald-400 transition-all shadow-md hover:shadow-lg">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <span class="text-white font-bold text-lg">{{ idx + 1 }}</span>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-emerald-700 uppercase tracking-wide">فروشنده</p>
+                  <p class="font-bold text-gray-900 text-lg">شخص {{ idx + 1 }}</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center px-4 py-2 rounded-xl bg-gradient-to-r from-gray-700 to-gray-900 text-white text-sm font-bold shadow-lg">{{ getRoleLabel(s.roleType) }}</span>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.firstName) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام پدر</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.fatherName) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام پدرکلان</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.grandFather) }}</p>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-phone text-emerald-600"></i>
+                  <span>شماره تماس</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.phoneNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-id-card text-blue-600"></i>
+                  <span>شماره تذکره</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.indentityCardNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-receipt text-purple-600"></i>
+                  <span>TIN</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.taxIdentificationNumber) }}</p>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع تذکره</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.tazkiraType) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">جلد / صفحه / نمبر</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.tazkiraVolume) }} / {{ safeValue(s.tazkiraPage) }} / {{ safeValue(s.tazkiraNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">معلومات اضافی</p>
+                <p class="text-gray-900 whitespace-pre-line text-sm">{{ safeValue(s.additionalDetails) }}</p>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="p-5 bg-white border-2 border-gray-200 rounded-xl hover:border-emerald-400 transition-all">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-id-card-alt text-white"></i>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">سند تذکره</p>
+                </div>
+                <div class="mt-3" *ngIf="s.nationalIdCard; else noSid">
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
+                    <span class="text-sm text-gray-800 break-all font-medium">{{ getFileName(s.nationalIdCard) }}</span>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(s.nationalIdCard)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(s.nationalIdCard)">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noSid>
+                  <p class="mt-3 text-sm text-gray-500 text-center p-4 bg-gray-50 rounded-lg">فایل موجود نیست</p>
+                </ng-template>
+              </div>
+
+              <div class="p-5 bg-white border-2 border-gray-200 rounded-xl hover:border-emerald-400 transition-all">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-file-signature text-white"></i>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">مکتوب وکالت / ورثه</p>
+                </div>
+                <div class="mt-3 space-y-3">
+                  <div *ngIf="s.authorizationLetter" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <span class="text-sm text-gray-800 break-all font-medium">وکالت: {{ getFileName(s.authorizationLetter) }}</span>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(s.authorizationLetter)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(s.authorizationLetter)">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="s.heirsLetter" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                    <span class="text-sm text-gray-800 break-all font-medium">ورثه: {{ getFileName(s.heirsLetter) }}</span>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(s.heirsLetter)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(s.heirsLetter)">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div *ngIf="!s.authorizationLetter && !s.heirsLetter" class="text-sm text-gray-500 text-center p-4 bg-gray-50 rounded-lg">فایل موجود نیست</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <ng-template #noSellers>
+        <div class="p-12 text-center">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-user-slash text-gray-400 text-3xl"></i>
+          </div>
+          <p class="text-gray-500 font-semibold">معلومات فروشنده موجود نیست</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-amber-600 to-orange-600 border-b border-amber-500">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-user-check text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">معلومات خریدار (عاقد)</h2>
+        </div>
+      </div>
+      <div class="p-8" *ngIf="viewData.buyers?.length; else noBuyers">
+        <div class="space-y-6">
+          <div *ngFor="let b of viewData.buyers; let idx = index" class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 hover:border-amber-400 transition-all shadow-md hover:shadow-lg">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <span class="text-white font-bold text-lg">{{ idx + 1 }}</span>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-amber-700 uppercase tracking-wide">خریدار</p>
+                  <p class="font-bold text-gray-900 text-lg">شخص {{ idx + 1 }}</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center px-4 py-2 rounded-xl bg-gradient-to-r from-gray-700 to-gray-900 text-white text-sm font-bold shadow-lg">{{ getRoleLabel(b.roleType) }}</span>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.firstName) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام پدر</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.fatherName) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام پدرکلان</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.grandFather) }}</p>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-phone text-amber-600"></i>
+                  <span>شماره تماس</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.phoneNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-id-card text-blue-600"></i>
+                  <span>شماره تذکره</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.indentityCardNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-receipt text-purple-600"></i>
+                  <span>TIN</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.taxIdentificationNumber) }}</p>
+              </div>
+
+              <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-dollar-sign"></i>
+                  <span>قیمت معامله</span>
+                </p>
+                <p class="text-green-900 font-bold text-lg">{{ safeValue(b.priceText || b.price) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع معامله</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.transactionType) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">توضیحات</p>
+                <p class="text-gray-900 text-sm">{{ safeValue(b.transactionTypeDescription) }}</p>
+              </div>
+
+              <div class="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-200">
+                <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-calendar-check"></i>
+                  <span>تاریخ شروع کرایه</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ formatDate(b.rentStartDate) }}</p>
+              </div>
+              <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
+                <p class="text-xs font-bold text-red-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-calendar-times"></i>
+                  <span>تاریخ ختم کرایه</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ formatDate(b.rentEndDate) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">معلومات اضافی</p>
+                <p class="text-gray-900 whitespace-pre-line text-sm">{{ safeValue(b.additionalDetails) }}</p>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="p-5 bg-white border-2 border-gray-200 rounded-xl hover:border-amber-400 transition-all">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-id-card-alt text-white"></i>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">سند تذکره</p>
+                </div>
+                <div class="mt-3" *ngIf="b.nationalIdCard; else noBid">
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
+                    <span class="text-sm text-gray-800 break-all font-medium">{{ getFileName(b.nationalIdCard) }}</span>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(b.nationalIdCard)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(b.nationalIdCard)">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noBid>
+                  <p class="mt-3 text-sm text-gray-500 text-center p-4 bg-gray-50 rounded-lg">فایل موجود نیست</p>
+                </ng-template>
+              </div>
+
+              <div class="p-5 bg-white border-2 border-gray-200 rounded-xl hover:border-amber-400 transition-all">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-file-signature text-white"></i>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">مکتوب وکالت</p>
+                </div>
+                <div class="mt-3" *ngIf="b.authorizationLetter; else noBal">
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <span class="text-sm text-gray-800 break-all font-medium">{{ getFileName(b.authorizationLetter) }}</span>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(b.authorizationLetter)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(b.authorizationLetter)">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noBal>
+                  <p class="mt-3 text-sm text-gray-500 text-center p-4 bg-gray-50 rounded-lg">فایل موجود نیست</p>
+                </ng-template>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <ng-template #noBuyers>
+        <div class="p-12 text-center">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-user-slash text-gray-400 text-3xl"></i>
+          </div>
+          <p class="text-gray-500 font-semibold">معلومات خریدار موجود نیست</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <div class="px-8 py-5 bg-gradient-to-r from-slate-700 to-gray-800 border-b border-slate-600">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-users text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white">معلومات شاهدین</h2>
+        </div>
+      </div>
+      <div class="p-8" *ngIf="viewData.witnesses?.length; else noWitnesses">
+        <div class="space-y-6">
+          <div *ngFor="let w of viewData.witnesses; let idx = index" class="bg-gradient-to-br from-slate-50 to-gray-50 border-2 border-slate-200 rounded-2xl p-6 hover:border-slate-400 transition-all shadow-md hover:shadow-lg">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-slate-600 to-gray-700 rounded-xl flex items-center justify-center shadow-lg">
+                <span class="text-white font-bold text-lg">{{ idx + 1 }}</span>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-700 uppercase tracking-wide">شاهد</p>
+                <p class="font-bold text-gray-900 text-lg">شاهد {{ idx + 1 }}</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(w.firstName) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نام پدر</p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(w.fatherName) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-phone text-slate-600"></i>
+                  <span>شماره تماس</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(w.phoneNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-id-card text-blue-600"></i>
+                  <span>شماره تذکره</span>
+                </p>
+                <p class="text-gray-900 font-semibold text-base">{{ safeValue(w.indentityCardNumber) }}</p>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <div class="p-5 bg-white border-2 border-gray-200 rounded-xl hover:border-slate-400 transition-all">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-id-card-alt text-white"></i>
+                  </div>
+                  <p class="text-sm font-bold text-gray-800">سند تذکره</p>
+                </div>
+                <div class="mt-3" *ngIf="w.nationalIdCard; else noWid">
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
+                    <span class="text-sm text-gray-800 break-all font-medium">{{ getFileName(w.nationalIdCard) }}</span>
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="openDocument(w.nationalIdCard)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button type="button" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" (click)="downloadDocument(w.nationalIdCard)">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noWid>
+                  <p class="mt-3 text-sm text-gray-500 text-center p-4 bg-gray-50 rounded-lg">فایل موجود نیست</p>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noWitnesses>
+        <div class="p-12 text-center">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-users-slash text-gray-400 text-3xl"></i>
+          </div>
+          <p class="text-gray-500 font-semibold">معلومات شاهدین موجود نیست</p>
+        </div>
+      </ng-template>
+    </div>
+
+  </div>
+  </div>
+</div>

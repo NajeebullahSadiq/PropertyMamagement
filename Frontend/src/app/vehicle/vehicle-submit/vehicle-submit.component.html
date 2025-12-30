@@ -1,193 +1,240 @@
-<section>
-    <div class="container">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-lg-12 col-xl-11">
-          <div class="card text-black" style="border-radius: 25px;">
-            <div class="card-body p-md-5">
-  
-              <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات وسایط نقلیه</p>
-              <form [formGroup]="vehicleForm"  (ngSubmit)="vehicleForm.valid ? selectedVehicleId ? updateVehicleDetails() : addVehicleDetails() : null">
-                <div class="form-group">
-                  <input type="hidden" formControlName="id">
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="permitNo" class="form-label">  نمبر جوازسیر </label>
-                        <div class="input-group">
-                          <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                          <input type="text" id="permitNo" class="form-control" formControlName="permitNo">
-                        </div>
-                        <div *ngIf="permitNo?.invalid && (permitNo?.dirty || permitNo?.touched)">
-                          <small class="text-danger" *ngIf="permitNo?.errors?.['required']"> این فیلد الزامی است</small>
-                        </div>
-                      </div>
-                  <div class="col-md-4">
-                    <label for="pilateNo" class="form-label"> نمبر پلیت</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="far fa-square"></i></span>
-                      <input type="number" (keypress)="onlyNumberKey($event)" id="pilateNo" class="form-control" formControlName="pilateNo">
-                    </div>
-                      <div *ngIf="pilateNo?.invalid && (pilateNo?.dirty || pilateNo?.touched)">
-                        <small class="text-danger" *ngIf="pilateNo?.errors?.['required']"> این فیلد الزامی است</small>
-                      </div>
-                    
-                  </div>
-                  <div class="col-md-4">
-                    <label for="typeOfVehicle" class="form-label"> نوعیت موتر </label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="far fa-square"></i></span>
-                      <input  id="typeOfVehicle" class="form-control" formControlName="typeOfVehicle">
-                    </div>
-                      <div *ngIf="typeOfVehicle?.invalid && (typeOfVehicle?.dirty || typeOfVehicle?.touched)">
-                        <small class="text-danger" *ngIf="typeOfVehicle?.errors?.['required']"> این فیلد الزامی است</small>
-                      </div>
-                    
-                  </div>
-                </div>
-                <br />
-                <div class="row">
-                  <div class="col-md-4">
-                    <label for="vehicleHand" class="form-label">دست وسیله نقلیه</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-hand-paper"></i></span>
-                      <select id="vehicleHand" class="form-control" formControlName="vehicleHand">
-                        <option value="">انتخاب کنید</option>
-                        <option *ngFor="let option of vehicleHandOptions" [value]="option.value">{{ option.label }}</option>
-                      </select>
-                    </div>
-                    <div *ngIf="vehicleHand?.invalid && (vehicleHand?.dirty || vehicleHand?.touched)">
-                      <small class="text-danger" *ngIf="vehicleHand?.errors?.['required']"> این فیلد الزامی است</small>
-                    </div>
-                  </div>
-                </div>
-                <br />
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="model" class="form-label">  مودل </label>
-                        <div class="input-group">
-                          <span class="input-group-text"><i class="far fa-square"></i></span>
-                          <input id="model" class="form-control" formControlName="model">
-                        </div>
-                          <div *ngIf="model?.invalid && (model?.dirty || model?.touched)">
-                            <small class="text-danger" *ngIf="model?.errors?.['required']"> این فیلد الزامی است</small>
-                          </div>
-                        
-                      </div>
-                  <div class="col-md-4">
-                    <label for="enginNo" class="form-label">شماره انجین</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-building"></i></span>
-                      <input type="number" (keypress)="onlyNumberKey($event)" id="enginNo" class="form-control" formControlName="enginNo">
-                    </div>
-                    <div *ngIf="enginNo?.invalid && (enginNo?.dirty || enginNo?.touched)">
-                      <small class="text-danger" *ngIf="enginNo?.errors?.['required']"> این فیلد الزامی است</small>
-                    </div>
-                  </div>
-  
-                  <div class="col-md-4">
-                    <label for="shasiNo" class="form-label">شماره شاسی</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-car"></i></span>
-                      <input type="number" (keypress)="onlyNumberKey($event)" id="shasiNo" class="form-control" formControlName="shasiNo">
-                    </div>
-                    <div *ngIf="shasiNo?.invalid && (shasiNo?.dirty || shasiNo?.touched)">
-                      <small class="text-danger" *ngIf="shasiNo?.errors?.['required']"> این فیلد الزامی است</small>
-                    </div>
-                  </div>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="color" class="form-label">  رنگ وسیله نقلیه</label>
-                        <div class="input-group">
-                          <span class="input-group-text"><i class="fas fa-palette"></i></span>
-                          <input  id="color" class="form-control" formControlName="color">
-                        </div>
-                          <div *ngIf="color?.invalid && (color?.dirty || color?.touched)">
-                            <small class="text-danger" *ngIf="color?.errors?.['required']"> این فیلد الزامی است</small>
-                          </div>
-                       
-                      </div>
-                  <div class="col-md-4">
-                    <label for="firstName" class="form-label"> قیمت به عدد</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                      <input type="number" (keypress)="onlyNumberKey($event)" id="price" class="form-control" formControlName="price" (input)="updateOnePercent()">
-                    </div>
-                    <div *ngIf="price?.invalid && (price?.dirty || price?.touched)">
-                      <small class="text-danger" *ngIf="price?.errors?.['required']"> این فیلد الزامی است</small>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <label for="firstName" class="form-label"> قیمت به حروف</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                      <input type="text" id="priceText" class="form-control" formControlName="priceText">
-                    </div>
-                    <div *ngIf="priceText?.invalid && (priceText?.dirty || priceText?.touched)">
-                      <small class="text-danger" *ngIf="priceText?.errors?.['required']"> این فیلد الزامی است</small>
-                    </div>
-                  </div>
-                </div>
-                <br>
-                <div class="row">
-                  <div class="col-md-4">
-                    <label for="firstName" class="form-label"> مبلغ حق ‌العمل رهنمای معاملات  </label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                      <input type="number" id="royaltyAmount"  [value]="onePercent"  class="form-control" disabled>
-                    </div>
-                
-                  </div>
-                  <div class="col-md-6">
-                    <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
-                    <div class="col-md-9">
-                      <div class="form-group col-md-12">
-                        <app-vehicle-fileupload #childComponent [existingFilePath]="imageName" (sendMessage)="uploadFinished($event)"></app-vehicle-fileupload>
-                     
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-2">
-                    <ng-container *ngIf="vehicleForm.get('id')?.value && vehicleForm.get('filePath')?.value">
-                      <h3 class="download-link" (click)="downloadFiles()">
-                        <i class="fas fa-arrow-alt-circle-down me-2"></i> 
-                        <div class="form-group col-md-12">
-                          دانلود اسناد
-                        </div>
-                      </h3>
-                    </ng-container>
-                  </div>
-                 
-  
-                </div>
-                <br>
-                <div class="row">
-                  <div class="col-md-10">
-  
-                    <div class="form-group">
-                      <label>جزئیات دیگر</label>
-                      <textarea id="des" class="form-control" formControlName="des" name="des" rows="3"
-                        required></textarea>
-                    </div>
-                    <div *ngIf="des?.invalid && (des?.dirty || des?.touched)">
-                      <small class="text-danger" *ngIf="des?.errors?.['required']"> این فیلد الزامی است</small>
-                    </div>
-                  </div>
-                </div>
-                <br>
-                <button type="submit" [disabled]="vehicleForm.invalid" class="btn btn-success"> {{selectedVehicleId ?
-                  'تغیر معلومات' : 'ثبت معلومات'}}</button>
-                <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
-                  style="margin-right: 5px;">جدید</button>
-                 
-              </form>
-          
+<section class="w-full bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات وسایط نقلیه</h1>
+      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به وسیله نقلیه را با دقت تکمیل نمایید</p>
+    </div>
+
+    <form [formGroup]="vehicleForm" (ngSubmit)="vehicleForm.valid ? selectedVehicleId ? updateVehicleDetails() : addVehicleDetails() : null">
+      <div class="hidden">
+        <input type="hidden" formControlName="id">
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-car"></i>
+            <span>مشخصات اساسی وسیله نقلیه</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label for="permitNo" class="block text-sm font-semibold text-gray-700 mb-2">نمبر جوازسیر</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-id-card"></i>
+                </span>
+                <input type="text" id="permitNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="permitNo">
+              </div>
+              <div *ngIf="permitNo?.invalid && (permitNo?.dirty || permitNo?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="permitNo?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
             </div>
-  
+            <div>
+              <label for="pilateNo" class="block text-sm font-semibold text-gray-700 mb-2">نمبر پلیت</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-hashtag"></i>
+                </span>
+                <input type="number" (keypress)="onlyNumberKey($event)" id="pilateNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="pilateNo">
+              </div>
+              <div *ngIf="pilateNo?.invalid && (pilateNo?.dirty || pilateNo?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="pilateNo?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div>
+              <label for="typeOfVehicle" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت موتر</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-car"></i>
+                </span>
+                <input id="typeOfVehicle" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="typeOfVehicle">
+              </div>
+              <div *ngIf="typeOfVehicle?.invalid && (typeOfVehicle?.dirty || typeOfVehicle?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="typeOfVehicle?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
           </div>
-  
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label for="vehicleHand" class="block text-sm font-semibold text-gray-700 mb-2">دست وسیله نقلیه</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-hand-paper"></i>
+                </span>
+                <select id="vehicleHand" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="vehicleHand">
+                  <option value="">انتخاب کنید</option>
+                  <option *ngFor="let option of vehicleHandOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+              </div>
+              <div *ngIf="vehicleHand?.invalid && (vehicleHand?.dirty || vehicleHand?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="vehicleHand?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div>
+              <label for="model" class="block text-sm font-semibold text-gray-700 mb-2">مودل</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-calendar"></i>
+                </span>
+                <input id="model" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="model">
+              </div>
+              <div *ngIf="model?.invalid && (model?.dirty || model?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="model?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div>
+              <label for="color" class="block text-sm font-semibold text-gray-700 mb-2">رنگ وسیله نقلیه</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-palette"></i>
+                </span>
+                <input id="color" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="color">
+              </div>
+              <div *ngIf="color?.invalid && (color?.dirty || color?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="color?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label for="enginNo" class="block text-sm font-semibold text-gray-700 mb-2">شماره انجین</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-cog"></i>
+                </span>
+                <input type="number" (keypress)="onlyNumberKey($event)" id="enginNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="enginNo">
+              </div>
+              <div *ngIf="enginNo?.invalid && (enginNo?.dirty || enginNo?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="enginNo?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div>
+              <label for="shasiNo" class="block text-sm font-semibold text-gray-700 mb-2">شماره شاسی</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-barcode"></i>
+                </span>
+                <input type="number" (keypress)="onlyNumberKey($event)" id="shasiNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="shasiNo">
+              </div>
+              <div *ngIf="shasiNo?.invalid && (shasiNo?.dirty || shasiNo?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="shasiNo?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>معلومات قیمت و معامله</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label for="price" class="block text-sm font-semibold text-gray-700 mb-2">قیمت به عدد</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-money-bill-alt"></i>
+                </span>
+                <input type="number" (keypress)="onlyNumberKey($event)" id="price" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="price" (input)="updateOnePercent()">
+              </div>
+              <div *ngIf="price?.invalid && (price?.dirty || price?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="price?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div>
+              <label for="priceText" class="block text-sm font-semibold text-gray-700 mb-2">قیمت به حروف</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-font"></i>
+                </span>
+                <input type="text" id="priceText" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="priceText">
+              </div>
+              <div *ngIf="priceText?.invalid && (priceText?.dirty || priceText?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="priceText?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div>
+              <label for="royaltyAmount" class="block text-sm font-semibold text-gray-700 mb-2">مبلغ حق‌العمل رهنمای معاملات</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-percentage"></i>
+                </span>
+                <input type="number" id="royaltyAmount" [value]="onePercent" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed" disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>آپلود اسناد</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <h3 class="text-base font-semibold text-gray-800 mb-3">آپلود اسنادها در سیستم</h3>
+              <app-vehicle-fileupload #childComponent [existingFilePath]="imageName" (sendMessage)="uploadFinished($event)"></app-vehicle-fileupload>
+            </div>
+            <div *ngIf="vehicleForm.get('id')?.value && vehicleForm.get('filePath')?.value">
+              <h3 class="text-base font-semibold text-gray-800 mb-3">دانلود اسناد</h3>
+              <button type="button" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2" (click)="downloadFiles()">
+                <i class="fas fa-download"></i>
+                <span>دانلود اسناد</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-info-circle"></i>
+            <span>جزئیات دیگر</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div>
+            <label for="des" class="block text-sm font-semibold text-gray-700 mb-2">جزئیات</label>
+            <div class="relative">
+              <span class="absolute top-3 left-3 text-gray-500">
+                <i class="fas fa-align-right"></i>
+              </span>
+              <textarea id="des" class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="des" rows="3"></textarea>
+            </div>
+            <div *ngIf="des?.invalid && (des?.dirty || des?.touched)">
+              <small class="text-red-600 text-xs mt-1 block" *ngIf="des?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="px-6 py-6">
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button type="submit" [disabled]="vehicleForm.invalid" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              <i class="fas fa-save"></i>
+              <span>{{selectedVehicleId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+            </button>
+            <button type="reset" (click)="resetForms()" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+              <i class="fas fa-plus"></i>
+              <span>جدید</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>

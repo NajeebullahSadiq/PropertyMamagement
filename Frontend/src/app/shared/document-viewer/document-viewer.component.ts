@@ -53,8 +53,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     });
 
     // Build the direct URL to the file
-    const cleanPath = this.data.filePath.replace(/^[\/\\]+/, '');
-    this.rawFileUrl = `${environment.apiURL}/upload/view/${cleanPath}`;
+    this.rawFileUrl = this.fileService.getFileUrl(this.data.filePath);
     
     console.log('Generated file URL:', this.rawFileUrl);
 
@@ -62,7 +61,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
       this.fileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawFileUrl);
       this.isLoading = false;
     } else if (this.isImage) {
-      this.fileService.viewFile(cleanPath).subscribe({
+      this.fileService.viewFile(this.data.filePath).subscribe({
         next: (blob) => {
           this.objectUrl = URL.createObjectURL(blob);
           this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(this.objectUrl);

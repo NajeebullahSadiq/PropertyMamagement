@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute } from '@angular/router';
 import { VehicleService } from '../shared/vehicle.service';
 import { VehiclesubService } from '../shared/vehiclesub.service';
@@ -15,7 +14,7 @@ import { WitnessdetailComponent } from './vehicle-submit/witnessdetail/witnessde
 })
 export class VehicleComponent {
   PropertyId: number=0;
-  @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
+  currentTab: number = 0;
   @ViewChild('propertyDetails') propertyDetails!: VehicleSubmitComponent;
   @ViewChild('propertySeller') propertySeller!: SellerdetailComponent;
   @ViewChild('propertyBuyer') propertyBuyer!: BuyerdetailComponent;
@@ -28,23 +27,27 @@ export class VehicleComponent {
      
     });
   }
+  
+  setTab(index: number) {
+    this.currentTab = index;
+  }
+  
   nextTab() {
     console.log('nextTab called');
-    console.log('Current tab index:', this.tabGroup?.selectedIndex);
+    console.log('Current tab index:', this.currentTab);
     console.log('Seller ID:', this.vehicleSubservice.sellerId);
-    const nextIndex = (this.tabGroup?.selectedIndex ?? 0) + 1;
-    if (this.tabGroup) {
-      const tabCount = this.tabGroup._tabs.length;
-      console.log('Moving to tab index:', nextIndex);
-      this.tabGroup.selectedIndex = nextIndex % (tabCount || 1);
-    }
+    const nextIndex = this.currentTab + 1;
+    const tabCount = 4;
+    console.log('Moving to tab index:', nextIndex);
+    this.currentTab = nextIndex % tabCount;
   }
+  
   resetChild(){
     this.propertyDetails.resetChild();
     this.propertySeller.resetChild();
    this.propertyBuyer.resetChild();
    this.propertyWitness.resetChild();
-   this.tabGroup.selectedIndex = 0;
+   this.currentTab = 0;
   
  
   }

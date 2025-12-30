@@ -19,6 +19,12 @@ export class WitnessdetailComponent {
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   @ViewChild('nationalIdComponent') nationalIdComponent!: NationalidUploadComponent;
+  onEditWitness(id: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.BindValu(id);
+  }
   onNextClick() {
     this.next.emit();
   }

@@ -34,6 +34,7 @@ export interface PropertyDetails {
   export interface PropertyDetailsList {
    
     id: number;
+    pnumber?: number;
     parea: number;
     punitTypeId:number;
     numofFloor:number;
@@ -52,6 +53,8 @@ export interface PropertyDetails {
     iscomplete:boolean;
     buyerName:string;
     sellerName:string;
+    buyerIndentityCardNumber?: number;
+    sellerIndentityCardNumber?: number;
 
   }
 

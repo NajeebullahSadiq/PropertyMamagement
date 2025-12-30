@@ -11,6 +11,18 @@ export class FileService {
 
   constructor(private http: HttpClient) { }
 
+  private encodeFilePath(filePath: string): string {
+    let cleanPath = filePath || '';
+    cleanPath = cleanPath.replace(/^[\/\\]+/, '');
+    cleanPath = cleanPath.replace(/\\/g, '/');
+    cleanPath = cleanPath.replace(/\/{2,}/g, '/');
+    return cleanPath
+      .split('/')
+      .filter(Boolean)
+      .map(segment => encodeURIComponent(segment))
+      .join('/');
+  }
+
   uploadFile(file: File, documentType?: string): Observable<HttpEvent<any>> {
     const formData = new FormData();
     formData.append('file', file);
@@ -28,9 +40,11 @@ export class FileService {
   }
 
   viewFile(filePath: string): Observable<Blob> {
-    const url = `${this.apiUrl}/upload/view/${filePath}`;
+    const encodedPath = this.encodeFilePath(filePath);
+    const url = `${this.apiUrl}/upload/view/${encodedPath}`;
     console.log('FileService.viewFile: Calling API', {
       filePath: filePath,
+      encodedPath: encodedPath,
       url: url
     });
     return this.http.get(url, {
@@ -39,38 +53,32 @@ export class FileService {
   }
 
   downloadFile(filePath: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/upload/download/${filePath}`, {
+    const encodedPath = this.encodeFilePath(filePath);
+    return this.http.get(`${this.apiUrl}/upload/download/${encodedPath}`, {
       responseType: 'blob'
     });
   }
 
   deleteFile(filePath: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/upload/delete/${filePath}`);
+    const encodedPath = this.encodeFilePath(filePath);
+    return this.http.delete(`${this.apiUrl}/upload/delete/${encodedPath}`);
   }
 
   getFileUrl(filePath: string): string {
-    // Use the API endpoint to view files
-    // Clean the file path and encode properly
-    let cleanPath = filePath;
-    
-    // Remove leading slashes and backslashes
-    cleanPath = cleanPath.replace(/^[\/\\]+/, '');
-    
-    // For file viewing, we don't need to encode the entire path if it's already properly formatted
-    // Just ensure special characters are properly handled
-    const fileUrl = `${this.apiUrl}/upload/view/${cleanPath}`;
+    const encodedPath = this.encodeFilePath(filePath);
+    const fileUrl = `${this.apiUrl}/upload/view/${encodedPath}`;
     console.log('FileService.getFileUrl:', {
       apiUrl: this.apiUrl,
       originalPath: filePath,
-      cleanPath: cleanPath,
+      encodedPath: encodedPath,
       finalUrl: fileUrl
     });
     return fileUrl;
   }
 
   getDownloadUrl(filePath: string): string {
-    // For downloads, use the API endpoint
-    return `${this.apiUrl}/upload/download/${filePath}`;
+    const encodedPath = this.encodeFilePath(filePath);
+    return `${this.apiUrl}/upload/download/${encodedPath}`;
   }
 
   getFileExtension(fileName: string): string {

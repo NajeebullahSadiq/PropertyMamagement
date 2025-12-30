@@ -54,12 +54,25 @@ export class NationalidUploadComponent implements OnInit, OnChanges {
   }
 
   private initializeExistingFile(): void {
-    if (this.existingFilePath && !this.uploadedFilePath) {
-      this.uploadedFilePath = this.existingFilePath;
-      this.uploadedFileName = this.existingFileName || this.extractFileName(this.existingFilePath);
-      if (this.uploadedFileName) {
-        this.message = 'فایل موجود';
+    if (this.isUploading) {
+      return;
+    }
+
+    if (this.existingFilePath) {
+      if (this.uploadedFilePath !== this.existingFilePath) {
+        this.uploadedFilePath = this.existingFilePath;
+        this.uploadedFileName = this.existingFileName || this.extractFileName(this.existingFilePath);
+        this.message = this.uploadedFileName ? 'فایل موجود' : '';
+        this.progress = 0;
       }
+      return;
+    }
+
+    if (this.uploadedFilePath || this.uploadedFileName || this.message) {
+      this.uploadedFilePath = '';
+      this.uploadedFileName = '';
+      this.message = '';
+      this.progress = 0;
     }
   }
 

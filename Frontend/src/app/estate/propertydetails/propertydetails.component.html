@@ -1,16 +1,23 @@
-<section class="w-full">
-  <div class="max-w-7xl mx-auto">
-    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-      <div class="px-6 py-8 sm:px-8 sm:py-10">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">ثبت مشخصات ملکیت</h1>
-            <form [formGroup]="propertyForm"
-              (ngSubmit)="propertyForm.valid ? selectedPropertyId ? updatePropertyDetails() : addPropertyDetails() : null">
-              <div class="hidden">
-                <input type="hidden" formControlName="id">
-              </div>
- <div class="mb-8">
-                <h2 class="text-xl font-bold text-blue-600 mb-6 pb-3 border-b-2 border-blue-100">مشخصات نوعیت ملکیت</h2>
-              </div>
+<section class="w-full bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات ملکیت</h1>
+      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به ملکیت را با دقت تکمیل نمایید</p>
+    </div>
+
+    <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()">
+      <div class="hidden">
+        <input type="hidden" formControlName="id">
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-home"></i>
+            <span>مشخصات نوعیت ملکیت</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ملکیت</label>
@@ -79,11 +86,17 @@
                   </div>
                 </div>
               </div>
-              
-              <div class="mb-8">
-                <h2 class="text-xl font-bold text-blue-600 mb-6 pb-3 border-b-2 border-blue-100">مشخصات سند</h2>
-              </div>
-              
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-file-contract"></i>
+            <span>مشخصات سند</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت سند</label>
@@ -149,16 +162,18 @@
                 </div>
 
               </div>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                
-            
-              </div>
-              <div class="mb-8">
-                <h2 class="text-xl font-bold text-blue-600 mb-6 pb-3 border-b-2 border-blue-100">آپلود اسناد ملکیت</h2>
-              </div>
+        </div>
+      </div>
 
-              <div class="space-y-6 mb-8">
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>آپلود اسناد ملکیت</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+              <div class="space-y-6 mb-6">
                 <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
                   <h3 class="text-base font-semibold text-gray-800 mb-3">آپلود اسناد قبلی</h3>
                   <app-upload #previousDocsComponent [existingFilePath]="previousDocumentsPath" (sendMessage)="previousDocumentsUploadFinished($event)"></app-upload>
@@ -169,12 +184,18 @@
                   <app-upload #existingDocsComponent [existingFilePath]="existingDocumentsPath" (sendMessage)="existingDocumentsUploadFinished($event)"></app-upload>
                 </div>
               </div>
+        </div>
+      </div>
 
-              <div class="mb-8">
-                <h2 class="text-xl font-bold text-blue-600 mb-6 pb-3 border-b-2 border-blue-100">ثبت آدرس ملکیت</h2>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>ثبت آدرس ملکیت</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
                   <ng-select formControlName="provinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterResults($event)" class="custom-ng-select">
@@ -200,11 +221,17 @@
                   </div>
                 </div>
               </div>
+        </div>
+      </div>
 
-              <div class="mb-8">
-                <h2 class="text-xl font-bold text-blue-600 mb-6 pb-3 border-b-2 border-blue-100">حدود اربعه</h2>
-              </div>
-
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-border-all"></i>
+            <span>حدود اربعه</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">شمالا</label>
@@ -259,27 +286,36 @@
                 </div>
               </div>
 
-              <div class="mb-8">
+              <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">جزئیات دیگر</label>
-                <textarea id="des" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" formControlName="des" name="des" rows="4"
-                  required></textarea>
+                <div class="relative">
+                  <span class="absolute top-3 left-3 text-gray-500">
+                    <i class="fas fa-align-left"></i>
+                  </span>
+                  <textarea id="des" class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" formControlName="des" name="des" rows="4" required></textarea>
+                </div>
                 <div *ngIf="des?.invalid && (des?.dirty || des?.touched)">
                   <small class="text-red-600 text-xs mt-1 block" *ngIf="des?.errors?.['required']">این فیلد الزامی است</small>
                 </div>
               </div>
-
-              <div class="flex gap-3 pt-6 border-t border-gray-200">
-                <button type="submit" [disabled]="propertyForm.invalid" class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                  {{selectedPropertyId ? 'تغیر معلومات' : 'ثبت معلومات'}}
-                </button>
-                <button type="reset" (click)="resetForms()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
-                  ثبت جدید
-                </button>
-              </div>
-               
-            </form>
+        </div>
       </div>
-    </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="px-6 py-6">
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              <i class="fas fa-save"></i>
+              <span>{{selectedPropertyId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+            </button>
+            <button type="reset" (click)="resetForms()" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+              <i class="fas fa-plus-circle"></i>
+              <span>ثبت جدید</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
 </section>
 

@@ -1,328 +1,383 @@
-<section>
-    <div class="container">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-lg-12 col-xl-11">
-                <div class="card text-black" style="border-radius: 25px;">
-                    <div class="card-body p-md-5">
-                        <div class="heading-wrapper">
-                            <img [src]="imagePath" class="seller-image" alt="Buyer Image">
-                          
-                            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات فروشنده</p> 
+<section class="w-full bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات مالک وسیله نقلیه</h1>
+      <p class="text-center text-gray-600">لطفا اطلاعات کامل مالک وسیله نقلیه را وارد نمایید</p>
+    </div>
+
+    <div class="mb-6" *ngIf="selectedSellerId">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <span class="text-blue-800 font-semibold">در حال ویرایش آی دی: {{ selectedSellerId }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="SellerForm" (ngSubmit)="SellerForm.valid ? selectedSellerId ? updateSellerDetails() : addSellerDetail() : null">
+      <div class="hidden">
+        <input type="hidden" formControlName="id" />
+      </div>
+
+      <div class="mb-6" *ngIf="duplicateError">
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg" role="alert">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <i class="fas fa-exclamation-circle text-red-500 ml-3"></i>
+              <span class="text-red-800 font-medium">{{ duplicateError }}</span>
+            </div>
+            <button type="button" class="text-red-500 hover:text-red-700" (click)="duplicateError = ''" aria-label="Close">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-user-circle"></i>
+            <span>پروفایل و اسناد</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="mb-6">
+            <app-profile-image-cropper #childComponent [initialImageUrl]="imagePath" documentType="profile"
+              [roundCropper]="true" (imageChanged)="profilePreviewChanged($event)"
+              (imageUploaded)="profileImageUploaded($event)" style="text-align: left"></app-profile-image-cropper>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-blue-600 mb-3 flex items-center gap-2">
+              <i class="fas fa-id-card"></i>
+              <span>آپلود تذکره ملی (الزامی)</span>
+            </h3>
+            <app-vehicle-nationalid-upload #nationalIdComponent [existingFilePath]="nationalIdFileName"
+              (sendMessage)="nationalIdUploadFinished($event)" style="text-align: left"></app-vehicle-nationalid-upload>
+            <div *ngIf="nationalIdCard?.invalid && (nationalIdCard?.dirty || nationalIdCard?.touched)">
+              <small class="text-red-600 text-xs mt-1 block" *ngIf="nationalIdCard?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" *ngIf="isAuthorizedAgent() || isHeirs()">
+                <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-file-signature"></i>
+                        <span>اسناد اضافی</span>
+                    </h2>
+                </div>
+                <div class="px-6 py-6">
+                    <div class="mb-6" *ngIf="isAuthorizedAgent()">
+                        <h3 class="text-lg font-bold text-red-600 mb-3 flex items-center gap-2">
+                            <i class="fas fa-file-signature"></i>
+                            <span>آپلود وکالت نامه (الزامی)</span>
+                        </h3>
+                        <app-vehicle-fileupload #authLetterComponent [existingFilePath]="authorizationLetterName"
+                            (sendMessage)="authorizationLetterUploadFinished($event)" style="text-align: left"></app-vehicle-fileupload>
+                        <div *ngIf="authorizationLetter?.invalid && (authorizationLetter?.dirty || authorizationLetter?.touched)">
+                            <small class="text-red-600 text-xs mt-1 block" *ngIf="authorizationLetter?.errors?.['required']">آپلود وکالت نامه الزامی است</small>
                         </div>
-                        <app-profile-image-cropper
-                          #childComponent
-                          [initialImageUrl]="imagePath"
-                          documentType="profile"
-                          [roundCropper]="true"
-                          (imageChanged)="profilePreviewChanged($event)"
-                          (imageUploaded)="profileImageUploaded($event)"
-                          style="text-align:left;"
-                        ></app-profile-image-cropper>
-                        <form [formGroup]="SellerForm"
-                            (ngSubmit)="SellerForm.valid ? selectedSellerId ? updateSellerDetails() : addSellerDetail() : null">
-                            <div class="form-group">
-                                <input type="hidden" formControlName="id">
-                            </div>
+                    </div>
 
-                            <!-- Duplicate Error Message -->
-                            <div class="row" *ngIf="duplicateError">
-                                <div class="col-md-12">
-                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 4px solid #dc3545; font-weight: 500;">
-                                        <i class="fas fa-exclamation-circle" style="margin-left: 8px;"></i>
-                                        {{ duplicateError }}
-                                        <button type="button" class="btn-close" (click)="duplicateError = ''" aria-label="Close"></button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Role Type Selection -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="roleType" class="form-label">نوعیت عاقد</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                                        <select id="roleType" class="form-control" formControlName="roleType">
-                                            <option *ngFor="let role of roleTypes" [value]="role.value">{{ role.label }}</option>
-                                        </select>
-                                    </div>
-                                    <div *ngIf="roleType?.invalid && (roleType?.dirty || roleType?.touched)">
-                                        <small class="text-danger" *ngIf="roleType?.errors?.['required']">این فیلد الزامی است</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Conditional Authorization Letter Upload (for agents) -->
-                            <div class="row mt-3" *ngIf="isAuthorizedAgent()">
-                                <div class="col-md-12">
-                                    <h5 style="font-weight: bold; color: #dc3545;">آپلود وکالت نامه (الزامی)</h5>
-                                    <app-vehicle-fileupload #authLetterComponent [existingFilePath]="authorizationLetterName" (sendMessage)="authorizationLetterUploadFinished($event)" style="text-align:left;"></app-vehicle-fileupload>
-                                    <div *ngIf="authorizationLetter?.invalid && (authorizationLetter?.dirty || authorizationLetter?.touched)">
-                                        <small class="text-danger" *ngIf="authorizationLetter?.errors?.['required']">آپلود وکالت نامه الزامی است</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Conditional Heirs Letter Upload (for heirs) -->
-                            <div class="row mt-3" *ngIf="isHeirs()">
-                                <div class="col-md-12">
-                                    <h5 style="font-weight: bold; color: #dc3545;">آپلود نامه ورثه (الزامی)</h5>
-                                    <app-vehicle-fileupload #heirsLetterComponent [existingFilePath]="heirsLetterName" (sendMessage)="heirsLetterUploadFinished($event)" style="text-align:left;"></app-vehicle-fileupload>
-                                    <div *ngIf="heirsLetter?.invalid && (heirsLetter?.dirty || heirsLetter?.touched)">
-                                        <small class="text-danger" *ngIf="heirsLetter?.errors?.['required']">آپلود نامه ورثه الزامی است</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="firstName" class="form-label">نام </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" id="firstName" class="form-control"
-                                            formControlName="firstName">
-                                        <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
-                                            <small class="text-danger" *ngIf="firstName?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="fatherName" class="form-label">نام پدر </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" id="fatherName" class="form-control"
-                                            formControlName="fatherName">
-                                        <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
-                                            <small class="text-danger" *ngIf="fatherName?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                               
-                            </div>
-                            
-                           
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label for="grandFather" class="form-label">نام پدر کلان</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" id="grandFather" class="form-control"
-                                            formControlName="grandFather">
-                                        <div *ngIf="grandFather?.invalid && (grandFather?.dirty || grandFather?.touched)">
-                                            <small class="text-danger" *ngIf="grandFather?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="tazkiraType" class="form-label">نوع تذکره</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                                        <select id="tazkiraType" class="form-control" formControlName="tazkiraType">
-                                            <option value="">انتخاب کنید</option>
-                                            <option value="Electronic">تذکره الکترونیکی</option>
-                                            <option value="Paper">تذکره کاغذی</option>
-                                        </select>
-                                        <div *ngIf="tazkiraType?.invalid && (tazkiraType?.dirty || tazkiraType?.touched)">
-                                            <small class="text-danger" *ngIf="tazkiraType?.errors?.['required']">این فیلد الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="indentityCardNumber" class="form-label">شماره تذکره</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text"  (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="form-control"
-                                            formControlName="indentityCardNumber">
-                                        <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
-                                            <small class="text-danger" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                </div>
-
-                                <!-- Conditional Paper Tazkira Fields -->
-                                <div class="row" *ngIf="isPaperTazkira()">
-                                    <div class="col-md-4">
-                                        <label for="tazkiraVolume" class="form-label">جلد</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-book"></i></span>
-                                            <input type="text" id="tazkiraVolume" class="form-control" formControlName="tazkiraVolume">
-                                            <div *ngIf="tazkiraVolume?.invalid && (tazkiraVolume?.dirty || tazkiraVolume?.touched)">
-                                                <small class="text-danger" *ngIf="tazkiraVolume?.errors?.['required']">این فیلد الزامی است</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="tazkiraPage" class="form-label">صفحه</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-file"></i></span>
-                                            <input type="text" id="tazkiraPage" class="form-control" formControlName="tazkiraPage">
-                                            <div *ngIf="tazkiraPage?.invalid && (tazkiraPage?.dirty || tazkiraPage?.touched)">
-                                                <small class="text-danger" *ngIf="tazkiraPage?.errors?.['required']">این فیلد الزامی است</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="tazkiraNumber" class="form-label"> ثبتنمبر</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
-                                            <input type="text" id="tazkiraNumber" class="form-control" formControlName="tazkiraNumber">
-                                            <div *ngIf="tazkiraNumber?.invalid && (tazkiraNumber?.dirty || tazkiraNumber?.touched)">
-                                                <small class="text-danger" *ngIf="tazkiraNumber?.errors?.['required']">این فیلد الزامی است</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label for="phoneNumber" class="form-label"> شماره موبایل</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                            <input type="text"  (keypress)="onlyNumberKey($event)" id="phoneNumber" class="form-control"
-                                                formControlName="phoneNumber">
-                                            <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
-                                                <small class="text-danger" *ngIf="phoneNumber?.errors?.['required']">این فیلد
-                                                    الزامی است</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <br>
-                                <section>
-                                    <div class="row d-flex justify-content-center align-items-center h-100">  
-                                        <h3 style="font-weight: bold;"> آپلود تذکره ملی فروشنده</h3>
-                                        <div class="col-md-12">
-                                            <app-vehicle-nationalid-upload #nationalIdComponent [existingFilePath]="nationalIdFileName" (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-vehicle-nationalid-upload>
-                                            <div *ngIf="nationalIdCard?.invalid && (nationalIdCard?.dirty || nationalIdCard?.touched)">
-                                                <small class="text-danger" *ngIf="nationalIdCard?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-                                <br>
-                                <section>
-                                    <div class="row d-flex justify-content-center align-items-center h-100">  
-                                                        <h3 style="font-weight: bold;"> سکونت اصلی</h3>
-                                <div class="row">
-                               
-                                <div class="col-md-4">
-                                    <label class="form-label me-3"> ولایت</label>
-                                    <ng-select formControlName="paddressProvinceId" [items]="province" [selectOnTab]="true"
-                                      bindLabel="dari" bindValue="id" (change)="filterResults($event)">
-                                    </ng-select>
-                                  
-                                  </div>
-                               
-                                <div class="col-md-4">
-                                    <label class="form-label me-3"> ناحیه/ولسوالی</label>
-                                    <ng-select formControlName="paddressDistrictId" [items]="district" [selectOnTab]="true"
-                                      bindLabel="dari" bindValue="id">
-                                    </ng-select>
-                                  
-                                  </div>
-                                <div class="col-md-4">
-                                    <label for="paddressVillage" class="form-label"> ګذر / قریه / ادرس بلاک</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" id="paddressVillage" class="form-control"
-                                            formControlName="paddressVillage">
-                                        <div *ngIf="paddressVillage?.invalid && (paddressVillage?.dirty || paddressVillage?.touched)">
-                                            <small class="text-danger" *ngIf="paddressVillage?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                      
-                          </div>    
-                        </section>
-                        <br>
-                        <section>
-                           
-                            <div class="row">
-                                <div class="row d-flex justify-content-center align-items-center h-100">  
-                                    <h3 style="font-weight: bold;"> سکونت فعلی</h3>
-                              
-                                
-                                <div class="col-md-4">
-                                    <label class="form-label me-3"> ولایت </label>
-                                    <ng-select formControlName="taddressProvinceId" [items]="province" [selectOnTab]="true"
-                                      bindLabel="dari" bindValue="id" (change)="filterResults2($event)">
-                                    </ng-select>
-                                  
-                                  </div>
-                              
-                                <div class="col-md-4">
-                                    <label class="form-label me-3"> ناحیه/ولسوالی</label>
-                                    <ng-select formControlName="taddressDistrictId" [items]="district2" [selectOnTab]="true"
-                                      bindLabel="dari" bindValue="id">
-                                    </ng-select>
-                                  
-                                  </div>
-                                <div class="col-md-4">
-                                    <label for="taddressVillage" class="form-label"> ګذر / قریه / ادرس بلاک </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" id="taddressVillage" class="form-control"
-                                            formControlName="taddressVillage">
-                                        <div *ngIf="taddressVillage?.invalid && (taddressVillage?.dirty || taddressVillage?.touched)">
-                                            <small class="text-danger" *ngIf="taddressVillage?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>       
-                            </div>
+                    <div *ngIf="isHeirs()">
+                        <h3 class="text-lg font-bold text-red-600 mb-3 flex items-center gap-2">
+                            <i class="fas fa-users"></i>
+                            <span>آپلود نامه ورثه (الزامی)</span>
+                        </h3>
+                        <app-vehicle-fileupload #heirsLetterComponent [existingFilePath]="heirsLetterName"
+                            (sendMessage)="heirsLetterUploadFinished($event)" style="text-align: left"></app-vehicle-fileupload>
+                        <div *ngIf="heirsLetter?.invalid && (heirsLetter?.dirty || heirsLetter?.touched)">
+                            <small class="text-red-600 text-xs mt-1 block" *ngIf="heirsLetter?.errors?.['required']">آپلود نامه ورثه الزامی است</small>
                         </div>
-                        </section>
-                        <br>
-                        <button type="submit" [disabled]="SellerForm.invalid" class="btn btn-success">{{selectedSellerId ?
-                          'تغیر معلومات' : 'ثبت معلومات'}}</button>
-                        <button type="reset"  class="btn btn-primary"
-                        style="margin-right: 5px;" (click)="resetChild()">جدید</button>
-                        </form>
                     </div>
                 </div>
-                <br>
-                <div class="container">
-                <table class="table table-bordered">
-                    <thead>
-                      <tr style="text-align: center;">
-                        <th> آی دی</th>
-                        <th>نام</th>
-                        <th>نام پدر</th>
-                        <th>نام پدر کلان</th>
-                        <th>شماره تذکره</th>
-                        <th>شماره موبایل</th>
-                        <th>نوعیت عاقد</th>
-                        <th>عملیات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let s of SellerDetails" style="text-align: center;">
-                        <td (click)="BindValue(s.id)" style="cursor: pointer;">{{ s.id }}</td>
-                        <td (click)="BindValue(s.id)" style="cursor: pointer;">{{ s.firstName }}</td>
-                        <td (click)="BindValue(s.id)" style="cursor: pointer;">{{ s.fatherName }}</td>
-                        <td (click)="BindValue(s.id)" style="cursor: pointer;">{{ s.grandFather }}</td>
-                        <td (click)="BindValue(s.id)" style="cursor: pointer;">{{ s.indentityCardNumber }}</td>
-                        <td (click)="BindValue(s.id)" style="cursor: pointer;">{{ s.phoneNumber }}</td>
-                        <td (click)="BindValue(s.id)" style="cursor: pointer;">{{ s.roleType }}</td>
-                        <td>
-                          <button class="btn btn-danger btn-sm" (click)="deleteSeller(s.id)">حذف</button>
-                        </td>
-                      </tr>
-                      <tr *ngIf="!SellerDetails || SellerDetails.length === 0">
-                        <td colspan="8" style="text-align: center;">هیچ فروشنده‌ای ثبت نشده است</td>
-                      </tr>
-                    </tbody>
-                  </table>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-info-circle"></i>
+                        <span>معلومات اساسی</span>
+                    </h2>
                 </div>
+                <div class="px-6 py-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="roleType" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت عاقد</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-user-tag"></i>
+                                </span>
+                                <select id="roleType" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="roleType">
+                                    <option *ngFor="let role of roleTypes" [value]="role.value">{{ role.label }}</option>
+                                </select>
+                            </div>
+                            <div *ngIf="roleType?.invalid && (roleType?.dirty || roleType?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="roleType?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">نام</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" id="firstName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="firstName" />
+                            </div>
+                            <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="firstName?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="fatherName" class="block text-sm font-semibold text-gray-700 mb-2">نام پدر</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" id="fatherName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="fatherName" />
+                            </div>
+                            <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="fatherName?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label for="grandFather" class="block text-sm font-semibold text-gray-700 mb-2">نام پدر کلان</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" id="grandFather" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="grandFather" />
+                            </div>
+                            <div *ngIf="grandFather?.invalid && (grandFather?.dirty || grandFather?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="grandFather?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="tazkiraType" class="block text-sm font-semibold text-gray-700 mb-2">نوع تذکره</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-id-card"></i>
+                                </span>
+                                <select id="tazkiraType" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="tazkiraType">
+                                    <option value="">انتخاب کنید</option>
+                                    <option value="Electronic">تذکره الکترونیکی</option>
+                                    <option value="Paper">تذکره کاغذی</option>
+                                </select>
+                            </div>
+                            <div *ngIf="tazkiraType?.invalid && (tazkiraType?.dirty || tazkiraType?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="tazkiraType?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="indentityCardNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره تذکره</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
+                                <input type="text" (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="indentityCardNumber" />
+                            </div>
+                            <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" *ngIf="isPaperTazkira()">
+                        <div>
+                            <label for="tazkiraVolume" class="block text-sm font-semibold text-gray-700 mb-2">جلد</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-book"></i>
+                                </span>
+                                <input type="text" id="tazkiraVolume" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="tazkiraVolume" />
+                            </div>
+                            <div *ngIf="tazkiraVolume?.invalid && (tazkiraVolume?.dirty || tazkiraVolume?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="tazkiraVolume?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="tazkiraPage" class="block text-sm font-semibold text-gray-700 mb-2">صفحه</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-file"></i>
+                                </span>
+                                <input type="text" id="tazkiraPage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="tazkiraPage" />
+                            </div>
+                            <div *ngIf="tazkiraPage?.invalid && (tazkiraPage?.dirty || tazkiraPage?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="tazkiraPage?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="tazkiraNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر ثبت</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
+                                <input type="text" id="tazkiraNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="tazkiraNumber" />
+                            </div>
+                            <div *ngIf="tazkiraNumber?.invalid && (tazkiraNumber?.dirty || tazkiraNumber?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="tazkiraNumber?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="phoneNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره موبایل</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-phone"></i>
+                            </span>
+                            <input type="text" (keypress)="onlyNumberKey($event)" id="phoneNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="phoneNumber" />
+                        </div>
+                        <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
+                            <small class="text-red-600 text-xs mt-1 block" *ngIf="phoneNumber?.errors?.['required']">این فیلد الزامی است</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>سکونت اصلی</span>
+                    </h2>
+                </div>
+                <div class="px-6 py-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
+                            <ng-select formControlName="paddressProvinceId" [items]="province" [selectOnTab]="true"
+                                bindLabel="dari" bindValue="id" (change)="filterResults($event)" class="custom-ng-select">
+                            </ng-select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
+                            <ng-select formControlName="paddressDistrictId" [items]="district" [selectOnTab]="true"
+                                bindLabel="dari" bindValue="id" class="custom-ng-select">
+                            </ng-select>
+                        </div>
+                        <div>
+                            <label for="paddressVillage" class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                <input type="text" id="paddressVillage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="paddressVillage" />
+                            </div>
+                            <div *ngIf="paddressVillage?.invalid && (paddressVillage?.dirty || paddressVillage?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="paddressVillage?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>سکونت فعلی</span>
+                    </h2>
+                </div>
+                <div class="px-6 py-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
+                            <ng-select formControlName="taddressProvinceId" [items]="province" [selectOnTab]="true"
+                                bindLabel="dari" bindValue="id" (change)="filterResults2($event)" class="custom-ng-select">
+                            </ng-select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
+                            <ng-select formControlName="taddressDistrictId" [items]="district2" [selectOnTab]="true"
+                                bindLabel="dari" bindValue="id" class="custom-ng-select">
+                            </ng-select>
+                        </div>
+                        <div>
+                            <label for="taddressVillage" class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                <input type="text" id="taddressVillage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="taddressVillage" />
+                            </div>
+                            <div *ngIf="taddressVillage?.invalid && (taddressVillage?.dirty || taddressVillage?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="taddressVillage?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+                <div class="px-6 py-6">
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button type="submit" [disabled]="SellerForm.invalid" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                            <i class="fas fa-save"></i>
+                            <span>{{selectedSellerId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+                        </button>
+                        <button type="reset" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2" (click)="resetChild()">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>ثبت جدید</span>
+                        </button>
+                        <button type="button" class="px-8 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2" (click)="reset()">
+                            <i class="fas fa-arrow-alt-circle-left"></i>
+                            <span>برگشت به فورم اصلی</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="mt-8 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-list"></i>
+                    <span>لیست فروشندګان</span>
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b-2 border-gray-200">
+                        <tr class="text-center">
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">آی دی</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام پدر</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام پدر کلان</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره تذکره</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره موبایل</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">نوعیت عاقد</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr *ngFor="let s of sellerDetails" class="text-center hover:bg-gray-50 transition-colors" [ngClass]="s.id === selectedSellerId ? 'bg-blue-50' : ''">
+                            <td (click)="BindValue(s.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ s.id }}</td>
+                            <td (click)="BindValue(s.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ s.firstName }}</td>
+                            <td (click)="BindValue(s.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ s.fatherName }}</td>
+                            <td (click)="BindValue(s.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ s.grandFather }}</td>
+                            <td (click)="BindValue(s.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ s.indentityCardNumber }}</td>
+                            <td (click)="BindValue(s.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ s.phoneNumber }}</td>
+                            <td (click)="BindValue(s.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ getRoleTypeLabel(s.roleType) }}</td>
+                            <td class="px-4 py-3">
+                                <button type="button" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors" (click)="onEditSeller(s.id, $event)">
+                                    <i class="fas fa-pen mr-1"></i>
+                                    ویرایش
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="!sellerDetails || sellerDetails.length === 0">
+                            <td colspan="8" class="px-4 py-8 text-center text-gray-500">هیچ فروشنده‌ای ثبت نشده است</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </section>
-
-

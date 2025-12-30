@@ -45,7 +45,8 @@ export class PropertydetailslistComponent {
         propertyTypeText: this.getDariPropertyTypeLabel(p.propertyTypeText)
       }));
       this.properties = mapped;
-      this.filteredProperties = mapped;
+      this.filteredProperties = this.filterProperties(mapped, this.searchTerm);
+      this.count = this.filteredProperties.length;
     });
   }
 
@@ -57,6 +58,10 @@ export class PropertydetailslistComponent {
 
   onEdit(propertyId: number) {
     this.router.navigate(['/dashboard/estate'], { queryParams: { id: propertyId } });
+  }
+
+  onView(propertyId: number) {
+    this.router.navigate(['/dashboard/estate/view', propertyId]);
   }
 
   onTableDataChange(event: any) {
@@ -77,12 +82,34 @@ export class PropertydetailslistComponent {
   }
 
   filterProperties(properties: PropertyDetailsList[], searchTerm: string): PropertyDetailsList[] {
-    return properties.filter(property =>
-      property.propertyTypeText.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.transactionTypeText.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (property.buyerName && property.buyerName.toString().toLowerCase().includes(searchTerm.toLowerCase())) || // add null check for buyerName
-      (property.sellerName && property.sellerName.toString().toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const term = (searchTerm ?? '').toString().trim().toLowerCase();
+    if (!term) {
+      return properties;
+    }
+
+    const toText = (value: unknown) => (value ?? '').toString().toLowerCase();
+
+    return (properties || []).filter(property => {
+      const idMatch = toText(property.id).includes(term);
+      const refMatch = toText(property.pnumber).includes(term);
+      const propertyTypeMatch = toText(property.propertyTypeText).includes(term);
+      const transactionTypeMatch = toText(property.transactionTypeText).includes(term);
+      const buyerNameMatch = toText(property.buyerName).includes(term);
+      const sellerNameMatch = toText(property.sellerName).includes(term);
+      const buyerNationalIdMatch = toText(property.buyerIndentityCardNumber).includes(term);
+      const sellerNationalIdMatch = toText(property.sellerIndentityCardNumber).includes(term);
+
+      return (
+        idMatch ||
+        refMatch ||
+        propertyTypeMatch ||
+        transactionTypeMatch ||
+        buyerNameMatch ||
+        sellerNameMatch ||
+        buyerNationalIdMatch ||
+        sellerNationalIdMatch
+      );
+    });
   }
   onPrint(id:any):void{
     const tree = this.router.createUrlTree(['/print', id]);

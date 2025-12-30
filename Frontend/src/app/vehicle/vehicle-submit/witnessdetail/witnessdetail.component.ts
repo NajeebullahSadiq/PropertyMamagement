@@ -23,6 +23,13 @@ export class WitnessdetailComponent {
   onNextClick() {
     this.next.emit();
   }
+
+  onEditWitness(id: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.BindValu(id);
+  }
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
     ,private fb: FormBuilder, private vehiclesub:VehiclesubService,private parentComponent: VehicleComponent)
     {
@@ -34,28 +41,73 @@ export class WitnessdetailComponent {
         phoneNumber: ['', Validators.required],
         nationalIdCardPath: ['', Validators.required]
       });
+
+      this.withnessForm.statusChanges.subscribe(status => {
+        if (status === 'INVALID') {
+          this.logInvalidControls();
+        }
+      });
     }
+
+    private setNationalIdRequired(isRequired: boolean): void {
+      const ctrl = this.withnessForm.get('nationalIdCardPath');
+      if (!ctrl) {
+        return;
+      }
+
+      if (isRequired) {
+        ctrl.setValidators([Validators.required]);
+      } else {
+        ctrl.clearValidators();
+      }
+
+      ctrl.updateValueAndValidity();
+    }
+
+    private logInvalidControls(): void {
+      const invalidControls = Object.keys(this.withnessForm.controls).filter((key) => {
+        const ctrl = this.withnessForm.get(key);
+        return !!ctrl && ctrl.invalid;
+      });
+
+      if (invalidControls.length > 0) {
+        console.warn('Witness form invalid controls:', invalidControls, this.withnessForm.value);
+      }
+    }
+
     ngOnInit() {
       this.vehiclesub.getWitnessById(this.id)
       .subscribe(witness => {
         this.witnessDetails = witness;
+        if (!witness || witness.length === 0) {
+          this.selectedId = 0;
+          this.setNationalIdRequired(true);
+          return;
+        }
+        const existingNationalIdPath = witness?.[0]?.nationalIdCardPath || witness?.[0]?.nationalIdCard || '';
         this.withnessForm.setValue({
           id: witness[0].id,
           firstName:witness[0].firstName,
           fatherName: witness[0].fatherName,
           indentityCardNumber: witness[0].indentityCardNumber,
           phoneNumber: witness[0].phoneNumber,
-          nationalIdCardPath: witness[0].nationalIdCardPath || ''
+          nationalIdCardPath: existingNationalIdPath
         });
-        this.nationalIdCardName = witness[0].nationalIdCardPath || '';
+        this.nationalIdCardName = existingNationalIdPath;
         this.vehiclesub.withnessId=witness[0].id;
         this.selectedId=witness[0].id;
+
+        // When editing an existing witness, do not block edits if national ID is missing.
+        this.setNationalIdRequired(false);
+
+        this.withnessForm.updateValueAndValidity();
         
         
       });
     }
     addwithnessDetails(): void {
       const withnessDetails = this.withnessForm.value as witnessDetail;
+      withnessDetails.nationalIdCard = this.nationalIdCardName;
       withnessDetails.nationalIdCardPath = this.nationalIdCardName;
       withnessDetails.propertyDetailsId = this.vehicleService.mainTableId;
       if (withnessDetails.id === null) {
@@ -89,6 +141,7 @@ export class WitnessdetailComponent {
     }
   updateWitnessDetails(): void {
     const wDetails = this.withnessForm.value as witnessDetail;
+    wDetails.nationalIdCard = this.nationalIdCardName;
     wDetails.nationalIdCardPath = this.nationalIdCardName;
     wDetails.propertyDetailsId=this.vehicleService.mainTableId;
     this.vehiclesub.updateWitnessDetails(wDetails).subscribe(result => {
@@ -113,11 +166,17 @@ resetChild(){
     this.selectedId=0;
     this.nationalIdCardName='';
     this.withnessForm.reset();
+
+    // In add mode, national ID upload is required.
+    this.setNationalIdRequired(true);
+
+    this.withnessForm.updateValueAndValidity();
   
 }
 BindValu(id: number) {
   const selectedWitness = this.witnessDetails.find(w => w.id === id);
   if (selectedWitness) {
+    const existingNationalIdPath = selectedWitness.nationalIdCardPath || selectedWitness.nationalIdCard || '';
     this.withnessForm.patchValue({
       
       id: selectedWitness.id,
@@ -125,11 +184,15 @@ BindValu(id: number) {
       fatherName: selectedWitness.fatherName,
       indentityCardNumber: selectedWitness.indentityCardNumber,
       phoneNumber: selectedWitness.phoneNumber,
-      propertyDetailsId:selectedWitness.propertyDetailsId,
-      nationalIdCardPath: selectedWitness.nationalIdCardPath || ''
+      nationalIdCardPath: existingNationalIdPath
     });
-    this.nationalIdCardName = selectedWitness.nationalIdCardPath || '';
+    this.nationalIdCardName = existingNationalIdPath;
     this.selectedId=selectedWitness.id;
+
+    // When editing an existing witness, do not block edits if national ID is missing.
+    this.setNationalIdRequired(false);
+
+    this.withnessForm.updateValueAndValidity();
   }
 }
 onlyNumberKey(event:any) {
@@ -144,6 +207,8 @@ onlyNumberKey(event:any) {
   nationalIdUploadFinished = (event:string) => { 
     this.nationalIdCardName=event;
     this.withnessForm.patchValue({ nationalIdCardPath: this.nationalIdCardName });
+    this.withnessForm.updateValueAndValidity();
+    this.logInvalidControls();
     console.log('Vehicle Witness National ID uploaded: '+event+'=======================');
   }
 

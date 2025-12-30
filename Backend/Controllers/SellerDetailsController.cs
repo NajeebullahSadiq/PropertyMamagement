@@ -778,13 +778,33 @@ namespace WebAPIBackend.Controllers
         [HttpPut("Updatewitness/{id}")]
         public async Task<IActionResult> UpdateWitness(int id, [FromBody] WitnessDetail request)
         {
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = userIdClaim.Value;
             if (id != request.Id)
             {
                 return BadRequest();
             }
-           
 
-            _context.Entry(request).State = EntityState.Modified;
+            var existingWitness = await _context.WitnessDetails.FindAsync(id);
+            if (existingWitness == null)
+            {
+                return NotFound();
+            }
+
+            var createdBy = existingWitness.CreatedBy;
+            var createdAt = existingWitness.CreatedAt;
+
+            _context.Entry(existingWitness).CurrentValues.SetValues(request);
+            existingWitness.CreatedBy = createdBy;
+            existingWitness.CreatedAt = createdAt;
+
+            var entry = _context.Entry(existingWitness);
+            entry.State = EntityState.Modified;
 
             try
             {

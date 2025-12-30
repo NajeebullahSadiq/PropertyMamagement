@@ -10,6 +10,7 @@ import { LocalizationService } from 'src/app/shared/localization.service';
 import { PropertyService } from 'src/app/shared/property.service';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
+import { VehicleComponent } from '../../vehicle.component';
 
 @Component({
   selector: 'app-buyerdetail',
@@ -41,6 +42,22 @@ export class BuyerdetailComponent {
     this.next.emit();
   }
 
+  reset() {
+    this.parentComponent.resetChild();
+  }
+
+  getRoleTypeLabel(roleType: string): string {
+    const role = this.roleTypes?.find((r: any) => r?.value === roleType);
+    return role ? role.label : roleType;
+  }
+
+  onEditBuyer(id: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.BindValue(id);
+  }
+
   @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
 
   ngAfterViewInit(): void {
@@ -51,7 +68,7 @@ export class BuyerdetailComponent {
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
     private localizationService: LocalizationService, private propertyDetailsService: PropertyService,
-    private duplicateCheckService: DuplicateCheckService){
+    private duplicateCheckService: DuplicateCheckService, private parentComponent: VehicleComponent){
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.buyerForm = this.fb.group({
@@ -215,6 +232,7 @@ export class BuyerdetailComponent {
       if (sellers && sellers.length > 0) {
         // Load first buyer for editing if exists
         const firstBuyer = sellers[0];
+        const existingNationalIdPath = firstBuyer.nationalIdCardPath || firstBuyer.nationalIdCard || '';
         this.buyerForm.setValue({
           id: firstBuyer.id,
           firstName:firstBuyer.firstName,
@@ -230,7 +248,7 @@ export class BuyerdetailComponent {
           taddressDistrictId: firstBuyer.taddressDistrictId,
           taddressVillage: firstBuyer.taddressVillage,
           photo:firstBuyer.photo,
-          nationalIdCard: firstBuyer.nationalIdCard || '',
+          nationalIdCard: existingNationalIdPath,
           roleType: firstBuyer.roleType || 'Buyer',
           authorizationLetter: firstBuyer.authorizationLetter || '',
           propertyTypeId: firstBuyer.propertyTypeId || '',
@@ -246,7 +264,7 @@ export class BuyerdetailComponent {
         });
         this.imagePath=this.baseUrl+firstBuyer.photo;
         this.imageName=firstBuyer.photo || '';
-        this.nationalIdFileName=firstBuyer.nationalIdCard || '';
+        this.nationalIdFileName=existingNationalIdPath;
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
         this.selectedbuyerId=firstBuyer.id;
         
@@ -276,6 +294,7 @@ export class BuyerdetailComponent {
     const vbuyerdetails = this.buyerForm.value as VBuyerDetail;
     vbuyerdetails.photo=this.imageName;
     vbuyerdetails.nationalIdCard = this.nationalIdFileName;
+    vbuyerdetails.nationalIdCardPath = this.nationalIdFileName;
     vbuyerdetails.authorizationLetter=this.authorizationLetterName;
     vbuyerdetails.propertyDetailsId=this.vehicleService.mainTableId;
     if (vbuyerdetails.id === null) {
@@ -335,6 +354,7 @@ updateBuyerDetails(): void {
   const sellerDetails = this.buyerForm.value as VBuyerDetail;
    sellerDetails.photo=this.imageName;
    sellerDetails.nationalIdCard = this.nationalIdFileName;
+   sellerDetails.nationalIdCardPath = this.nationalIdFileName;
    sellerDetails.authorizationLetter=this.authorizationLetterName;
   if(sellerDetails.id===0 && this.selectedbuyerId!==0 || this.selectedbuyerId!==null){
     sellerDetails.id=this.selectedbuyerId;
@@ -353,6 +373,7 @@ updateBuyerDetails(): void {
  BindValue(id: number) {
   const selectedBuyer = this.buyerDetails.find(b => b.id === id);
   if (selectedBuyer) {
+    const existingNationalIdPath = selectedBuyer.nationalIdCardPath || selectedBuyer.nationalIdCard || '';
     this.buyerForm.patchValue({
       id: selectedBuyer.id,
       firstName: selectedBuyer.firstName,
@@ -368,7 +389,7 @@ updateBuyerDetails(): void {
       taddressDistrictId: selectedBuyer.taddressDistrictId,
       taddressVillage: selectedBuyer.taddressVillage,
       photo: selectedBuyer.photo,
-      nationalIdCard: selectedBuyer.nationalIdCard || '',
+      nationalIdCard: existingNationalIdPath,
       roleType: selectedBuyer.roleType || 'Buyer',
       authorizationLetter: selectedBuyer.authorizationLetter || '',
       propertyTypeId: selectedBuyer.propertyTypeId || '',
@@ -384,7 +405,7 @@ updateBuyerDetails(): void {
     });
     this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
     this.imageName = selectedBuyer.photo || '';
-    this.nationalIdFileName = selectedBuyer.nationalIdCard || '';
+    this.nationalIdFileName = existingNationalIdPath;
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
     this.selectedbuyerId = selectedBuyer.id;
     

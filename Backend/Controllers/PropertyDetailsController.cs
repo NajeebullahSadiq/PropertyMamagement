@@ -133,6 +133,7 @@ namespace WebAPIBackend.Controllers
                          select new
                          {
                              p.Id,
+                             p.Pnumber,
                              p.Parea,
                              p.PunitTypeId,
                              p.NumofFloor,
@@ -152,6 +153,8 @@ namespace WebAPIBackend.Controllers
                              p.iscomplete,
                              SellerName = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().FirstName : null,
                              BuyerName = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().FirstName : null,
+                             SellerIndentityCardNumber = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().IndentityCardNumber : null,
+                             BuyerIndentityCardNumber = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().IndentityCardNumber : null,
                          }).ToList();
 
             return Ok(query);
@@ -170,6 +173,186 @@ namespace WebAPIBackend.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex}");
             }
+        }
+
+        [Authorize]
+        [HttpGet("GetView/{id}")]
+        public async Task<IActionResult> GetPropertyViewById(int id)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            IQueryable<PropertyDetail> propertyQuery;
+            if (roles.Contains("ADMIN"))
+            {
+                propertyQuery = _context.PropertyDetails;
+            }
+            else
+            {
+                propertyQuery = _context.PropertyDetails.Where(p => p.CreatedBy == userId);
+            }
+
+            var data = await propertyQuery
+                .AsNoTracking()
+                .Where(p => p.Id == id)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Pnumber,
+                    p.Parea,
+                    p.PunitTypeId,
+                    UnitTypeName = p.PunitType != null ? p.PunitType.Name : null,
+                    p.NumofFloor,
+                    p.NumofRooms,
+                    p.PropertyTypeId,
+                    p.CustomPropertyType,
+                    PropertyTypeName = p.PropertyType != null ? p.PropertyType.Name : null,
+                    PropertyTypeText = p.PropertyType != null && p.PropertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase) && p.CustomPropertyType != null
+                        ? p.CustomPropertyType
+                        : p.PropertyType != null ? p.PropertyType.Name : null,
+                    p.TransactionTypeId,
+                    TransactionTypeName = p.TransactionType != null ? p.TransactionType.Name : null,
+                    p.Price,
+                    p.PriceText,
+                    p.RoyaltyAmount,
+                    p.Des,
+                    p.iscomplete,
+                    p.iseditable,
+                    p.West,
+                    p.East,
+                    p.North,
+                    p.South,
+                    p.DocumentType,
+                    p.IssuanceNumber,
+                    p.IssuanceDate,
+                    p.SerialNumber,
+                    p.TransactionDate,
+                    p.FilePath,
+                    p.PreviousDocumentsPath,
+                    p.ExistingDocumentsPath,
+                    Address = p.PropertyAddresses
+                        .Select(a => new
+                        {
+                            a.Id,
+                            a.ProvinceId,
+                            a.DistrictId,
+                            a.Village,
+                            ProvinceDari = _context.Locations
+                                .Where(l => a.ProvinceId.HasValue && l.Id == a.ProvinceId.Value)
+                                .Select(l => l.Dari)
+                                .FirstOrDefault(),
+                            DistrictDari = _context.Locations
+                                .Where(l => a.DistrictId.HasValue && l.Id == a.DistrictId.Value)
+                                .Select(l => l.Dari)
+                                .FirstOrDefault(),
+                        })
+                        .FirstOrDefault(),
+                    Sellers = p.SellerDetails
+                        .Select(s => new
+                        {
+                            s.Id,
+                            s.FirstName,
+                            s.FatherName,
+                            s.GrandFather,
+                            s.PhoneNumber,
+                            s.IndentityCardNumber,
+                            s.TazkiraType,
+                            s.TazkiraVolume,
+                            s.TazkiraPage,
+                            s.TazkiraNumber,
+                            s.RoleType,
+                            s.TaxIdentificationNumber,
+                            s.AdditionalDetails,
+                            s.Photo,
+                            s.NationalIdCard,
+                            s.AuthorizationLetter,
+                            s.HeirsLetter,
+                            s.PaddressProvinceId,
+                            s.PaddressDistrictId,
+                            s.PaddressVillage,
+                            PaddressProvinceDari = s.PaddressProvince != null ? s.PaddressProvince.Dari : null,
+                            PaddressDistrictDari = s.PaddressDistrict != null ? s.PaddressDistrict.Dari : null,
+                            s.TaddressProvinceId,
+                            s.TaddressDistrictId,
+                            s.TaddressVillage,
+                            TaddressProvinceDari = s.TaddressProvince != null ? s.TaddressProvince.Dari : null,
+                            TaddressDistrictDari = s.TaddressDistrict != null ? s.TaddressDistrict.Dari : null,
+                        })
+                        .ToList(),
+                    Buyers = p.BuyerDetails
+                        .Select(b => new
+                        {
+                            b.Id,
+                            b.FirstName,
+                            b.FatherName,
+                            b.GrandFather,
+                            b.PhoneNumber,
+                            b.IndentityCardNumber,
+                            b.TazkiraType,
+                            b.TazkiraVolume,
+                            b.TazkiraPage,
+                            b.TazkiraNumber,
+                            b.RoleType,
+                            b.TaxIdentificationNumber,
+                            b.AdditionalDetails,
+                            b.Photo,
+                            b.NationalIdCard,
+                            b.AuthorizationLetter,
+                            b.Price,
+                            b.PriceText,
+                            b.RoyaltyAmount,
+                            b.HalfPrice,
+                            b.TransactionType,
+                            b.TransactionTypeDescription,
+                            b.RentStartDate,
+                            b.RentEndDate,
+                            b.PaddressProvinceId,
+                            b.PaddressDistrictId,
+                            b.PaddressVillage,
+                            PaddressProvinceDari = b.PaddressProvince != null ? b.PaddressProvince.Dari : null,
+                            PaddressDistrictDari = b.PaddressDistrict != null ? b.PaddressDistrict.Dari : null,
+                            b.TaddressProvinceId,
+                            b.TaddressDistrictId,
+                            b.TaddressVillage,
+                            TaddressProvinceDari = b.TaddressProvince != null ? b.TaddressProvince.Dari : null,
+                            TaddressDistrictDari = b.TaddressDistrict != null ? b.TaddressDistrict.Dari : null,
+                        })
+                        .ToList(),
+                    Witnesses = p.WitnessDetails
+                        .Select(w => new
+                        {
+                            w.Id,
+                            w.FirstName,
+                            w.FatherName,
+                            w.PhoneNumber,
+                            w.IndentityCardNumber,
+                            w.TazkiraType,
+                            w.TazkiraVolume,
+                            w.TazkiraPage,
+                            w.TazkiraNumber,
+                            w.NationalIdCard
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (data == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(data);
         }
 
         [Authorize]

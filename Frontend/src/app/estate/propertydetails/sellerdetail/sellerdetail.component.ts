@@ -48,6 +48,72 @@ export class SellerdetailComponent {
       this.childComponent.reset();
     }
   }
+
+  onEditSeller(id: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.BindValue(id);
+  }
+
+  deleteSeller(id: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (confirm('آیا مطمئن هستید که می‌خواهید این فروشنده را حذف کنید؟')) {
+      this.selerService.deleteSeller(id).subscribe(
+        () => {
+          this.toastr.success("فروشنده با موفقیت حذف شد");
+          this.loadSellerDetails();
+          this.resetChild();
+        },
+        (error) => {
+          this.toastr.error("خطا در حذف فروشنده");
+        }
+      );
+    }
+  }
+
+  onSubmit(): void {
+    if (this.sellerForm.invalid) {
+      this.sellerForm.markAllAsTouched();
+      const invalidControls = Object.keys(this.sellerForm.controls)
+        .filter(key => this.sellerForm.get(key)?.invalid);
+      console.log('Invalid sellerForm controls:', invalidControls);
+      this.toastr.error('لطفاً تمام فیلد های الزامی را خانه پُری کنید');
+      return;
+    }
+
+    if (this.selectedSellerId) {
+      this.updateSellerDetails();
+    } else {
+      this.addSellerDetails();
+    }
+  }
+
+  private normalizeTazkiraType(value: any, seller?: any): string {
+    const raw = (value ?? '').toString().trim();
+
+    if (!raw) {
+      const hasPaperFields = !!(seller?.tazkiraVolume || seller?.tazkiraPage || seller?.tazkiraNumber);
+      return hasPaperFields ? 'Paper' : 'Electronic';
+    }
+
+    const lower = raw.toLowerCase();
+    if (lower === 'paper' || lower.includes('paper') || raw.includes('کاغذ')) {
+      return 'Paper';
+    }
+    if (lower === 'electronic' || lower.includes('electronic') || raw.includes('الکترون')) {
+      return 'Electronic';
+    }
+
+    // Fallback: keep the backend expected values if they already match, otherwise default.
+    if (raw === 'Paper' || raw === 'Electronic') {
+      return raw;
+    }
+
+    return 'Electronic';
+  }
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
     private duplicateCheckService: DuplicateCheckService){
@@ -167,13 +233,14 @@ export class SellerdetailComponent {
       if (sellers && sellers.length > 0) {
         // Load first seller for editing if exists
         const firstSeller = sellers[0];
+        const normalizedTazkiraType = this.normalizeTazkiraType(firstSeller.tazkiraType, firstSeller);
         this.sellerForm.setValue({
           id: firstSeller.id,
           firstName:firstSeller.firstName,
           fatherName: firstSeller.fatherName,
           grandFather: firstSeller.grandFather,
           indentityCardNumber: firstSeller.indentityCardNumber,
-          tazkiraType: firstSeller.tazkiraType || '',
+          tazkiraType: normalizedTazkiraType,
           tazkiraVolume: firstSeller.tazkiraVolume || '',
           tazkiraPage: firstSeller.tazkiraPage || '',
           tazkiraNumber: firstSeller.tazkiraNumber || '',
@@ -295,29 +362,49 @@ export class SellerdetailComponent {
     sellerDetails.nationalIdCard = this.nationalIdCardName;
     sellerDetails.authorizationLetter=this.authorizationLetterName;
     sellerDetails.heirsLetter=this.heirsLetterName;
-    if(sellerDetails.id===0 && this.selectedSellerId!==0 || this.selectedSellerId!==null){
-      sellerDetails.id=this.selectedSellerId;
+
+    const effectivePropertyId = this.id > 0 ? this.id : this.propertyDetailsService.mainTableId;
+    if (!(sellerDetails as any).propertyDetailsId && effectivePropertyId) {
+      (sellerDetails as any).propertyDetailsId = effectivePropertyId;
     }
-    this.selerService.updateSellerdetails(sellerDetails).subscribe(result => {
-      if(result.id!==0) {
-        this.toastr.info("معلومات موفقانه تغیر کرد");
-        this.selerService.udateSellerId(result.id);
-        this.loadSellerDetails(); // Reload the list
-        this.resetChild(); // Reset form
+
+    if ((!sellerDetails.id || sellerDetails.id === 0) && this.selectedSellerId) {
+      sellerDetails.id = this.selectedSellerId;
+    }
+
+    this.selerService.updateSellerdetails(sellerDetails).subscribe({
+      next: (result: any) => {
+        if(result.id!==0) {
+          this.toastr.info("معلومات موفقانه تغیر کرد");
+          this.selerService.udateSellerId(result.id);
+          this.loadSellerDetails(); // Reload the list
+          this.resetChild(); // Reset form
+        }
+      },
+      error: (error) => {
+        if (error?.status === 400) {
+          this.toastr.error(error?.error || 'خطا در تغیر معلومات');
+        } else if (error?.status === 401) {
+          this.toastr.warning('جلسه شما ختم شده است. لطفاً دوباره وارد شوید.');
+        } else {
+          this.toastr.error('خطا در تغیر معلومات');
+        }
+        console.log('Update seller error:', error);
       }
-   });
+    });
   }
 
   BindValue(id: number) {
     const selectedSeller = this.sellerDetails.find(s => s.id === id);
     if (selectedSeller) {
+      const normalizedTazkiraType = this.normalizeTazkiraType(selectedSeller.tazkiraType, selectedSeller);
       this.sellerForm.patchValue({
         id: selectedSeller.id,
         firstName: selectedSeller.firstName,
         fatherName: selectedSeller.fatherName,
         grandFather: selectedSeller.grandFather,
         indentityCardNumber: selectedSeller.indentityCardNumber,
-        tazkiraType: selectedSeller.tazkiraType || '',
+        tazkiraType: normalizedTazkiraType,
         tazkiraVolume: selectedSeller.tazkiraVolume || '',
         tazkiraPage: selectedSeller.tazkiraPage || '',
         tazkiraNumber: selectedSeller.tazkiraNumber || '',
@@ -361,20 +448,6 @@ export class SellerdetailComponent {
     }
   }
 
-  deleteSeller(id: number) {
-    if (confirm('آیا مطمئن هستید که می‌خواهید این فروشنده را حذف کنید؟')) {
-      this.selerService.deleteSeller(id).subscribe(
-        () => {
-          this.toastr.success("فروشنده با موفقیت حذف شد");
-          this.loadSellerDetails();
-          this.resetChild();
-        },
-        (error) => {
-          this.toastr.error("خطا در حذف فروشنده");
-        }
-      );
-    }
-  }
   filterResults(getId:any) {
     
     this.selerService.getdistrict(getId.id).subscribe(res => {

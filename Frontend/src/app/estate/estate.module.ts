@@ -33,6 +33,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { CancellationPageComponent } from './cancellation-page/cancellation-page.component';
 import { SharedModule } from '../shared/shared.module';
+import { PropertydetailsviewComponent } from './propertydetailsview/propertydetailsview.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { SharedModule } from '../shared/shared.module';
     UploadComponent,
     NationalidUploadComponent,
     PropertydetailslistComponent,
+    PropertydetailsviewComponent,
     CancellationPageComponent
   ],
   imports: [

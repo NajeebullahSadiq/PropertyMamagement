@@ -26,6 +26,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PrintComponent } from './print/print.component';
 import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
 import { PrintLicenseComponent } from './print-license/print-license.component';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { PrintLicenseComponent } from './print-license/print-license.component';
     NgSelectModule,
     
     CommonModule,
+    SharedModule,
     TranslateModule.forRoot({
       loader: {
           provide: TranslateLoader,

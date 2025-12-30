@@ -4,8 +4,8 @@
         <img src="/assets/img/10.png" alt="Logo">
         <br><br>
         <p>نمبر جواز: <span> &nbsp; {{data.licenseNumber}}</span></p>
-        <p>تاریخ صدور: <span>{{data.issueDateShamsi}}</span></p>
-        <p>تاریخ ختم:  &nbsp; &nbsp;<span>{{data.expireDateShamsi}}</span> </p>
+        <p>تاریخ صدور: <span>{{data.issueDate | calendarDate}}</span></p>
+        <p>تاریخ ختم:  &nbsp; &nbsp;<span>{{data.expireDate | calendarDate}}</span> </p>
       </td>
       <td class="col-middle">
         <p>امارت اسلامی افغانستان</p>
@@ -25,7 +25,7 @@
     <br>
     <br>
     <br>
-   <p style="font-size:18px;font-weight: bold;">این جواز مطابق احکام مندرج فقره 4 ماده 13 قانون رهنمای معاملات برای محترم <span>( {{data.firstName}})</span> ولد<span>( {{data.fatherName}}  ) </span> ولدیت <span>( {{data.grandFatherName}} )</span>متولد  <span>({{data.dateofBirthShamsi}})</span>دارنده شماره تذکره <span>({{data.indentityCardNumber}})</span>اعطاء گردید و به اساس آن میتواند در حدود احکام قانون در عقود و معاملات (عقار)/ (وسایط نقلیه) بین اشخاص وساطت نماید.</p>
+   <p style="font-size:18px;font-weight: bold;">این جواز مطابق احکام مندرج فقره 4 ماده 13 قانون رهنمای معاملات برای محترم <span>( {{data.firstName}})</span> ولد<span>( {{data.fatherName}}  ) </span> ولدیت <span>( {{data.grandFatherName}} )</span>متولد  <span>({{data.dateofBirth | calendarDate}})</span>دارنده شماره تذکره <span>({{data.indentityCardNumber}})</span>اعطاء گردید و به اساس آن میتواند در حدود احکام قانون در عقود و معاملات (عقار)/ (وسایط نقلیه) بین اشخاص وساطت نماید.</p>
    <br><br>
    <br>
    <p style="font-size:18px;font-weight: bold;">آدرس دقیق دفتر رهنمای معاملات: <span> (  {{data.officeAddress}}  )</span></p>

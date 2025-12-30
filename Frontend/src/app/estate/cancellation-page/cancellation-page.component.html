@@ -75,7 +75,7 @@
           <p class="transaction-type">{{ getTransactionTypeLabel(transaction.transactionTypeName) }}</p>
         </div>
         <div class="transaction-date">
-          <span>{{ formatDate(transaction.createdAt) }}</span>
+          <span>{{ transaction.createdAt | calendarDate }}</span>
         </div>
       </div>
 
@@ -125,7 +125,7 @@
           <span class="status-badge">ابطال شده</span>
         </div>
         <div class="transaction-date">
-          <span>{{ formatDate(transaction.cancellationDate) }}</span>
+          <span>{{ transaction.cancellationDate | calendarDate }}</span>
         </div>
       </div>
 

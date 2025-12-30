@@ -166,6 +166,30 @@ export class CalendarConversionService {
     return num < 10 ? `0${num}` : `${num}`;
   }
 
+  getDaysInMonth(year: number, month: number, calendarType: CalendarType): number {
+    if (!year || !month) {
+      return 0;
+    }
+
+    switch (calendarType) {
+      case CalendarType.GREGORIAN:
+        return new Date(year, month, 0).getDate();
+
+      case CalendarType.HIJRI_SHAMSI: {
+        const jalaali = momentJalaali(`${year}/${this.padZero(month)}`, 'jYYYY/jMM');
+        return typeof jalaali.jDaysInMonth === 'function' ? jalaali.jDaysInMonth() : 30;
+      }
+
+      case CalendarType.HIJRI_QAMARI: {
+        const hijri = momentHijri(`${year}/${this.padZero(month)}`, 'iYYYY/iMM');
+        return typeof hijri.iDaysInMonth === 'function' ? hijri.iDaysInMonth() : 29;
+      }
+
+      default:
+        return 0;
+    }
+  }
+
   getMonthName(month: number, calendarType: CalendarType): string {
     const gregorianMonths = ['January', 'February', 'March', 'April', 'May', 'June', 
                              'July', 'August', 'September', 'October', 'November', 'December'];

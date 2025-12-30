@@ -9,6 +9,7 @@ import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
+import { VehicleComponent } from '../../vehicle.component';
 
 @Component({
   selector: 'app-sellerdetail',
@@ -39,6 +40,26 @@ export class SellerdetailComponent {
     this.next.emit();
   }
 
+  reset() {
+    this.parentComponent.resetChild();
+  }
+
+  getRoleTypeLabel(roleType: string): string {
+    const role = this.roleTypes?.find((r: any) => r?.value === roleType);
+    return role ? role.label : roleType;
+  }
+
+  onEditSeller(id: number, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.BindValue(id);
+  }
+
+  get sellerDetails(): VBuyerDetail[] {
+    return this.SellerDetails || [];
+  }
+
   @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
 
   ngAfterViewInit(): void {
@@ -48,7 +69,8 @@ export class SellerdetailComponent {
   }
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
-    private localizationService: LocalizationService, private duplicateCheckService: DuplicateCheckService){
+    private localizationService: LocalizationService, private duplicateCheckService: DuplicateCheckService,
+    private parentComponent: VehicleComponent){
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.SellerForm = this.fb.group({

@@ -3,21 +3,81 @@
     {{ label }}
     <span *ngIf="required" class="text-danger">*</span>
   </label>
-  <div class="input-group">
-    <span class="input-group-text">
-      <i class="fas fa-calendar-alt"></i>
-    </span>
-    <input
-      [type]="getInputType()"
-      class="form-control"
-      [value]="inputValue"
-      (input)="onInputChange($event)"
-      (blur)="onBlur()"
-      [disabled]="disabled"
-      [placeholder]="placeholder"
-      [pattern]="getPattern()"
-      [required]="required"
-    />
+  <div class="input-wrapper">
+    <div class="input-group">
+      <span class="input-group-text">
+        <i class="fas fa-calendar-alt"></i>
+      </span>
+      <input
+        [type]="getInputType()"
+        class="form-control"
+        [value]="inputValue"
+        (input)="onInputChange($event)"
+        (blur)="onBlur()"
+        (click)="toggleCalendarPopup()"
+        [disabled]="disabled"
+        [placeholder]="placeholder"
+        [pattern]="getPattern()"
+        [required]="required"
+        [readonly]="shouldShowCalendarIcon()"
+      />
+      <button 
+        *ngIf="shouldShowCalendarIcon()" 
+        type="button"
+        class="calendar-toggle-btn"
+        (click)="toggleCalendarPopup()"
+        [disabled]="disabled"
+      >
+        <i class="fas fa-calendar"></i>
+      </button>
+    </div>
+    
+    <div *ngIf="showCalendarPopup" class="calendar-popup">
+      <div class="calendar-header">
+        <button type="button" class="nav-btn" (click)="previousYear()">
+          <i class="fas fa-angle-double-right"></i>
+        </button>
+        <button type="button" class="nav-btn" (click)="previousMonth()">
+          <i class="fas fa-angle-right"></i>
+        </button>
+        
+        <div class="month-year-display">
+          <span class="month-name">{{ getMonthName() }}</span>
+          <span class="year-number">{{ currentYear }}</span>
+        </div>
+        
+        <button type="button" class="nav-btn" (click)="nextMonth()">
+          <i class="fas fa-angle-left"></i>
+        </button>
+        <button type="button" class="nav-btn" (click)="nextYear()">
+          <i class="fas fa-angle-double-left"></i>
+        </button>
+      </div>
+      
+      <div class="calendar-body">
+        <div class="weekday-names">
+          <div *ngFor="let day of getWeekDayNames()" class="weekday-name">
+            {{ day }}
+          </div>
+        </div>
+        
+        <div class="calendar-days">
+          <div *ngFor="let week of calendarDays" class="calendar-week">
+            <button
+              *ngFor="let day of week"
+              type="button"
+              class="calendar-day"
+              [class.empty]="!day"
+              [class.selected]="isSelectedDay(day)"
+              (click)="selectDate(day)"
+              [disabled]="!day"
+            >
+              {{ day || '' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <small class="form-text text-muted calendar-hint">
     {{ currentCalendar === CalendarType.GREGORIAN ? 'میلادی' : 

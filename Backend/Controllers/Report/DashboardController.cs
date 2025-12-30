@@ -21,6 +21,62 @@ namespace WebAPIBackend.Controllers.Report
             _userManager = userManager;
         }
 
+        private static bool TryParseStartEndDates(string startDate, string endDate, out DateTime start, out DateTime end)
+        {
+            start = default;
+            end = default;
+
+            if (string.IsNullOrWhiteSpace(startDate) || string.IsNullOrWhiteSpace(endDate))
+            {
+                return false;
+            }
+
+            if (!TryParseDate(startDate, out start) || !TryParseDate(endDate, out end))
+            {
+                return false;
+            }
+
+            start = start.Date;
+            end = end.Date;
+
+            if (start > end)
+            {
+                var tmp = start;
+                start = end;
+                end = tmp;
+            }
+
+            return true;
+        }
+
+        private static bool TryParseDate(string value, out DateTime result)
+        {
+            result = default;
+
+            var trimmed = value.Trim();
+
+            if (DateTime.TryParseExact(trimmed, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var shamsiParts))
+            {
+                var persian = new PersianCalendar();
+                result = persian.ToDateTime(shamsiParts.Year, shamsiParts.Month, shamsiParts.Day, 0, 0, 0, 0);
+                return true;
+            }
+
+            if (DateTime.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeLocal, out var parsed))
+            {
+                result = parsed;
+                return true;
+            }
+
+            if (DateTime.TryParse(trimmed, out parsed))
+            {
+                result = parsed;
+                return true;
+            }
+
+            return false;
+        }
+
 
         [HttpGet]
         [Route("GetCompanyDashboardData")]
@@ -101,19 +157,10 @@ namespace WebAPIBackend.Controllers.Report
         [Route("GetDashboardDataByDate")]
         public IActionResult GetDashboardDataByDate(string startDate, string endDate)
         {
-            // Define the format of the string value for Shamsi dates
-            string format = "dd-MM-yyyy"; // The format for Shamsi dates.
-
-            // Parse the string value into a DateTime object
-            DateTime endDated = DateTime.ParseExact(endDate, format, CultureInfo.InvariantCulture);
-            DateTime startDated = DateTime.ParseExact(startDate, format, CultureInfo.InvariantCulture);
-
-            // Create a PersianCalendar object
-            PersianCalendar persian = new PersianCalendar();
-
-            // Convert the Shamsi date to a Gregorian date
-            DateTime gregoriansDate = persian.ToDateTime(startDated.Year, startDated.Month, startDated.Day, 0, 0, 0, 0);
-            DateTime gregorianeDate = persian.ToDateTime(endDated.Year, endDated.Month, endDated.Day, 0, 0, 0, 0);
+            if (!TryParseStartEndDates(startDate, endDate, out var gregoriansDate, out var gregorianeDate))
+            {
+                return BadRequest("Invalid date range");
+            }
 
             var vquery = _context.VehiclesPropertyDetails
                .Where(b => b.Price.HasValue &&
@@ -517,19 +564,10 @@ namespace WebAPIBackend.Controllers.Report
         [Route("GetTopUsersSummaryByDate")]
         public IActionResult GetTopUsersSummaryByDate(string startDate, string endDate)
         {
-            // Define the format of the string value for Shamsi dates
-            string format = "dd-MM-yyyy"; // The format for Shamsi dates.
-
-            // Parse the string value into a DateTime object
-            DateTime endDated = DateTime.ParseExact(endDate, format, CultureInfo.InvariantCulture);
-            DateTime startDated = DateTime.ParseExact(startDate, format, CultureInfo.InvariantCulture);
-
-            // Create a PersianCalendar object
-            PersianCalendar persian = new PersianCalendar();
-
-            // Convert the Shamsi date to a Gregorian date
-            DateTime gregoriansDate = persian.ToDateTime(startDated.Year, startDated.Month, startDated.Day, 0, 0, 0, 0);
-            DateTime gregorianeDate = persian.ToDateTime(endDated.Year, endDated.Month, endDated.Day, 0, 0, 0, 0);
+            if (!TryParseStartEndDates(startDate, endDate, out var gregoriansDate, out var gregorianeDate))
+            {
+                return BadRequest("Invalid date range");
+            }
 
             var topUsersSummary = _context.PropertyDetails
                 .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue && b.CreatedAt.Value.Date >= gregoriansDate.Date &&
@@ -587,19 +625,10 @@ namespace WebAPIBackend.Controllers.Report
         [Route("GetVehicleTopUsersSummaryByDate")]
         public IActionResult GetVehicleTopUsersSummaryByDate(string startDate, string endDate)
         {
-            // Define the format of the string value for Shamsi dates
-            string format = "dd-MM-yyyy"; // The format for Shamsi dates.
-
-            // Parse the string value into a DateTime object
-            DateTime endDated = DateTime.ParseExact(endDate, format, CultureInfo.InvariantCulture);
-            DateTime startDated = DateTime.ParseExact(startDate, format, CultureInfo.InvariantCulture);
-
-            // Create a PersianCalendar object
-            PersianCalendar persian = new PersianCalendar();
-
-            // Convert the Shamsi date to a Gregorian date
-            DateTime gregoriansDate = persian.ToDateTime(startDated.Year, startDated.Month, startDated.Day, 0, 0, 0, 0);
-            DateTime gregorianeDate = persian.ToDateTime(endDated.Year, endDated.Month, endDated.Day, 0, 0, 0, 0);
+            if (!TryParseStartEndDates(startDate, endDate, out var gregoriansDate, out var gregorianeDate))
+            {
+                return BadRequest("Invalid date range");
+            }
 
             var topUsersSummary = _context.VehiclesPropertyDetails
                 .Where(b => b.Price.HasValue && b.CreatedAt.Value.Date >= gregoriansDate.Date &&

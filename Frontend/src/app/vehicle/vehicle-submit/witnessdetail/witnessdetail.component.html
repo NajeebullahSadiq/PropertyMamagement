@@ -1,126 +1,163 @@
-<section>
-    <div class="container">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-lg-12 col-xl-11">
-                <div class="card text-black" style="border-radius: 25px;">
-                    <div class="card-body p-md-5">
-                        <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات شاهدین</p>
-                        <form [formGroup]="withnessForm"
-                            (ngSubmit)="withnessForm.valid ? selectedId ? updateWitnessDetails() : addwithnessDetails() : null">
-                            <div class="form-group">
-                                <input type="hidden" formControlName="id">
+<section class="w-full bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات شاهدین</h1>
+            <p class="text-center text-gray-600">لطفا اطلاعات شاهدین معامله را وارد نمایید</p>
+        </div>
+
+        <div class="mb-6" *ngIf="selectedId">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <span class="text-blue-800 font-semibold">در حال ویرایش آی دی: {{ selectedId }}</span>
+            </div>
+        </div>
+
+        <form [formGroup]="withnessForm" (ngSubmit)="withnessForm.valid ? selectedId ? updateWitnessDetails() : addwithnessDetails() : null">
+            <div class="hidden">
+                <input type="hidden" formControlName="id">
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-user-friends"></i>
+                        <span>معلومات شاهد</span>
+                    </h2>
+                </div>
+                <div class="px-6 py-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div>
+                            <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">نام</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" id="firstName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    formControlName="firstName">
                             </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label for="firstName" class="form-label">نام </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" id="firstName" class="form-control"
-                                            formControlName="firstName">
-                                        <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
-                                            <small class="text-danger" *ngIf="firstName?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="fatherName" class="form-label">نام پدر </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" id="fatherName" class="form-control"
-                                            formControlName="fatherName">
-                                        <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
-                                            <small class="text-danger" *ngIf="fatherName?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="indentityCardNumber" class="form-label"> شماره تذکره</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="form-control"
-                                            formControlName="indentityCardNumber">
-                                        <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
-                                            <small class="text-danger" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="firstName?.errors?.['required']">این فیلد الزامی است</small>
                             </div>
-                            
-                           
-                            <div class="row">
-                               
-                               
-                                <div class="col-md-4">
-                                    <label for="phoneNumber" class="form-label"> شماره موبایل</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                        <input type="text" (keypress)="onlyNumberKey($event)" id="phoneNumber" class="form-control"
-                                            formControlName="phoneNumber">
-                                        <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
-                                            <small class="text-danger" *ngIf="phoneNumber?.errors?.['required']">این فیلد
-                                                الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <h5 style="font-weight: bold; color: #007bff;">آپلود تذکره ملی شاهد (الزامی)</h5>
-                                        <app-vehicle-nationalid-upload #nationalIdComponent (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-vehicle-nationalid-upload>
-                                        <div *ngIf="nationalIdCardPath?.invalid && (nationalIdCardPath?.dirty || nationalIdCardPath?.touched)">
-                                            <small class="text-danger" *ngIf="nationalIdCardPath?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <br>
-                               
-                        <br>
-                        <br>
-                        <button type="submit" [disabled]="withnessForm.invalid" class="btn btn-success">{{selectedId ?
-                          'تغیر معلومات' : 'ثبت معلومات'}}</button>
-                        <button type="reset"  class="btn btn-primary"
-                        style="margin-right: 5px;" (click)="resetChild()">جدید</button>
-                        
-                        <button type="reset" class="btn btn-primary" style="margin-right: 5px; background-color: gray;" (click)="reset()">
-                            <i class="fas fa-arrow-alt-circle-left"></i>
-                            برگشت به فورم اصلی
-                          </button>
-                        </form>
+                        </div>
+                        <div>
+                            <label for="fatherName" class="block text-sm font-semibold text-gray-700 mb-2">نام پدر</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" id="fatherName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    formControlName="fatherName">
+                            </div>
+                            <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="fatherName?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="indentityCardNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره تذکره</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
+                                <input type="text" (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    formControlName="indentityCardNumber">
+                            </div>
+                            <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="phoneNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره موبایل</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                                <input type="text" (keypress)="onlyNumberKey($event)" id="phoneNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="phoneNumber">
+                            </div>
+                            <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="phoneNumber?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <br>
-                <div class="container">
-                <table class="table table-bordered">
-                    <thead>
-                      <tr style="text-align: center;">
-                        <th> آی دی</th>
-                        <th>نام</th>
-                        <th>نام پدر</th>
-                        <th>شماره تذکره</th>
-                        <th>شماره موبایل</th>
-                      
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-id-card"></i>
+                        <span>آپلود تذکره ملی</span>
+                    </h2>
+                </div>
+                <div class="px-6 py-6">
+                    <h3 class="text-lg font-bold text-blue-600 mb-3 flex items-center gap-2">
+                        <i class="fas fa-id-card"></i>
+                        <span>آپلود تذکره ملی شاهد (الزامی)</span>
+                    </h3>
+                    <app-vehicle-nationalid-upload #nationalIdComponent [existingFilePath]="nationalIdCardName" (sendMessage)="nationalIdUploadFinished($event)" style="text-align:left;"></app-vehicle-nationalid-upload>
+                    <div *ngIf="nationalIdCardPath?.invalid && (nationalIdCardPath?.dirty || nationalIdCardPath?.touched)">
+                        <small class="text-red-600 text-xs mt-1 block" *ngIf="nationalIdCardPath?.errors?.['required']">آپلود تذکره ملی الزامی است</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+                <div class="px-6 py-6">
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button type="submit" [disabled]="withnessForm.invalid" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                            <i class="fas fa-save"></i>
+                            <span>{{ selectedId ? "تغیر معلومات" : "ثبت معلومات" }}</span>
+                        </button>
+                        <button type="reset" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2" (click)="resetChild()">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>ثبت جدید</span>
+                        </button>
+                        <button type="reset" class="px-8 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2" (click)="reset()">
+                            <i class="fas fa-arrow-alt-circle-left"></i>
+                            <span>برگشت به فورم اصلی</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <div class="mt-8 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-list"></i>
+                    <span>لیست شاهدین</span>
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b-2 border-gray-200">
+                      <tr class="text-center">
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700">آی دی</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام پدر</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره تذکره</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره موبایل</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700">عملیات</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr *ngFor="
-                      let w of witnessDetails" style="text-align: center;">
-                        <td (click)="BindValu(w.id)">{{ w.id }}</td>
-                        <td (click)="BindValu(w.id)">{{ w.firstName }}</td>
-                        <td (click)="BindValu(w.id)">{{ w.fatherName }}</td>
-                        <td (click)="BindValu(w.id)">{{ w.indentityCardNumber }}</td>
-                        <td (click)="BindValu(w.id)">{{ w.phoneNumber }}</td>
-                        
+                    <tbody class="divide-y divide-gray-200">
+                      <tr *ngFor="let w of witnessDetails" class="text-center hover:bg-gray-50 transition-colors" [ngClass]="w.id === selectedId ? 'bg-blue-50' : ''">
+                        <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.id }}</td>
+                        <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.firstName }}</td>
+                        <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.fatherName }}</td>
+                        <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.indentityCardNumber }}</td>
+                        <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.phoneNumber }}</td>
+                        <td class="px-4 py-3">
+                            <button type="button" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors mr-2" (click)="onEditWitness(w.id, $event)">
+                                <i class="fas fa-pen mr-1"></i>
+                                ویرایش
+                            </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="!witnessDetails || witnessDetails.length === 0">
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">هیچ شاهدی ثبت نشده است</td>
                       </tr>
                     </tbody>
                   </table>
-                </div>
             </div>
         </div>
     </div>
-
 </section>
-
