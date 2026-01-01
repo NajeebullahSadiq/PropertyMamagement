@@ -1,8 +1,12 @@
-<section class="w-full bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات ملکیت</h1>
-      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به ملکیت را با دقت تکمیل نمایید</p>
+<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+        <i class="fas fa-home text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">ثبت مشخصات ملکیت</h1>
+      <p class="text-gray-500 max-w-md mx-auto">لطفا تمام معلومات مربوط به ملکیت را با دقت تکمیل نمایید</p>
     </div>
 
     <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()">
@@ -10,305 +14,255 @@
         <input type="hidden" formControlName="id">
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-2">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-home"></i>
+      <!-- Property Type Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-home text-sm"></i>
+            </div>
             <span>مشخصات نوعیت ملکیت</span>
           </h2>
         </div>
-        <div class="px-6 py-6">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ملکیت</label>
-                  <ng-select formControlName="propertyTypeId" [items]="localizedPropertyTypes" [selectOnTab]="true" bindLabel="name"
-                    bindValue="id" class="custom-ng-select">
-                  </ng-select>
-                  <div *ngIf="propertyTypeId?.invalid && (propertyTypeId?.dirty || propertyTypeId?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="propertyTypeId?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
- <div>
-                  <label for="parea" class="block text-sm font-semibold text-gray-700 mb-2">مساحت ملکیت</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="far fa-square"></i>
-                    </span>
-                    <input type="number" (keypress)="onlyNumberKey($event)" id="parea" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="parea">
-                  </div>
-                  <div *ngIf="parea?.invalid && (parea?.dirty || parea?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="parea?.errors?.['required']">مساحت ملکیت الزامی است</small>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">واحد اندازه گیری</label>
-                  <ng-select formControlName="punitTypeId" [items]="localizedUnitTypes" [selectOnTab]="true" bindLabel="name"
-                    bindValue="id" class="custom-ng-select">
-                  </ng-select>
-                </div>
-                <div *ngIf="isOtherPropertyType()">
-                  <label for="customPropertyType" class="block text-sm font-semibold text-gray-700 mb-2">نوع ملکیت (سایر)</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-edit"></i>
-                    </span>
-                    <input type="text" id="customPropertyType"
-                      class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      formControlName="customPropertyType" placeholder="نوع ملکیت را وارد کنید">
-                  </div>
-                  <div *ngIf="customPropertyType?.invalid && (customPropertyType?.dirty || customPropertyType?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="customPropertyType?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
-                   
-                <div>
-                  <label for="numofFloor" class="block text-sm font-semibold text-gray-700 mb-2">تعداد منزل</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-building"></i>
-                    </span>
-                    <input type="number" (keypress)="onlyNumberKey($event)" id="numofFloor" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="numofFloor">
-                  </div>
-                  <div *ngIf="numofFloor?.invalid && (numofFloor?.dirty || numofFloor?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="numofFloor?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
-                <div>
-                  <label for="numofRooms" class="block text-sm font-semibold text-gray-700 mb-2">تعداد اطاق</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-bed"></i>
-                    </span>
-                    <input type="number" (keypress)="onlyNumberKey($event)" id="numofRooms" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="numofRooms">
-                  </div>
-                  <div *ngIf="numofRooms?.invalid && (numofRooms?.dirty || numofRooms?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="numofRooms?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ملکیت</label>
+              <ng-select formControlName="propertyTypeId" [items]="localizedPropertyTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" class="custom-ng-select"></ng-select>
+              <div *ngIf="propertyTypeId?.invalid && (propertyTypeId?.dirty || propertyTypeId?.touched)">
+                <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>این فیلد الزامی است</small>
               </div>
+            </div>
+            <div class="form-group">
+              <label for="parea" class="block text-sm font-semibold text-gray-700 mb-2">مساحت ملکیت</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="far fa-square"></i>
+                </span>
+                <input type="number" (keypress)="onlyNumberKey($event)" id="parea" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="parea">
+              </div>
+              <div *ngIf="parea?.invalid && (parea?.dirty || parea?.touched)">
+                <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>مساحت ملکیت الزامی است</small>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">واحد اندازه گیری</label>
+              <ng-select formControlName="punitTypeId" [items]="localizedUnitTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" class="custom-ng-select"></ng-select>
+            </div>
+            <div *ngIf="isOtherPropertyType()" class="form-group">
+              <label for="customPropertyType" class="block text-sm font-semibold text-gray-700 mb-2">نوع ملکیت (سایر)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-edit"></i>
+                </span>
+                <input type="text" id="customPropertyType" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="customPropertyType" placeholder="نوع ملکیت را وارد کنید">
+              </div>
+              <div *ngIf="customPropertyType?.invalid && (customPropertyType?.dirty || customPropertyType?.touched)">
+                <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="numofFloor" class="block text-sm font-semibold text-gray-700 mb-2">تعداد منزل</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-building"></i>
+                </span>
+                <input type="number" (keypress)="onlyNumberKey($event)" id="numofFloor" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="numofFloor">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="numofRooms" class="block text-sm font-semibold text-gray-700 mb-2">تعداد اطاق</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-bed"></i>
+                </span>
+                <input type="number" (keypress)="onlyNumberKey($event)" id="numofRooms" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="numofRooms">
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-green-600 to-green-700 px-3 py-2">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-file-contract"></i>
+      <!-- Document Details Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-emerald-600 to-green-600 px-6 py-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-file-contract text-sm"></i>
+            </div>
             <span>مشخصات سند</span>
           </h2>
         </div>
-        <div class="px-6 py-6">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت سند</label>
-                  <ng-select formControlName="documentType" (change)="onDocumentTypeChange()" class="custom-ng-select">
-                    <ng-option value="قباله شرعی">قباله شرعی</ng-option>
-                    <ng-option value="سند ملکیت">سند ملکیت</ng-option>
-                    <ng-option value="سټه رهنمای معاملات">سټه رهنمای معاملات</ng-option>
-                    <ng-option value="سند دست‌نویس">سند دست‌نویس</ng-option>
-                  </ng-select>
-                  <div *ngIf="documentType?.invalid && (documentType?.dirty || documentType?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="documentType?.errors?.['required']">انتخاب نوع سند الزامی است</small>
-                  </div>
-                </div>
-
-                <div *ngIf="requiresIssuanceFields()">
-                  <label for="issuanceNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر قباله</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-hashtag"></i>
-                    </span>
-                    <input type="text" id="issuanceNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      formControlName="issuanceNumber">
-                  </div>
-                  <div *ngIf="issuanceNumber?.invalid && (issuanceNumber?.dirty || issuanceNumber?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="issuanceNumber?.errors?.['required']">نمبر صدور الزامی است</small>
-                  </div>
-                </div>
-
-                <div *ngIf="requiresIssuanceFields()">
-                  <app-multi-calendar-datepicker
-                    formControlName="issuanceDate"
-                    label="تاریخ صدور"
-                    [required]="true">
-                  </app-multi-calendar-datepicker>
-                  <div *ngIf="issuanceDate?.invalid && (issuanceDate?.dirty || issuanceDate?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="issuanceDate?.errors?.['required']">تاریخ صدور الزامی است</small>
-                  </div>
-                </div>
-
-                <div *ngIf="requiresSerialNumber()">
-                  <label for="serialNumber" class="block text-sm font-semibold text-gray-700 mb-2">سریال نمبر سته</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-barcode"></i>
-                    </span>
-                    <input type="text" id="serialNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      formControlName="serialNumber">
-                  </div>
-                  <div *ngIf="serialNumber?.invalid && (serialNumber?.dirty || serialNumber?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="serialNumber?.errors?.['required']">سریال نمبر سته الزامی است</small>
-                  </div>
-                </div>
-
-                <div *ngIf="requiresTransactionDate()">
-                  <app-multi-calendar-datepicker
-                    formControlName="transactionDate"
-                    label="تاریخ معامله"
-                    [required]="true">
-                  </app-multi-calendar-datepicker>
-                  <div *ngIf="transactionDate?.invalid && (transactionDate?.dirty || transactionDate?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="transactionDate?.errors?.['required']">تاریخ معامله الزامی است</small>
-                  </div>
-                </div>
-
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت سند</label>
+              <ng-select formControlName="documentType" (change)="onDocumentTypeChange()" class="custom-ng-select">
+                <ng-option value="قباله شرعی">قباله شرعی</ng-option>
+                <ng-option value="سند ملکیت">سند ملکیت</ng-option>
+                <ng-option value="سټه رهنمای معاملات">سټه رهنمای معاملات</ng-option>
+                <ng-option value="سند دست‌نویس">سند دست‌نویس</ng-option>
+              </ng-select>
+              <div *ngIf="documentType?.invalid && (documentType?.dirty || documentType?.touched)">
+                <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>انتخاب نوع سند الزامی است</small>
               </div>
+            </div>
+            <div *ngIf="requiresIssuanceFields()" class="form-group">
+              <label for="issuanceNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر قباله</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-hashtag"></i>
+                </span>
+                <input type="text" id="issuanceNumber" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" formControlName="issuanceNumber">
+              </div>
+            </div>
+            <div *ngIf="requiresIssuanceFields()" class="form-group">
+              <app-multi-calendar-datepicker formControlName="issuanceDate" label="تاریخ صدور" [required]="true"></app-multi-calendar-datepicker>
+            </div>
+            <div *ngIf="requiresSerialNumber()" class="form-group">
+              <label for="serialNumber" class="block text-sm font-semibold text-gray-700 mb-2">سریال نمبر سته</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-barcode"></i>
+                </span>
+                <input type="text" id="serialNumber" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" formControlName="serialNumber">
+              </div>
+            </div>
+            <div *ngIf="requiresTransactionDate()" class="form-group">
+              <app-multi-calendar-datepicker formControlName="transactionDate" label="تاریخ معامله" [required]="true"></app-multi-calendar-datepicker>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-">
-        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-3 py-2">
-          <h2 class="text-xl font-bold text-white flex items-center gap-1">
-            <i class="fas fa-cloud-upload-alt"></i>
+      <!-- Document Upload Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-cloud-upload-alt text-sm"></i>
+            </div>
             <span>آپلود اسناد ملکیت</span>
           </h2>
         </div>
-        <div class="px-6 py-6">
-              <div class="space-y-6 mb-6">
-                <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                  <h3 class="text-base font-semibold text-gray-800 mb-3">آپلود اسناد قبلی</h3>
-                  <app-upload #previousDocsComponent [existingFilePath]="previousDocumentsPath" (sendMessage)="previousDocumentsUploadFinished($event)"></app-upload>
-                </div>
-
-                <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                  <h3 class="text-base font-semibold text-gray-800 mb-3">آپلود اسناد موجوده</h3>
-                  <app-upload #existingDocsComponent [existingFilePath]="existingDocumentsPath" (sendMessage)="existingDocumentsUploadFinished($event)"></app-upload>
-                </div>
-              </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-dashed border-gray-200 hover:border-violet-300 transition-colors">
+              <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <i class="fas fa-file-archive text-violet-500"></i>
+                آپلود اسناد قبلی
+              </h3>
+              <app-upload #previousDocsComponent [existingFilePath]="previousDocumentsPath" (sendMessage)="previousDocumentsUploadFinished($event)"></app-upload>
+            </div>
+            <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-dashed border-gray-200 hover:border-violet-300 transition-colors">
+              <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <i class="fas fa-file-alt text-violet-500"></i>
+                آپلود اسناد موجوده
+              </h3>
+              <app-upload #existingDocsComponent [existingFilePath]="existingDocumentsPath" (sendMessage)="existingDocumentsUploadFinished($event)"></app-upload>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-3 py-2">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-map-marker-alt"></i>
+      <!-- Property Address Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-cyan-600 to-teal-600 px-6 py-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-map-marker-alt text-sm"></i>
+            </div>
             <span>ثبت آدرس ملکیت</span>
           </h2>
         </div>
-        <div class="px-6 py-6">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
-                  <ng-select formControlName="provinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterResults($event)" class="custom-ng-select">
-                  </ng-select>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
-                  <ng-select formControlName="districtId" [items]="districts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select">
-                  </ng-select>
-                </div>
-
-                <div>
-                  <label for="village" class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-file-alt"></i>
-                    </span>
-                    <input type="text" id="village" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="village">
-                  </div>
-                  <div *ngIf="village?.invalid && (village?.dirty || village?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="village?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
+              <ng-select formControlName="provinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterResults($event)" class="custom-ng-select"></ng-select>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
+              <ng-select formControlName="districtId" [items]="districts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+            </div>
+            <div class="form-group">
+              <label for="village" class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-map-pin"></i>
+                </span>
+                <input type="text" id="village" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all" formControlName="village">
               </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-3 py-2">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-border-all"></i>
+      <!-- Boundaries Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-border-all text-sm"></i>
+            </div>
             <span>حدود اربعه</span>
           </h2>
         </div>
-        <div class="px-6 py-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">شمالا</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-map-marker"></i>
-                    </span>
-                    <input type="text" id="north" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="north">
-                  </div>
-                  <div *ngIf="north?.invalid && (north?.dirty || north?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="north?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">شرقا</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-map-marker"></i>
-                    </span>
-                    <input type="text" id="east" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="east">
-                  </div>
-                  <div *ngIf="east?.invalid && (east?.dirty || east?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="east?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شمالا</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-arrow-up"></i>
+                </span>
+                <input type="text" id="north" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all" formControlName="north">
               </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">جنوبا</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-map-marker"></i>
-                    </span>
-                    <input type="text" id="south" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="south">
-                  </div>
-                  <div *ngIf="south?.invalid && (south?.dirty || south?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="south?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">غربا</label>
-                  <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                      <i class="fas fa-map-marker"></i>
-                    </span>
-                    <input type="text" id="west" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="west">
-                  </div>
-                  <div *ngIf="west?.invalid && (west?.dirty || west?.touched)">
-                    <small class="text-red-600 text-xs mt-1 block" *ngIf="west?.errors?.['required']">این فیلد الزامی است</small>
-                  </div>
-                </div>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شرقا</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-arrow-right"></i>
+                </span>
+                <input type="text" id="east" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all" formControlName="east">
               </div>
-
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">جزئیات دیگر</label>
-                <div class="relative">
-                  <span class="absolute top-3 left-3 text-gray-500">
-                    <i class="fas fa-align-left"></i>
-                  </span>
-                  <textarea id="des" class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" formControlName="des" name="des" rows="4" required></textarea>
-                </div>
-                <div *ngIf="des?.invalid && (des?.dirty || des?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="des?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">جنوبا</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-arrow-down"></i>
+                </span>
+                <input type="text" id="south" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all" formControlName="south">
               </div>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">غربا</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-arrow-left"></i>
+                </span>
+                <input type="text" id="west" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all" formControlName="west">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">جزئیات دیگر</label>
+            <textarea id="des" class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none" formControlName="des" rows="4"></textarea>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="px-6 py-6">
-          <div class="flex flex-wrap gap-3 justify-center">
-            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+      <!-- Action Buttons -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+        <div class="p-6">
+          <div class="flex flex-wrap gap-4 justify-center">
+            <button type="submit" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 hover:-translate-y-0.5 active:translate-y-0">
               <i class="fas fa-save"></i>
               <span>{{selectedPropertyId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
             </button>
-            <button type="reset" (click)="resetForms()" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+            <button type="reset" (click)="resetForms()" class="px-8 py-3.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 flex items-center gap-3 hover:-translate-y-0.5 active:translate-y-0">
               <i class="fas fa-plus-circle"></i>
               <span>ثبت جدید</span>
             </button>

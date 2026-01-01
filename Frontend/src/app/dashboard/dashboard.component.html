@@ -1,396 +1,364 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 p-6">
+  <!-- Page Header -->
+  <div class="mb-8 text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+      <i class="fas fa-chart-line text-white text-2xl"></i>
+    </div>
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">داشبورد مدیریت</h1>
+    <p class="text-gray-500">نمای کلی از عملکرد سیستم و آمار معاملات</p>
+  </div>
 
-<div class="container">
-  <div class="row">
-    <h2 style="text-align:center;" class="designation"> راپور وسایط نقلیه به اساس ماه های سال</h2>
-    <div class="col-md-6">
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-car text-purple-500"></i>
+        راپور وسایط نقلیه به اساس ماه های سال
+      </h3>
       <canvas id="myChart" width="400" height="200"></canvas>
     </div>
-    <div class="col-md-6">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-chart-bar text-blue-500"></i>
+        نمودار معاملات وسایط
+      </h3>
       <canvas id="vChart" width="400" height="200"></canvas>
     </div>
   </div>
- 
-  <br>
-  <h2 style="text-align:center;" class="designation"> راپور جایداد  به اساس ماه های سال</h2>
-<div class="row">
-  <div class="col-md-6">
-    <canvas id="propertyChart" width="800" height="400"></canvas>
-  </div>
-  <div class="col-md-6">
-    <canvas id="transactionChart" width="800" height="400"></canvas>
-  </div>
-  
-</div>
-  <hr class="divider" />
-  <br>
-  <br>
-  <br>
-  <div class="row">
-     
-      <div class="col-md-4">
-        <h3 style="text-align:center;" class="designation">معامله انجام شده</h3>
-          <canvas id="totalchart"></canvas>
-      </div>
-      
-      <div class="col-md-4">
-        <h3 style="text-align:center;" class="designation">معامله تکمیل شده</h3>
-          <canvas id="total-completed" ></canvas>
-      </div>
-      <div class="col-md-4">
-        <h3 style="text-align:center;"  class="designation">معامله تکمیل ناشده</h3>
-          <canvas id="total-notcompleted"></canvas>
-      </div>
-       
-  </div>
-  <br>
-  <br>
-  <hr class="divider" />
-  <br>
-  <h2 style="text-align:center;" class="designation">PI Chart</h2>
-  <div class="row">
-    
-    <div class="col-md-4">
-        <canvas id="totalchart2"></canvas>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-home text-emerald-500"></i>
+        راپور جایداد به اساس ماه های سال
+      </h3>
+      <canvas id="propertyChart" width="800" height="400"></canvas>
     </div>
-    <div class="col-md-4">
-      <canvas id="totalchart3"></canvas>
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-exchange-alt text-amber-500"></i>
+        نمودار معاملات جایداد
+      </h3>
+      <canvas id="transactionChart" width="800" height="400"></canvas>
+    </div>
   </div>
-  <div class="col-md-4">
-    <canvas id="totalchart4"></canvas>
-</div>
+
+  <!-- Pie Charts Section -->
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
+    <h2 class="text-xl font-bold text-gray-800 mb-6 text-center flex items-center justify-center gap-3">
+      <i class="fas fa-chart-pie text-indigo-500"></i>
+      آمار کلی معاملات
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center">
+        <h4 class="text-sm font-semibold text-gray-600 mb-3">معامله انجام شده</h4>
+        <canvas id="totalchart"></canvas>
+      </div>
+      <div class="text-center">
+        <h4 class="text-sm font-semibold text-gray-600 mb-3">معامله تکمیل شده</h4>
+        <canvas id="total-completed"></canvas>
+      </div>
+      <div class="text-center">
+        <h4 class="text-sm font-semibold text-gray-600 mb-3">معامله تکمیل ناشده</h4>
+        <canvas id="total-notcompleted"></canvas>
+      </div>
+    </div>
   </div>
-  <hr class="divider" />
-  <br>
 
- </div>
+  <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
+    <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">نمودارهای دایره‌ای</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div><canvas id="totalchart2"></canvas></div>
+      <div><canvas id="totalchart3"></canvas></div>
+      <div><canvas id="totalchart4"></canvas></div>
+    </div>
+  </div>
 
-<div class="container-fluid">
-  <h3 class="designation" style="text-align: center;">راپور عمومی معاملات املاک</h3>
-    <div class="row">
-        <ng-container>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع پول معامله شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalAmount || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <!-- Property Statistics Section -->
+  <div class="mb-8">
+    <div class="flex items-center justify-center gap-3 mb-6">
+      <div class="h-px flex-1 bg-gradient-to-r from-transparent to-gray-300"></div>
+      <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-building text-blue-500"></i>
+        راپور عمومی معاملات املاک
+      </h2>
+      <div class="h-px flex-1 bg-gradient-to-l from-transparent to-gray-300"></div>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <!-- Total Amount -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع پول معامله شده</p>
+            <p class="text-2xl font-bold text-gray-800">{{ dashboardData?.totalRecord?.totalAmount || 0 }}</p>
           </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalAmountNotCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <i class="fas fa-money-bill-wave text-white"></i>
           </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalAmountCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-        <!--Second Section-->
-        <ng-container>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله انجام شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransaction || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-exchange-alt fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع  معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransactionNotCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-exchange-alt fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-exchange-alt fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-        <!--Third Section-->
-        <ng-container>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع کمیشن تمام معاملات </div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalRoyaltyAmount || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalRoyaltyAmountNotCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ dashboardData?.totalRecord?.totalRoyaltyAmountCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" > تعداد رهنمایی معاملات ثبت شده </div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalCompany?.totalCompanyRegisterd?.totalTransaction || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-building  fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2" routerLink="/dashboard/realestate/exlist" style="cursor: pointer;">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" > تعداد جواز تاریخ گذشته</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalexpiredLicense?.totalLicenseExpired?.totalTransaction || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-building  fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
+        </div>
       </div>
 
-
-      <hr class="divider" />
-
-
-      <h3 class="designation" style="text-align: center;">راپور عمومی معاملات وسایط</h3>
-    <div class="row">
-        <ng-container>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalAmount || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <!-- Not Completed Amount -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع پول معامله تکمیل ناشده</p>
+            <p class="text-2xl font-bold text-amber-600">{{ dashboardData?.totalRecord?.totalAmountNotCompleted || 0 }}</p>
           </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع پول معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalAmountNotCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <i class="fas fa-clock text-white"></i>
           </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع پول معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalAmountCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-        <!--Second Section-->
-        <ng-container>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله انجام شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransaction || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-exchange-alt fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع  معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransactionNotCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-exchange-alt fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-exchange-alt fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-        <!--Third Section-->
-        <ng-container>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن تمام معاملات </div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmount || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">مجموع کمیشن معامله تکمیل ناشده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmountNotCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-              <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                  <div class="col mr-2">
-                    <div class="h5 mb-0 font-weight-bold text-gray-800" >مجموع کمیشن معامله تکمیل شده</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmountCompleted || 0 }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <i  class="fas fa-money-bill fa-2x"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
+        </div>
       </div>
-</div>
 
+      <!-- Completed Amount -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع پول معامله تکمیل شده</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ dashboardData?.totalRecord?.totalAmountCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <i class="fas fa-check-circle text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Transactions -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع معامله انجام شده</p>
+            <p class="text-2xl font-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransaction || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+            <i class="fas fa-exchange-alt text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Not Completed Transactions -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع معامله تکمیل ناشده</p>
+            <p class="text-2xl font-bold text-red-600">{{ dashboardData?.totalRecord?.totalTransactionNotCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+            <i class="fas fa-times-circle text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed Transactions -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع معامله تکمیل شده</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ dashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/30">
+            <i class="fas fa-check-double text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Royalty -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع کمیشن تمام معاملات</p>
+            <p class="text-2xl font-bold text-gray-800">{{ dashboardData?.totalRecord?.totalRoyaltyAmount || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg shadow-pink-500/30">
+            <i class="fas fa-percentage text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Royalty Not Completed -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع کمیشن معامله تکمیل ناشده</p>
+            <p class="text-2xl font-bold text-amber-600">{{ dashboardData?.totalRecord?.totalRoyaltyAmountNotCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+            <i class="fas fa-hourglass-half text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Royalty Completed -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع کمیشن معامله تکمیل شده</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ dashboardData?.totalRecord?.totalRoyaltyAmountCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-lime-500 to-green-600 flex items-center justify-center shadow-lg shadow-lime-500/30">
+            <i class="fas fa-coins text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Companies -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">تعداد رهنمایی معاملات ثبت شده</p>
+            <p class="text-2xl font-bold text-indigo-600">{{ totalCompany?.totalCompanyRegisterd?.totalTransaction || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <i class="fas fa-building text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expired Licenses -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer" routerLink="/dashboard/realestate/exlist">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">تعداد جواز تاریخ گذشته</p>
+            <p class="text-2xl font-bold text-red-600">{{ totalexpiredLicense?.totalLicenseExpired?.totalTransaction || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle Statistics Section -->
+  <div class="mb-8">
+    <div class="flex items-center justify-center gap-3 mb-6">
+      <div class="h-px flex-1 bg-gradient-to-r from-transparent to-gray-300"></div>
+      <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-car text-purple-500"></i>
+        راپور عمومی معاملات وسایط
+      </h2>
+      <div class="h-px flex-1 bg-gradient-to-l from-transparent to-gray-300"></div>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <!-- Vehicle Total Amount -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع پول معامله شده</p>
+            <p class="text-2xl font-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalAmount || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <i class="fas fa-money-bill-wave text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Not Completed Amount -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع پول معامله تکمیل ناشده</p>
+            <p class="text-2xl font-bold text-amber-600">{{ vehicleDashboardData?.totalRecord?.totalAmountNotCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <i class="fas fa-clock text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Completed Amount -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع پول معامله تکمیل شده</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ vehicleDashboardData?.totalRecord?.totalAmountCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <i class="fas fa-check-circle text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Total Transactions -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع معامله انجام شده</p>
+            <p class="text-2xl font-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransaction || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500 to-pink-600 flex items-center justify-center shadow-lg shadow-fuchsia-500/30">
+            <i class="fas fa-exchange-alt text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Not Completed Transactions -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع معامله تکمیل ناشده</p>
+            <p class="text-2xl font-bold text-red-600">{{ vehicleDashboardData?.totalRecord?.totalTransactionNotCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+            <i class="fas fa-times-circle text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Completed Transactions -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع معامله تکمیل شده</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ vehicleDashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/30">
+            <i class="fas fa-check-double text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Total Royalty -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع کمیشن تمام معاملات</p>
+            <p class="text-2xl font-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmount || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
+            <i class="fas fa-percentage text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Royalty Not Completed -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع کمیشن معامله تکمیل ناشده</p>
+            <p class="text-2xl font-bold text-amber-600">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmountNotCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+            <i class="fas fa-hourglass-half text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Royalty Completed -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">مجموع کمیشن معامله تکمیل شده</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ vehicleDashboardData?.totalRecord?.totalRoyaltyAmountCompleted || 0 }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-lime-500 to-green-600 flex items-center justify-center shadow-lg shadow-lime-500/30">
+            <i class="fas fa-coins text-white"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

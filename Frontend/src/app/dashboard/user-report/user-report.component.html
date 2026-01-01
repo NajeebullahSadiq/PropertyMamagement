@@ -1,39 +1,87 @@
-<div class="container">
-    <div class="row mt-4">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+  <!-- Header Section -->
+  <div class="mb-8">
+    <h1 class="text-dari-4xl font-dari-semibold text-slate-800 mb-2">گزارش کاربران</h1>
+    <p class="text-slate-500">خلاصه عملکرد دفاتر ثبت شده در سیستم</p>
+  </div>
+
+  <!-- Property Reports by Office -->
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-1 h-8 bg-emerald-500 rounded-full"></div>
+      <h2 class="text-dari-2xl font-dari-semibold text-slate-800">راپور املاک به اساس دفتر های ثبت شده</h2>
+    </div>
     
-     <h2>راپور املاک به اساس دفتر های ثبت شده</h2>
-     <hr>
-      <div class="col-lg-4" *ngFor="let user of topUsers">
-        <div class="card mb-3">
-          <div class="card-body">
-            <div class="col-auto" style="text-align: left;">
-                <i  class="fas fa-money-bill fa-2x"></i>
-            </div>
-            <h5 class="card-title">{{ user.createdBy }}</h5>
-            <p class="card-text">  تعداد معامله ثبت شده: <strong>{{ user.totalPropertiesCreated }}</strong></p>
-            <p class="card-text">مقدار پول معامله شده: <strong> {{ user.totalPriceOfProperties }}</strong></p>
-            <p class="card-text">نام دفتر راهنمایی معاملات:  <strong>{{ user.companyTitle }}</strong></p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div *ngFor="let user of topUsers" 
+           class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg hover:border-emerald-200 transition-all duration-300 group">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center group-hover:bg-emerald-500 transition-colors duration-300">
+            <i class="fas fa-building text-emerald-600 group-hover:text-white text-xl transition-colors duration-300"></i>
+          </div>
+          <span class="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-dari-medium rounded-full">املاک</span>
+        </div>
+        <h3 class="text-lg font-dari-semibold text-slate-800 mb-3">{{ user.createdBy }}</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center py-2 border-b border-slate-100">
+            <span class="text-slate-500 text-sm">تعداد معامله</span>
+            <span class="font-dari-semibold text-slate-800">{{ user.totalPropertiesCreated }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-slate-100">
+            <span class="text-slate-500 text-sm">مقدار پول</span>
+            <span class="font-dari-semibold text-emerald-600">{{ user.totalPriceOfProperties | number }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2">
+            <span class="text-slate-500 text-sm">نام دفتر</span>
+            <span class="font-dari-medium text-slate-700 text-sm">{{ user.companyTitle }}</span>
+          </div>
         </div>
       </div>
     </div>
-   
-    <div class="row mt-4">
     
-      <h2>راپور وسایط به اساس دفتر های ثبت شده</h2>
-      <hr>
-       <div class="col-lg-4" *ngFor="let user of vehicleTopUsers">
-         <div class="card mb-3">
-           <div class="card-body">
-             <div class="col-auto" style="text-align: left;">
-                 <i  class="fas fa-money-bill fa-2x"></i>
-             </div>
-             <h5 class="card-title">{{ user.createdBy }}</h5>
-             <p class="card-text">  تعداد معامله ثبت شده: <strong>{{ user.totalPropertiesCreated }}</strong></p>
-             <p class="card-text">مقدار پول معامله شده: <strong> {{ user.totalPriceOfProperties }}</strong></p>
-             <p class="card-text">نام دفتر راهنمایی معاملات:  <strong>{{ user.companyTitle }}</strong></p>
-         </div>
-       </div>
-     </div>
+    <div *ngIf="!topUsers || topUsers.length === 0" class="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
+      <i class="fas fa-inbox text-4xl text-slate-300 mb-3"></i>
+      <p class="text-slate-500">داده‌ای برای نمایش وجود ندارد</p>
+    </div>
+  </div>
 
+  <!-- Vehicle Reports by Office -->
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-1 h-8 bg-blue-500 rounded-full"></div>
+      <h2 class="text-dari-2xl font-dari-semibold text-slate-800">راپور وسایط به اساس دفتر های ثبت شده</h2>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div *ngFor="let user of vehicleTopUsers" 
+           class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg hover:border-blue-200 transition-all duration-300 group">
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-500 transition-colors duration-300">
+            <i class="fas fa-car text-blue-600 group-hover:text-white text-xl transition-colors duration-300"></i>
+          </div>
+          <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-dari-medium rounded-full">وسایط</span>
+        </div>
+        <h3 class="text-lg font-dari-semibold text-slate-800 mb-3">{{ user.createdBy }}</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center py-2 border-b border-slate-100">
+            <span class="text-slate-500 text-sm">تعداد معامله</span>
+            <span class="font-dari-semibold text-slate-800">{{ user.totalPropertiesCreated }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-slate-100">
+            <span class="text-slate-500 text-sm">مقدار پول</span>
+            <span class="font-dari-semibold text-blue-600">{{ user.totalPriceOfProperties | number }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2">
+            <span class="text-slate-500 text-sm">نام دفتر</span>
+            <span class="font-dari-medium text-slate-700 text-sm">{{ user.companyTitle }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!vehicleTopUsers || vehicleTopUsers.length === 0" class="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
+      <i class="fas fa-inbox text-4xl text-slate-300 mb-3"></i>
+      <p class="text-slate-500">داده‌ای برای نمایش وجود ندارد</p>
+    </div>
   </div>
-  </div>
+</div>

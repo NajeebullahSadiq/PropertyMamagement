@@ -21,6 +21,35 @@ namespace WebAPIBackend.Controllers.Companies
             _context = context;
         }
 
+        // Helper: safely parse a Shamsi date string (yyyy-MM-dd or yyyy/MM/dd) to DateOnly using PersianCalendar
+        private static bool TryParsePersianDate(string input, out DateOnly result)
+        {
+            result = default;
+            if (string.IsNullOrWhiteSpace(input)) return false;
+            var sanitized = input.Trim();
+            // Accept both '-' and '/' separators
+            sanitized = sanitized.Replace('/', '-');
+            var parts = sanitized.Split('-');
+            if (parts.Length != 3) return false;
+            if (!int.TryParse(parts[0], out var y) || !int.TryParse(parts[1], out var m) || !int.TryParse(parts[2], out var d))
+                return false;
+
+            // Validate ranges for Persian calendar
+            if (y < 1 || m < 1 || m > 12 || d < 1 || d > 31) return false;
+
+            try
+            {
+                var pc = new PersianCalendar();
+                var dt = pc.ToDateTime(y, m, d, 0, 0, 0, 0);
+                result = DateOnly.FromDateTime(dt);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -128,23 +157,16 @@ namespace WebAPIBackend.Controllers.Companies
                     return BadRequest("Title is required.");
                 }
 
-                // PetitionDate is nullable in the request model, but the existing code assumes it is always present.
-                // Guard against null/short/invalid formats to avoid 500s.
-                if (string.IsNullOrWhiteSpace(request.PetitionDate) || request.PetitionDate.Length < 10)
+                // Validate and parse Persian PetitionDate safely
+                if (string.IsNullOrWhiteSpace(request.PetitionDate))
                 {
-                    return BadRequest("PetitionDate is required and must be in 'yyyy-MM-dd' format (Persian calendar).");
+                    return BadRequest("PetitionDate is required and must be a valid Shamsi date (yyyy-MM-dd or yyyy/MM/dd).");
                 }
 
-                if (!int.TryParse(request.PetitionDate.Substring(0, 4), out var persianYear) ||
-                    !int.TryParse(request.PetitionDate.Substring(5, 2), out var persianMonth) ||
-                    !int.TryParse(request.PetitionDate.Substring(8, 2), out var persianDay))
+                if (!TryParsePersianDate(request.PetitionDate!, out var pdate))
                 {
-                    return BadRequest("PetitionDate must be in 'yyyy-MM-dd' format (Persian calendar).");
+                    return BadRequest("PetitionDate must be a valid Shamsi date (yyyy-MM-dd or yyyy/MM/dd).");
                 }
-
-                var persianCalendar = new PersianCalendar();
-                var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-                var pdate = DateOnly.FromDateTime(gregorianDate);
 
                 var userId = userIdClaim.Value;
 
@@ -181,22 +203,10 @@ namespace WebAPIBackend.Controllers.Companies
                 return BadRequest("Request body is required.");
             }
 
-            // PetitionDate is nullable in the request model, but the existing code assumes it is always present.
-            if (string.IsNullOrWhiteSpace(request.PetitionDate) || request.PetitionDate.Length < 10)
+            if (string.IsNullOrWhiteSpace(request.PetitionDate) || !TryParsePersianDate(request.PetitionDate!, out var pdate))
             {
-                return BadRequest("PetitionDate is required and must be in 'yyyy-MM-dd' format (Persian calendar).");
+                return BadRequest("PetitionDate is required and must be a valid Shamsi date (yyyy-MM-dd or yyyy/MM/dd).");
             }
-
-            if (!int.TryParse(request.PetitionDate.Substring(0, 4), out var persianYear) ||
-                !int.TryParse(request.PetitionDate.Substring(5, 2), out var persianMonth) ||
-                !int.TryParse(request.PetitionDate.Substring(8, 2), out var persianDay))
-            {
-                return BadRequest("PetitionDate must be in 'yyyy-MM-dd' format (Persian calendar).");
-            }
-
-            var persianCalendar = new PersianCalendar();
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            var pdate = DateOnly.FromDateTime(gregorianDate);
 
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
@@ -226,7 +236,7 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.LicenseNumber = request.LicenseNumber;
             existingProperty.PetitionNumber = request.PetitionNumber;
             existingProperty.PetitionDate = pdate;
-            existingProperty.Tin=request.Tin;
+            existingProperty.Tin = request.Tin;
             existingProperty.DocPath = request.DocPath;
 
             // Restore the original values of the CreatedBy and CreatedAt properties

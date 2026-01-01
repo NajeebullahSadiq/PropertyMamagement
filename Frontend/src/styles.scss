@@ -796,3 +796,118 @@ mat-select,
 
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
+
+
+/* ============================================
+   MODERN SIDEBAR & MENU GLOBAL STYLES
+   ============================================ */
+
+/* Modern Menu Panel Styling */
+.mat-mdc-menu-panel {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  overflow: hidden !important;
+  min-width: 180px !important;
+}
+
+.mat-mdc-menu-content {
+  padding: 6px !important;
+}
+
+.mat-mdc-menu-item {
+  border-radius: 8px !important;
+  margin: 2px 0 !important;
+  transition: all 0.15s ease !important;
+
+  &:hover {
+    background-color: #f8fafc !important;
+  }
+
+  &:focus {
+    background-color: #f1f5f9 !important;
+  }
+
+  .mat-icon {
+    color: #64748b !important;
+    margin-left: 10px !important;
+  }
+
+  span {
+    font-family: 'NotoSansArabic', 'Gulzar', sans-serif !important;
+  }
+}
+
+/* Sidebar Smooth Transitions */
+.mat-drawer {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mat-drawer-backdrop {
+  background-color: rgba(15, 23, 42, 0.3) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* Modern Toolbar Styling */
+.mat-toolbar {
+  font-family: 'NotoSansArabic', 'Gulzar', sans-serif !important;
+}
+
+/* Icon Button Hover States */
+.mat-mdc-icon-button {
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    background-color: rgba(241, 245, 249, 0.8) !important;
+  }
+
+  .mat-icon {
+    transition: transform 0.2s ease !important;
+  }
+
+  &:hover .mat-icon {
+    transform: scale(1.05);
+  }
+}
+
+/* Sidenav Modern Styling */
+.mat-drawer-container {
+  background-color: #f8fafc !important;
+}
+
+.mat-drawer-side {
+  border-right: none !important;
+}
+
+/* Active Route Indicator Animation */
+@keyframes activeIndicator {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: 28px;
+    opacity: 1;
+  }
+}
+
+/* Smooth scroll for sidebar */
+.sidebar-modern {
+  scroll-behavior: smooth;
+}
+
+/* Focus visible states for accessibility */
+.nav-item:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Tooltip styling */
+.mat-mdc-tooltip {
+  font-family: 'NotoSansArabic', 'Gulzar', sans-serif !important;
+  font-size: 12px !important;
+  background-color: #1e293b !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+}
