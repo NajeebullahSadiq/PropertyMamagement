@@ -1,123 +1,167 @@
-<section style="height: 800px;">
-    <div class="card-body p-md-5">
-        <div class="heading-wrapper">
-            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات تضمین شرکت   </p>
-        </div>
-        <form [formGroup]="gauranteeForm"  (ngSubmit)="gauranteeForm.valid ? selectedId ? updateData() : addData() : null">
-            <div class="form-group">
-                <input type="hidden" formControlName="id">
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <label class="form-label me-3">نوعیت تضمین</label>
-                    <ng-select [items]="localizedGuaranteeTypes" [selectOnTab]="true"
-                    bindLabel="name" bindValue="id"  formControlName="guaranteeTypeId">
-                    </ng-select>
-                  
-                  </div>
-                <div class="col-md-4">
-                    <label  class="form-label"> نمبر سند(تضمین)</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                        <input type="text" id="propertyDocumentNumber" formControlName="propertyDocumentNumber" class="form-control">
-                    </div>
-                    <div *ngIf="propertyDocumentNumber?.invalid && (propertyDocumentNumber?.dirty || propertyDocumentNumber?.touched)">
-                        <small class="text-danger" *ngIf="propertyDocumentNumber?.errors?.['required']">این فیلد  الزامی است</small>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <app-multi-calendar-datepicker
-                        formControlName="propertyDocumentDate"
-                        label="تاریخ  سند(تضمین)">
-                    </app-multi-calendar-datepicker>
-                  </div>
-            </div>
-           <br>
-           <div class="row">
-            <div class="col-md-4">
-                <label  class="form-label">	شماره مکتوب ارسالی به مرجع  تضمین</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                    <input type="text" id="senderMaktobNumber" formControlName="senderMaktobNumber" class="form-control">
-                </div>
-                <div *ngIf="senderMaktobNumber?.invalid && (senderMaktobNumber?.dirty || senderMaktobNumber?.touched)">
-                    <small class="text-danger" *ngIf="senderMaktobNumber?.errors?.['required']">این فیلد  الزامی است</small>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <app-multi-calendar-datepicker
-                    formControlName="senderMaktobDate"
-                    label="تاریخ مکتوب ارسالی  به مرجع تضمین">
-                </app-multi-calendar-datepicker>
-              </div>
-             <div class="col-md-4">
-                <label  class="form-label">	شماره مکتوب جوابیه تضمین</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                    <input type="text" id="answerdMaktobNumber" formControlName="answerdMaktobNumber" class="form-control">
-                </div>
-                <div *ngIf="answerdMaktobNumber?.invalid && (answerdMaktobNumber?.dirty || answerdMaktobNumber?.touched)">
-                    <small class="text-danger" *ngIf="answerdMaktobNumber?.errors?.['required']">این فیلد  الزامی است</small>
-                </div>
-            </div>
-           </div>
-           <div class="row">
-            <div class="col-md-4">
-                <app-multi-calendar-datepicker
-                    formControlName="answerdMaktobDate"
-                    label="تاریخ مکتوب جوابیه تضمین">
-                </app-multi-calendar-datepicker>
-              </div>
-          
-              <div class="col-md-4">
-                <app-multi-calendar-datepicker
-                    formControlName="dateofGuarantee"
-                    label="تاریخ ارایه تضمین خط">
-                </app-multi-calendar-datepicker>
-              </div>
+<section class="w-full bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات تضمین شرکت</h1>
+      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به تضمین را با دقت تکمیل نمایید</p>
+    </div>
 
-              <div class="col-md-4">
-                <label  class="form-label">		شماره تضمین خط   </label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                    <input type="text" id="guaranteeDocNumber" formControlName="guaranteeDocNumber" class="form-control">
-                </div>
-                <div *ngIf="guaranteeDocNumber?.invalid && (guaranteeDocNumber?.dirty || guaranteeDocNumber?.touched)">
-                    <small class="text-danger" *ngIf="guaranteeDocNumber?.errors?.['required']">این فیلد  الزامی است</small>
-                </div>
+    <form [formGroup]="gauranteeForm" (ngSubmit)="gauranteeForm.valid ? selectedId ? updateData() : addData() : null">
+      <div class="hidden">
+        <input type="hidden" formControlName="id">
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-shield-alt"></i>
+            <span>معلومات تضمین</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تضمین</label>
+              <ng-select [items]="localizedGuaranteeTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="guaranteeTypeId" class="custom-ng-select">
+              </ng-select>
             </div>
-           </div>
-           <div class="row">
-            <div class="col-md-4">
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر سند(تضمین)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="propertyDocumentNumber" formControlName="propertyDocumentNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+              <div *ngIf="propertyDocumentNumber?.invalid && (propertyDocumentNumber?.dirty || propertyDocumentNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="propertyDocumentNumber?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <div>
               <app-multi-calendar-datepicker
-                  formControlName="guaranteeDate"
-                  label="تاریخ تضمین خط">
+                formControlName="propertyDocumentDate"
+                label="تاریخ سند(تضمین)">
               </app-multi-calendar-datepicker>
             </div>
-            <div class="col-md-4">
-              <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
-              <div class="col-md-9">
-                  <div class="form-group col-md-12">
-                      <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
-                  </div>
-              </div>
-              <div class="col-md-2">
-                <ng-container *ngIf="gauranteeForm.get('id')?.value && gauranteeForm.get('docPath')?.value">
-                  <h3 class="download-link" (click)="downloadFiles()">
-                    <i class="fas fa-arrow-alt-circle-down me-2"></i> 
-                    <div class="form-group col-md-12">
-                      دانلود اسناد
-                    </div>
-                  </h3>
-                </ng-container>
-              </div>
           </div>
-           </div>
-            <br>
-            <button type="submit" [disabled]="gauranteeForm.invalid" class="btn btn-success"> {{selectedId ?
-                'تغیر معلومات' : 'ثبت معلومات'}}</button>
-              <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
-                style="margin-right: 5px;">جدید</button>
-        </form>
-    </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-file-alt"></i>
+            <span>معلومات مکتوب</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره مکتوب ارسالی به مرجع تضمین</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="senderMaktobNumber" formControlName="senderMaktobNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+              <div *ngIf="senderMaktobNumber?.invalid && (senderMaktobNumber?.dirty || senderMaktobNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="senderMaktobNumber?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="senderMaktobDate"
+                label="تاریخ مکتوب ارسالی به مرجع تضمین">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره مکتوب جوابیه تضمین</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="answerdMaktobNumber" formControlName="answerdMaktobNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+              <div *ngIf="answerdMaktobNumber?.invalid && (answerdMaktobNumber?.dirty || answerdMaktobNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="answerdMaktobNumber?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="answerdMaktobDate"
+                label="تاریخ مکتوب جوابیه تضمین">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="dateofGuarantee"
+                label="تاریخ ارایه تضمین خط">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره تضمین خط</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="guaranteeDocNumber" formControlName="guaranteeDocNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+              <div *ngIf="guaranteeDocNumber?.invalid && (guaranteeDocNumber?.dirty || guaranteeDocNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="guaranteeDocNumber?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="guaranteeDate"
+                label="تاریخ تضمین خط">
+              </app-multi-calendar-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>آپلود اسنادها در سیستم</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="space-y-4">
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+              <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
+            </div>
+            
+            <ng-container *ngIf="gauranteeForm.get('id')?.value && gauranteeForm.get('docPath')?.value">
+              <div class="flex items-center justify-center">
+                <button type="button" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2" (click)="downloadFiles()">
+                  <i class="fas fa-arrow-alt-circle-down"></i>
+                  <span>دانلود اسناد</span>
+                </button>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4 justify-center pb-6">
+        <button type="submit" [disabled]="gauranteeForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
+          <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+        </button>
+        <button type="reset" (click)="resetForms()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <i class="fas fa-plus-circle"></i>
+          <span>جدید</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </section>

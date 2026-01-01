@@ -1,55 +1,50 @@
-<div class="w-full bg-gray-50 min-h-screen">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <mat-tab-group class="modern-tabs" [selectedIndex]="currentTab" (selectedTabChange)="setTab($event.index)">
-                <mat-tab class="blue-tab">
-                    <ng-template matTabLabel>
-                        <div class="flex items-center gap-2 px-3 py-2">
-                            <mat-icon class="large-icon text-blue-900">directions_car</mat-icon>
-                            <span class="font-semibold">وسایط</span>
-                        </div>
-                    </ng-template>
-                    <div class="p-6">
-                        <app-vehicle-submit #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-vehicle-submit>
-                    </div>
-                </mat-tab>
-
-                <mat-tab [disabled]="vehicleService.mainTableId === 0">
-                    <ng-template matTabLabel>
-                        <div class="flex items-center gap-2 px-3 py-2">
-                            <mat-icon class="large-icon text-blue-900">person</mat-icon>
-                            <span class="font-semibold">فروشنده</span>
-                        </div>
-                    </ng-template>
-                    <div class="p-6">
-                        <app-sellerdetail #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
-                    </div>
-                </mat-tab>
-
-                <mat-tab [disabled]="vehicleService.mainTableId === 0">
-                    <ng-template matTabLabel>
-                        <div class="flex items-center gap-2 px-3 py-2">
-                            <mat-icon class="large-icon text-blue-900">person</mat-icon>
-                            <span class="font-semibold">خریدار</span>
-                        </div>
-                    </ng-template>
-                    <div class="p-6">
-                        <app-buyerdetail #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
-                    </div>
-                </mat-tab>
-
-                <mat-tab [disabled]="vehicleService.mainTableId === 0">
-                    <ng-template matTabLabel>
-                        <div class="flex items-center gap-2 px-3 py-2">
-                            <mat-icon class="large-icon text-blue-900">person</mat-icon>
-                            <span class="font-semibold">شاهدین</span>
-                        </div>
-                    </ng-template>
-                    <div class="p-6">
-                        <app-witnessdetail #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
-                    </div>
-                </mat-tab>
-            </mat-tab-group>
+<div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+    <mat-tab-group #tabGroup class="modern-tabs" (selectedTabChange)="setTab($event.index)">
+      <mat-tab class="blue-tab">
+        <ng-template matTabLabel>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">directions_car</mat-icon>
+            <span class="font-semibold">وسایط</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-vehicle-submit #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-vehicle-submit>
         </div>
-    </div>
+      </mat-tab>
+      <mat-tab [disabled]="vehicleService.mainTableId === 0">
+        <ng-template matTabLabel>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">person</mat-icon>
+            <span class="font-semibold">فروشنده</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-sellerdetail #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
+        </div>
+      </mat-tab>
+      <mat-tab [disabled]="vehicleService.mainTableId === 0">
+        <ng-template matTabLabel>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">person</mat-icon>
+            <span class="font-semibold">خریدار</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-buyerdetail #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
+        </div>
+      </mat-tab>
+      <mat-tab [disabled]="vehicleService.mainTableId === 0">
+        <ng-template matTabLabel>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <mat-icon class="large-icon text-blue-900">person</mat-icon>
+            <span class="font-semibold">شاهدین</span>
+          </div>
+        </ng-template>
+        <div class="p-6">
+          <app-witnessdetail #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>

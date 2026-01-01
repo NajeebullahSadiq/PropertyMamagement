@@ -120,7 +120,8 @@ catch (Exception ex)
 app.UseCors();
 
 app.UseStaticFiles();
-var resourcesPath = Path.Combine(AppContext.BaseDirectory, "Resources");
+var storageRoot = builder.Configuration["FileStorage:RootPath"] ?? AppContext.BaseDirectory;
+var resourcesPath = Path.Combine(storageRoot, "Resources");
 Directory.CreateDirectory(resourcesPath);
 Directory.CreateDirectory(Path.Combine(resourcesPath, "Images"));
 var documentsPath = Path.Combine(resourcesPath, "Documents");

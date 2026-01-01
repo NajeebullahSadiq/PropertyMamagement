@@ -1,91 +1,121 @@
-<section style="height: 800px;">
-    <div class="card-body p-md-5">
-        <div class="heading-wrapper">
-            <p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">ثبت مشخصات شرکت راهنمایی معاملات </p>
-        </div>
-        <form [formGroup]="licenseForm"  (ngSubmit)="licenseForm.valid ? selectedId ? updateData() : addData() : null">
-            <div class="form-group">
-                <input type="hidden" formControlName="id">
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="title" class="form-label">شماره جواز</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                        <input type="text" id="licenseNumber" formControlName="licenseNumber" class="form-control">
-                    </div>
-                    <div *ngIf="licenseNumber?.invalid && (licenseNumber?.dirty || licenseNumber?.touched)">
-                        <small class="text-danger" *ngIf="licenseNumber?.errors?.['required']">این فیلد  الزامی است</small>
-                      </div>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">نوع جواز</label>
-                    <ng-select [items]="licenseTypes" [selectOnTab]="true"
-                    bindLabel="dari" bindValue="id" formControlName="licenseType">
-                    </ng-select>
-                    <div *ngIf="licenseType?.invalid && (licenseType?.dirty || licenseType?.touched)">
-                        <small class="text-danger" *ngIf="licenseType?.errors?.['required']">این فیلد الزامی است</small>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <app-multi-calendar-datepicker
-                        formControlName="issueDate"
-                        label="تاریخ  صدور">
-                    </app-multi-calendar-datepicker>
-                  </div>
-                  <div class="col-md-4">
-                    <app-multi-calendar-datepicker
-                        formControlName="expireDate"
-                        label="تاریخ  ختم جواز">
-                    </app-multi-calendar-datepicker>
-                  </div>
-            </div>
-
-            <br>
-            <div class="row">
-                <div class="col-md-4">
-                    <label class="form-label me-3">ناحیه مربوطه</label>
-                    <ng-select [items]="Areas" [selectOnTab]="true"
-                    bindLabel="name" bindValue="id"  formControlName="areaId">
-                    </ng-select>
-                  
-                  </div>
-                  <div class="col-md-4">
-                    <label for="title" class="form-label"> آدرس دقیق دفتر</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-map-marker"></i></span>
-                        <input type="text" id="officeAddress" formControlName="officeAddress" class="form-control">
-                    </div>
-                    <div *ngIf="officeAddress?.invalid && (officeAddress?.dirty || officeAddress?.touched)">
-                        <small class="text-danger" *ngIf="officeAddress?.errors?.['required']">این فیلد  الزامی است</small>
-                      </div>
-                </div>
-                <div class="col-md-4">
-                    <label for="firstName" class="form-label">آپلود اسنادها در سیستم</label>
-                    <div class="col-md-9">
-                        <div class="form-group col-md-12">
-                            <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                      <ng-container *ngIf="licenseForm.get('id')?.value && licenseForm.get('docPath')?.value">
-                        <h3 class="download-link" (click)="downloadFiles()">
-                          <i class="fas fa-arrow-alt-circle-down me-2"></i> 
-                          <div class="form-group col-md-12">
-                            دانلود اسناد
-                          </div>
-                        </h3>
-                      </ng-container>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <button type="submit" [disabled]="licenseForm.invalid" class="btn btn-success"> {{selectedId ?
-                'تغیر معلومات' : 'ثبت معلومات'}}</button>
-              <button type="reset"  (click)="resetForms()"   class="btn btn-primary"
-                style="margin-right: 5px;">جدید</button>
-                <button type="button" (click)="navigateToPrint()" class="btn btn-secondary print">چاپ جواز</button>
-        </form>
+<section class="w-full bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات جواز شرکت راهنمایی معاملات</h1>
+      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به جواز را با دقت تکمیل نمایید</p>
     </div>
-</section>
 
+    <form [formGroup]="licenseForm" (ngSubmit)="licenseForm.valid ? selectedId ? updateData() : addData() : null">
+      <div class="hidden">
+        <input type="hidden" formControlName="id">
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-certificate"></i>
+            <span>معلومات جواز</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label for="licenseNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره جواز</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="licenseNumber" formControlName="licenseNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+              <div *ngIf="licenseNumber?.invalid && (licenseNumber?.dirty || licenseNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="licenseNumber?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوع جواز</label>
+              <ng-select [items]="licenseTypes" [selectOnTab]="true" bindLabel="dari" bindValue="id" formControlName="licenseType" class="custom-ng-select">
+              </ng-select>
+              <div *ngIf="licenseType?.invalid && (licenseType?.dirty || licenseType?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="licenseType?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="issueDate"
+                label="تاریخ صدور">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="expireDate"
+                label="تاریخ ختم جواز">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه مربوطه</label>
+              <ng-select [items]="Areas" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="areaId" class="custom-ng-select">
+              </ng-select>
+            </div>
+
+            <div>
+              <label for="officeAddress" class="block text-sm font-semibold text-gray-700 mb-2">آدرس دقیق دفتر</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-map-marker"></i>
+                </span>
+                <input type="text" id="officeAddress" formControlName="officeAddress" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+              <div *ngIf="officeAddress?.invalid && (officeAddress?.dirty || officeAddress?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="officeAddress?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>آپلود اسنادها در سیستم</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="space-y-4">
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+              <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
+            </div>
+            
+            <ng-container *ngIf="licenseForm.get('id')?.value && licenseForm.get('docPath')?.value">
+              <div class="flex items-center justify-center">
+                <button type="button" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2" (click)="downloadFiles()">
+                  <i class="fas fa-arrow-alt-circle-down"></i>
+                  <span>دانلود اسناد</span>
+                </button>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4 justify-center pb-6">
+        <button type="submit" [disabled]="licenseForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
+          <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+        </button>
+        <button type="reset" (click)="resetForms()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <i class="fas fa-plus-circle"></i>
+          <span>جدید</span>
+        </button>
+        <button type="button" (click)="navigateToPrint()" class="px-8 py-3 bg-gray-700 hover:bg-gray-800 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <i class="fas fa-print"></i>
+          <span>چاپ جواز</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
