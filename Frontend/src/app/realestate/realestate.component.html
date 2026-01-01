@@ -3,7 +3,7 @@
       <mat-tab class="blue-tab">
           <ng-template matTabLabel>
             <mat-icon class="large-icon">home</mat-icon>
-                     شرکت راهنمایی معاملات
+                     دفتر راهنمایی معاملات
             </ng-template>
             <app-companydetails #companydetails  [id]="PropertyId" (next)="nextTab()"></app-companydetails>
         </mat-tab>
@@ -17,7 +17,7 @@
         <mat-tab [disabled]="comservice.mainTableId === 0 || comservice.ownerId===0">
           <ng-template matTabLabel  >
               <mat-icon class="large-icon">location_on</mat-icon>
-                    آدرس مالک شرکت
+                    آدرس مالک دفتر
             </ng-template>
           <app-companyowneraddress #companyowneraddress  [id]="PropertyId" (next)="nextTab()"></app-companyowneraddress>
         </mat-tab>

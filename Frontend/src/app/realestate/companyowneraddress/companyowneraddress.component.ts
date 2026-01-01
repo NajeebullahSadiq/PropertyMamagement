@@ -71,7 +71,7 @@ export class CompanyowneraddressComponent {
         if (error.status === 400) {
           this.toastr.error("شما فقط میتوانید یک آدرس دایمی و یک آدرس فعلی اضافه کنید");
         } else if (error.status === 312) {
-          this.toastr.error("لطفا ابتدا معلومات مالک شرکت  را ثبت کنید");
+          this.toastr.error("لطفا ابتدا معلومات مالک دفتر  را ثبت کنید");
         } else {
           this.toastr.error("An error occurred");
         }

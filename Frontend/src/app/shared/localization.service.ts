@@ -125,7 +125,7 @@ export class LocalizationService {
   guaranteeTypes = [
     { value: 'Bank Guarantee', label: 'ضمانت بانکی' },
     { value: 'Personal Guarantee', label: 'ضمانت شخصی' },
-    { value: 'Corporate Guarantee', label: 'ضمانت شرکتی' },
+    { value: 'Corporate Guarantee', label: 'ضمانت دفتری' },
     { value: 'Property Guarantee', label: 'ضمانت ملکی' },
     { value: 'Cash Deposit', label: 'سپردهٔ نقد' },
     { value: 'Government Guarantee', label: 'ضمانت دولتی' },
