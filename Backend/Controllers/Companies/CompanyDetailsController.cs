@@ -110,53 +110,94 @@ namespace WebAPIBackend.Controllers.Companies
         [HttpPost]
         public async Task<ActionResult<int>> SaveProperty([FromBody] CompanyDetailData request)
         {
-            var userIdClaim = HttpContext.User.FindFirst("UserID");
-            if (userIdClaim == null)
+            try
             {
-                return Unauthorized();
-            }
-           
-            DateOnly pdate;
-            var userId = userIdClaim.Value;
+                var userIdClaim = HttpContext.User.FindFirst("UserID");
+                if (userIdClaim == null)
+                {
+                    return Unauthorized();
+                }
 
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.PetitionDate.Substring(0, 4));
-            var persianMonth = int.Parse(request.PetitionDate.Substring(5, 2));
-            var persianDay = int.Parse(request.PetitionDate.Substring(8, 2));
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            pdate = DateOnly.FromDateTime(gregorianDate);
-            var property = new CompanyDetail
-            {
-                Title = request.Title,
-                PhoneNumber = request.PhoneNumber,
-                LicenseNumber = request.LicenseNumber,
-                PetitionNumber = request.PetitionNumber,
-                PetitionDate = pdate, // Convert DateOnly to string
-                Tin=request.Tin,
-                DocPath = request.DocPath,
-                CreatedAt = DateTime.Now,
-                CreatedBy = userId,
-            };
-           
+                if (request == null)
+                {
+                    return BadRequest("Request body is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Title))
+                {
+                    return BadRequest("Title is required.");
+                }
+
+                // PetitionDate is nullable in the request model, but the existing code assumes it is always present.
+                // Guard against null/short/invalid formats to avoid 500s.
+                if (string.IsNullOrWhiteSpace(request.PetitionDate) || request.PetitionDate.Length < 10)
+                {
+                    return BadRequest("PetitionDate is required and must be in 'yyyy-MM-dd' format (Persian calendar).");
+                }
+
+                if (!int.TryParse(request.PetitionDate.Substring(0, 4), out var persianYear) ||
+                    !int.TryParse(request.PetitionDate.Substring(5, 2), out var persianMonth) ||
+                    !int.TryParse(request.PetitionDate.Substring(8, 2), out var persianDay))
+                {
+                    return BadRequest("PetitionDate must be in 'yyyy-MM-dd' format (Persian calendar).");
+                }
+
+                var persianCalendar = new PersianCalendar();
+                var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
+                var pdate = DateOnly.FromDateTime(gregorianDate);
+
+                var userId = userIdClaim.Value;
+
+                var property = new CompanyDetail
+                {
+                    Title = request.Title,
+                    PhoneNumber = request.PhoneNumber,
+                    LicenseNumber = request.LicenseNumber,
+                    PetitionNumber = request.PetitionNumber,
+                    PetitionDate = pdate,
+                    Tin = request.Tin,
+                    DocPath = request.DocPath,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                };
+
                 _context.Add(property);
                 await _context.SaveChangesAsync();
+
                 var result = new { Id = property.Id };
                 return Ok(result);
-          
-         
-           
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCompanyDetails(int id, [FromBody] CompanyDetailData request)
         {
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.PetitionDate.Substring(0, 4));
-            var persianMonth = int.Parse(request.PetitionDate.Substring(5, 2));
-            var persianDay = int.Parse(request.PetitionDate.Substring(8, 2));
+            if (request == null)
+            {
+                return BadRequest("Request body is required.");
+            }
+
+            // PetitionDate is nullable in the request model, but the existing code assumes it is always present.
+            if (string.IsNullOrWhiteSpace(request.PetitionDate) || request.PetitionDate.Length < 10)
+            {
+                return BadRequest("PetitionDate is required and must be in 'yyyy-MM-dd' format (Persian calendar).");
+            }
+
+            if (!int.TryParse(request.PetitionDate.Substring(0, 4), out var persianYear) ||
+                !int.TryParse(request.PetitionDate.Substring(5, 2), out var persianMonth) ||
+                !int.TryParse(request.PetitionDate.Substring(8, 2), out var persianDay))
+            {
+                return BadRequest("PetitionDate must be in 'yyyy-MM-dd' format (Persian calendar).");
+            }
+
+            var persianCalendar = new PersianCalendar();
             var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            DateOnly pdate;
-            pdate = DateOnly.FromDateTime(gregorianDate);
+            var pdate = DateOnly.FromDateTime(gregorianDate);
+
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {

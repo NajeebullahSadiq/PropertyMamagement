@@ -50,7 +50,7 @@ export class CompanydetailsComponent {
 	minDate ={year:1320,month: 12, day: 31}
 
   imageName:string=''
-  selectedDate!: NgbDate;
+  selectedDate: NgbDate;
   companyForm: FormGroup = new FormGroup({});
   selectedId:number=0;
   companyDetails!: companydetails[];
@@ -68,7 +68,7 @@ export class CompanydetailsComponent {
     this.next.emit();
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,private ngbDateParserFormatter: NgbDateParserFormatter,
-	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent){
+	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent, private calendar: NgbCalendar){
 	this.companyForm = this.fb.group({
 		id: [0],
 		title: ['', Validators.required],
@@ -81,58 +81,65 @@ export class CompanydetailsComponent {
 	  });
 	  this.comservice.mainTableId=0;
 	  this.comservice.ownerId=0;
+	  this.selectedDate = this.calendar.getToday();
 	}
 	
 	ngOnInit() {
-		// var yyyy=2021;
-		// this.selectedDate = new NgbDate(2021, 1, 1);
-		this.comservice.getCompanyById(this.id)
-		.subscribe({
-		  next: (detail) => {
-		    if (detail && detail.length > 0) {
-		      this.companyDetails = detail;
-		      this.companyForm.setValue({
-			    id: detail[0].id,
-			    title:detail[0].title,
-			    phoneNumber:detail[0].phoneNumber,
-			    licenseNumber:detail[0].licenseNumber,
-			    petitionDate:detail[0].petitionDate,
-			    petitionNumber:detail[0].petitionNumber,
-			    tin:detail[0].tin,
-			    docPath:detail[0].docPath
-
-		      });
-		      this.comservice.mainTableId=detail[0].id;
-		      this.selectedId=detail[0].id;
-		      const dateString = detail[0].petitionDate;
-		      const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-		      let parsedDate: NgbDate | null = null;
-		      
-		      if (parsedDateStruct) {
-			    parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
-		      }
-		      if(parsedDate){
-			    this.selectedDate = parsedDate;
-		      }
-		    }
-		  },
-		  error: (error) => {
-		    console.error('Error loading company details:', error);
-		  }
-		});
+		if (this.id && this.id > 0) {
+			this.comservice.getCompanyById(this.id)
+			.subscribe({
+			  next: (detail) => {
+			    if (detail && detail.length > 0) {
+			      this.companyDetails = detail;
+			      
+			      const dateString = detail[0].petitionDate;
+			      const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
+			      let dateValue: Date | string = detail[0].petitionDate;
+			      
+			      if (parsedDateStruct) {
+					const year = parsedDateStruct.year;
+					const month = parsedDateStruct.month - 1;
+					const day = parsedDateStruct.day;
+					dateValue = new Date(year, month, day);
+			      }
+			      
+			      this.companyForm.setValue({
+				    id: detail[0].id,
+				    title:detail[0].title,
+				    phoneNumber:detail[0].phoneNumber,
+				    licenseNumber:detail[0].licenseNumber,
+				    petitionDate: dateValue,
+				    petitionNumber:detail[0].petitionNumber,
+				    tin:detail[0].tin,
+				    docPath:detail[0].docPath
+			      });
+			      
+			      this.comservice.mainTableId=detail[0].id;
+			      this.selectedId=detail[0].id;
+			    }
+			  },
+			  error: (error) => {
+			    console.error('Error loading company details:', error);
+			  }
+			});
+		}
 	}
 
 	addCompanyDetails(): void {
 		const companyDetail = this.companyForm.value as companydetails;
-		const date = new Date(
-			this.selectedDate.year,
-			this.selectedDate.month - 1, // Adjust month value (JavaScript months are 0-based)
-			this.selectedDate.day
-		  );
-		companyDetail.petitionDate = date.toISOString();
+		const petitionDateValue = this.companyForm.get('petitionDate')?.value;
+		
+		if (petitionDateValue) {
+			const date = typeof petitionDateValue === 'string' ? new Date(petitionDateValue) : petitionDateValue;
+			companyDetail.petitionDate = date.toISOString();
+		} else {
+			this.toastr.error("لطفا تاریخ ارائه عریضه را انتخاب کنید");
+			return;
+		}
+		
 		companyDetail.docPath=this.imageName;
-		 if(companyDetail.id===null){
-		  companyDetail.id=0;
+		if(companyDetail.id===null){
+			companyDetail.id=0;
 		}
 		this.comservice.addcompanies(companyDetail).subscribe(
 		  result => {
@@ -151,16 +158,17 @@ export class CompanydetailsComponent {
 		);
 	}
 	updateCompanyDetails():void{
- 
 		const companyDetail = this.companyForm.value as companydetails;
-		const date = new Date(
-			Date.UTC(
-			this.selectedDate.year,
-			this.selectedDate.month - 1, // Adjust month value (JavaScript months are 0-based)
-			this.selectedDate.day
-			)
-		  );
-		companyDetail.petitionDate = date.toISOString();
+		const petitionDateValue = this.companyForm.get('petitionDate')?.value;
+		
+		if (petitionDateValue) {
+			const date = typeof petitionDateValue === 'string' ? new Date(petitionDateValue) : petitionDateValue;
+			companyDetail.petitionDate = date.toISOString();
+		} else {
+			this.toastr.error("لطفا تاریخ ارائه عریضه را انتخاب کنید");
+			return;
+		}
+		
 		companyDetail.docPath=this.imageName;
 		if(companyDetail.id===0 && this.selectedId!==0 || this.selectedId!==null){
 		  companyDetail.id=this.selectedId;
