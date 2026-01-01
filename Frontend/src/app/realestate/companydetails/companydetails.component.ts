@@ -87,32 +87,38 @@ export class CompanydetailsComponent {
 		// var yyyy=2021;
 		// this.selectedDate = new NgbDate(2021, 1, 1);
 		this.comservice.getCompanyById(this.id)
-		.subscribe(detail => {
-		  this.companyDetails = detail;
-		  this.companyForm.setValue({
-			id: detail[0].id,
-			title:detail[0].title,
-			phoneNumber:detail[0].phoneNumber,
-			licenseNumber:detail[0].licenseNumber,
-			petitionDate:detail[0].petitionDate,
-			petitionNumber:detail[0].petitionNumber,
-			tin:detail[0].tin,
-			docPath:detail[0].docPath
+		.subscribe({
+		  next: (detail) => {
+		    if (detail && detail.length > 0) {
+		      this.companyDetails = detail;
+		      this.companyForm.setValue({
+			    id: detail[0].id,
+			    title:detail[0].title,
+			    phoneNumber:detail[0].phoneNumber,
+			    licenseNumber:detail[0].licenseNumber,
+			    petitionDate:detail[0].petitionDate,
+			    petitionNumber:detail[0].petitionNumber,
+			    tin:detail[0].tin,
+			    docPath:detail[0].docPath
 
-		  });
-		  this.comservice.mainTableId=detail[0].id;
-		  this.selectedId=detail[0].id;
-		  const dateString = detail[0].petitionDate;
-		  const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-		  let parsedDate: NgbDate | null = null;
-		  
-		  if (parsedDateStruct) {
-			parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
+		      });
+		      this.comservice.mainTableId=detail[0].id;
+		      this.selectedId=detail[0].id;
+		      const dateString = detail[0].petitionDate;
+		      const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
+		      let parsedDate: NgbDate | null = null;
+		      
+		      if (parsedDateStruct) {
+			    parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
+		      }
+		      if(parsedDate){
+			    this.selectedDate = parsedDate;
+		      }
+		    }
+		  },
+		  error: (error) => {
+		    console.error('Error loading company details:', error);
 		  }
-		  if(parsedDate){
-			this.selectedDate = parsedDate;
-		  }
-		  
 		});
 	}
 

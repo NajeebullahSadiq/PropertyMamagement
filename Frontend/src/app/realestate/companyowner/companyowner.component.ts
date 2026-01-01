@@ -107,39 +107,46 @@ export class CompanyownerComponent {
 	  });
 
 	  this.comservice.getOwnerById(this.id)
-		.subscribe(detail => {
-		  this.ownerDetails = detail;
-		  this.ownerForm.setValue({
-			id: detail[0].id,
-			firstName:detail[0].firstName,
-			fatherName:detail[0].fatherName,
-			grandFatherName:detail[0].grandFatherName,
-			educationLevelId:detail[0].educationLevelId,
-			dateofBirth:detail[0].dateofBirth,
-			identityCardTypeId:detail[0].identityCardTypeId,
-			indentityCardNumber:detail[0].indentityCardNumber,
-			jild:detail[0].jild,
-			safha:detail[0].safha,
-			companyId:detail[0].companyId,
-			sabtNumber:detail[0].sabtNumber,
-			pothoPath:detail[0].pothoPath,
+		.subscribe({
+		  next: (detail) => {
+		    if (detail && detail.length > 0) {
+		      this.ownerDetails = detail;
+		      this.ownerForm.setValue({
+			    id: detail[0].id,
+			    firstName:detail[0].firstName,
+			    fatherName:detail[0].fatherName,
+			    grandFatherName:detail[0].grandFatherName,
+			    educationLevelId:detail[0].educationLevelId,
+			    dateofBirth:detail[0].dateofBirth,
+			    identityCardTypeId:detail[0].identityCardTypeId,
+			    indentityCardNumber:detail[0].indentityCardNumber,
+			    jild:detail[0].jild,
+			    safha:detail[0].safha,
+			    companyId:detail[0].companyId,
+			    sabtNumber:detail[0].sabtNumber,
+			    pothoPath:detail[0].pothoPath,
 
-		  });
-		  this.comservice.ownerId=detail[0].id;
-		  this.selectedId=detail[0].id;
-		  const dateString = detail[0].dateofBirth;
-		  this.imagePath=this.baseUrl+detail[0].pothoPath;
-		  this.imageName=detail.map(item => item.pothoPath).toString();
-		  const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-		  let parsedDate: NgbDate | null = null;
-		  
-		  if (parsedDateStruct) {
-			parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
+		      });
+		      this.comservice.ownerId=detail[0].id;
+		      this.selectedId=detail[0].id;
+		      const dateString = detail[0].dateofBirth;
+		      this.imagePath=this.baseUrl+detail[0].pothoPath;
+		      this.imageName=detail.map(item => item.pothoPath).toString();
+		      const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
+		      let parsedDate: NgbDate | null = null;
+		      
+		      if (parsedDateStruct) {
+			    parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
+		      }
+		      if(parsedDate){
+			    this.selectedDate = parsedDate;
+		      }
+		      this.onPropertyTypeChange();
+		    }
+		  },
+		  error: (error) => {
+		    console.error('Error loading owner details:', error);
 		  }
-		  if(parsedDate){
-			this.selectedDate = parsedDate;
-		  }
-		  this.onPropertyTypeChange();
 		});
 }
   uploadFinished = (event:string) => { 

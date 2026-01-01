@@ -138,3 +138,15 @@ mat-sidenav-container.legacy-sidenav-container {
   justify-content: flex-start;
 }
 
+/* Modern layout overflow fixes */
+mat-sidenav {
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+
+/* mat-sidenav-content should handle scrolling */
+mat-sidenav-content {
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+

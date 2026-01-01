@@ -564,5 +564,235 @@ tbody td {
   }
 }
 
+/* ============================================
+   OVERLAY & DROPDOWN FIX
+   ============================================ */
+
+/* Ensure Material overlays (dropdowns, date pickers) are not clipped */
+.cdk-overlay-container {
+  z-index: 10000 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+  overflow: visible !important;
+}
+
+.cdk-overlay-container * {
+  pointer-events: auto;
+}
+
+.cdk-overlay-pane {
+  z-index: 10000 !important;
+  position: absolute !important;
+  overflow: visible !important;
+}
+
+.cdk-overlay-backdrop {
+  z-index: 9998 !important;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+  overflow: visible !important;
+}
+
+/* Fix for mat-select panels - prevent double scrollbars */
+.mat-mdc-select-panel {
+  max-height: 400px !important;
+  overflow: visible !important;  /* Panel wrapper should not scroll */
+  z-index: 10001 !important;
+  position: absolute !important;
+}
+
+/* Only the options list container should scroll */
+.mat-mdc-select-panel .mdc-list {
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Individual options should not scroll */
+.mat-mdc-select-panel mat-option,
+.mat-mdc-select-panel .mat-mdc-option {
+  overflow: visible !important;
+}
+
+/* Fix for mat-menu panels */
+.mat-mdc-menu-panel {
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  z-index: 10001 !important;
+}
+
+/* Fix for mat-datepicker */
+.mat-datepicker-popup {
+  z-index: 10001 !important;
+}
+
+.mat-datepicker-content {
+  z-index: 10001 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Fix for mat-autocomplete */
+.mat-mdc-autocomplete-panel {
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  z-index: 10001 !important;
+}
+
+/* Fix ng-select double scrollbar issue - ONLY items container should scroll */
+.ng-dropdown-panel {
+  z-index: 10001 !important;
+  max-height: 300px !important;
+  overflow: visible !important;  /* Panel itself should NOT scroll */
+  position: absolute !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Only the items wrapper should have scrolling */
+.ng-dropdown-panel-items {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Ensure ng-dropdown-panel element itself doesn't scroll */
+ng-dropdown-panel {
+  overflow: visible !important;
+}
+
+/* Remove scrolling from any wrapper divs inside the panel */
+.ng-dropdown-panel > div:not(.ng-dropdown-panel-items) {
+  overflow: visible !important;
+}
+
+/* Fix for select2 dropdowns - prevent double scrollbars */
+.select2-container--open {
+  z-index: 10001 !important;
+}
+
+.select2-dropdown {
+  z-index: 10001 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  overflow: visible !important;  /* Wrapper should not scroll */
+}
+
+.select2-results {
+  max-height: 300px !important;
+  overflow-y: auto !important;  /* Only results container scrolls */
+  overflow-x: hidden !important;
+}
+
+.select2-container {
+  z-index: 10001 !important;
+}
+
+/* Global fix: Prevent any nested scrolling in dropdown panels */
+[class*="-panel"],
+[class*="-dropdown"] {
+  & > div:not([class*="items"]):not([class*="results"]):not([class*="list"]) {
+    overflow: visible !important;
+  }
+}
+
+/* Global fix: prevent overflow-hidden on containers from clipping dropdowns */
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Allow form containers to show their dropdown children */
+.mat-mdc-form-field {
+  overflow: visible !important;
+}
+
+/* Ensure parent containers don't clip overlays */
+router-outlet,
+.content,
+main {
+  overflow: visible !important;
+}
+
+/* CRITICAL FIX: Override overflow-hidden on containers with forms */
+/* This ensures dropdowns and date pickers are fully visible throughout the app */
+
+/* Override overflow on tab panels and content areas */
+.mat-mdc-tab-body-content,
+.mat-mdc-tab-body,
+.mat-mdc-tab-body-wrapper,
+mat-tab-group,
+.modern-tabs,
+.mat-mdc-tab-header,
+.mat-mdc-tab-label-container {
+  overflow: visible !important;
+}
+
+/* Remove any max-height constraints that cause internal scrolling */
+.mat-mdc-tab-body-content {
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* For ALL card containers with overflow-hidden - make them visible */
+.bg-white.overflow-hidden,
+.overflow-hidden.shadow-md,
+.overflow-hidden.shadow-lg,
+.overflow-hidden.shadow-xl,
+.overflow-hidden.border,
+.rounded-xl.overflow-hidden,
+.rounded-2xl.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Prevent nested scrollable containers in form sections */
+section.bg-gray-50,
+.bg-gray-50.py-8 {
+  overflow: visible !important;
+}
+
+/* Ensure form containers don't create their own scroll areas */
+form {
+  overflow: visible !important;
+}
+
+/* Prevent padding containers from creating scroll areas */
+.p-6, .p-4, .px-6, .px-4, .py-6, .py-4 {
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* Ensure all form-related containers never clip content */
+.mat-mdc-form-field,
+.mat-mdc-form-field-flex,
+.mat-mdc-text-field-wrapper,
+.mat-mdc-form-field-infix {
+  overflow: visible !important;
+}
+
+/* Ensure ng-select and its containers don't clip dropdowns */
+ng-select,
+.ng-select,
+.ng-select-container,
+.ng-select-wrapper {
+  overflow: visible !important;
+}
+
+/* Ensure mat-select containers allow overflow */
+mat-select,
+.mat-mdc-select,
+.mat-mdc-select-trigger {
+  overflow: visible !important;
+}
+
+/* Ensure mat-datepicker containers allow overflow */
+.mat-datepicker-toggle,
+.mat-datepicker-input {
+  overflow: visible !important;
+}
+
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';

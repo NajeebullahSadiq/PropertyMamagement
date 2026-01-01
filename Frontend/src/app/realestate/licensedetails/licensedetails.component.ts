@@ -91,33 +91,40 @@ export class LicensedetailsComponent {
       });
 
       this.comservice.getLicenseById(this.id)
-		.subscribe(detail => {
-		  this.licenseDetails = detail;
-		  this.licenseForm.setValue({
-			id: detail[0].id,
-      licenseNumber:detail[0].licenseNumber,
-      issueDate:detail[0].issueDate,
-      expireDate:detail[0].expireDate,
-      areaId:detail[0].areaId,
-      officeAddress:detail[0].officeAddress,
-      licenseType:detail[0].licenseType,
-      companyId:detail[0].companyId,
-      docPath:detail[0].docPath,
-		  });
-      this.selectedId=detail[0].id;
-		  const dateString = detail[0].issueDate;
-      const ExdateString = detail[0].expireDate;
-		  const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-      const ExparsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(ExdateString);
-		  let parsedDate: NgbDate | null = null;
-      let exparsedDate: NgbDate | null = null;
-		  if (parsedDateStruct && ExparsedDateStruct) {
-			parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
-      exparsedDate=new NgbDate(ExparsedDateStruct.year, ExparsedDateStruct.month, ExparsedDateStruct.day);
-		  }
-		  if(parsedDate && exparsedDate){
-			this.selectedDateIssue = parsedDate;
-      this.selectedDateExpire=exparsedDate;
+		.subscribe({
+		  next: (detail) => {
+		    if (detail && detail.length > 0) {
+		      this.licenseDetails = detail;
+		      this.licenseForm.setValue({
+			    id: detail[0].id,
+                licenseNumber:detail[0].licenseNumber,
+                issueDate:detail[0].issueDate,
+                expireDate:detail[0].expireDate,
+                areaId:detail[0].areaId,
+                officeAddress:detail[0].officeAddress,
+                licenseType:detail[0].licenseType,
+                companyId:detail[0].companyId,
+                docPath:detail[0].docPath,
+		      });
+              this.selectedId=detail[0].id;
+		      const dateString = detail[0].issueDate;
+              const ExdateString = detail[0].expireDate;
+		      const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
+              const ExparsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(ExdateString);
+		      let parsedDate: NgbDate | null = null;
+              let exparsedDate: NgbDate | null = null;
+		      if (parsedDateStruct && ExparsedDateStruct) {
+			    parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
+                exparsedDate=new NgbDate(ExparsedDateStruct.year, ExparsedDateStruct.month, ExparsedDateStruct.day);
+		      }
+		      if(parsedDate && exparsedDate){
+			    this.selectedDateIssue = parsedDate;
+                this.selectedDateExpire=exparsedDate;
+		      }
+		    }
+		  },
+		  error: (error) => {
+		    console.error('Error loading license details:', error);
 		  }
     });
     }
