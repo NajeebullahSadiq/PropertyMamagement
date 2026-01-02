@@ -12,4 +12,5 @@ export interface companyowner{
     companyId:number;
     sabtNumber:string;
     pothoPath:string;
+    calendarType?:string;
 }

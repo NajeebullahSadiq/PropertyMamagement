@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
@@ -20,79 +21,25 @@ namespace WebAPIBackend.Controllers.Companies
         {
             _context = context;
         }
+
         [HttpGet("{id}")]
-        public async Task<IActionResult> getById(int id)
+        public async Task<IActionResult> getById(int id, [FromQuery] string? calendarType = null)
         {
             try
             {
                 var Pro = await _context.Gaurantees.Where(x => x.CompanyId.Equals(id)).ToListAsync();
 
-                // Convert the petitionDate to Shamsi
-                PersianCalendar persianCalendar = new PersianCalendar();
+                // Convert dates to the requested calendar type (defaults to HijriShamsi)
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 foreach (var item in Pro)
                 {
-                    DateOnly? gregorianDate = item.PropertyDocumentDate;
-                    DateOnly? senderMaktobDategregorianDate = item.SenderMaktobDate;
-                    DateOnly? answerMaktobDategregorianDate = item.AnswerdMaktobDate;
-                    DateOnly? dateofguaranteeDategregorianDate = item.DateofGuarantee;
-                    DateOnly? guaranteeDategregorianDate = item.GuaranteeDate;
-                    if (guaranteeDategregorianDate.HasValue)
-                    {
-                        DateTime guaranteeDategregorianDateTime = guaranteeDategregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(guaranteeDategregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(guaranteeDategregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(guaranteeDategregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.GuaranteeDate = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
-                    if (dateofguaranteeDategregorianDate.HasValue)
-                    {
-                        DateTime dateofguaranteeDategregorianDateTime = dateofguaranteeDategregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(dateofguaranteeDategregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(dateofguaranteeDategregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(dateofguaranteeDategregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.DateofGuarantee = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
-                    if (answerMaktobDategregorianDate.HasValue)
-                    {
-                        DateTime answerMaktobDategregorianDateTime = answerMaktobDategregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(answerMaktobDategregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(answerMaktobDategregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(answerMaktobDategregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.AnswerdMaktobDate = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
-                    if (senderMaktobDategregorianDate.HasValue)
-                    {
-                        DateTime senderMaktobDategregorianDateTime = senderMaktobDategregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(senderMaktobDategregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(senderMaktobDategregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(senderMaktobDategregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.SenderMaktobDate = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
-                    if (gregorianDate.HasValue)
-                    {
-                        DateTime gregorianDateTime = gregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(gregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(gregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(gregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.PropertyDocumentDate = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
+                    item.PropertyDocumentDate = DateConversionHelper.ToCalendarDateOnly(item.PropertyDocumentDate, calendar);
+                    item.SenderMaktobDate = DateConversionHelper.ToCalendarDateOnly(item.SenderMaktobDate, calendar);
+                    item.AnswerdMaktobDate = DateConversionHelper.ToCalendarDateOnly(item.AnswerdMaktobDate, calendar);
+                    item.DateofGuarantee = DateConversionHelper.ToCalendarDateOnly(item.DateofGuarantee, calendar);
+                    item.GuaranteeDate = DateConversionHelper.ToCalendarDateOnly(item.GuaranteeDate, calendar);
                 }
-           
+
                 return Ok(Pro);
             }
             catch (Exception ex)
@@ -100,6 +47,7 @@ namespace WebAPIBackend.Controllers.Companies
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
         [HttpPost]
         public async Task<ActionResult<int>> SaveProperty([FromBody] GauranteeData request)
         {
@@ -118,72 +66,31 @@ namespace WebAPIBackend.Controllers.Companies
                 return StatusCode(312, "Main Table is Empty");
             }
 
-            DateOnly PropertyDocumentDate;
             var userId = userIdClaim.Value;
 
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.PropertyDocumentDate.Substring(0, 4));
-            var persianMonth = int.Parse(request.PropertyDocumentDate.Substring(5, 2));
-            var persianDay = int.Parse(request.PropertyDocumentDate.Substring(8, 2));
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            PropertyDocumentDate = DateOnly.FromDateTime(gregorianDate);
+            // Parse all dates using multi-calendar helper
+            DateConversionHelper.TryParseToDateOnly(request.PropertyDocumentDate, request.CalendarType, out var propertyDocumentDate);
+            DateConversionHelper.TryParseToDateOnly(request.SenderMaktobDate, request.CalendarType, out var senderMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.AnswerdMaktobDate, request.CalendarType, out var answerdMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.DateofGuarantee, request.CalendarType, out var dateofGuarantee);
+            DateConversionHelper.TryParseToDateOnly(request.GuaranteeDate, request.CalendarType, out var guaranteeDate);
 
-            //SenderMaktobDate
-            DateOnly SenderMaktobDate;
-            var persianCalendarSenderMaktobDate = new System.Globalization.PersianCalendar();
-            var persianYearSenderMaktobDate = int.Parse(request.SenderMaktobDate.Substring(0, 4));
-            var persianMonthSenderMaktobDate = int.Parse(request.SenderMaktobDate.Substring(5, 2));
-            var persianDaySenderMaktobDate = int.Parse(request.SenderMaktobDate.Substring(8, 2));
-            var gregorianDateSenderMaktobDate = persianCalendarSenderMaktobDate.ToDateTime(persianYearSenderMaktobDate, persianMonthSenderMaktobDate, persianDaySenderMaktobDate, 0, 0, 0, 0);
-            SenderMaktobDate = DateOnly.FromDateTime(gregorianDateSenderMaktobDate);
-            //End
-
-            //DateofGuarantee
-            DateOnly DateofGuarantee;
-            var persianCalendarDateofGuarantee = new System.Globalization.PersianCalendar();
-            var persianYearDateofGuarantee = int.Parse(request.DateofGuarantee.Substring(0, 4));
-            var persianMonthDateofGuarantee = int.Parse(request.DateofGuarantee.Substring(5, 2));
-            var persianDayDateofGuarantee = int.Parse(request.DateofGuarantee.Substring(8, 2));
-            var gregorianDateDateofGuarantee = persianCalendarDateofGuarantee.ToDateTime(persianYearDateofGuarantee, persianMonthDateofGuarantee, persianDayDateofGuarantee, 0, 0, 0, 0);
-            DateofGuarantee = DateOnly.FromDateTime(gregorianDateDateofGuarantee);
-            //End
-
-            //AnswerdMaktobDate
-            DateOnly AnswerdMaktobDate;
-            var persianCalendarAnswerdMaktobDate = new System.Globalization.PersianCalendar();
-            var persianYearAnswerdMaktobDate = int.Parse(request.AnswerdMaktobDate.Substring(0, 4));
-            var persianMonthAnswerdMaktobDate = int.Parse(request.AnswerdMaktobDate.Substring(5, 2));
-            var persianDayAnswerdMaktobDate = int.Parse(request.AnswerdMaktobDate.Substring(8, 2));
-            var gregorianDateAnswerdMaktobDate = persianCalendarAnswerdMaktobDate.ToDateTime(persianYearAnswerdMaktobDate, persianMonthAnswerdMaktobDate, persianDayAnswerdMaktobDate, 0, 0, 0, 0);
-            AnswerdMaktobDate = DateOnly.FromDateTime(gregorianDateAnswerdMaktobDate);
-            //End
-
-            //AnswerdMaktobDate
-            DateOnly GuaranteeDate;
-            var persianCalendarGuaranteeDate = new System.Globalization.PersianCalendar();
-            var persianYearGuaranteeDate = int.Parse(request.GuaranteeDate.Substring(0, 4));
-            var persianMonthGuaranteeDate = int.Parse(request.GuaranteeDate.Substring(5, 2));
-            var persianDayGuaranteeDate = int.Parse(request.GuaranteeDate.Substring(8, 2));
-            var gregorianDateGuaranteeDate = persianCalendarGuaranteeDate.ToDateTime(persianYearGuaranteeDate, persianMonthGuaranteeDate, persianDayGuaranteeDate, 0, 0, 0, 0);
-            GuaranteeDate = DateOnly.FromDateTime(gregorianDateGuaranteeDate);
-            //End
             var property = new Gaurantee
             {
                 GuaranteeTypeId = request.GuaranteeTypeId,
                 PropertyDocumentNumber = request.PropertyDocumentNumber,
-                PropertyDocumentDate = PropertyDocumentDate,
+                PropertyDocumentDate = propertyDocumentDate,
                 SenderMaktobNumber = request.SenderMaktobNumber,
-                SenderMaktobDate = SenderMaktobDate, // Convert DateOnly to string
-                AnswerdMaktobNumber=request.AnswerdMaktobNumber,
-                DateofGuarantee= DateofGuarantee,
-                AnswerdMaktobDate = AnswerdMaktobDate,
-                GuaranteeDocNumber =request.GuaranteeDocNumber,
-                GuaranteeDate= GuaranteeDate,
-                CompanyId =request.CompanyId,
-                DocPath=request.DocPath,
+                SenderMaktobDate = senderMaktobDate,
+                AnswerdMaktobNumber = request.AnswerdMaktobNumber,
+                DateofGuarantee = dateofGuarantee,
+                AnswerdMaktobDate = answerdMaktobDate,
+                GuaranteeDocNumber = request.GuaranteeDocNumber,
+                GuaranteeDate = guaranteeDate,
+                CompanyId = request.CompanyId,
+                DocPath = request.DocPath,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
-
             };
 
             _context.Add(property);
@@ -195,54 +102,13 @@ namespace WebAPIBackend.Controllers.Companies
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCompanyDetails(int id, [FromBody] GauranteeData request)
         {
-            DateOnly PropertyDocumentDate;
+            // Parse all dates using multi-calendar helper
+            DateConversionHelper.TryParseToDateOnly(request.PropertyDocumentDate, request.CalendarType, out var propertyDocumentDate);
+            DateConversionHelper.TryParseToDateOnly(request.SenderMaktobDate, request.CalendarType, out var senderMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.AnswerdMaktobDate, request.CalendarType, out var answerdMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.DateofGuarantee, request.CalendarType, out var dateofGuarantee);
+            DateConversionHelper.TryParseToDateOnly(request.GuaranteeDate, request.CalendarType, out var guaranteeDate);
 
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.PropertyDocumentDate.Substring(0, 4));
-            var persianMonth = int.Parse(request.PropertyDocumentDate.Substring(5, 2));
-            var persianDay = int.Parse(request.PropertyDocumentDate.Substring(8, 2));
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            PropertyDocumentDate = DateOnly.FromDateTime(gregorianDate);
-
-            //SenderMaktobDate
-            DateOnly SenderMaktobDate;
-            var persianCalendarSenderMaktobDate = new System.Globalization.PersianCalendar();
-            var persianYearSenderMaktobDate = int.Parse(request.SenderMaktobDate.Substring(0, 4));
-            var persianMonthSenderMaktobDate = int.Parse(request.SenderMaktobDate.Substring(5, 2));
-            var persianDaySenderMaktobDate = int.Parse(request.SenderMaktobDate.Substring(8, 2));
-            var gregorianDateSenderMaktobDate = persianCalendarSenderMaktobDate.ToDateTime(persianYearSenderMaktobDate, persianMonthSenderMaktobDate, persianDaySenderMaktobDate, 0, 0, 0, 0);
-            SenderMaktobDate = DateOnly.FromDateTime(gregorianDateSenderMaktobDate);
-            //End
-
-            //DateofGuarantee
-            DateOnly DateofGuarantee;
-            var persianCalendarDateofGuarantee = new System.Globalization.PersianCalendar();
-            var persianYearDateofGuarantee = int.Parse(request.DateofGuarantee.Substring(0, 4));
-            var persianMonthDateofGuarantee = int.Parse(request.DateofGuarantee.Substring(5, 2));
-            var persianDayDateofGuarantee = int.Parse(request.DateofGuarantee.Substring(8, 2));
-            var gregorianDateDateofGuarantee = persianCalendarDateofGuarantee.ToDateTime(persianYearDateofGuarantee, persianMonthDateofGuarantee, persianDayDateofGuarantee, 0, 0, 0, 0);
-            DateofGuarantee = DateOnly.FromDateTime(gregorianDateDateofGuarantee);
-            //End
-
-            //AnswerdMaktobDate
-            DateOnly AnswerdMaktobDate;
-            var persianCalendarAnswerdMaktobDate = new System.Globalization.PersianCalendar();
-            var persianYearAnswerdMaktobDate = int.Parse(request.AnswerdMaktobDate.Substring(0, 4));
-            var persianMonthAnswerdMaktobDate = int.Parse(request.AnswerdMaktobDate.Substring(5, 2));
-            var persianDayAnswerdMaktobDate = int.Parse(request.AnswerdMaktobDate.Substring(8, 2));
-            var gregorianDateAnswerdMaktobDate = persianCalendarAnswerdMaktobDate.ToDateTime(persianYearAnswerdMaktobDate, persianMonthAnswerdMaktobDate, persianDayAnswerdMaktobDate, 0, 0, 0, 0);
-            AnswerdMaktobDate = DateOnly.FromDateTime(gregorianDateAnswerdMaktobDate);
-            //End
-
-            //AnswerdMaktobDate
-            DateOnly GuaranteeDate;
-            var persianCalendarGuaranteeDate = new System.Globalization.PersianCalendar();
-            var persianYearGuaranteeDate = int.Parse(request.GuaranteeDate.Substring(0, 4));
-            var persianMonthGuaranteeDate = int.Parse(request.GuaranteeDate.Substring(5, 2));
-            var persianDayGuaranteeDate = int.Parse(request.GuaranteeDate.Substring(8, 2));
-            var gregorianDateGuaranteeDate = persianCalendarGuaranteeDate.ToDateTime(persianYearGuaranteeDate, persianMonthGuaranteeDate, persianDayGuaranteeDate, 0, 0, 0, 0);
-            GuaranteeDate = DateOnly.FromDateTime(gregorianDateGuaranteeDate);
-            //End
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {
@@ -261,27 +127,25 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound();
             }
 
-            // Store the original values of the CreatedBy and CreatedAt properties
+            // Store the original values
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
             var companyId = existingProperty.CompanyId;
 
             // Update the entity with the new values
-                existingProperty.GuaranteeTypeId = request.GuaranteeTypeId;
-                existingProperty.PropertyDocumentNumber = request.PropertyDocumentNumber;
-                existingProperty.PropertyDocumentDate = PropertyDocumentDate;
-                existingProperty.SenderMaktobNumber = request.SenderMaktobNumber;
-                existingProperty.SenderMaktobDate = SenderMaktobDate; // Convert DateOnly to string
-                existingProperty.AnswerdMaktobNumber = request.AnswerdMaktobNumber;
-                existingProperty.DateofGuarantee = DateofGuarantee;
-                existingProperty.AnswerdMaktobDate = AnswerdMaktobDate;
-                existingProperty.GuaranteeDocNumber = request.GuaranteeDocNumber;
-                existingProperty.GuaranteeDate = GuaranteeDate;
-                existingProperty.DocPath = request.DocPath;
-              
+            existingProperty.GuaranteeTypeId = request.GuaranteeTypeId;
+            existingProperty.PropertyDocumentNumber = request.PropertyDocumentNumber;
+            existingProperty.PropertyDocumentDate = propertyDocumentDate;
+            existingProperty.SenderMaktobNumber = request.SenderMaktobNumber;
+            existingProperty.SenderMaktobDate = senderMaktobDate;
+            existingProperty.AnswerdMaktobNumber = request.AnswerdMaktobNumber;
+            existingProperty.DateofGuarantee = dateofGuarantee;
+            existingProperty.AnswerdMaktobDate = answerdMaktobDate;
+            existingProperty.GuaranteeDocNumber = request.GuaranteeDocNumber;
+            existingProperty.GuaranteeDate = guaranteeDate;
+            existingProperty.DocPath = request.DocPath;
 
-
-            // Restore the original values of the CreatedBy and CreatedAt properties
+            // Restore the original values
             existingProperty.CreatedBy = createdBy;
             existingProperty.CreatedAt = createdAt;
 
@@ -300,7 +164,6 @@ namespace WebAPIBackend.Controllers.Companies
 
             foreach (var change in changes)
             {
-                // Only add an entry to the vehicleaudit table if the property has been modified
                 if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
                 {
                     _context.Graunteeaudits.Add(new Graunteeaudit

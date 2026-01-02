@@ -7,7 +7,7 @@ export interface companydetails{
     petitionNumber:number;
     tin:number,
     docPath:string;
- 
+    calendarType?:string;
 }
 
 export interface companydetailsList {

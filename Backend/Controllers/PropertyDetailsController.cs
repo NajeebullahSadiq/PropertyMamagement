@@ -7,6 +7,7 @@ using System.Security.Claims;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models;
+using WebAPIBackend.Helpers;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -374,6 +375,29 @@ namespace WebAPIBackend.Controllers
                 return StatusCode(400, errorMessage);
             }
 
+            // Parse calendar type and convert dates
+            var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
+            
+            DateTime? issuanceDate = null;
+            if (!string.IsNullOrWhiteSpace(request.IssuanceDateStr))
+            {
+                issuanceDate = DateConversionHelper.ParseDateString(request.IssuanceDateStr, calendarType);
+            }
+            else if (request.IssuanceDate.HasValue)
+            {
+                issuanceDate = request.IssuanceDate;
+            }
+
+            DateTime? transactionDate = null;
+            if (!string.IsNullOrWhiteSpace(request.TransactionDateStr))
+            {
+                transactionDate = DateConversionHelper.ParseDateString(request.TransactionDateStr, calendarType);
+            }
+            else if (request.TransactionDate.HasValue)
+            {
+                transactionDate = request.TransactionDate;
+            }
+
             //  var userId = 25;
             var property = new PropertyDetail
             {
@@ -400,9 +424,9 @@ namespace WebAPIBackend.Controllers
                 South=request.South,
                 DocumentType=request.DocumentType,
                 IssuanceNumber=request.IssuanceNumber,
-                IssuanceDate=request.IssuanceDate,
+                IssuanceDate=issuanceDate,
                 SerialNumber=request.SerialNumber,
-                TransactionDate=request.TransactionDate,
+                TransactionDate=transactionDate,
                 iscomplete = false,
                 iseditable = false
                 
@@ -494,6 +518,19 @@ namespace WebAPIBackend.Controllers
 
             request.CustomPropertyType = normalizedCustomPropertyType;
 
+            // Parse calendar type and convert dates
+            var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
+            
+            if (!string.IsNullOrWhiteSpace(request.IssuanceDateStr))
+            {
+                request.IssuanceDate = DateConversionHelper.ParseDateString(request.IssuanceDateStr, calendarType);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.TransactionDateStr))
+            {
+                request.TransactionDate = DateConversionHelper.ParseDateString(request.TransactionDateStr, calendarType);
+            }
+
             // Store the original values of the CreatedBy and CreatedOn properties
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
@@ -547,7 +584,7 @@ namespace WebAPIBackend.Controllers
 
         [Authorize]
         [HttpGet("GetPrintRecord/{id}")]
-        public async Task<IActionResult> GetPrintRecordById(int id)
+        public async Task<IActionResult> GetPrintRecordById(int id, [FromQuery] string? calendarType = null)
         {
             try
             {
@@ -560,13 +597,12 @@ namespace WebAPIBackend.Controllers
                     return NotFound(); // Return 404 if the data with the given ID is not found
                 }
 
-                // Convert the 'CreatedAt' property to Shamsi (Persian) date format
-                var persianCalendar = new PersianCalendar();
+                // Convert the 'CreatedAt' property to the requested calendar format
+                var calendar = Helpers.DateConversionHelper.ParseCalendarType(calendarType);
                 string shamsiDate = string.Empty;
                 if (data.CreatedAt.HasValue)
                 {
-                    var createdAt = data.CreatedAt.Value;
-                    shamsiDate = $"{persianCalendar.GetYear(createdAt)}/{persianCalendar.GetMonth(createdAt)}/{persianCalendar.GetDayOfMonth(createdAt)}";
+                    shamsiDate = Helpers.DateConversionHelper.FormatDate(data.CreatedAt.Value, calendar);
                 }
 
                 // Create a custom result object with the desired properties
@@ -644,7 +680,7 @@ namespace WebAPIBackend.Controllers
                     // PropertyUnitType and TransactionType
                     UnitType = data.UnitType,
                     TransactionType = data.TransactionType,
-                    CreatedAtShamsi = shamsiDate,
+                    CreatedAtFormatted = shamsiDate,
 
                     // Property Documents and Images
                     FilePath = data.FilePath,

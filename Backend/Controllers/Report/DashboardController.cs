@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 
 namespace WebAPIBackend.Controllers.Report
 {
@@ -21,7 +22,7 @@ namespace WebAPIBackend.Controllers.Report
             _userManager = userManager;
         }
 
-        private static bool TryParseStartEndDates(string startDate, string endDate, out DateTime start, out DateTime end)
+        private static bool TryParseStartEndDates(string startDate, string endDate, string? calendarType, out DateTime start, out DateTime end)
         {
             start = default;
             end = default;
@@ -31,13 +32,16 @@ namespace WebAPIBackend.Controllers.Report
                 return false;
             }
 
-            if (!TryParseDate(startDate, out start) || !TryParseDate(endDate, out end))
+            var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+            
+            if (!DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var startDateOnly) ||
+                !DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var endDateOnly))
             {
                 return false;
             }
 
-            start = start.Date;
-            end = end.Date;
+            start = startDateOnly.ToDateTime(TimeOnly.MinValue);
+            end = endDateOnly.ToDateTime(TimeOnly.MinValue);
 
             if (start > end)
             {
@@ -47,34 +51,6 @@ namespace WebAPIBackend.Controllers.Report
             }
 
             return true;
-        }
-
-        private static bool TryParseDate(string value, out DateTime result)
-        {
-            result = default;
-
-            var trimmed = value.Trim();
-
-            if (DateTime.TryParseExact(trimmed, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var shamsiParts))
-            {
-                var persian = new PersianCalendar();
-                result = persian.ToDateTime(shamsiParts.Year, shamsiParts.Month, shamsiParts.Day, 0, 0, 0, 0);
-                return true;
-            }
-
-            if (DateTime.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeLocal, out var parsed))
-            {
-                result = parsed;
-                return true;
-            }
-
-            if (DateTime.TryParse(trimmed, out parsed))
-            {
-                result = parsed;
-                return true;
-            }
-
-            return false;
         }
 
 
@@ -155,9 +131,9 @@ namespace WebAPIBackend.Controllers.Report
 
         [HttpGet]
         [Route("GetDashboardDataByDate")]
-        public IActionResult GetDashboardDataByDate(string startDate, string endDate)
+        public IActionResult GetDashboardDataByDate(string startDate, string endDate, string? calendarType = null)
         {
-            if (!TryParseStartEndDates(startDate, endDate, out var gregoriansDate, out var gregorianeDate))
+            if (!TryParseStartEndDates(startDate, endDate, calendarType, out var gregoriansDate, out var gregorianeDate))
             {
                 return BadRequest("Invalid date range");
             }
@@ -562,9 +538,9 @@ namespace WebAPIBackend.Controllers.Report
        
         [HttpGet]
         [Route("GetTopUsersSummaryByDate")]
-        public IActionResult GetTopUsersSummaryByDate(string startDate, string endDate)
+        public IActionResult GetTopUsersSummaryByDate(string startDate, string endDate, string? calendarType = null)
         {
-            if (!TryParseStartEndDates(startDate, endDate, out var gregoriansDate, out var gregorianeDate))
+            if (!TryParseStartEndDates(startDate, endDate, calendarType, out var gregoriansDate, out var gregorianeDate))
             {
                 return BadRequest("Invalid date range");
             }
@@ -623,9 +599,9 @@ namespace WebAPIBackend.Controllers.Report
 
         [HttpGet]
         [Route("GetVehicleTopUsersSummaryByDate")]
-        public IActionResult GetVehicleTopUsersSummaryByDate(string startDate, string endDate)
+        public IActionResult GetVehicleTopUsersSummaryByDate(string startDate, string endDate, string? calendarType = null)
         {
-            if (!TryParseStartEndDates(startDate, endDate, out var gregoriansDate, out var gregorianeDate))
+            if (!TryParseStartEndDates(startDate, endDate, calendarType, out var gregoriansDate, out var gregorianeDate))
             {
                 return BadRequest("Invalid date range");
             }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
@@ -22,40 +23,18 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> getById(int id)
+        public async Task<IActionResult> getById(int id, [FromQuery] string? calendarType = null)
         {
             try
             {
                 var Pro = await _context.LicenseDetails.Where(x => x.CompanyId.Equals(id)).ToListAsync();
 
-                // Convert the petitionDate to Shamsi
-                PersianCalendar persianCalendar = new PersianCalendar();
+                // Convert dates to the requested calendar type (defaults to HijriShamsi)
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 foreach (var item in Pro)
                 {
-                    DateOnly? gregorianDate = item.IssueDate;
-                    DateOnly? EXgregorianDate = item.ExpireDate;
-                    if (EXgregorianDate.HasValue)
-                    {
-                        DateTime ExgregorianDateTime = EXgregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(ExgregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(ExgregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(ExgregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.ExpireDate = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
-                    if (gregorianDate.HasValue)
-                    {
-                        DateTime gregorianDateTime = gregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(gregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(gregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(gregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.IssueDate = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
+                    item.IssueDate = DateConversionHelper.ToCalendarDateOnly(item.IssueDate, calendar);
+                    item.ExpireDate = DateConversionHelper.ToCalendarDateOnly(item.ExpireDate, calendar);
                 }
 
                 return Ok(Pro);
@@ -84,37 +63,30 @@ namespace WebAPIBackend.Controllers.Companies
                 return StatusCode(312, "Main Table is Empty");
             }
 
-            DateOnly Issuedate;
             var userId = userIdClaim.Value;
 
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.IssueDate.Substring(0, 4));
-            var persianMonth = int.Parse(request.IssueDate.Substring(5, 2));
-            var persianDay = int.Parse(request.IssueDate.Substring(8, 2));
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            Issuedate = DateOnly.FromDateTime(gregorianDate);
+            // Parse dates using multi-calendar helper
+            if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
+            {
+                return BadRequest("IssueDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+            }
 
-            //ExpireDate
-            DateOnly Expiredate;
-            var persianCalendarExpire = new System.Globalization.PersianCalendar();
-            var persianYearExpire = int.Parse(request.ExpireDate.Substring(0, 4));
-            var persianMonthExpire = int.Parse(request.ExpireDate.Substring(5, 2));
-            var persianDayExpire = int.Parse(request.ExpireDate.Substring(8, 2));
-            var gregorianDateExpire = persianCalendarExpire.ToDateTime(persianYearExpire, persianMonthExpire, persianDayExpire, 0, 0, 0, 0);
-            Expiredate = DateOnly.FromDateTime(gregorianDateExpire);
-            //End
+            if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var expireDate))
+            {
+                return BadRequest("ExpireDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+            }
+
             var property = new LicenseDetail
             {
                 LicenseNumber = request.LicenseNumber,
-                IssueDate = Issuedate,
-                ExpireDate = Expiredate,
+                IssueDate = issueDate,
+                ExpireDate = expireDate,
                 AreaId = request.AreaId,
-                OfficeAddress = request.OfficeAddress, // Convert DateOnly to string
+                OfficeAddress = request.OfficeAddress,
                 CompanyId = request.CompanyId,
                 DocPath = request.DocPath,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
-
             };
 
             _context.Add(property);
@@ -126,25 +98,17 @@ namespace WebAPIBackend.Controllers.Companies
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCompanyDetails(int id, [FromBody] LicenseDetailData request)
         {
-            DateOnly Issuedate;
-          
+            // Parse dates using multi-calendar helper
+            if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
+            {
+                return BadRequest("IssueDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+            }
 
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.IssueDate.Substring(0, 4));
-            var persianMonth = int.Parse(request.IssueDate.Substring(5, 2));
-            var persianDay = int.Parse(request.IssueDate.Substring(8, 2));
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            Issuedate = DateOnly.FromDateTime(gregorianDate);
+            if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var expireDate))
+            {
+                return BadRequest("ExpireDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+            }
 
-            //ExpireDate
-            DateOnly Expiredate;
-            var persianCalendarExpire = new System.Globalization.PersianCalendar();
-            var persianYearExpire = int.Parse(request.ExpireDate.Substring(0, 4));
-            var persianMonthExpire = int.Parse(request.ExpireDate.Substring(5, 2));
-            var persianDayExpire = int.Parse(request.ExpireDate.Substring(8, 2));
-            var gregorianDateExpire = persianCalendarExpire.ToDateTime(persianYearExpire, persianMonthExpire, persianDayExpire, 0, 0, 0, 0);
-            Expiredate = DateOnly.FromDateTime(gregorianDateExpire);
-            //End
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {
@@ -163,20 +127,20 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound();
             }
 
-            // Store the original values of the CreatedBy and CreatedAt properties
+            // Store the original values
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
-            var companyId=existingProperty.CompanyId;
+            var companyId = existingProperty.CompanyId;
 
             // Update the entity with the new values
             existingProperty.LicenseNumber = request.LicenseNumber;
-            existingProperty.IssueDate = Issuedate;
-            existingProperty.ExpireDate = Expiredate;
+            existingProperty.IssueDate = issueDate;
+            existingProperty.ExpireDate = expireDate;
             existingProperty.AreaId = request.AreaId;
             existingProperty.OfficeAddress = request.OfficeAddress;
             existingProperty.DocPath = request.DocPath;
 
-            // Restore the original values of the CreatedBy and CreatedAt properties
+            // Restore the original values
             existingProperty.CreatedBy = createdBy;
             existingProperty.CreatedAt = createdAt;
 
@@ -195,7 +159,6 @@ namespace WebAPIBackend.Controllers.Companies
 
             foreach (var change in changes)
             {
-                // Only add an entry to the vehicleaudit table if the property has been modified
                 if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
                 {
                     _context.Licenseaudits.Add(new Licenseaudit
@@ -217,32 +180,28 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet("GetLicenseView/{id}")]
-        // LicenseDetail
-        public async Task<IActionResult> GetLicenseViewById(int id)
+        public async Task<IActionResult> GetLicenseViewById(int id, [FromQuery] string? calendarType = null)
         {
-            // Call the DbContext to retrieve the data by ID
             var data = await _context.LicenseView
                 .FirstOrDefaultAsync(x => x.CompanyId == id);
             if (data == null)
             {
-                return NotFound(); // Return 404 if the data with the given ID is not found
+                return NotFound();
             }
 
-            // Assuming 'data.IssueDate' is a DateOnly property
-            DateOnly issueDate =(DateOnly)data.IssueDate;
-            DateOnly ExpireDate = (DateOnly)data.ExpireDate;
-            DateOnly DateofBirth=(DateOnly)data.DateofBirth;
-            // Create a DateTime instance with a specific time (midnight)
-            DateTime issueDateTime = new DateTime(issueDate.Year, issueDate.Month, issueDate.Day, 0, 0, 0, DateTimeKind.Utc);
-            DateTime ExpireDateTime = new DateTime(ExpireDate.Year, ExpireDate.Month, ExpireDate.Day, 0, 0, 0, DateTimeKind.Utc);
-            DateTime DateofBirthDateTime = new DateTime(DateofBirth.Year, DateofBirth.Month, DateofBirth.Day, 0, 0, 0, DateTimeKind.Utc);
-            var persianCalendar = new PersianCalendar();
-            // Assuming 'data.IssueDate' is a DateOnly property
+            var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-            string IssueDateShamsi = $"{persianCalendar.GetYear(issueDateTime)}/{persianCalendar.GetMonth(issueDateTime)}/{persianCalendar.GetDayOfMonth(issueDateTime)}";
-            string ExpireDateShamsi = $"{persianCalendar.GetYear(ExpireDateTime)}/{persianCalendar.GetMonth(ExpireDateTime)}/{persianCalendar.GetDayOfMonth(ExpireDateTime)}";
-            string DateofBirthShamsi = $"{persianCalendar.GetYear(DateofBirthDateTime)}/{persianCalendar.GetMonth(DateofBirthDateTime)}/{persianCalendar.GetDayOfMonth(DateofBirthDateTime)}";
-            // Create a custom result object with the desired properties
+            // Format dates for the requested calendar
+            string issueDateFormatted = data.IssueDate.HasValue 
+                ? DateConversionHelper.FormatDateOnly(data.IssueDate, calendar) 
+                : "";
+            string expireDateFormatted = data.ExpireDate.HasValue 
+                ? DateConversionHelper.FormatDateOnly(data.ExpireDate, calendar) 
+                : "";
+            string dateOfBirthFormatted = data.DateofBirth.HasValue 
+                ? DateConversionHelper.FormatDateOnly(data.DateofBirth, calendar) 
+                : "";
+
             var result = new
             {
                 data.CompanyId,
@@ -259,12 +218,12 @@ namespace WebAPIBackend.Controllers.Companies
                 data.OfficeAddress,
                 data.IssueDate,
                 data.ExpireDate,
-                issueDateShamsi = IssueDateShamsi,
-                expireDateShamsi=ExpireDateShamsi,
-                dateofBirthShamsi=DateofBirthShamsi,
+                issueDateFormatted,
+                expireDateFormatted,
+                dateOfBirthFormatted,
             };
 
-            return Ok(result); // Return the data as JSON if found
+            return Ok(result);
         }
     }
 }

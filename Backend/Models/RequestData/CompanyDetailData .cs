@@ -19,5 +19,11 @@
         public string? DocPath { get; set; }
 
         public double? Tin { get; set; }
+
+        /// <summary>
+        /// Calendar type for date parsing: "gregorian", "hijriShamsi", or "hijriQamari"
+        /// Defaults to "hijriShamsi" if not provided
+        /// </summary>
+        public string? CalendarType { get; set; }
     }
 }

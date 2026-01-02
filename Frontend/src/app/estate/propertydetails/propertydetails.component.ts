@@ -12,6 +12,8 @@ import { SellerService } from 'src/app/shared/seller.service';
 import { EstateComponent } from '../estate.component';
 import { UploadComponent } from '../upload/upload.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { CalendarService } from 'src/app/shared/calendar.service';
 
 @Component({
   selector: 'app-propertydetails',
@@ -74,7 +76,9 @@ export class PropertydetailsComponent  implements AfterViewInit {
     ,private fb: FormBuilder, 
     private unittypeService: PunittypeService,private route: ActivatedRoute,private router: Router,
     private parentComponent: EstateComponent,private selerService:SellerService,
-    private localizationService: LocalizationService) {
+    private localizationService: LocalizationService,
+    private calendarConversionService: CalendarConversionService,
+    private calendarService: CalendarService) {
       this.propertyForm = this.fb.group({
         id: [0],
         propertyTypeId: ['', Validators.required],
@@ -212,6 +216,27 @@ export class PropertydetailsComponent  implements AfterViewInit {
       //$('#unittype').select2();
     });
   }
+
+  private formatDateForBackend(dateValue: any): string {
+    const currentCalendar = this.calendarService.getSelectedCalendar();
+
+    if (dateValue instanceof Date) {
+      const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+      const year = calendarDate.year;
+      const month = String(calendarDate.month).padStart(2, '0');
+      const day = String(calendarDate.day).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } else if (typeof dateValue === 'object' && dateValue.year) {
+      const year = dateValue.year;
+      const month = String(dateValue.month).padStart(2, '0');
+      const day = String(dateValue.day).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } else if (typeof dateValue === 'string') {
+      return dateValue.replace(/\//g, '-');
+    }
+    return '';
+  }
+
   addPropertyDetails(): void {
     const propertyDetails = this.propertyForm.value as PropertyDetails;
     propertyDetails.filePath=this.imageName;
@@ -234,19 +259,27 @@ export class PropertydetailsComponent  implements AfterViewInit {
     if (!propertyDetails.serialNumber || (propertyDetails.serialNumber as any) === '') {
       propertyDetails.serialNumber = null as any;
     }
-    // Convert dates to UTC if they exist
-    if(propertyDetails.issuanceDate) {
-      const date = new Date(propertyDetails.issuanceDate);
-      propertyDetails.issuanceDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    
+    // Format dates for backend using calendar service
+    const currentCalendar = this.calendarService.getSelectedCalendar();
+    const issuanceDateValue = this.propertyForm.get('issuanceDate')?.value;
+    const transactionDateValue = this.propertyForm.get('transactionDate')?.value;
+    
+    if (issuanceDateValue) {
+      (propertyDetails as any).issuanceDateStr = this.formatDateForBackend(issuanceDateValue);
+      propertyDetails.issuanceDate = null as any;
     } else {
       propertyDetails.issuanceDate = null as any;
     }
-    if(propertyDetails.transactionDate && (propertyDetails.transactionDate as any) !== '') {
-      const date = new Date(propertyDetails.transactionDate);
-      propertyDetails.transactionDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    if (transactionDateValue && (transactionDateValue as any) !== '') {
+      (propertyDetails as any).transactionDateStr = this.formatDateForBackend(transactionDateValue);
+      propertyDetails.transactionDate = null as any;
     } else {
       propertyDetails.transactionDate = null as any;
     }
+    
+    propertyDetails.calendarType = currentCalendar;
+    
     this.propertyDetailsService.addPropertyDetails(propertyDetails).subscribe(result => {
       if(result.id!==0) {
        this.propertyDetailsService.updateMainTableId(result.id);
@@ -281,19 +314,27 @@ export class PropertydetailsComponent  implements AfterViewInit {
     if (!propertyDetails.serialNumber || (propertyDetails.serialNumber as any) === '') {
       propertyDetails.serialNumber = null as any;
     }
-    // Convert dates to UTC if they exist
-    if(propertyDetails.issuanceDate) {
-      const date = new Date(propertyDetails.issuanceDate);
-      propertyDetails.issuanceDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    
+    // Format dates for backend using calendar service
+    const currentCalendar = this.calendarService.getSelectedCalendar();
+    const issuanceDateValue = this.propertyForm.get('issuanceDate')?.value;
+    const transactionDateValue = this.propertyForm.get('transactionDate')?.value;
+    
+    if (issuanceDateValue) {
+      (propertyDetails as any).issuanceDateStr = this.formatDateForBackend(issuanceDateValue);
+      propertyDetails.issuanceDate = null as any;
     } else {
       propertyDetails.issuanceDate = null as any;
     }
-    if(propertyDetails.transactionDate && (propertyDetails.transactionDate as any) !== '') {
-      const date = new Date(propertyDetails.transactionDate);
-      propertyDetails.transactionDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000) as any;
+    if (transactionDateValue && (transactionDateValue as any) !== '') {
+      (propertyDetails as any).transactionDateStr = this.formatDateForBackend(transactionDateValue);
+      propertyDetails.transactionDate = null as any;
     } else {
       propertyDetails.transactionDate = null as any;
     }
+    
+    propertyDetails.calendarType = currentCalendar;
+    
     this.propertyDetailsService.updatePropertyDetails(propertyDetails).subscribe(result => {
       if(result.id!==0)
        this.propertyDetailsService.updateMainTableId(result.id);

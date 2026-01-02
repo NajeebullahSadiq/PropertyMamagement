@@ -6,6 +6,69 @@ namespace WebAPIBackend.Helpers
 {
     public static class DateConversionHelper
     {
+        /// <summary>
+        /// Parse calendar type string to CalendarType enum, defaults to HijriShamsi
+        /// </summary>
+        public static CalendarType ParseCalendarType(string? calendarTypeStr)
+        {
+            if (string.IsNullOrWhiteSpace(calendarTypeStr))
+                return CalendarType.HijriShamsi;
+
+            return calendarTypeStr.ToLowerInvariant() switch
+            {
+                "gregorian" => CalendarType.Gregorian,
+                "hijrishamsi" => CalendarType.HijriShamsi,
+                "hijriqamari" => CalendarType.HijriQamari,
+                _ => CalendarType.HijriShamsi
+            };
+        }
+
+        /// <summary>
+        /// Try to parse a date string using the specified calendar type and convert to DateOnly (Gregorian)
+        /// </summary>
+        public static bool TryParseToDateOnly(string? input, CalendarType calendarType, out DateOnly result)
+        {
+            result = default;
+            if (string.IsNullOrWhiteSpace(input)) return false;
+
+            var gregorianDate = ParseDateString(input, calendarType);
+            if (gregorianDate.HasValue)
+            {
+                result = DateOnly.FromDateTime(gregorianDate.Value);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Try to parse a date string using the specified calendar type string and convert to DateOnly (Gregorian)
+        /// </summary>
+        public static bool TryParseToDateOnly(string? input, string? calendarTypeStr, out DateOnly result)
+        {
+            var calendarType = ParseCalendarType(calendarTypeStr);
+            return TryParseToDateOnly(input, calendarType, out result);
+        }
+
+        /// <summary>
+        /// Convert DateOnly to formatted string in the specified calendar
+        /// </summary>
+        public static string FormatDateOnly(DateOnly? date, CalendarType calendarType)
+        {
+            if (!date.HasValue) return "";
+            var (year, month, day) = FromGregorian(date.Value.ToDateTime(TimeOnly.MinValue), calendarType);
+            return $"{year:D4}/{month:D2}/{day:D2}";
+        }
+
+        /// <summary>
+        /// Convert DateOnly to a new DateOnly with calendar-specific year/month/day values (for display purposes)
+        /// </summary>
+        public static DateOnly? ToCalendarDateOnly(DateOnly? gregorianDate, CalendarType calendarType)
+        {
+            if (!gregorianDate.HasValue) return null;
+            var (year, month, day) = FromGregorian(gregorianDate.Value.ToDateTime(TimeOnly.MinValue), calendarType);
+            return new DateOnly(year, month, day);
+        }
+
         public static DateTime ToGregorian(int year, int month, int day, CalendarType calendarType)
         {
             try

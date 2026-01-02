@@ -1,3 +1,5 @@
+import { CalendarType } from './calendar-type';
+
 export interface PropertyDetails {
    
     id: number;
@@ -23,9 +25,10 @@ export interface PropertyDetails {
     north:string;
     documentType?:string;
     issuanceNumber?:string;
-    issuanceDate?:Date;
+    issuanceDate?:string;
     serialNumber?:string;
-    transactionDate?:Date;
+    transactionDate?:string;
+    calendarType?: CalendarType;
 
     propertyAddresses?: any[];
 

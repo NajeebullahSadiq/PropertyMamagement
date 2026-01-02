@@ -48,11 +48,25 @@ This document summarizes the implementation of multi-calendar date support acros
 - Allows users to switch calendars application-wide
 - Persists selection across sessions
 
-#### **Updated Components**
+#### **Updated Frontend Components**
 - **Shared Module**: Exports calendar components for use across the application
 - **Master Layout**: Integrated calendar selector in the toolbar
-- **Buyer Detail Forms** (Estate & Vehicle): Replaced date inputs with multi-calendar picker
-- **Property Details Form**: Replaced issuance date and transaction date inputs
+- **Company Details** (`companydetails.component.ts`): Updated with `formatDateForBackend()` and `calendarType` support
+- **Company Owner** (`companyowner.component.ts`): Updated with `formatDateForBackend()` and `calendarType` support
+- **License Details** (`licensedetails.component.ts`): Updated with `formatDateForBackend()` and `calendarType` support
+- **Guarantee** (`guarantee.component.ts`): Updated with `formatDateForBackend()` and `calendarType` support
+- **Property Details** (`propertydetails.component.ts`): Updated with `formatDateForBackend()` and `calendarType` support
+- **Report Component** (`report.component.ts`): Updated to pass `calendarType` to dashboard service
+
+#### **Updated Frontend Models**
+- `companydetails.ts`: Added `calendarType` field
+- `companyowner.ts`: Added `calendarType` field
+- `LicenseDetail.ts`: Added `calendarType` field
+- `Guarantee.ts`: Added `calendarType` field
+- `PropertyDetail.ts`: Added `calendarType` field, changed date fields to string type
+
+#### **Updated Frontend Services**
+- `dashboard.service.ts`: Updated methods to accept optional `calendarType` parameter
 
 ---
 
@@ -74,12 +88,32 @@ public enum CalendarType
 ```
 
 **b) DateConversionHelper** (`Backend/Helpers/DateConversionHelper.cs`)
+- `ParseCalendarType()`: Parses calendar type string to enum
+- `TryParseToDateOnly()`: Parses date string to DateOnly with calendar conversion
+- `FormatDateOnly()`: Formats DateOnly for display
+- `ToCalendarDateOnly()`: Converts DateOnly to calendar-specific values
 - `ToGregorian()`: Converts from any calendar to Gregorian
 - `FromGregorian()`: Converts from Gregorian to any calendar
 - `FormatDate()`: Formats dates for display
 - `ParseDateString()`: Parses date strings
 - `IsValidDate()`: Validates dates
 - `GetMonthName()`: Returns localized month names
+
+#### **Updated Backend Models**
+- `CompanyDetailData.cs`: Added `CalendarType` property
+- `CompanyOwnerData.cs`: Added `CalendarType` property
+- `LicenseDetailData.cs`: Added `CalendarType` property
+- `GauranteeData.cs`: Added `CalendarType` property
+- `PropertyDetail.cs`: Added `CalendarType`, `IssuanceDateStr`, `TransactionDateStr` properties (NotMapped)
+
+#### **Updated Backend Controllers**
+- `CompanyDetailsController.cs`: Uses `DateConversionHelper` for date parsing
+- `CompanyOwnerController.cs`: Uses `DateConversionHelper` for date parsing
+- `LicenseDetailController.cs`: Uses `DateConversionHelper` for date parsing
+- `GuaranteeController.cs`: Uses `DateConversionHelper` for date parsing
+- `PropertyDetailsController.cs`: Uses `DateConversionHelper` for date parsing
+- `DashboardController.cs`: Accepts `calendarType` parameter for date range queries
+- `VehiclesController.cs`: Uses `DateConversionHelper` for date parsing
 
 ---
 
@@ -106,16 +140,14 @@ Database
 
 ---
 
-## 📝 Pending Tasks
+## 📝 Remaining Tasks
 
-### **High Priority**
+### **Medium Priority**
 
-1. **Update Additional Forms**
+1. **Update Additional Forms (if any remain)**
    - Search for remaining `type="date"` inputs in other modules
-   - Company Owner: DateofBirth field
-   - Company Details: PetitionDate field
-   - License forms and other date fields
-   - Report date filters
+   - Vehicle buyer/seller forms (if not using multi-calendar picker)
+   - Any other date fields not yet updated
 
 2. **Test All Scenarios**
    - Date entry in each calendar type
@@ -124,32 +156,18 @@ Database
    - Form submission and data persistence
    - Date comparison/validation (e.g., end date > start date)
 
-3. **Update Report Filters**
-   - Search/filter components using date ranges
-   - Report generation with date parameters
-
-### **Medium Priority**
-
-4. **Database Schema Review**
+3. **Database Schema Review**
    - Current implementation doesn't require schema changes (stores Gregorian)
    - Consider adding calendar type metadata column if needed for audit purposes
 
-5. **API Endpoint Updates**
-   - Review if any API endpoints need explicit calendar type handling
-   - Most should work automatically with current implementation
-
-6. **Error Handling**
-   - Add user-friendly error messages for invalid dates
-   - Handle edge cases (leap years, month boundaries, etc.)
-
 ### **Low Priority**
 
-7. **UI Enhancements**
+4. **UI Enhancements**
    - Add calendar-specific date picker widgets (optional)
    - Improve mobile responsiveness
    - Add tooltips explaining calendar types
 
-8. **Documentation**
+5. **Documentation**
    - User guide for calendar functionality
    - API documentation updates
 
@@ -306,6 +324,6 @@ For issues or questions about the multi-calendar implementation:
 
 ---
 
-**Implementation Date**: December 2025  
-**Status**: Core functionality implemented, testing and refinement needed  
-**Next Review**: After initial testing phase
+**Implementation Date**: December 2025 - January 2026  
+**Status**: Core functionality implemented across all major modules  
+**Next Review**: After user acceptance testing

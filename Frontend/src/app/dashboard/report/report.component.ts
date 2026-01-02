@@ -6,6 +6,10 @@ import {
 	NgbDatepickerI18n,
 	NgbCalendarPersian,
 } from '@ng-bootstrap/ng-bootstrap';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarType } from 'src/app/models/calendar-type';
+
 const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
 const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
 
@@ -39,7 +43,11 @@ export class ReportComponent {
   endDate:any;
   topUsers: any[]=[];
   vehicleTopUsers:any[]=[];
-  constructor(private dashService:DashboardService) { 
+  constructor(
+    private dashService: DashboardService,
+    private calendarConversionService: CalendarConversionService,
+    private calendarService: CalendarService
+  ) { 
 
   }
   ngOnInit(): void {
@@ -66,20 +74,21 @@ export class ReportComponent {
   }
 
   fetchDashboardData(): void {
-    const sDate = this.startDate ? new Date(this.startDate) : null;
-    const eDate = this.endDate ? new Date(this.endDate) : null;
-    if (!sDate || !eDate || Number.isNaN(sDate.getTime()) || Number.isNaN(eDate.getTime())) {
+    const currentCalendar = this.calendarService.getSelectedCalendar();
+    
+    // Format dates based on selected calendar
+    const startDateStr = this.formatDateForBackend(this.startDate);
+    const endDateStr = this.formatDateForBackend(this.endDate);
+    
+    if (!startDateStr || !endDateStr) {
       return;
     }
 
-    const start = this.toYmd(sDate);
-    const end = this.toYmd(eDate);
-
-    this.dashService.getDashboardDataByDate(start, end)
+    this.dashService.getDashboardDataByDate(startDateStr, endDateStr, currentCalendar)
       .subscribe((data) => {
         this.dashboardData = data;
       });
-      this.dashService.getTotalUserDataByDate(start, end)
+      this.dashService.getTotalUserDataByDate(startDateStr, endDateStr, currentCalendar)
       .subscribe((data) => {
         console.log(data); // Check the response from the server in the browser console
         
@@ -89,7 +98,7 @@ export class ReportComponent {
           console.error("Invalid 'topUsers' data format:", data);
         }
       });
-      this.dashService.getVehicleTotalUserDataByDate(start, end)
+      this.dashService.getVehicleTotalUserDataByDate(startDateStr, endDateStr, currentCalendar)
       .subscribe((data) => {
         console.log(data); // Check the response from the server in the browser console
         
@@ -101,11 +110,24 @@ export class ReportComponent {
       });
   }
 
-  private toYmd(date: Date): string {
-    const y = date.getFullYear();
-    const m = `${date.getMonth() + 1}`.padStart(2, '0');
-    const d = `${date.getDate()}`.padStart(2, '0');
-    return `${y}-${m}-${d}`;
+  private formatDateForBackend(dateValue: any): string {
+    const currentCalendar = this.calendarService.getSelectedCalendar();
+
+    if (dateValue instanceof Date) {
+      const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+      const year = calendarDate.year;
+      const month = String(calendarDate.month).padStart(2, '0');
+      const day = String(calendarDate.day).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } else if (typeof dateValue === 'object' && dateValue.year) {
+      const year = dateValue.year;
+      const month = String(dateValue.month).padStart(2, '0');
+      const day = String(dateValue.day).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } else if (typeof dateValue === 'string') {
+      return dateValue.replace(/\//g, '-');
+    }
+    return '';
   }
   
 }

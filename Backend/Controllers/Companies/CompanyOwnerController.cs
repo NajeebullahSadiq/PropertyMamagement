@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
@@ -22,29 +23,17 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> getOwnerById(int id)
+        public async Task<IActionResult> getOwnerById(int id, [FromQuery] string? calendarType = null)
         {
             try
             {
                 var Pro = await _context.CompanyOwners.Where(x => x.CompanyId.Equals(id)).ToListAsync();
 
-                // Convert the petitionDate to Shamsi
-                PersianCalendar persianCalendar = new PersianCalendar();
+                // Convert dates to the requested calendar type (defaults to HijriShamsi)
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 foreach (var item in Pro)
                 {
-                    DateOnly? gregorianDate = item.DateofBirth;
-
-                    if (gregorianDate.HasValue)
-                    {
-                        DateTime gregorianDateTime = gregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(gregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(gregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(gregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.DateofBirth = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
+                    item.DateofBirth = DateConversionHelper.ToCalendarDateOnly(item.DateofBirth, calendar);
                 }
 
                 return Ok(Pro);
@@ -72,24 +61,24 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 return StatusCode(312, "Main Table is Empty");
             }
-            DateOnly pdate;
+
             var userId = userIdClaim.Value;
 
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.DateofBirth.Substring(0, 4));
-            var persianMonth = int.Parse(request.DateofBirth.Substring(5, 2));
-            var persianDay = int.Parse(request.DateofBirth.Substring(8, 2));
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            pdate = DateOnly.FromDateTime(gregorianDate);
+            // Parse date using multi-calendar helper
+            if (!DateConversionHelper.TryParseToDateOnly(request.DateofBirth, request.CalendarType, out var pdate))
+            {
+                return BadRequest("DateofBirth must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+            }
+
             var property = new CompanyOwner
             {
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
                 GrandFatherName = request.GrandFatherName,
                 EducationLevelId = request.EducationLevelId,
-                DateofBirth = pdate, // Convert DateOnly to string
+                DateofBirth = pdate,
                 IdentityCardTypeId = request.IdentityCardTypeId,
-                IndentityCardNumber=request.IndentityCardNumber,
+                IndentityCardNumber = request.IndentityCardNumber,
                 Jild = request.Jild,
                 Safha = request.Safha,
                 CompanyId = request.CompanyId,
@@ -97,7 +86,6 @@ namespace WebAPIBackend.Controllers.Companies
                 PothoPath = request.PothoPath,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
-
             };
 
             _context.Add(property);
@@ -105,16 +93,16 @@ namespace WebAPIBackend.Controllers.Companies
             var result = new { Id = property.Id };
             return Ok(result);
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCompanyDetails(int id, [FromBody] CompanyOwnerData request)
         {
-            var persianCalendar = new System.Globalization.PersianCalendar();
-            var persianYear = int.Parse(request.DateofBirth.Substring(0, 4));
-            var persianMonth = int.Parse(request.DateofBirth.Substring(5, 2));
-            var persianDay = int.Parse(request.DateofBirth.Substring(8, 2));
-            var gregorianDate = persianCalendar.ToDateTime(persianYear, persianMonth, persianDay, 0, 0, 0, 0);
-            DateOnly pdate;
-            pdate = DateOnly.FromDateTime(gregorianDate);
+            // Parse date using multi-calendar helper
+            if (!DateConversionHelper.TryParseToDateOnly(request.DateofBirth, request.CalendarType, out var pdate))
+            {
+                return BadRequest("DateofBirth must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+            }
+
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {
@@ -170,7 +158,6 @@ namespace WebAPIBackend.Controllers.Companies
 
             foreach (var change in changes)
             {
-                // Only add an entry to the vehicleaudit table if the property has been modified
                 if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
                 {
                     _context.Companyowneraudits.Add(new Companyowneraudit

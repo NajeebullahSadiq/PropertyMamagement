@@ -214,7 +214,7 @@ namespace WebAPIBackend.Controllers.Vehicles
         }
 
         [HttpGet("GetPrintRecord/{id}")]
-        public async Task<IActionResult> GetPrintRecordById(int id)
+        public async Task<IActionResult> GetPrintRecordById(int id, [FromQuery] string? calendarType = null)
         {
             // Call the DbContext to retrieve the data by ID
             var data = await _context.getVehiclePrintData
@@ -224,9 +224,9 @@ namespace WebAPIBackend.Controllers.Vehicles
                 return NotFound(); // Return 404 if the data with the given ID is not found
             }
 
-            // Convert the 'CreatedAt' property to Shamsi (Persian) date format
-            var persianCalendar = new PersianCalendar();
-            string shamsiDate = $"{persianCalendar.GetYear(data.CreatedAt)}/{persianCalendar.GetMonth(data.CreatedAt)}/{persianCalendar.GetDayOfMonth(data.CreatedAt)}";
+            // Convert the 'CreatedAt' property to the requested calendar format
+            var calendar = Helpers.DateConversionHelper.ParseCalendarType(calendarType);
+            string shamsiDate = Helpers.DateConversionHelper.FormatDate(data.CreatedAt, calendar);
 
             // Create a custom result object with the desired properties
             var result = new
@@ -270,7 +270,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 data.WitnessTwoFatherName,
                 data.WitnessTwoIndentityCardNumber,
                 data.CreatedAt,
-                CreatedAtShamsi = shamsiDate // Add the converted Shamsi date to the result object
+                CreatedAtFormatted = shamsiDate // Add the converted date to the result object
             };
 
             return Ok(result); // Return the data as JSON if found

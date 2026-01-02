@@ -61,6 +61,24 @@ public partial class PropertyDetail
 
     public DateTime? TransactionDate { get; set; }
 
+    /// <summary>
+    /// Calendar type for date conversion (not mapped to database)
+    /// </summary>
+    [NotMapped]
+    public string? CalendarType { get; set; }
+
+    /// <summary>
+    /// Issuance date as string from frontend (not mapped to database)
+    /// </summary>
+    [NotMapped]
+    public string? IssuanceDateStr { get; set; }
+
+    /// <summary>
+    /// Transaction date as string from frontend (not mapped to database)
+    /// </summary>
+    [NotMapped]
+    public string? TransactionDateStr { get; set; }
+
     public virtual ICollection<BuyerDetail> BuyerDetails { get; } = new List<BuyerDetail>();
 
     public virtual ICollection<PropertyAddress> PropertyAddresses { get; } = new List<PropertyAddress>();

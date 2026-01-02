@@ -12,4 +12,5 @@ export interface Guarantee{
     guaranteeDate:string;
     companyId:number;
     docPath:string;
+    calendarType?:string;
 }

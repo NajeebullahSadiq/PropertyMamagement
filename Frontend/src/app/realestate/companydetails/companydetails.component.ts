@@ -14,6 +14,9 @@ import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
 import { PropertyService } from 'src/app/shared/property.service';
 import { RealestateComponent } from '../realestate.component';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 
 
 const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
@@ -68,7 +71,8 @@ export class CompanydetailsComponent {
     this.next.emit();
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,private ngbDateParserFormatter: NgbDateParserFormatter,
-	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent, private calendar: NgbCalendar){
+	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent, private calendar: NgbCalendar,
+	private calendarConversionService: CalendarConversionService, private calendarService: CalendarService){
 	this.companyForm = this.fb.group({
 		id: [0],
 		title: ['', Validators.required],
@@ -128,15 +132,37 @@ export class CompanydetailsComponent {
 	addCompanyDetails(): void {
 		const companyDetail = this.companyForm.value as companydetails;
 		const petitionDateValue = this.companyForm.get('petitionDate')?.value;
+		const currentCalendar = this.calendarService.getSelectedCalendar();
 		
 		if (petitionDateValue) {
-			const date = typeof petitionDateValue === 'string' ? new Date(petitionDateValue) : petitionDateValue;
-			companyDetail.petitionDate = date.toISOString();
+			// Format date based on current calendar type
+			if (petitionDateValue instanceof Date) {
+				// Date object from multi-calendar-datepicker - format for the current calendar
+				const calendarDate = this.calendarConversionService.fromGregorian(petitionDateValue, currentCalendar);
+				const year = calendarDate.year;
+				const month = String(calendarDate.month).padStart(2, '0');
+				const day = String(calendarDate.day).padStart(2, '0');
+				companyDetail.petitionDate = `${year}-${month}-${day}`;
+			} else if (typeof petitionDateValue === 'object' && petitionDateValue.year) {
+				// NgbDateStruct - already in calendar format
+				const year = petitionDateValue.year;
+				const month = String(petitionDateValue.month).padStart(2, '0');
+				const day = String(petitionDateValue.day).padStart(2, '0');
+				companyDetail.petitionDate = `${year}-${month}-${day}`;
+			} else if (typeof petitionDateValue === 'string') {
+				// Already a string - normalize format (replace / with -)
+				companyDetail.petitionDate = petitionDateValue.replace(/\//g, '-');
+			} else {
+				this.toastr.error("فرمت تاریخ نامعتبر است");
+				return;
+			}
 		} else {
 			this.toastr.error("لطفا تاریخ ارائه عریضه را انتخاب کنید");
 			return;
 		}
 		
+		// Send calendar type to backend
+		companyDetail.calendarType = currentCalendar;
 		companyDetail.docPath=this.imageName;
 		if(companyDetail.id===null){
 			companyDetail.id=0;
@@ -160,15 +186,37 @@ export class CompanydetailsComponent {
 	updateCompanyDetails():void{
 		const companyDetail = this.companyForm.value as companydetails;
 		const petitionDateValue = this.companyForm.get('petitionDate')?.value;
+		const currentCalendar = this.calendarService.getSelectedCalendar();
 		
 		if (petitionDateValue) {
-			const date = typeof petitionDateValue === 'string' ? new Date(petitionDateValue) : petitionDateValue;
-			companyDetail.petitionDate = date.toISOString();
+			// Format date based on current calendar type
+			if (petitionDateValue instanceof Date) {
+				// Date object from multi-calendar-datepicker - format for the current calendar
+				const calendarDate = this.calendarConversionService.fromGregorian(petitionDateValue, currentCalendar);
+				const year = calendarDate.year;
+				const month = String(calendarDate.month).padStart(2, '0');
+				const day = String(calendarDate.day).padStart(2, '0');
+				companyDetail.petitionDate = `${year}-${month}-${day}`;
+			} else if (typeof petitionDateValue === 'object' && petitionDateValue.year) {
+				// NgbDateStruct - already in calendar format
+				const year = petitionDateValue.year;
+				const month = String(petitionDateValue.month).padStart(2, '0');
+				const day = String(petitionDateValue.day).padStart(2, '0');
+				companyDetail.petitionDate = `${year}-${month}-${day}`;
+			} else if (typeof petitionDateValue === 'string') {
+				// Already a string - normalize format (replace / with -)
+				companyDetail.petitionDate = petitionDateValue.replace(/\//g, '-');
+			} else {
+				this.toastr.error("فرمت تاریخ نامعتبر است");
+				return;
+			}
 		} else {
 			this.toastr.error("لطفا تاریخ ارائه عریضه را انتخاب کنید");
 			return;
 		}
 		
+		// Send calendar type to backend
+		companyDetail.calendarType = currentCalendar;
 		companyDetail.docPath=this.imageName;
 		if(companyDetail.id===0 && this.selectedId!==0 || this.selectedId!==null){
 		  companyDetail.id=this.selectedId;

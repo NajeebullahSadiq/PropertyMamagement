@@ -26,6 +26,10 @@
 
         public string? SabtNumber { get; set; }
         public string? PothoPath { get; set; }
-       
+
+        /// <summary>
+        /// Calendar type for date parsing: "gregorian", "hijriShamsi", or "hijriQamari"
+        /// </summary>
+        public string? CalendarType { get; set; }
     }
 }

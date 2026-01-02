@@ -8,4 +8,5 @@ export interface LicenseDetail{
     companyId:number;
     docPath:string;
     licenseType:string;
+    calendarType?:string;
 }

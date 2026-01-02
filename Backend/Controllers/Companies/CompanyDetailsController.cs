@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
@@ -19,35 +20,6 @@ namespace WebAPIBackend.Controllers.Companies
         public CompanyDetailsController(AppDbContext context)
         {
             _context = context;
-        }
-
-        // Helper: safely parse a Shamsi date string (yyyy-MM-dd or yyyy/MM/dd) to DateOnly using PersianCalendar
-        private static bool TryParsePersianDate(string input, out DateOnly result)
-        {
-            result = default;
-            if (string.IsNullOrWhiteSpace(input)) return false;
-            var sanitized = input.Trim();
-            // Accept both '-' and '/' separators
-            sanitized = sanitized.Replace('/', '-');
-            var parts = sanitized.Split('-');
-            if (parts.Length != 3) return false;
-            if (!int.TryParse(parts[0], out var y) || !int.TryParse(parts[1], out var m) || !int.TryParse(parts[2], out var d))
-                return false;
-
-            // Validate ranges for Persian calendar
-            if (y < 1 || m < 1 || m > 12 || d < 1 || d > 31) return false;
-
-            try
-            {
-                var pc = new PersianCalendar();
-                var dt = pc.ToDateTime(y, m, d, 0, 0, 0, 0);
-                result = DateOnly.FromDateTime(dt);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         [HttpGet]
@@ -103,29 +75,17 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCompanyById(int id)
+        public async Task<IActionResult> GetCompanyById(int id, [FromQuery] string? calendarType = null)
         {
             try
             {
                 var Pro = await _context.CompanyDetails.Where(x => x.Id.Equals(id)).ToListAsync();
 
-                // Convert the petitionDate to Shamsi
-                PersianCalendar persianCalendar = new PersianCalendar();
+                // Convert dates to the requested calendar type (defaults to HijriShamsi)
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 foreach (var item in Pro)
                 {
-                    DateOnly? gregorianDate = item.PetitionDate;
-
-                    if (gregorianDate.HasValue)
-                    {
-                        DateTime gregorianDateTime = gregorianDate.Value.ToDateTime(TimeOnly.MinValue);
-
-                        int shamsiYear = persianCalendar.GetYear(gregorianDateTime);
-                        int shamsiMonth = persianCalendar.GetMonth(gregorianDateTime);
-                        int shamsiDay = persianCalendar.GetDayOfMonth(gregorianDateTime);
-
-                        // Assign the converted Shamsi date back to the original property
-                        item.PetitionDate = new DateOnly(shamsiYear, shamsiMonth, shamsiDay);
-                    }
+                    item.PetitionDate = DateConversionHelper.ToCalendarDateOnly(item.PetitionDate, calendar);
                 }
 
                 return Ok(Pro);
@@ -157,15 +117,16 @@ namespace WebAPIBackend.Controllers.Companies
                     return BadRequest("Title is required.");
                 }
 
-                // Validate and parse Persian PetitionDate safely
+                // Parse calendar type and validate date
                 if (string.IsNullOrWhiteSpace(request.PetitionDate))
                 {
-                    return BadRequest("PetitionDate is required and must be a valid Shamsi date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest("PetitionDate is required.");
                 }
 
-                if (!TryParsePersianDate(request.PetitionDate!, out var pdate))
+                var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
+                if (!DateConversionHelper.TryParseToDateOnly(request.PetitionDate!, calendarType, out var pdate))
                 {
-                    return BadRequest("PetitionDate must be a valid Shamsi date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest($"PetitionDate must be a valid date in {calendarType} format (yyyy-MM-dd or yyyy/MM/dd).");
                 }
 
                 var userId = userIdClaim.Value;
@@ -203,9 +164,11 @@ namespace WebAPIBackend.Controllers.Companies
                 return BadRequest("Request body is required.");
             }
 
-            if (string.IsNullOrWhiteSpace(request.PetitionDate) || !TryParsePersianDate(request.PetitionDate!, out var pdate))
+            // Parse calendar type and validate date
+            var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
+            if (string.IsNullOrWhiteSpace(request.PetitionDate) || !DateConversionHelper.TryParseToDateOnly(request.PetitionDate!, calendarType, out var pdate))
             {
-                return BadRequest("PetitionDate is required and must be a valid Shamsi date (yyyy-MM-dd or yyyy/MM/dd).");
+                return BadRequest($"PetitionDate is required and must be a valid date in {calendarType} format (yyyy-MM-dd or yyyy/MM/dd).");
             }
 
             var userIdClaim = HttpContext.User.FindFirst("UserID");
