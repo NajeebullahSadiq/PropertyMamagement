@@ -39,6 +39,7 @@
         [class.round]="roundCropper"
         [src]="(croppedImageUrl || initialImageUrl || 'assets/img/avatar.png')"
         alt="Profile preview"
+        (error)="onImageError($event)"
       />
     </div>
   </div>

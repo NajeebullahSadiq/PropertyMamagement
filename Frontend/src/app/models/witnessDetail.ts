@@ -12,4 +12,9 @@ export interface witnessDetail {
     propertyDetailsId:number;
     nationalIdCard:string;
     nationalIdCardPath?:string;
+    paddressProvinceId?:number;
+    paddressDistrictId?:number;
+    paddressVillage?:string;
+    relationshipToParties?:string;
+    witnessType?:string;
 }

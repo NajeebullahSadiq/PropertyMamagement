@@ -31,6 +31,16 @@ public partial class PropertyDetail
 
     public int? TransactionTypeId { get; set; }
 
+    public string Status { get; set; } = "Draft";
+
+    public string? VerifiedBy { get; set; }
+
+    public DateTime? VerifiedAt { get; set; }
+
+    public string? ApprovedBy { get; set; }
+
+    public DateTime? ApprovedAt { get; set; }
+
     public string? Des { get; set; }
 
     public DateTime? CreatedAt { get; set; }
@@ -93,4 +103,8 @@ public partial class PropertyDetail
 
     public virtual ICollection<WitnessDetail> WitnessDetails { get; } = new List<WitnessDetail>();
     public virtual ICollection<Propertyaudit> Propertyaudits { get; } = new List<Propertyaudit>();
+    public virtual ICollection<PropertyOwnershipHistory> PropertyOwnershipHistories { get; } = new List<PropertyOwnershipHistory>();
+    public virtual ICollection<PropertyPayment> PropertyPayments { get; } = new List<PropertyPayment>();
+    public virtual ICollection<PropertyValuation> PropertyValuations { get; } = new List<PropertyValuation>();
+    public virtual ICollection<PropertyDocument> PropertyDocuments { get; } = new List<PropertyDocument>();
 }

@@ -108,6 +108,11 @@ export class GuaranteeComponent {
 		if (this.id > 0) {
 			this.comservice.getGuaranteeById(this.id)
 				.subscribe(detail => {
+					if (!detail || detail.length === 0) {
+						// No guarantee data exists yet
+						this.guaranteeDetails = [];
+						return;
+					}
 					this.guaranteeDetails = detail;
 					this.gauranteeForm.setValue({
 						id: detail[0].id,
@@ -125,6 +130,8 @@ export class GuaranteeComponent {
 						docPath: detail[0].docPath,
 					});
 					this.selectedId = detail[0].id;
+					// Set imageName from existing docPath
+					this.imageName = detail[0].docPath || '';
 					const dateString = detail[0].propertyDocumentDate;
 					const senderMaktobDateString = detail[0].senderMaktobDate;
 					const answerMaktobDateString = detail[0].answerdMaktobDate;
@@ -188,6 +195,12 @@ export class GuaranteeComponent {
 		details.dateofGuarantee = this.formatDateForBackend(this.gauranteeForm.get('dateofGuarantee')?.value);
 		details.guaranteeDate = this.formatDateForBackend(this.gauranteeForm.get('guaranteeDate')?.value);
 
+		// Convert string form values to numbers for backend (int? fields)
+		details.propertyDocumentNumber = Number(details.propertyDocumentNumber) || 0;
+		details.answerdMaktobNumber = Number(details.answerdMaktobNumber) || 0;
+		details.guaranteeDocNumber = Number(details.guaranteeDocNumber) || 0;
+		details.guaranteeTypeId = Number(details.guaranteeTypeId) || 0;
+
 		details.calendarType = currentCalendar;
 		details.docPath = this.imageName;
 		details.companyId = this.comservice.mainTableId;
@@ -211,16 +224,34 @@ export class GuaranteeComponent {
 		details.dateofGuarantee = this.formatDateForBackend(this.gauranteeForm.get('dateofGuarantee')?.value);
 		details.guaranteeDate = this.formatDateForBackend(this.gauranteeForm.get('guaranteeDate')?.value);
 
+		// Convert string form values to numbers for backend (int? fields)
+		details.propertyDocumentNumber = Number(details.propertyDocumentNumber) || 0;
+		details.answerdMaktobNumber = Number(details.answerdMaktobNumber) || 0;
+		details.guaranteeDocNumber = Number(details.guaranteeDocNumber) || 0;
+		details.guaranteeTypeId = Number(details.guaranteeTypeId) || 0;
+
 		details.calendarType = currentCalendar;
 		details.docPath = this.imageName;
 		details.companyId = this.comservice.mainTableId;
 		if (details.id === null) {
 			details.id = 0;
 		}
-		this.comservice.addGuarantee(details).subscribe(result => {
-			if (result.id !== 0)
-				this.toastr.success("معلومات موفقانه ثبت شد");
-			this.selectedId = result.id;
+		
+		console.log('Sending guarantee data:', JSON.stringify(details));
+		
+		this.comservice.addGuarantee(details).subscribe({
+			next: (result) => {
+				if (result.id !== 0)
+					this.toastr.success("معلومات موفقانه ثبت شد");
+				this.selectedId = result.id;
+			},
+			error: (err) => {
+				console.error('Guarantee POST error:', err);
+				if (err.error) {
+					console.error('Error body:', err.error);
+					this.toastr.error(typeof err.error === 'string' ? err.error : JSON.stringify(err.error));
+				}
+			}
 		});
 	}
 

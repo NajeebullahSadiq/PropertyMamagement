@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Guarantor } from 'src/app/models/Guarantor';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
-import { FileuploadComponent } from '../fileupload/fileupload.component';
+import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -30,11 +30,14 @@ export class GuaranatorsComponent {
   onNextClick() {
     this.next.emit();
   }
-  @ViewChild('childComponent') childComponent!: FileuploadComponent;
+  @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
+  private pendingImagePath: string = '';
+  
   ngAfterViewInit(): void {
-    if (this.childComponent) {
-      // Child component is ready, call its reset method
-      this.childComponent.reset();
+    // If we have a pending image path from ngOnInit, set it now
+    if (this.pendingImagePath && this.childComponent) {
+      this.childComponent.setExistingImage(this.pendingImagePath);
+      this.pendingImagePath = '';
     }
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,private selerService:SellerService){
@@ -101,9 +104,29 @@ export class GuaranatorsComponent {
       //  this.onPropertyTypeChange();
       });
     }
-  uploadFinished = (event:string) => { 
-    this.imageName=event;
-    this.imagePath=this.baseUrl+this.imageName;
+  uploadFinished = (event: string) => {
+    this.imageName = event;
+    this.imagePath = event ? (this.baseUrl + event) : 'assets/img/avatar.png';
+  }
+
+  profilePreviewChanged = (localObjectUrl: string) => {
+    if (localObjectUrl) {
+      this.imagePath = localObjectUrl;
+      return;
+    }
+
+    if (this.imageName) {
+      this.imagePath = this.baseUrl + this.imageName;
+      return;
+    }
+
+    this.imagePath = 'assets/img/avatar.png';
+  }
+
+  profileImageUploaded = (dbPath: string) => {
+    this.imageName = dbPath || '';
+    this.guaranatorForm.patchValue({ pothoPath: this.imageName });
+    this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
   }
   addData(): void {
     const details = this.guaranatorForm.value as Guarantor;
@@ -149,14 +172,14 @@ export class GuaranatorsComponent {
 		
 		});
   }
-  resetForms():void{
+  resetForms(): void {
     if (this.childComponent) {
-      // Child component is available, reset it
       this.childComponent.reset();
-        this.imagePath='assets/img/avatar.png';
-      }
-   this.selectedId=0;
-   this.guaranatorForm.reset();
+    }
+    this.imagePath = 'assets/img/avatar.png';
+    this.imageName = '';
+    this.selectedId = 0;
+    this.guaranatorForm.reset();
   }
   filterResults(getId:any) {
     
@@ -224,10 +247,17 @@ export class GuaranatorsComponent {
         this.district2 = res;
         
       });
-      this.selectedId=id;
-      this.imagePath=this.baseUrl+selectedOwnerAddress.pothoPath;
-      this.imageName=selectedOwnerAddress.pothoPath;
-     this.onPropertyTypeChange();
+      this.selectedId = id;
+      this.imagePath = selectedOwnerAddress.pothoPath ? (this.baseUrl + selectedOwnerAddress.pothoPath) : 'assets/img/avatar.png';
+      this.imageName = selectedOwnerAddress.pothoPath || '';
+      if (selectedOwnerAddress.pothoPath) {
+        if (this.childComponent) {
+          this.childComponent.setExistingImage(this.baseUrl + selectedOwnerAddress.pothoPath);
+        } else {
+          this.pendingImagePath = this.baseUrl + selectedOwnerAddress.pothoPath;
+        }
+      }
+      this.onPropertyTypeChange();
     }
    
   }

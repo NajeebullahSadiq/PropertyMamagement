@@ -43,6 +43,7 @@ export class BuyerdetailComponent {
   @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
   @ViewChild('nationalIdComponent') nationalIdComponent!: NationalidUploadComponent;
   @ViewChild('authLetterComponent') authLetterComponent!: UploadComponent;
+  private pendingImagePath: string = '';
 
   onEditBuyer(id: number, event?: Event) {
     if (event) {
@@ -51,9 +52,10 @@ export class BuyerdetailComponent {
     this.BindValue(id);
   }
   ngAfterViewInit(): void {
-    if (this.childComponent) {
-      // Child component is ready, call its reset method
-      this.childComponent.reset();
+    // If we have a pending image path from ngOnInit, set it now
+    if (this.pendingImagePath && this.childComponent) {
+      this.childComponent.setExistingImage(this.pendingImagePath);
+      this.pendingImagePath = '';
     }
   }
 
@@ -327,8 +329,12 @@ export class BuyerdetailComponent {
         this.nationalIdCardName=firstBuyer.nationalIdCard || '';
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
         
-        if (this.childComponent && firstBuyer.photo) {
-          this.childComponent.setExistingImage(this.baseUrl + firstBuyer.photo);
+        if (firstBuyer.photo) {
+          if (this.childComponent) {
+            this.childComponent.setExistingImage(this.baseUrl + firstBuyer.photo);
+          } else {
+            this.pendingImagePath = this.baseUrl + firstBuyer.photo;
+          }
         }
         
         if (firstBuyer.paddressProvinceId) {
@@ -499,8 +505,12 @@ updateBuyerDetails(): void {
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
     this.selectedSellerId = selectedBuyer.id;
     
-    if (this.childComponent && selectedBuyer.photo) {
-      this.childComponent.setExistingImage(this.baseUrl + selectedBuyer.photo);
+    if (selectedBuyer.photo) {
+      if (this.childComponent) {
+        this.childComponent.setExistingImage(this.baseUrl + selectedBuyer.photo);
+      } else {
+        this.pendingImagePath = this.baseUrl + selectedBuyer.photo;
+      }
     }
     
     if (selectedBuyer.paddressProvinceId) {

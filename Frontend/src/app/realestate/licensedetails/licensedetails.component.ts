@@ -121,6 +121,8 @@ export class LicensedetailsComponent {
 							docPath: detail[0].docPath,
 						});
 						this.selectedId = detail[0].id;
+						// Set imageName from existing docPath
+						this.imageName = detail[0].docPath || '';
 						const dateString = detail[0].issueDate;
 						const ExdateString = detail[0].expireDate;
 						const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);

@@ -92,6 +92,14 @@ namespace WebAPIBackend.Configuration
 
         public virtual DbSet<WitnessDetail> WitnessDetails { get; set; }
 
+        public virtual DbSet<PropertyOwnershipHistory> PropertyOwnershipHistories { get; set; }
+
+        public virtual DbSet<PropertyPayment> PropertyPayments { get; set; }
+
+        public virtual DbSet<PropertyValuation> PropertyValuations { get; set; }
+
+        public virtual DbSet<PropertyDocument> PropertyDocuments { get; set; }
+
         public virtual DbSet<Vehicleaudit> Vehicleaudits { get; set; }
 
         public virtual DbSet<Vehicleselleraudit> Vehicleselleraudits { get; set; }
@@ -669,6 +677,74 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.PropertyDetails).WithMany(p => p.WitnessDetails)
                     .HasForeignKey(d => d.PropertyDetailsId)
                     .HasConstraintName("WitnessDetails_PropertyDetailsId_fkey");
+
+                entity.HasOne(d => d.PaddressProvince).WithMany()
+                    .HasForeignKey(d => d.PaddressProvinceId)
+                    .HasConstraintName("WitnessDetails_PaddressProvinceId_fkey");
+
+                entity.HasOne(d => d.PaddressDistrict).WithMany()
+                    .HasForeignKey(d => d.PaddressDistrictId)
+                    .HasConstraintName("WitnessDetails_PaddressDistrictId_fkey");
+            });
+
+            modelBuilder.Entity<PropertyOwnershipHistory>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PropertyOwnershipHistory_pkey");
+
+                entity.ToTable("PropertyOwnershipHistory", "tr");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.OwnershipStartDate).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.OwnershipEndDate).HasColumnType("timestamp without time zone");
+
+                entity.HasOne(d => d.PropertyDetails).WithMany(p => p.PropertyOwnershipHistories)
+                    .HasForeignKey(d => d.PropertyDetailsId)
+                    .HasConstraintName("PropertyOwnershipHistory_PropertyDetailsId_fkey");
+            });
+
+            modelBuilder.Entity<PropertyPayment>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PropertyPayment_pkey");
+
+                entity.ToTable("PropertyPayment", "tr");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.PaymentDate).HasColumnType("timestamp without time zone");
+
+                entity.HasOne(d => d.PropertyDetails).WithMany(p => p.PropertyPayments)
+                    .HasForeignKey(d => d.PropertyDetailsId)
+                    .HasConstraintName("PropertyPayment_PropertyDetailsId_fkey");
+            });
+
+            modelBuilder.Entity<PropertyValuation>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PropertyValuation_pkey");
+
+                entity.ToTable("PropertyValuation", "tr");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.ValuationDate).HasColumnType("timestamp without time zone");
+
+                entity.HasOne(d => d.PropertyDetails).WithMany(p => p.PropertyValuations)
+                    .HasForeignKey(d => d.PropertyDetailsId)
+                    .HasConstraintName("PropertyValuation_PropertyDetailsId_fkey");
+            });
+
+            modelBuilder.Entity<PropertyDocument>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PropertyDocument_pkey");
+
+                entity.ToTable("PropertyDocument", "tr");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+
+                entity.HasOne(d => d.PropertyDetails).WithMany(p => p.PropertyDocuments)
+                    .HasForeignKey(d => d.PropertyDetailsId)
+                    .HasConstraintName("PropertyDocument_PropertyDetailsId_fkey");
             });
             modelBuilder.Entity<Propertyaudit>(entity =>
             {

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
 import { ProfileImageCropperDialogComponent, ProfileImageCropperDialogResult } from './profile-image-cropper-dialog.component';
@@ -9,7 +9,7 @@ import { ProfileImageCropperDialogComponent, ProfileImageCropperDialogResult } f
   templateUrl: './profile-image-cropper.component.html',
   styleUrls: ['./profile-image-cropper.component.scss']
 })
-export class ProfileImageCropperComponent {
+export class ProfileImageCropperComponent implements OnChanges {
   @Input() initialImageUrl: string = '';
   @Input() documentType: string = 'profile';
   @Input() roundCropper: boolean = true;
@@ -29,8 +29,18 @@ export class ProfileImageCropperComponent {
 
   constructor(
     private http: HttpClient,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['initialImageUrl'] && changes['initialImageUrl'].currentValue) {
+      // When initialImageUrl changes from parent, clear croppedImageUrl to show the new image
+      if (!this.croppedImageUrl) {
+        this.message = 'عکس موجود';
+      }
+    }
+  }
 
   onFileSelected(event: Event): void {
     this.error = '';
@@ -137,6 +147,18 @@ export class ProfileImageCropperComponent {
       this.croppedImageUrl = '';
       this.initialImageUrl = imagePath;
       this.message = 'عکس موجود';
+      this.cdr.detectChanges();
+    }
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    console.error('Image failed to load:', img.src);
+    // Fallback to avatar if image fails to load
+    if (img.src !== 'assets/img/avatar.png' && !img.src.endsWith('assets/img/avatar.png')) {
+      this.initialImageUrl = '';
+      this.croppedImageUrl = '';
+      this.error = 'خطا در بارگذاری تصویر';
     }
   }
 }

@@ -3,7 +3,7 @@ export interface Guarantee{
     guaranteeTypeId:number;
     propertyDocumentNumber:number;
     propertyDocumentDate:string;
-    senderMaktobNumber:number;
+    senderMaktobNumber:string;
     senderMaktobDate:string;
     answerdMaktobNumber:number;
     answerdMaktobDate:string;

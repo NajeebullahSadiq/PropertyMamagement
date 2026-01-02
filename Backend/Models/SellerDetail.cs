@@ -57,6 +57,10 @@ public partial class SellerDetail
 
     public string? AdditionalDetails { get; set; }
 
+    public double? SharePercentage { get; set; }
+
+    public double? ShareAmount { get; set; }
+
     public virtual Location? PaddressDistrict { get; set; }
 
     public virtual Location? PaddressProvince { get; set; }

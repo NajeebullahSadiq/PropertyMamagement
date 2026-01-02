@@ -10,7 +10,7 @@ public partial class Gaurantee
 
     public int? GuaranteeTypeId { get; set; }
 
-    public int? PropertyDocumentNumber { get; set; }
+    public long? PropertyDocumentNumber { get; set; }
 
     public DateOnly? PropertyDocumentDate { get; set; }
 
@@ -18,13 +18,13 @@ public partial class Gaurantee
 
     public DateOnly? SenderMaktobDate { get; set; }
 
-    public int? AnswerdMaktobNumber { get; set; }
+    public long? AnswerdMaktobNumber { get; set; }
 
     public DateOnly? AnswerdMaktobDate { get; set; }
 
     public DateOnly? DateofGuarantee { get; set; }
 
-    public int? GuaranteeDocNumber { get; set; }
+    public long? GuaranteeDocNumber { get; set; }
 
     public DateOnly? GuaranteeDate { get; set; }
 

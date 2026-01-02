@@ -29,6 +29,11 @@ export interface PropertyDetails {
     serialNumber?:string;
     transactionDate?:string;
     calendarType?: CalendarType;
+    status?: string;
+    verifiedBy?: string;
+    verifiedAt?: string;
+    approvedBy?: string;
+    approvedAt?: string;
 
     propertyAddresses?: any[];
 
@@ -58,6 +63,7 @@ export interface PropertyDetails {
     sellerName:string;
     buyerIndentityCardNumber?: number;
     sellerIndentityCardNumber?: number;
+    status?: string;
 
   }
 

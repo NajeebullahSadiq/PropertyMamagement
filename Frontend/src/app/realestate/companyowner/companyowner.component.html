@@ -13,14 +13,9 @@
         </h2>
       </div>
       <div class="px-6 py-6">
-        <div class="flex flex-col items-center gap-4">
-          <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-lg">
-            <img [src]="imagePath" class="w-full h-full object-cover" alt="عکس مالک">
-          </div>
-          <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 w-full">
-            <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
-          </div>
-        </div>
+        <app-profile-image-cropper #childComponent [initialImageUrl]="imagePath" documentType="company"
+          [roundCropper]="true" (imageChanged)="profilePreviewChanged($event)"
+          (imageUploaded)="profileImageUploaded($event)" style="text-align: left"></app-profile-image-cropper>
       </div>
     </div>
 

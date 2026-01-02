@@ -31,5 +31,19 @@ public partial class WitnessDetail
 
     public string? NationalIdCard { get; set; }
 
+    public int? PaddressProvinceId { get; set; }
+
+    public int? PaddressDistrictId { get; set; }
+
+    public string? PaddressVillage { get; set; }
+
+    public string? RelationshipToParties { get; set; }
+
+    public string? WitnessType { get; set; }
+
     public virtual PropertyDetail? PropertyDetails { get; set; }
+
+    public virtual Location? PaddressProvince { get; set; }
+
+    public virtual Location? PaddressDistrict { get; set; }
 }

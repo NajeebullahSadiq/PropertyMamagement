@@ -34,6 +34,8 @@ export interface SellerDetail {
     transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
     taxIdentificationNumber?:string;
     additionalDetails?:string;
+    sharePercentage?:number;
+    shareAmount?:number;
 }
 
 export interface VBuyerDetail {
@@ -70,4 +72,6 @@ export interface VBuyerDetail {
     rentEndDate?:Date; // Rental end date for lessee roles
     transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
     transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
+    sharePercentage?:number;
+    shareAmount?:number;
 }

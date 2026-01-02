@@ -6,7 +6,7 @@
 
         public int? GuaranteeTypeId { get; set; }
 
-        public int? PropertyDocumentNumber { get; set; }
+        public long? PropertyDocumentNumber { get; set; }
 
         public string? PropertyDocumentDate { get; set; }
 
@@ -14,13 +14,13 @@
 
         public string? SenderMaktobDate { get; set; }
 
-        public int? AnswerdMaktobNumber { get; set; }
+        public long? AnswerdMaktobNumber { get; set; }
 
         public string? AnswerdMaktobDate { get; set; }
 
         public string? DateofGuarantee { get; set; }
 
-        public int? GuaranteeDocNumber { get; set; }
+        public long? GuaranteeDocNumber { get; set; }
 
         public string? GuaranteeDate { get; set; }
 

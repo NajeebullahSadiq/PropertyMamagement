@@ -105,6 +105,7 @@ export class PropertydetailsComponent  implements AfterViewInit {
         existingDocumentsPath: [''],
         iscomplete: [false],
         iseditable: [false],
+        status: ['Draft'],
 
         
       });
@@ -170,6 +171,7 @@ export class PropertydetailsComponent  implements AfterViewInit {
               issuanceDate:properties[0].issuanceDate || '',
               serialNumber:properties[0].serialNumber || '',
               transactionDate:properties[0].transactionDate || '',
+              status:properties[0].status || 'Draft',
             });
             this.imageName=properties.map(item => item.filePath).toString();
             this.previousDocumentsPath = properties[0].previousDocumentsPath || '';
@@ -400,6 +402,7 @@ export class PropertydetailsComponent  implements AfterViewInit {
       issuanceDate:'',
       serialNumber:'',
       transactionDate:'',
+      status:'Draft',
     });
     const numofFloorControl = this.propertyForm.get('numofFloor');
     const numofRoomControl = this.propertyForm.get('numofRooms');

@@ -16,7 +16,7 @@
 
         public int? IdentityCardTypeId { get; set; }
 
-        public int? IndentityCardNumber { get; set; }
+        public string? IndentityCardNumber { get; set; }
 
         public string? Jild { get; set; }
 

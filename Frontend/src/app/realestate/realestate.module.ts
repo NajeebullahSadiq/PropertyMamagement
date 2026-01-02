@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule } from '@angular/material/dialog';
 import { CompanydetailsComponent } from './companydetails/companydetails.component';
 import { CompanyownerComponent } from './companyowner/companyowner.component';
 import { CompanyowneraddressComponent } from './companyowneraddress/companyowneraddress.component';
@@ -51,6 +52,7 @@ import { SharedModule } from '../shared/shared.module';
     MatDividerModule,
     MatTableModule,
     MatTabsModule,
+    MatDialogModule,
     NgSelectModule,
     FormsModule,
     NgbModule,

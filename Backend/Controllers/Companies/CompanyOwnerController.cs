@@ -78,7 +78,7 @@ namespace WebAPIBackend.Controllers.Companies
                 EducationLevelId = request.EducationLevelId,
                 DateofBirth = pdate,
                 IdentityCardTypeId = request.IdentityCardTypeId,
-                IndentityCardNumber = request.IndentityCardNumber,
+                IndentityCardNumber = string.IsNullOrEmpty(request.IndentityCardNumber) ? null : double.TryParse(request.IndentityCardNumber, out var cardNum) ? cardNum : null,
                 Jild = request.Jild,
                 Safha = request.Safha,
                 CompanyId = request.CompanyId,
@@ -132,7 +132,7 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.EducationLevelId = request.EducationLevelId;
             existingProperty.DateofBirth = pdate;
             existingProperty.IdentityCardTypeId = request.IdentityCardTypeId;
-            existingProperty.IndentityCardNumber = request.IndentityCardNumber;
+            existingProperty.IndentityCardNumber = string.IsNullOrEmpty(request.IndentityCardNumber) ? null : double.TryParse(request.IndentityCardNumber, out var cardNum) ? cardNum : null;
             existingProperty.Jild = request.Jild;
             existingProperty.Safha = request.Safha;
             existingProperty.CompanyId = request.CompanyId;

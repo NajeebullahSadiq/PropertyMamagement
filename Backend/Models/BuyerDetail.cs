@@ -54,6 +54,10 @@ public partial class BuyerDetail
 
     public string? AdditionalDetails { get; set; }
 
+    public double? SharePercentage { get; set; }
+
+    public double? ShareAmount { get; set; }
+
     public double? Price { get; set; }
 
     public string? PriceText { get; set; }

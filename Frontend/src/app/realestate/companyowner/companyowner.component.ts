@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { companyowner } from 'src/app/models/companyowner';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
-import { FileuploadComponent } from '../fileupload/fileupload.component';
+import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
@@ -67,10 +67,14 @@ export class CompanyownerComponent {
 	onNextClick() {
 		this.next.emit();
 	}
-	@ViewChild('childComponent') childComponent!: FileuploadComponent;
+	@ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
+	private pendingImagePath: string = '';
+	
 	ngAfterViewInit(): void {
-		if (this.childComponent) {
-			this.childComponent.reset();
+		// If we have a pending image path from ngOnInit, set it now
+		if (this.pendingImagePath && this.childComponent) {
+			this.childComponent.setExistingImage(this.pendingImagePath);
+			this.pendingImagePath = '';
 		}
 	}
 	constructor(
@@ -137,8 +141,17 @@ export class CompanyownerComponent {
 						this.comservice.ownerId = detail[0].id;
 						this.selectedId = detail[0].id;
 						const dateString = detail[0].dateofBirth;
-						this.imagePath = this.baseUrl + detail[0].pothoPath;
-						this.imageName = detail.map(item => item.pothoPath).toString();
+						// Set existing image for profile cropper
+						if (detail[0].pothoPath) {
+							this.imagePath = this.baseUrl + detail[0].pothoPath;
+							this.imageName = detail[0].pothoPath;
+							if (this.childComponent) {
+								this.childComponent.setExistingImage(this.imagePath);
+							} else {
+								// Store for later if child component isn't ready yet
+								this.pendingImagePath = this.imagePath;
+							}
+						}
 						const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
 						let parsedDate: NgbDate | null = null;
 
@@ -159,7 +172,27 @@ export class CompanyownerComponent {
 
 	uploadFinished = (event: string) => {
 		this.imageName = event;
-		this.imagePath = this.baseUrl + this.imageName;
+		this.imagePath = event ? (this.baseUrl + event) : 'assets/img/avatar.png';
+	}
+
+	profilePreviewChanged = (localObjectUrl: string) => {
+		if (localObjectUrl) {
+			this.imagePath = localObjectUrl;
+			return;
+		}
+
+		if (this.imageName) {
+			this.imagePath = this.baseUrl + this.imageName;
+			return;
+		}
+
+		this.imagePath = 'assets/img/avatar.png';
+	}
+
+	profileImageUploaded = (dbPath: string) => {
+		this.imageName = dbPath || '';
+		this.ownerForm.patchValue({ pothoPath: this.imageName });
+		this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
 	}
 
 	onPropertyTypeChange() {
@@ -298,8 +331,9 @@ export class CompanyownerComponent {
 	resetForms(): void {
 		if (this.childComponent) {
 			this.childComponent.reset();
-			this.imagePath = 'assets/img/avatar.png';
 		}
+		this.imagePath = 'assets/img/avatar.png';
+		this.imageName = '';
 		this.ownerForm.reset();
 		this.comservice.ownerId = 0;
 		this.selectedId = 0;

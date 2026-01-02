@@ -61,10 +61,13 @@ export class SellerdetailComponent {
   }
 
   @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
+  private pendingImagePath: string = '';
 
   ngAfterViewInit(): void {
-    if (this.childComponent) {
-      this.childComponent.reset();
+    // If we have a pending image path from ngOnInit, set it now
+    if (this.pendingImagePath && this.childComponent) {
+      this.childComponent.setExistingImage(this.pendingImagePath);
+      this.pendingImagePath = '';
     }
   }
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
@@ -208,8 +211,12 @@ export class SellerdetailComponent {
         this.heirsLetterName=firstSeller.heirsLetter || '';
         this.selectedSellerId=firstSeller.id;
         
-        if (this.childComponent && firstSeller.photo) {
-          this.childComponent.setExistingImage(this.baseUrl + firstSeller.photo);
+        if (firstSeller.photo) {
+          if (this.childComponent) {
+            this.childComponent.setExistingImage(this.baseUrl + firstSeller.photo);
+          } else {
+            this.pendingImagePath = this.baseUrl + firstSeller.photo;
+          }
         }
         
         if (firstSeller.paddressProvinceId) {
@@ -344,8 +351,12 @@ updateSellerDetails(): void {
     this.heirsLetterName = selectedSeller.heirsLetter || '';
     this.selectedSellerId = selectedSeller.id;
     
-    if (this.childComponent && selectedSeller.photo) {
-      this.childComponent.setExistingImage(this.baseUrl + selectedSeller.photo);
+    if (selectedSeller.photo) {
+      if (this.childComponent) {
+        this.childComponent.setExistingImage(this.baseUrl + selectedSeller.photo);
+      } else {
+        this.pendingImagePath = this.baseUrl + selectedSeller.photo;
+      }
     }
     
     if (selectedSeller.paddressProvinceId) {

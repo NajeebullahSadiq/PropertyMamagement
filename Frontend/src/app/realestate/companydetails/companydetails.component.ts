@@ -96,27 +96,22 @@ export class CompanydetailsComponent {
 			    if (detail && detail.length > 0) {
 			      this.companyDetails = detail;
 			      
+			      // Keep the date as a string - it's already in the correct calendar format from the backend
 			      const dateString = detail[0].petitionDate;
-			      const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-			      let dateValue: Date | string = detail[0].petitionDate;
-			      
-			      if (parsedDateStruct) {
-					const year = parsedDateStruct.year;
-					const month = parsedDateStruct.month - 1;
-					const day = parsedDateStruct.day;
-					dateValue = new Date(year, month, day);
-			      }
 			      
 			      this.companyForm.setValue({
 				    id: detail[0].id,
 				    title:detail[0].title,
 				    phoneNumber:detail[0].phoneNumber,
 				    licenseNumber:detail[0].licenseNumber,
-				    petitionDate: dateValue,
+				    petitionDate: dateString, // Keep as string
 				    petitionNumber:detail[0].petitionNumber,
 				    tin:detail[0].tin,
 				    docPath:detail[0].docPath
 			      });
+			      
+			      // Set imageName from existing docPath
+			      this.imageName = detail[0].docPath || '';
 			      
 			      this.comservice.mainTableId=detail[0].id;
 			      this.selectedId=detail[0].id;

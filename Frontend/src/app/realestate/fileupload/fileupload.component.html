@@ -1,15 +1,60 @@
-<div>
-    <div>
-      <input type="file" #file placeholder="Choose file" (change)="uploadFile(file.files)" style="display:none;" multiple
-        accept="image/*">
-      <button type="button" class="btn btn-success" (click)="file.click()">انتخاب فایل </button>
-      <div class="col-md-12">
-        <span class="upload" *ngIf="progress > 0">
-          {{progress}}%
-        </span>
-        <span class="upload" *ngIf="message">
-          {{message}}
+<div class="upload-container">
+  <div class="upload-area">
+    <input type="file" #file placeholder="Choose file" (change)="uploadFile(file.files)" style="display:none;"
+      [accept]="acceptTypes">
+    
+    <div class="flex flex-wrap gap-2 items-center">
+      <button type="button" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2" 
+        (click)="file.click()" [disabled]="isUploading">
+        <i class="fas fa-upload"></i>
+        <span>انتخاب فایل</span>
+      </button>
+
+      <button type="button" *ngIf="uploadedFilePath" 
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+        (click)="viewFile()">
+        <i class="fas fa-eye"></i>
+        <span>مشاهده</span>
+      </button>
+
+      <button type="button" *ngIf="uploadedFilePath" 
+        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+        (click)="downloadFile()">
+        <i class="fas fa-download"></i>
+        <span>دانلود</span>
+      </button>
+
+      <button type="button" *ngIf="uploadedFilePath" 
+        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+        (click)="deleteFile()">
+        <i class="fas fa-trash"></i>
+        <span>حذف</span>
+      </button>
+    </div>
+
+    <div class="mt-3" *ngIf="progress > 0 || message">
+      <div class="flex items-center gap-2">
+        <div *ngIf="progress > 0 && progress < 100" class="flex-1">
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" [style.width.%]="progress"></div>
+          </div>
+          <span class="text-sm text-gray-600 mt-1">{{ progress }}%</span>
+        </div>
+        <span *ngIf="message" class="text-sm" [ngClass]="{'text-green-600': !message.includes('خطا'), 'text-red-600': message.includes('خطا')}">
+          <i class="fas" [ngClass]="{'fa-check-circle': !message.includes('خطا'), 'fa-exclamation-circle': message.includes('خطا')}"></i>
+          {{ message }}
         </span>
       </div>
     </div>
+
+    <div *ngIf="uploadedFilePath && uploadedFileName" class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+      <div class="flex items-center gap-2">
+        <i class="fas text-2xl" [ngClass]="getFileIcon(uploadedFileName)"></i>
+        <div class="flex-1">
+          <p class="text-sm font-medium text-gray-800 truncate">{{ uploadedFileName }}</p>
+          <p class="text-xs text-gray-500">{{ getFileTypeLabel(uploadedFileName) }}</p>
+        </div>
+      </div>
+    </div>
   </div>
+</div>

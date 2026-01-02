@@ -116,17 +116,13 @@
         <div class="px-6 py-6">
           <div class="space-y-4">
             <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-              <app-fileupload #childComponent (sendMessage)="uploadFinished($event)"></app-fileupload>
+              <app-fileupload #childComponent 
+                [existingFilePath]="companyForm.get('docPath')?.value"
+                documentType="company"
+                acceptTypes="image/*,.pdf,.doc,.docx"
+                (sendMessage)="uploadFinished($event)">
+              </app-fileupload>
             </div>
-            
-            <ng-container *ngIf="companyForm.get('id')?.value && companyForm.get('docPath')?.value">
-              <div class="flex items-center justify-center">
-                <button type="button" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2" (click)="downloadFiles()">
-                  <i class="fas fa-arrow-alt-circle-down"></i>
-                  <span>دانلود اسناد</span>
-                </button>
-              </div>
-            </ng-container>
           </div>
         </div>
       </div>
