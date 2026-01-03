@@ -6,7 +6,7 @@ export interface companyowner{
     educationLevelId:number;
     dateofBirth:string;
     identityCardTypeId:number;
-    indentityCardNumber:number;
+    indentityCardNumber:string;
     jild:string;
     safha:string;
     companyId:number;

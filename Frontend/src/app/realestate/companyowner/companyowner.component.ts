@@ -131,7 +131,7 @@ export class CompanyownerComponent {
 							educationLevelId: detail[0].educationLevelId,
 							dateofBirth: detail[0].dateofBirth,
 							identityCardTypeId: detail[0].identityCardTypeId,
-							indentityCardNumber: detail[0].indentityCardNumber,
+							indentityCardNumber: detail[0].indentityCardNumber != null ? String(detail[0].indentityCardNumber) : '',
 							jild: detail[0].jild,
 							safha: detail[0].safha,
 							companyId: detail[0].companyId,
@@ -273,6 +273,11 @@ export class CompanyownerComponent {
 			return;
 		}
 
+		// Ensure indentityCardNumber is sent as string
+		if (details.indentityCardNumber != null) {
+			details.indentityCardNumber = String(details.indentityCardNumber);
+		}
+
 		details.calendarType = currentCalendar;
 		details.pothoPath = this.imageName;
 		details.companyId = this.comservice.mainTableId;
@@ -305,6 +310,11 @@ export class CompanyownerComponent {
 		} else {
 			this.toastr.error("لطفا تاریخ تولد را انتخاب کنید");
 			return;
+		}
+
+		// Ensure indentityCardNumber is sent as string
+		if (details.indentityCardNumber != null) {
+			details.indentityCardNumber = String(details.indentityCardNumber);
 		}
 
 		details.calendarType = currentCalendar;
