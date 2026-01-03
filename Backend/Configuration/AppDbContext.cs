@@ -8,7 +8,7 @@ using WebAPIBackend.Models.ViewModels;
 
 namespace WebAPIBackend.Configuration
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
 
         public AppDbContext(DbContextOptions options) : base(options)

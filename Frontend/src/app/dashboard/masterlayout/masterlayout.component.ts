@@ -70,7 +70,9 @@ export class MasterlayoutComponent implements AfterViewInit {
   onLogout() {
     localStorage.removeItem('token');
     this.router.navigate(['/Auth']);
-   
+  }
+  navigateToRegister() {
+    this.router.navigate(['/dashboard/Auth/Register']);
   }
   setlang(){
     this.translate.use('دری');

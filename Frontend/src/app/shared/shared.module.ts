@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ImageCropperModule } from 'ngx-image-cropper';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { DocumentViewerComponent } from './document-viewer/document-viewer.component';
 import { ProfileImageCropperComponent } from './profile-image-cropper/profile-image-cropper.component';
@@ -11,6 +12,11 @@ import { MultiCalendarDatepickerComponent } from './multi-calendar-datepicker/mu
 import { CalendarSelectorComponent } from './calendar-selector/calendar-selector.component';
 import { CalendarDatePipe } from './calendar-date.pipe';
 
+// Dialog components moved from AuthModule for global availability
+import { ChangepasswordComponent } from '../auth/changepassword/changepassword.component';
+import { ResetpasswordComponent } from '../auth/resetpassword/resetpassword.component';
+import { LockuserComponent } from '../auth/lockuser/lockuser.component';
+
 @NgModule({
   declarations: [
     DocumentViewerComponent,
@@ -18,21 +24,30 @@ import { CalendarDatePipe } from './calendar-date.pipe';
     ProfileImageCropperDialogComponent,
     MultiCalendarDatepickerComponent,
     CalendarSelectorComponent,
-    CalendarDatePipe
+    CalendarDatePipe,
+    // Dialog components
+    ChangepasswordComponent,
+    ResetpasswordComponent,
+    LockuserComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatDialogModule,
-    ImageCropperModule
+    ImageCropperModule,
+    NgSelectModule
   ],
   exports: [
     DocumentViewerComponent,
     ProfileImageCropperComponent,
     MultiCalendarDatepickerComponent,
     CalendarSelectorComponent,
-    CalendarDatePipe
+    CalendarDatePipe,
+    // Export dialog components so they can be used anywhere
+    ChangepasswordComponent,
+    ResetpasswordComponent,
+    LockuserComponent
   ]
 })
 export class SharedModule {}

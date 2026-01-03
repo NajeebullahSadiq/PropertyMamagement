@@ -576,26 +576,29 @@ tbody td {
   left: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  pointer-events: none;
+  pointer-events: none !important;
   overflow: visible !important;
 }
 
 .cdk-overlay-container * {
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 
 .cdk-overlay-pane {
   z-index: 10000 !important;
   position: absolute !important;
   overflow: visible !important;
+  pointer-events: auto !important;
 }
 
 .cdk-overlay-backdrop {
   z-index: 9998 !important;
+  pointer-events: auto !important;
 }
 
 .cdk-overlay-connected-position-bounding-box {
   overflow: visible !important;
+  pointer-events: auto !important;
 }
 
 /* Fix for mat-select panels - prevent double scrollbars */
@@ -807,18 +810,24 @@ mat-select,
   border-radius: 12px !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05) !important;
   border: 1px solid rgba(226, 232, 240, 0.8) !important;
-  overflow: hidden !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   min-width: 180px !important;
+  z-index: 10001 !important;
+  pointer-events: auto !important;
 }
 
 .mat-mdc-menu-content {
   padding: 6px !important;
+  pointer-events: auto !important;
 }
 
 .mat-mdc-menu-item {
   border-radius: 8px !important;
   margin: 2px 0 !important;
   transition: all 0.15s ease !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 
   &:hover {
     background-color: #f8fafc !important;
@@ -910,4 +919,43 @@ mat-select,
   background-color: #1e293b !important;
   border-radius: 6px !important;
   padding: 6px 12px !important;
+}
+
+/* ============================================
+   FIX: Ensure mat-menu items are clickable
+   ============================================ */
+
+/* CDK Overlay must allow pointer events to pass through to children */
+.cdk-overlay-container {
+  pointer-events: none !important;
+}
+
+/* All children of overlay container should be clickable */
+.cdk-overlay-container *,
+.cdk-overlay-pane,
+.cdk-overlay-pane * {
+  pointer-events: auto !important;
+}
+
+/* Backdrop should be clickable to close menu */
+.cdk-overlay-backdrop {
+  pointer-events: auto !important;
+}
+
+/* Menu panel and all its contents must be clickable */
+.mat-mdc-menu-panel {
+  pointer-events: auto !important;
+  z-index: 10001 !important;
+}
+
+.mat-mdc-menu-content {
+  pointer-events: auto !important;
+}
+
+/* Menu items must be clickable */
+.mat-mdc-menu-item,
+button.mat-mdc-menu-item,
+button[mat-menu-item] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }

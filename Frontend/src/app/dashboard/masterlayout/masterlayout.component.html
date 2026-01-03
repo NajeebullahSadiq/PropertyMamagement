@@ -1,5 +1,4 @@
 <mat-toolbar class="toolbar-modern !h-14 !px-4">
-  <!-- Gradient background -->
   <div class="toolbar-bg"></div>
   
   <button
@@ -29,44 +28,44 @@
       <mat-icon>account_circle</mat-icon>
     </button>
 
-    <mat-menu #userAccountMenu>
-      <button mat-menu-item routerLink="/dashboard/Auth/Register" *ngIf="userRole == 'ADMIN'">
-        <mat-icon>people</mat-icon>
-        <span class="font-bold">ایجاد کاربر</span>
-      </button>
-      <button mat-menu-item (click)="openDialog()">
-        <mat-icon>lock</mat-icon>
-        <span class="font-bold">تغیر پسورد</span>
-      </button>
-      <button mat-menu-item (click)="openReset()" *ngIf="userRole == 'ADMIN'">
-        <mat-icon>lock_reset</mat-icon>
-        <span class="font-bold">باز نشانی پسورد</span>
-      </button>
-      <button mat-menu-item (click)="openLockuser()" *ngIf="userRole == 'ADMIN'">
-        <mat-icon>lock_person</mat-icon>
-        <span class="font-bold">قفل حساب کابران</span>
-      </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item (click)="onLogout()">
-        <mat-icon class="text-red-500">logout</mat-icon>
-        <span class="font-bold text-red-600">خروج</span>
-      </button>
-    </mat-menu>
-
     <button mat-icon-button [matMenuTriggerFor]="lang" class="text-white hover:bg-white/10">
       <mat-icon>translate</mat-icon>
     </button>
-
-    <mat-menu #lang>
-      <button mat-menu-item (click)="setlang()">
-        <span class="font-bold">دری</span>
-      </button>
-      <button mat-menu-item (click)="setlangen()">
-        <span class="font-bold">پشتو</span>
-      </button>
-    </mat-menu>
   </div>
 </mat-toolbar>
+
+<mat-menu #userAccountMenu="matMenu">
+  <button mat-menu-item (click)="navigateToRegister()" *ngIf="userRole == 'ADMIN'">
+    <mat-icon>people</mat-icon>
+    <span>ایجاد کاربر</span>
+  </button>
+  <button mat-menu-item (click)="openDialog()">
+    <mat-icon>lock</mat-icon>
+    <span>تغیر پسورد</span>
+  </button>
+  <button mat-menu-item (click)="openReset()" *ngIf="userRole == 'ADMIN'">
+    <mat-icon>lock_reset</mat-icon>
+    <span>باز نشانی پسورد</span>
+  </button>
+  <button mat-menu-item (click)="openLockuser()" *ngIf="userRole == 'ADMIN'">
+    <mat-icon>lock_person</mat-icon>
+    <span>قفل حساب کابران</span>
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="onLogout()">
+    <mat-icon color="warn">logout</mat-icon>
+    <span style="color: #dc2626;">خروج</span>
+  </button>
+</mat-menu>
+
+<mat-menu #lang="matMenu">
+  <button mat-menu-item (click)="setlang()">
+    <span>دری</span>
+  </button>
+  <button mat-menu-item (click)="setlangen()">
+    <span>پشتو</span>
+  </button>
+</mat-menu>
 
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav="matSidenav" class="sidenav-modern">

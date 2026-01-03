@@ -5,22 +5,20 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AuthRoutingModule } from './auth-routing.module';
 import { AuthComponent } from './auth.component';
-import { ChangepasswordComponent } from './changepassword/changepassword.component';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
-import { LockuserComponent } from './lockuser/lockuser.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { UploadComponent } from './register/upload/upload.component';
-import { ResetpasswordComponent } from './resetpassword/resetpassword.component';
+
+// Note: ChangepasswordComponent, ResetpasswordComponent, and LockuserComponent
+// have been moved to SharedModule for global availability as dialogs
+
 @NgModule({
   declarations: [
     AuthComponent,
     LoginComponent,
     RegisterComponent,
     UploadComponent,
-    ChangepasswordComponent,
-    ResetpasswordComponent,
-    LockuserComponent,
     ForbiddenComponent
   ],
   imports: [
