@@ -79,6 +79,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
+                GrandFatherName = request.GrandFatherName,
                 IdentityCardTypeId = request.IdentityCardTypeId,
                 CompanyId = request.CompanyId,
                 IndentityCardNumber = request.IndentityCardNumber,
@@ -151,6 +152,7 @@ namespace WebAPIBackend.Controllers.Companies
             // Update the entity with the new values
             existingProperty.FirstName = request.FirstName;
             existingProperty.FatherName = request.FatherName;
+            existingProperty.GrandFatherName = request.GrandFatherName;
             existingProperty.IdentityCardTypeId = request.IdentityCardTypeId;
             existingProperty.IndentityCardNumber = request.IndentityCardNumber;
             existingProperty.Jild = request.Jild;

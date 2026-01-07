@@ -7,6 +7,7 @@ import { companyOwnerAddress, companyOwnerAddressData } from '../models/companyO
 import { Guarantor } from '../models/Guarantor';
 import { LicenseDetail } from '../models/LicenseDetail';
 import { AccountInfo, AccountInfoData } from '../models/AccountInfo';
+import { CancellationInfo, CancellationInfoData } from '../models/CancellationInfo';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -121,5 +122,22 @@ export class CompnaydetailService {
 
   updateAccountInfo(id: number, data: AccountInfoData): Observable<{ id: number }> {
     return this.http.put<{ id: number }>(`${this.baseUrlowner}CompanyAccountInfo/${id}`, data);
+  }
+
+  // Cancellation Info (فسخ / لغوه) methods
+  getCancellationInfoByCompanyId(companyId: number, calendarType?: string): Observable<CancellationInfo> {
+    let url = `${this.baseUrlowner}CompanyCancellationInfo/${companyId}`;
+    if (calendarType) {
+      url += `?calendarType=${calendarType}`;
+    }
+    return this.http.get<CancellationInfo>(url);
+  }
+
+  createCancellationInfo(data: CancellationInfoData): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(`${this.baseUrlowner}CompanyCancellationInfo`, data);
+  }
+
+  updateCancellationInfo(id: number, data: CancellationInfoData): Observable<{ id: number }> {
+    return this.http.put<{ id: number }>(`${this.baseUrlowner}CompanyCancellationInfo/${id}`, data);
   }
 }

@@ -8,6 +8,8 @@ namespace WebAPIBackend.Models.RequestData
 
         public string FatherName { get; set; } = null!;
 
+        public string? GrandFatherName { get; set; }
+
         public int? IdentityCardTypeId { get; set; }
 
         public int? CompanyId { get; set; }

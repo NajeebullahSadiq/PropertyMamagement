@@ -115,6 +115,7 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<Companydetailsaudit> Companydetailsaudits { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<CompanyAccountInfo> CompanyAccountInfos { get; set; }
+        public virtual DbSet<CompanyCancellationInfo> CompanyCancellationInfos { get; set; }
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -200,6 +201,23 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.Company).WithMany(p => p.CompanyAccountInfos)
                     .HasForeignKey(d => d.CompanyId)
                     .HasConstraintName("FK_CompanyAccountInfo_CompanyDetails");
+            });
+
+            modelBuilder.Entity<CompanyCancellationInfo>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("CompanyCancellationInfo_pkey");
+
+                entity.ToTable("CompanyCancellationInfo", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.LicenseCancellationLetterNumber).HasMaxLength(100);
+                entity.Property(e => e.RevenueCancellationLetterNumber).HasMaxLength(100);
+                entity.Property(e => e.Remarks).HasMaxLength(1000);
+
+                entity.HasOne(d => d.Company).WithMany(p => p.CompanyCancellationInfos)
+                    .HasForeignKey(d => d.CompanyId)
+                    .HasConstraintName("FK_CompanyCancellationInfo_CompanyDetails");
             });
 
             modelBuilder.Entity<CompanyOwner>(entity =>

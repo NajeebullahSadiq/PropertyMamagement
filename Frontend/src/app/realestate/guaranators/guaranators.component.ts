@@ -89,6 +89,7 @@ export class GuaranatorsComponent {
       id: [0],
       firstName: ['', Validators.required],
       fatherName: ['', Validators.required],
+      grandFatherName: [''],
       identityCardTypeId: ['', Validators.required],
       indentityCardNumber: ['', Validators.required],
       jild: ['', Validators.required],
@@ -322,6 +323,7 @@ export class GuaranatorsComponent {
         id: selectedOwnerAddress.id,
         firstName: selectedOwnerAddress.firstName,
         fatherName: selectedOwnerAddress.fatherName,
+        grandFatherName: selectedOwnerAddress.grandFatherName,
         identityCardTypeId: selectedOwnerAddress.identityCardTypeId,
         indentityCardNumber: selectedOwnerAddress.indentityCardNumber,
         jild: selectedOwnerAddress.jild,
@@ -417,6 +419,7 @@ export class GuaranatorsComponent {
 
   get firstName() { return this.guaranatorForm.get('firstName'); }
   get fatherName() { return this.guaranatorForm.get('fatherName'); }
+  get grandFatherName() { return this.guaranatorForm.get('grandFatherName'); }
   get identityCardTypeId() { return this.guaranatorForm.get('identityCardTypeId'); }
   get indentityCardNumber() { return this.guaranatorForm.get('indentityCardNumber'); }
   get jild() { return this.guaranatorForm.get('jild'); }

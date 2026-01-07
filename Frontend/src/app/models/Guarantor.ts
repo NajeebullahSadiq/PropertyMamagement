@@ -2,6 +2,7 @@ export interface Guarantor{
     id: number;
     firstName:string;
     fatherName:string;
+    grandFatherName?:string;
     identityCardTypeId:number;
     indentityCardNumber:number;
     jild:string;

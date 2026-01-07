@@ -38,9 +38,18 @@ namespace WebAPIBackend.Controllers.Companies
                     return NotFound(new { message = "Company not found" });
                 }
 
-                var accountInfo = await _context.CompanyAccountInfos
-                    .Where(x => x.CompanyId == companyId)
-                    .FirstOrDefaultAsync();
+                CompanyAccountInfo? accountInfo = null;
+                try
+                {
+                    accountInfo = await _context.CompanyAccountInfos
+                        .Where(x => x.CompanyId == companyId)
+                        .FirstOrDefaultAsync();
+                }
+                catch (Exception)
+                {
+                    // Table might not exist yet, return null
+                    return Ok(null);
+                }
 
                 if (accountInfo == null)
                 {

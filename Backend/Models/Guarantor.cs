@@ -12,6 +12,8 @@ public partial class Guarantor
 
     public string FatherName { get; set; } = null!;
 
+    public string? GrandFatherName { get; set; }
+
     public int? IdentityCardTypeId { get; set; }
 
     public int? CompanyId { get; set; }

@@ -17,6 +17,7 @@ import { CompanyownerComponent } from './companyowner/companyowner.component';
 import { CompanyowneraddressComponent } from './companyowneraddress/companyowneraddress.component';
 import { GuaranatorsComponent } from './guaranators/guaranators.component';
 import { AccountinfoComponent } from './accountinfo/accountinfo.component';
+import { CancellationinfoComponent } from './cancellationinfo/cancellationinfo.component';
 
 import { LicensedetailsComponent } from './licensedetails/licensedetails.component';
 import { FileuploadComponent } from './fileupload/fileupload.component';
@@ -39,7 +40,8 @@ import { SharedModule } from '../shared/shared.module';
     FileuploadComponent,
     RealestatelistComponent,
     ExpiredlicenselistComponent,
-    AccountinfoComponent
+    AccountinfoComponent,
+    CancellationinfoComponent
   ],
   imports: [
     CommonModule,

@@ -37,5 +37,13 @@
       </ng-template>
       <app-accountinfo #accountinfo [id]="PropertyId" (next)="nextTab()"></app-accountinfo>
     </mat-tab>
+
+    <mat-tab [disabled]="comservice.mainTableId === 0">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">cancel</mat-icon>
+        فسخ / لغوه
+      </ng-template>
+      <app-cancellationinfo #cancellationinfo [id]="PropertyId" (next)="nextTab()"></app-cancellationinfo>
+    </mat-tab>
   </mat-tab-group>
 </div>

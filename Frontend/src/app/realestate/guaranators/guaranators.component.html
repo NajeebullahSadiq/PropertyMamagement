@@ -61,6 +61,16 @@
             </div>
 
             <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">ولدیت</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-user"></i>
+                </span>
+                <input type="text" id="grandFatherName" formControlName="grandFatherName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+            </div>
+
+            <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">شماره تماس</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -378,6 +388,7 @@
             <tr class="text-center">
               <th class="px-4 py-4 text-sm font-bold text-gray-700">اسم</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">ولد</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ولدیت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره تماس</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت تضمین</th>
             </tr>
@@ -386,6 +397,7 @@
             <tr *ngFor="let w of guaranatorDetails" class="text-center hover:bg-orange-50 transition-colors cursor-pointer" (click)="BindValu(w.id)">
               <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ w.fatherName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ w.grandFatherName }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ w.phoneNumber }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ getGuaranteeTypeName(w.guaranteeTypeId) }}</td>
             </tr>

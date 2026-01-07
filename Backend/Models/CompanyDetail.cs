@@ -40,4 +40,5 @@ public partial class CompanyDetail
     public virtual ICollection<PeriodicForm> PeriodicForms { get; } = new List<PeriodicForm>();
     public virtual ICollection<Companydetailsaudit> Companydetailsaudits { get; } = new List<Companydetailsaudit>();
     public virtual ICollection<CompanyAccountInfo> CompanyAccountInfos { get; } = new List<CompanyAccountInfo>();
+    public virtual ICollection<CompanyCancellationInfo> CompanyCancellationInfos { get; } = new List<CompanyCancellationInfo>();
 }
