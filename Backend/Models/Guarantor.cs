@@ -46,11 +46,36 @@ public partial class Guarantor
 
     public string? TaddressVillage { get; set; }
 
+    // Guarantee Information (merged from Gaurantee entity)
+    public int? GuaranteeTypeId { get; set; }
+
+    public long? PropertyDocumentNumber { get; set; }
+
+    public DateOnly? PropertyDocumentDate { get; set; }
+
+    public string? SenderMaktobNumber { get; set; }
+
+    public DateOnly? SenderMaktobDate { get; set; }
+
+    public long? AnswerdMaktobNumber { get; set; }
+
+    public DateOnly? AnswerdMaktobDate { get; set; }
+
+    public DateOnly? DateofGuarantee { get; set; }
+
+    public long? GuaranteeDocNumber { get; set; }
+
+    public DateOnly? GuaranteeDate { get; set; }
+
+    public string? GuaranteeDocPath { get; set; }
+
     public virtual CompanyDetail? Company { get; set; }
 
     public virtual ICollection<Guarantorsaudit> Guarantorsaudits { get; } = new List<Guarantorsaudit>();
 
     public virtual IdentityCardType? IdentityCardType { get; set; }
+
+    public virtual GuaranteeType? GuaranteeType { get; set; }
 
     public virtual Location? PaddressDistrict { get; set; }
 

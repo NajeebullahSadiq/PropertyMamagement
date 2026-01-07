@@ -114,6 +114,7 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<Companyowneraudit> Companyowneraudits { get; set; }
         public virtual DbSet<Companydetailsaudit> Companydetailsaudits { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
+        public virtual DbSet<CompanyAccountInfo> CompanyAccountInfos { get; set; }
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -182,6 +183,23 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.PetitionNumber).HasMaxLength(12);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(13);
                 entity.Property(e => e.Tin).HasColumnName("TIN");
+            });
+
+            modelBuilder.Entity<CompanyAccountInfo>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("CompanyAccountInfo_pkey");
+
+                entity.ToTable("CompanyAccountInfo", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.SettlementInfo).HasMaxLength(500);
+                entity.Property(e => e.TaxPaymentAmount).HasPrecision(18, 2);
+                entity.Property(e => e.CompanyCommission).HasPrecision(18, 2);
+
+                entity.HasOne(d => d.Company).WithMany(p => p.CompanyAccountInfos)
+                    .HasForeignKey(d => d.CompanyId)
+                    .HasConstraintName("FK_CompanyAccountInfo_CompanyDetails");
             });
 
             modelBuilder.Entity<CompanyOwner>(entity =>
@@ -337,6 +355,10 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.IdentityCardType).WithMany(p => p.Guarantors)
                     .HasForeignKey(d => d.IdentityCardTypeId)
                     .HasConstraintName("Guarantors_IdentityCardTypeId_fkey");
+
+                entity.HasOne(d => d.GuaranteeType).WithMany(p => p.Guarantors)
+                    .HasForeignKey(d => d.GuaranteeTypeId)
+                    .HasConstraintName("Guarantors_GuaranteeTypeId_fkey");
 
                 entity.HasOne(d => d.PaddressDistrict).WithMany(p => p.GuarantorPaddressDistricts)
                     .HasForeignKey(d => d.PaddressDistrictId)

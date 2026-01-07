@@ -16,4 +16,17 @@ export interface Guarantor{
     taddressProvinceId:number;
     taddressDistrictId:number;
     taddressVillage:string;
+    // Guarantee Information
+    guaranteeTypeId?:number;
+    propertyDocumentNumber?:number;
+    propertyDocumentDate?:string;
+    senderMaktobNumber?:string;
+    senderMaktobDate?:string;
+    answerdMaktobNumber?:number;
+    answerdMaktobDate?:string;
+    dateofGuarantee?:string;
+    guaranteeDocNumber?:number;
+    guaranteeDate?:string;
+    guaranteeDocPath?:string;
+    calendarType?:string;
 }

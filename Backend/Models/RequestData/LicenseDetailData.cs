@@ -20,6 +20,41 @@
 
         public string? LicenseType { get; set; }
 
+        /// <summary>
+        /// License Category (نوعیت جواز): جدید (New), تجدید (Renewal), مثنی (Duplicate)
+        /// </summary>
+        public string? LicenseCategory { get; set; }
+
+        /// <summary>
+        /// مبلغ حق‌الامتیاز - Royalty/License Fee Amount
+        /// </summary>
+        public decimal? RoyaltyAmount { get; set; }
+
+        /// <summary>
+        /// تاریخ حق‌الامتیاز - Royalty/License Fee Date (string format for multi-calendar support)
+        /// </summary>
+        public string? RoyaltyDate { get; set; }
+
+        /// <summary>
+        /// مبلغ جریمه - Penalty Amount
+        /// </summary>
+        public decimal? PenaltyAmount { get; set; }
+
+        /// <summary>
+        /// تاریخ جریمه - Penalty Date (string format for multi-calendar support)
+        /// </summary>
+        public string? PenaltyDate { get; set; }
+
+        /// <summary>
+        /// مکتوب قوای بشری - HR Letter Reference Number
+        /// </summary>
+        public string? HrLetter { get; set; }
+
+        /// <summary>
+        /// تاریخ مکتوب قوای بشری - HR Letter Date (string format for multi-calendar support)
+        /// </summary>
+        public string? HrLetterDate { get; set; }
+
         public DateTime? CreatedAt { get; set; }
 
         public string? CreatedBy { get; set; }

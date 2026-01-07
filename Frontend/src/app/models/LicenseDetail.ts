@@ -8,5 +8,14 @@ export interface LicenseDetail{
     companyId:number;
     docPath:string;
     licenseType:string;
+    // License Category (نوعیت جواز): جدید, تجدید, مثنی
+    licenseCategory?:string;
     calendarType?:string;
+    // Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
+    royaltyAmount?:number;      // مبلغ حق‌الامتیاز
+    royaltyDate?:string;        // تاریخ حق‌الامتیاز
+    penaltyAmount?:number;      // مبلغ جریمه
+    penaltyDate?:string;        // تاریخ جریمه
+    hrLetter?:string;           // مکتوب قوای بشری
+    hrLetterDate?:string;       // تاریخ مکتوب قوای بشری
 }

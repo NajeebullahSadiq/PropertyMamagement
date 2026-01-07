@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
+using WebAPIBackend.Models.RequestData;
 
 namespace WebAPIBackend.Controllers.Companies
 {
@@ -21,11 +23,22 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> getGuaranatorById(int id)
+        public async Task<IActionResult> getGuaranatorById(int id, [FromQuery] string? calendarType = null)
         {
             try
             {
                 var Pro = await _context.Guarantors.Where(x => x.CompanyId.Equals(id)).ToListAsync();
+
+                // Convert dates to the requested calendar type (defaults to HijriShamsi)
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                foreach (var item in Pro)
+                {
+                    item.PropertyDocumentDate = DateConversionHelper.ToCalendarDateOnly(item.PropertyDocumentDate, calendar);
+                    item.SenderMaktobDate = DateConversionHelper.ToCalendarDateOnly(item.SenderMaktobDate, calendar);
+                    item.AnswerdMaktobDate = DateConversionHelper.ToCalendarDateOnly(item.AnswerdMaktobDate, calendar);
+                    item.DateofGuarantee = DateConversionHelper.ToCalendarDateOnly(item.DateofGuarantee, calendar);
+                    item.GuaranteeDate = DateConversionHelper.ToCalendarDateOnly(item.GuaranteeDate, calendar);
+                }
 
                 return Ok(Pro);
             }
@@ -36,14 +49,13 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> SaveProperty([FromBody] Guarantor request)
+        public async Task<ActionResult<int>> SaveProperty([FromBody] GuarantorData request)
         {
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {
                 return Unauthorized();
             }
-
 
             var userId = userIdClaim.Value;
             int propertyCount = _context.Guarantors.Count(wd => wd.CompanyId == request.CompanyId && wd.CompanyId != null);
@@ -55,6 +67,13 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 return StatusCode(312, "Main Table is Empty");
             }
+
+            // Parse all guarantee dates using multi-calendar helper
+            DateConversionHelper.TryParseToDateOnly(request.PropertyDocumentDate, request.CalendarType, out var propertyDocumentDate);
+            DateConversionHelper.TryParseToDateOnly(request.SenderMaktobDate, request.CalendarType, out var senderMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.AnswerdMaktobDate, request.CalendarType, out var answerdMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.DateofGuarantee, request.CalendarType, out var dateofGuarantee);
+            DateConversionHelper.TryParseToDateOnly(request.GuaranteeDate, request.CalendarType, out var guaranteeDate);
 
             var property = new Guarantor
             {
@@ -74,9 +93,20 @@ namespace WebAPIBackend.Controllers.Companies
                 TaddressProvinceId = request.TaddressProvinceId,
                 TaddressDistrictId = request.TaddressDistrictId,
                 TaddressVillage = request.TaddressVillage,
+                // Guarantee fields
+                GuaranteeTypeId = request.GuaranteeTypeId,
+                PropertyDocumentNumber = request.PropertyDocumentNumber,
+                PropertyDocumentDate = propertyDocumentDate,
+                SenderMaktobNumber = request.SenderMaktobNumber,
+                SenderMaktobDate = senderMaktobDate,
+                AnswerdMaktobNumber = request.AnswerdMaktobNumber,
+                AnswerdMaktobDate = answerdMaktobDate,
+                DateofGuarantee = dateofGuarantee,
+                GuaranteeDocNumber = request.GuaranteeDocNumber,
+                GuaranteeDate = guaranteeDate,
+                GuaranteeDocPath = request.GuaranteeDocPath,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
-
             };
 
             _context.Add(property);
@@ -86,9 +116,8 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProperty(int id, [FromBody] Guarantor request)
+        public async Task<IActionResult> UpdateProperty(int id, [FromBody] GuarantorData request)
         {
-           
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {
@@ -107,10 +136,18 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound();
             }
 
+            // Parse all guarantee dates using multi-calendar helper
+            DateConversionHelper.TryParseToDateOnly(request.PropertyDocumentDate, request.CalendarType, out var propertyDocumentDate);
+            DateConversionHelper.TryParseToDateOnly(request.SenderMaktobDate, request.CalendarType, out var senderMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.AnswerdMaktobDate, request.CalendarType, out var answerdMaktobDate);
+            DateConversionHelper.TryParseToDateOnly(request.DateofGuarantee, request.CalendarType, out var dateofGuarantee);
+            DateConversionHelper.TryParseToDateOnly(request.GuaranteeDate, request.CalendarType, out var guaranteeDate);
+
             // Store the original values of the CreatedBy and CreatedAt properties
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
             var companyId = existingProperty.CompanyId;
+
             // Update the entity with the new values
             existingProperty.FirstName = request.FirstName;
             existingProperty.FatherName = request.FatherName;
@@ -128,6 +165,18 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.TaddressProvinceId = request.TaddressProvinceId;
             existingProperty.TaddressDistrictId = request.TaddressDistrictId;
             existingProperty.TaddressVillage = request.TaddressVillage;
+            // Guarantee fields
+            existingProperty.GuaranteeTypeId = request.GuaranteeTypeId;
+            existingProperty.PropertyDocumentNumber = request.PropertyDocumentNumber;
+            existingProperty.PropertyDocumentDate = propertyDocumentDate;
+            existingProperty.SenderMaktobNumber = request.SenderMaktobNumber;
+            existingProperty.SenderMaktobDate = senderMaktobDate;
+            existingProperty.AnswerdMaktobNumber = request.AnswerdMaktobNumber;
+            existingProperty.AnswerdMaktobDate = answerdMaktobDate;
+            existingProperty.DateofGuarantee = dateofGuarantee;
+            existingProperty.GuaranteeDocNumber = request.GuaranteeDocNumber;
+            existingProperty.GuaranteeDate = guaranteeDate;
+            existingProperty.GuaranteeDocPath = request.GuaranteeDocPath;
 
             // Restore the original values of the CreatedBy and CreatedAt properties
             existingProperty.CreatedBy = createdBy;
@@ -148,7 +197,7 @@ namespace WebAPIBackend.Controllers.Companies
 
             foreach (var change in changes)
             {
-                // Only add an entry to the vehicleaudit table if the property has been modified
+                // Only add an entry to the audit table if the property has been modified
                 if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
                 {
                     _context.Guarantorsaudits.Add(new Guarantorsaudit

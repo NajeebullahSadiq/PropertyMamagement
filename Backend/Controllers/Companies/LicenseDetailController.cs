@@ -35,6 +35,9 @@ namespace WebAPIBackend.Controllers.Companies
                 {
                     item.IssueDate = DateConversionHelper.ToCalendarDateOnly(item.IssueDate, calendar);
                     item.ExpireDate = DateConversionHelper.ToCalendarDateOnly(item.ExpireDate, calendar);
+                    item.RoyaltyDate = DateConversionHelper.ToCalendarDateOnly(item.RoyaltyDate, calendar);
+                    item.PenaltyDate = DateConversionHelper.ToCalendarDateOnly(item.PenaltyDate, calendar);
+                    item.HrLetterDate = DateConversionHelper.ToCalendarDateOnly(item.HrLetterDate, calendar);
                 }
 
                 return Ok(Pro);
@@ -76,6 +79,56 @@ namespace WebAPIBackend.Controllers.Companies
                 return BadRequest("ExpireDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
             }
 
+            // Validate LicenseCategory if provided
+            var allowedLicenseCategories = new[] { "جدید", "تجدید", "مثنی" };
+            if (!string.IsNullOrEmpty(request.LicenseCategory) && !allowedLicenseCategories.Contains(request.LicenseCategory))
+            {
+                return BadRequest("Invalid LicenseCategory. Allowed values: جدید, تجدید, مثنی");
+            }
+
+            // Parse HrLetterDate if provided
+            DateOnly? hrLetterDate = null;
+            if (!string.IsNullOrEmpty(request.HrLetterDate))
+            {
+                if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
+                {
+                    return BadRequest("HrLetterDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                }
+                hrLetterDate = parsedHrLetterDate;
+            }
+
+            // Parse RoyaltyDate if provided
+            DateOnly? royaltyDate = null;
+            if (!string.IsNullOrEmpty(request.RoyaltyDate))
+            {
+                if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
+                {
+                    return BadRequest("RoyaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                }
+                royaltyDate = parsedRoyaltyDate;
+            }
+
+            // Parse PenaltyDate if provided
+            DateOnly? penaltyDate = null;
+            if (!string.IsNullOrEmpty(request.PenaltyDate))
+            {
+                if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
+                {
+                    return BadRequest("PenaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                }
+                penaltyDate = parsedPenaltyDate;
+            }
+
+            // Validate numeric fields
+            if (request.RoyaltyAmount.HasValue && request.RoyaltyAmount < 0)
+            {
+                return BadRequest("RoyaltyAmount must be a non-negative number.");
+            }
+            if (request.PenaltyAmount.HasValue && request.PenaltyAmount < 0)
+            {
+                return BadRequest("PenaltyAmount must be a non-negative number.");
+            }
+
             var property = new LicenseDetail
             {
                 LicenseNumber = request.LicenseNumber,
@@ -85,6 +138,14 @@ namespace WebAPIBackend.Controllers.Companies
                 OfficeAddress = request.OfficeAddress,
                 CompanyId = request.CompanyId,
                 DocPath = request.DocPath,
+                LicenseType = request.LicenseType,
+                LicenseCategory = request.LicenseCategory,
+                RoyaltyAmount = request.RoyaltyAmount,
+                RoyaltyDate = royaltyDate,
+                PenaltyAmount = request.PenaltyAmount,
+                PenaltyDate = penaltyDate,
+                HrLetter = request.HrLetter,
+                HrLetterDate = hrLetterDate,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
             };
@@ -127,6 +188,56 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound();
             }
 
+            // Validate LicenseCategory if provided
+            var allowedLicenseCategories = new[] { "جدید", "تجدید", "مثنی" };
+            if (!string.IsNullOrEmpty(request.LicenseCategory) && !allowedLicenseCategories.Contains(request.LicenseCategory))
+            {
+                return BadRequest("Invalid LicenseCategory. Allowed values: جدید, تجدید, مثنی");
+            }
+
+            // Parse HrLetterDate if provided
+            DateOnly? hrLetterDate = null;
+            if (!string.IsNullOrEmpty(request.HrLetterDate))
+            {
+                if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
+                {
+                    return BadRequest("HrLetterDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                }
+                hrLetterDate = parsedHrLetterDate;
+            }
+
+            // Parse RoyaltyDate if provided
+            DateOnly? royaltyDate = null;
+            if (!string.IsNullOrEmpty(request.RoyaltyDate))
+            {
+                if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
+                {
+                    return BadRequest("RoyaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                }
+                royaltyDate = parsedRoyaltyDate;
+            }
+
+            // Parse PenaltyDate if provided
+            DateOnly? penaltyDate = null;
+            if (!string.IsNullOrEmpty(request.PenaltyDate))
+            {
+                if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
+                {
+                    return BadRequest("PenaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                }
+                penaltyDate = parsedPenaltyDate;
+            }
+
+            // Validate numeric fields
+            if (request.RoyaltyAmount.HasValue && request.RoyaltyAmount < 0)
+            {
+                return BadRequest("RoyaltyAmount must be a non-negative number.");
+            }
+            if (request.PenaltyAmount.HasValue && request.PenaltyAmount < 0)
+            {
+                return BadRequest("PenaltyAmount must be a non-negative number.");
+            }
+
             // Store the original values
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
@@ -139,6 +250,14 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.AreaId = request.AreaId;
             existingProperty.OfficeAddress = request.OfficeAddress;
             existingProperty.DocPath = request.DocPath;
+            existingProperty.LicenseType = request.LicenseType;
+            existingProperty.LicenseCategory = request.LicenseCategory;
+            existingProperty.RoyaltyAmount = request.RoyaltyAmount;
+            existingProperty.RoyaltyDate = royaltyDate;
+            existingProperty.PenaltyAmount = request.PenaltyAmount;
+            existingProperty.PenaltyDate = penaltyDate;
+            existingProperty.HrLetter = request.HrLetter;
+            existingProperty.HrLetterDate = hrLetterDate;
 
             // Restore the original values
             existingProperty.CreatedBy = createdBy;
@@ -201,6 +320,15 @@ namespace WebAPIBackend.Controllers.Companies
             string dateOfBirthFormatted = data.DateofBirth.HasValue 
                 ? DateConversionHelper.FormatDateOnly(data.DateofBirth, calendar) 
                 : "";
+            string hrLetterDateFormatted = data.HrLetterDate.HasValue 
+                ? DateConversionHelper.FormatDateOnly(data.HrLetterDate, calendar) 
+                : "";
+            string royaltyDateFormatted = data.RoyaltyDate.HasValue 
+                ? DateConversionHelper.FormatDateOnly(data.RoyaltyDate, calendar) 
+                : "";
+            string penaltyDateFormatted = data.PenaltyDate.HasValue 
+                ? DateConversionHelper.FormatDateOnly(data.PenaltyDate, calendar) 
+                : "";
 
             var result = new
             {
@@ -228,6 +356,16 @@ namespace WebAPIBackend.Controllers.Companies
                 data.TemporaryProvinceName,
                 data.TemporaryDistrictName,
                 data.TemporaryVillage,
+                // Financial and Administrative Fields
+                data.RoyaltyAmount,
+                data.RoyaltyDate,
+                royaltyDateFormatted,
+                data.PenaltyAmount,
+                data.PenaltyDate,
+                penaltyDateFormatted,
+                data.HrLetter,
+                data.HrLetterDate,
+                hrLetterDateFormatted,
             };
 
             return Ok(result);

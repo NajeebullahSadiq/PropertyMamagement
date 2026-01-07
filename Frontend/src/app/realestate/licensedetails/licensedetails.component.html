@@ -42,6 +42,12 @@
             </div>
 
             <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت جواز</label>
+              <ng-select [items]="licenseCategoryOptions" [selectOnTab]="true" bindLabel="label" bindValue="value" formControlName="licenseCategory" class="custom-ng-select" placeholder="انتخاب نوعیت جواز">
+              </ng-select>
+            </div>
+
+            <div>
               <app-multi-calendar-datepicker
                 formControlName="issueDate"
                 label="تاریخ صدور">
@@ -93,6 +99,82 @@
                 acceptTypes="image/*,.pdf,.doc,.docx"
                 (sendMessage)="uploadFinished($event)">
               </app-fileupload>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial and Administrative Section (جزئیات مالی و اسناد جواز) -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>جزئیات مالی و اسناد جواز</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Royalty Amount (مبلغ حق‌الامتیاز) -->
+            <div>
+              <label for="royaltyAmount" class="block text-sm font-semibold text-gray-700 mb-2">مبلغ حق‌الامتیاز</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-money-bill-wave"></i>
+                </span>
+                <input type="number" id="royaltyAmount" formControlName="royaltyAmount" 
+                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  placeholder="مبلغ را وارد کنید" min="0" step="0.01">
+              </div>
+            </div>
+
+            <!-- Royalty Date (تاریخ حق‌الامتیاز) -->
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="royaltyDate"
+                label="تاریخ حق‌الامتیاز">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <!-- Penalty Amount (مبلغ جریمه) -->
+            <div>
+              <label for="penaltyAmount" class="block text-sm font-semibold text-gray-700 mb-2">مبلغ جریمه</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </span>
+                <input type="number" id="penaltyAmount" formControlName="penaltyAmount" 
+                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  placeholder="مبلغ جریمه را وارد کنید" min="0" step="0.01">
+              </div>
+            </div>
+
+            <!-- Penalty Date (تاریخ جریمه) -->
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="penaltyDate"
+                label="تاریخ جریمه">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <!-- HR Letter (مکتوب قوای بشری) -->
+            <div>
+              <label for="hrLetter" class="block text-sm font-semibold text-gray-700 mb-2">مکتوب قوای بشری</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="hrLetter" formControlName="hrLetter" 
+                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  placeholder="شماره یا توضیحات مکتوب">
+              </div>
+            </div>
+
+            <!-- HR Letter Date (تاریخ مکتوب قوای بشری) -->
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="hrLetterDate"
+                label="تاریخ مکتوب قوای بشری">
+              </app-multi-calendar-datepicker>
             </div>
           </div>
         </div>

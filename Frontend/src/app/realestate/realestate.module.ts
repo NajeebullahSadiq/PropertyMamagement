@@ -15,8 +15,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { CompanydetailsComponent } from './companydetails/companydetails.component';
 import { CompanyownerComponent } from './companyowner/companyowner.component';
 import { CompanyowneraddressComponent } from './companyowneraddress/companyowneraddress.component';
-import { GuaranteeComponent } from './guarantee/guarantee.component';
 import { GuaranatorsComponent } from './guaranators/guaranators.component';
+import { AccountinfoComponent } from './accountinfo/accountinfo.component';
 
 import { LicensedetailsComponent } from './licensedetails/licensedetails.component';
 import { FileuploadComponent } from './fileupload/fileupload.component';
@@ -34,12 +34,12 @@ import { SharedModule } from '../shared/shared.module';
     CompanydetailsComponent,
     CompanyownerComponent,
     CompanyowneraddressComponent,
-    GuaranteeComponent,
     GuaranatorsComponent,
     LicensedetailsComponent,
     FileuploadComponent,
     RealestatelistComponent,
-    ExpiredlicenselistComponent
+    ExpiredlicenselistComponent,
+    AccountinfoComponent
   ],
   imports: [
     CommonModule,

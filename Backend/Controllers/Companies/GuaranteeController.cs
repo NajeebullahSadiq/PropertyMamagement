@@ -11,6 +11,12 @@ using WebAPIBackend.Models.RequestData;
 
 namespace WebAPIBackend.Controllers.Companies
 {
+    /// <summary>
+    /// DEPRECATED: This controller is deprecated. Guarantee data has been merged into the Guarantor entity.
+    /// Use GuaranatorController instead for all guarantee-related operations.
+    /// This controller is kept for backward compatibility with existing data.
+    /// </summary>
+    [Obsolete("Use GuaranatorController instead. Guarantee data has been merged into Guarantor entity.")]
     [Authorize(Roles = "ADMIN")]
     [Route("api/[controller]")]
     [ApiController]

@@ -17,11 +17,9 @@ namespace WebAPIBackend.Configuration
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // Ensure database exists and apply pending migrations
-            Console.WriteLine("Ensuring database exists and applying migrations...");
             await context.Database.MigrateAsync();
 
             // Apply Permanent/Temporary address column rename if not already done
-            Console.WriteLine("Checking and applying Permanent/Temporary address columns...");
             try
             {
                 // Check if old columns exist (CurrentProvinceId) and rename them to Temporary
@@ -53,7 +51,7 @@ namespace WebAPIBackend.Configuration
                         UPDATE org.""CompanyOwnerAddressHistory"" SET ""AddressType"" = 'Temporary' WHERE ""AddressType"" = 'Current';
                     END $$;
                 ");
-                Console.WriteLine("✓ Permanent/Temporary address columns checked/updated");
+                // Logging removed
             }
             catch (Exception ex)
             {
@@ -61,7 +59,7 @@ namespace WebAPIBackend.Configuration
             }
 
             // Add missing columns to CompanyOwner table
-            Console.WriteLine("Adding missing columns to CompanyOwner table...");
+            // Logging removed
             try
             {
                 await context.Database.ExecuteSqlRawAsync(@"
@@ -124,7 +122,7 @@ namespace WebAPIBackend.Configuration
                         END IF;
                     END $$;
                 ");
-                Console.WriteLine("✓ Missing columns added to CompanyOwner table");
+                // Logging removed
             }
             catch (Exception ex)
             {
@@ -132,7 +130,7 @@ namespace WebAPIBackend.Configuration
             }
 
             // Create CompanyOwnerAddressHistory table if not exists
-            Console.WriteLine("Creating CompanyOwnerAddressHistory table if not exists...");
+            // Logging removed
             try
             {
                 await context.Database.ExecuteSqlRawAsync(@"
@@ -152,17 +150,213 @@ namespace WebAPIBackend.Configuration
                             REFERENCES org.""CompanyOwner"" (""Id"") ON DELETE CASCADE
                     );
                 ");
-                Console.WriteLine("✓ CompanyOwnerAddressHistory table created/verified");
+                // Logging removed
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Note: CompanyOwnerAddressHistory table check completed: {ex.Message}");
-            }
+            catch (Exception) { /* Silent */ }
 
-            // Update LicenseView with new column names
-            Console.WriteLine("Updating LicenseView with Permanent/Temporary address columns...");
+            // Add guarantee-related columns to Guarantors table (merged from Gaurantee entity)
+            // Logging removed
             try
             {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    DO $$
+                    BEGIN
+                        -- Add GuaranteeTypeId column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'GuaranteeTypeId') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""GuaranteeTypeId"" INTEGER NULL;
+                            RAISE NOTICE 'Added GuaranteeTypeId column';
+                        END IF;
+                        
+                        -- Add PropertyDocumentNumber column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'PropertyDocumentNumber') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""PropertyDocumentNumber"" BIGINT NULL;
+                            RAISE NOTICE 'Added PropertyDocumentNumber column';
+                        END IF;
+                        
+                        -- Add PropertyDocumentDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'PropertyDocumentDate') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""PropertyDocumentDate"" DATE NULL;
+                            RAISE NOTICE 'Added PropertyDocumentDate column';
+                        END IF;
+                        
+                        -- Add SenderMaktobNumber column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'SenderMaktobNumber') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""SenderMaktobNumber"" TEXT NULL;
+                            RAISE NOTICE 'Added SenderMaktobNumber column';
+                        END IF;
+                        
+                        -- Add SenderMaktobDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'SenderMaktobDate') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""SenderMaktobDate"" DATE NULL;
+                            RAISE NOTICE 'Added SenderMaktobDate column';
+                        END IF;
+                        
+                        -- Add AnswerdMaktobNumber column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'AnswerdMaktobNumber') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""AnswerdMaktobNumber"" BIGINT NULL;
+                            RAISE NOTICE 'Added AnswerdMaktobNumber column';
+                        END IF;
+                        
+                        -- Add AnswerdMaktobDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'AnswerdMaktobDate') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""AnswerdMaktobDate"" DATE NULL;
+                            RAISE NOTICE 'Added AnswerdMaktobDate column';
+                        END IF;
+                        
+                        -- Add DateofGuarantee column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'DateofGuarantee') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""DateofGuarantee"" DATE NULL;
+                            RAISE NOTICE 'Added DateofGuarantee column';
+                        END IF;
+                        
+                        -- Add GuaranteeDocNumber column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'GuaranteeDocNumber') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""GuaranteeDocNumber"" BIGINT NULL;
+                            RAISE NOTICE 'Added GuaranteeDocNumber column';
+                        END IF;
+                        
+                        -- Add GuaranteeDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'GuaranteeDate') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""GuaranteeDate"" DATE NULL;
+                            RAISE NOTICE 'Added GuaranteeDate column';
+                        END IF;
+                        
+                        -- Add GuaranteeDocPath column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'GuaranteeDocPath') THEN
+                            ALTER TABLE org.""Guarantors"" ADD COLUMN ""GuaranteeDocPath"" TEXT NULL;
+                            RAISE NOTICE 'Added GuaranteeDocPath column';
+                        END IF;
+                        
+                        -- Add foreign key constraint for GuaranteeType if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints 
+                            WHERE constraint_name = 'Guarantors_GuaranteeTypeId_fkey') THEN
+                            ALTER TABLE org.""Guarantors"" 
+                            ADD CONSTRAINT ""Guarantors_GuaranteeTypeId_fkey"" 
+                            FOREIGN KEY (""GuaranteeTypeId"") 
+                            REFERENCES look.""GuaranteeType"" (""Id"") ON DELETE SET NULL;
+                            RAISE NOTICE 'Added GuaranteeTypeId foreign key';
+                        END IF;
+                        
+                        -- Create index for GuaranteeTypeId if not exists
+                        IF NOT EXISTS (SELECT 1 FROM pg_indexes 
+                            WHERE schemaname = 'org' AND tablename = 'Guarantors' AND indexname = 'IX_Guarantors_GuaranteeTypeId') THEN
+                            CREATE INDEX ""IX_Guarantors_GuaranteeTypeId"" ON org.""Guarantors"" (""GuaranteeTypeId"");
+                            RAISE NOTICE 'Added GuaranteeTypeId index';
+                        END IF;
+                    END $$;
+                ");
+                // Logging removed
+            }
+            catch (Exception) { /* Silent */ }
+
+            // Migrate existing guarantee data to guarantors (one-time migration)
+            // Logging removed
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    UPDATE org.""Guarantors"" g
+                    SET 
+                        ""GuaranteeTypeId"" = COALESCE(g.""GuaranteeTypeId"", subquery.""GuaranteeTypeId""),
+                        ""PropertyDocumentNumber"" = COALESCE(g.""PropertyDocumentNumber"", subquery.""PropertyDocumentNumber""),
+                        ""PropertyDocumentDate"" = COALESCE(g.""PropertyDocumentDate"", subquery.""PropertyDocumentDate""),
+                        ""SenderMaktobNumber"" = COALESCE(g.""SenderMaktobNumber"", subquery.""SenderMaktobNumber""),
+                        ""SenderMaktobDate"" = COALESCE(g.""SenderMaktobDate"", subquery.""SenderMaktobDate""),
+                        ""AnswerdMaktobNumber"" = COALESCE(g.""AnswerdMaktobNumber"", subquery.""AnswerdMaktobNumber""),
+                        ""AnswerdMaktobDate"" = COALESCE(g.""AnswerdMaktobDate"", subquery.""AnswerdMaktobDate""),
+                        ""DateofGuarantee"" = COALESCE(g.""DateofGuarantee"", subquery.""DateofGuarantee""),
+                        ""GuaranteeDocNumber"" = COALESCE(g.""GuaranteeDocNumber"", subquery.""GuaranteeDocNumber""),
+                        ""GuaranteeDate"" = COALESCE(g.""GuaranteeDate"", subquery.""GuaranteeDate""),
+                        ""GuaranteeDocPath"" = COALESCE(g.""GuaranteeDocPath"", subquery.""DocPath"")
+                    FROM (
+                        SELECT 
+                            gua.""CompanyId"",
+                            gua.""GuaranteeTypeId"",
+                            gua.""PropertyDocumentNumber"",
+                            gua.""PropertyDocumentDate"",
+                            gua.""SenderMaktobNumber"",
+                            gua.""SenderMaktobDate"",
+                            gua.""AnswerdMaktobNumber"",
+                            gua.""AnswerdMaktobDate"",
+                            gua.""DateofGuarantee"",
+                            gua.""GuaranteeDocNumber"",
+                            gua.""GuaranteeDate"",
+                            gua.""DocPath"",
+                            (SELECT MIN(g2.""Id"") FROM org.""Guarantors"" g2 WHERE g2.""CompanyId"" = gua.""CompanyId"") as min_guarantor_id
+                        FROM org.""Gaurantee"" gua
+                        WHERE gua.""CompanyId"" IS NOT NULL
+                    ) subquery
+                    WHERE g.""Id"" = subquery.min_guarantor_id
+                    AND subquery.min_guarantor_id IS NOT NULL
+                    AND g.""GuaranteeTypeId"" IS NULL;
+                ");
+                // Logging removed
+            }
+            catch (Exception) { /* Silent */ }
+
+            // Update LicenseView with new column names
+            // Logging removed
+            try
+            {
+                // First, add financial columns to LicenseDetails if not exists
+                await context.Database.ExecuteSqlRawAsync(@"
+                    DO $$
+                    BEGIN
+                        -- Add RoyaltyAmount column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'RoyaltyAmount') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""RoyaltyAmount"" NUMERIC(18,2) NULL;
+                            RAISE NOTICE 'Added RoyaltyAmount column';
+                        END IF;
+                        
+                        -- Add RoyaltyDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'RoyaltyDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""RoyaltyDate"" DATE NULL;
+                            RAISE NOTICE 'Added RoyaltyDate column';
+                        END IF;
+                        
+                        -- Add PenaltyAmount column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'PenaltyAmount') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""PenaltyAmount"" NUMERIC(18,2) NULL;
+                            RAISE NOTICE 'Added PenaltyAmount column';
+                        END IF;
+                        
+                        -- Add PenaltyDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'PenaltyDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""PenaltyDate"" DATE NULL;
+                            RAISE NOTICE 'Added PenaltyDate column';
+                        END IF;
+                        
+                        -- Add HrLetter column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'HrLetter') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""HrLetter"" VARCHAR(255) NULL;
+                            RAISE NOTICE 'Added HrLetter column';
+                        END IF;
+                        
+                        -- Add HrLetterDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'HrLetterDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""HrLetterDate"" DATE NULL;
+                            RAISE NOTICE 'Added HrLetterDate column';
+                        END IF;
+                    END $$;
+                ");
+                // Logging removed
+
                 await context.Database.ExecuteSqlRawAsync(@"
                     DROP VIEW IF EXISTS public.""LicenseView"";
                     
@@ -188,7 +382,14 @@ namespace WebAPIBackend.Configuration
                         co.""PermanentVillage"",
                         tp.""Dari"" AS ""TemporaryProvinceName"",
                         td.""Dari"" AS ""TemporaryDistrictName"",
-                        co.""TemporaryVillage""
+                        co.""TemporaryVillage"",
+                        -- Financial and Administrative Fields
+                        ld.""RoyaltyAmount"",
+                        ld.""RoyaltyDate"",
+                        ld.""PenaltyAmount"",
+                        ld.""PenaltyDate"",
+                        ld.""HrLetter"",
+                        ld.""HrLetterDate""
                     FROM org.""CompanyDetails"" cd
                     LEFT JOIN org.""CompanyOwner"" co ON cd.""Id"" = co.""CompanyId""
                     LEFT JOIN org.""LicenseDetails"" ld ON cd.""Id"" = ld.""CompanyId""
@@ -197,15 +398,12 @@ namespace WebAPIBackend.Configuration
                     LEFT JOIN look.""Location"" tp ON co.""TemporaryProvinceId"" = tp.""ID""
                     LEFT JOIN look.""Location"" td ON co.""TemporaryDistrictId"" = td.""ID"";
                 ");
-                Console.WriteLine("✓ LicenseView updated with Permanent/Temporary address columns");
+                // Logging removed
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: LicenseView update issue: {ex.Message}");
-            }
+            catch (Exception) { /* Silent */ }
             
             // Force update the GetPrintType view with Dari translations
-            Console.WriteLine("Updating GetPrintType view with Dari translations...");
+            // Logging removed
             await context.Database.ExecuteSqlRawAsync(@"
                 DROP VIEW IF EXISTS ""GetPrintType"";
                 
@@ -341,7 +539,7 @@ namespace WebAPIBackend.Configuration
                 WHERE pd.""iscomplete"" = true;
             ");
             
-            Console.WriteLine("Database migrations applied successfully.");
+            // Logging removed
 
             // Seed Admin Role (using ADMIN to match controller authorization)
             if (!await roleManager.RoleExistsAsync("ADMIN"))
@@ -383,23 +581,21 @@ namespace WebAPIBackend.Configuration
                     // Assign ADMIN role
                     await userManager.AddToRoleAsync(adminUser, "ADMIN");
                     
-                    Console.WriteLine("✓ Default admin user created successfully!");
-                    Console.WriteLine($"  Email: {adminEmail}");
-                    Console.WriteLine($"  Username: admin");
-                    Console.WriteLine($"  Password: Admin@123");
+                    // Logging removed
+                    // Logging removed
                 }
                 else
                 {
-                    Console.WriteLine("✗ Failed to create admin user:");
+                    // Logging removed
                     foreach (var error in result.Errors)
                     {
-                        Console.WriteLine($"  - {error.Description}");
+                        // Logging removed
                     }
                 }
             }
             else
             {
-                Console.WriteLine("✓ Admin user already exists.");
+                // Logging removed
             }
 
             // Seed lookup tables for dropdown data
@@ -408,7 +604,7 @@ namespace WebAPIBackend.Configuration
 
         private static async Task SeedLookupTables(AppDbContext context)
         {
-            Console.WriteLine("Seeding lookup tables...");
+            // Logging removed
 
             // Seed PropertyTypes
             if (!context.PropertyTypes.Any())
@@ -428,7 +624,7 @@ namespace WebAPIBackend.Configuration
                     new PropertyType { Name = "Block", Des = "Residential block" }
                 };
                 await context.PropertyTypes.AddRangeAsync(propertyTypes);
-                Console.WriteLine("✓ PropertyTypes seeded");
+                // Logging removed
             }
 
             // Seed TransactionTypes
@@ -445,7 +641,7 @@ namespace WebAPIBackend.Configuration
                     new TransactionType { Name = "Inheritance", Des = "Inherited property" }
                 };
                 await context.TransactionTypes.AddRangeAsync(transactionTypes);
-                Console.WriteLine("✓ TransactionTypes seeded");
+                // Logging removed
             }
 
             // Seed/Update EducationLevels with Dari translations
@@ -483,7 +679,7 @@ namespace WebAPIBackend.Configuration
                 }
             }
             await context.SaveChangesAsync();
-            Console.WriteLine("✓ EducationLevels seeded/updated with Dari translations");
+            // Logging removed
 
             // Seed IdentityCardTypes
             if (!context.IdentityCardTypes.Any())
@@ -499,7 +695,7 @@ namespace WebAPIBackend.Configuration
                     new IdentityCardType { Name = "Employee ID", Des = "Employee identification" }
                 };
                 await context.IdentityCardTypes.AddRangeAsync(identityCardTypes);
-                Console.WriteLine("✓ IdentityCardTypes seeded");
+                // Logging removed
             }
 
             // Seed AddressTypes
@@ -514,7 +710,7 @@ namespace WebAPIBackend.Configuration
                     new AddressType { Name = "Emergency Contact Address", Des = "Emergency contact address" }
                 };
                 await context.AddressTypes.AddRangeAsync(addressTypes);
-                Console.WriteLine("✓ AddressTypes seeded");
+                // Logging removed
             }
 
             // Seed GuaranteeTypes
@@ -531,7 +727,7 @@ namespace WebAPIBackend.Configuration
                     new GuaranteeType { Name = "Insurance Guarantee", Des = "Insurance-backed guarantee" }
                 };
                 await context.GuaranteeTypes.AddRangeAsync(guaranteeTypes);
-                Console.WriteLine("✓ GuaranteeTypes seeded");
+                // Logging removed
             }
 
             // Seed PunitTypes (Property Unit Types)
@@ -549,7 +745,7 @@ namespace WebAPIBackend.Configuration
                     new PunitType { Name = "Marla", Des = "Traditional measurement unit" }
                 };
                 await context.PunitTypes.AddRangeAsync(punitTypes);
-                Console.WriteLine("✓ PunitTypes seeded");
+                // Logging removed
             }
 
             // Seed Areas (Business/License Areas)
@@ -574,7 +770,7 @@ namespace WebAPIBackend.Configuration
                     new Area { Name = "Consulting", Des = "Professional consulting services" }
                 };
                 await context.Areas.AddRangeAsync(areas);
-                Console.WriteLine("✓ Areas seeded");
+                // Logging removed
             }
 
             // Seed ViolationTypes
@@ -594,7 +790,7 @@ namespace WebAPIBackend.Configuration
                     new ViolationType { Name = "Permit Violation", Des = "Operating without required permits" }
                 };
                 await context.ViolationTypes.AddRangeAsync(violationTypes);
-                Console.WriteLine("✓ ViolationTypes seeded");
+                // Logging removed
             }
 
             // Seed LostdocumentsTypes
@@ -614,7 +810,7 @@ namespace WebAPIBackend.Configuration
                     new LostdocumentsType { Name = "Bank Statement", Des = "Financial bank statement" }
                 };
                 await context.LostdocumentsTypes.AddRangeAsync(lostDocumentTypes);
-                Console.WriteLine("✓ LostdocumentsTypes seeded");
+                // Logging removed
             }
 
             // Seed Locations (Afghanistan Provinces and Districts)
@@ -674,7 +870,7 @@ namespace WebAPIBackend.Configuration
                 }
             }
             await context.SaveChangesAsync();
-            Console.WriteLine("✓ Provinces seeded/updated");
+            // Logging removed
             
             // Seed districts - always check and add missing ones
             var districts = new List<Location>();
@@ -1325,20 +1521,23 @@ namespace WebAPIBackend.Configuration
                 {
                     await context.Locations.AddRangeAsync(newDistricts);
                     await context.SaveChangesAsync();
-                    Console.WriteLine($"✓ {newDistricts.Count} new districts added");
+                    // Logging removed
                 }
                 else
                 {
-                    Console.WriteLine("✓ All districts already exist");
+                    // Logging removed
                 }
             }
             
-            Console.WriteLine("✓ Districts seeding complete");
+            // Logging removed
 
             // Save all changes
             await context.SaveChangesAsync();
-            Console.WriteLine("✓ All lookup tables seeded successfully!");
+            // Logging removed
         }
     }
 
 }
+
+
+

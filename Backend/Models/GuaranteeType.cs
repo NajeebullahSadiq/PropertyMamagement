@@ -12,4 +12,6 @@ public partial class GuaranteeType
     public string? Des { get; set; }
 
     public virtual ICollection<Gaurantee> Gaurantees { get; } = new List<Gaurantee>();
+
+    public virtual ICollection<Guarantor> Guarantors { get; } = new List<Guarantor>();
 }

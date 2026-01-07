@@ -1,39 +1,41 @@
 <div class="container">
   <mat-tab-group #tabGroup>
-      <mat-tab class="blue-tab">
-          <ng-template matTabLabel>
-            <mat-icon class="large-icon">home</mat-icon>
-                     دفتر راهنمایی معاملات
-            </ng-template>
-            <app-companydetails #companydetails  [id]="PropertyId" (next)="nextTab()"></app-companydetails>
-        </mat-tab>
-        <mat-tab [disabled]="comservice.mainTableId === 0">
-          <ng-template matTabLabel  >
-              <mat-icon class="large-icon">person</mat-icon>
-                   مشخصات مالک
-            </ng-template>
-          <app-companyowner #companyowner  [id]="PropertyId" (next)="nextTab()"></app-companyowner>
-        </mat-tab>
-      <mat-tab [disabled]="comservice.mainTableId === 0">
-        <ng-template matTabLabel>
-            <mat-icon class="large-icon">person</mat-icon>
-                 تضمین کننده  
-          </ng-template>
-      <app-guaranators #guaranators  [id]="PropertyId" (next)="nextTab()"></app-guaranators>
+    <mat-tab class="blue-tab">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">home</mat-icon>
+        دفتر راهنمایی معاملات
+      </ng-template>
+      <app-companydetails #companydetails [id]="PropertyId" (next)="nextTab()"></app-companydetails>
     </mat-tab>
     <mat-tab [disabled]="comservice.mainTableId === 0">
       <ng-template matTabLabel>
-          <mat-icon class="large-icon">description</mat-icon>
-                مشخصات جواز    
-        </ng-template>
-    <app-licensedetails #licensedetails  [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
-  </mat-tab>
-  <mat-tab [disabled]="comservice.mainTableId === 0">
-    <ng-template matTabLabel>
-        <mat-icon class="large-icon">description</mat-icon>
-              مشخصات تضمین    
+        <mat-icon class="large-icon">person</mat-icon>
+        مشخصات مالک
       </ng-template>
-  <app-guarantee #guarantee [id]="PropertyId" (next)="nextTab()"></app-guarantee>
-</mat-tab>
-    </mat-tab-group>
-  </div>
+      <app-companyowner #companyowner [id]="PropertyId" (next)="nextTab()"></app-companyowner>
+    </mat-tab>
+    <mat-tab [disabled]="comservice.mainTableId === 0">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">description</mat-icon>
+        مشخصات جواز
+      </ng-template>
+      <app-licensedetails #licensedetails [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
+    </mat-tab>
+
+    <mat-tab [disabled]="comservice.mainTableId === 0">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">security</mat-icon>
+        تضمین کنندگان
+      </ng-template>
+      <app-guaranators #guaranators [id]="PropertyId" (next)="nextTab()"></app-guaranators>
+    </mat-tab>
+
+    <mat-tab [disabled]="comservice.mainTableId === 0">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">account_balance</mat-icon>
+        مالیه
+      </ng-template>
+      <app-accountinfo #accountinfo [id]="PropertyId" (next)="nextTab()"></app-accountinfo>
+    </mat-tab>
+  </mat-tab-group>
+</div>

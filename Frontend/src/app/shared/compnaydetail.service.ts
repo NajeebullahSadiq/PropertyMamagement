@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { companydetails, companydetailsList } from '../models/companydetails';
 import { companyowner } from '../models/companyowner';
 import { companyOwnerAddress, companyOwnerAddressData } from '../models/companyOwnerAddress';
-import { Guarantee } from '../models/Guarantee';
 import { Guarantor } from '../models/Guarantor';
 import { LicenseDetail } from '../models/LicenseDetail';
+import { AccountInfo, AccountInfoData } from '../models/AccountInfo';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -80,13 +80,6 @@ export class CompnaydetailService {
     const url = `${this.baseUrlowner+'LicenseDetail'}/${propertyDetails.id}`;
     return this.http.put<LicenseDetail>(url, propertyDetails);
   }
-  addGuarantee(details: Guarantee): Observable<Guarantee> {
-    return this.http.post<Guarantee>(this.baseUrlowner+'Guarantee', details);
-  }
-  updateGuarantee(propertyDetails: Guarantee): Observable<Guarantee> {
-    const url = `${this.baseUrlowner+'Guarantee'}/${propertyDetails.id}`;
-    return this.http.put<Guarantee>(url, propertyDetails);
-  }
 
   getComapaniesList(): Observable<companydetailsList[]> {
     return this.http.get<companydetailsList[]>(this.baseUrl);
@@ -112,7 +105,21 @@ export class CompnaydetailService {
   getLicenseById(id: number): Observable<LicenseDetail[]> {
     return this.http.get<LicenseDetail[]>(this.baseUrlowner+'LicenseDetail/'+ id);
   }
-  getGuaranteeById(id: number): Observable<Guarantee[]> {
-    return this.http.get<Guarantee[]>(this.baseUrlowner+'Guarantee/'+ id);
+
+  // Account Info (مالیه) methods
+  getAccountInfoByCompanyId(companyId: number, calendarType?: string): Observable<AccountInfo> {
+    let url = `${this.baseUrlowner}CompanyAccountInfo/${companyId}`;
+    if (calendarType) {
+      url += `?calendarType=${calendarType}`;
+    }
+    return this.http.get<AccountInfo>(url);
+  }
+
+  createAccountInfo(data: AccountInfoData): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(`${this.baseUrlowner}CompanyAccountInfo`, data);
+  }
+
+  updateAccountInfo(id: number, data: AccountInfoData): Observable<{ id: number }> {
+    return this.http.put<{ id: number }>(`${this.baseUrlowner}CompanyAccountInfo/${id}`, data);
   }
 }

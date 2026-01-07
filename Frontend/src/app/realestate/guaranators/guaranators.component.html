@@ -1,8 +1,8 @@
 <section class="w-full bg-gray-50 py-8">
   <div class="max-w-7xl mx-auto px-4">
     <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات تضمین کننده ها دفتر</h1>
-      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به تضمین کننده را با دقت تکمیل نمایید</p>
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات تضمین کننده ها</h1>
+      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به تضمین کننده و تضمین را با دقت تکمیل نمایید</p>
     </div>
 
     <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
@@ -18,11 +18,13 @@
           (imageUploaded)="profileImageUploaded($event)" style="text-align: left"></app-profile-image-cropper>
       </div>
     </div>
+
     <form [formGroup]="guaranatorForm" (ngSubmit)="guaranatorForm.valid ? selectedId ? updateData() : addData() : null">
       <div class="hidden">
         <input type="hidden" formControlName="id">
       </div>
 
+      <!-- Personal Information Section -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
@@ -74,6 +76,7 @@
         </div>
       </div>
 
+      <!-- Identity Card Section -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
@@ -144,7 +147,7 @@
         </div>
       </div>
 
-
+      <!-- Permanent Address Section -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
@@ -182,6 +185,7 @@
         </div>
       </div>
 
+      <!-- Temporary Address Section -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
@@ -219,6 +223,135 @@
         </div>
       </div>
 
+      <!-- Guarantee Information Section -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-shield-alt"></i>
+            <span>معلومات تضمین</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تضمین</label>
+              <ng-select [items]="localizedGuaranteeTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="guaranteeTypeId" class="custom-ng-select">
+              </ng-select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر سند(تضمین)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="propertyDocumentNumber" formControlName="propertyDocumentNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="propertyDocumentDate"
+                label="تاریخ سند(تضمین)">
+              </app-multi-calendar-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maktob Information Section -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-rose-600 to-rose-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-file-alt"></i>
+            <span>معلومات مکتوب</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره مکتوب ارسالی به مرجع تضمین</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="senderMaktobNumber" formControlName="senderMaktobNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="senderMaktobDate"
+                label="تاریخ مکتوب ارسالی به مرجع تضمین">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره مکتوب جوابیه تضمین</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="answerdMaktobNumber" formControlName="answerdMaktobNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="answerdMaktobDate"
+                label="تاریخ مکتوب جوابیه تضمین">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="dateofGuarantee"
+                label="تاریخ ارایه تضمین خط">
+              </app-multi-calendar-datepicker>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره تضمین خط</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="guaranteeDocNumber" formControlName="guaranteeDocNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+              </div>
+            </div>
+
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="guaranteeDate"
+                label="تاریخ تضمین خط">
+              </app-multi-calendar-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guarantee Document Upload Section -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-cyan-600 to-cyan-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>آپلود اسناد تضمین</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="space-y-4">
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+              <app-fileupload #guaranteeFileUpload 
+                [existingFilePath]="guaranatorForm.get('guaranteeDocPath')?.value"
+                documentType="company"
+                acceptTypes="image/*,.pdf,.doc,.docx"
+                (sendMessage)="guaranteeDocUploadFinished($event)">
+              </app-fileupload>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="flex gap-4 justify-center pb-6">
         <button type="submit" [disabled]="guaranatorForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
           <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
@@ -231,6 +364,7 @@
       </div>
     </form>
 
+    <!-- Guarantors List Table -->
     <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-8">
       <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
         <h2 class="text-xl font-bold text-white flex items-center gap-2">
@@ -242,18 +376,18 @@
         <table class="w-full">
           <thead class="bg-gray-50 border-b-2 border-gray-200">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوع آدرس</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ولایت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ولسوالی</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ګذر / قریه / ادرس بلاک</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">اسم</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ولد</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره تماس</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت تضمین</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
             <tr *ngFor="let w of guaranatorDetails" class="text-center hover:bg-orange-50 transition-colors cursor-pointer" (click)="BindValu(w.id)">
               <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ w.fatherName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ w.phoneNumber }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ getGuaranteeTypeName(w.guaranteeTypeId) }}</td>
             </tr>
           </tbody>
         </table>

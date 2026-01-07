@@ -63,6 +63,13 @@ export class LicensedetailsComponent {
 		{ id: 'carSale', name: 'Car Sale', dari: 'موټر فروشی' }
 	];
 
+	// License Category options (نوعیت جواز)
+	licenseCategoryOptions = [
+		{ value: 'جدید', label: 'جدید' },
+		{ value: 'تجدید', label: 'تجدید' },
+		{ value: 'مثنی', label: 'مثنی' }
+	];
+
 	@Input() id: number = 0;
 	@Output() next = new EventEmitter<void>();
 	onNextClick() {
@@ -94,8 +101,16 @@ export class LicensedetailsComponent {
 			areaId: ['', Validators.required],
 			officeAddress: ['', Validators.required],
 			licenseType: ['', Validators.required],
+			licenseCategory: [''],
 			companyId: [''],
 			docPath: [''],
+			// Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
+			royaltyAmount: [null],
+			royaltyDate: [''],
+			penaltyAmount: [null],
+			penaltyDate: [''],
+			hrLetter: [''],
+			hrLetterDate: [''],
 		});
 	}
 
@@ -117,8 +132,16 @@ export class LicensedetailsComponent {
 							areaId: detail[0].areaId,
 							officeAddress: detail[0].officeAddress,
 							licenseType: detail[0].licenseType,
+							licenseCategory: detail[0].licenseCategory || '',
 							companyId: detail[0].companyId,
 							docPath: detail[0].docPath,
+							// Financial and Administrative Fields
+							royaltyAmount: detail[0].royaltyAmount || null,
+							royaltyDate: detail[0].royaltyDate || '',
+							penaltyAmount: detail[0].penaltyAmount || null,
+							penaltyDate: detail[0].penaltyDate || '',
+							hrLetter: detail[0].hrLetter || '',
+							hrLetterDate: detail[0].hrLetterDate || '',
 						});
 						this.selectedId = detail[0].id;
 						// Set imageName from existing docPath
@@ -169,6 +192,9 @@ export class LicensedetailsComponent {
 		const details = this.licenseForm.value as LicenseDetail;
 		const issueDateValue = this.licenseForm.get('issueDate')?.value;
 		const expireDateValue = this.licenseForm.get('expireDate')?.value;
+		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;
+		const royaltyDateValue = this.licenseForm.get('royaltyDate')?.value;
+		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
 		const currentCalendar = this.calendarService.getSelectedCalendar();
 
 		if (issueDateValue) {
@@ -176,6 +202,15 @@ export class LicensedetailsComponent {
 		}
 		if (expireDateValue) {
 			details.expireDate = this.formatDateForBackend(expireDateValue);
+		}
+		if (hrLetterDateValue) {
+			details.hrLetterDate = this.formatDateForBackend(hrLetterDateValue);
+		}
+		if (royaltyDateValue) {
+			details.royaltyDate = this.formatDateForBackend(royaltyDateValue);
+		}
+		if (penaltyDateValue) {
+			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
 		}
 
 		details.calendarType = currentCalendar;
@@ -195,6 +230,9 @@ export class LicensedetailsComponent {
 		const details = this.licenseForm.value as LicenseDetail;
 		const issueDateValue = this.licenseForm.get('issueDate')?.value;
 		const expireDateValue = this.licenseForm.get('expireDate')?.value;
+		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;
+		const royaltyDateValue = this.licenseForm.get('royaltyDate')?.value;
+		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
 		const currentCalendar = this.calendarService.getSelectedCalendar();
 
 		if (issueDateValue) {
@@ -202,6 +240,15 @@ export class LicensedetailsComponent {
 		}
 		if (expireDateValue) {
 			details.expireDate = this.formatDateForBackend(expireDateValue);
+		}
+		if (hrLetterDateValue) {
+			details.hrLetterDate = this.formatDateForBackend(hrLetterDateValue);
+		}
+		if (royaltyDateValue) {
+			details.royaltyDate = this.formatDateForBackend(royaltyDateValue);
+		}
+		if (penaltyDateValue) {
+			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
 		}
 
 		details.calendarType = currentCalendar;
@@ -266,7 +313,15 @@ export class LicensedetailsComponent {
 	get issueDate() { return this.licenseForm.get('issueDate'); }
 	get expireDate() { return this.licenseForm.get('expireDate'); }
 	get licenseType() { return this.licenseForm.get('licenseType'); }
+	get licenseCategory() { return this.licenseForm.get('licenseCategory'); }
 	get licenareaIdseNumber() { return this.licenseForm.get('areaId'); }
 	get companyId() { return this.licenseForm.get('companyId'); }
 	get docPath() { return this.licenseForm.get('docPath'); }
+	// Financial and Administrative Fields getters
+	get royaltyAmount() { return this.licenseForm.get('royaltyAmount'); }
+	get royaltyDate() { return this.licenseForm.get('royaltyDate'); }
+	get penaltyAmount() { return this.licenseForm.get('penaltyAmount'); }
+	get penaltyDate() { return this.licenseForm.get('penaltyDate'); }
+	get hrLetter() { return this.licenseForm.get('hrLetter'); }
+	get hrLetterDate() { return this.licenseForm.get('hrLetterDate'); }
 }

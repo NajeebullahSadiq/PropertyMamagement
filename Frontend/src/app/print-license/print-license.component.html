@@ -32,6 +32,49 @@
    <br>
    <p style="font-size:18px;font-weight: bold;"> شماره تماس دارنده جواز :<span>{{data.phoneNumber}}</span> شماره تشخصیه مالیه دهی: <span> {{data.tin}}</span></p>
    <br>
+   <!-- Financial and Administrative Details (جزئیات مالی و اسناد جواز) -->
+   <div *ngIf="data.royaltyAmount || data.penaltyAmount || data.hrLetter || data.hrLetterDate">
+     <p style="font-size:18px;font-weight: bold;">جزئیات مالی و اسناد جواز:</p>
+     <p style="font-size:16px;font-weight: bold;" *ngIf="data.royaltyAmount">مبلغ حق‌الامتیاز: <span>{{data.royaltyAmount | number}}</span> افغانی <span *ngIf="data.royaltyDateFormatted">- تاریخ: {{data.royaltyDateFormatted}}</span></p>
+     <p style="font-size:16px;font-weight: bold;" *ngIf="data.penaltyAmount">مبلغ جریمه: <span>{{data.penaltyAmount | number}}</span> افغانی <span *ngIf="data.penaltyDateFormatted">- تاریخ: {{data.penaltyDateFormatted}}</span></p>
+     <p style="font-size:16px;font-weight: bold;" *ngIf="data.hrLetter">مکتوب قوای بشری: <span>{{data.hrLetter}}</span> <span *ngIf="data.hrLetterDateFormatted">- تاریخ: {{data.hrLetterDateFormatted}}</span></p>
+     <br>
+   </div>
+
+   <!-- Account Info / Tax Information (مالیه) -->
+   <div *ngIf="accountInfo">
+     <p style="font-size:18px;font-weight: bold;">معلومات مالیه:</p>
+     <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+       <tr *ngIf="accountInfo.settlementInfo">
+         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc; width: 40%;">نمرمكتوب تصفيه معلومات:</td>
+         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.settlementInfo}}</td>
+       </tr>
+       <tr>
+         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">تحويل ماليات (مبلغ):</td>
+         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.taxPaymentAmount | number}} افغانی</td>
+       </tr>
+       <tr *ngIf="accountInfo.settlementYear">
+         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">سال تصفيه مالية:</td>
+         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.settlementYear}}</td>
+       </tr>
+       <tr *ngIf="accountInfo.taxPaymentDate">
+         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">تاريخ تحويل ماليات:</td>
+         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.taxPaymentDateFormatted || accountInfo.taxPaymentDate}}</td>
+       </tr>
+       <tr *ngIf="accountInfo.transactionCount">
+         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">تعدادی معامله:</td>
+         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.transactionCount}}</td>
+       </tr>
+       <tr *ngIf="accountInfo.companyCommission">
+         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">كمیشن رهنما:</td>
+         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.companyCommission | number}} افغانی</td>
+       </tr>
+     </table>
+   </div>
+   <div *ngIf="!accountInfo">
+     <p style="font-size:16px; color: #666; font-style: italic;">معلومات مالیه ثبت نشده است</p>
+   </div>
+
    <p style="font-size:18px;font-weight: bold;">یاداشت: این جواز نامه برای مدت سه سال پس از تاریخ صدور آن قابل اعتبار میباشد. و هرگونه استفاده خلاف قانون از این جواز پیگرد قانونی دارد.</p>
 
    <br>

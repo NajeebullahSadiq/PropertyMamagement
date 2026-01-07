@@ -9,7 +9,6 @@ import { CompanydetailsComponent } from './companydetails/companydetails.compone
 import { CompanyownerComponent } from './companyowner/companyowner.component';
 import { FileuploadComponent } from './fileupload/fileupload.component';
 import { GuaranatorsComponent } from './guaranators/guaranators.component';
-import { GuaranteeComponent } from './guarantee/guarantee.component';
 import { LicensedetailsComponent } from './licensedetails/licensedetails.component';
 
 @Component({
@@ -23,7 +22,6 @@ export class RealestateComponent {
   @ViewChild('companyowner') companyowner!: CompanyownerComponent;
   @ViewChild('guaranators') guaranators!:GuaranatorsComponent;
   @ViewChild('licensedetails') licensedetails!:LicensedetailsComponent;
-  @ViewChild('guarantee') guarantee!:GuaranteeComponent;
 
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
 
@@ -48,6 +46,5 @@ export class RealestateComponent {
     this.companyowner.resetForms();
     this.guaranators.resetForms();
     this.licensedetails.resetForms();
-    this.guarantee.resetForms();
   }
 }
