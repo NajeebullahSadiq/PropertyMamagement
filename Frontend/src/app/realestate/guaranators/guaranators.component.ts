@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbCalendar, NgbDatepickerI18n, NgbCalendarPersian } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Guarantor } from 'src/app/models/Guarantor';
+import { Guarantor, GuaranteeTypeEnum } from 'src/app/models/Guarantor';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
@@ -58,6 +58,14 @@ export class GuaranatorsComponent {
   localizedGuaranteeTypes: any;
   guaranatorForm: FormGroup = new FormGroup({});
   guaranatorDetails!: Guarantor[];
+  
+  // Districts for guarantee (Customary Deed)
+  guaranteeDistricts: any;
+  
+  // Guarantee Type visibility flags
+  showShariaDeedFields = false;
+  showCustomaryDeedFields = false;
+  showCashFields = false;
 
   @Input() id: number = 0;
   @Output() next = new EventEmitter<void>();
@@ -105,7 +113,7 @@ export class GuaranatorsComponent {
       taddressVillage: ['', Validators.required],
       pothoPath: [''],
       // Guarantee fields
-      guaranteeTypeId: [''],
+      guaranteeTypeId: ['', Validators.required],
       propertyDocumentNumber: [''],
       propertyDocumentDate: [''],
       senderMaktobNumber: [''],
@@ -116,6 +124,16 @@ export class GuaranatorsComponent {
       guaranteeDocNumber: [''],
       guaranteeDate: [''],
       guaranteeDocPath: [''],
+      // Conditional fields - Sharia Deed (قباله شرعی)
+      courtName: [''],
+      collateralNumber: [''],
+      // Conditional fields - Customary Deed (قباله عرفی)
+      setSerialNumber: [''],
+      guaranteeDistrictId: [''],
+      // Conditional fields - Cash (پول نقد)
+      bankName: [''],
+      depositNumber: [''],
+      depositDate: [''],
     });
   }
 
@@ -202,12 +220,16 @@ export class GuaranatorsComponent {
     details.answerdMaktobDate = this.formatDateForBackend(this.guaranatorForm.get('answerdMaktobDate')?.value);
     details.dateofGuarantee = this.formatDateForBackend(this.guaranatorForm.get('dateofGuarantee')?.value);
     details.guaranteeDate = this.formatDateForBackend(this.guaranatorForm.get('guaranteeDate')?.value);
+    
+    // Format conditional date field (Cash)
+    details.depositDate = this.formatDateForBackend(this.guaranatorForm.get('depositDate')?.value);
 
     // Convert string form values to numbers for backend
     details.propertyDocumentNumber = Number(details.propertyDocumentNumber) || undefined;
     details.answerdMaktobNumber = Number(details.answerdMaktobNumber) || undefined;
     details.guaranteeDocNumber = Number(details.guaranteeDocNumber) || undefined;
     details.guaranteeTypeId = Number(details.guaranteeTypeId) || undefined;
+    details.guaranteeDistrictId = Number(details.guaranteeDistrictId) || undefined;
 
     if (details.id === null) {
       details.id = 0;
@@ -251,12 +273,16 @@ export class GuaranatorsComponent {
     details.answerdMaktobDate = this.formatDateForBackend(this.guaranatorForm.get('answerdMaktobDate')?.value);
     details.dateofGuarantee = this.formatDateForBackend(this.guaranatorForm.get('dateofGuarantee')?.value);
     details.guaranteeDate = this.formatDateForBackend(this.guaranatorForm.get('guaranteeDate')?.value);
+    
+    // Format conditional date field (Cash)
+    details.depositDate = this.formatDateForBackend(this.guaranatorForm.get('depositDate')?.value);
 
     // Convert string form values to numbers for backend
     details.propertyDocumentNumber = Number(details.propertyDocumentNumber) || undefined;
     details.answerdMaktobNumber = Number(details.answerdMaktobNumber) || undefined;
     details.guaranteeDocNumber = Number(details.guaranteeDocNumber) || undefined;
     details.guaranteeTypeId = Number(details.guaranteeTypeId) || undefined;
+    details.guaranteeDistrictId = Number(details.guaranteeDistrictId) || undefined;
 
     if (details.id === 0 && this.selectedId !== 0 || this.selectedId !== null) {
       details.id = this.selectedId;
@@ -280,6 +306,15 @@ export class GuaranatorsComponent {
     this.guaranteeDocName = '';
     this.selectedId = 0;
     this.guaranatorForm.reset();
+    
+    // Reset visibility flags
+    this.showShariaDeedFields = false;
+    this.showCustomaryDeedFields = false;
+    this.showCashFields = false;
+    
+    // Clear conditional validators
+    this.clearConditionalValidators();
+    this.updateConditionalFieldsValidity();
   }
 
   filterResults(getId: any) {
@@ -313,6 +348,107 @@ export class GuaranatorsComponent {
       safha?.setValue(null);
       sabtNumber?.enable();
       sabtNumber?.setValue(null);
+    }
+  }
+
+  /**
+   * Handle guarantee type change - show/hide conditional fields and update validators
+   */
+  onGuaranteeTypeChange() {
+    const guaranteeTypeId = Number(this.guaranatorForm.get('guaranteeTypeId')?.value);
+    
+    // Reset visibility flags
+    this.showShariaDeedFields = false;
+    this.showCustomaryDeedFields = false;
+    this.showCashFields = false;
+    
+    // Clear all conditional field validators first
+    this.clearConditionalValidators();
+    
+    // Clear all conditional field values
+    this.clearConditionalFieldValues();
+    
+    // Set visibility and validators based on selected type
+    switch (guaranteeTypeId) {
+      case GuaranteeTypeEnum.Cash: // پول نقد
+        this.showCashFields = true;
+        this.guaranatorForm.get('bankName')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('depositNumber')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('depositDate')?.setValidators([Validators.required]);
+        break;
+        
+      case GuaranteeTypeEnum.ShariaDeed: // قباله شرعی
+        this.showShariaDeedFields = true;
+        this.guaranatorForm.get('courtName')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('collateralNumber')?.setValidators([Validators.required]);
+        break;
+        
+      case GuaranteeTypeEnum.CustomaryDeed: // قباله عرفی
+        this.showCustomaryDeedFields = true;
+        this.guaranatorForm.get('setSerialNumber')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('guaranteeDistrictId')?.setValidators([Validators.required]);
+        break;
+    }
+    
+    // Update validity for all conditional fields
+    this.updateConditionalFieldsValidity();
+  }
+  
+  /**
+   * Clear validators from all conditional fields
+   */
+  private clearConditionalValidators() {
+    // Sharia Deed fields
+    this.guaranatorForm.get('courtName')?.clearValidators();
+    this.guaranatorForm.get('collateralNumber')?.clearValidators();
+    // Customary Deed fields
+    this.guaranatorForm.get('setSerialNumber')?.clearValidators();
+    this.guaranatorForm.get('guaranteeDistrictId')?.clearValidators();
+    // Cash fields
+    this.guaranatorForm.get('bankName')?.clearValidators();
+    this.guaranatorForm.get('depositNumber')?.clearValidators();
+    this.guaranatorForm.get('depositDate')?.clearValidators();
+  }
+  
+  /**
+   * Clear values from all conditional fields
+   */
+  private clearConditionalFieldValues() {
+    // Sharia Deed fields
+    this.guaranatorForm.patchValue({
+      courtName: '',
+      collateralNumber: '',
+      // Customary Deed fields
+      setSerialNumber: '',
+      guaranteeDistrictId: '',
+      // Cash fields
+      bankName: '',
+      depositNumber: '',
+      depositDate: '',
+    });
+  }
+  
+  /**
+   * Update validity status for all conditional fields
+   */
+  private updateConditionalFieldsValidity() {
+    this.guaranatorForm.get('courtName')?.updateValueAndValidity();
+    this.guaranatorForm.get('collateralNumber')?.updateValueAndValidity();
+    this.guaranatorForm.get('setSerialNumber')?.updateValueAndValidity();
+    this.guaranatorForm.get('guaranteeDistrictId')?.updateValueAndValidity();
+    this.guaranatorForm.get('bankName')?.updateValueAndValidity();
+    this.guaranatorForm.get('depositNumber')?.updateValueAndValidity();
+    this.guaranatorForm.get('depositDate')?.updateValueAndValidity();
+  }
+  
+  /**
+   * Load districts for guarantee (Customary Deed) based on province
+   */
+  filterGuaranteeDistricts(event: any) {
+    if (event?.id) {
+      this.selerService.getdistrict(event.id).subscribe(res => {
+        this.guaranteeDistricts = res;
+      });
     }
   }
 
@@ -350,6 +486,16 @@ export class GuaranatorsComponent {
         guaranteeDocNumber: selectedOwnerAddress.guaranteeDocNumber,
         guaranteeDate: selectedOwnerAddress.guaranteeDate,
         guaranteeDocPath: selectedOwnerAddress.guaranteeDocPath,
+        // Conditional fields - Sharia Deed
+        courtName: selectedOwnerAddress.courtName,
+        collateralNumber: selectedOwnerAddress.collateralNumber,
+        // Conditional fields - Customary Deed
+        setSerialNumber: selectedOwnerAddress.setSerialNumber,
+        guaranteeDistrictId: selectedOwnerAddress.guaranteeDistrictId,
+        // Conditional fields - Cash
+        bankName: selectedOwnerAddress.bankName,
+        depositNumber: selectedOwnerAddress.depositNumber,
+        depositDate: selectedOwnerAddress.depositDate,
       });
 
       this.selerService.getdistrict(selectedOwnerAddress.paddressProvinceId.valueOf()).subscribe(res => {
@@ -374,7 +520,46 @@ export class GuaranatorsComponent {
       // Parse guarantee dates
       this.parseAndSetDates(selectedOwnerAddress);
       this.onPropertyTypeChange();
+      
+      // Set visibility flags based on loaded guarantee type (without clearing values)
+      this.setGuaranteeTypeVisibility(selectedOwnerAddress.guaranteeTypeId);
     }
+  }
+  
+  /**
+   * Set visibility flags based on guarantee type without clearing values
+   * Used when loading existing data
+   */
+  private setGuaranteeTypeVisibility(guaranteeTypeId: number | undefined) {
+    this.showShariaDeedFields = false;
+    this.showCustomaryDeedFields = false;
+    this.showCashFields = false;
+    
+    // Clear validators first
+    this.clearConditionalValidators();
+    
+    switch (guaranteeTypeId) {
+      case GuaranteeTypeEnum.Cash:
+        this.showCashFields = true;
+        this.guaranatorForm.get('bankName')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('depositNumber')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('depositDate')?.setValidators([Validators.required]);
+        break;
+        
+      case GuaranteeTypeEnum.ShariaDeed:
+        this.showShariaDeedFields = true;
+        this.guaranatorForm.get('courtName')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('collateralNumber')?.setValidators([Validators.required]);
+        break;
+        
+      case GuaranteeTypeEnum.CustomaryDeed:
+        this.showCustomaryDeedFields = true;
+        this.guaranatorForm.get('setSerialNumber')?.setValidators([Validators.required]);
+        this.guaranatorForm.get('guaranteeDistrictId')?.setValidators([Validators.required]);
+        break;
+    }
+    
+    this.updateConditionalFieldsValidity();
   }
 
   private parseAndSetDates(data: Guarantor) {
@@ -384,6 +569,7 @@ export class GuaranatorsComponent {
       { field: 'answerdMaktobDate', value: data.answerdMaktobDate },
       { field: 'dateofGuarantee', value: data.dateofGuarantee },
       { field: 'guaranteeDate', value: data.guaranteeDate },
+      { field: 'depositDate', value: data.depositDate }, // Cash conditional field
     ];
 
     dateFields.forEach(({ field, value }) => {
@@ -399,9 +585,25 @@ export class GuaranatorsComponent {
 
   mapGuaranteeTypesToLocalized(backendTypes: any[]): any[] {
     return backendTypes.map(type => {
-      const localized = this.localizationService.guaranteeTypes.find(
+      // First try to match by English value
+      let localized = this.localizationService.guaranteeTypes.find(
         gt => gt.value.toLowerCase() === type.name.toLowerCase()
       );
+      
+      // If not found, try to match by Dari label (in case DB has Dari names)
+      if (!localized) {
+        localized = this.localizationService.guaranteeTypes.find(
+          gt => gt.label === type.name
+        );
+      }
+      
+      // If still not found, try to match by ID
+      if (!localized) {
+        localized = this.localizationService.guaranteeTypes.find(
+          gt => gt.id === type.id
+        );
+      }
+      
       return {
         id: type.id,
         name: localized ? localized.label : type.name
@@ -446,4 +648,14 @@ export class GuaranatorsComponent {
   get guaranteeDocNumber() { return this.guaranatorForm.get('guaranteeDocNumber'); }
   get guaranteeDate() { return this.guaranatorForm.get('guaranteeDate'); }
   get guaranteeDocPath() { return this.guaranatorForm.get('guaranteeDocPath'); }
+  // Conditional field getters - Sharia Deed
+  get courtName() { return this.guaranatorForm.get('courtName'); }
+  get collateralNumber() { return this.guaranatorForm.get('collateralNumber'); }
+  // Conditional field getters - Customary Deed
+  get setSerialNumber() { return this.guaranatorForm.get('setSerialNumber'); }
+  get guaranteeDistrictId() { return this.guaranatorForm.get('guaranteeDistrictId'); }
+  // Conditional field getters - Cash
+  get bankName() { return this.guaranatorForm.get('bankName'); }
+  get depositNumber() { return this.guaranatorForm.get('depositNumber'); }
+  get depositDate() { return this.guaranatorForm.get('depositDate'); }
 }

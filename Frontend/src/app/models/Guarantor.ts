@@ -30,4 +30,21 @@ export interface Guarantor{
     guaranteeDate?:string;
     guaranteeDocPath?:string;
     calendarType?:string;
+    // Conditional fields - Sharia Deed (قباله شرعی)
+    courtName?:string;           // محکمه نوم
+    collateralNumber?:string;    // نمبر وثیقه
+    // Conditional fields - Customary Deed (قباله عرفی)
+    setSerialNumber?:string;     // نمبر سریال سټه
+    guaranteeDistrictId?:number; // ناحیه
+    // Conditional fields - Cash (پول نقد)
+    bankName?:string;            // بانک
+    depositNumber?:string;       // نمبر اویز
+    depositDate?:string;         // تاریخ اویز
+}
+
+// Guarantee Type Constants
+export enum GuaranteeTypeEnum {
+    Cash = 1,          // پول نقد
+    ShariaDeed = 2,    // قباله شرعی
+    CustomaryDeed = 3  // قباله عرفی
 }

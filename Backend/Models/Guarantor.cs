@@ -71,6 +71,19 @@ public partial class Guarantor
 
     public string? GuaranteeDocPath { get; set; }
 
+    // Conditional fields for Sharia Deed (قباله شرعی)
+    public string? CourtName { get; set; }           // محکمه نوم
+    public string? CollateralNumber { get; set; }    // نمبر وثیقه
+
+    // Conditional fields for Customary Deed (قباله عرفی)
+    public string? SetSerialNumber { get; set; }     // نمبر سریال سټه
+    public int? GuaranteeDistrictId { get; set; }    // ناحیه
+
+    // Conditional fields for Cash (پول نقد)
+    public string? BankName { get; set; }            // بانک
+    public string? DepositNumber { get; set; }       // نمبر اویز
+    public DateOnly? DepositDate { get; set; }       // تاریخ اویز
+
     public virtual CompanyDetail? Company { get; set; }
 
     public virtual ICollection<Guarantorsaudit> Guarantorsaudits { get; } = new List<Guarantorsaudit>();
@@ -86,4 +99,7 @@ public partial class Guarantor
     public virtual Location? TaddressDistrict { get; set; }
 
     public virtual Location? TaddressProvince { get; set; }
+
+    // Navigation property for Guarantee District
+    public virtual Location? GuaranteeDistrict { get; set; }
 }

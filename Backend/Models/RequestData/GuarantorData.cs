@@ -61,6 +61,19 @@ namespace WebAPIBackend.Models.RequestData
 
         public string? GuaranteeDocPath { get; set; }
 
+        // Conditional fields for Sharia Deed (قباله شرعی)
+        public string? CourtName { get; set; }           // محکمه نوم
+        public string? CollateralNumber { get; set; }    // نمبر وثیقه
+
+        // Conditional fields for Customary Deed (قباله عرفی)
+        public string? SetSerialNumber { get; set; }     // نمبر سریال سټه
+        public int? GuaranteeDistrictId { get; set; }    // ناحیه
+
+        // Conditional fields for Cash (پول نقد)
+        public string? BankName { get; set; }            // بانک
+        public string? DepositNumber { get; set; }       // نمبر اویز
+        public string? DepositDate { get; set; }         // تاریخ اویز (string for calendar conversion)
+
         /// <summary>
         /// Calendar type for date parsing: "gregorian", "hijriShamsi", or "hijriQamari"
         /// </summary>

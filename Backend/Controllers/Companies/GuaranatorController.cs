@@ -17,9 +17,110 @@ namespace WebAPIBackend.Controllers.Companies
     public class GuaranatorController : ControllerBase
     {
         private readonly AppDbContext _context;
+
+        // Guarantee Type Constants
+        private const int GuaranteeType_Cash = 1;          // پول نقد
+        private const int GuaranteeType_ShariaDeed = 2;    // قباله شرعی
+        private const int GuaranteeType_CustomaryDeed = 3; // قباله عرفی
+
         public GuaranatorController(AppDbContext context)
         {
             _context = context;
+        }
+
+        /// <summary>
+        /// Validates guarantee type and its required conditional fields
+        /// </summary>
+        private (bool IsValid, string ErrorMessage) ValidateGuaranteeFields(GuarantorData request)
+        {
+            // Guarantee type is required
+            if (!request.GuaranteeTypeId.HasValue || request.GuaranteeTypeId == 0)
+            {
+                return (false, "نوعیت تضمین الزامی است");
+            }
+
+            // Validate guarantee type is one of the 3 allowed values
+            if (request.GuaranteeTypeId < 1 || request.GuaranteeTypeId > 3)
+            {
+                return (false, "نوعیت تضمین نامعتبر است");
+            }
+
+            switch (request.GuaranteeTypeId)
+            {
+                case GuaranteeType_Cash: // پول نقد
+                    if (string.IsNullOrWhiteSpace(request.BankName))
+                        return (false, "بانک الزامی است");
+                    if (string.IsNullOrWhiteSpace(request.DepositNumber))
+                        return (false, "نمبر اویز الزامی است");
+                    if (string.IsNullOrWhiteSpace(request.DepositDate))
+                        return (false, "تاریخ اویز الزامی است");
+                    break;
+
+                case GuaranteeType_ShariaDeed: // قباله شرعی
+                    if (string.IsNullOrWhiteSpace(request.CourtName))
+                        return (false, "محکمه نوم الزامی است");
+                    if (string.IsNullOrWhiteSpace(request.CollateralNumber))
+                        return (false, "نمبر وثیقه الزامی است");
+                    break;
+
+                case GuaranteeType_CustomaryDeed: // قباله عرفی
+                    if (string.IsNullOrWhiteSpace(request.SetSerialNumber))
+                        return (false, "نمبر سریال سټه الزامی است");
+                    if (!request.GuaranteeDistrictId.HasValue || request.GuaranteeDistrictId == 0)
+                        return (false, "ناحیه الزامی است");
+                    break;
+            }
+
+            return (true, string.Empty);
+        }
+
+        /// <summary>
+        /// Clears conditional fields that don't belong to the selected guarantee type
+        /// </summary>
+        private void ClearIrrelevantFields(Guarantor guarantor, int? guaranteeTypeId)
+        {
+            switch (guaranteeTypeId)
+            {
+                case GuaranteeType_Cash:
+                    // Clear Sharia Deed fields
+                    guarantor.CourtName = null;
+                    guarantor.CollateralNumber = null;
+                    // Clear Customary Deed fields
+                    guarantor.SetSerialNumber = null;
+                    guarantor.GuaranteeDistrictId = null;
+                    break;
+
+                case GuaranteeType_ShariaDeed:
+                    // Clear Cash fields
+                    guarantor.BankName = null;
+                    guarantor.DepositNumber = null;
+                    guarantor.DepositDate = null;
+                    // Clear Customary Deed fields
+                    guarantor.SetSerialNumber = null;
+                    guarantor.GuaranteeDistrictId = null;
+                    break;
+
+                case GuaranteeType_CustomaryDeed:
+                    // Clear Cash fields
+                    guarantor.BankName = null;
+                    guarantor.DepositNumber = null;
+                    guarantor.DepositDate = null;
+                    // Clear Sharia Deed fields
+                    guarantor.CourtName = null;
+                    guarantor.CollateralNumber = null;
+                    break;
+
+                default:
+                    // Clear all conditional fields if no valid type
+                    guarantor.CourtName = null;
+                    guarantor.CollateralNumber = null;
+                    guarantor.SetSerialNumber = null;
+                    guarantor.GuaranteeDistrictId = null;
+                    guarantor.BankName = null;
+                    guarantor.DepositNumber = null;
+                    guarantor.DepositDate = null;
+                    break;
+            }
         }
 
         [HttpGet("{id}")]
@@ -38,6 +139,8 @@ namespace WebAPIBackend.Controllers.Companies
                     item.AnswerdMaktobDate = DateConversionHelper.ToCalendarDateOnly(item.AnswerdMaktobDate, calendar);
                     item.DateofGuarantee = DateConversionHelper.ToCalendarDateOnly(item.DateofGuarantee, calendar);
                     item.GuaranteeDate = DateConversionHelper.ToCalendarDateOnly(item.GuaranteeDate, calendar);
+                    // Convert Cash deposit date
+                    item.DepositDate = DateConversionHelper.ToCalendarDateOnly(item.DepositDate, calendar);
                 }
 
                 return Ok(Pro);
@@ -74,6 +177,15 @@ namespace WebAPIBackend.Controllers.Companies
             DateConversionHelper.TryParseToDateOnly(request.AnswerdMaktobDate, request.CalendarType, out var answerdMaktobDate);
             DateConversionHelper.TryParseToDateOnly(request.DateofGuarantee, request.CalendarType, out var dateofGuarantee);
             DateConversionHelper.TryParseToDateOnly(request.GuaranteeDate, request.CalendarType, out var guaranteeDate);
+            // Parse Cash deposit date
+            DateConversionHelper.TryParseToDateOnly(request.DepositDate, request.CalendarType, out var depositDate);
+
+            // Validate guarantee type and conditional fields
+            var validation = ValidateGuaranteeFields(request);
+            if (!validation.IsValid)
+            {
+                return BadRequest(validation.ErrorMessage);
+            }
 
             var property = new Guarantor
             {
@@ -106,9 +218,22 @@ namespace WebAPIBackend.Controllers.Companies
                 GuaranteeDocNumber = request.GuaranteeDocNumber,
                 GuaranteeDate = guaranteeDate,
                 GuaranteeDocPath = request.GuaranteeDocPath,
+                // Conditional fields - Sharia Deed
+                CourtName = request.CourtName,
+                CollateralNumber = request.CollateralNumber,
+                // Conditional fields - Customary Deed
+                SetSerialNumber = request.SetSerialNumber,
+                GuaranteeDistrictId = request.GuaranteeDistrictId,
+                // Conditional fields - Cash
+                BankName = request.BankName,
+                DepositNumber = request.DepositNumber,
+                DepositDate = depositDate,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
             };
+
+            // Clear fields that don't belong to the selected guarantee type
+            ClearIrrelevantFields(property, request.GuaranteeTypeId);
 
             _context.Add(property);
             await _context.SaveChangesAsync();
@@ -137,12 +262,21 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound();
             }
 
+            // Validate guarantee type and conditional fields
+            var validation = ValidateGuaranteeFields(request);
+            if (!validation.IsValid)
+            {
+                return BadRequest(validation.ErrorMessage);
+            }
+
             // Parse all guarantee dates using multi-calendar helper
             DateConversionHelper.TryParseToDateOnly(request.PropertyDocumentDate, request.CalendarType, out var propertyDocumentDate);
             DateConversionHelper.TryParseToDateOnly(request.SenderMaktobDate, request.CalendarType, out var senderMaktobDate);
             DateConversionHelper.TryParseToDateOnly(request.AnswerdMaktobDate, request.CalendarType, out var answerdMaktobDate);
             DateConversionHelper.TryParseToDateOnly(request.DateofGuarantee, request.CalendarType, out var dateofGuarantee);
             DateConversionHelper.TryParseToDateOnly(request.GuaranteeDate, request.CalendarType, out var guaranteeDate);
+            // Parse Cash deposit date
+            DateConversionHelper.TryParseToDateOnly(request.DepositDate, request.CalendarType, out var depositDate);
 
             // Store the original values of the CreatedBy and CreatedAt properties
             var createdBy = existingProperty.CreatedBy;
@@ -179,6 +313,19 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.GuaranteeDocNumber = request.GuaranteeDocNumber;
             existingProperty.GuaranteeDate = guaranteeDate;
             existingProperty.GuaranteeDocPath = request.GuaranteeDocPath;
+            // Conditional fields - Sharia Deed
+            existingProperty.CourtName = request.CourtName;
+            existingProperty.CollateralNumber = request.CollateralNumber;
+            // Conditional fields - Customary Deed
+            existingProperty.SetSerialNumber = request.SetSerialNumber;
+            existingProperty.GuaranteeDistrictId = request.GuaranteeDistrictId;
+            // Conditional fields - Cash
+            existingProperty.BankName = request.BankName;
+            existingProperty.DepositNumber = request.DepositNumber;
+            existingProperty.DepositDate = depositDate;
+
+            // Clear fields that don't belong to the selected guarantee type
+            ClearIrrelevantFields(existingProperty, request.GuaranteeTypeId);
 
             // Restore the original values of the CreatedBy and CreatedAt properties
             existingProperty.CreatedBy = createdBy;

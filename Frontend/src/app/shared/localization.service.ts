@@ -121,15 +121,12 @@ export class LocalizationService {
     { value: 'Emergency Contact Address', label: 'آدرس تماس اضطراری' }
   ];
 
-  // Guarantee Types (from backend lookup table)
+  // Guarantee Types - Standardized to 3 options only
+  // 1 = Cash (پول نقد), 2 = Sharia Deed (قباله شرعی), 3 = Customary Deed (قباله عرفی)
   guaranteeTypes = [
-    { value: 'Bank Guarantee', label: 'ضمانت بانکی' },
-    { value: 'Personal Guarantee', label: 'ضمانت شخصی' },
-    { value: 'Corporate Guarantee', label: 'ضمانت دفتری' },
-    { value: 'Property Guarantee', label: 'ضمانت ملکی' },
-    { value: 'Cash Deposit', label: 'سپردهٔ نقد' },
-    { value: 'Government Guarantee', label: 'ضمانت دولتی' },
-    { value: 'Insurance Guarantee', label: 'ضمانت بیمهٔ' }
+    { value: 'Cash', label: 'پول نقد', id: 1 },
+    { value: 'ShariaDeed', label: 'قباله شرعی', id: 2 },
+    { value: 'CustomaryDeed', label: 'قباله عرفی', id: 3 }
   ];
 
   // Property Unit Types (from backend lookup table)

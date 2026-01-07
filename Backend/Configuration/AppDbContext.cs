@@ -393,6 +393,18 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.TaddressProvince).WithMany(p => p.GuarantorTaddressProvinces)
                     .HasForeignKey(d => d.TaddressProvinceId)
                     .HasConstraintName("Guarantors_TaddressProvinceId_fkey");
+
+                // GuaranteeDistrict navigation for Customary Deed
+                entity.HasOne(d => d.GuaranteeDistrict).WithMany()
+                    .HasForeignKey(d => d.GuaranteeDistrictId)
+                    .HasConstraintName("Guarantors_GuaranteeDistrictId_fkey");
+
+                // Configure conditional field max lengths
+                entity.Property(e => e.CourtName).HasMaxLength(255);
+                entity.Property(e => e.CollateralNumber).HasMaxLength(100);
+                entity.Property(e => e.SetSerialNumber).HasMaxLength(100);
+                entity.Property(e => e.BankName).HasMaxLength(255);
+                entity.Property(e => e.DepositNumber).HasMaxLength(100);
             });
 
             modelBuilder.Entity<Haqulemtyaz>(entity =>

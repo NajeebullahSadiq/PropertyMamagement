@@ -244,9 +244,12 @@
         <div class="px-6 py-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تضمین</label>
-              <ng-select [items]="localizedGuaranteeTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="guaranteeTypeId" class="custom-ng-select">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تضمین <span class="text-red-500">*</span></label>
+              <ng-select [items]="localizedGuaranteeTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="guaranteeTypeId" (change)="onGuaranteeTypeChange()" class="custom-ng-select">
               </ng-select>
+              <div *ngIf="guaranteeTypeId?.invalid && (guaranteeTypeId?.dirty || guaranteeTypeId?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="guaranteeTypeId?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
             </div>
 
             <div>
@@ -264,6 +267,118 @@
                 formControlName="propertyDocumentDate"
                 label="تاریخ سند(تضمین)">
               </app-multi-calendar-datepicker>
+            </div>
+          </div>
+
+          <!-- Sharia Deed Conditional Fields (قباله شرعی) -->
+          <div *ngIf="showShariaDeedFields" class="border-t border-gray-200 pt-6 mt-2">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <i class="fas fa-gavel text-amber-600"></i>
+              <span>معلومات قباله شرعی</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">محکمه نوم <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-balance-scale"></i>
+                  </span>
+                  <input type="text" formControlName="courtName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+                </div>
+                <div *ngIf="courtName?.invalid && (courtName?.dirty || courtName?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="courtName?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر وثیقه <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-file-contract"></i>
+                  </span>
+                  <input type="text" formControlName="collateralNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+                </div>
+                <div *ngIf="collateralNumber?.invalid && (collateralNumber?.dirty || collateralNumber?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="collateralNumber?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customary Deed Conditional Fields (قباله عرفی) -->
+          <div *ngIf="showCustomaryDeedFields" class="border-t border-gray-200 pt-6 mt-2">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <i class="fas fa-scroll text-amber-600"></i>
+              <span>معلومات قباله عرفی</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر سریال سټه <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-hashtag"></i>
+                  </span>
+                  <input type="text" formControlName="setSerialNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+                </div>
+                <div *ngIf="setSerialNumber?.invalid && (setSerialNumber?.dirty || setSerialNumber?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="setSerialNumber?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه <span class="text-red-500">*</span></label>
+                <ng-select formControlName="guaranteeDistrictId" [items]="district" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select">
+                </ng-select>
+                <div *ngIf="guaranteeDistrictId?.invalid && (guaranteeDistrictId?.dirty || guaranteeDistrictId?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="guaranteeDistrictId?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cash Conditional Fields (پول نقد) -->
+          <div *ngIf="showCashFields" class="border-t border-gray-200 pt-6 mt-2">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <i class="fas fa-money-bill-wave text-amber-600"></i>
+              <span>معلومات پول نقد</span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">بانک <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-university"></i>
+                  </span>
+                  <input type="text" formControlName="bankName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+                </div>
+                <div *ngIf="bankName?.invalid && (bankName?.dirty || bankName?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="bankName?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر اویز <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-receipt"></i>
+                  </span>
+                  <input type="text" formControlName="depositNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+                </div>
+                <div *ngIf="depositNumber?.invalid && (depositNumber?.dirty || depositNumber?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="depositNumber?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+
+              <div>
+                <app-multi-calendar-datepicker
+                  formControlName="depositDate"
+                  label="تاریخ اویز"
+                  [required]="true">
+                </app-multi-calendar-datepicker>
+                <div *ngIf="depositDate?.invalid && (depositDate?.dirty || depositDate?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="depositDate?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
             </div>
           </div>
         </div>
