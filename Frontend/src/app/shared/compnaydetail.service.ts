@@ -101,6 +101,11 @@ export class CompnaydetailService {
   getOwnerById(id: number): Observable<companyowner[]> {
     return this.http.get<companyowner[]>(this.baseUrlowner+'CompanyOwner/'+ id);
   }
+
+  getOwnerAddressHistory(companyId: number): Observable<any[]> {
+    return this.http.get<any[]>(this.baseUrlowner+'CompanyOwner/addressHistory/'+ companyId);
+  }
+
   getGuaranatorById(id: number): Observable<Guarantor[]> {
     return this.http.get<Guarantor[]>(this.baseUrlowner+'Guaranator/'+ id);
   }

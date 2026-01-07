@@ -9,6 +9,8 @@ public partial class LicenseView
 
     public string? PhoneNumber { get; set; }
 
+    public string? WhatsAppNumber { get; set; }
+
     public string? Title { get; set; }
 
     public double? Tin { get; set; }
@@ -32,4 +34,14 @@ public partial class LicenseView
     public DateOnly? IssueDate { get; set; }
 
     public DateOnly? ExpireDate { get; set; }
+
+    // Office Address Fields (آدرس دفتر)
+    public string? OfficeProvinceName { get; set; }
+    public string? OfficeDistrictName { get; set; }
+    public string? OfficeVillage { get; set; }
+
+    // Owner Personal Address Fields (آدرس شخصی مالک)
+    public string? PersonalProvinceName { get; set; }
+    public string? PersonalDistrictName { get; set; }
+    public string? PersonalVillage { get; set; }
 }

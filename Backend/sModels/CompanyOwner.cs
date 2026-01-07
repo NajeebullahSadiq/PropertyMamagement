@@ -37,6 +37,16 @@ public partial class CompanyOwner
 
     public string? PothoPath { get; set; }
 
+    // Integrated Address Fields (Permanent Address)
+    public int? PermanentProvinceId { get; set; }
+    public int? PermanentDistrictId { get; set; }
+    public string? PermanentVillage { get; set; }
+
+    // Integrated Address Fields (Current Address)
+    public int? CurrentProvinceId { get; set; }
+    public int? CurrentDistrictId { get; set; }
+    public string? CurrentVillage { get; set; }
+
     public virtual CompanyDetail? Company { get; set; }
 
     public virtual ICollection<CompanyOwnerAddress> CompanyOwnerAddresses { get; } = new List<CompanyOwnerAddress>();
@@ -46,4 +56,10 @@ public partial class CompanyOwner
     public virtual EducationLevel? EducationLevel { get; set; }
 
     public virtual IdentityCardType? IdentityCardType { get; set; }
+
+    // Navigation properties for address locations
+    public virtual Location? PermanentProvince { get; set; }
+    public virtual Location? PermanentDistrict { get; set; }
+    public virtual Location? CurrentProvince { get; set; }
+    public virtual Location? CurrentDistrict { get; set; }
 }

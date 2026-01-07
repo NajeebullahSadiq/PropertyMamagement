@@ -29,6 +29,8 @@ namespace WebAPIBackend.Configuration
 
         public virtual DbSet<CompanyOwnerAddress> CompanyOwnerAddresses { get; set; }
 
+        public virtual DbSet<CompanyOwnerAddressHistory> CompanyOwnerAddressHistories { get; set; }
+
         public virtual DbSet<EducationLevel> EducationLevels { get; set; }
 
         public virtual DbSet<FormsReference> FormsReferences { get; set; }
@@ -127,7 +129,8 @@ namespace WebAPIBackend.Configuration
                     .HasNoKey()
                     .ToView("LicenseView");
 
-                entity.Property(e => e.PhoneNumber).HasMaxLength(13);
+                entity.Property(e => e.PhoneNumber).HasMaxLength(20);
+                entity.Property(e => e.WhatsAppNumber).HasMaxLength(20);
                 entity.Property(e => e.Tin).HasColumnName("TIN");
             });
             modelBuilder.Entity<AddressType>(entity =>
@@ -201,6 +204,23 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.IdentityCardType).WithMany(p => p.CompanyOwners)
                     .HasForeignKey(d => d.IdentityCardTypeId)
                     .HasConstraintName("CompanyOwner_IdentityCardTypeId_fkey");
+
+                // Integrated Address Navigation Properties
+                entity.HasOne(d => d.PermanentProvince).WithMany()
+                    .HasForeignKey(d => d.PermanentProvinceId)
+                    .HasConstraintName("CompanyOwner_PermanentProvinceId_fkey");
+
+                entity.HasOne(d => d.PermanentDistrict).WithMany()
+                    .HasForeignKey(d => d.PermanentDistrictId)
+                    .HasConstraintName("CompanyOwner_PermanentDistrictId_fkey");
+
+                entity.HasOne(d => d.TemporaryProvince).WithMany()
+                    .HasForeignKey(d => d.TemporaryProvinceId)
+                    .HasConstraintName("CompanyOwner_TemporaryProvinceId_fkey");
+
+                entity.HasOne(d => d.TemporaryDistrict).WithMany()
+                    .HasForeignKey(d => d.TemporaryDistrictId)
+                    .HasConstraintName("CompanyOwner_TemporaryDistrictId_fkey");
             });
 
             modelBuilder.Entity<CompanyOwnerAddress>(entity =>
@@ -227,6 +247,31 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.Province).WithMany(p => p.CompanyOwnerAddressProvinces)
                     .HasForeignKey(d => d.ProvinceId)
                     .HasConstraintName("CompanyOwnerAddress_ProvinceId_fkey");
+            });
+
+            modelBuilder.Entity<CompanyOwnerAddressHistory>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("CompanyOwnerAddressHistory_pkey");
+
+                entity.ToTable("CompanyOwnerAddressHistory", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.EffectiveFrom).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.EffectiveTo).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.AddressType).HasMaxLength(20);
+
+                entity.HasOne(d => d.CompanyOwner).WithMany(p => p.AddressHistory)
+                    .HasForeignKey(d => d.CompanyOwnerId)
+                    .HasConstraintName("CompanyOwnerAddressHistory_CompanyOwnerId_fkey");
+
+                entity.HasOne(d => d.Province).WithMany()
+                    .HasForeignKey(d => d.ProvinceId)
+                    .HasConstraintName("CompanyOwnerAddressHistory_ProvinceId_fkey");
+
+                entity.HasOne(d => d.District).WithMany()
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("CompanyOwnerAddressHistory_DistrictId_fkey");
             });
 
             modelBuilder.Entity<EducationLevel>(entity =>

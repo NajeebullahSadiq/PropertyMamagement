@@ -19,6 +19,190 @@ namespace WebAPIBackend.Configuration
             // Ensure database exists and apply pending migrations
             Console.WriteLine("Ensuring database exists and applying migrations...");
             await context.Database.MigrateAsync();
+
+            // Apply Permanent/Temporary address column rename if not already done
+            Console.WriteLine("Checking and applying Permanent/Temporary address columns...");
+            try
+            {
+                // Check if old columns exist (CurrentProvinceId) and rename them to Temporary
+                var columnExists = await context.Database.ExecuteSqlRawAsync(@"
+                    DO $$
+                    BEGIN
+                        -- Check if CurrentProvinceId exists (old naming) and rename to Temporary
+                        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'CurrentProvinceId') THEN
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""CurrentProvinceId"" TO ""TemporaryProvinceId"";
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""CurrentDistrictId"" TO ""TemporaryDistrictId"";
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""CurrentVillage"" TO ""TemporaryVillage"";
+                            RAISE NOTICE 'Columns renamed from Current to Temporary';
+                        END IF;
+                        
+                        -- Check if OfficeProvinceId exists (previous change) and rename back to Permanent/Temporary
+                        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'OfficeProvinceId') THEN
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""OfficeProvinceId"" TO ""PermanentProvinceId"";
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""OfficeDistrictId"" TO ""PermanentDistrictId"";
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""OfficeVillage"" TO ""PermanentVillage"";
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""PersonalProvinceId"" TO ""TemporaryProvinceId"";
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""PersonalDistrictId"" TO ""TemporaryDistrictId"";
+                            ALTER TABLE org.""CompanyOwner"" RENAME COLUMN ""PersonalVillage"" TO ""TemporaryVillage"";
+                            RAISE NOTICE 'Columns renamed from Office/Personal to Permanent/Temporary';
+                        END IF;
+                        
+                        -- Update address history types
+                        UPDATE org.""CompanyOwnerAddressHistory"" SET ""AddressType"" = 'Permanent' WHERE ""AddressType"" = 'Office';
+                        UPDATE org.""CompanyOwnerAddressHistory"" SET ""AddressType"" = 'Temporary' WHERE ""AddressType"" = 'Personal';
+                        UPDATE org.""CompanyOwnerAddressHistory"" SET ""AddressType"" = 'Temporary' WHERE ""AddressType"" = 'Current';
+                    END $$;
+                ");
+                Console.WriteLine("✓ Permanent/Temporary address columns checked/updated");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Note: Column rename check completed (may already be applied): {ex.Message}");
+            }
+
+            // Add missing columns to CompanyOwner table
+            Console.WriteLine("Adding missing columns to CompanyOwner table...");
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    DO $$
+                    BEGIN
+                        -- Add PhoneNumber column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PhoneNumber') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PhoneNumber"" VARCHAR(20) NULL;
+                            RAISE NOTICE 'Added PhoneNumber column';
+                        END IF;
+                        
+                        -- Add WhatsAppNumber column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'WhatsAppNumber') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""WhatsAppNumber"" VARCHAR(20) NULL;
+                            RAISE NOTICE 'Added WhatsAppNumber column';
+                        END IF;
+                        
+                        -- Add PermanentProvinceId column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PermanentProvinceId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PermanentProvinceId"" INTEGER NULL;
+                            RAISE NOTICE 'Added PermanentProvinceId column';
+                        END IF;
+                        
+                        -- Add PermanentDistrictId column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PermanentDistrictId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PermanentDistrictId"" INTEGER NULL;
+                            RAISE NOTICE 'Added PermanentDistrictId column';
+                        END IF;
+                        
+                        -- Add PermanentVillage column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PermanentVillage') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PermanentVillage"" TEXT NULL;
+                            RAISE NOTICE 'Added PermanentVillage column';
+                        END IF;
+                        
+                        -- Add TemporaryProvinceId column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryProvinceId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryProvinceId"" INTEGER NULL;
+                            RAISE NOTICE 'Added TemporaryProvinceId column';
+                        END IF;
+                        
+                        -- Add TemporaryDistrictId column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryDistrictId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryDistrictId"" INTEGER NULL;
+                            RAISE NOTICE 'Added TemporaryDistrictId column';
+                        END IF;
+                        
+                        -- Add TemporaryVillage column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryVillage') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryVillage"" TEXT NULL;
+                            RAISE NOTICE 'Added TemporaryVillage column';
+                        END IF;
+                    END $$;
+                ");
+                Console.WriteLine("✓ Missing columns added to CompanyOwner table");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Note: Column addition completed (may already exist): {ex.Message}");
+            }
+
+            // Create CompanyOwnerAddressHistory table if not exists
+            Console.WriteLine("Creating CompanyOwnerAddressHistory table if not exists...");
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    CREATE TABLE IF NOT EXISTS org.""CompanyOwnerAddressHistory"" (
+                        ""Id"" SERIAL PRIMARY KEY,
+                        ""CompanyOwnerId"" INTEGER NOT NULL,
+                        ""ProvinceId"" INTEGER NULL,
+                        ""DistrictId"" INTEGER NULL,
+                        ""Village"" TEXT NULL,
+                        ""AddressType"" VARCHAR(50) NOT NULL DEFAULT 'Permanent',
+                        ""EffectiveFrom"" TIMESTAMP NULL,
+                        ""EffectiveTo"" TIMESTAMP NULL,
+                        ""IsActive"" BOOLEAN NOT NULL DEFAULT FALSE,
+                        ""CreatedAt"" TIMESTAMP NULL,
+                        ""CreatedBy"" VARCHAR(255) NULL,
+                        CONSTRAINT ""FK_CompanyOwnerAddressHistory_CompanyOwner"" FOREIGN KEY (""CompanyOwnerId"") 
+                            REFERENCES org.""CompanyOwner"" (""Id"") ON DELETE CASCADE
+                    );
+                ");
+                Console.WriteLine("✓ CompanyOwnerAddressHistory table created/verified");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Note: CompanyOwnerAddressHistory table check completed: {ex.Message}");
+            }
+
+            // Update LicenseView with new column names
+            Console.WriteLine("Updating LicenseView with Permanent/Temporary address columns...");
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    DROP VIEW IF EXISTS public.""LicenseView"";
+                    
+                    CREATE OR REPLACE VIEW public.""LicenseView"" AS
+                    SELECT 
+                        cd.""Id"" AS ""CompanyId"",
+                        co.""PhoneNumber"",
+                        co.""WhatsAppNumber"",
+                        cd.""Title"",
+                        cd.""TIN"" AS ""Tin"",
+                        co.""FirstName"",
+                        co.""FatherName"",
+                        co.""GrandFatherName"",
+                        co.""DateofBirth"",
+                        co.""IndentityCardNumber"",
+                        co.""PothoPath"" AS ""OwnerPhoto"",
+                        ld.""LicenseNumber"",
+                        ld.""OfficeAddress"",
+                        ld.""IssueDate"",
+                        ld.""ExpireDate"",
+                        pp.""Dari"" AS ""PermanentProvinceName"",
+                        pd.""Dari"" AS ""PermanentDistrictName"",
+                        co.""PermanentVillage"",
+                        tp.""Dari"" AS ""TemporaryProvinceName"",
+                        td.""Dari"" AS ""TemporaryDistrictName"",
+                        co.""TemporaryVillage""
+                    FROM org.""CompanyDetails"" cd
+                    LEFT JOIN org.""CompanyOwner"" co ON cd.""Id"" = co.""CompanyId""
+                    LEFT JOIN org.""LicenseDetails"" ld ON cd.""Id"" = ld.""CompanyId""
+                    LEFT JOIN look.""Location"" pp ON co.""PermanentProvinceId"" = pp.""ID""
+                    LEFT JOIN look.""Location"" pd ON co.""PermanentDistrictId"" = pd.""ID""
+                    LEFT JOIN look.""Location"" tp ON co.""TemporaryProvinceId"" = tp.""ID""
+                    LEFT JOIN look.""Location"" td ON co.""TemporaryDistrictId"" = td.""ID"";
+                ");
+                Console.WriteLine("✓ LicenseView updated with Permanent/Temporary address columns");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: LicenseView update issue: {ex.Message}");
+            }
             
             // Force update the GetPrintType view with Dari translations
             Console.WriteLine("Updating GetPrintType view with Dari translations...");
@@ -264,25 +448,42 @@ namespace WebAPIBackend.Configuration
                 Console.WriteLine("✓ TransactionTypes seeded");
             }
 
-            // Seed EducationLevels
-            if (!context.EducationLevels.Any())
+            // Seed/Update EducationLevels with Dari translations
+            var educationLevelData = new[]
             {
-                var educationLevels = new[]
+                new { Name = "Illiterate", Dari = "بی سواد", Sorter = "01" },
+                new { Name = "Primary School", Dari = "مکتب ابتدایی", Sorter = "02" },
+                new { Name = "Secondary School", Dari = "مکتب متوسطه", Sorter = "03" },
+                new { Name = "High School", Dari = "لیسه", Sorter = "04" },
+                new { Name = "Diploma", Dari = "دیپلوم", Sorter = "05" },
+                new { Name = "Bachelor's Degree", Dari = "لیسانس", Sorter = "06" },
+                new { Name = "Master's Degree", Dari = "ماستر", Sorter = "07" },
+                new { Name = "PhD/Doctorate", Dari = "دکتورا", Sorter = "08" },
+                new { Name = "Religious Education", Dari = "تعلیمات دینی", Sorter = "09" },
+                new { Name = "Technical/Vocational", Dari = "فنی و حرفوی", Sorter = "10" }
+            };
+            
+            foreach (var eduLevel in educationLevelData)
+            {
+                var existing = await context.EducationLevels.FirstOrDefaultAsync(e => e.Name == eduLevel.Name);
+                if (existing == null)
                 {
-                    new EducationLevel { Name = "Illiterate", Sorter = "01" },
-                    new EducationLevel { Name = "Primary School", Sorter = "02" },
-                    new EducationLevel { Name = "Secondary School", Sorter = "03" },
-                    new EducationLevel { Name = "High School", Sorter = "04" },
-                    new EducationLevel { Name = "Diploma", Sorter = "05" },
-                    new EducationLevel { Name = "Bachelor's Degree", Sorter = "06" },
-                    new EducationLevel { Name = "Master's Degree", Sorter = "07" },
-                    new EducationLevel { Name = "PhD/Doctorate", Sorter = "08" },
-                    new EducationLevel { Name = "Religious Education", Sorter = "09" },
-                    new EducationLevel { Name = "Technical/Vocational", Sorter = "10" }
-                };
-                await context.EducationLevels.AddRangeAsync(educationLevels);
-                Console.WriteLine("✓ EducationLevels seeded");
+                    await context.EducationLevels.AddAsync(new EducationLevel 
+                    { 
+                        Name = eduLevel.Name, 
+                        Dari = eduLevel.Dari, 
+                        Sorter = eduLevel.Sorter 
+                    });
+                }
+                else
+                {
+                    existing.Dari = eduLevel.Dari;
+                    existing.Sorter = eduLevel.Sorter;
+                    context.EducationLevels.Update(existing);
+                }
             }
+            await context.SaveChangesAsync();
+            Console.WriteLine("✓ EducationLevels seeded/updated with Dari translations");
 
             // Seed IdentityCardTypes
             if (!context.IdentityCardTypes.Any())

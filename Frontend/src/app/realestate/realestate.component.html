@@ -14,13 +14,6 @@
             </ng-template>
           <app-companyowner #companyowner  [id]="PropertyId" (next)="nextTab()"></app-companyowner>
         </mat-tab>
-        <mat-tab [disabled]="comservice.mainTableId === 0 || comservice.ownerId===0">
-          <ng-template matTabLabel  >
-              <mat-icon class="large-icon">location_on</mat-icon>
-                    آدرس مالک دفتر
-            </ng-template>
-          <app-companyowneraddress #companyowneraddress  [id]="PropertyId" (next)="nextTab()"></app-companyowneraddress>
-        </mat-tab>
       <mat-tab [disabled]="comservice.mainTableId === 0">
         <ng-template matTabLabel>
             <mat-icon class="large-icon">person</mat-icon>

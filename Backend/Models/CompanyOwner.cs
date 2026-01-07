@@ -38,12 +38,33 @@ public partial class CompanyOwner
 
     public string? PothoPath { get; set; }
 
+    // Contact Information
+    public string? PhoneNumber { get; set; }
+    public string? WhatsAppNumber { get; set; }
+
+    // Permanent Address Fields (آدرس دایمی)
+    public int? PermanentProvinceId { get; set; }
+    public int? PermanentDistrictId { get; set; }
+    public string? PermanentVillage { get; set; }
+
+    // Temporary Address Fields (آدرس موقت)
+    public int? TemporaryProvinceId { get; set; }
+    public int? TemporaryDistrictId { get; set; }
+    public string? TemporaryVillage { get; set; }
+
     public virtual CompanyDetail? Company { get; set; }
 
     public virtual ICollection<CompanyOwnerAddress> CompanyOwnerAddresses { get; } = new List<CompanyOwnerAddress>();
+    public virtual ICollection<CompanyOwnerAddressHistory> AddressHistory { get; } = new List<CompanyOwnerAddressHistory>();
     public virtual ICollection<Companyowneraudit> Companyowneraudits { get; } = new List<Companyowneraudit>();
 
     public virtual EducationLevel? EducationLevel { get; set; }
 
     public virtual IdentityCardType? IdentityCardType { get; set; }
+
+    // Navigation properties for address locations
+    public virtual Location? PermanentProvince { get; set; }
+    public virtual Location? PermanentDistrict { get; set; }
+    public virtual Location? TemporaryProvince { get; set; }
+    public virtual Location? TemporaryDistrict { get; set; }
 }

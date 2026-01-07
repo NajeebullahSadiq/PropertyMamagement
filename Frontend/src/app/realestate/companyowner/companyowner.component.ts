@@ -10,14 +10,13 @@ import {
 	NgbDateParserFormatter,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { companyowner } from 'src/app/models/companyowner';
+import { companyowner, companyOwnerAddressHistory } from 'src/app/models/companyowner';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
-import { CalendarType } from 'src/app/models/calendar-type';
 
 
 const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
@@ -62,6 +61,30 @@ export class CompanyownerComponent {
 	ownerDetails!: companyowner[];
 	filteredIdTypes: any;
 
+	// Address related properties
+	province: any;
+	permanentDistrict: any;
+	temporaryDistrict: any;
+
+	// Address change mode
+	isAddressChangeMode: boolean = false;
+	addressHistory: companyOwnerAddressHistory[] = [];
+	showAddressHistory: boolean = false;
+
+	// Store current address for display during change mode
+	currentAddressDisplay: {
+		permanentProvinceName?: string;
+		permanentDistrictName?: string;
+		permanentVillage?: string;
+		temporaryProvinceName?: string;
+		temporaryDistrictName?: string;
+		temporaryVillage?: string;
+	} = {};
+
+	// New address districts (for address change mode)
+	newPermanentDistrict: any;
+	newTemporaryDistrict: any;
+
 	@Input() id: number = 0;
 	@Output() next = new EventEmitter<void>();
 	onNextClick() {
@@ -71,7 +94,6 @@ export class CompanyownerComponent {
 	private pendingImagePath: string = '';
 	
 	ngAfterViewInit(): void {
-		// If we have a pending image path from ngOnInit, set it now
 		if (this.pendingImagePath && this.childComponent) {
 			this.childComponent.setExistingImage(this.pendingImagePath);
 			this.pendingImagePath = '';
@@ -99,8 +121,59 @@ export class CompanyownerComponent {
 			safha: [''],
 			companyId: [''],
 			sabtNumber: [''],
-			pothoPath: ['']
+			pothoPath: [''],
+			// Contact Information
+			phoneNumber: [''],
+			whatsAppNumber: [''],
+			// Permanent Address Fields (آدرس دایمی)
+			permanentProvinceId: ['', Validators.required],
+			permanentDistrictId: ['', Validators.required],
+			permanentVillage: ['', Validators.required],
+			// Temporary Address Fields (آدرس موقت)
+			temporaryProvinceId: [''],
+			temporaryDistrictId: [''],
+			temporaryVillage: [''],
+			// New Address Fields (for address change mode)
+			newPermanentProvinceId: [''],
+			newPermanentDistrictId: [''],
+			newPermanentVillage: [''],
+			newTemporaryProvinceId: [''],
+			newTemporaryDistrictId: [''],
+			newTemporaryVillage: ['']
 		});
+
+		// Add cross-field validation for phone numbers
+		this.ownerForm.get('whatsAppNumber')?.valueChanges.subscribe(() => {
+			this.validatePhoneNumbers();
+		});
+		this.ownerForm.get('phoneNumber')?.valueChanges.subscribe(() => {
+			this.validatePhoneNumbers();
+		});
+	}
+
+	// Validate that phone and WhatsApp numbers are not identical
+	validatePhoneNumbers(): void {
+		const phoneNumber = this.ownerForm.get('phoneNumber')?.value?.trim();
+		const whatsAppNumber = this.ownerForm.get('whatsAppNumber')?.value?.trim();
+		
+		if (phoneNumber && whatsAppNumber && phoneNumber === whatsAppNumber) {
+			this.ownerForm.get('whatsAppNumber')?.setErrors({ duplicatePhone: true });
+		} else {
+			const errors = this.ownerForm.get('whatsAppNumber')?.errors;
+			if (errors) {
+				delete errors['duplicatePhone'];
+				if (Object.keys(errors).length === 0) {
+					this.ownerForm.get('whatsAppNumber')?.setErrors(null);
+				}
+			}
+		}
+	}
+
+	// Check if phone numbers are duplicate (for template use)
+	get isPhoneDuplicate(): boolean {
+		const phoneNumber = this.ownerForm.get('phoneNumber')?.value?.trim();
+		const whatsAppNumber = this.ownerForm.get('whatsAppNumber')?.value?.trim();
+		return !!(phoneNumber && whatsAppNumber && phoneNumber === whatsAppNumber);
 	}
 
 	ngOnInit() {
@@ -118,12 +191,16 @@ export class CompanyownerComponent {
 			this.EducationLevel = res;
 		});
 
+		this.selerService.getprovince().subscribe(res => {
+			this.province = res;
+		});
+
 		this.comservice.getOwnerById(this.id)
 			.subscribe({
 				next: (detail) => {
 					if (detail && detail.length > 0) {
 						this.ownerDetails = detail;
-						this.ownerForm.setValue({
+						this.ownerForm.patchValue({
 							id: detail[0].id,
 							firstName: detail[0].firstName,
 							fatherName: detail[0].fatherName,
@@ -137,18 +214,36 @@ export class CompanyownerComponent {
 							companyId: detail[0].companyId,
 							sabtNumber: detail[0].sabtNumber,
 							pothoPath: detail[0].pothoPath,
+							phoneNumber: detail[0].phoneNumber || '',
+							whatsAppNumber: detail[0].whatsAppNumber || '',
+							permanentProvinceId: detail[0].permanentProvinceId || '',
+							permanentDistrictId: detail[0].permanentDistrictId || '',
+							permanentVillage: detail[0].permanentVillage || '',
+							temporaryProvinceId: detail[0].temporaryProvinceId || '',
+							temporaryDistrictId: detail[0].temporaryDistrictId || '',
+							temporaryVillage: detail[0].temporaryVillage || ''
 						});
+
+						// Store current address for display
+						this.currentAddressDisplay = {
+							permanentProvinceName: detail[0].permanentProvinceName,
+							permanentDistrictName: detail[0].permanentDistrictName,
+							permanentVillage: detail[0].permanentVillage,
+							temporaryProvinceName: detail[0].temporaryProvinceName,
+							temporaryDistrictName: detail[0].temporaryDistrictName,
+							temporaryVillage: detail[0].temporaryVillage
+						};
+
 						this.comservice.ownerId = detail[0].id;
 						this.selectedId = detail[0].id;
 						const dateString = detail[0].dateofBirth;
-						// Set existing image for profile cropper
+
 						if (detail[0].pothoPath) {
 							this.imagePath = this.baseUrl + detail[0].pothoPath;
 							this.imageName = detail[0].pothoPath;
 							if (this.childComponent) {
 								this.childComponent.setExistingImage(this.imagePath);
 							} else {
-								// Store for later if child component isn't ready yet
 								this.pendingImagePath = this.imagePath;
 							}
 						}
@@ -162,12 +257,122 @@ export class CompanyownerComponent {
 							this.selectedDate = parsedDate;
 						}
 						this.onPropertyTypeChange();
+
+						if (detail[0].permanentProvinceId) {
+							this.selerService.getdistrict(detail[0].permanentProvinceId).subscribe(res => {
+								this.permanentDistrict = res;
+							});
+						}
+						if (detail[0].temporaryProvinceId) {
+							this.selerService.getdistrict(detail[0].temporaryProvinceId).subscribe(res => {
+								this.temporaryDistrict = res;
+							});
+						}
+
+						// Load address history
+						this.loadAddressHistory();
 					}
 				},
 				error: (error) => {
 					console.error('Error loading owner details:', error);
 				}
 			});
+	}
+
+	loadAddressHistory(): void {
+		if (this.id > 0) {
+			this.comservice.getOwnerAddressHistory(this.id).subscribe({
+				next: (history) => {
+					this.addressHistory = history;
+				},
+				error: (error) => {
+					console.error('Error loading address history:', error);
+				}
+			});
+		}
+	}
+
+	toggleAddressHistory(): void {
+		this.showAddressHistory = !this.showAddressHistory;
+	}
+
+	// Enable address change mode
+	enableAddressChangeMode(): void {
+		this.isAddressChangeMode = true;
+		// Clear new address fields
+		this.ownerForm.patchValue({
+			newPermanentProvinceId: '',
+			newPermanentDistrictId: '',
+			newPermanentVillage: '',
+			newTemporaryProvinceId: '',
+			newTemporaryDistrictId: '',
+			newTemporaryVillage: ''
+		});
+		this.newPermanentDistrict = [];
+		this.newTemporaryDistrict = [];
+	}
+
+	// Cancel address change mode
+	cancelAddressChange(): void {
+		this.isAddressChangeMode = false;
+		this.ownerForm.patchValue({
+			newPermanentProvinceId: '',
+			newPermanentDistrictId: '',
+			newPermanentVillage: '',
+			newTemporaryProvinceId: '',
+			newTemporaryDistrictId: '',
+			newTemporaryVillage: ''
+		});
+	}
+
+	// Filter districts for new permanent address
+	filterNewPermanentDistricts(event: any): void {
+		if (event && event.id) {
+			this.selerService.getdistrict(event.id).subscribe(res => {
+				this.newPermanentDistrict = res;
+				this.ownerForm.patchValue({ newPermanentDistrictId: '' });
+			});
+		} else {
+			this.newPermanentDistrict = [];
+			this.ownerForm.patchValue({ newPermanentDistrictId: '' });
+		}
+	}
+
+	// Filter districts for new temporary address
+	filterNewTemporaryDistricts(event: any): void {
+		if (event && event.id) {
+			this.selerService.getdistrict(event.id).subscribe(res => {
+				this.newTemporaryDistrict = res;
+				this.ownerForm.patchValue({ newTemporaryDistrictId: '' });
+			});
+		} else {
+			this.newTemporaryDistrict = [];
+			this.ownerForm.patchValue({ newTemporaryDistrictId: '' });
+		}
+	}
+
+	filterPermanentDistricts(event: any) {
+		if (event && event.id) {
+			this.selerService.getdistrict(event.id).subscribe(res => {
+				this.permanentDistrict = res;
+				this.ownerForm.patchValue({ permanentDistrictId: '' });
+			});
+		} else {
+			this.permanentDistrict = [];
+			this.ownerForm.patchValue({ permanentDistrictId: '' });
+		}
+	}
+
+	filterTemporaryDistricts(event: any) {
+		if (event && event.id) {
+			this.selerService.getdistrict(event.id).subscribe(res => {
+				this.temporaryDistrict = res;
+				this.ownerForm.patchValue({ temporaryDistrictId: '' });
+			});
+		} else {
+			this.temporaryDistrict = [];
+			this.ownerForm.patchValue({ temporaryDistrictId: '' });
+		}
 	}
 
 	uploadFinished = (event: string) => {
@@ -180,12 +385,10 @@ export class CompanyownerComponent {
 			this.imagePath = localObjectUrl;
 			return;
 		}
-
 		if (this.imageName) {
 			this.imagePath = this.baseUrl + this.imageName;
 			return;
 		}
-
 		this.imagePath = 'assets/img/avatar.png';
 	}
 
@@ -262,6 +465,12 @@ export class CompanyownerComponent {
 	}
 
 	addOwner(): void {
+		// Check for duplicate phone numbers before submission
+		if (this.isPhoneDuplicate) {
+			this.toastr.error("شماره تماس و شماره واتساپ نباید یکسان باشد");
+			return;
+		}
+
 		const details = this.ownerForm.value as companyowner;
 		const dateValue = this.ownerForm.get('dateofBirth')?.value;
 		const currentCalendar = this.calendarService.getSelectedCalendar();
@@ -273,7 +482,6 @@ export class CompanyownerComponent {
 			return;
 		}
 
-		// Ensure indentityCardNumber is sent as string
 		if (details.indentityCardNumber != null) {
 			details.indentityCardNumber = String(details.indentityCardNumber);
 		}
@@ -284,6 +492,20 @@ export class CompanyownerComponent {
 		if (details.id === null) {
 			details.id = 0;
 		}
+
+		// Contact Information
+		details.phoneNumber = this.ownerForm.get('phoneNumber')?.value?.trim() || null;
+		details.whatsAppNumber = this.ownerForm.get('whatsAppNumber')?.value?.trim() || null;
+
+		// Permanent Address Fields (آدرس دایمی)
+		details.permanentProvinceId = this.ownerForm.get('permanentProvinceId')?.value || null;
+		details.permanentDistrictId = this.ownerForm.get('permanentDistrictId')?.value || null;
+		details.permanentVillage = this.ownerForm.get('permanentVillage')?.value || null;
+		// Temporary Address Fields (آدرس موقت)
+		details.temporaryProvinceId = this.ownerForm.get('temporaryProvinceId')?.value || null;
+		details.temporaryDistrictId = this.ownerForm.get('temporaryDistrictId')?.value || null;
+		details.temporaryVillage = this.ownerForm.get('temporaryVillage')?.value || null;
+
 		this.comservice.addcompanyOwner(details).subscribe(
 			result => {
 				if (result.id !== 0) {
@@ -295,12 +517,18 @@ export class CompanyownerComponent {
 			},
 			error => {
 				console.error('Error adding owner:', error);
-				this.toastr.error("خرابی در ثبت معلومات: " + (error.message || 'نامعلوم'));
+				this.toastr.error("خرابی در ثبت معلومات: " + (error.error || error.message || 'نامعلوم'));
 			}
 		);
 	}
 
 	updateOwner(): void {
+		// Check for duplicate phone numbers before submission
+		if (this.isPhoneDuplicate) {
+			this.toastr.error("شماره تماس و شماره واتساپ نباید یکسان باشد");
+			return;
+		}
+
 		const details = this.ownerForm.value as companyowner;
 		const dateValue = this.ownerForm.get('dateofBirth')?.value;
 		const currentCalendar = this.calendarService.getSelectedCalendar();
@@ -312,7 +540,6 @@ export class CompanyownerComponent {
 			return;
 		}
 
-		// Ensure indentityCardNumber is sent as string
 		if (details.indentityCardNumber != null) {
 			details.indentityCardNumber = String(details.indentityCardNumber);
 		}
@@ -323,17 +550,49 @@ export class CompanyownerComponent {
 		if (details.id === 0 && this.selectedId !== 0 || this.selectedId !== null) {
 			details.id = this.selectedId;
 		}
+
+		// Contact Information
+		details.phoneNumber = this.ownerForm.get('phoneNumber')?.value?.trim() || null;
+		details.whatsAppNumber = this.ownerForm.get('whatsAppNumber')?.value?.trim() || null;
+
+		// Handle address change mode
+		if (this.isAddressChangeMode) {
+			// Use new address values and set flag
+			details.permanentProvinceId = this.ownerForm.get('newPermanentProvinceId')?.value || null;
+			details.permanentDistrictId = this.ownerForm.get('newPermanentDistrictId')?.value || null;
+			details.permanentVillage = this.ownerForm.get('newPermanentVillage')?.value || null;
+			details.temporaryProvinceId = this.ownerForm.get('newTemporaryProvinceId')?.value || null;
+			details.temporaryDistrictId = this.ownerForm.get('newTemporaryDistrictId')?.value || null;
+			details.temporaryVillage = this.ownerForm.get('newTemporaryVillage')?.value || null;
+			details.isAddressChange = true;
+		} else {
+			details.permanentProvinceId = this.ownerForm.get('permanentProvinceId')?.value || null;
+			details.permanentDistrictId = this.ownerForm.get('permanentDistrictId')?.value || null;
+			details.permanentVillage = this.ownerForm.get('permanentVillage')?.value || null;
+			details.temporaryProvinceId = this.ownerForm.get('temporaryProvinceId')?.value || null;
+			details.temporaryDistrictId = this.ownerForm.get('temporaryDistrictId')?.value || null;
+			details.temporaryVillage = this.ownerForm.get('temporaryVillage')?.value || null;
+			details.isAddressChange = false;
+		}
+
 		this.comservice.updateowner(details).subscribe(
 			result => {
 				if (result.id !== 0) {
 					this.selectedId = result.id;
-					this.toastr.info("معلومات موفقانه تغیر یافت ");
+					if (this.isAddressChangeMode) {
+						this.toastr.success("آدرس موفقانه تغییر یافت");
+						this.isAddressChangeMode = false;
+						// Reload data to refresh address display
+						this.ngOnInit();
+					} else {
+						this.toastr.info("معلومات موفقانه تغیر یافت");
+					}
 					this.onNextClick();
 				}
 			},
 			error => {
 				console.error('Error updating owner:', error);
-				this.toastr.error("خرابی در تغیر معلومات: " + (error.message || 'نامعلوم'));
+				this.toastr.error("خرابی در تغیر معلومات: " + (error.error || error.message || 'نامعلوم'));
 			}
 		);
 	}
@@ -347,6 +606,11 @@ export class CompanyownerComponent {
 		this.ownerForm.reset();
 		this.comservice.ownerId = 0;
 		this.selectedId = 0;
+		this.permanentDistrict = [];
+		this.temporaryDistrict = [];
+		this.isAddressChangeMode = false;
+		this.addressHistory = [];
+		this.showAddressHistory = false;
 	}
 
 	get firstName() { return this.ownerForm.get('firstName'); }
@@ -361,6 +625,16 @@ export class CompanyownerComponent {
 	get companyId() { return this.ownerForm.get('companyId'); }
 	get sabtNumber() { return this.ownerForm.get('sabtNumber'); }
 	get pothoPath() { return this.ownerForm.get('pothoPath'); }
+	get phoneNumber() { return this.ownerForm.get('phoneNumber'); }
+	get whatsAppNumber() { return this.ownerForm.get('whatsAppNumber'); }
+	// Permanent Address getters (آدرس دایمی)
+	get permanentProvinceId() { return this.ownerForm.get('permanentProvinceId'); }
+	get permanentDistrictId() { return this.ownerForm.get('permanentDistrictId'); }
+	get permanentVillage() { return this.ownerForm.get('permanentVillage'); }
+	// Temporary Address getters (آدرس موقت)
+	get temporaryProvinceId() { return this.ownerForm.get('temporaryProvinceId'); }
+	get temporaryDistrictId() { return this.ownerForm.get('temporaryDistrictId'); }
+	get temporaryVillage() { return this.ownerForm.get('temporaryVillage'); }
 
 	isElectricIdSelected(): boolean {
 		const identityCardTypeId = this.ownerForm.get('identityCardTypeId')?.value;

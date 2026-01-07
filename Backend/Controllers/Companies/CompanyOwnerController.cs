@@ -27,16 +27,116 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var Pro = await _context.CompanyOwners.Where(x => x.CompanyId.Equals(id)).ToListAsync();
+                var Pro = await _context.CompanyOwners
+                    .Where(x => x.CompanyId.Equals(id))
+                    .Select(o => new
+                    {
+                        o.Id,
+                        o.FirstName,
+                        o.FatherName,
+                        o.GrandFatherName,
+                        o.EducationLevelId,
+                        DateofBirth = o.DateofBirth,
+                        o.IdentityCardTypeId,
+                        o.IndentityCardNumber,
+                        o.Jild,
+                        o.Safha,
+                        o.CompanyId,
+                        o.SabtNumber,
+                        o.PothoPath,
+                        // Contact Information
+                        o.PhoneNumber,
+                        o.WhatsAppNumber,
+                        // Permanent Address Fields (آدرس دایمی)
+                        o.PermanentProvinceId,
+                        o.PermanentDistrictId,
+                        o.PermanentVillage,
+                        // Temporary Address Fields (آدرس موقت)
+                        o.TemporaryProvinceId,
+                        o.TemporaryDistrictId,
+                        o.TemporaryVillage,
+                        // Location names for display
+                        PermanentProvinceName = o.PermanentProvince != null ? o.PermanentProvince.Dari : null,
+                        PermanentDistrictName = o.PermanentDistrict != null ? o.PermanentDistrict.Dari : null,
+                        TemporaryProvinceName = o.TemporaryProvince != null ? o.TemporaryProvince.Dari : null,
+                        TemporaryDistrictName = o.TemporaryDistrict != null ? o.TemporaryDistrict.Dari : null,
+                    })
+                    .ToListAsync();
 
                 // Convert dates to the requested calendar type (defaults to HijriShamsi)
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
-                foreach (var item in Pro)
+                var result = Pro.Select(item => new
                 {
-                    item.DateofBirth = DateConversionHelper.ToCalendarDateOnly(item.DateofBirth, calendar);
+                    item.Id,
+                    item.FirstName,
+                    item.FatherName,
+                    item.GrandFatherName,
+                    item.EducationLevelId,
+                    DateofBirth = DateConversionHelper.ToCalendarDateOnly(item.DateofBirth, calendar),
+                    item.IdentityCardTypeId,
+                    item.IndentityCardNumber,
+                    item.Jild,
+                    item.Safha,
+                    item.CompanyId,
+                    item.SabtNumber,
+                    item.PothoPath,
+                    item.PhoneNumber,
+                    item.WhatsAppNumber,
+                    item.PermanentProvinceId,
+                    item.PermanentDistrictId,
+                    item.PermanentVillage,
+                    item.TemporaryProvinceId,
+                    item.TemporaryDistrictId,
+                    item.TemporaryVillage,
+                    item.PermanentProvinceName,
+                    item.PermanentDistrictName,
+                    item.TemporaryProvinceName,
+                    item.TemporaryDistrictName,
+                }).ToList();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Get address history for a company owner
+        /// </summary>
+        [HttpGet("addressHistory/{companyId}")]
+        public async Task<IActionResult> GetAddressHistory(int companyId)
+        {
+            try
+            {
+                var owner = await _context.CompanyOwners
+                    .FirstOrDefaultAsync(x => x.CompanyId == companyId);
+
+                if (owner == null)
+                {
+                    return NotFound("Owner not found");
                 }
 
-                return Ok(Pro);
+                var history = await _context.CompanyOwnerAddressHistories
+                    .Where(h => h.CompanyOwnerId == owner.Id)
+                    .OrderByDescending(h => h.EffectiveFrom)
+                    .Select(h => new
+                    {
+                        h.Id,
+                        h.AddressType,
+                        h.ProvinceId,
+                        h.DistrictId,
+                        h.Village,
+                        ProvinceName = h.Province != null ? h.Province.Dari : null,
+                        DistrictName = h.District != null ? h.District.Dari : null,
+                        h.EffectiveFrom,
+                        h.EffectiveTo,
+                        h.IsActive
+                    })
+                    .ToListAsync();
+
+                return Ok(history);
             }
             catch (Exception ex)
             {
@@ -62,6 +162,13 @@ namespace WebAPIBackend.Controllers.Companies
                 return StatusCode(312, "Main Table is Empty");
             }
 
+            // Validate phone numbers are not identical
+            if (!string.IsNullOrEmpty(request.PhoneNumber) && !string.IsNullOrEmpty(request.WhatsAppNumber) 
+                && request.PhoneNumber.Trim() == request.WhatsAppNumber.Trim())
+            {
+                return BadRequest("شماره تماس و شماره واتساپ نباید یکسان باشد");
+            }
+
             var userId = userIdClaim.Value;
 
             // Parse date using multi-calendar helper
@@ -84,8 +191,19 @@ namespace WebAPIBackend.Controllers.Companies
                 CompanyId = request.CompanyId,
                 SabtNumber = request.SabtNumber,
                 PothoPath = request.PothoPath,
+                // Contact Information
+                PhoneNumber = request.PhoneNumber?.Trim(),
+                WhatsAppNumber = request.WhatsAppNumber?.Trim(),
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
+                // Permanent Address Fields (آدرس دایمی)
+                PermanentProvinceId = request.PermanentProvinceId,
+                PermanentDistrictId = request.PermanentDistrictId,
+                PermanentVillage = request.PermanentVillage,
+                // Temporary Address Fields (آدرس موقت)
+                TemporaryProvinceId = request.TemporaryProvinceId,
+                TemporaryDistrictId = request.TemporaryDistrictId,
+                TemporaryVillage = request.TemporaryVillage,
             };
 
             _context.Add(property);
@@ -101,6 +219,13 @@ namespace WebAPIBackend.Controllers.Companies
             if (!DateConversionHelper.TryParseToDateOnly(request.DateofBirth, request.CalendarType, out var pdate))
             {
                 return BadRequest("DateofBirth must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+            }
+
+            // Validate phone numbers are not identical
+            if (!string.IsNullOrEmpty(request.PhoneNumber) && !string.IsNullOrEmpty(request.WhatsAppNumber) 
+                && request.PhoneNumber.Trim() == request.WhatsAppNumber.Trim())
+            {
+                return BadRequest("شماره تماس و شماره واتساپ نباید یکسان باشد");
             }
 
             var userIdClaim = HttpContext.User.FindFirst("UserID");
@@ -125,6 +250,12 @@ namespace WebAPIBackend.Controllers.Companies
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
 
+            // Handle Address Change - Archive old address to history if this is an address change
+            if (request.IsAddressChange)
+            {
+                await ArchiveCurrentAddressToHistory(existingProperty, userId);
+            }
+
             // Update the entity with the new values
             existingProperty.FirstName = request.FirstName;
             existingProperty.FatherName = request.FatherName;
@@ -138,6 +269,17 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.CompanyId = request.CompanyId;
             existingProperty.SabtNumber = request.SabtNumber;
             existingProperty.PothoPath = request.PothoPath;
+            // Contact Information
+            existingProperty.PhoneNumber = request.PhoneNumber?.Trim();
+            existingProperty.WhatsAppNumber = request.WhatsAppNumber?.Trim();
+            // Permanent Address Fields (آدرس دایمی)
+            existingProperty.PermanentProvinceId = request.PermanentProvinceId;
+            existingProperty.PermanentDistrictId = request.PermanentDistrictId;
+            existingProperty.PermanentVillage = request.PermanentVillage;
+            // Temporary Address Fields (آدرس موقت)
+            existingProperty.TemporaryProvinceId = request.TemporaryProvinceId;
+            existingProperty.TemporaryDistrictId = request.TemporaryDistrictId;
+            existingProperty.TemporaryVillage = request.TemporaryVillage;
 
             // Restore the original values of the CreatedBy and CreatedAt properties
             existingProperty.CreatedBy = createdBy;
@@ -176,6 +318,76 @@ namespace WebAPIBackend.Controllers.Companies
 
             var result = new { Id = request.Id };
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Archives the current address to history before updating with new address
+        /// </summary>
+        private async Task ArchiveCurrentAddressToHistory(CompanyOwner owner, string userId)
+        {
+            var now = DateTime.Now;
+
+            // Archive Permanent Address if exists
+            if (owner.PermanentProvinceId.HasValue || owner.PermanentDistrictId.HasValue || !string.IsNullOrEmpty(owner.PermanentVillage))
+            {
+                // Mark any existing active permanent address history as inactive
+                var existingActivePermanent = await _context.CompanyOwnerAddressHistories
+                    .Where(h => h.CompanyOwnerId == owner.Id && h.AddressType == "Permanent" && h.IsActive)
+                    .ToListAsync();
+
+                foreach (var existing in existingActivePermanent)
+                {
+                    existing.IsActive = false;
+                    existing.EffectiveTo = now;
+                }
+
+                // Create new history record for the current permanent address
+                var permanentHistory = new CompanyOwnerAddressHistory
+                {
+                    CompanyOwnerId = owner.Id,
+                    ProvinceId = owner.PermanentProvinceId,
+                    DistrictId = owner.PermanentDistrictId,
+                    Village = owner.PermanentVillage,
+                    AddressType = "Permanent",
+                    EffectiveFrom = owner.CreatedAt ?? now,
+                    EffectiveTo = now,
+                    IsActive = false,
+                    CreatedAt = now,
+                    CreatedBy = userId
+                };
+                _context.CompanyOwnerAddressHistories.Add(permanentHistory);
+            }
+
+            // Archive Temporary Address if exists
+            if (owner.TemporaryProvinceId.HasValue || owner.TemporaryDistrictId.HasValue || !string.IsNullOrEmpty(owner.TemporaryVillage))
+            {
+                // Mark any existing active temporary address history as inactive
+                var existingActiveTemporary = await _context.CompanyOwnerAddressHistories
+                    .Where(h => h.CompanyOwnerId == owner.Id && h.AddressType == "Temporary" && h.IsActive)
+                    .ToListAsync();
+
+                foreach (var existing in existingActiveTemporary)
+                {
+                    existing.IsActive = false;
+                    existing.EffectiveTo = now;
+                }
+
+                // Create new history record for the temporary address
+                var temporaryHistory = new CompanyOwnerAddressHistory
+                {
+                    CompanyOwnerId = owner.Id,
+                    ProvinceId = owner.TemporaryProvinceId,
+                    DistrictId = owner.TemporaryDistrictId,
+                    Village = owner.TemporaryVillage,
+                    AddressType = "Temporary",
+                    EffectiveFrom = owner.CreatedAt ?? now,
+                    EffectiveTo = now,
+                    IsActive = false,
+                    CreatedAt = now,
+                    CreatedBy = userId
+                };
+                _context.CompanyOwnerAddressHistories.Add(temporaryHistory);
+            }
         }
     }
 }

@@ -221,6 +221,13 @@ namespace WebAPIBackend.Controllers.Companies
                 issueDateFormatted,
                 expireDateFormatted,
                 dateOfBirthFormatted,
+                // Integrated Owner Address Fields
+                data.PermanentProvinceName,
+                data.PermanentDistrictName,
+                data.PermanentVillage,
+                data.TemporaryProvinceName,
+                data.TemporaryDistrictName,
+                data.TemporaryVillage,
             };
 
             return Ok(result);

@@ -34,7 +34,7 @@
   </div>
 </mat-toolbar>
 
-<mat-menu #userAccountMenu="matMenu">
+<mat-menu #userAccountMenu="matMenu" panelClass="user-account-menu-panel">
   <button mat-menu-item (click)="navigateToRegister()" *ngIf="userRole == 'ADMIN'">
     <mat-icon>people</mat-icon>
     <span>ایجاد کاربر</span>

@@ -7,7 +7,6 @@ import { map, Observable } from 'rxjs';
 import { CompnaydetailService } from '../shared/compnaydetail.service';
 import { CompanydetailsComponent } from './companydetails/companydetails.component';
 import { CompanyownerComponent } from './companyowner/companyowner.component';
-import { CompanyowneraddressComponent } from './companyowneraddress/companyowneraddress.component';
 import { FileuploadComponent } from './fileupload/fileupload.component';
 import { GuaranatorsComponent } from './guaranators/guaranators.component';
 import { GuaranteeComponent } from './guarantee/guarantee.component';
@@ -22,7 +21,6 @@ export class RealestateComponent {
   PropertyId: number=0;
   @ViewChild('companydetails') companydetails!: CompanydetailsComponent;
   @ViewChild('companyowner') companyowner!: CompanyownerComponent;
-  @ViewChild('companyowneraddress') companyowneraddress!: CompanyowneraddressComponent;
   @ViewChild('guaranators') guaranators!:GuaranatorsComponent;
   @ViewChild('licensedetails') licensedetails!:LicensedetailsComponent;
   @ViewChild('guarantee') guarantee!:GuaranteeComponent;
@@ -48,10 +46,8 @@ export class RealestateComponent {
   resetChild(){
     this.companydetails.resetChild();
     this.companyowner.resetForms();
-    this.companyowneraddress.resetForms();
     this.guaranators.resetForms();
     this.licensedetails.resetForms();
     this.guarantee.resetForms();
- 
   }
 }

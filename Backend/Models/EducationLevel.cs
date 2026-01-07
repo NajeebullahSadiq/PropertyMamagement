@@ -9,6 +9,8 @@ public partial class EducationLevel
 
     public string Name { get; set; } = null!;
 
+    public string? Dari { get; set; }
+
     public short? Parentid { get; set; }
 
     public string? Sorter { get; set; }
