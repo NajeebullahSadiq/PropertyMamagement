@@ -36,7 +36,12 @@
         /// </summary>
         public string? CalendarType { get; set; }
 
-        // Permanent Address Fields (آدرس دایمی)
+        // Owner's Own Address Fields (آدرس اصلی مالک)
+        public int? OwnerProvinceId { get; set; }
+        public int? OwnerDistrictId { get; set; }
+        public string? OwnerVillage { get; set; }
+
+        // Permanent Address Fields (آدرس دایمی) - Current Residence
         public int? PermanentProvinceId { get; set; }
         public int? PermanentDistrictId { get; set; }
         public string? PermanentVillage { get; set; }

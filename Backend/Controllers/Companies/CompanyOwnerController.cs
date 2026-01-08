@@ -47,7 +47,11 @@ namespace WebAPIBackend.Controllers.Companies
                         // Contact Information
                         o.PhoneNumber,
                         o.WhatsAppNumber,
-                        // Permanent Address Fields (آدرس دایمی)
+                        // Owner's Own Address Fields (آدرس اصلی مالک)
+                        o.OwnerProvinceId,
+                        o.OwnerDistrictId,
+                        o.OwnerVillage,
+                        // Permanent Address Fields (آدرس دایمی) - Current Residence
                         o.PermanentProvinceId,
                         o.PermanentDistrictId,
                         o.PermanentVillage,
@@ -56,6 +60,8 @@ namespace WebAPIBackend.Controllers.Companies
                         o.TemporaryDistrictId,
                         o.TemporaryVillage,
                         // Location names for display
+                        OwnerProvinceName = o.OwnerProvince != null ? o.OwnerProvince.Dari : null,
+                        OwnerDistrictName = o.OwnerDistrict != null ? o.OwnerDistrict.Dari : null,
                         PermanentProvinceName = o.PermanentProvince != null ? o.PermanentProvince.Dari : null,
                         PermanentDistrictName = o.PermanentDistrict != null ? o.PermanentDistrict.Dari : null,
                         TemporaryProvinceName = o.TemporaryProvince != null ? o.TemporaryProvince.Dari : null,
@@ -82,12 +88,17 @@ namespace WebAPIBackend.Controllers.Companies
                     item.PothoPath,
                     item.PhoneNumber,
                     item.WhatsAppNumber,
+                    item.OwnerProvinceId,
+                    item.OwnerDistrictId,
+                    item.OwnerVillage,
                     item.PermanentProvinceId,
                     item.PermanentDistrictId,
                     item.PermanentVillage,
                     item.TemporaryProvinceId,
                     item.TemporaryDistrictId,
                     item.TemporaryVillage,
+                    item.OwnerProvinceName,
+                    item.OwnerDistrictName,
                     item.PermanentProvinceName,
                     item.PermanentDistrictName,
                     item.TemporaryProvinceName,
@@ -196,7 +207,11 @@ namespace WebAPIBackend.Controllers.Companies
                 WhatsAppNumber = request.WhatsAppNumber?.Trim(),
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
-                // Permanent Address Fields (آدرس دایمی)
+                // Owner's Own Address Fields (آدرس اصلی مالک)
+                OwnerProvinceId = request.OwnerProvinceId,
+                OwnerDistrictId = request.OwnerDistrictId,
+                OwnerVillage = request.OwnerVillage,
+                // Permanent Address Fields (آدرس دایمی) - Current Residence
                 PermanentProvinceId = request.PermanentProvinceId,
                 PermanentDistrictId = request.PermanentDistrictId,
                 PermanentVillage = request.PermanentVillage,
@@ -272,7 +287,11 @@ namespace WebAPIBackend.Controllers.Companies
             // Contact Information
             existingProperty.PhoneNumber = request.PhoneNumber?.Trim();
             existingProperty.WhatsAppNumber = request.WhatsAppNumber?.Trim();
-            // Permanent Address Fields (آدرس دایمی)
+            // Owner's Own Address Fields (آدرس اصلی مالک)
+            existingProperty.OwnerProvinceId = request.OwnerProvinceId;
+            existingProperty.OwnerDistrictId = request.OwnerDistrictId;
+            existingProperty.OwnerVillage = request.OwnerVillage;
+            // Permanent Address Fields (آدرس دایمی) - Current Residence
             existingProperty.PermanentProvinceId = request.PermanentProvinceId;
             existingProperty.PermanentDistrictId = request.PermanentDistrictId;
             existingProperty.PermanentVillage = request.PermanentVillage;
@@ -326,6 +345,37 @@ namespace WebAPIBackend.Controllers.Companies
         private async Task ArchiveCurrentAddressToHistory(CompanyOwner owner, string userId)
         {
             var now = DateTime.Now;
+
+            // Archive Owner's Own Address if exists
+            if (owner.OwnerProvinceId.HasValue || owner.OwnerDistrictId.HasValue || !string.IsNullOrEmpty(owner.OwnerVillage))
+            {
+                // Mark any existing active owner address history as inactive
+                var existingActiveOwner = await _context.CompanyOwnerAddressHistories
+                    .Where(h => h.CompanyOwnerId == owner.Id && h.AddressType == "Owner" && h.IsActive)
+                    .ToListAsync();
+
+                foreach (var existing in existingActiveOwner)
+                {
+                    existing.IsActive = false;
+                    existing.EffectiveTo = now;
+                }
+
+                // Create new history record for the current owner address
+                var ownerHistory = new CompanyOwnerAddressHistory
+                {
+                    CompanyOwnerId = owner.Id,
+                    ProvinceId = owner.OwnerProvinceId,
+                    DistrictId = owner.OwnerDistrictId,
+                    Village = owner.OwnerVillage,
+                    AddressType = "Owner",
+                    EffectiveFrom = owner.CreatedAt ?? now,
+                    EffectiveTo = now,
+                    IsActive = false,
+                    CreatedAt = now,
+                    CreatedBy = userId
+                };
+                _context.CompanyOwnerAddressHistories.Add(ownerHistory);
+            }
 
             // Archive Permanent Address if exists
             if (owner.PermanentProvinceId.HasValue || owner.PermanentDistrictId.HasValue || !string.IsNullOrEmpty(owner.PermanentVillage))

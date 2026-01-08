@@ -186,12 +186,56 @@
         </div>
       </div>
 
-      <!-- Permanent Address Section (آدرس دایمی) -->
+      <!-- Owner's Own Address Section (آدرس اصلی مالک) -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-home"></i>
+            <span>آدرس اصلی مالک</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div *ngIf="!isAddressChangeMode">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
+                <ng-select formControlName="ownerProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterOwnerDistricts($event)" class="custom-ng-select"></ng-select>
+                <div *ngIf="ownerProvinceId?.invalid && (ownerProvinceId?.dirty || ownerProvinceId?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="ownerProvinceId?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
+                <ng-select formControlName="ownerDistrictId" [items]="ownerDistrict" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+                <div *ngIf="ownerDistrictId?.invalid && (ownerDistrictId?.dirty || ownerDistrictId?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="ownerDistrictId?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-map-marker"></i>
+                  </span>
+                  <input type="text" formControlName="ownerVillage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div *ngIf="ownerVillage?.invalid && (ownerVillage?.dirty || ownerVillage?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block" *ngIf="ownerVillage?.errors?.['required']">این فیلد الزامی است</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permanent Address Section (آدرس دایمی) - Current Residence -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 flex justify-between items-center">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-home"></i>
-            <span>آدرس دایمی</span>
+            <i class="fas fa-map-marker-alt"></i>
+            <span>آدرس فعلی سکونت</span>
           </h2>
           <!-- Address Change Button - Only show when editing existing owner -->
           <div class="flex gap-2" *ngIf="selectedId > 0 && !isAddressChangeMode">
@@ -214,14 +258,19 @@
               <i class="fas fa-map-pin text-gray-600"></i>
               <span>آدرس فعلی (قبلی)</span>
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-700">
+              <div *ngIf="currentAddressDisplay.ownerProvinceName || currentAddressDisplay.ownerDistrictName || currentAddressDisplay.ownerVillage">
+                <p class="font-semibold text-purple-700 mb-1">آدرس اصلی مالک:</p>
+                <p>{{ currentAddressDisplay.ownerProvinceName }} - {{ currentAddressDisplay.ownerDistrictName }}</p>
+                <p *ngIf="currentAddressDisplay.ownerVillage">{{ currentAddressDisplay.ownerVillage }}</p>
+              </div>
               <div *ngIf="currentAddressDisplay.permanentProvinceName || currentAddressDisplay.permanentDistrictName || currentAddressDisplay.permanentVillage">
-                <p class="font-semibold text-indigo-700 mb-1">آدرس دایمی:</p>
+                <p class="font-semibold text-indigo-700 mb-1">آدرس فعلی سکونت:</p>
                 <p>{{ currentAddressDisplay.permanentProvinceName }} - {{ currentAddressDisplay.permanentDistrictName }}</p>
                 <p *ngIf="currentAddressDisplay.permanentVillage">{{ currentAddressDisplay.permanentVillage }}</p>
               </div>
               <div *ngIf="currentAddressDisplay.temporaryProvinceName || currentAddressDisplay.temporaryDistrictName || currentAddressDisplay.temporaryVillage">
-                <p class="font-semibold text-indigo-700 mb-1">آدرس موقت:</p>
+                <p class="font-semibold text-teal-700 mb-1">آدرس موقت:</p>
                 <p>{{ currentAddressDisplay.temporaryProvinceName }} - {{ currentAddressDisplay.temporaryDistrictName }}</p>
                 <p *ngIf="currentAddressDisplay.temporaryVillage">{{ currentAddressDisplay.temporaryVillage }}</p>
               </div>
@@ -246,11 +295,33 @@
               آدرس جدید جایگزین آدرس فعلی خواهد شد. آدرس قبلی در تاریخچه ذخیره می‌شود.
             </p>
             
-            <!-- New Permanent Address -->
+            <!-- New Owner's Own Address -->
             <div class="mb-6">
               <h4 class="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <i class="fas fa-home text-indigo-600"></i>
-                <span>آدرس دایمی جدید</span>
+                <i class="fas fa-home text-purple-600"></i>
+                <span>آدرس اصلی مالک جدید</span>
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
+                  <ng-select formControlName="newOwnerProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterNewOwnerDistricts($event)" class="custom-ng-select"></ng-select>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
+                  <ng-select formControlName="newOwnerDistrictId" [items]="newOwnerDistrict" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+                  <input type="text" formControlName="newOwnerVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+              </div>
+            </div>
+
+            <!-- New Current Residence Address -->
+            <div class="mb-6 border-t border-yellow-300 pt-4">
+              <h4 class="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <i class="fas fa-map-marker-alt text-indigo-600"></i>
+                <span>آدرس فعلی سکونت جدید</span>
               </h4>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -271,7 +342,7 @@
             <!-- New Temporary Address -->
             <div class="border-t border-yellow-300 pt-4">
               <h4 class="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <i class="fas fa-location-arrow text-indigo-600"></i>
+                <i class="fas fa-location-arrow text-teal-600"></i>
                 <span>آدرس موقت جدید (اختیاری)</span>
               </h4>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -383,8 +454,8 @@
             <tbody class="divide-y divide-gray-200">
               <tr *ngFor="let history of addressHistory" class="text-center hover:bg-gray-50 transition-colors">
                 <td class="px-4 py-3 text-sm text-gray-700">
-                  <span [ngClass]="history.addressType === 'Permanent' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'" class="px-2 py-1 rounded-full text-xs font-semibold">
-                    {{ history.addressType === 'Permanent' ? 'دایمی' : 'موقت' }}
+                  <span [ngClass]="history.addressType === 'Owner' ? 'bg-purple-100 text-purple-800' : (history.addressType === 'Permanent' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800')" class="px-2 py-1 rounded-full text-xs font-semibold">
+                    {{ history.addressType === 'Owner' ? 'اصلی مالک' : (history.addressType === 'Permanent' ? 'فعلی سکونت' : 'موقت') }}
                   </span>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ history.provinceName }}</td>

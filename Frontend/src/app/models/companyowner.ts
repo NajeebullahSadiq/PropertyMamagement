@@ -16,7 +16,11 @@ export interface companyowner{
     // Contact Information
     phoneNumber?:string;
     whatsAppNumber?:string;
-    // Permanent Address Fields (آدرس دایمی)
+    // Owner's Own Address Fields (آدرس اصلی مالک)
+    ownerProvinceId?:number;
+    ownerDistrictId?:number;
+    ownerVillage?:string;
+    // Permanent Address Fields (آدرس دایمی) - Current Residence
     permanentProvinceId?:number;
     permanentDistrictId?:number;
     permanentVillage?:string;
@@ -25,6 +29,8 @@ export interface companyowner{
     temporaryDistrictId?:number;
     temporaryVillage?:string;
     // Location names for display
+    ownerProvinceName?:string;
+    ownerDistrictName?:string;
     permanentProvinceName?:string;
     permanentDistrictName?:string;
     temporaryProvinceName?:string;

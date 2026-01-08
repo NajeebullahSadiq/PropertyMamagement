@@ -63,6 +63,7 @@ export class CompanyownerComponent {
 
 	// Address related properties
 	province: any;
+	ownerDistrict: any;
 	permanentDistrict: any;
 	temporaryDistrict: any;
 
@@ -73,6 +74,9 @@ export class CompanyownerComponent {
 
 	// Store current address for display during change mode
 	currentAddressDisplay: {
+		ownerProvinceName?: string;
+		ownerDistrictName?: string;
+		ownerVillage?: string;
 		permanentProvinceName?: string;
 		permanentDistrictName?: string;
 		permanentVillage?: string;
@@ -82,6 +86,7 @@ export class CompanyownerComponent {
 	} = {};
 
 	// New address districts (for address change mode)
+	newOwnerDistrict: any;
 	newPermanentDistrict: any;
 	newTemporaryDistrict: any;
 
@@ -125,7 +130,11 @@ export class CompanyownerComponent {
 			// Contact Information
 			phoneNumber: [''],
 			whatsAppNumber: [''],
-			// Permanent Address Fields (آدرس دایمی)
+			// Owner's Own Address Fields (آدرس اصلی مالک)
+			ownerProvinceId: ['', Validators.required],
+			ownerDistrictId: ['', Validators.required],
+			ownerVillage: ['', Validators.required],
+			// Permanent Address Fields (آدرس دایمی) - Current Residence
 			permanentProvinceId: ['', Validators.required],
 			permanentDistrictId: ['', Validators.required],
 			permanentVillage: ['', Validators.required],
@@ -134,6 +143,9 @@ export class CompanyownerComponent {
 			temporaryDistrictId: [''],
 			temporaryVillage: [''],
 			// New Address Fields (for address change mode)
+			newOwnerProvinceId: [''],
+			newOwnerDistrictId: [''],
+			newOwnerVillage: [''],
 			newPermanentProvinceId: [''],
 			newPermanentDistrictId: [''],
 			newPermanentVillage: [''],
@@ -216,6 +228,9 @@ export class CompanyownerComponent {
 							pothoPath: detail[0].pothoPath,
 							phoneNumber: detail[0].phoneNumber || '',
 							whatsAppNumber: detail[0].whatsAppNumber || '',
+							ownerProvinceId: detail[0].ownerProvinceId || '',
+							ownerDistrictId: detail[0].ownerDistrictId || '',
+							ownerVillage: detail[0].ownerVillage || '',
 							permanentProvinceId: detail[0].permanentProvinceId || '',
 							permanentDistrictId: detail[0].permanentDistrictId || '',
 							permanentVillage: detail[0].permanentVillage || '',
@@ -226,6 +241,9 @@ export class CompanyownerComponent {
 
 						// Store current address for display
 						this.currentAddressDisplay = {
+							ownerProvinceName: detail[0].ownerProvinceName,
+							ownerDistrictName: detail[0].ownerDistrictName,
+							ownerVillage: detail[0].ownerVillage,
 							permanentProvinceName: detail[0].permanentProvinceName,
 							permanentDistrictName: detail[0].permanentDistrictName,
 							permanentVillage: detail[0].permanentVillage,
@@ -258,6 +276,11 @@ export class CompanyownerComponent {
 						}
 						this.onPropertyTypeChange();
 
+						if (detail[0].ownerProvinceId) {
+							this.selerService.getdistrict(detail[0].ownerProvinceId).subscribe(res => {
+								this.ownerDistrict = res;
+							});
+						}
 						if (detail[0].permanentProvinceId) {
 							this.selerService.getdistrict(detail[0].permanentProvinceId).subscribe(res => {
 								this.permanentDistrict = res;
@@ -301,6 +324,9 @@ export class CompanyownerComponent {
 		this.isAddressChangeMode = true;
 		// Clear new address fields
 		this.ownerForm.patchValue({
+			newOwnerProvinceId: '',
+			newOwnerDistrictId: '',
+			newOwnerVillage: '',
 			newPermanentProvinceId: '',
 			newPermanentDistrictId: '',
 			newPermanentVillage: '',
@@ -308,6 +334,7 @@ export class CompanyownerComponent {
 			newTemporaryDistrictId: '',
 			newTemporaryVillage: ''
 		});
+		this.newOwnerDistrict = [];
 		this.newPermanentDistrict = [];
 		this.newTemporaryDistrict = [];
 	}
@@ -316,6 +343,9 @@ export class CompanyownerComponent {
 	cancelAddressChange(): void {
 		this.isAddressChangeMode = false;
 		this.ownerForm.patchValue({
+			newOwnerProvinceId: '',
+			newOwnerDistrictId: '',
+			newOwnerVillage: '',
 			newPermanentProvinceId: '',
 			newPermanentDistrictId: '',
 			newPermanentVillage: '',
@@ -323,6 +353,19 @@ export class CompanyownerComponent {
 			newTemporaryDistrictId: '',
 			newTemporaryVillage: ''
 		});
+	}
+
+	// Filter districts for new owner address
+	filterNewOwnerDistricts(event: any): void {
+		if (event && event.id) {
+			this.selerService.getdistrict(event.id).subscribe(res => {
+				this.newOwnerDistrict = res;
+				this.ownerForm.patchValue({ newOwnerDistrictId: '' });
+			});
+		} else {
+			this.newOwnerDistrict = [];
+			this.ownerForm.patchValue({ newOwnerDistrictId: '' });
+		}
 	}
 
 	// Filter districts for new permanent address
@@ -360,6 +403,18 @@ export class CompanyownerComponent {
 		} else {
 			this.permanentDistrict = [];
 			this.ownerForm.patchValue({ permanentDistrictId: '' });
+		}
+	}
+
+	filterOwnerDistricts(event: any) {
+		if (event && event.id) {
+			this.selerService.getdistrict(event.id).subscribe(res => {
+				this.ownerDistrict = res;
+				this.ownerForm.patchValue({ ownerDistrictId: '' });
+			});
+		} else {
+			this.ownerDistrict = [];
+			this.ownerForm.patchValue({ ownerDistrictId: '' });
 		}
 	}
 
@@ -497,7 +552,11 @@ export class CompanyownerComponent {
 		details.phoneNumber = this.ownerForm.get('phoneNumber')?.value?.trim() || null;
 		details.whatsAppNumber = this.ownerForm.get('whatsAppNumber')?.value?.trim() || null;
 
-		// Permanent Address Fields (آدرس دایمی)
+		// Owner's Own Address Fields (آدرس اصلی مالک)
+		details.ownerProvinceId = this.ownerForm.get('ownerProvinceId')?.value || null;
+		details.ownerDistrictId = this.ownerForm.get('ownerDistrictId')?.value || null;
+		details.ownerVillage = this.ownerForm.get('ownerVillage')?.value || null;
+		// Permanent Address Fields (آدرس دایمی) - Current Residence
 		details.permanentProvinceId = this.ownerForm.get('permanentProvinceId')?.value || null;
 		details.permanentDistrictId = this.ownerForm.get('permanentDistrictId')?.value || null;
 		details.permanentVillage = this.ownerForm.get('permanentVillage')?.value || null;
@@ -558,6 +617,9 @@ export class CompanyownerComponent {
 		// Handle address change mode
 		if (this.isAddressChangeMode) {
 			// Use new address values and set flag
+			details.ownerProvinceId = this.ownerForm.get('newOwnerProvinceId')?.value || null;
+			details.ownerDistrictId = this.ownerForm.get('newOwnerDistrictId')?.value || null;
+			details.ownerVillage = this.ownerForm.get('newOwnerVillage')?.value || null;
 			details.permanentProvinceId = this.ownerForm.get('newPermanentProvinceId')?.value || null;
 			details.permanentDistrictId = this.ownerForm.get('newPermanentDistrictId')?.value || null;
 			details.permanentVillage = this.ownerForm.get('newPermanentVillage')?.value || null;
@@ -566,6 +628,9 @@ export class CompanyownerComponent {
 			details.temporaryVillage = this.ownerForm.get('newTemporaryVillage')?.value || null;
 			details.isAddressChange = true;
 		} else {
+			details.ownerProvinceId = this.ownerForm.get('ownerProvinceId')?.value || null;
+			details.ownerDistrictId = this.ownerForm.get('ownerDistrictId')?.value || null;
+			details.ownerVillage = this.ownerForm.get('ownerVillage')?.value || null;
 			details.permanentProvinceId = this.ownerForm.get('permanentProvinceId')?.value || null;
 			details.permanentDistrictId = this.ownerForm.get('permanentDistrictId')?.value || null;
 			details.permanentVillage = this.ownerForm.get('permanentVillage')?.value || null;
@@ -606,6 +671,7 @@ export class CompanyownerComponent {
 		this.ownerForm.reset();
 		this.comservice.ownerId = 0;
 		this.selectedId = 0;
+		this.ownerDistrict = [];
 		this.permanentDistrict = [];
 		this.temporaryDistrict = [];
 		this.isAddressChangeMode = false;
@@ -627,7 +693,11 @@ export class CompanyownerComponent {
 	get pothoPath() { return this.ownerForm.get('pothoPath'); }
 	get phoneNumber() { return this.ownerForm.get('phoneNumber'); }
 	get whatsAppNumber() { return this.ownerForm.get('whatsAppNumber'); }
-	// Permanent Address getters (آدرس دایمی)
+	// Owner's Own Address getters (آدرس اصلی مالک)
+	get ownerProvinceId() { return this.ownerForm.get('ownerProvinceId'); }
+	get ownerDistrictId() { return this.ownerForm.get('ownerDistrictId'); }
+	get ownerVillage() { return this.ownerForm.get('ownerVillage'); }
+	// Permanent Address getters (آدرس دایمی) - Current Residence
 	get permanentProvinceId() { return this.ownerForm.get('permanentProvinceId'); }
 	get permanentDistrictId() { return this.ownerForm.get('permanentDistrictId'); }
 	get permanentVillage() { return this.ownerForm.get('permanentVillage'); }

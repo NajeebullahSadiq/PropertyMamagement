@@ -42,7 +42,12 @@ public partial class CompanyOwner
     public string? PhoneNumber { get; set; }
     public string? WhatsAppNumber { get; set; }
 
-    // Permanent Address Fields (آدرس دایمی)
+    // Owner's Own Address Fields (آدرس اصلی مالک)
+    public int? OwnerProvinceId { get; set; }
+    public int? OwnerDistrictId { get; set; }
+    public string? OwnerVillage { get; set; }
+
+    // Permanent Address Fields (آدرس دایمی) - Current Residence
     public int? PermanentProvinceId { get; set; }
     public int? PermanentDistrictId { get; set; }
     public string? PermanentVillage { get; set; }
@@ -63,6 +68,8 @@ public partial class CompanyOwner
     public virtual IdentityCardType? IdentityCardType { get; set; }
 
     // Navigation properties for address locations
+    public virtual Location? OwnerProvince { get; set; }
+    public virtual Location? OwnerDistrict { get; set; }
     public virtual Location? PermanentProvince { get; set; }
     public virtual Location? PermanentDistrict { get; set; }
     public virtual Location? TemporaryProvince { get; set; }

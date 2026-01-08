@@ -241,7 +241,16 @@ namespace WebAPIBackend.Configuration
                     .HasForeignKey(d => d.IdentityCardTypeId)
                     .HasConstraintName("CompanyOwner_IdentityCardTypeId_fkey");
 
-                // Integrated Address Navigation Properties
+                // Owner's Own Address Navigation Properties
+                entity.HasOne(d => d.OwnerProvince).WithMany()
+                    .HasForeignKey(d => d.OwnerProvinceId)
+                    .HasConstraintName("CompanyOwner_OwnerProvinceId_fkey");
+
+                entity.HasOne(d => d.OwnerDistrict).WithMany()
+                    .HasForeignKey(d => d.OwnerDistrictId)
+                    .HasConstraintName("CompanyOwner_OwnerDistrictId_fkey");
+
+                // Integrated Address Navigation Properties (Current Residence)
                 entity.HasOne(d => d.PermanentProvince).WithMany()
                     .HasForeignKey(d => d.PermanentProvinceId)
                     .HasConstraintName("CompanyOwner_PermanentProvinceId_fkey");
