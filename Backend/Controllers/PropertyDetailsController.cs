@@ -116,10 +116,16 @@ namespace WebAPIBackend.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            // Check if user can access property module
+            if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "property"))
+            {
+                return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول ملکیت را ندارید" });
+            }
+
             IQueryable<PropertyDetail> propertyQuery;
 
-            // Check if the user is an admin
-            if (roles.Contains("ADMIN"))
+            // Check if user can view all records
+            if (RbacHelper.CanViewAllRecords(roles, "property"))
             {
                 propertyQuery = _context.PropertyDetails;
             }
@@ -156,6 +162,7 @@ namespace WebAPIBackend.Controllers
                              BuyerName = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().FirstName : null,
                              SellerIndentityCardNumber = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().IndentityCardNumber : null,
                              BuyerIndentityCardNumber = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().IndentityCardNumber : null,
+                             p.CreatedBy
                          }).ToList();
 
             return Ok(query);
@@ -360,7 +367,6 @@ namespace WebAPIBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> SaveProperty([FromBody] PropertyDetail request)
         {
-
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {
@@ -368,6 +374,19 @@ namespace WebAPIBackend.Controllers
             }
 
             var userId = userIdClaim.Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Check if user can create property records
+            if (!RbacHelper.CanCreateRecords(roles, "property"))
+            {
+                return StatusCode(403, new { message = "شما اجازه ایجاد سند ملکیت را ندارید" });
+            }
 
             var (isValid, errorMessage, normalizedCustomPropertyType) = await ValidateAndNormalizePropertyTypeAsync(request.PropertyTypeId, request.CustomPropertyType);
             if (!isValid)
@@ -398,7 +417,6 @@ namespace WebAPIBackend.Controllers
                 transactionDate = request.TransactionDate;
             }
 
-            //  var userId = 25;
             var property = new PropertyDetail
             {
                 Pnumber = request.Pnumber == 0 ? 0 : request.Pnumber,

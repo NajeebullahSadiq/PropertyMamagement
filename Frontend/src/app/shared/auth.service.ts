@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { loginModel } from '../models/loginModel';
 import { environment } from 'src/environments/environment';
+import { UserRoles } from './rbac.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,6 +14,7 @@ export class AuthService {
   photoPath='';
 
   constructor(private fb: FormBuilder, private http: HttpClient) { }
+  
   formModel = this.fb.group({
     FirstName: ['',Validators.required],
     LastName:['',Validators.required],
@@ -21,41 +24,41 @@ export class AuthService {
     Role:['',Validators.required],
     PhoneNumber:[''],
     PhotoPath:[],
+    LicenseType: [''],
     Passwords: this.fb.group({
       Password: ['', [Validators.required, Validators.minLength(4)]],
       ConfirmPassword: ['', Validators.required]
     }, { validator: this.comparePasswords })
-
   });
+
   comparePasswords(fb: FormGroup) {
     let confirmPswrdCtrl = fb.get('ConfirmPassword');
-    //passwordMismatch
-    //confirmPswrdCtrl.errors={passwordMismatch:true}
     if(confirmPswrdCtrl){
-    if (confirmPswrdCtrl.errors == null || 'passwordMismatch' in confirmPswrdCtrl.errors) {
-      if (fb.get('Password')?.value != confirmPswrdCtrl.value)
-        confirmPswrdCtrl.setErrors({ passwordMismatch: true });
-      else
-        confirmPswrdCtrl.setErrors(null);
+      if (confirmPswrdCtrl.errors == null || 'passwordMismatch' in confirmPswrdCtrl.errors) {
+        if (fb.get('Password')?.value != confirmPswrdCtrl.value)
+          confirmPswrdCtrl.setErrors({ passwordMismatch: true });
+        else
+          confirmPswrdCtrl.setErrors(null);
+      }
     }
   }
-  }
-
 
   login(formData: any) {
     return this.http.post(this.BaseURI + '/ApplicationUser/Login', formData);
   }
+
   register() {
     var body = {
       userName: this.formModel.value.UserName,
       email: this.formModel.value.Email,
       firstName: this.formModel.value.FirstName,
-      lastName:this.formModel.value.LastName,
-      role:this.formModel.value.Role,
+      lastName: this.formModel.value.LastName,
+      role: this.formModel.value.Role,
       password: this.formModel.value.Passwords.Password,
-      phoneNumber:this.formModel.value.PhoneNumber,
-      companyId:this.formModel.value.CompanyId,
-      photoPath:this.photoPath
+      phoneNumber: this.formModel.value.PhoneNumber,
+      companyId: this.formModel.value.CompanyId,
+      photoPath: this.photoPath,
+      licenseType: this.formModel.value.LicenseType
     };
     return this.http.post(this.BaseURI + '/ApplicationUser/Register', body);
   }
@@ -67,56 +70,69 @@ export class AuthService {
   getCurrentUserProfile() {
     return this.http.get(this.BaseURI + '/UserProfile/getProfile');
   }
+
   upload(file: File): Observable<HttpEvent<any>> {
     const formData: FormData = new FormData();
-
     formData.append('file', file);
-
     const req = new HttpRequest('POST', `${this.BaseURI}/upload`, formData, {
       reportProgress: true,
       responseType: 'json',
     });
-
     return this.http.request(req);
   }
+
   getFiles(): Observable<any> {
     return this.http.get(`${this.BaseURI}/files`);
   }
 
   roleMatch(allowedRoles: any[]): boolean {
     var isMatch = false;
-    var token=localStorage.getItem('token');
-    if(token)
-    var payLoad = JSON.parse(window.atob(token.split('.')[1]));
-    var userRole = payLoad.role;
-    allowedRoles.forEach(element => {
-      if (userRole == element) {
-        isMatch = true;
-        return false;
-      }
-      else{
-        return;
-      }
-    });
+    var token = localStorage.getItem('token');
+    if (token) {
+      var payLoad = JSON.parse(window.atob(token.split('.')[1]));
+      var userRole = payLoad.role || payLoad.userRole;
+      allowedRoles.forEach(element => {
+        if (userRole == element) {
+          isMatch = true;
+          return false;
+        } else {
+          return;
+        }
+      });
+    }
     return isMatch;
   }
-  getCompanies(){
-    return this.http.get(this.BaseURI+'/CompanyDetails/getCompanies');
+
+  getCompanies() {
+    return this.http.get(this.BaseURI + '/CompanyDetails/getCompanies');
   }
-  getRoles(){
-    return this.http.get(this.BaseURI+'/UserProfile/Role');
+
+  getRoles() {
+    return this.http.get(this.BaseURI + '/ApplicationUser/GetRoles');
   }
+
   changePassword(model: any): Observable<any> {
-    return this.http.post(this.BaseURI+'/ApplicationUser/ChangePassword', model);
+    return this.http.post(this.BaseURI + '/ApplicationUser/ChangePassword', model);
   }
+
   resetPassword(model: loginModel): Observable<any> {
-    return this.http.post(this.BaseURI+'/ApplicationUser/ResetPassword', model);
+    return this.http.post(this.BaseURI + '/ApplicationUser/ResetPassword', model);
   }
-  getUsers(){
-    return this.http.get(this.BaseURI+'/ApplicationUser/UserInfo');
+
+  getUsers() {
+    return this.http.get(this.BaseURI + '/ApplicationUser/UserInfo');
   }
+
   lockUser(userName: string, isLocked: boolean) {
     const data = { UserName: userName, IsLooked: isLocked };
     return this.http.post(`${this.BaseURI}/ApplicationUser/LockUser`, data);
+  }
+
+  updateUserRole(userId: string, newRole: string) {
+    return this.http.post(`${this.BaseURI}/ApplicationUser/UpdateUserRole`, { userId, newRole });
+  }
+
+  createCompanyUser(userData: any) {
+    return this.http.post(`${this.BaseURI}/ApplicationUser/CreateCompanyUser`, userData);
   }
 }

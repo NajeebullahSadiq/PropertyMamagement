@@ -5,6 +5,8 @@
   padding: 0.5rem 1rem;
   background-color: #f8f9fa;
   border-radius: 0.25rem;
+  position: relative;
+  z-index: 1;
 
   .calendar-label {
     display: flex;
@@ -34,6 +36,8 @@
     background-color: white;
     cursor: pointer;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    position: relative;
+    z-index: 1;
 
     &:hover {
       border-color: #80bdff;

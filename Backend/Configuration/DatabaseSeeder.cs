@@ -19,6 +19,61 @@ namespace WebAPIBackend.Configuration
             // Ensure database exists and apply pending migrations
             await context.Database.MigrateAsync();
 
+            // Add RBAC columns to AspNetUsers table - each column separately to handle existing columns
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""LicenseType"" VARCHAR(50) NULL");
+            }
+            catch (Exception) { /* Column may already exist */ }
+            
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""UserRole"" VARCHAR(50) NULL");
+            }
+            catch (Exception) { /* Column may already exist */ }
+            
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""CreatedAt"" TIMESTAMP NULL");
+            }
+            catch (Exception) { /* Column may already exist */ }
+            
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""CreatedBy"" VARCHAR(255) NULL");
+            }
+            catch (Exception) { /* Column may already exist */ }
+            
+            // Update existing admin users to have ADMIN role
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    UPDATE ""AspNetUsers"" 
+                    SET ""UserRole"" = 'ADMIN', ""CreatedAt"" = NOW(), ""CreatedBy"" = 'system'
+                    WHERE ""IsAdmin"" = true AND (""UserRole"" IS NULL OR ""UserRole"" = '');
+                ");
+            }
+            catch (Exception) { /* Silent */ }
+
+            // Add Owner's Own Address columns to CompanyOwner table
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE org.""CompanyOwner"" ADD COLUMN IF NOT EXISTS ""OwnerProvinceId"" INTEGER NULL");
+            }
+            catch (Exception) { /* Column may already exist */ }
+            
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE org.""CompanyOwner"" ADD COLUMN IF NOT EXISTS ""OwnerDistrictId"" INTEGER NULL");
+            }
+            catch (Exception) { /* Column may already exist */ }
+            
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE org.""CompanyOwner"" ADD COLUMN IF NOT EXISTS ""OwnerVillage"" TEXT NULL");
+            }
+            catch (Exception) { /* Column may already exist */ }
+
             // Apply Permanent/Temporary address column rename if not already done
             try
             {
@@ -541,18 +596,8 @@ namespace WebAPIBackend.Configuration
             
             // Logging removed
 
-            // Seed Admin Role (using ADMIN to match controller authorization)
-            if (!await roleManager.RoleExistsAsync("ADMIN"))
-            {
-                var adminRole = new IdentityRole("ADMIN");
-                await roleManager.CreateAsync(adminRole);
-
-                // Add claims to Admin role - grant all permissions
-                await roleManager.AddClaimAsync(adminRole, new Claim(CustomClaimTypes.Permission, UserPermissions.View));
-                await roleManager.AddClaimAsync(adminRole, new Claim(CustomClaimTypes.Permission, UserPermissions.ViewUserTest));
-                await roleManager.AddClaimAsync(adminRole, new Claim(CustomClaimTypes.Permission, UserPermissions.Add));
-                await roleManager.AddClaimAsync(adminRole, new Claim(CustomClaimTypes.Permission, UserPermissions.Edit));
-            }
+            // Seed all roles with their permissions
+            await SeedRolesAndPermissions(roleManager);
 
             // Seed default admin user
             var adminEmail = "admin@prmis.gov.af";
@@ -571,7 +616,10 @@ namespace WebAPIBackend.Configuration
                     IsAdmin = true,
                     IsLocked = false,
                     CompanyId = 0,
-                    PhoneNumber = "0700000000"
+                    PhoneNumber = "0700000000",
+                    UserRole = UserRoles.Admin,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = "system"
                 };
 
                 var result = await userManager.CreateAsync(adminUser, "Admin@123");
@@ -579,27 +627,61 @@ namespace WebAPIBackend.Configuration
                 if (result.Succeeded)
                 {
                     // Assign ADMIN role
-                    await userManager.AddToRoleAsync(adminUser, "ADMIN");
-                    
-                    // Logging removed
-                    // Logging removed
-                }
-                else
-                {
-                    // Logging removed
-                    foreach (var error in result.Errors)
-                    {
-                        // Logging removed
-                    }
+                    await userManager.AddToRoleAsync(adminUser, UserRoles.Admin);
                 }
             }
             else
             {
-                // Logging removed
+                // Update existing admin user with new fields if missing
+                if (string.IsNullOrEmpty(adminUser.UserRole))
+                {
+                    adminUser.UserRole = UserRoles.Admin;
+                    adminUser.CreatedAt ??= DateTime.UtcNow;
+                    adminUser.CreatedBy ??= "system";
+                    await userManager.UpdateAsync(adminUser);
+                }
             }
 
             // Seed lookup tables for dropdown data
             await SeedLookupTables(context);
+        }
+
+        private static async Task SeedRolesAndPermissions(RoleManager<IdentityRole> roleManager)
+        {
+            foreach (var roleName in UserRoles.AllRoles)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    var role = new IdentityRole(roleName);
+                    await roleManager.CreateAsync(role);
+
+                    // Add permissions to role
+                    var permissions = RolePermissions.GetPermissionsForRole(roleName);
+                    foreach (var permission in permissions)
+                    {
+                        await roleManager.AddClaimAsync(role, new Claim(CustomClaimTypes.Permission, permission));
+                    }
+                }
+                else
+                {
+                    // Update existing role with any missing permissions
+                    var role = await roleManager.FindByNameAsync(roleName);
+                    if (role != null)
+                    {
+                        var existingClaims = await roleManager.GetClaimsAsync(role);
+                        var existingPermissions = existingClaims.Where(c => c.Type == CustomClaimTypes.Permission).Select(c => c.Value).ToList();
+                        var requiredPermissions = RolePermissions.GetPermissionsForRole(roleName);
+
+                        foreach (var permission in requiredPermissions)
+                        {
+                            if (!existingPermissions.Contains(permission))
+                            {
+                                await roleManager.AddClaimAsync(role, new Claim(CustomClaimTypes.Permission, permission));
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static async Task SeedLookupTables(AppDbContext context)

@@ -7,6 +7,7 @@ using System.Globalization;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models;
+using WebAPIBackend.Helpers;
 
 namespace WebAPIBackend.Controllers.Vehicles
 {
@@ -43,10 +44,16 @@ namespace WebAPIBackend.Controllers.Vehicles
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            // Check if user can access vehicle module
+            if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "vehicle"))
+            {
+                return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول وسایط نقلیه را ندارید" });
+            }
+
             IQueryable<VehiclesPropertyDetail> propertyQuery;
 
-            // Check if the user is an admin
-            if (roles.Contains("ADMIN"))
+            // Check if user can view all records
+            if (RbacHelper.CanViewAllRecords(roles, "vehicle"))
             {
                 propertyQuery = _context.VehiclesPropertyDetails;
             }

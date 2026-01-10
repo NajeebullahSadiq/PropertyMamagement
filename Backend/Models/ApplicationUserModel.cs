@@ -16,5 +16,10 @@ namespace WebAPI.Models
         public string? Role { get; set; }
         public string? PhoneNumber { get; set; }
         public int CompanyId { get; set; }
+        
+        /// <summary>
+        /// License type (realEstate or carSale) - determines module access for company operators
+        /// </summary>
+        public string? LicenseType { get; set; }
     }
 }

@@ -12,6 +12,18 @@ import { MultiCalendarDatepickerComponent } from './multi-calendar-datepicker/mu
 import { CalendarSelectorComponent } from './calendar-selector/calendar-selector.component';
 import { CalendarDatePipe } from './calendar-date.pipe';
 
+// RBAC Directives
+import {
+  HasPermissionDirective,
+  HasRoleDirective,
+  HasAnyRoleDirective,
+  CanAccessModuleDirective,
+  IsViewOnlyDirective,
+  CanEditDirective,
+  CanEditRecordDirective,
+  IsAdminDirective
+} from './directives/rbac.directive';
+
 // Dialog components moved from AuthModule for global availability
 import { ChangepasswordComponent } from '../auth/changepassword/changepassword.component';
 import { ResetpasswordComponent } from '../auth/resetpassword/resetpassword.component';
@@ -25,6 +37,15 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     MultiCalendarDatepickerComponent,
     CalendarSelectorComponent,
     CalendarDatePipe,
+    // RBAC Directives
+    HasPermissionDirective,
+    HasRoleDirective,
+    HasAnyRoleDirective,
+    CanAccessModuleDirective,
+    IsViewOnlyDirective,
+    CanEditDirective,
+    CanEditRecordDirective,
+    IsAdminDirective,
     // Dialog components
     ChangepasswordComponent,
     ResetpasswordComponent,
@@ -44,6 +65,15 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     MultiCalendarDatepickerComponent,
     CalendarSelectorComponent,
     CalendarDatePipe,
+    // RBAC Directives
+    HasPermissionDirective,
+    HasRoleDirective,
+    HasAnyRoleDirective,
+    CanAccessModuleDirective,
+    IsViewOnlyDirective,
+    CanEditDirective,
+    CanEditRecordDirective,
+    IsAdminDirective,
     // Export dialog components so they can be used anywhere
     ChangepasswordComponent,
     ResetpasswordComponent,

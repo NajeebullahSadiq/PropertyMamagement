@@ -64,6 +64,7 @@ export interface PropertyDetails {
     buyerIndentityCardNumber?: number;
     sellerIndentityCardNumber?: number;
     status?: string;
+    createdBy?: string;
 
   }
 

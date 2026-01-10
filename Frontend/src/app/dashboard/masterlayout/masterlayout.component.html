@@ -1,3 +1,4 @@
+﻿<!-- Toolbar -->
 <mat-toolbar class="toolbar-modern !h-14 !px-4">
   <div class="toolbar-bg"></div>
   
@@ -5,13 +6,13 @@
     mat-icon-button
     *ngIf="sidenav.mode === 'over'"
     (click)="sidenav.toggle()"
-    class="relative z-10 text-white hover:bg-white/10"
+    class="toolbar-btn text-white hover:bg-white/10"
   >
     <mat-icon *ngIf="!sidenav.opened">menu</mat-icon>
     <mat-icon *ngIf="sidenav.opened">close</mat-icon>
   </button>
 
-  <div class="relative z-10 flex items-center gap-3">
+  <div class="toolbar-content flex items-center gap-3">
     <img src="assets/img/mcitlogo.png" class="h-9 w-9 object-contain" />
     <div class="flex flex-col">
       <span class="text-[10px] text-white/70">{{ "title2" | translate }}</span>
@@ -21,131 +22,121 @@
 
   <span class="flex-1"></span>
 
-  <div class="relative z-10 flex items-center gap-1">
+  <div class="toolbar-actions flex items-center gap-2">
     <app-calendar-selector></app-calendar-selector>
 
-    <button mat-icon-button [matMenuTriggerFor]="userAccountMenu" class="text-white hover:bg-white/10">
+    <!-- User Account Button -->
+    <button 
+      (click)="toggleUserMenu($event)"
+      class="toolbar-btn flex items-center justify-center w-10 h-10 rounded-full text-white hover:bg-white/10 transition-colors cursor-pointer"
+    >
       <mat-icon>account_circle</mat-icon>
     </button>
 
-    <button mat-icon-button [matMenuTriggerFor]="lang" class="text-white hover:bg-white/10">
+    <!-- Language Button -->
+    <button 
+      (click)="toggleLangMenu($event)"
+      class="toolbar-btn flex items-center justify-center w-10 h-10 rounded-full text-white hover:bg-white/10 transition-colors cursor-pointer"
+    >
       <mat-icon>translate</mat-icon>
     </button>
   </div>
 </mat-toolbar>
 
-<mat-menu #userAccountMenu="matMenu" panelClass="user-account-menu-panel">
-  <button mat-menu-item (click)="navigateToRegister()" *ngIf="userRole == 'ADMIN'">
-    <mat-icon>people</mat-icon>
+<!-- Backdrop -->
+<div 
+  *ngIf="isUserMenuOpen || isLangMenuOpen"
+  (click)="closeAllMenus()"
+  class="fixed inset-0 bg-transparent"
+  style="z-index: 99998;"
+></div>
+
+<!-- User Dropdown Menu -->
+<div 
+  *ngIf="isUserMenuOpen"
+  class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
+  style="z-index: 99999; top: 60px; left: 20px; min-width: 220px;"
+>
+  <button *ngIf="canAccessUsers" (click)="navigateToRegister()" class="dropdown-item">
+    <mat-icon class="text-gray-500">people</mat-icon>
     <span>ایجاد کاربر</span>
   </button>
-  <button mat-menu-item (click)="openDialog()">
-    <mat-icon>lock</mat-icon>
+  <button (click)="openDialog()" class="dropdown-item">
+    <mat-icon class="text-gray-500">lock</mat-icon>
     <span>تغیر پسورد</span>
   </button>
-  <button mat-menu-item (click)="openReset()" *ngIf="userRole == 'ADMIN'">
-    <mat-icon>lock_reset</mat-icon>
+  <button *ngIf="canAccessUsers" (click)="openReset()" class="dropdown-item">
+    <mat-icon class="text-gray-500">lock_reset</mat-icon>
     <span>باز نشانی پسورد</span>
   </button>
-  <button mat-menu-item (click)="openLockuser()" *ngIf="userRole == 'ADMIN'">
-    <mat-icon>lock_person</mat-icon>
+  <button *ngIf="canAccessUsers" (click)="openLockuser()" class="dropdown-item">
+    <mat-icon class="text-gray-500">lock_person</mat-icon>
     <span>قفل حساب کابران</span>
   </button>
-  <mat-divider></mat-divider>
-  <button mat-menu-item (click)="onLogout()">
-    <mat-icon color="warn">logout</mat-icon>
-    <span style="color: #dc2626;">خروج</span>
+  <div class="border-t border-gray-100 my-1"></div>
+  <button (click)="onLogout()" class="dropdown-item text-red-600 hover:bg-red-50">
+    <mat-icon class="text-red-500">logout</mat-icon>
+    <span>خروج</span>
   </button>
-</mat-menu>
+</div>
 
-<mat-menu #lang="matMenu">
-  <button mat-menu-item (click)="setlang()">
+<!-- Language Dropdown Menu -->
+<div 
+  *ngIf="isLangMenuOpen"
+  class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
+  style="z-index: 99999; top: 60px; left: 70px; min-width: 150px;"
+>
+  <button (click)="setlang()" class="dropdown-item">
     <span>دری</span>
   </button>
-  <button mat-menu-item (click)="setlangen()">
+  <button (click)="setlangen()" class="dropdown-item">
     <span>پشتو</span>
   </button>
-</mat-menu>
+</div>
 
+<!-- Sidenav Container -->
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav="matSidenav" class="sidenav-modern">
-    <!-- User Profile - Compact -->
     <div class="p-3 border-b border-slate-200 text-center">
-      <img
-        class="mx-auto h-12 w-12 rounded-full object-cover border-2 border-slate-200"
-        [src]="filePath"
-        (error)="handleImageError()"
-      />
-      <div class="mt-2 text-sm font-bold text-slate-800">
-        {{ userDetails.firstName }} {{ userDetails.lastName }}
-      </div>
-      <div class="text-xs text-slate-500 font-semibold">
-        {{ userRole == 'ADMIN' ? 'مدیر سیستم' : 'کاربر' }}
-      </div>
+      <img class="mx-auto h-12 w-12 rounded-full object-cover border-2 border-slate-200" [src]="filePath" (error)="handleImageError()" />
+      <div class="mt-2 text-sm font-bold text-slate-800">{{ userDetails.firstName }} {{ userDetails.lastName }}</div>
+      <div class="text-xs text-slate-500 font-semibold">{{ userRoleDari || (userRole == 'ADMIN' ? 'مدیر سیستم' : 'کاربر') }}</div>
+      <div *ngIf="isViewOnly" class="mt-1 inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">فقط مشاهده</div>
     </div>
-
-    <!-- Navigation - Compact -->
     <nav class="p-2">
-      <!-- Dashboard -->
-      <a *ngIf="userRole == 'ADMIN'" routerLink="/dashboard/dashboard" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>dashboard</mat-icon>
-        <span>{{ "dashboard" | translate }}</span>
+      <a *ngIf="canAccessDashboard" routerLink="/dashboard/dashboard" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>dashboard</mat-icon><span>{{ "dashboard" | translate }}</span>
       </a>
-
-      <!-- Company Section -->
-      <div *ngIf="userRole == 'ADMIN'" class="section-label">شرکت ها</div>
-
-      <a *ngIf="userRole == 'ADMIN'" routerLink="/dashboard/realestate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-        <mat-icon>business</mat-icon>
-        <span>{{ "company" | translate }}</span>
+      <div *ngIf="canAccessCompany" class="section-label">شرکت ها</div>
+      <a *ngIf="canAccessCompany && !isViewOnly" routerLink="/dashboard/realestate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>business</mat-icon><span>{{ "company" | translate }}</span>
       </a>
-
-      <a *ngIf="userRole == 'ADMIN'" routerLink="/dashboard/realestate/list" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>list_alt</mat-icon>
-        <span>{{ "companylist" | translate }}</span>
+      <a *ngIf="canAccessCompany" routerLink="/dashboard/realestate/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>list_alt</mat-icon><span>{{ "companylist" | translate }}</span>
       </a>
-
-      <!-- Property Section -->
-      <div class="section-label">ملکیت ها</div>
-
-      <a routerLink="/dashboard/estate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-        <mat-icon>apartment</mat-icon>
-        <span>{{ "property" | translate }}</span>
+      <div *ngIf="canAccessProperty" class="section-label">ملکیت ها</div>
+      <a *ngIf="canAccessProperty && !isViewOnly" routerLink="/dashboard/estate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>apartment</mat-icon><span>{{ "property" | translate }}</span>
       </a>
-
-      <a routerLink="/dashboard/estate/list" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>format_list_bulleted</mat-icon>
-        <span>{{ "propertylist" | translate }}</span>
+      <a *ngIf="canAccessProperty" routerLink="/dashboard/estate/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>format_list_bulleted</mat-icon><span>{{ "propertylist" | translate }}</span>
       </a>
-
-      <!-- Vehicle Section -->
-      <div class="section-label">وسایط نقلیه</div>
-
-      <a routerLink="/dashboard/vehicle" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-        <mat-icon>directions_car</mat-icon>
-        <span>{{ "vehicle" | translate }}</span>
+      <div *ngIf="canAccessVehicle" class="section-label">وسایط نقلیه</div>
+      <a *ngIf="canAccessVehicle && !isViewOnly" routerLink="/dashboard/vehicle" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>directions_car</mat-icon><span>{{ "vehicle" | translate }}</span>
       </a>
-
-      <a routerLink="/dashboard/vehicle/list" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>format_list_bulleted</mat-icon>
-        <span>{{ "vehiclelist" | translate }}</span>
+      <a *ngIf="canAccessVehicle" routerLink="/dashboard/vehicle/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>format_list_bulleted</mat-icon><span>{{ "vehiclelist" | translate }}</span>
       </a>
-
-      <!-- Reports Section -->
-      <div *ngIf="userRole == 'ADMIN'" class="section-label">گزارشات</div>
-
-      <a *ngIf="userRole == 'ADMIN'" routerLink="/dashboard/report" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>assessment</mat-icon>
-        <span>{{ "report" | translate }}</span>
+      <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
+      <a *ngIf="canAccessReports" routerLink="/dashboard/report" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>
       </a>
-
-      <a *ngIf="userRole == 'ADMIN'" routerLink="/dashboard/userreport" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>summarize</mat-icon>
-        <span>{{ "reportbycompany" | translate }}</span>
+      <a *ngIf="canAccessReports && canAccessUsers" routerLink="/dashboard/userreport" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>summarize</mat-icon><span>{{ "reportbycompany" | translate }}</span>
       </a>
     </nav>
   </mat-sidenav>
-
   <mat-sidenav-content class="bg-slate-50">
     <div class="m-4 rounded-xl bg-white shadow-sm border border-slate-200 min-h-[calc(100vh-88px)]">
       <router-outlet></router-outlet>

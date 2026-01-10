@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
@@ -11,22 +13,45 @@ using WebAPIBackend.Models.RequestData;
 
 namespace WebAPIBackend.Controllers.Companies
 {
-   [Authorize(Roles = "ADMIN")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CompanyDetailsController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public CompanyDetailsController(AppDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public CompanyDetailsController(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Check if user can access company module
+                if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "company"))
+                {
+                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول شرکت ها را ندارید" });
+                }
+
                 var query = from p in _context.CompanyDetails
                             select new
                             {
@@ -46,15 +71,36 @@ namespace WebAPIBackend.Controllers.Companies
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
         [HttpGet("getexpired")]
-        public IActionResult GetExpiredLicense()
+        public async Task<IActionResult> GetExpiredLicense()
         {
             try
             {
-                var currentDate = DateOnly.FromDateTime(DateTime.Now); // Current date in DateOnly format
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Check if user can access company module
+                if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "company"))
+                {
+                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول شرکت ها را ندارید" });
+                }
+
+                var currentDate = DateOnly.FromDateTime(DateTime.Now);
 
                 var query = from p in _context.CompanyDetails
-                            where p.LicenseDetails.Any(l => l.ExpireDate < currentDate) // Filter out non-expired licenses
+                            where p.LicenseDetails.Any(l => l.ExpireDate < currentDate)
                             select new
                             {
                                 p.Id,

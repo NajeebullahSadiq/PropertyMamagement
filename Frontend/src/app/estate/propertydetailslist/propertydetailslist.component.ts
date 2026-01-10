@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PropertyDetails, PropertyDetailsList } from 'src/app/models/PropertyDetail';
 import { PropertyService } from 'src/app/shared/property.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
+import { RbacService } from 'src/app/shared/rbac.service';
 
 @Component({
   selector: 'app-propertydetailslist',
@@ -20,16 +21,27 @@ export class PropertydetailslistComponent {
   count: number = 0;
   tableSize: number = 10;
   tableSizes: any = [10,50,100];
+  
+  // RBAC flags
+  isViewOnly = false;
+  canCreate = false;
+  currentUserId = '';
 
   constructor(
     private http: HttpClient,
     private propertyService: PropertyService,
     private toastr: ToastrService,
     private router: Router,
-    private localizationService: LocalizationService
+    private localizationService: LocalizationService,
+    private rbacService: RbacService
   ) {}
 
   ngOnInit() {
+    // Load RBAC permissions
+    this.isViewOnly = this.rbacService.isViewOnly();
+    this.canCreate = !this.isViewOnly && this.rbacService.hasPermission('property.create');
+    this.currentUserId = this.rbacService.getCurrentUserId();
+    
     this.loadData();
     // Subscribe to property added event to reload list immediately
     this.propertyService.propertyAdded.subscribe(() => {
@@ -54,6 +66,10 @@ export class PropertydetailslistComponent {
     const value = (propertyTypeValue ?? '').toString();
     const match = this.localizationService.propertyTypes.find(pt => pt.value === value);
     return match?.label || 'سایر';
+  }
+
+  canEditRecord(createdBy: string): boolean {
+    return this.rbacService.canEditRecord(createdBy);
   }
 
   onEdit(propertyId: number) {
