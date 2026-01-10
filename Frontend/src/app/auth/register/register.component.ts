@@ -24,6 +24,13 @@ export class RegisterComponent implements OnInit {
   showCompanySelect = false;
   showLicenseTypeSelect = false;
 
+  // UI State
+  successMessage: string = '';
+  errorMessage: string = '';
+  isSubmitting: boolean = false;
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+
   // License types for company operators
   licenseTypes = [
     { id: 'realEstate', name: 'Real Estate', dari: 'املاک' },
@@ -62,12 +69,19 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit() {
+    // Clear previous messages
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.isSubmitting = true;
+
     this.service.photoPath = this.imageName;
 
     this.service.register().subscribe(
       (res: any) => {
+        this.isSubmitting = false;
         if (res.succeeded) {
           this.service.formModel.reset();
+          this.successMessage = 'کاربر جدید موفقانه ایجاد گردید!';
           this.toastr.success('New user created!', 'معلومات موفقانه ثبت سیستم گردید');
           this.callChildMethod();
           this.filePath = 'assets/img/avatar.png';
@@ -77,13 +91,40 @@ export class RegisterComponent implements OnInit {
           this.service.getUserProfile().subscribe(res => {
             this.userDetails = res;
           });
+          
+          // Auto-hide success message after 5 seconds
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 5000);
         } else {
           res.errors.forEach((element: { code: any; description: string | undefined; }) => {
             switch (element.code) {
               case 'DuplicateUserName':
+                this.errorMessage = 'این نام کاربری قبلاً استفاده شده است. لطفاً نام کاربری دیگری انتخاب کنید.';
                 this.toastr.error('Username is already taken', 'Registration failed.');
                 break;
+              case 'DuplicateEmail':
+                this.errorMessage = 'این ایمیل آدرس قبلاً ثبت شده است.';
+                this.toastr.error('Email is already registered', 'Registration failed.');
+                break;
+              case 'PasswordTooShort':
+                this.errorMessage = 'پسورد باید حداقل ۶ کرکتر باشد.';
+                this.toastr.error('Password is too short', 'Registration failed.');
+                break;
+              case 'PasswordRequiresNonAlphanumeric':
+                this.errorMessage = 'پسورد باید شامل کرکتر های خاص باشد.';
+                this.toastr.error('Password requires special characters', 'Registration failed.');
+                break;
+              case 'PasswordRequiresDigit':
+                this.errorMessage = 'پسورد باید شامل اعداد باشد.';
+                this.toastr.error('Password requires digits', 'Registration failed.');
+                break;
+              case 'PasswordRequiresUpper':
+                this.errorMessage = 'پسورد باید شامل حروف بزرگ باشد.';
+                this.toastr.error('Password requires uppercase letters', 'Registration failed.');
+                break;
               default:
+                this.errorMessage = element.description || 'خطا در ثبت کاربر. لطفاً دوباره تلاش کنید.';
                 this.toastr.error(element.description, 'Registration failed.');
                 break;
             }
@@ -91,7 +132,10 @@ export class RegisterComponent implements OnInit {
         }
       },
       err => {
+        this.isSubmitting = false;
         console.log(err);
+        this.errorMessage = 'خطا در اتصال به سرور. لطفاً اتصال انترنت خود را بررسی کنید.';
+        this.toastr.error('Connection error', 'خطا در اتصال');
       }
     );
   }
@@ -103,6 +147,18 @@ export class RegisterComponent implements OnInit {
 
   callChildMethod() {
     this.childComponent.childMethod();
+  }
+
+  resetForm() {
+    this.service.formModel.reset();
+    this.filePath = 'assets/img/avatar.png';
+    this.imageName = '';
+    this.showCompanySelect = false;
+    this.showLicenseTypeSelect = false;
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.showPassword = false;
+    this.showConfirmPassword = false;
   }
 
   onPropertyTypeChange() {

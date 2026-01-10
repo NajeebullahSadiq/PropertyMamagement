@@ -1,164 +1,355 @@
-<section>
-  <div class="row d-flex justify-content-center align-items-center h-100 content">
-    <div class="col-lg-12 col-xl-11 content">
+<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+        <i class="fas fa-user-plus text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">فورم ایجاد اکونت ها</h1>
+      <p class="text-gray-500 max-w-md mx-auto">ایجاد حساب کاربری جدید در سیستم</p>
+    </div>
 
-      <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">فورم ایجاد اکونت ها</p>
-      <form [formGroup]="service.formModel" autocomplete="off" (submit)="onSubmit()">
-        <div class="form-group">
-          <input type="hidden" formControlName="id">
+    <!-- Success Message Alert -->
+    <div *ngIf="successMessage" 
+         class="mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3 animate-slide-up max-w-4xl mx-auto">
+      <div class="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+        <i class="fas fa-check-circle text-emerald-600 text-lg"></i>
+      </div>
+      <div class="flex-1">
+        <h4 class="text-sm font-bold text-emerald-800">موفقیت!</h4>
+        <p class="text-sm text-emerald-700">{{ successMessage }}</p>
+      </div>
+      <button (click)="successMessage = ''" class="text-emerald-500 hover:text-emerald-700 transition-colors">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Error Message Alert -->
+    <div *ngIf="errorMessage" 
+         class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 animate-slide-up max-w-4xl mx-auto">
+      <div class="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+        <i class="fas fa-exclamation-circle text-red-600 text-lg"></i>
+      </div>
+      <div class="flex-1">
+        <h4 class="text-sm font-bold text-red-800">خطا!</h4>
+        <p class="text-sm text-red-700">{{ errorMessage }}</p>
+      </div>
+      <button (click)="errorMessage = ''" class="text-red-500 hover:text-red-700 transition-colors">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="service.formModel" autocomplete="off" (submit)="onSubmit()">
+      <input type="hidden" formControlName="id">
+
+      <!-- Avatar Upload Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-camera"></i>
+            <span>آپلود عکس کاربر</span>
+          </h2>
         </div>
-        <div class="row">
-          <div class="col-md-10">
-            <div class="row">
-              <div class="col-md-4">
-                <label class="form-label">نام</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-user"></i></span>
-                  <input type="text" class="form-control" formControlName="FirstName">
-                </div>
-                <div *ngIf="service.formModel.get('FirstName')?.touched && service.formModel.get('FirstName')?.errors?.['required']">
-                  <small class="text-danger">این فیلد الزامی است</small>
-                </div>
+        <div class="px-6 py-6">
+          <div class="flex flex-col items-center">
+            <div class="relative mb-4">
+              <img [src]="filePath" alt="Avatar" 
+                   class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+              <div class="absolute bottom-1 right-1 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-md">
+                <i class="fas fa-camera text-white text-sm"></i>
               </div>
-              <div class="col-md-4">
-                <label class="form-label">تخلص</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-user"></i></span>
-                  <input type="text" class="form-control" formControlName="LastName">
-                </div>
-                <div *ngIf="service.formModel.get('LastName')?.touched && service.formModel.get('LastName')?.errors?.['required']">
-                  <small class="text-danger">این فیلد الزامی است</small>
-                </div>
+            </div>
+            <p class="text-gray-500 text-sm mb-4">فرمت های مجاز: JPG, PNG</p>
+            <app-upload (sendMessage)="uploadFinished($event)"></app-upload>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Information Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-user"></i>
+            <span>معلومات شخصی</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- First Name -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نام</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-user"></i>
+                </span>
+                <input type="text" formControlName="FirstName"
+                       class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                       [ngClass]="{'border-red-500': service.formModel.get('FirstName')?.touched && service.formModel.get('FirstName')?.errors?.['required']}">
               </div>
-              <div class="col-md-4">
-                <label class="form-label">نام کاربر به انگلیسی</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-user"></i></span>
-                  <input type="text" class="form-control" formControlName="UserName">
-                </div>
-                <div *ngIf="service.formModel.get('UserName')?.touched && service.formModel.get('UserName')?.errors?.['required']">
-                  <small class="text-danger">این فیلد الزامی است</small>
-                </div>
+              <div *ngIf="service.formModel.get('FirstName')?.touched && service.formModel.get('FirstName')?.errors?.['required']">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
             </div>
 
-            <div class="row">
-              <div class="col-md-4">
-                <label class="form-label">ایمیل آدرس</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                  <input type="text" class="form-control" formControlName="Email">
-                </div>
-                <div *ngIf="service.formModel.get('Email')?.touched && service.formModel.get('Email')?.errors?.['email']">
-                  <small class="text-danger">ایمیل آدرس درست نیست</small>
-                </div>
+            <!-- Last Name -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">تخلص</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-user"></i>
+                </span>
+                <input type="text" formControlName="LastName"
+                       class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                       [ngClass]="{'border-red-500': service.formModel.get('LastName')?.touched && service.formModel.get('LastName')?.errors?.['required']}">
               </div>
-              <div class="col-md-4">
-                <label class="form-label">شماره موبایل</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                  <input type="text" class="form-control" formControlName="PhoneNumber">
-                </div>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label me-3">نقش کاربر</label>
-                <ng-select formControlName="Role" [items]="roles" [selectOnTab]="true" 
-                           bindLabel="dari" bindValue="name" (change)="onPropertyTypeChange()">
-                </ng-select>
-                <div *ngIf="service.formModel.get('Role')?.touched && service.formModel.get('Role')?.errors?.['required']">
-                  <small class="text-danger">این فیلد الزامی است</small>
-                </div>
+              <div *ngIf="service.formModel.get('LastName')?.touched && service.formModel.get('LastName')?.errors?.['required']">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
             </div>
 
-            <div formGroupName="Passwords" class="row">
-              <div class="form-group col-md-4">
-                <label class="form-label">پسورد</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                  <input type="password" class="form-control" formControlName="Password">
-                </div>
-                <div *ngIf="service.formModel.get('Passwords.Password')?.touched && service.formModel.get('Passwords.Password')?.errors?.['required']">
-                  <small class="text-danger">این فیلد الزامی است</small>
-                </div>
+            <!-- Username -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نام کاربر به انگلیسی</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-at"></i>
+                </span>
+                <input type="text" formControlName="UserName" dir="ltr"
+                       class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-left"
+                       [ngClass]="{'border-red-500': service.formModel.get('UserName')?.touched && service.formModel.get('UserName')?.errors?.['required']}">
               </div>
-
-              <div class="form-group col-md-4">
-                <label class="form-label">تکرار پسورد</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                  <input type="password" class="form-control" formControlName="ConfirmPassword">
-                </div>
-                <div *ngIf="service.formModel.get('Passwords.ConfirmPassword')?.touched && service.formModel.get('Passwords.ConfirmPassword')?.errors?.['required']">
-                  <small class="text-danger">این فیلد الزامی است</small>
-                </div>
-                <div *ngIf="service.formModel.get('Passwords.ConfirmPassword')?.touched && service.formModel.get('Passwords.ConfirmPassword')?.errors?.['passwordMismatch']">
-                  <small class="text-danger">پسورد با تکرار آن مطابقت ندارد</small>
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <!-- Company Selection - shown for company operators -->
-              <div class="col-md-4" *ngIf="showCompanySelect">
-                <label class="form-label me-3">عنوان رهنمایی معاملات</label>
-                <ng-select formControlName="CompanyId" [items]="companylist" [selectOnTab]="true" 
-                           bindLabel="title" bindValue="id">
-                </ng-select>
-              </div>
-
-              <!-- License Type Selection - shown for company operators -->
-              <div class="col-md-4" *ngIf="showLicenseTypeSelect">
-                <label class="form-label me-3">نوع جواز</label>
-                <ng-select formControlName="LicenseType" [items]="licenseTypes" [selectOnTab]="true" 
-                           bindLabel="dari" bindValue="id">
-                </ng-select>
+              <div *ngIf="service.formModel.get('UserName')?.touched && service.formModel.get('UserName')?.errors?.['required']">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="col-md-2">
-            <div class="form-group col-md-12">
-              <img src='{{filePath}}' alt="Avatar" class="avatar">
-              <app-upload (sendMessage)="uploadFinished($event)"></app-upload>
+      <!-- Contact Information Section -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-address-book"></i>
+            <span>معلومات تماس</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">ایمیل آدرس</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-envelope"></i>
+                </span>
+                <input type="email" formControlName="Email" dir="ltr"
+                       class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-left"
+                       [ngClass]="{'border-red-500': service.formModel.get('Email')?.touched && service.formModel.get('Email')?.errors?.['email']}">
+              </div>
+              <div *ngIf="service.formModel.get('Email')?.touched && service.formModel.get('Email')?.errors?.['email']">
+                <small class="text-red-600 text-xs mt-1 block">ایمیل آدرس درست نیست</small>
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره موبایل</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-phone"></i>
+                </span>
+                <input type="tel" formControlName="PhoneNumber" dir="ltr"
+                       class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-left"
+                       placeholder="0700000000">
+              </div>
+            </div>
+
+            <!-- Role -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نقش کاربر</label>
+              <ng-select formControlName="Role" [items]="roles" [selectOnTab]="true" 
+                         bindLabel="dari" bindValue="name" (change)="onPropertyTypeChange()"
+                         placeholder="انتخاب نقش..."
+                         class="custom-ng-select">
+              </ng-select>
+              <div *ngIf="service.formModel.get('Role')?.touched && service.formModel.get('Role')?.errors?.['required']">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <br />
-        <button class="btn btn-outline-primary" [disabled]="!service.formModel.valid" type="submit">ثبت</button>
-        <button type="reset" class="btn btn-outline-primary">جدید</button>
-      </form>
+      <!-- Password Section -->
+      <div formGroupName="Passwords" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-shield-alt"></i>
+            <span>امنیت حساب</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Password -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">پسورد</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-lock"></i>
+                </span>
+                <input [type]="showPassword ? 'text' : 'password'" formControlName="Password" dir="ltr"
+                       class="w-full px-4 py-2.5 pl-10 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-left"
+                       [ngClass]="{'border-red-500': service.formModel.get('Passwords.Password')?.touched && service.formModel.get('Passwords.Password')?.errors?.['required']}">
+                <button type="button" (click)="showPassword = !showPassword"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                  <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
+              <div *ngIf="service.formModel.get('Passwords.Password')?.touched && service.formModel.get('Passwords.Password')?.errors?.['required']">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
+            </div>
 
-      <br>
-      <div>
-        <table class="table table-bordered">
-          <thead>
-            <tr style="text-align: center;">
-              <th>شماره مسلسل</th>
-              <th>نام</th>
-              <th>تخلص</th>
-              <th>نام کاربری</th>
-              <th>آدرس ایمیل</th>
-              <th>نقش</th>
-              <th>حالت</th>
+            <!-- Confirm Password -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">تکرار پسورد</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-lock"></i>
+                </span>
+                <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="ConfirmPassword" dir="ltr"
+                       class="w-full px-4 py-2.5 pl-10 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-left"
+                       [ngClass]="{'border-red-500': (service.formModel.get('Passwords.ConfirmPassword')?.touched && service.formModel.get('Passwords.ConfirmPassword')?.errors?.['required']) || service.formModel.get('Passwords.ConfirmPassword')?.errors?.['passwordMismatch']}">
+                <button type="button" (click)="showConfirmPassword = !showConfirmPassword"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                  <i [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
+              <div *ngIf="service.formModel.get('Passwords.ConfirmPassword')?.touched && service.formModel.get('Passwords.ConfirmPassword')?.errors?.['required']">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
+              <div *ngIf="service.formModel.get('Passwords.ConfirmPassword')?.touched && service.formModel.get('Passwords.ConfirmPassword')?.errors?.['passwordMismatch']">
+                <small class="text-red-600 text-xs mt-1 block">پسورد با تکرار آن مطابقت ندارد</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Selection Section (Conditional) -->
+      <div *ngIf="showCompanySelect || showLicenseTypeSelect" 
+           class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-building"></i>
+            <span>معلومات شرکت</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Company -->
+            <div *ngIf="showCompanySelect">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">عنوان رهنمایی معاملات</label>
+              <ng-select formControlName="CompanyId" [items]="companylist" [selectOnTab]="true" 
+                         bindLabel="title" bindValue="id"
+                         placeholder="انتخاب شرکت..."
+                         class="custom-ng-select">
+              </ng-select>
+            </div>
+
+            <!-- License Type -->
+            <div *ngIf="showLicenseTypeSelect">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نوع جواز</label>
+              <ng-select formControlName="LicenseType" [items]="licenseTypes" [selectOnTab]="true" 
+                         bindLabel="dari" bindValue="id"
+                         placeholder="انتخاب نوع جواز..."
+                         class="custom-ng-select">
+              </ng-select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+        <div class="p-6">
+          <div class="flex flex-wrap gap-4 justify-center">
+            <button type="submit" 
+                    [disabled]="!service.formModel.valid || isSubmitting"
+                    class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 hover:-translate-y-0.5 active:translate-y-0">
+              <i *ngIf="!isSubmitting" class="fas fa-save"></i>
+              <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin"></i>
+              <span>{{ isSubmitting ? 'در حال ثبت...' : 'ثبت کاربر' }}</span>
+            </button>
+            <button type="reset" (click)="resetForm()"
+                    class="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 flex items-center gap-3 hover:-translate-y-0.5 active:translate-y-0">
+              <i class="fas fa-plus-circle"></i>
+              <span>فورم جدید</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Users Table Section -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-slate-700 to-slate-800 px-6 py-4 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <i class="fas fa-users"></i>
+          <span>لیست کاربران سیستم</span>
+        </h2>
+        <span class="bg-white/20 text-white text-sm px-3 py-1 rounded-full">
+          {{ userDetails?.length || 0 }} کاربر
+        </span>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b-2 border-gray-200">
+            <tr class="text-center">
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نام</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تخلص</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نام کاربری</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">آدرس ایمیل</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نقش</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">حالت</th>
             </tr>
           </thead>
-          <tbody>
-            <tr style="text-align: center;" *ngFor="let user of userDetails; let i = index">
-              <td>{{i + 1}}</td>
-              <td>{{user.firstName}}</td>
-              <td>{{user.lastName}}</td>
-              <td>{{user.userName}}</td>
-              <td>{{user.email}}</td>
-              <td>{{user.roleDari || getRoleDari(user.role)}}</td>
-              <td>
-                <span *ngIf="user.isLocked; else notLocked">
-                  <i class="fas fa-times-circle text-danger"></i> قفل
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let user of userDetails; let i = index" 
+                class="text-center hover:bg-gray-50 transition-colors"
+                [ngClass]="{'bg-gray-50': i % 2 === 1}">
+              <td class="px-4 py-3 text-sm text-gray-700">{{ i + 1 }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ user.firstName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ user.lastName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700" dir="ltr">{{ user.userName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700" dir="ltr">{{ user.email || '-' }}</td>
+              <td class="px-4 py-3">
+                <span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">
+                  {{ user.roleDari || getRoleDari(user.role) }}
                 </span>
-                <ng-template #notLocked>
-                  <i class="fas fa-check-circle text-success"></i> فعال
-                </ng-template>
+              </td>
+              <td class="px-4 py-3">
+                <span *ngIf="user.isLocked" 
+                      class="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                  <i class="fas fa-lock text-xs"></i>
+                  قفل
+                </span>
+                <span *ngIf="!user.isLocked" 
+                      class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+                  <i class="fas fa-check-circle text-xs"></i>
+                  فعال
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="!userDetails || userDetails.length === 0">
+              <td colspan="7" class="px-4 py-12 text-center">
+                <div class="flex flex-col items-center gap-3 text-gray-400">
+                  <i class="fas fa-users text-4xl"></i>
+                  <p class="text-sm">هیچ کاربری یافت نشد</p>
+                </div>
               </td>
             </tr>
           </tbody>
