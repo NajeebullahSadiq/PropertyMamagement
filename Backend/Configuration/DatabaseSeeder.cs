@@ -769,6 +769,29 @@ namespace WebAPIBackend.Configuration
                 Console.WriteLine($"Note: VehiclesBuyerDetails columns check completed: {ex.Message}");
             }
 
+            // Create UserProfileWithCompany view (required by DbContext)
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    CREATE OR REPLACE VIEW ""UserProfileWithCompany"" AS
+                    SELECT 
+                        u.""Id"" AS ""UserId"",
+                        u.""Email"",
+                        u.""UserName"",
+                        u.""FirstName"",
+                        u.""LastName"",
+                        u.""PhotoPath"",
+                        c.""Title"" AS ""CompanyName"",
+                        COALESCE(c.""PhoneNumber"", u.""PhoneNumber"") AS ""PhoneNumber""
+                    FROM ""AspNetUsers"" u
+                    LEFT JOIN ""org"".""CompanyDetails"" c ON u.""CompanyId"" = c.""Id"";
+                ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Note: UserProfileWithCompany view creation: {ex.Message}");
+            }
+
             // Seed lookup tables for dropdown data
             await SeedLookupTables(context);
         }
