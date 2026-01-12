@@ -792,6 +792,85 @@ namespace WebAPIBackend.Configuration
                 Console.WriteLine($"Note: UserProfileWithCompany view creation: {ex.Message}");
             }
 
+            // Add missing columns to lookup tables (Area, etc.)
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    DO $
+                    BEGIN
+                        -- Add CreatedAt column to Area if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'Area' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""Area"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+                        
+                        -- Add CreatedBy column to Area if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'Area' AND column_name = 'CreatedBy') THEN
+                            ALTER TABLE look.""Area"" ADD COLUMN ""CreatedBy"" VARCHAR(50) NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to Location if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'Location' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""Location"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+                        
+                        -- Add CreatedBy column to Location if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'Location' AND column_name = 'CreatedBy') THEN
+                            ALTER TABLE look.""Location"" ADD COLUMN ""CreatedBy"" VARCHAR(50) NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to PropertyType if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'PropertyType' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""PropertyType"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to TransactionType if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'TransactionType' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""TransactionType"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to EducationLevel if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'EducationLevel' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""EducationLevel"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to IdentityCardType if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'IdentityCardType' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""IdentityCardType"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to AddressType if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'AddressType' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""AddressType"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to GuaranteeType if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'GuaranteeType' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""GuaranteeType"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+
+                        -- Add CreatedAt column to PUnitType if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'look' AND table_name = 'PUnitType' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE look.""PUnitType"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                        END IF;
+                    END $;
+                ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Note: Lookup table columns check: {ex.Message}");
+            }
+
             // Seed lookup tables for dropdown data
             await SeedLookupTables(context);
         }
