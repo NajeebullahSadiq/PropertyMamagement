@@ -773,7 +773,7 @@ namespace WebAPIBackend.Configuration
             try
             {
                 await context.Database.ExecuteSqlRawAsync(@"
-                    CREATE OR REPLACE VIEW ""UserProfileWithCompany"" AS
+                    CREATE OR REPLACE VIEW public.""UserProfileWithCompany"" AS
                     SELECT 
                         u.""Id"" AS ""UserId"",
                         u.""Email"",
@@ -783,8 +783,8 @@ namespace WebAPIBackend.Configuration
                         u.""PhotoPath"",
                         c.""Title"" AS ""CompanyName"",
                         COALESCE(c.""PhoneNumber"", u.""PhoneNumber"") AS ""PhoneNumber""
-                    FROM ""AspNetUsers"" u
-                    LEFT JOIN ""org"".""CompanyDetails"" c ON u.""CompanyId"" = c.""Id"";
+                    FROM public.""AspNetUsers"" u
+                    LEFT JOIN org.""CompanyDetails"" c ON u.""CompanyId"" = c.""Id"";
                 ");
             }
             catch (Exception ex)

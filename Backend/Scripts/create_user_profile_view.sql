@@ -4,9 +4,9 @@
 -- =====================================================
 -- 1. Create UserProfileWithCompany View
 -- =====================================================
-DROP VIEW IF EXISTS "UserProfileWithCompany";
+DROP VIEW IF EXISTS public."UserProfileWithCompany";
 
-CREATE OR REPLACE VIEW "UserProfileWithCompany" AS
+CREATE OR REPLACE VIEW public."UserProfileWithCompany" AS
 SELECT 
     u."Id" AS "UserId",
     u."Email",
@@ -16,8 +16,8 @@ SELECT
     u."PhotoPath",
     c."Title" AS "CompanyName",
     COALESCE(c."PhoneNumber", u."PhoneNumber") AS "PhoneNumber"
-FROM "AspNetUsers" u
-LEFT JOIN "org"."CompanyDetails" c ON u."CompanyId" = c."Id";
+FROM public."AspNetUsers" u
+LEFT JOIN org."CompanyDetails" c ON u."CompanyId" = c."Id";
 
 -- =====================================================
 -- 2. Seed RBAC Roles in AspNetRoles
@@ -71,7 +71,7 @@ WHERE "IsAdmin" = true AND ("UserRole" IS NULL OR "UserRole" = '');
 -- 5. Verify the changes
 -- =====================================================
 SELECT 'UserProfileWithCompany view created' AS status;
-SELECT * FROM "UserProfileWithCompany" LIMIT 3;
+SELECT * FROM public."UserProfileWithCompany" LIMIT 3;
 
 SELECT 'Roles in AspNetRoles:' AS status;
 SELECT "Name" FROM "AspNetRoles" ORDER BY "Name";
