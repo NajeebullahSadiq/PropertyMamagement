@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { FileService } from 'src/app/shared/file.service';
@@ -14,9 +14,11 @@ export class CompanydetailsviewComponent {
   isLoading = true;
   error: string | null = null;
   viewData: any = null;
+  private companyId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private companyService: CompnaydetailService,
     private dialog: MatDialog,
     private fileService: FileService
@@ -31,8 +33,16 @@ export class CompanydetailsviewComponent {
         this.error = 'شناسهٔ شرکت معتبر نیست';
         return;
       }
+      this.companyId = id;
       this.loadView(id);
     });
+  }
+
+  printLicense(): void {
+    if (this.companyId) {
+      const url = this.router.createUrlTree(['/printLicense', this.companyId]).toString();
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   }
 
   private loadView(id: number): void {

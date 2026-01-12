@@ -1,88 +1,106 @@
-<table class="container" id="pdf-content">
-    <tr>
-      <td class="col-left">
-        <img src="/assets/img/10.png" alt="Logo">
-        <br><br>
-        <p>نمبر جواز: <span> &nbsp; {{data.licenseNumber}}</span></p>
-        <p>تاریخ صدور: <span>{{data.issueDate | calendarDate}}</span></p>
-        <p>تاریخ ختم:  &nbsp; &nbsp;<span>{{data.expireDate | calendarDate}}</span> </p>
-      </td>
-      <td class="col-middle">
-        <p>امارت اسلامی افغانستان</p>
-        <p>وزارت عدلیه</p>
-        <p>ریاست عمومی انسجام</p>
-        <p>ریاست رهنمای معاملات و عریضه نویسان</p>
-        <br><br><br>
-        <p>جواز نامه فعالیت</p>
-        <p> ( <span>{{data.title}}</span>)</p>
-      </td>
-      <td class="col-right">
-        <img src="/assets/img/mojlogo.png" style="margin-top: 50px;" alt="Logo"><br><br><br>
-        <img [src]="filePath" style="width:170px !important; height: 160px !important; text-align: left !important; margin-left: -30px;" alt="userimage">
-       
-      </td>
-    </tr>
-    <br>
-    <br>
-    <br>
-   <p style="font-size:18px;font-weight: bold;">این جواز مطابق احکام مندرج فقره 4 ماده 13 قانون رهنمای معاملات برای محترم <span>( {{data.firstName}})</span> ولد<span>( {{data.fatherName}}  ) </span> ولدیت <span>( {{data.grandFatherName}} )</span>متولد  <span>({{data.dateofBirth | calendarDate}})</span>دارنده شماره تذکره <span>({{data.indentityCardNumber}})</span>اعطاء گردید و به اساس آن میتواند در حدود احکام قانون در عقود و معاملات (عقار)/ (وسایط نقلیه) بین اشخاص وساطت نماید.</p>
-   <br><br>
-   <br>
-   <p style="font-size:18px;font-weight: bold;">آدرس دقیق دفتر رهنمای معاملات: <span> (  {{data.officeAddress}}  )</span></p>
-   <br>
-   <p style="font-size:18px;font-weight: bold;"> شماره تماس دارنده جواز :<span>{{data.phoneNumber}}</span> شماره تشخصیه مالیه دهی: <span> {{data.tin}}</span></p>
-   <br>
-   <!-- Financial and Administrative Details (جزئیات مالی و اسناد جواز) -->
-   <div *ngIf="data.royaltyAmount || data.penaltyAmount || data.hrLetter || data.hrLetterDate">
-     <p style="font-size:18px;font-weight: bold;">جزئیات مالی و اسناد جواز:</p>
-     <p style="font-size:16px;font-weight: bold;" *ngIf="data.royaltyAmount">مبلغ حق‌الامتیاز: <span>{{data.royaltyAmount | number}}</span> افغانی <span *ngIf="data.royaltyDateFormatted">- تاریخ: {{data.royaltyDateFormatted}}</span></p>
-     <p style="font-size:16px;font-weight: bold;" *ngIf="data.penaltyAmount">مبلغ جریمه: <span>{{data.penaltyAmount | number}}</span> افغانی <span *ngIf="data.penaltyDateFormatted">- تاریخ: {{data.penaltyDateFormatted}}</span></p>
-     <p style="font-size:16px;font-weight: bold;" *ngIf="data.hrLetter">مکتوب قوای بشری: <span>{{data.hrLetter}}</span> <span *ngIf="data.hrLetterDateFormatted">- تاریخ: {{data.hrLetterDateFormatted}}</span></p>
-     <br>
-   </div>
+<!-- Loading Indicator -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-spinner"></div>
+  <p>در حال بارگذاری معلومات جواز...</p>
+</div>
 
-   <!-- Account Info / Tax Information (مالیه) -->
-   <div *ngIf="accountInfo">
-     <p style="font-size:18px;font-weight: bold;">معلومات مالیه:</p>
-     <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
-       <tr *ngIf="accountInfo.settlementInfo">
-         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc; width: 40%;">نمرمكتوب تصفيه معلومات:</td>
-         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.settlementInfo}}</td>
-       </tr>
-       <tr>
-         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">تحويل ماليات (مبلغ):</td>
-         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.taxPaymentAmount | number}} افغانی</td>
-       </tr>
-       <tr *ngIf="accountInfo.settlementYear">
-         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">سال تصفيه مالية:</td>
-         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.settlementYear}}</td>
-       </tr>
-       <tr *ngIf="accountInfo.taxPaymentDate">
-         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">تاريخ تحويل ماليات:</td>
-         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.taxPaymentDateFormatted || accountInfo.taxPaymentDate}}</td>
-       </tr>
-       <tr *ngIf="accountInfo.transactionCount">
-         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">تعدادی معامله:</td>
-         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.transactionCount}}</td>
-       </tr>
-       <tr *ngIf="accountInfo.companyCommission">
-         <td style="font-size:16px; font-weight: bold; padding: 5px; border: 1px solid #ccc;">كمیشن رهنما:</td>
-         <td style="font-size:16px; padding: 5px; border: 1px solid #ccc;">{{accountInfo.companyCommission | number}} افغانی</td>
-       </tr>
-     </table>
-   </div>
-   <div *ngIf="!accountInfo">
-     <p style="font-size:16px; color: #666; font-style: italic;">معلومات مالیه ثبت نشده است</p>
-   </div>
+<div class="certificate-page" *ngIf="!isLoading">
+  <div class="certificate-wrapper">
+    <!-- Decorative Blue Border Frame -->
+    <div class="decorative-border">
+      <!-- Corner Decorations -->
+      <div class="corner-decoration top-right"></div>
+      <div class="corner-decoration top-left"></div>
+      <div class="corner-decoration bottom-right"></div>
+      <div class="corner-decoration bottom-left"></div>
+      
+      <div class="certificate-content">
+        <!-- Header Section - 3 Columns -->
+        <table class="header-table">
+          <tr>
+            <!-- RIGHT side: National Emblem + License Info -->
+            <td class="header-col-right">
+              <img src="/assets/img/afg.png" alt="نشان ملی افغانستان" class="national-emblem">
+              <p class="license-info">شماره جوازنامه <span>({{data.licenseNumber || '     '}})</span></p>
+              <p class="license-info">تاریخ صدور: <span>{{data.issueDateFormatted || (data.issueDate | calendarDate) || '     '}}</span></p>
+              <p class="license-info">تاریخ ختم: <span>{{data.expireDateFormatted || (data.expireDate | calendarDate) || '     '}}</span></p>
+            </td>
+            <!-- CENTER: Ministry Info -->
+            <td class="header-col-center">
+              <p class="ministry-line-1">امارت اسلامی افغانستان</p>
+              <p class="ministry-line-2">وزارت عدلیه</p>
+              <p class="ministry-line-3">ریاست عمومی انسجام</p>
+              <p class="ministry-line-4">ریاست امور رهنمای معاملات و عریضه نویسان</p>
+            </td>
+            <!-- LEFT side: Ministry Logo + Photo (stacked vertically) -->
+            <td class="header-col-left">
+              <div class="left-column-content">
+                <img src="/assets/img/mcitlogo.png" alt="لوگو وزارت" class="ministry-logo">
+                <div class="photo-frame">
+                  <img [src]="filePath" alt="عکس" class="owner-photo" onerror="this.src='assets/img/avatar2.png'">
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
 
-   <p style="font-size:18px;font-weight: bold;">یاداشت: این جواز نامه برای مدت سه سال پس از تاریخ صدور آن قابل اعتبار میباشد. و هرگونه استفاده خلاف قانون از این جواز پیگرد قانونی دارد.</p>
+        <!-- Title Section -->
+        <div class="title-section">
+          <p class="certificate-title">جوازنامه فعالیت رهنمای معاملات <span>({{data.title || '     '}})</span></p>
+        </div>
 
-   <br>
-   <br>
-   <br>
-   <p style="font-size:25px;font-weight: bold; text-align: center;">با احترام</p>
-   <p style="font-size:25px;font-weight: bold; text-align: center;">رئیس عمومی انسجام</p>
-  </table>
+        <!-- Main Content -->
+        <div class="main-content">
+          <!-- Line 1 -->
+          <p class="info-line">
+            محترم <span class="val">({{data.firstName || '     '}})</span>
+            ولد <span class="val">({{data.fatherName || '     '}})</span>
+            ولدیت <span class="val">({{data.grandFatherName || '     '}})</span>
+            متولد سال <span class="val">({{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate) || '     '}})</span>
+           دارنده تذکره الکټرونیکی ()
+          </p>
 
+          <!-- Line 2 -->
+          <p class="info-line">
+            <span class="red">مسکونه اصلی ولسوالی</span> <span class="val">({{data.permanentDistrictName || '     '}})</span>
+            <span class="red">ولایت</span> <span class="val">({{data.permanentProvinceName || '     '}})</span>
+            <span class="red">مسکونه فعلی ناحیه یا ولسوالی</span> <span class="val">({{data.temporaryDistrictName || '     '}})</span>
+            <span class="red">ولایت</span> <span class="val">({{data.temporaryProvinceName || '     '}})</span>
+          </p>
 
-  
+          <!-- Authorization Line -->
+          <p class="info-line">
+            <span class="red">واقع ناحیه</span> <span class="val">({{data.temporaryVillage || data.permanentVillage || '     '}})</span>
+            با در نظرداشت احکام مندرج فقره (4) ماده (13) قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
+          </p>
+
+          <!-- Inquiry Line -->
+          <p class="info-line small">
+            ذریعه استعلام نمبر <span class="val underline">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</span> به مطبعه معرفی شد.
+          </p>
+
+          <!-- Signature -->
+          <div class="signature-block">
+            <p>بااحترام</p>
+            <p class="sig-title">رئیس عمومی انسجام</p>
+          </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer-section">
+          <p class="footer-line">آدرس دفتر رهنمای معاملات: <span class="val">({{data.officeAddress || '     '}})</span></p>
+          
+          <p class="note-line"><span class="note-label">نوت:</span> مدت اعتبار این جوازنامه از تاریخ صدور برای مدت سه سال می باشد.</p>
+          
+          <p class="footer-line">
+            شماره تماس دارنده جوازنامه: <span class="val">({{data.phoneNumber || '     '}})</span>
+            نمبر تشخیصیه <span class="val">({{data.tin || '     '}})</span>
+            شماره ثبت <span class="val underline">(     )</span>
+            دیتابیس
+            قیمت جواز نامه: <span class="val">(پانزده هزار افغانی)</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

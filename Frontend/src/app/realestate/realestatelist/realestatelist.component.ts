@@ -51,6 +51,11 @@ export class RealestatelistComponent {
     this.router.navigate(['/realestate/view', propertyId]);
   }
 
+  onPrint(propertyId: number) {
+    const url = this.router.createUrlTree(['/printLicense', propertyId]).toString();
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   onTableDataChange(event: any) {
     this.page = event;
     this.loadData();

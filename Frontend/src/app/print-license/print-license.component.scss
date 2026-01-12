@@ -1,77 +1,548 @@
-/* Style for the container table */
-.container {
-    width: 100%;
-    border-collapse: collapse;
+/* Afghan Government License Certificate - A4 Landscape with Decorative Border */
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f0f0f0;
 }
 
-/* Style for the table rows */
-tr {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #ddd;
+  border-top-color: #1565c0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
 }
 
-/* Style for the left column (table cell) */
-.col-left {
-    width: 25%;
-    text-align: right;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-/* Style for the middle column (table cell) */
-.col-middle {
-    width: 50%;
-    text-align: center;
-    
+.loading-container p {
+  font-family: 'B Nazanin', Tahoma, sans-serif;
+  font-size: 16px;
+  color: #555;
 }
 
-/* Style for the right column (table cell) */
-.col-right {
-    width: 25%;
-    text-align: left;
+/* Certificate Page - Landscape A4 */
+.certificate-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #c0c0c0;
+  padding: 15px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Style for the image within the right column (table cell) */
-.col-right img {
-    height: 100px;
-    width: 90px;
-}
-.col-left img  {
-    height:170px;
-    width: 150px;
-}
-/* Style for the bold text paragraphs within table cells */
-td p {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0;
-    padding: 5px;
-    font-size: 20px;
+.certificate-wrapper {
+  width: 297mm;
+  height: 210mm;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 4mm;
+  box-sizing: border-box;
 }
 
+/* Elegant Decorative Border Frame */
+.decorative-border {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 15px 20px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #fafcff 0%, #ffffff 50%, #f8fafc 100%);
+  
+  /* Multi-layer border effect */
+  border: 4px solid #1976D2;
+  border-radius: 8px;
+  
+  /* Outer glow effect */
+  box-shadow: 
+    inset 0 0 0 2px #fff,
+    inset 0 0 0 4px #64B5F6,
+    inset 0 0 0 6px #fff,
+    inset 0 0 0 8px #BBDEFB;
+}
 
-/* Additional styles for printing */
+/* Decorative corner ornaments */
+.decorative-border::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  border: 2px solid #42A5F5;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Corner Decorations - Elegant curved corners */
+.corner-decoration {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  z-index: 10;
+}
+
+.corner-decoration::before,
+.corner-decoration::after {
+  content: '';
+  position: absolute;
+  background: #1976D2;
+}
+
+/* Top Right Corner */
+.corner-decoration.top-right {
+  top: 8px;
+  right: 8px;
+}
+
+.corner-decoration.top-right::before {
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.corner-decoration.top-right::after {
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 30px;
+  border-radius: 2px;
+}
+
+/* Top Left Corner */
+.corner-decoration.top-left {
+  top: 8px;
+  left: 8px;
+}
+
+.corner-decoration.top-left::before {
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.corner-decoration.top-left::after {
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 30px;
+  border-radius: 2px;
+}
+
+/* Bottom Right Corner */
+.corner-decoration.bottom-right {
+  bottom: 8px;
+  right: 8px;
+}
+
+.corner-decoration.bottom-right::before {
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.corner-decoration.bottom-right::after {
+  bottom: 0;
+  right: 0;
+  width: 4px;
+  height: 30px;
+  border-radius: 2px;
+}
+
+/* Bottom Left Corner */
+.corner-decoration.bottom-left {
+  bottom: 8px;
+  left: 8px;
+}
+
+.corner-decoration.bottom-left::before {
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.corner-decoration.bottom-left::after {
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  height: 30px;
+  border-radius: 2px;
+}
+
+/* Inner decorative dots at corners */
+.corner-decoration::after {
+  box-shadow: 
+    8px 8px 0 0 #64B5F6,
+    16px 16px 0 0 #90CAF9;
+}
+
+.corner-decoration.top-right::after {
+  box-shadow: 
+    -8px 8px 0 0 #64B5F6,
+    -16px 16px 0 0 #90CAF9;
+}
+
+.corner-decoration.bottom-right::after {
+  box-shadow: 
+    -8px -8px 0 0 #64B5F6,
+    -16px -16px 0 0 #90CAF9;
+}
+
+.corner-decoration.bottom-left::after {
+  box-shadow: 
+    8px -8px 0 0 #64B5F6,
+    16px -16px 0 0 #90CAF9;
+}
+
+/* Content */
+.certificate-content {
+  position: relative;
+  z-index: 5;
+  direction: rtl;
+  text-align: right;
+  font-family: 'B Nazanin', Tahoma, Arial, sans-serif;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+/* Header Table */
+.header-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 5px;
+}
+
+.header-col-right {
+  width: 25%;
+  text-align: right;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+
+.header-col-center {
+  width: 50%;
+  text-align: center;
+  vertical-align: top;
+  padding: 5px;
+}
+
+.header-col-left {
+  width: 20%;
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 0 5px 0;
+}
+
+.left-column-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  float: left;
+}
+
+.national-emblem {
+  width: 70px;
+  height: auto;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.ministry-logo {
+  width: auto;
+  height: 70px;
+}
+
+.photo-frame {
+  width: 100px;
+  height: 115px;
+  border: 3px solid #1976D2;
+  border-radius: 6px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.owner-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ministry-line-1 {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 2px 0;
+  color: #1a237e;
+}
+
+.ministry-line-2 {
+  font-size: 17px;
+  font-weight: bold;
+  margin: 0 0 2px 0;
+  color: #283593;
+}
+
+.ministry-line-3 {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 2px 0;
+  color: #303f9f;
+}
+
+.ministry-line-4 {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0;
+  color: #3949ab;
+}
+
+.license-info {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0 0 4px 0;
+  color: #333;
+}
+
+.license-info span {
+  color: #1565c0;
+}
+
+/* Title Section */
+.title-section {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.certificate-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #1a237e;
+  margin: 0;
+}
+
+.certificate-title span {
+  color: #1565c0;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 8px 5px;
+  position: relative;
+}
+
+.info-line {
+  font-size: 14px;
+  line-height: 2;
+  margin: 0 0 6px 0;
+  color: #333;
+  font-weight: bold;
+}
+
+.info-line.small {
+  font-size: 13px;
+}
+
+.info-line .val {
+  color: #1565c0;
+  margin: 0 2px;
+}
+
+.info-line .val.underline {
+  border-bottom: 1px dotted #666;
+}
+
+.info-line .red {
+  color: #c62828;
+}
+
+/* Signature */
+.signature-block {
+  text-align: center;
+  margin: 15px 0 10px 0;
+  width: fit-content;
+  position: absolute;
+  left: 15%;
+}
+
+.signature-block p {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 3px 0;
+  color: #333;
+}
+
+.signature-block .sig-title {
+  color: #1565c0;
+}
+
+/* Footer */
+.footer-section {
+  border-top: 2px solid #1976D2;
+  padding-top: 8px;
+  margin-top: auto;
+  padding-right: 15px;
+  background: linear-gradient(to bottom, rgba(227, 242, 253, 0.3), transparent);
+}
+
+.footer-line {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.footer-line .val {
+  color: #1565c0;
+  margin: 0 3px;
+}
+
+.footer-line .val.underline {
+  border-bottom: 1px dotted #666;
+}
+
+.note-line {
+  font-size: 12px;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  color: #333;
+  padding: 5px 10px;
+  background: linear-gradient(135deg, #fff8e1 0%, #fffde7 100%);
+  border-radius: 4px;
+  border-right: 4px solid #ffc107;
+  display: inline-block;
+}
+
+.note-line .note-label {
+  color: #e65100;
+  margin-left: 5px;
+}
+
+/* Print Styles - A4 Landscape */
 @media print {
-    body {
-        margin: 0; /* Remove default page margin */
-    }
+  @page {
+    size: A4 landscape;
+    margin: 5mm;
+  }
 
-    .container {
-        width: 100%; /* Ensure the table expands to the full page width */
-    }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 
-    .col-left, .col-middle, .col-right {
-        width: 33.33%; /* Equal width for columns in print */
-        
-    }
+  html, body {
+    width: 297mm;
+    height: 210mm;
+    margin: 0;
+    padding: 0;
+    background: #fff !important;
+  }
 
-    /* Adjust image size for print */
-    .col-right img {
-        height: 100px;
-        width: 90px;
-    }
-    .col-left img {
-        height: 170px;
-        width: 160px;
-    }
+  .loading-container {
+    display: none !important;
+  }
+
+  .certificate-page {
+    width: 297mm;
+    height: 210mm;
+    padding: 0;
+    margin: 0;
+    background: #fff !important;
+    display: block;
+  }
+
+  .certificate-wrapper {
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+    padding: 4mm;
+    margin: 0;
+  }
+
+  .decorative-border {
+    border-color: #1976D2 !important;
+    background: #fff !important;
+    box-shadow: 
+      inset 0 0 0 2px #fff,
+      inset 0 0 0 4px #64B5F6,
+      inset 0 0 0 6px #fff,
+      inset 0 0 0 8px #BBDEFB !important;
+  }
+
+  .decorative-border::before {
+    border-color: #42A5F5 !important;
+  }
+
+  .corner-decoration::before,
+  .corner-decoration::after {
+    background: #1976D2 !important;
+  }
+
+  .ministry-line-1 { color: #1a237e !important; }
+  .ministry-line-2 { color: #283593 !important; }
+  .ministry-line-3 { color: #303f9f !important; }
+  .ministry-line-4 { color: #3949ab !important; }
+  .certificate-title { color: #1a237e !important; }
+
+  .license-info span,
+  .certificate-title span,
+  .info-line .val,
+  .footer-line .val,
+  .signature-block .sig-title {
+    color: #1565c0 !important;
+  }
+
+  .info-line .red {
+    color: #c62828 !important;
+  }
+
+  .note-line {
+    background: linear-gradient(135deg, #fff8e1 0%, #fffde7 100%) !important;
+    border-right-color: #ffc107 !important;
+  }
+
+  .note-line .note-label {
+    color: #e65100 !important;
+  }
+
+  .photo-frame {
+    border-color: #1976D2 !important;
+    box-shadow: none !important;
+  }
+
+  .footer-section {
+    border-top-color: #1976D2 !important;
+    background: transparent !important;
+  }
+}
+
+/* Screen Preview */
+@media screen and (max-width: 1200px) {
+  .certificate-wrapper {
+    width: 100%;
+    height: auto;
+    min-height: 60vw;
+  }
 }
