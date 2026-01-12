@@ -92,6 +92,10 @@ export class CompnaydetailService {
     return this.http.get<companydetails[]>(this.baseUrl+'/'+ id);
   }
 
+  getCompanyViewById(id: number): Observable<any> {
+    return this.http.get<any>(this.baseUrl + '/GetView/' + id);
+  }
+
   getOwnerById(id: number): Observable<companyowner[]> {
     return this.http.get<companyowner[]>(this.baseUrlowner+'CompanyOwner/'+ id);
   }

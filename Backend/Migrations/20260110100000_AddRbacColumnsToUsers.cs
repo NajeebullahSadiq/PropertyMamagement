@@ -11,36 +11,38 @@ namespace WebAPIBackend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Add LicenseType column to AspNetUsers
-            migrationBuilder.AddColumn<string>(
-                name: "LicenseType",
-                table: "AspNetUsers",
-                type: "character varying(50)",
-                maxLength: 50,
-                nullable: true);
-
-            // Add UserRole column to AspNetUsers
-            migrationBuilder.AddColumn<string>(
-                name: "UserRole",
-                table: "AspNetUsers",
-                type: "character varying(50)",
-                maxLength: 50,
-                nullable: true);
-
-            // Add CreatedAt column to AspNetUsers
-            migrationBuilder.AddColumn<DateTime>(
-                name: "CreatedAt",
-                table: "AspNetUsers",
-                type: "timestamp without time zone",
-                nullable: true);
-
-            // Add CreatedBy column to AspNetUsers
-            migrationBuilder.AddColumn<string>(
-                name: "CreatedBy",
-                table: "AspNetUsers",
-                type: "character varying(255)",
-                maxLength: 255,
-                nullable: true);
+            // Safely add columns using DO block to check if they exist first
+            migrationBuilder.Sql(@"
+                DO $$ 
+                BEGIN
+                    -- Set default value for Discriminator column if it exists
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'AspNetUsers' AND column_name = 'Discriminator') THEN
+                        ALTER TABLE ""AspNetUsers"" ALTER COLUMN ""Discriminator"" SET DEFAULT 'ApplicationUser';
+                        UPDATE ""AspNetUsers"" SET ""Discriminator"" = 'ApplicationUser' WHERE ""Discriminator"" IS NULL;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'AspNetUsers' AND column_name = 'LicenseType') THEN
+                        ALTER TABLE ""AspNetUsers"" ADD COLUMN ""LicenseType"" VARCHAR(50) NULL;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'AspNetUsers' AND column_name = 'UserRole') THEN
+                        ALTER TABLE ""AspNetUsers"" ADD COLUMN ""UserRole"" VARCHAR(50) NULL;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'AspNetUsers' AND column_name = 'CreatedAt') THEN
+                        ALTER TABLE ""AspNetUsers"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'AspNetUsers' AND column_name = 'CreatedBy') THEN
+                        ALTER TABLE ""AspNetUsers"" ADD COLUMN ""CreatedBy"" VARCHAR(255) NULL;
+                    END IF;
+                END $$;
+            ");
 
             // Update existing admin users to have ADMIN role
             migrationBuilder.Sql(@"

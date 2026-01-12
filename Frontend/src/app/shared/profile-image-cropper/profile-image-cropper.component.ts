@@ -56,6 +56,11 @@ export class ProfileImageCropperComponent implements OnChanges {
     const dialogRef = this.dialog.open(ProfileImageCropperDialogComponent, {
       width: '720px',
       maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'profile-cropper-dialog-panel',
+      disableClose: true,
+      hasBackdrop: true,
+      backdropClass: 'cropper-dialog-backdrop',
       data: {
         file,
         roundCropper: this.roundCropper,

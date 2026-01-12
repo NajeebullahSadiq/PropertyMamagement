@@ -46,7 +46,7 @@ export class CancellationinfoComponent {
     maxDate = { year: 1410, month: 12, day: 31 };
     minDate = { year: 1320, month: 12, day: 31 };
 
-    cancellationForm: FormGroup = new FormGroup({});
+    cancellationForm!: FormGroup;
     selectedId: number = 0;
     selectedLicenseCancellationLetterDate!: NgbDate;
     cancellationInfo: CancellationInfo | null = null;

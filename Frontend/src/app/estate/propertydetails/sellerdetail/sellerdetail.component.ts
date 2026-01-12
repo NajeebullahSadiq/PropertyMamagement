@@ -500,14 +500,6 @@ export class SellerdetailComponent {
       this.authorizationLetterName='';
       this.heirsLetterName='';
   }
-  onlyNumberKey(event:any) {
-    const keyCode = event.which || event.keyCode;
-    const keyValue = String.fromCharCode(keyCode);
-  
-    if (/\D/.test(keyValue)) {
-      event.preventDefault();
-    }
-  }
   nationalIdUploadFinished = (event:string) => { 
     this.nationalIdCardName=event;
     this.sellerForm.patchValue({ nationalIdCard: this.nationalIdCardName });

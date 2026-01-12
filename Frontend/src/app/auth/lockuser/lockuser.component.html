@@ -1,28 +1,71 @@
-
-
-  <br>
-
-  <div class="container">
-
-   <h3 class="fontstyle">مسدود کردن و غیر مسدود کردن</h3>
-   <h3 class="fontstyle">حساب کاربران سیستم</h3>
-
-      <div class="row">
-          <label class="form-label">انتخاب کاربر</label>
-          <ng-select  id="userName" name="userName"  [items]="users" [selectOnTab]="true" bindLabel="userName"
-            bindValue="userName" [(ngModel)]="userName">
-          </ng-select>
-        </div>
-    <div class="row">
-      <label class="form-label">آیا اکونت قفل شود؟؟</label>
-      <div class="input-group form-check form-switch">
-        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" [(ngModel)]="isLocked" checked>
-      </div>
-      
+<!-- Modal Header -->
+<div class="modal-header" dir="rtl">
+  <div class="header-content">
+    <div class="header-icon">
+      <i class="fas fa-user-cog"></i>
     </div>
-      <br>
-          <button (click)="lockUser()" class="btn btn-outline-secondary">ثبت و ارسال</button>
-          <button type="button" (click)="close()" class="btn btn-outline-secondary" style="margin-right: 10px;"> بستن </button>
-    <br>
-   <br>
+    <div class="header-text">
+      <h2 class="modal-title">مدیریت کاربران</h2>
+      <p class="modal-subtitle">مسدود یا فعال کردن حساب کاربری</p>
+    </div>
   </div>
+  <button type="button" class="close-btn" (click)="close()">
+    <i class="fas fa-times"></i>
+  </button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body" dir="rtl">
+  <!-- User Selection -->
+  <div class="form-group">
+    <label class="form-label">
+      <i class="fas fa-user label-icon"></i>
+      انتخاب کاربر
+      <span class="required-star">*</span>
+    </label>
+    <ng-select 
+      id="userName" 
+      name="userName" 
+      [items]="users" 
+      [selectOnTab]="true" 
+      bindLabel="userName"
+      bindValue="userName" 
+      [(ngModel)]="userName"
+      placeholder="کاربر مورد نظر را انتخاب کنید..."
+      class="custom-ng-select">
+    </ng-select>
+  </div>
+
+  <!-- Account Status Toggle -->
+  <div class="form-group">
+    <label class="form-label">
+      <i class="fas fa-shield-alt label-icon"></i>
+      وضعیت حساب
+    </label>
+    <div class="status-toggle" [class.locked]="isLocked" [class.unlocked]="!isLocked">
+      <div class="status-icon">
+        <i class="fas" [class.fa-lock]="isLocked" [class.fa-lock-open]="!isLocked"></i>
+      </div>
+      <div class="status-text">
+        <span class="status-label">{{ isLocked ? 'حساب قفل شود' : 'حساب فعال باشد' }}</span>
+        <span class="status-desc">{{ isLocked ? 'کاربر قادر به ورود نخواهد بود' : 'کاربر می‌تواند وارد سیستم شود' }}</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="isLocked">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer" dir="rtl">
+  <button type="button" class="btn-cancel" (click)="close()">
+    <i class="fas fa-times"></i>
+    انصراف
+  </button>
+  <button type="button" class="btn-submit" (click)="lockUser()" [disabled]="!userName">
+    <i class="fas fa-check"></i>
+    ثبت تغییرات
+  </button>
+</div>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-forbidden',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ForbiddenComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
+  }
+
+  loginWithAnotherAccount() {
+    // Clear the token and redirect to login
+    localStorage.removeItem('token');
+    this.router.navigateByUrl('/Auth');
   }
 
 }

@@ -111,6 +111,170 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
         }
 
+        /// <summary>
+        /// Get complete vehicle details for view page (read-only)
+        /// </summary>
+        [HttpGet("View/{id}")]
+        public async Task<IActionResult> GetVehicleViewById(int id)
+        {
+            try
+            {
+                var userIdClaim = HttpContext.User.FindFirst("UserID");
+                if (userIdClaim == null || string.IsNullOrWhiteSpace(userIdClaim.Value))
+                {
+                    return Unauthorized();
+                }
+
+                string userId = userIdClaim.Value;
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Check if user can access vehicle module
+                if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "vehicle"))
+                {
+                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول وسایط نقلیه را ندارید" });
+                }
+
+                // Get vehicle details with all related data
+                var vehicle = await _context.VehiclesPropertyDetails
+                    .AsNoTracking()
+                    .Include(v => v.TransactionType)
+                    .FirstOrDefaultAsync(v => v.Id == id);
+
+                if (vehicle == null)
+                {
+                    return NotFound(new { message = "وسیله نقلیه یافت نشد" });
+                }
+
+                // Check if user can view this record
+                if (!RbacHelper.CanViewAllRecords(roles, "vehicle") && vehicle.CreatedBy != userId)
+                {
+                    return StatusCode(403, new { message = "شما اجازه مشاهده این رکورد را ندارید" });
+                }
+
+                // Get sellers with location names
+                // Note: Some columns (NationalIdCardPath, RoleType, AuthorizationLetter, HeirsLetter) may not exist in DB
+                var sellers = await _context.VehiclesSellerDetails
+                    .AsNoTracking()
+                    .Where(s => s.PropertyDetailsId == id)
+                    .Select(s => new
+                    {
+                        s.Id,
+                        s.FirstName,
+                        s.FatherName,
+                        s.GrandFather,
+                        s.IndentityCardNumber,
+                        s.TazkiraType,
+                        s.TazkiraVolume,
+                        s.TazkiraPage,
+                        s.TazkiraNumber,
+                        s.PhoneNumber,
+                        s.Photo,
+                        PermanentProvinceName = s.PaddressProvince != null ? s.PaddressProvince.Dari : null,
+                        PermanentDistrictName = s.PaddressDistrict != null ? s.PaddressDistrict.Dari : null,
+                        PaddressVillage = s.PaddressVillage,
+                        TemporaryProvinceName = s.TaddressProvince != null ? s.TaddressProvince.Dari : null,
+                        TemporaryDistrictName = s.TaddressDistrict != null ? s.TaddressDistrict.Dari : null,
+                        TaddressVillage = s.TaddressVillage,
+                        s.CreatedAt
+                    })
+                    .ToListAsync();
+
+                // Get buyers with location names
+                // Note: Some columns (NationalIdCardPath, RoleType, AuthorizationLetter, RentStartDate, RentEndDate) may not exist in DB
+                var buyers = await _context.VehiclesBuyerDetails
+                    .AsNoTracking()
+                    .Where(b => b.PropertyDetailsId == id)
+                    .Select(b => new
+                    {
+                        b.Id,
+                        b.FirstName,
+                        b.FatherName,
+                        b.GrandFather,
+                        b.IndentityCardNumber,
+                        b.TazkiraType,
+                        b.TazkiraVolume,
+                        b.TazkiraPage,
+                        b.TazkiraNumber,
+                        b.PhoneNumber,
+                        b.Photo,
+                        PermanentProvinceName = b.PaddressProvince != null ? b.PaddressProvince.Dari : null,
+                        PermanentDistrictName = b.PaddressDistrict != null ? b.PaddressDistrict.Dari : null,
+                        PaddressVillage = b.PaddressVillage,
+                        TemporaryProvinceName = b.TaddressProvince != null ? b.TaddressProvince.Dari : null,
+                        TemporaryDistrictName = b.TaddressDistrict != null ? b.TaddressDistrict.Dari : null,
+                        TaddressVillage = b.TaddressVillage,
+                        b.CreatedAt
+                    })
+                    .ToListAsync();
+
+                // Get witnesses
+                var witnesses = await _context.VehiclesWitnessDetails
+                    .AsNoTracking()
+                    .Where(w => w.PropertyDetailsId == id)
+                    .Select(w => new
+                    {
+                        w.Id,
+                        w.FirstName,
+                        w.FatherName,
+                        w.IndentityCardNumber,
+                        w.TazkiraType,
+                        w.TazkiraVolume,
+                        w.TazkiraPage,
+                        w.TazkiraNumber,
+                        w.PhoneNumber,
+                        w.CreatedAt
+                    })
+                    .ToListAsync();
+
+                // Build response
+                var result = new
+                {
+                    // Vehicle Details
+                    vehicle.Id,
+                    vehicle.PermitNo,
+                    vehicle.PilateNo,
+                    vehicle.TypeOfVehicle,
+                    vehicle.Model,
+                    vehicle.EnginNo,
+                    vehicle.ShasiNo,
+                    vehicle.Color,
+                    vehicle.VehicleHand,
+                    
+                    // Transaction Info
+                    TransactionTypeName = vehicle.TransactionType?.Name,
+                    vehicle.Price,
+                    vehicle.PriceText,
+                    vehicle.RoyaltyAmount,
+                    vehicle.Des,
+                    
+                    // Documents
+                    vehicle.FilePath,
+                    
+                    // Status
+                    vehicle.iscomplete,
+                    vehicle.iseditable,
+                    vehicle.CreatedAt,
+                    
+                    // Related entities
+                    Sellers = sellers,
+                    Buyers = buyers,
+                    Witnesses = witnesses
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> SaveProperty([FromBody] VehiclesPropertyDetail request)
         {

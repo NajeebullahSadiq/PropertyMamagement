@@ -107,7 +107,7 @@ export class MasterlayoutComponent implements AfterViewInit {
 
   navigateToRegister() {
     this.closeAllMenus();
-    this.router.navigate(['/dashboard/Auth/Register']);
+    this.router.navigate(['/Auth/Register']);
   }
 
   setlang() {
@@ -144,18 +144,31 @@ export class MasterlayoutComponent implements AfterViewInit {
 
   openDialog(): void {
     this.closeAllMenus();
-    this.dialog.open(ChangepasswordComponent, {});
+    this.dialog.open(ChangepasswordComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      hasBackdrop: true,
+      disableClose: false
+    });
   }
 
   openReset(): void {
     this.closeAllMenus();
-    this.dialog.open(ResetpasswordComponent, {});
+    this.dialog.open(ResetpasswordComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      hasBackdrop: true,
+      disableClose: false
+    });
   }
 
   openLockuser(): void {
     this.closeAllMenus();
     this.dialog.open(LockuserComponent, {
-      width: '300px'
+      width: '500px',
+      maxWidth: '95vw',
+      hasBackdrop: true,
+      disableClose: false
     });
   }
 }

@@ -14,6 +14,7 @@ import { UploadComponent } from '../upload/upload.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { NumeralService } from 'src/app/shared/numeral.service';
 
 @Component({
   selector: 'app-propertydetails',
@@ -78,7 +79,8 @@ export class PropertydetailsComponent  implements AfterViewInit {
     private parentComponent: EstateComponent,private selerService:SellerService,
     private localizationService: LocalizationService,
     private calendarConversionService: CalendarConversionService,
-    private calendarService: CalendarService) {
+    private calendarService: CalendarService,
+    private numeralService: NumeralService) {
       this.propertyForm = this.fb.group({
         id: [0],
         propertyTypeId: ['', Validators.required],
@@ -349,14 +351,6 @@ export class PropertydetailsComponent  implements AfterViewInit {
  
 
 
-  onlyNumberKey(event:any) {
-    const keyCode = event.which || event.keyCode;
-    const keyValue = String.fromCharCode(keyCode);
-  
-    if (/\D/.test(keyValue)) {
-      event.preventDefault();
-    }
-  }
   uploadFinished = (event:string) => { 
     this.imageName = event;
   }
@@ -376,7 +370,7 @@ export class PropertydetailsComponent  implements AfterViewInit {
       this.selectedPropertyId=0;
       this.selectedAddressId=0;
       this.id=0;
-      this.router.navigate(['/dashboard/estate']);
+      this.router.navigate(['/estate']);
     }
     this.propertyForm.reset({
       id: 0,

@@ -13,6 +13,8 @@ import { AuthService } from 'src/app/shared/auth.service';
 export class ChangepasswordComponent implements OnInit {
 
   model: any = {};
+  showCurrentPassword = false;
+  showNewPassword = false;
 
   constructor(private service: AuthService,public dialogRef: MatDialogRef<ChangepasswordComponent>,private toastr: ToastrService) { }
 

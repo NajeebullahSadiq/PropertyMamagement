@@ -48,14 +48,14 @@
   *ngIf="isUserMenuOpen || isLangMenuOpen"
   (click)="closeAllMenus()"
   class="fixed inset-0 bg-transparent"
-  style="z-index: 99998;"
+  style="z-index: 9000;"
 ></div>
 
 <!-- User Dropdown Menu -->
 <div 
   *ngIf="isUserMenuOpen"
   class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
-  style="z-index: 99999; top: 60px; left: 20px; min-width: 220px;"
+  style="z-index: 9001; top: 60px; left: 20px; min-width: 220px;"
 >
   <button *ngIf="canAccessUsers" (click)="navigateToRegister()" class="dropdown-item">
     <mat-icon class="text-gray-500">people</mat-icon>
@@ -84,7 +84,7 @@
 <div 
   *ngIf="isLangMenuOpen"
   class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
-  style="z-index: 99999; top: 60px; left: 70px; min-width: 150px;"
+  style="z-index: 9001; top: 60px; left: 70px; min-width: 150px;"
 >
   <button (click)="setlang()" class="dropdown-item">
     <span>دری</span>
@@ -104,36 +104,43 @@
       <div *ngIf="isViewOnly" class="mt-1 inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">فقط مشاهده</div>
     </div>
     <nav class="p-2">
-      <a *ngIf="canAccessDashboard" routerLink="/dashboard/dashboard" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessDashboard" routerLink="/dashboard" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>dashboard</mat-icon><span>{{ "dashboard" | translate }}</span>
       </a>
       <div *ngIf="canAccessCompany" class="section-label">شرکت ها</div>
-      <a *ngIf="canAccessCompany && !isViewOnly" routerLink="/dashboard/realestate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessCompany && !isViewOnly" routerLink="/realestate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>business</mat-icon><span>{{ "company" | translate }}</span>
       </a>
-      <a *ngIf="canAccessCompany" routerLink="/dashboard/realestate/list" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessCompany" routerLink="/realestate/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>list_alt</mat-icon><span>{{ "companylist" | translate }}</span>
       </a>
       <div *ngIf="canAccessProperty" class="section-label">ملکیت ها</div>
-      <a *ngIf="canAccessProperty && !isViewOnly" routerLink="/dashboard/estate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessProperty && !isViewOnly" routerLink="/estate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>apartment</mat-icon><span>{{ "property" | translate }}</span>
       </a>
-      <a *ngIf="canAccessProperty" routerLink="/dashboard/estate/list" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessProperty" routerLink="/estate/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>format_list_bulleted</mat-icon><span>{{ "propertylist" | translate }}</span>
       </a>
       <div *ngIf="canAccessVehicle" class="section-label">وسایط نقلیه</div>
-      <a *ngIf="canAccessVehicle && !isViewOnly" routerLink="/dashboard/vehicle" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessVehicle && !isViewOnly" routerLink="/vehicle" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>directions_car</mat-icon><span>{{ "vehicle" | translate }}</span>
       </a>
-      <a *ngIf="canAccessVehicle" routerLink="/dashboard/vehicle/list" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessVehicle" routerLink="/vehicle/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>format_list_bulleted</mat-icon><span>{{ "vehiclelist" | translate }}</span>
       </a>
       <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
-      <a *ngIf="canAccessReports" routerLink="/dashboard/report" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>
       </a>
-      <a *ngIf="canAccessReports && canAccessUsers" routerLink="/dashboard/userreport" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessReports && canAccessUsers" routerLink="/userreport" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>summarize</mat-icon><span>{{ "reportbycompany" | translate }}</span>
+      </a>
+      <div *ngIf="canAccessUsers" class="section-label">مدیریت کاربران</div>
+      <a *ngIf="canAccessUsers" routerLink="/users" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>people</mat-icon><span>لیست کاربران</span>
+      </a>
+      <a *ngIf="canAccessUsers" routerLink="/Auth/Register" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>person_add</mat-icon><span>ایجاد کاربر جدید</span>
       </a>
     </nav>
   </mat-sidenav>

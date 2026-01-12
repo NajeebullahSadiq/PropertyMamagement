@@ -1,0 +1,188 @@
+<div class="w-full bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">مدیریت کاربران</h1>
+      <p class="text-center text-gray-600">مشاهده و مدیریت تمام کاربران سیستم</p>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Search -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">جستجو</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              <i class="fas fa-search"></i>
+            </span>
+            <input 
+              type="text" 
+              class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+              [(ngModel)]="searchTerm" 
+              (ngModelChange)="onSearch()" 
+              placeholder="نام کاربری، نام، ایمیل..."
+            >
+          </div>
+        </div>
+
+        <!-- Role Filter -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">نقش</label>
+          <select 
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            [(ngModel)]="roleFilter"
+            (change)="onRoleFilterChange()"
+          >
+            <option value="">همه نقش‌ها</option>
+            <option *ngFor="let role of roles" [value]="role.id">{{ role.dari }}</option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">وضعیت</label>
+          <select 
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            [(ngModel)]="statusFilter"
+            (change)="onStatusFilterChange()"
+          >
+            <option value="">همه</option>
+            <option value="active">فعال</option>
+            <option value="inactive">غیرفعال</option>
+          </select>
+        </div>
+
+        <!-- Table Size -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد ردیف‌ها</label>
+          <select 
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            [(ngModel)]="tableSize"
+            (change)="onTableSizeChange($event)"
+          >
+            <option *ngFor="let size of tableSizes" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Clear Filters -->
+      <div class="mt-4 flex justify-end">
+        <button 
+          class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
+          (click)="clearFilters()"
+        >
+          <i class="fas fa-times ml-1"></i>
+          پاک کردن فیلترها
+        </button>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <i class="fas fa-users"></i>
+          <span>لیست کاربران ({{ count }} کاربر)</span>
+        </h2>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="p-8 text-center">
+        <i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i>
+        <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!isLoading" class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b-2 border-gray-200">
+            <tr class="text-center">
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">#</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تصویر</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نام کاربری</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نام کامل</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نقش</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوع جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">وضعیت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ایجاد</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr 
+              *ngFor="let user of filteredUsers | paginate: { itemsPerPage: tableSize, currentPage: page, totalItems: count }; let i = index" 
+              class="text-center hover:bg-blue-50 transition-colors"
+            >
+              <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                {{ (page - 1) * tableSize + i + 1 }}
+              </td>
+              <td class="px-4 py-3">
+                <img 
+                  [src]="getUserPhoto(user.photoPath)" 
+                  class="w-10 h-10 rounded-full object-cover mx-auto border-2 border-gray-200"
+                  (error)="$any($event.target).src = 'assets/img/avatar.png'"
+                >
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ user.userName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ user.firstName }} {{ user.lastName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">
+                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                  {{ user.roleDari }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ getLicenseTypeText(user.licenseType) }}</td>
+              <td class="px-4 py-3">
+                <span 
+                  class="px-2 py-1 rounded-full text-xs font-medium"
+                  [ngClass]="getStatusClass(user.isLocked)"
+                >
+                  {{ getStatusText(user.isLocked) }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ formatDate(user.createdAt) }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-2">
+                  <button 
+                    class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-1"
+                    (click)="onEdit(user)"
+                    title="ویرایش"
+                  >
+                    <i class="fas fa-edit"></i>
+                    <span>ویرایش</span>
+                  </button>
+                  <button 
+                    class="px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-1"
+                    [ngClass]="user.isLocked ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'"
+                    (click)="onToggleStatus(user)"
+                    [title]="user.isLocked ? 'فعال کردن' : 'غیرفعال کردن'"
+                  >
+                    <i [class]="user.isLocked ? 'fas fa-unlock' : 'fas fa-lock'"></i>
+                    <span>{{ user.isLocked ? 'فعال' : 'غیرفعال' }}</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="filteredUsers.length === 0">
+              <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                <i class="fas fa-users text-4xl mb-2"></i>
+                <p>کاربری یافت نشد</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center mt-6">
+      <pagination-controls 
+        (pageChange)="onTableDataChange($event)" 
+        [previousLabel]="'قبلی'" 
+        [nextLabel]="'بعدی'"
+      ></pagination-controls>
+    </div>
+  </div>
+</div>

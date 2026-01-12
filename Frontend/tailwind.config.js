@@ -25,12 +25,28 @@ module.exports = {
         'dari-3xl': ['20px', { lineHeight: '1.6', letterSpacing: '-0.2px' }],
         'dari-4xl': ['24px', { lineHeight: '1.5', letterSpacing: '-0.3px' }],
         'dari-5xl': ['28px', { lineHeight: '1.4', letterSpacing: '-0.4px' }],
+        // Compact form sizes
+        'compact-xs': ['0.65rem', { lineHeight: '1.4' }],
+        'compact-sm': ['0.75rem', { lineHeight: '1.5' }],
+        'compact-base': ['0.8rem', { lineHeight: '1.5' }],
+        'compact-lg': ['0.875rem', { lineHeight: '1.5' }],
       },
       fontWeight: {
         'dari-light': 300,
         'dari-normal': 400,
         'dari-medium': 500,
         'dari-semibold': 600,
+      },
+      spacing: {
+        // Compact spacing values
+        'compact-1': '0.25rem',
+        'compact-2': '0.375rem',
+        'compact-3': '0.5rem',
+        'compact-4': '0.75rem',
+        'compact-5': '1rem',
+      },
+      borderRadius: {
+        'compact': '0.375rem',
       },
       animation: {
         'gradient-shift': 'gradientShift 15s ease infinite',

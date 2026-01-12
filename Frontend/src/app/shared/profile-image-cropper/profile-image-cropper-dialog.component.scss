@@ -1,18 +1,26 @@
 .cropper-dialog {
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
 }
 
 .cropper-area {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .zoom-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 8px 0;
+  z-index: 1;
 }
 
 .preview-row {
@@ -40,4 +48,42 @@
 
 .dialog-actions {
   gap: 8px;
+  padding: 16px 0 8px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 16px;
+  position: sticky;
+  bottom: 0;
+  background: white;
+}
+
+// Ensure buttons are visible and styled properly
+.dialog-actions .btn {
+  min-width: 80px;
+  padding: 8px 16px;
+}
+
+.dialog-actions .btn-success {
+  background-color: #10b981;
+  border-color: #10b981;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: #059669;
+    border-color: #059669;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.dialog-actions .btn-outline-secondary {
+  border-color: #6b7280;
+  color: #6b7280;
+  
+  &:hover {
+    background-color: #6b7280;
+    color: white;
+  }
 }

@@ -104,7 +104,8 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error creating user", error = ex.Message });
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = "Error creating user", error = innerMessage, details = ex.ToString() });
             }
         }
 
@@ -438,6 +439,133 @@ namespace WebAPI.Controllers
             public string? PhoneNumber { get; set; }
             public int CompanyId { get; set; }
             public string LicenseType { get; set; } = "";
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        [Route("UpdateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "کاربر یافت نشد" });
+            }
+
+            // Update user properties
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+            user.PhoneNumber = model.PhoneNumber;
+            user.CompanyId = model.CompanyId;
+            user.LicenseType = model.LicenseType;
+
+            // Update role if changed
+            if (!string.IsNullOrEmpty(model.Role))
+            {
+                var currentRoles = await _userManager.GetRolesAsync(user);
+                var currentRole = currentRoles.FirstOrDefault();
+                
+                if (currentRole != model.Role)
+                {
+                    // Remove existing roles
+                    await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                    // Ensure new role exists
+                    if (!await _roleManager.RoleExistsAsync(model.Role))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(model.Role));
+                    }
+
+                    // Add new role
+                    await _userManager.AddToRoleAsync(user, model.Role);
+                    user.UserRole = model.Role;
+                    user.IsAdmin = model.Role == UserRoles.Admin;
+                }
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok(new { message = "معلومات کاربر با موفقیت تغییر کرد" });
+            }
+
+            return BadRequest(new { message = "خطا در تغییر معلومات کاربر", errors = result.Errors });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        [Route("ToggleUserStatus")]
+        public async Task<IActionResult> ToggleUserStatus([FromBody] ToggleUserStatusModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "کاربر یافت نشد" });
+            }
+
+            user.IsLocked = model.IsLocked;
+            var result = await _userManager.UpdateAsync(user);
+            
+            if (result.Succeeded)
+            {
+                return Ok(new { 
+                    message = model.IsLocked ? "حساب کاربری غیرفعال شد" : "حساب کاربری فعال شد",
+                    isLocked = user.IsLocked
+                });
+            }
+
+            return BadRequest(new { message = "خطا در تغییر وضعیت کاربر" });
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        [Route("GetUser/{userId}")]
+        public async Task<IActionResult> GetUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "کاربر یافت نشد" });
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault() ?? user.UserRole ?? "";
+
+            return Ok(new
+            {
+                user.Id,
+                user.UserName,
+                user.Email,
+                user.FirstName,
+                user.LastName,
+                user.PhoneNumber,
+                user.CompanyId,
+                user.LicenseType,
+                user.IsLocked,
+                user.PhotoPath,
+                user.CreatedAt,
+                Role = role,
+                RoleDari = UserRoles.GetDariName(role)
+            });
+        }
+
+        public class UpdateUserModel
+        {
+            public string UserId { get; set; } = "";
+            public string FirstName { get; set; } = "";
+            public string LastName { get; set; } = "";
+            public string Email { get; set; } = "";
+            public string? PhoneNumber { get; set; }
+            public int CompanyId { get; set; }
+            public string? LicenseType { get; set; }
+            public string? Role { get; set; }
+        }
+
+        public class ToggleUserStatusModel
+        {
+            public string UserId { get; set; } = "";
+            public bool IsLocked { get; set; }
         }
     }
 }

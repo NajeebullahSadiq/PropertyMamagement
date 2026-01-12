@@ -1,0 +1,1051 @@
+/* ============================================
+   COMPACT ENTERPRISE FORM STYLES
+   Professional, balanced form layout
+   ============================================ */
+
+/* ============================================
+   1. GLOBAL FORM SPACING OPTIMIZATION
+   ============================================ */
+
+/* Reduce page section padding */
+section.bg-gray-50,
+section.bg-gradient-to-br,
+.w-full.bg-gray-50 {
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.25rem !important;
+}
+
+/* Reduce page header margins */
+.mb-8 {
+  margin-bottom: 1.25rem !important;
+}
+
+/* Compact page titles */
+h1.text-4xl,
+h1.text-3xl {
+  font-size: 1.75rem !important;
+  margin-bottom: 0.375rem !important;
+}
+
+/* Compact page descriptions */
+p.text-center.text-gray-600,
+p.text-gray-500.max-w-md {
+  font-size: 0.875rem !important;
+  margin-bottom: 0 !important;
+}
+
+/* Page header icon containers */
+.w-16.h-16 {
+  width: 3rem !important;
+  height: 3rem !important;
+  margin-bottom: 0.625rem !important;
+}
+
+.w-16.h-16 i {
+  font-size: 1.125rem !important;
+}
+
+/* ============================================
+   2. FORM CARD SECTIONS
+   ============================================ */
+
+/* Reduce card margins */
+.bg-white.rounded-xl.shadow-md.mb-6,
+.bg-white.rounded-2xl.shadow-lg.mb-6 {
+  margin-bottom: 1rem !important;
+}
+
+/* Compact card headers */
+.bg-gradient-to-r.px-6.py-4,
+.bg-gradient-to-r.px-3.py-2 {
+  padding: 0.625rem 1.25rem !important;
+}
+
+/* Smaller section titles */
+.bg-gradient-to-r h2.text-xl,
+.bg-gradient-to-r h2.text-lg {
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+}
+
+/* Section title icons */
+.bg-gradient-to-r h2 i,
+.bg-gradient-to-r h2 .w-8.h-8 {
+  font-size: 0.95rem !important;
+}
+
+.bg-gradient-to-r h2 .w-8.h-8 {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+}
+
+/* Compact card body padding */
+.px-6.py-6 {
+  padding: 1rem 1.25rem !important;
+}
+
+.p-6 {
+  padding: 1rem 1.25rem !important;
+}
+
+/* ============================================
+   3. FORM GRID & LAYOUT
+   ============================================ */
+
+/* Reduce grid gaps */
+.grid.gap-6 {
+  gap: 1rem !important;
+}
+
+.grid.gap-4 {
+  gap: 0.75rem !important;
+}
+
+/* Remove extra bottom margins in grids */
+.grid.mb-6 {
+  margin-bottom: 0.25rem !important;
+}
+
+/* ============================================
+   4. FORM LABELS
+   ============================================ */
+
+/* Compact labels */
+label.block.text-sm.font-semibold,
+.block.text-sm.font-semibold.text-gray-700 {
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.375rem !important;
+  color: #4b5563 !important;
+}
+
+label.mb-2 {
+  margin-bottom: 0.375rem !important;
+}
+
+/* ============================================
+   5. INPUT FIELDS
+   ============================================ */
+
+/* Compact text inputs */
+input.w-full.px-4.py-2\.5,
+input.w-full.px-4.py-3,
+input.form-input.w-full.px-4.py-3,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+textarea {
+  padding: 0.5rem 0.875rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.5rem !important;
+  min-height: auto !important;
+  height: auto !important;
+}
+
+/* Inputs with left icons */
+input.pl-10,
+input.pl-12 {
+  padding-left: 2.25rem !important;
+}
+
+/* Input icon positioning */
+.relative span.absolute.inset-y-0.left-0.pl-3,
+.relative span.absolute.inset-y-0.left-0.pl-4 {
+  padding-left: 0.625rem !important;
+}
+
+.relative span.absolute.inset-y-0.left-0 i {
+  font-size: 0.8125rem !important;
+}
+
+/* Textarea specific */
+textarea {
+  min-height: 70px !important;
+}
+
+textarea.rows-3,
+textarea[rows="3"] {
+  min-height: 60px !important;
+}
+
+textarea.rows-4,
+textarea[rows="4"] {
+  min-height: 75px !important;
+}
+
+/* ============================================
+   6. SELECT & DROPDOWN CONTROLS
+   ============================================ */
+
+/* ng-select compact styling */
+.ng-select .ng-select-container {
+  min-height: 36px !important;
+  height: 36px !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 36px !important;
+}
+
+.ng-select .ng-select-container .ng-value-container {
+  padding: 0 0.625rem !important;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-input {
+  padding: 0 !important;
+  top: 5px !important;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  font-size: 0.875rem !important;
+}
+
+.ng-select .ng-arrow-wrapper {
+  padding-right: 0.375rem !important;
+  width: 22px !important;
+}
+
+.ng-select .ng-clear-wrapper {
+  width: 18px !important;
+}
+
+/* ng-select dropdown panel */
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  padding: 0.5rem 0.625rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* Native select */
+select.w-full {
+  padding: 0.5rem 0.875rem !important;
+  font-size: 0.875rem !important;
+  height: 36px !important;
+  border-radius: 0.5rem !important;
+}
+
+/* ============================================
+   7. DATE PICKER COMPACT
+   ============================================ */
+
+/* Multi-calendar datepicker */
+app-multi-calendar-datepicker {
+  display: block;
+}
+
+app-multi-calendar-datepicker .mat-mdc-form-field {
+  width: 100% !important;
+}
+
+app-multi-calendar-datepicker input {
+  padding: 0.5rem 0.875rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* Material form field compact */
+.mat-mdc-form-field {
+  font-size: 0.875rem !important;
+}
+
+.mat-mdc-form-field-infix {
+  padding-top: 0.375rem !important;
+  padding-bottom: 0.375rem !important;
+  min-height: 36px !important;
+}
+
+.mat-mdc-text-field-wrapper {
+  padding: 0 !important;
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+/* ============================================
+   8. BUTTONS
+   ============================================ */
+
+/* Compact action buttons */
+button.px-8.py-3,
+button.px-8.py-3\.5 {
+  padding: 0.625rem 1.5rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Button container */
+.flex.gap-4.justify-center.pb-6 {
+  padding-bottom: 1rem !important;
+  gap: 0.625rem !important;
+}
+
+.flex.flex-wrap.gap-4.justify-center {
+  gap: 0.625rem !important;
+}
+
+/* Smaller button icons */
+button i.fas,
+button i.far {
+  font-size: 0.8125rem !important;
+}
+
+/* Secondary/utility buttons */
+button.px-4.py-2,
+button.px-6.py-3 {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.8125rem !important;
+}
+
+/* ============================================
+   9. VALIDATION MESSAGES
+   ============================================ */
+
+/* Compact error messages */
+small.text-red-600.text-xs,
+small.text-red-500.text-xs,
+.invalid-feedback {
+  font-size: 0.7rem !important;
+  margin-top: 0.1875rem !important;
+  line-height: 1.3 !important;
+}
+
+/* Character count */
+small.text-gray-500.text-xs {
+  font-size: 0.7rem !important;
+  margin-top: 0.1875rem !important;
+}
+
+/* ============================================
+   10. FILE UPLOAD SECTIONS
+   ============================================ */
+
+/* Compact file upload containers */
+.bg-gray-50.p-5.rounded-lg,
+.bg-gradient-to-br.from-gray-50.p-5 {
+  padding: 1rem !important;
+}
+
+/* Upload section titles */
+h3.text-base.font-semibold,
+h3.text-sm.font-bold {
+  font-size: 0.875rem !important;
+  margin-bottom: 0.625rem !important;
+}
+
+/* ============================================
+   11. TABLES
+   ============================================ */
+
+/* Compact table headers */
+thead th.px-4.py-4 {
+  padding: 0.625rem 1rem !important;
+  font-size: 0.8125rem !important;
+}
+
+/* Compact table cells */
+tbody td.px-4.py-3 {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.8125rem !important;
+}
+
+/* Table section headers */
+.bg-gradient-to-r.px-6.py-4 h2 {
+  font-size: 1rem !important;
+}
+
+/* ============================================
+   12. PROFILE IMAGE UPLOAD
+   ============================================ */
+
+/* Compact profile image section */
+app-profile-image-cropper {
+  display: block;
+}
+
+.w-32.h-32 {
+  width: 6rem !important;
+  height: 6rem !important;
+}
+
+/* ============================================
+   13. CONDITIONAL SECTIONS
+   ============================================ */
+
+/* Compact conditional field sections */
+.border-t.border-gray-200.pt-6.mt-2 {
+  padding-top: 1rem !important;
+  margin-top: 0.625rem !important;
+}
+
+/* Conditional section titles */
+h3.text-lg.font-semibold {
+  font-size: 0.9375rem !important;
+  margin-bottom: 0.625rem !important;
+}
+
+h4.text-md.font-semibold {
+  font-size: 0.875rem !important;
+  margin-bottom: 0.625rem !important;
+}
+
+/* ============================================
+   14. ADDRESS HISTORY & SPECIAL SECTIONS
+   ============================================ */
+
+/* Address change mode boxes */
+.p-4.bg-gray-100.rounded-lg,
+.p-4.bg-yellow-50.rounded-lg {
+  padding: 1rem !important;
+}
+
+/* Address display text */
+.p-4 p.font-semibold {
+  font-size: 0.8125rem !important;
+  margin-bottom: 0.375rem !important;
+}
+
+.p-4 p {
+  font-size: 0.8125rem !important;
+}
+
+/* ============================================
+   15. BADGES & STATUS INDICATORS
+   ============================================ */
+
+/* Compact badges */
+span.px-2.py-1.rounded-full,
+span.px-3.py-1.rounded-full {
+  padding: 0.1875rem 0.625rem !important;
+  font-size: 0.7rem !important;
+}
+
+/* ============================================
+   16. ALERT MESSAGES
+   ============================================ */
+
+/* Compact alerts */
+.mb-6.bg-emerald-50,
+.mb-6.bg-red-50 {
+  margin-bottom: 1rem !important;
+  padding: 0.625rem 1rem !important;
+}
+
+.mb-6 .w-10.h-10 {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+
+.mb-6 h4.text-sm {
+  font-size: 0.8125rem !important;
+}
+
+.mb-6 p.text-sm {
+  font-size: 0.75rem !important;
+}
+
+/* ============================================
+   17. MODAL & DIALOG FORMS
+   ============================================ */
+
+/* Compact modal content */
+.modal-body {
+  padding: 1rem !important;
+}
+
+.modal-header {
+  padding: 0.625rem 1rem !important;
+}
+
+.modal-footer {
+  padding: 0.625rem 1rem !important;
+}
+
+/* ============================================
+   18. FORM ICONS
+   ============================================ */
+
+/* Smaller form field icons */
+.relative span.absolute i {
+  font-size: 0.75rem !important;
+}
+
+/* Icon containers in headers */
+.w-8.h-8.rounded-lg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+.w-8.h-8.rounded-lg i {
+  font-size: 0.7rem !important;
+}
+
+/* ============================================
+   18.1 RTL INPUT ICON FIX
+   Prevents text from going behind icons in RTL forms
+   ============================================ */
+
+/* Ensure inputs with left icons have proper padding */
+.relative input.pl-10 {
+  padding-left: 2.5rem !important;
+}
+
+.relative input.pl-12 {
+  padding-left: 3rem !important;
+}
+
+/* For LTR text direction inputs (email, username, phone, password) */
+/* These have dir="ltr" and need left padding for the icon */
+input[dir="ltr"] {
+  text-align: left !important;
+  
+  &.pl-10 {
+    padding-left: 2.5rem !important;
+  }
+  
+  &.pl-12 {
+    padding-left: 3rem !important;
+  }
+}
+
+/* Icon positioning - ensure it stays visible */
+.relative span.absolute.inset-y-0.left-0 {
+  z-index: 10 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Ensure icon has proper left spacing */
+.relative span.absolute.inset-y-0.left-0.pl-3 {
+  padding-left: 0.75rem !important;
+}
+
+/* Password toggle button positioning */
+.relative button.absolute.right-3 {
+  z-index: 10 !important;
+}
+
+/* Inputs with both left icon and right toggle button */
+input.pl-10.pr-12,
+input.pl-12.pr-12 {
+  padding-left: 2.5rem !important;
+  padding-right: 3rem !important;
+}
+
+/* ============================================
+   18.2 CRITICAL: Fix text overlap with icons
+   When English text is entered in RTL forms
+   ============================================ */
+
+/* All inputs inside relative containers with left-positioned icons */
+.relative > span.absolute.left-0 + input,
+.relative > span.absolute.inset-y-0.left-0 ~ input {
+  padding-left: 2.5rem !important;
+}
+
+/* Ensure text doesn't start from the very left edge */
+.relative input[type="text"],
+.relative input[type="email"],
+.relative input[type="tel"],
+.relative input[type="password"],
+.relative input[type="number"] {
+  /* When input has pl-10 class, ensure minimum padding */
+  &.pl-10 {
+    padding-left: 2.5rem !important;
+    min-height: 36px !important;
+  }
+  
+  &.pl-12 {
+    padding-left: 3rem !important;
+    min-height: 36px !important;
+  }
+}
+
+/* Fix for inputs that contain English/LTR text */
+/* The text-left class indicates LTR content */
+input.text-left {
+  text-align: left !important;
+  direction: ltr !important;
+  
+  &.pl-10 {
+    padding-left: 2.5rem !important;
+  }
+}
+
+/* Ensure icon background doesn't get covered */
+.relative span.absolute.left-0 {
+  background: transparent !important;
+}
+
+/* ============================================
+   19. SPACING UTILITIES OVERRIDE
+   ============================================ */
+
+/* Override large margins */
+.mb-4 {
+  margin-bottom: 0.625rem !important;
+}
+
+.mt-8 {
+  margin-top: 1.25rem !important;
+}
+
+.space-y-4 > * + * {
+  margin-top: 0.625rem !important;
+}
+
+.space-y-5 > * + * {
+  margin-top: 0.625rem !important;
+}
+
+/* ============================================
+   20. LOGIN PAGE SPECIFIC
+   ============================================ */
+
+/* Login card compact */
+.max-w-md .px-8.py-10 {
+  padding: 1.75rem !important;
+}
+
+.max-w-md .p-8 {
+  padding: 1.5rem !important;
+}
+
+.max-w-md .space-y-5 > * + * {
+  margin-top: 1rem !important;
+}
+
+/* Login logo */
+.max-w-md .w-20.h-20 {
+  width: 4rem !important;
+  height: 4rem !important;
+  margin-bottom: 0.625rem !important;
+}
+
+/* Login header text */
+.max-w-md h1.text-xl {
+  font-size: 1.125rem !important;
+  margin-bottom: 0.375rem !important;
+}
+
+.max-w-md p.text-blue-200 {
+  font-size: 0.8125rem !important;
+}
+
+/* Login input fields */
+.max-w-md input.py-3 {
+  padding-top: 0.625rem !important;
+  padding-bottom: 0.625rem !important;
+}
+
+/* Login button */
+.max-w-md button.py-3\.5 {
+  padding-top: 0.625rem !important;
+  padding-bottom: 0.625rem !important;
+}
+
+/* Login footer */
+.max-w-md .px-8.py-4 {
+  padding: 0.625rem 1.25rem !important;
+}
+
+/* ============================================
+   21. RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Slightly more compact on mobile */
+  .px-6.py-6,
+  .p-6 {
+    padding: 0.75rem 1rem !important;
+  }
+  
+  .grid.gap-6 {
+    gap: 0.75rem !important;
+  }
+  
+  h1.text-4xl,
+  h1.text-3xl {
+    font-size: 1.5rem !important;
+  }
+  
+  button.px-8.py-3 {
+    padding: 0.5rem 1.25rem !important;
+    font-size: 0.8125rem !important;
+  }
+}
+
+/* ============================================
+   22. PRINT STYLES
+   ============================================ */
+
+@media print {
+  section {
+    padding: 0 !important;
+  }
+  
+  .bg-white.rounded-xl,
+  .bg-white.rounded-2xl {
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
+    margin-bottom: 0.625rem !important;
+  }
+}
+
+/* ============================================
+   23. DASHBOARD & REPORT PAGES
+   ============================================ */
+
+/* Dashboard page padding */
+.min-h-screen.bg-gradient-to-br.p-6 {
+  padding: 1.25rem !important;
+}
+
+/* Dashboard header */
+.min-h-screen .mb-8.text-center {
+  margin-bottom: 1.25rem !important;
+}
+
+/* Dashboard stat cards */
+.bg-white.rounded-2xl.shadow-lg.p-5,
+.bg-white.rounded-2xl.shadow-lg.p-6 {
+  padding: 1rem !important;
+}
+
+/* Dashboard stat card icons */
+.w-12.h-12.rounded-xl {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+.w-12.h-12.rounded-xl i {
+  font-size: 1rem !important;
+}
+
+/* Dashboard stat values */
+.text-2xl.font-bold {
+  font-size: 1.375rem !important;
+}
+
+/* Dashboard stat labels */
+.text-sm.font-medium.text-gray-500 {
+  font-size: 0.75rem !important;
+  margin-bottom: 0.1875rem !important;
+}
+
+/* Dashboard section headers */
+.flex.items-center.justify-center.gap-3.mb-6 h2 {
+  font-size: 1.125rem !important;
+}
+
+/* Dashboard grid gaps */
+.grid.gap-4,
+.grid.gap-5,
+.grid.gap-6 {
+  gap: 0.75rem !important;
+}
+
+/* Chart containers */
+.bg-white.rounded-2xl.shadow-lg.p-6 canvas {
+  max-height: 200px !important;
+}
+
+/* Report page cards */
+.bg-gradient-to-br.rounded-2xl.p-5 {
+  padding: 1rem !important;
+}
+
+/* Report card icons */
+.bg-white\/20.rounded-xl {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+/* Report card values */
+.text-2xl.font-dari-semibold {
+  font-size: 1.25rem !important;
+}
+
+/* Report card labels */
+.text-white\/80.text-sm,
+.text-slate-500.text-sm {
+  font-size: 0.75rem !important;
+}
+
+/* Report section headers */
+.text-dari-2xl.font-dari-semibold {
+  font-size: 1.125rem !important;
+}
+
+/* Report filter section */
+.bg-white.rounded-2xl.shadow-sm.p-6.mb-8 {
+  padding: 1rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+/* Report filter inputs */
+.flex-1.min-w-\[200px\] {
+  min-width: 160px !important;
+}
+
+/* ============================================
+   24. CALENDAR SELECTOR COMPACT
+   ============================================ */
+
+app-calendar-selector {
+  display: block;
+}
+
+app-calendar-selector .flex.items-center.gap-2 {
+  gap: 0.375rem !important;
+}
+
+app-calendar-selector button {
+  padding: 0.375rem 0.625rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* ============================================
+   25. PROPERTY DETAILS LIST
+   ============================================ */
+
+app-propertydetailslist {
+  display: block;
+  margin-top: 1rem !important;
+}
+
+/* ============================================
+   26. FILTER/SEARCH FORMS
+   ============================================ */
+
+/* Search filter containers */
+.flex.flex-wrap.items-end.gap-4 {
+  gap: 0.625rem !important;
+}
+
+/* Filter labels */
+.block.text-sm.font-dari-medium {
+  font-size: 0.8125rem !important;
+  margin-bottom: 0.375rem !important;
+}
+
+/* ============================================
+   27. CARD HOVER EFFECTS (Reduced)
+   ============================================ */
+
+/* Reduce hover translate effect */
+.hover\:-translate-y-1:hover {
+  transform: translateY(-3px) !important;
+}
+
+.hover\:-translate-y-0\.5:hover {
+  transform: translateY(-2px) !important;
+}
+
+/* ============================================
+   28. ICON CONTAINERS
+   ============================================ */
+
+/* Reduce icon container sizes globally */
+.w-10.h-10 {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+
+.w-10.h-10 i {
+  font-size: 0.8125rem !important;
+}
+
+/* ============================================
+   29. SHADOW ADJUSTMENTS
+   ============================================ */
+
+/* Slightly reduce shadow intensity for compact look */
+.shadow-lg {
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.1), 0 3px 6px -2px rgba(0, 0, 0, 0.06) !important;
+}
+
+.shadow-xl {
+  box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.1), 0 6px 8px -3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ============================================
+   30. BORDER RADIUS ADJUSTMENTS
+   ============================================ */
+
+/* Slightly reduce border radius for compact look */
+.rounded-2xl {
+  border-radius: 1rem !important;
+}
+
+.rounded-xl {
+  border-radius: 0.625rem !important;
+}
+
+/* ============================================
+   31. MULTI-CALENDAR DATEPICKER COMPACT
+   ============================================ */
+
+app-multi-calendar-datepicker {
+  display: block;
+}
+
+app-multi-calendar-datepicker label {
+  font-size: 0.8125rem !important;
+  margin-bottom: 0.375rem !important;
+}
+
+app-multi-calendar-datepicker .mat-mdc-form-field {
+  width: 100% !important;
+}
+
+app-multi-calendar-datepicker .mat-mdc-form-field-infix {
+  padding: 0.375rem 0 !important;
+  min-height: 36px !important;
+}
+
+app-multi-calendar-datepicker input.mat-mdc-input-element {
+  font-size: 0.875rem !important;
+}
+
+/* ============================================
+   32. FILE UPLOAD COMPONENT COMPACT
+   ============================================ */
+
+app-fileupload,
+app-upload,
+app-vehicle-fileupload {
+  display: block;
+}
+
+app-fileupload .p-4,
+app-upload .p-4,
+app-vehicle-fileupload .p-4 {
+  padding: 0.625rem !important;
+}
+
+/* ============================================
+   33. PROFILE IMAGE CROPPER COMPACT
+   ============================================ */
+
+app-profile-image-cropper {
+  display: block;
+}
+
+app-profile-image-cropper .flex.flex-col.items-center {
+  gap: 0.625rem !important;
+}
+
+/* ============================================
+   34. EMPTY STATE MESSAGES
+   ============================================ */
+
+.text-center.py-12 {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+.text-center.py-12 i.text-4xl {
+  font-size: 1.75rem !important;
+}
+
+.text-center.py-12 p {
+  font-size: 0.875rem !important;
+}
+
+/* ============================================
+   35. FORM SECTION DIVIDERS
+   ============================================ */
+
+.border-t.pt-6 {
+  padding-top: 1rem !important;
+}
+
+.border-t.mt-2 {
+  margin-top: 0.625rem !important;
+}
+
+/* ============================================
+   36. INLINE FORM ELEMENTS
+   ============================================ */
+
+/* Inline form groups */
+.flex.items-center.gap-2 {
+  gap: 0.5rem !important;
+}
+
+.flex.items-center.gap-3 {
+  gap: 0.625rem !important;
+}
+
+/* ============================================
+   37. FORM FOOTER SPACING
+   ============================================ */
+
+.pb-6 {
+  padding-bottom: 1rem !important;
+}
+
+.pt-6 {
+  padding-top: 1rem !important;
+}
+
+/* ============================================
+   38. MAX WIDTH CONTAINERS
+   ============================================ */
+
+.max-w-7xl {
+  max-width: 100% !important;
+}
+
+.max-w-4xl {
+  max-width: 100% !important;
+}
+
+/* ============================================
+   39. FORM CONTAINER PADDING
+   ============================================ */
+
+.mx-auto.px-4 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.mx-auto.px-4.sm\:px-6 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* ============================================
+   40. ACCESSIBILITY - MAINTAIN READABILITY
+   ============================================ */
+
+/* Ensure minimum touch targets */
+button,
+input,
+select,
+.ng-select .ng-select-container {
+  min-height: 36px !important;
+}
+
+/* Ensure text remains readable */
+label,
+input,
+select,
+textarea,
+.ng-select .ng-value-label,
+.ng-select .ng-option {
+  line-height: 1.5 !important;
+}
+
+/* Focus states remain visible */
+input:focus,
+select:focus,
+textarea:focus,
+.ng-select.ng-select-focused .ng-select-container {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+}

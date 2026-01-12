@@ -8,6 +8,7 @@ import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
 import { VehicleComponent } from '../vehicle.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
+import { NumeralService } from 'src/app/shared/numeral.service';
 
 @Component({
   selector: 'app-vehicle-submit',
@@ -35,7 +36,7 @@ export class VehicleSubmitComponent implements AfterViewInit{
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private vehicleService: VehicleService,
     private parentComponent: VehicleComponent,private router: Router,private vehiclesubservice:VehiclesubService,
-    private localizationService: LocalizationService){
+    private localizationService: LocalizationService, private numeralService: NumeralService){
     this.vehicleForm = this.fb.group({
       id: [0],
       permitNo: ['', Validators.required],
@@ -65,6 +66,12 @@ export class VehicleSubmitComponent implements AfterViewInit{
     this.vehicleHandOptions = this.localizationService.vehicleHandOptions;
     
     this.selectedVehicleId=this.id;
+    
+    // Only fetch vehicle details if we have a valid ID
+    if (!this.id || this.id === 0) {
+      return;
+    }
+    
     this.vehicleService.getPropertyDetailsById(this.id)
     .subscribe(properties => {
       this.properties = properties;
@@ -132,17 +139,10 @@ updateVehicleDetails():void{
   updateOnePercent() {
     const priceControl = this.price;
     if (priceControl && priceControl.value) {
-      this.onePercent = priceControl.value * 0.01;
+      const normalizedPrice = this.numeralService.parseNumber(priceControl.value);
+      this.onePercent = normalizedPrice * 0.01;
     } else {
       this.onePercent = 0;
-    }
-  }
-  onlyNumberKey(event:any) {
-    const keyCode = event.which || event.keyCode;
-    const keyValue = String.fromCharCode(keyCode);
-  
-    if (/\D/.test(keyValue)) {
-      event.preventDefault();
     }
   }
   uploadFinished = (event:string) => { 

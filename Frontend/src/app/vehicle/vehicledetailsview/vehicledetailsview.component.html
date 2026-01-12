@@ -1,0 +1,346 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8 no-print">
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">نمایش جزئیات وسیله نقلیه</h1>
+        <p class="text-sm text-gray-600 mt-2">مشاهده اطلاعات کامل معامله وسیله نقلیه</p>
+      </div>
+      <div class="flex gap-3">
+        <button (click)="printPage()" class="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+          <i class="fas fa-print"></i>
+          <span class="font-medium">چاپ</span>
+        </button>
+        <a routerLink="/vehicle/list" class="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-gray-950 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+          <i class="fas fa-arrow-right transition-transform group-hover:-translate-x-1"></i>
+          <span class="font-medium">بازگشت به لیست</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="bg-white rounded-2xl shadow-xl border border-gray-100 p-12">
+      <div class="flex flex-col items-center justify-center gap-4">
+        <div class="relative">
+          <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <i class="fas fa-car text-blue-600 text-lg"></i>
+          </div>
+        </div>
+        <p class="text-gray-700 font-semibold text-lg">در حال بارگذاری اطلاعات...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && error" class="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl shadow-xl border border-red-200 p-8">
+      <div class="flex items-start gap-4 text-red-700">
+        <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+          <i class="fas fa-exclamation-circle text-2xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-bold text-lg">خطا در بارگذاری</p>
+          <p class="mt-2 text-red-600">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="!isLoading && !error && viewData" class="space-y-8">
+
+      <!-- Section 1: Vehicle Basic Information -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+        <div class="px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 border-b border-blue-500">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-car text-white text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white">مشخصات اساسی وسیله نقلیه</h2>
+          </div>
+        </div>
+        <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+            <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">نمبر جوازسیر</p>
+            <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.permitNo) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر پلیت</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.pilateNo) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوعیت موتر</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.typeOfVehicle) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">مودل</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.model) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">رنگ</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.color) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">دست وسیله نقلیه</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ getVehicleHandLabel(viewData.vehicleHand) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">شماره انجین</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.enginNo) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">شماره شاسی</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.shasiNo) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">حالت</p>
+            <span *ngIf="viewData.iscomplete" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow-lg">
+              <i class="fas fa-check-circle"></i> تکمیل شده
+            </span>
+            <span *ngIf="!viewData.iscomplete" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold shadow-lg">
+              <i class="fas fa-times-circle"></i> تکمیل ناشده
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Transaction Information -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+        <div class="px-8 py-5 bg-gradient-to-r from-green-600 to-emerald-600 border-b border-green-500">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-money-bill-wave text-white text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white">معلومات قیمت و معامله</h2>
+          </div>
+        </div>
+        <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+            <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">نوع معامله</p>
+            <p class="text-gray-900 font-bold text-lg">{{ getTransactionTypeLabel(viewData.transactionTypeName) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200">
+            <p class="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2">قیمت به عدد</p>
+            <p class="text-gray-900 font-bold text-lg">{{ formatCurrency(viewData.price) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">قیمت به حروف</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.priceText) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+            <p class="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2">حق‌العمل رهنمای معاملات</p>
+            <p class="text-gray-900 font-bold text-lg">{{ formatCurrency(viewData.royaltyAmount) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ ثبت</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ viewData.createdAt | calendarDate }}</p>
+          </div>
+          <div class="md:col-span-3 p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200" *ngIf="viewData.des">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">جزئیات / توضیحات</p>
+            <p class="text-gray-900 font-semibold text-lg whitespace-pre-line">{{ safeValue(viewData.des) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Vehicle Documents -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl" *ngIf="viewData.filePath">
+        <div class="px-8 py-5 bg-gradient-to-r from-purple-600 to-pink-600 border-b border-purple-500">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-file-alt text-white text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white">اسناد وسیله نقلیه</h2>
+          </div>
+        </div>
+        <div class="p-8">
+          <div class="p-5 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border border-indigo-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-file-pdf text-indigo-600 text-xl"></i>
+                <span class="text-gray-800 font-medium">{{ getFileName(viewData.filePath) }}</span>
+              </div>
+              <div class="flex gap-2 no-print">
+                <button type="button" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md" (click)="openDocument(viewData.filePath)">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button type="button" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg shadow-md" (click)="downloadDocument(viewData.filePath)">
+                  <i class="fas fa-download"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Seller Information -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl" *ngIf="viewData.sellers?.length">
+        <div class="px-8 py-5 bg-gradient-to-r from-emerald-600 to-green-600 border-b border-emerald-500">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-user-tie text-white text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white">معلومات فروشنده</h2>
+          </div>
+        </div>
+        <div class="p-8 space-y-6">
+          <div *ngFor="let s of viewData.sellers; let idx = index" class="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                <span class="text-white font-bold text-lg">{{ idx + 1 }}</span>
+              </div>
+              <div>
+                <p class="font-bold text-gray-900 text-lg">{{ safeValue(s.firstName) }} فرزند {{ safeValue(s.fatherName) }}</p>
+                <p class="text-sm text-gray-600">فروشنده</p>
+              </div>
+              <!-- Seller Photo -->
+              <div class="mr-auto" *ngIf="s.photo">
+                <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-300 shadow-lg">
+                  <img [src]="s.photo" alt="عکس فروشنده" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">نام پدرکلان</p>
+                <p class="font-semibold">{{ safeValue(s.grandFather) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">شماره تماس</p>
+                <p class="font-semibold">{{ safeValue(s.phoneNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">شماره تذکره</p>
+                <p class="font-semibold">{{ safeValue(s.indentityCardNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">نوع تذکره</p>
+                <p class="font-semibold">{{ safeValue(s.tazkiraType) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">جلد / صفحه / نمبر</p>
+                <p class="font-semibold">{{ safeValue(s.tazkiraVolume) }} / {{ safeValue(s.tazkiraPage) }} / {{ safeValue(s.tazkiraNumber) }}</p>
+              </div>
+            </div>
+            <!-- Seller Addresses -->
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="p-4 bg-white rounded-xl border border-gray-200" *ngIf="s.permanentProvinceName || s.permanentDistrictName || s.paddressVillage">
+                <p class="text-xs text-gray-500 mb-2 font-bold">آدرس دایمی</p>
+                <p class="font-semibold text-sm">{{ safeValue(s.permanentProvinceName) }} - {{ safeValue(s.permanentDistrictName) }} - {{ safeValue(s.paddressVillage) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200" *ngIf="s.temporaryProvinceName || s.temporaryDistrictName || s.taddressVillage">
+                <p class="text-xs text-gray-500 mb-2 font-bold">آدرس موقت</p>
+                <p class="font-semibold text-sm">{{ safeValue(s.temporaryProvinceName) }} - {{ safeValue(s.temporaryDistrictName) }} - {{ safeValue(s.taddressVillage) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Buyer Information -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl" *ngIf="viewData.buyers?.length">
+        <div class="px-8 py-5 bg-gradient-to-r from-blue-600 to-cyan-600 border-b border-blue-500">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-user text-white text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white">معلومات خریدار</h2>
+          </div>
+        </div>
+        <div class="p-8 space-y-6">
+          <div *ngFor="let b of viewData.buyers; let idx = index" class="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                <span class="text-white font-bold text-lg">{{ idx + 1 }}</span>
+              </div>
+              <div>
+                <p class="font-bold text-gray-900 text-lg">{{ safeValue(b.firstName) }} فرزند {{ safeValue(b.fatherName) }}</p>
+                <p class="text-sm text-gray-600">خریدار</p>
+              </div>
+              <!-- Buyer Photo -->
+              <div class="mr-auto" *ngIf="b.photo">
+                <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-300 shadow-lg">
+                  <img [src]="b.photo" alt="عکس خریدار" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">نام پدرکلان</p>
+                <p class="font-semibold">{{ safeValue(b.grandFather) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">شماره تماس</p>
+                <p class="font-semibold">{{ safeValue(b.phoneNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">شماره تذکره</p>
+                <p class="font-semibold">{{ safeValue(b.indentityCardNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">نوع تذکره</p>
+                <p class="font-semibold">{{ safeValue(b.tazkiraType) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">جلد / صفحه / نمبر</p>
+                <p class="font-semibold">{{ safeValue(b.tazkiraVolume) }} / {{ safeValue(b.tazkiraPage) }} / {{ safeValue(b.tazkiraNumber) }}</p>
+              </div>
+            </div>
+            <!-- Buyer Addresses -->
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="p-4 bg-white rounded-xl border border-gray-200" *ngIf="b.permanentProvinceName || b.permanentDistrictName || b.paddressVillage">
+                <p class="text-xs text-gray-500 mb-2 font-bold">آدرس دایمی</p>
+                <p class="font-semibold text-sm">{{ safeValue(b.permanentProvinceName) }} - {{ safeValue(b.permanentDistrictName) }} - {{ safeValue(b.paddressVillage) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200" *ngIf="b.temporaryProvinceName || b.temporaryDistrictName || b.taddressVillage">
+                <p class="text-xs text-gray-500 mb-2 font-bold">آدرس موقت</p>
+                <p class="font-semibold text-sm">{{ safeValue(b.temporaryProvinceName) }} - {{ safeValue(b.temporaryDistrictName) }} - {{ safeValue(b.taddressVillage) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 6: Witness Information -->
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl" *ngIf="viewData.witnesses?.length">
+        <div class="px-8 py-5 bg-gradient-to-r from-orange-600 to-red-600 border-b border-orange-500">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <i class="fas fa-users text-white text-lg"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white">معلومات شاهدین</h2>
+          </div>
+        </div>
+        <div class="p-8 space-y-6">
+          <div *ngFor="let w of viewData.witnesses; let idx = index" class="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                <span class="text-white font-bold text-lg">{{ idx + 1 }}</span>
+              </div>
+              <div>
+                <p class="font-bold text-gray-900 text-lg">{{ safeValue(w.firstName) }} فرزند {{ safeValue(w.fatherName) }}</p>
+                <p class="text-sm text-gray-600">شاهد</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">شماره تماس</p>
+                <p class="font-semibold">{{ safeValue(w.phoneNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">شماره تذکره</p>
+                <p class="font-semibold">{{ safeValue(w.indentityCardNumber) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">نوع تذکره</p>
+                <p class="font-semibold">{{ safeValue(w.tazkiraType) }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-1">جلد / صفحه / نمبر</p>
+                <p class="font-semibold">{{ safeValue(w.tazkiraVolume) }} / {{ safeValue(w.tazkiraPage) }} / {{ safeValue(w.tazkiraNumber) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

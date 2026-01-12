@@ -7,6 +7,9 @@
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "~select2/dist/css/select2.css";
 
+/* Compact Enterprise Form Styles */
+@import "./styles/compact-forms.scss";
+
 /* ============================================
    DARI FONT FACE DEFINITIONS
    ============================================ */
@@ -166,6 +169,53 @@ textarea::placeholder {
 }
 
 /* ============================================
+   RTL FORM INPUT WITH ICONS FIX
+   Prevents text from overlapping icons in RTL layout
+   ============================================ */
+
+/* In RTL mode, icons positioned on left need extra padding */
+/* This ensures text doesn't overlap with icons regardless of text direction */
+html[dir="rtl"] .relative input.pl-10,
+html[dir="rtl"] .relative input.pl-12,
+.relative input.pl-10,
+.relative input.pl-12 {
+  padding-left: 2.5rem !important;
+  text-indent: 0 !important;
+}
+
+/* For LTR text inputs (email, username, phone) in RTL layout */
+/* The icon is on the left, text flows LTR, so we need left padding */
+input[dir="ltr"].pl-10,
+input[dir="ltr"].pl-12 {
+  padding-left: 2.5rem !important;
+  padding-right: 1rem !important;
+  text-align: left !important;
+}
+
+/* Ensure icon container doesn't overlap text */
+.relative span.absolute.inset-y-0.left-0 {
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Fix for inputs with icons - ensure proper spacing */
+.relative input[type="text"],
+.relative input[type="email"],
+.relative input[type="tel"],
+.relative input[type="password"],
+.relative input[type="number"] {
+  /* Add minimum left padding when there's an icon sibling */
+  &.pl-10, &.pl-12 {
+    padding-left: 2.5rem !important;
+  }
+}
+
+/* Password fields with toggle button on right */
+input.pr-12 {
+  padding-right: 3rem !important;
+}
+
+/* ============================================
    BUTTON TYPOGRAPHY
    ============================================ */
 
@@ -212,6 +262,35 @@ tbody td {
 .ng-select .ng-select-container {
   font-family: 'NotoSansArabic', 'Gulzar', sans-serif;
   background-color: #fff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.5rem !important;
+  min-height: 42px !important;
+}
+
+/* Fix ng-select double border issue in dialogs */
+.mat-mdc-dialog-container .ng-select .ng-select-container,
+.mat-dialog-container .ng-select .ng-select-container,
+.cdk-overlay-pane .ng-select .ng-select-container {
+  border: 1px solid #d1d5db !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.mat-mdc-dialog-container .ng-select.ng-select-focused .ng-select-container,
+.mat-dialog-container .ng-select.ng-select-focused .ng-select-container,
+.cdk-overlay-pane .ng-select.ng-select-focused .ng-select-container {
+  border: 2px solid #3b82f6 !important;
+  box-shadow: none !important;
+}
+
+/* Remove any inner borders/lines from ng-select */
+.ng-select .ng-select-container .ng-value-container {
+  border: none !important;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-input {
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .ng-select .ng-input > input {
@@ -220,6 +299,9 @@ tbody td {
   line-height: 1.7;
   letter-spacing: 0.15px;
   color: #334155 !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .ng-select .ng-option {
@@ -423,6 +505,98 @@ tbody td {
   letter-spacing: 0.15px;
 }
 
+/* Global dialog size improvements */
+.mat-mdc-dialog-container,
+.mat-dialog-container {
+  min-width: 400px !important;
+  padding: 24px !important;
+}
+
+.mat-mdc-dialog-surface {
+  min-width: 400px !important;
+  padding: 24px !important;
+}
+
+/* Dialog form input styling - clean single border */
+.mat-mdc-dialog-container .form-control,
+.mat-dialog-container .form-control,
+.mat-mdc-dialog-container .input-group .form-control,
+.mat-dialog-container .input-group .form-control {
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.5rem !important;
+  min-height: 42px !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.mat-mdc-dialog-container .form-control:focus,
+.mat-dialog-container .form-control:focus {
+  border: 2px solid #3b82f6 !important;
+  box-shadow: none !important;
+}
+
+/* Fix input-group double border in dialogs */
+.mat-mdc-dialog-container .input-group,
+.mat-dialog-container .input-group {
+  border: none !important;
+}
+
+/* Dialog form labels */
+.mat-mdc-dialog-container .form-label,
+.mat-dialog-container .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+/* Dialog row spacing */
+.mat-mdc-dialog-container .row,
+.mat-dialog-container .row {
+  margin-bottom: 1rem;
+}
+
+/* Responsive dialog sizing for smaller screens */
+@media (max-width: 500px) {
+  .mat-mdc-dialog-container,
+  .mat-dialog-container,
+  .mat-mdc-dialog-surface {
+    min-width: 90vw !important;
+    max-width: 95vw !important;
+  }
+}
+
+/* Profile Image Cropper Dialog Panel */
+.profile-cropper-dialog-panel {
+  .mat-mdc-dialog-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh !important;
+    overflow: hidden;
+  }
+  
+  .mat-mdc-dialog-content {
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+  }
+  
+  .mat-mdc-dialog-actions {
+    flex-shrink: 0;
+    padding: 16px 24px !important;
+    margin: 0 !important;
+    border-top: 1px solid #e5e7eb;
+    background: white;
+    display: flex !important;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+
+/* Cropper Dialog Backdrop styling */
+.cropper-dialog-backdrop {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
 /* ============================================
    UTILITY CLASSES FOR TYPOGRAPHY
    ============================================ */
@@ -609,7 +783,7 @@ tbody td {
 
 /* Ensure Material overlays (dropdowns, date pickers) are not clipped */
 .cdk-overlay-container {
-  z-index: 10000 !important;
+  z-index: 99999 !important;
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -624,15 +798,16 @@ tbody td {
 }
 
 .cdk-overlay-pane {
-  z-index: 10000 !important;
+  z-index: 99999 !important;
   position: absolute !important;
   overflow: visible !important;
   pointer-events: auto !important;
 }
 
 .cdk-overlay-backdrop {
-  z-index: 9998 !important;
+  z-index: 99998 !important;
   pointer-events: auto !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
 }
 
 .cdk-overlay-connected-position-bounding-box {
@@ -644,7 +819,7 @@ tbody td {
 .mat-mdc-select-panel {
   max-height: 400px !important;
   overflow: visible !important;  /* Panel wrapper should not scroll */
-  z-index: 10001 !important;
+  z-index: 100000 !important;
   position: absolute !important;
 }
 
@@ -665,16 +840,16 @@ tbody td {
 .mat-mdc-menu-panel {
   max-height: 400px !important;
   overflow-y: auto !important;
-  z-index: 10001 !important;
+  z-index: 100000 !important;
 }
 
 /* Fix for mat-datepicker */
 .mat-datepicker-popup {
-  z-index: 10001 !important;
+  z-index: 100000 !important;
 }
 
 .mat-datepicker-content {
-  z-index: 10001 !important;
+  z-index: 100000 !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -682,12 +857,12 @@ tbody td {
 .mat-mdc-autocomplete-panel {
   max-height: 400px !important;
   overflow-y: auto !important;
-  z-index: 10001 !important;
+  z-index: 100000 !important;
 }
 
 /* Fix ng-select double scrollbar issue - ONLY items container should scroll */
 .ng-dropdown-panel {
-  z-index: 10001 !important;
+  z-index: 100000 !important;
   max-height: 300px !important;
   overflow: visible !important;  /* Panel itself should NOT scroll */
   position: absolute !important;
@@ -990,6 +1165,7 @@ mat-select,
 /* CDK Overlay must allow pointer events to pass through to children */
 .cdk-overlay-container {
   pointer-events: none !important;
+  z-index: 99999 !important;
 }
 
 /* All children of overlay container should be clickable */
@@ -999,9 +1175,59 @@ mat-select,
   pointer-events: auto !important;
 }
 
-/* Backdrop should be clickable to close menu */
+/* Backdrop should be clickable to close dialogs/menus */
 .cdk-overlay-backdrop {
   pointer-events: auto !important;
+  z-index: 99999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+/* ============================================
+   FIX: Material Dialog/Popup Styles
+   ============================================ */
+
+/* Dialog backdrop - must be clickable to close */
+.cdk-overlay-dark-backdrop,
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  pointer-events: auto !important;
+  z-index: 99999 !important;
+}
+
+/* Ensure dialogs appear above backdrop */
+.cdk-overlay-pane.mat-mdc-dialog-panel,
+.mat-mdc-dialog-container {
+  z-index: 100000 !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure dialog content is fully interactive */
+.mat-mdc-dialog-surface,
+.mat-mdc-dialog-content,
+.mat-mdc-dialog-actions,
+mat-dialog-container,
+.mdc-dialog__surface {
+  pointer-events: auto !important;
+}
+
+/* Dialog inputs and buttons must be clickable */
+.mat-mdc-dialog-container input,
+.mat-mdc-dialog-container button,
+.mat-mdc-dialog-container select,
+.mat-mdc-dialog-container textarea,
+.mat-mdc-dialog-container a,
+.mat-mdc-dialog-container .form-control {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.mat-mdc-dialog-container input,
+.mat-mdc-dialog-container textarea {
+  cursor: text !important;
 }
 
 /* Menu panel and all its contents must be clickable */
@@ -1073,11 +1299,75 @@ button[mat-menu-item] {
   }
 }
 
-/* Ensure fixed positioned dropdowns are above everything */
-div[style*="z-index: 99999"] {
+/* Ensure fixed positioned dropdowns are above everything except dialogs */
+div[style*="z-index: 9001"] {
   pointer-events: auto !important;
 }
 
-div[style*="z-index: 99998"] {
+div[style*="z-index: 9000"] {
   pointer-events: auto !important;
+}
+
+
+/* ============================================
+   CRITICAL: Force dialogs above everything
+   ============================================ */
+
+/* Force the overlay container to be on top of everything */
+.cdk-global-overlay-wrapper {
+  z-index: 99999 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure mat-dialog panel is above backdrop */
+.mat-mdc-dialog-panel {
+  z-index: 100000 !important;
+  pointer-events: auto !important;
+}
+
+mat-dialog-container,
+.mat-mdc-dialog-container,
+.mdc-dialog,
+.mdc-dialog__container,
+.mdc-dialog__surface {
+  z-index: 100000 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Override any transform that might affect stacking */
+.cdk-overlay-pane {
+  transform: none !important;
+}
+
+/* Ensure the dialog backdrop covers everything and is clickable */
+.cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
+  z-index: 99998 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  pointer-events: auto !important;
+}
+
+
+/* User Management Modal - Clean styling without default padding */
+.mat-mdc-dialog-container:has(.user-management-modal),
+.mat-dialog-container:has(.user-management-modal) {
+  padding: 0 !important;
+}
+
+.mat-mdc-dialog-surface:has(.user-management-modal) {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+/* Ensure the modal content fills the dialog properly */
+.mat-mdc-dialog-content:has(.user-management-modal),
+.mat-dialog-content:has(.user-management-modal) {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-height: none !important;
 }

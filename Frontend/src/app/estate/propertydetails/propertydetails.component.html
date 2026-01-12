@@ -39,7 +39,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
                   <i class="far fa-square"></i>
                 </span>
-                <input type="number" (keypress)="onlyNumberKey($event)" id="parea" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="parea">
+                <input type="text" appNumericInput id="parea" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="parea">
               </div>
               <div *ngIf="parea?.invalid && (parea?.dirty || parea?.touched)">
                 <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>مساحت ملکیت الزامی است</small>
@@ -67,7 +67,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
                   <i class="fas fa-building"></i>
                 </span>
-                <input type="number" (keypress)="onlyNumberKey($event)" id="numofFloor" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="numofFloor">
+                <input type="text" appNumericInput id="numofFloor" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="numofFloor">
               </div>
             </div>
             <div class="form-group">
@@ -76,7 +76,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
                   <i class="fas fa-bed"></i>
                 </span>
-                <input type="number" (keypress)="onlyNumberKey($event)" id="numofRooms" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="numofRooms">
+                <input type="text" appNumericInput id="numofRooms" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all" formControlName="numofRooms">
               </div>
             </div>
             <div class="form-group">

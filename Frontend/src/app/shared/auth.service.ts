@@ -135,4 +135,16 @@ export class AuthService {
   createCompanyUser(userData: any) {
     return this.http.post(`${this.BaseURI}/ApplicationUser/CreateCompanyUser`, userData);
   }
+
+  updateUser(userData: any) {
+    return this.http.post(`${this.BaseURI}/ApplicationUser/UpdateUser`, userData);
+  }
+
+  toggleUserStatus(userId: string, isLocked: boolean) {
+    return this.http.post(`${this.BaseURI}/ApplicationUser/ToggleUserStatus`, { userId, isLocked });
+  }
+
+  getUser(userId: string) {
+    return this.http.get(`${this.BaseURI}/ApplicationUser/GetUser/${userId}`);
+  }
 }

@@ -9,6 +9,7 @@ import { UploadComponent } from '../../upload/upload.component';
 import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-upload.component';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
+import { NumeralService } from 'src/app/shared/numeral.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -100,7 +101,7 @@ export class BuyerdetailComponent {
   }
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
-    private duplicateCheckService: DuplicateCheckService){
+    private duplicateCheckService: DuplicateCheckService, private numeralService: NumeralService){
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.sellerForm = this.fb.group({
@@ -668,14 +669,6 @@ deleteBuyer(id: number, event?: Event) {
    }
    return 'قیمت به حروف';
  }
-onlyNumberKey(event:any) {
-  const keyCode = event.which || event.keyCode;
-  const keyValue = String.fromCharCode(keyCode);
-
-  if (/\D/.test(keyValue)) {
-    event.preventDefault();
-  }
-}
 uploadFinished = (event:string) => { 
   this.imageName=event;
   this.imagePath=this.baseUrl+this.imageName;

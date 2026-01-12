@@ -76,6 +76,14 @@ export class WitnessdetailComponent {
     }
 
     ngOnInit() {
+      // Only fetch witness details if we have a valid ID
+      if (!this.id || this.id === 0) {
+        this.witnessDetails = [];
+        this.selectedId = 0;
+        this.setNationalIdRequired(true);
+        return;
+      }
+      
       this.vehiclesub.getWitnessById(this.id)
       .subscribe(witness => {
         this.witnessDetails = witness;
@@ -193,14 +201,6 @@ BindValu(id: number) {
     this.setNationalIdRequired(false);
 
     this.withnessForm.updateValueAndValidity();
-  }
-}
-onlyNumberKey(event:any) {
-  const keyCode = event.which || event.keyCode;
-  const keyValue = String.fromCharCode(keyCode);
-
-  if (/\D/.test(keyValue)) {
-    event.preventDefault();
   }
 }
 

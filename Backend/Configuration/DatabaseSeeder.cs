@@ -19,30 +19,50 @@ namespace WebAPIBackend.Configuration
             // Ensure database exists and apply pending migrations
             await context.Database.MigrateAsync();
 
-            // Add RBAC columns to AspNetUsers table - each column separately to handle existing columns
+            // Add RBAC columns to AspNetUsers table using DO block for better compatibility
             try
             {
-                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""LicenseType"" VARCHAR(50) NULL");
+                await context.Database.ExecuteSqlRawAsync(@"
+                    DO $$ 
+                    BEGIN
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_name = 'AspNetUsers' AND column_name = 'LicenseType') THEN
+                            ALTER TABLE ""AspNetUsers"" ADD COLUMN ""LicenseType"" VARCHAR(50) NULL;
+                            RAISE NOTICE 'Added LicenseType column to AspNetUsers';
+                        END IF;
+                        
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_name = 'AspNetUsers' AND column_name = 'UserRole') THEN
+                            ALTER TABLE ""AspNetUsers"" ADD COLUMN ""UserRole"" VARCHAR(50) NULL;
+                            RAISE NOTICE 'Added UserRole column to AspNetUsers';
+                        END IF;
+                        
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_name = 'AspNetUsers' AND column_name = 'CreatedAt') THEN
+                            ALTER TABLE ""AspNetUsers"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
+                            RAISE NOTICE 'Added CreatedAt column to AspNetUsers';
+                        END IF;
+                        
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_name = 'AspNetUsers' AND column_name = 'CreatedBy') THEN
+                            ALTER TABLE ""AspNetUsers"" ADD COLUMN ""CreatedBy"" VARCHAR(255) NULL;
+                            RAISE NOTICE 'Added CreatedBy column to AspNetUsers';
+                        END IF;
+                        
+                        -- Set default value for Discriminator column if it exists and has NOT NULL constraint
+                        IF EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_name = 'AspNetUsers' AND column_name = 'Discriminator') THEN
+                            ALTER TABLE ""AspNetUsers"" ALTER COLUMN ""Discriminator"" SET DEFAULT 'ApplicationUser';
+                            UPDATE ""AspNetUsers"" SET ""Discriminator"" = 'ApplicationUser' WHERE ""Discriminator"" IS NULL;
+                            RAISE NOTICE 'Set default value for Discriminator column';
+                        END IF;
+                    END $$;
+                ");
             }
-            catch (Exception) { /* Column may already exist */ }
-            
-            try
-            {
-                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""UserRole"" VARCHAR(50) NULL");
+            catch (Exception ex) 
+            { 
+                Console.WriteLine($"Note: RBAC columns check completed: {ex.Message}");
             }
-            catch (Exception) { /* Column may already exist */ }
-            
-            try
-            {
-                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""CreatedAt"" TIMESTAMP NULL");
-            }
-            catch (Exception) { /* Column may already exist */ }
-            
-            try
-            {
-                await context.Database.ExecuteSqlRawAsync(@"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""CreatedBy"" VARCHAR(255) NULL");
-            }
-            catch (Exception) { /* Column may already exist */ }
             
             // Update existing admin users to have ADMIN role
             try
@@ -51,6 +71,37 @@ namespace WebAPIBackend.Configuration
                     UPDATE ""AspNetUsers"" 
                     SET ""UserRole"" = 'ADMIN', ""CreatedAt"" = NOW(), ""CreatedBy"" = 'system'
                     WHERE ""IsAdmin"" = true AND (""UserRole"" IS NULL OR ""UserRole"" = '');
+                ");
+            }
+            catch (Exception) { /* Silent */ }
+
+            // Seed RBAC roles if they don't exist
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    INSERT INTO ""AspNetRoles"" (""Id"", ""Name"", ""NormalizedName"", ""ConcurrencyStamp"")
+                    SELECT gen_random_uuid()::text, 'ADMIN', 'ADMIN', gen_random_uuid()::text
+                    WHERE NOT EXISTS (SELECT 1 FROM ""AspNetRoles"" WHERE ""Name"" = 'ADMIN');
+
+                    INSERT INTO ""AspNetRoles"" (""Id"", ""Name"", ""NormalizedName"", ""ConcurrencyStamp"")
+                    SELECT gen_random_uuid()::text, 'AUTHORITY', 'AUTHORITY', gen_random_uuid()::text
+                    WHERE NOT EXISTS (SELECT 1 FROM ""AspNetRoles"" WHERE ""Name"" = 'AUTHORITY');
+
+                    INSERT INTO ""AspNetRoles"" (""Id"", ""Name"", ""NormalizedName"", ""ConcurrencyStamp"")
+                    SELECT gen_random_uuid()::text, 'COMPANY_REGISTRAR', 'COMPANY_REGISTRAR', gen_random_uuid()::text
+                    WHERE NOT EXISTS (SELECT 1 FROM ""AspNetRoles"" WHERE ""Name"" = 'COMPANY_REGISTRAR');
+
+                    INSERT INTO ""AspNetRoles"" (""Id"", ""Name"", ""NormalizedName"", ""ConcurrencyStamp"")
+                    SELECT gen_random_uuid()::text, 'LICENSE_REVIEWER', 'LICENSE_REVIEWER', gen_random_uuid()::text
+                    WHERE NOT EXISTS (SELECT 1 FROM ""AspNetRoles"" WHERE ""Name"" = 'LICENSE_REVIEWER');
+
+                    INSERT INTO ""AspNetRoles"" (""Id"", ""Name"", ""NormalizedName"", ""ConcurrencyStamp"")
+                    SELECT gen_random_uuid()::text, 'PROPERTY_OPERATOR', 'PROPERTY_OPERATOR', gen_random_uuid()::text
+                    WHERE NOT EXISTS (SELECT 1 FROM ""AspNetRoles"" WHERE ""Name"" = 'PROPERTY_OPERATOR');
+
+                    INSERT INTO ""AspNetRoles"" (""Id"", ""Name"", ""NormalizedName"", ""ConcurrencyStamp"")
+                    SELECT gen_random_uuid()::text, 'VEHICLE_OPERATOR', 'VEHICLE_OPERATOR', gen_random_uuid()::text
+                    WHERE NOT EXISTS (SELECT 1 FROM ""AspNetRoles"" WHERE ""Name"" = 'VEHICLE_OPERATOR');
                 ");
             }
             catch (Exception) { /* Silent */ }
@@ -640,6 +691,82 @@ namespace WebAPIBackend.Configuration
                     adminUser.CreatedBy ??= "system";
                     await userManager.UpdateAsync(adminUser);
                 }
+            }
+
+            // Add missing columns to VehiclesBuyerDetails table
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    DO $$
+                    BEGIN
+                        -- Add NationalIdCardPath column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'NationalIdCardPath') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""NationalIdCardPath"" TEXT NULL;
+                            RAISE NOTICE 'Added NationalIdCardPath column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add RoleType column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'RoleType') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""RoleType"" TEXT NULL;
+                            RAISE NOTICE 'Added RoleType column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add AuthorizationLetter column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'AuthorizationLetter') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""AuthorizationLetter"" TEXT NULL;
+                            RAISE NOTICE 'Added AuthorizationLetter column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add RentStartDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'RentStartDate') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""RentStartDate"" TIMESTAMP WITHOUT TIME ZONE NULL;
+                            RAISE NOTICE 'Added RentStartDate column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add RentEndDate column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'RentEndDate') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""RentEndDate"" TIMESTAMP WITHOUT TIME ZONE NULL;
+                            RAISE NOTICE 'Added RentEndDate column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add TazkiraType column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'TazkiraType') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""TazkiraType"" TEXT NULL;
+                            RAISE NOTICE 'Added TazkiraType column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add TazkiraVolume column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'TazkiraVolume') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""TazkiraVolume"" TEXT NULL;
+                            RAISE NOTICE 'Added TazkiraVolume column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add TazkiraPage column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'TazkiraPage') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""TazkiraPage"" TEXT NULL;
+                            RAISE NOTICE 'Added TazkiraPage column to VehiclesBuyerDetails';
+                        END IF;
+                        
+                        -- Add TazkiraNumber column if not exists
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'tr' AND table_name = 'VehiclesBuyerDetails' AND column_name = 'TazkiraNumber') THEN
+                            ALTER TABLE tr.""VehiclesBuyerDetails"" ADD COLUMN ""TazkiraNumber"" TEXT NULL;
+                            RAISE NOTICE 'Added TazkiraNumber column to VehiclesBuyerDetails';
+                        END IF;
+                    END $$;
+                ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Note: VehiclesBuyerDetails columns check completed: {ex.Message}");
             }
 
             // Seed lookup tables for dropdown data

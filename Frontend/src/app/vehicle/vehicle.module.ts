@@ -19,6 +19,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { MatDialogModule } from '@angular/material/dialog';
 import { VehicleSubmitComponent } from './vehicle-submit/vehicle-submit.component';
 import { BuyerdetailComponent } from './vehicle-submit/buyerdetail/buyerdetail.component';
 import { SellerdetailComponent } from './vehicle-submit/sellerdetail/sellerdetail.component';
@@ -26,6 +27,7 @@ import { WitnessdetailComponent } from './vehicle-submit/witnessdetail/witnessde
 import { VehicleFileuploadComponent } from './vehicle-submit/vehicle-fileupload/vehicle-fileupload.component';
 import { VehiclelistComponent } from './vehiclelist/vehiclelist.component';
 import { VehicleNationalidUploadComponent } from './vehicle-submit/nationalid-upload/nationalid-upload.component';
+import { VehicledetailsviewComponent } from './vehicledetailsview/vehicledetailsview.component';
 import { SharedModule } from '../shared/shared.module';
 
 
@@ -39,7 +41,8 @@ import { SharedModule } from '../shared/shared.module';
     WitnessdetailComponent,
     VehicleFileuploadComponent,
     VehiclelistComponent,
-    VehicleNationalidUploadComponent
+    VehicleNationalidUploadComponent,
+    VehicledetailsviewComponent
     
   ],
   imports: [
@@ -62,6 +65,7 @@ import { SharedModule } from '../shared/shared.module';
     MatPaginatorModule,
     MatTableModule,
     NgxPaginationModule,
+    MatDialogModule,
     SharedModule
   ]
 })

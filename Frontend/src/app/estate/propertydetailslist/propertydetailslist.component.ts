@@ -73,11 +73,11 @@ export class PropertydetailslistComponent {
   }
 
   onEdit(propertyId: number) {
-    this.router.navigate(['/dashboard/estate'], { queryParams: { id: propertyId } });
+    this.router.navigate(['/estate'], { queryParams: { id: propertyId } });
   }
 
   onView(propertyId: number) {
-    this.router.navigate(['/dashboard/estate/view', propertyId]);
+    this.router.navigate(['/estate/view', propertyId]);
   }
 
   onTableDataChange(event: any) {

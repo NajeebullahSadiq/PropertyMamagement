@@ -1,11 +1,9 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/shared/auth.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
+import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
-
-import { UploadComponent } from './upload/upload.component';
 
 @Component({
   selector: 'app-register',
@@ -37,7 +35,7 @@ export class RegisterComponent implements OnInit {
     { id: 'carSale', name: 'Car Sale', dari: 'موټر فروشی' }
   ];
 
-  @ViewChild(UploadComponent) childComponent!: UploadComponent;
+  @ViewChild('imageCropper') imageCropper!: ProfileImageCropperComponent;
   @ViewChild('secondDiv', { static: false }) secondDivRef!: ElementRef;
 
   constructor(
@@ -145,8 +143,18 @@ export class RegisterComponent implements OnInit {
     this.filePath = this.baseUrl + this.imageName;
   }
 
+  profilePreviewChanged = (localObjectUrl: string) => {
+    // This is called when user crops an image but before upload
+    // The localObjectUrl is a temporary blob URL for preview
+    if (localObjectUrl) {
+      this.filePath = localObjectUrl;
+    }
+  }
+
   callChildMethod() {
-    this.childComponent.childMethod();
+    if (this.imageCropper) {
+      this.imageCropper.reset();
+    }
   }
 
   resetForm() {
@@ -159,6 +167,9 @@ export class RegisterComponent implements OnInit {
     this.errorMessage = '';
     this.showPassword = false;
     this.showConfirmPassword = false;
+    if (this.imageCropper) {
+      this.imageCropper.reset();
+    }
   }
 
   onPropertyTypeChange() {

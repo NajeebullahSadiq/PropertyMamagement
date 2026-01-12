@@ -41,16 +41,18 @@ export class UploadComponent implements OnInit {
 
     let fileToUpload = <File>files[0];
     const formData = new FormData();
-    formData.append('file', fileToUpload,this.date+this.hour+this.minutes+this.second+fileToUpload.name);
+    formData.append('file', fileToUpload, fileToUpload.name);
     this.fileName=fileToUpload.name;
-    this.http.post(this.apiURL+'/upload', formData, {reportProgress: true, observe: 'events'})
+    this.http.post<{dbPath: string, fileName: string}>(this.apiURL+'/upload', formData, {reportProgress: true, observe: 'events'})
       .subscribe({
         next: (event) => {
         if (event.type === HttpEventType.UploadProgress)
         this.progress = Math.round(100 * (event.loaded || 1) / (event.total || 1))
          if (event.type === HttpEventType.Response) {
           this.message = fileToUpload.name + ' ' + this.translateService.instant('success');
-          this.sendMessage.emit(this.date+this.hour+this.minutes+this.second+fileToUpload.name);
+          // Use the dbPath from server response for correct file path
+          const response = event.body;
+          this.sendMessage.emit(response?.dbPath || '');
         }
       },
       error: (err: HttpErrorResponse) => console.log(err)

@@ -223,7 +223,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-hashtag"></i>
                                 </span>
-                                <input type="text" (keypress)="onlyNumberKey($event)" id="indentityCardNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                <input type="text" appNumericInput id="indentityCardNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     formControlName="indentityCardNumber">
                             </div>
                             <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
@@ -301,7 +301,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-phone"></i>
                                 </span>
-                                <input type="text" (keypress)="onlyNumberKey($event)" id="phoneNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                <input type="text" appNumericInput id="phoneNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     formControlName="phoneNumber">
                             </div>
                             <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
@@ -444,8 +444,9 @@
                                     <div class="relative">
                                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fas fa-money-bill-alt"></i></span>
                                         <input
-                                          type="number"
-                                          (keypress)="onlyNumberKey($event)"
+                                          type="text"
+                                          appNumericInput
+                                          [allowDecimal]="true"
                                           id="price"
                                           class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                           formControlName="price"
@@ -479,7 +480,9 @@
                                     <div class="relative">
                                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fas fa-money-bill-alt"></i></span>
                                         <input
-                                          type="number"
+                                          type="text"
+                                          appNumericInput
+                                          [allowDecimal]="true"
                                           id="halfPrice"
                                           class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                           formControlName="halfPrice"
@@ -493,7 +496,9 @@
                                     <div class="relative">
                                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fas fa-money-bill-alt"></i></span>
                                         <input
-                                          type="number"
+                                          type="text"
+                                          appNumericInput
+                                          [allowDecimal]="true"
                                           id="royaltyAmount"
                                           class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                           formControlName="royaltyAmount"

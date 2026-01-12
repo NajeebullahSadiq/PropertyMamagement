@@ -9,6 +9,7 @@ import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { UploadComponent } from './register/upload/upload.component';
+import { SharedModule } from '../shared/shared.module';
 
 // Note: ChangepasswordComponent, ResetpasswordComponent, and LockuserComponent
 // have been moved to SharedModule for global availability as dialogs
@@ -26,7 +27,8 @@ import { UploadComponent } from './register/upload/upload.component';
     AuthRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    NgSelectModule
+    NgSelectModule,
+    SharedModule
   ]
 })
 export class AuthModule { }

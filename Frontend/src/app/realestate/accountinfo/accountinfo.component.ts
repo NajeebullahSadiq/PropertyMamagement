@@ -46,7 +46,7 @@ export class AccountinfoComponent {
     maxDate = { year: 1410, month: 12, day: 31 };
     minDate = { year: 1320, month: 12, day: 31 };
 
-    accountForm: FormGroup = new FormGroup({});
+    accountForm!: FormGroup;
     selectedId: number = 0;
     selectedTaxPaymentDate!: NgbDate;
     accountInfo: AccountInfo | null = null;

@@ -13,6 +13,8 @@ import { AuthService } from 'src/app/shared/auth.service';
 })
 export class ResetpasswordComponent implements OnInit {
   users:any;
+  showPassword = false;
+  
   constructor(private service:AuthService,private toastr: ToastrService,public dialogRef: MatDialogRef<ResetpasswordComponent>) { }
 
   ngOnInit(): void {

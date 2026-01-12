@@ -36,4 +36,11 @@ export class VehicleService {
     const url = `${this.baseUrl}/GetPrintRecord/${id}`;
     return this.http.get(url);
   }
+  
+  /**
+   * Get complete vehicle details for view page (read-only)
+   */
+  getVehicleViewById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/View/${id}`);
+  }
 }

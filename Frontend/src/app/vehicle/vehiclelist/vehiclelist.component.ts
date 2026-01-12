@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { VehiclesDetailsList } from 'src/app/models/PropertyDetail';
 import { VehicleService } from 'src/app/shared/vehicle.service';
+import { RbacService } from 'src/app/shared/rbac.service';
 
 @Component({
   selector: 'app-vehiclelist',
@@ -18,8 +19,17 @@ export class VehiclelistComponent {
   count: number = 0;
   tableSize: number = 10;
   tableSizes: any = [10,50,100];
+  isViewOnly: boolean = false;
 
-  constructor(private http: HttpClient, private vehicleservice: VehicleService, private toastr: ToastrService, private router: Router) {}
+  constructor(
+    private http: HttpClient, 
+    private vehicleservice: VehicleService, 
+    private toastr: ToastrService, 
+    private router: Router,
+    private rbacService: RbacService
+  ) {
+    this.isViewOnly = this.rbacService.isViewOnly();
+  }
 
   ngOnInit() {
     this.loadData();
@@ -34,7 +44,11 @@ export class VehiclelistComponent {
   }
 
   onEdit(propertyId: number) {
-    this.router.navigate(['/dashboard/vehicle'], { queryParams: { id: propertyId } });
+    this.router.navigate(['/vehicle'], { queryParams: { id: propertyId } });
+  }
+
+  onView(propertyId: number) {
+    this.router.navigate(['/vehicle/view', propertyId]);
   }
 
   onTableDataChange(event: any) {

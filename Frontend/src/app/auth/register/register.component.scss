@@ -80,6 +80,36 @@
   }
 }
 
+// Centered profile image cropper
+.centered-cropper {
+  ::ng-deep .profile-image-cropper {
+    align-items: center;
+    text-align: center;
+  }
+  
+  ::ng-deep .profile-image-actions {
+    justify-content: center;
+  }
+  
+  ::ng-deep .profile-image-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    grid-template-columns: unset;
+  }
+  
+  ::ng-deep .profile-image-preview {
+    justify-content: center;
+  }
+  
+  ::ng-deep .preview-img {
+    width: 140px;
+    height: 140px;
+    border: 4px solid white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
 // Animation for alerts
 @keyframes slideUp {
   from {

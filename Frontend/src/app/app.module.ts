@@ -27,6 +27,7 @@ import { PrintComponent } from './print/print.component';
 import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
 import { PrintLicenseComponent } from './print-license/print-license.component';
 import { SharedModule } from './shared/shared.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { SharedModule } from './shared/shared.module';
     
     CommonModule,
     SharedModule,
+    DashboardModule,
     TranslateModule.forRoot({
       loader: {
           provide: TranslateLoader,

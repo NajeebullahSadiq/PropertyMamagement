@@ -142,6 +142,182 @@ namespace WebAPIBackend.Controllers.Companies
             }
         }
 
+        /// <summary>
+        /// Get comprehensive company view data for read-only display
+        /// </summary>
+        [HttpGet("GetView/{id}")]
+        public async Task<IActionResult> GetCompanyViewById(int id)
+        {
+            try
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Check if user can access company module
+                if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "company"))
+                {
+                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول شرکت ها را ندارید" });
+                }
+
+                var data = await _context.CompanyDetails
+                    .AsNoTracking()
+                    .Where(c => c.Id == id)
+                    .Select(c => new
+                    {
+                        // Basic Company Information
+                        c.Id,
+                        c.Title,
+                        c.PhoneNumber,
+                        c.LicenseNumber,
+                        c.PetitionDate,
+                        c.PetitionNumber,
+                        c.Tin,
+                        c.DocPath,
+                        c.Status,
+                        c.CreatedAt,
+
+                        // Company Owner Information
+                        Owner = c.CompanyOwners.Select(o => new
+                        {
+                            o.Id,
+                            o.FirstName,
+                            o.FatherName,
+                            o.GrandFatherName,
+                            o.DateofBirth,
+                            o.PhoneNumber,
+                            o.WhatsAppNumber,
+                            o.IndentityCardNumber,
+                            o.Jild,
+                            o.Safha,
+                            o.SabtNumber,
+                            o.PothoPath,
+                            EducationLevelName = o.EducationLevel != null ? o.EducationLevel.Dari : null,
+                            IdentityCardTypeName = o.IdentityCardType != null ? o.IdentityCardType.Name : null,
+                            // Owner's Own Address
+                            OwnerProvinceName = o.OwnerProvince != null ? o.OwnerProvince.Dari : null,
+                            OwnerDistrictName = o.OwnerDistrict != null ? o.OwnerDistrict.Dari : null,
+                            o.OwnerVillage,
+                            // Permanent Address
+                            PermanentProvinceName = o.PermanentProvince != null ? o.PermanentProvince.Dari : null,
+                            PermanentDistrictName = o.PermanentDistrict != null ? o.PermanentDistrict.Dari : null,
+                            o.PermanentVillage,
+                            // Temporary Address
+                            TemporaryProvinceName = o.TemporaryProvince != null ? o.TemporaryProvince.Dari : null,
+                            TemporaryDistrictName = o.TemporaryDistrict != null ? o.TemporaryDistrict.Dari : null,
+                            o.TemporaryVillage
+                        }).FirstOrDefault(),
+
+                        // License Details
+                        License = c.LicenseDetails.Select(l => new
+                        {
+                            l.Id,
+                            l.LicenseNumber,
+                            l.LicenseType,
+                            l.LicenseCategory,
+                            l.IssueDate,
+                            l.ExpireDate,
+                            l.OfficeAddress,
+                            AreaName = l.Area != null ? l.Area.Name : null,
+                            l.RoyaltyAmount,
+                            l.RoyaltyDate,
+                            l.PenaltyAmount,
+                            l.PenaltyDate,
+                            l.HrLetter,
+                            l.HrLetterDate,
+                            l.DocPath
+                        }).FirstOrDefault(),
+
+                        // Guarantors
+                        Guarantors = c.Guarantors.Select(g => new
+                        {
+                            g.Id,
+                            g.FirstName,
+                            g.FatherName,
+                            g.GrandFatherName,
+                            g.PhoneNumber,
+                            g.IndentityCardNumber,
+                            g.Jild,
+                            g.Safha,
+                            g.SabtNumber,
+                            g.PothoPath,
+                            IdentityCardTypeName = g.IdentityCardType != null ? g.IdentityCardType.Name : null,
+                            GuaranteeTypeName = g.GuaranteeType != null ? g.GuaranteeType.Name : null,
+                            g.GuaranteeTypeId,
+                            g.PropertyDocumentNumber,
+                            g.PropertyDocumentDate,
+                            g.SenderMaktobNumber,
+                            g.SenderMaktobDate,
+                            g.AnswerdMaktobNumber,
+                            g.AnswerdMaktobDate,
+                            g.DateofGuarantee,
+                            g.GuaranteeDocNumber,
+                            g.GuaranteeDate,
+                            g.GuaranteeDocPath,
+                            // Conditional fields
+                            g.CourtName,
+                            g.CollateralNumber,
+                            g.SetSerialNumber,
+                            GuaranteeDistrictName = g.GuaranteeDistrict != null ? g.GuaranteeDistrict.Dari : null,
+                            g.BankName,
+                            g.DepositNumber,
+                            g.DepositDate,
+                            // Addresses
+                            PermanentProvinceName = g.PaddressProvince != null ? g.PaddressProvince.Dari : null,
+                            PermanentDistrictName = g.PaddressDistrict != null ? g.PaddressDistrict.Dari : null,
+                            g.PaddressVillage,
+                            TemporaryProvinceName = g.TaddressProvince != null ? g.TaddressProvince.Dari : null,
+                            TemporaryDistrictName = g.TaddressDistrict != null ? g.TaddressDistrict.Dari : null,
+                            g.TaddressVillage
+                        }).ToList(),
+
+                        // Account Info (Financial/Tax)
+                        AccountInfo = c.CompanyAccountInfos.Select(a => new
+                        {
+                            a.Id,
+                            a.SettlementInfo,
+                            a.TaxPaymentAmount,
+                            a.SettlementYear,
+                            a.TaxPaymentDate,
+                            a.TransactionCount,
+                            a.CompanyCommission
+                        }).FirstOrDefault(),
+
+                        // Cancellation Info
+                        CancellationInfo = c.CompanyCancellationInfos.Select(ci => new
+                        {
+                            ci.Id,
+                            ci.LicenseCancellationLetterNumber,
+                            ci.RevenueCancellationLetterNumber,
+                            ci.LicenseCancellationLetterDate,
+                            ci.Remarks
+                        }).FirstOrDefault()
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (data == null)
+                {
+                    return NotFound(new { message = "شرکت یافت نشد" });
+                }
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> SaveProperty([FromBody] CompanyDetailData request)
         {

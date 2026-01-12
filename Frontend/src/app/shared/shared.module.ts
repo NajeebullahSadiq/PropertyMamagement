@@ -24,6 +24,9 @@ import {
   IsAdminDirective
 } from './directives/rbac.directive';
 
+// Numeric Input Directive for Dari/Pashto number support
+import { NumericInputDirective } from './directives/numeric-input.directive';
+
 // Dialog components moved from AuthModule for global availability
 import { ChangepasswordComponent } from '../auth/changepassword/changepassword.component';
 import { ResetpasswordComponent } from '../auth/resetpassword/resetpassword.component';
@@ -46,6 +49,8 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     CanEditDirective,
     CanEditRecordDirective,
     IsAdminDirective,
+    // Numeric Input Directive
+    NumericInputDirective,
     // Dialog components
     ChangepasswordComponent,
     ResetpasswordComponent,
@@ -74,6 +79,8 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     CanEditDirective,
     CanEditRecordDirective,
     IsAdminDirective,
+    // Numeric Input Directive
+    NumericInputDirective,
     // Export dialog components so they can be used anywhere
     ChangepasswordComponent,
     ResetpasswordComponent,

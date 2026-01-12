@@ -229,6 +229,13 @@ export class BuyerdetailComponent {
   }
 
   loadBuyerDetails() {
+    // Only fetch buyer details if we have a valid ID
+    if (!this.id || this.id === 0) {
+      this.buyerDetails = [];
+      this.selectedbuyerId = 0;
+      return;
+    }
+    
     this.vehiclesubservice.getBuyerById(this.id)
     .subscribe(sellers => {
       this.buyerDetails = sellers || [];
@@ -469,14 +476,6 @@ deleteBuyer(id: number) {
       if (this.childComponent) {
         this.childComponent.reset();
       }
-}
-onlyNumberKey(event:any) {
-  const keyCode = event.which || event.keyCode;
-  const keyValue = String.fromCharCode(keyCode);
-
-  if (/\D/.test(keyValue)) {
-    event.preventDefault();
-  }
 }
 nationalIdUploadFinished = (event:string) => { 
   this.nationalIdFileName=event;

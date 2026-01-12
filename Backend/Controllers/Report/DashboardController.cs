@@ -9,7 +9,7 @@ using WebAPIBackend.Helpers;
 
 namespace WebAPIBackend.Controllers.Report
 {
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN,AUTHORITY")]
     [Route("api/[controller]")]
     [ApiController]
     public class DashboardController : ControllerBase

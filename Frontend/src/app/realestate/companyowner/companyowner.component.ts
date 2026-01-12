@@ -57,7 +57,7 @@ export class CompanyownerComponent {
 	selectedDate!: NgbDate;
 	IdTypes: any;
 	EducationLevel: any;
-	ownerForm: FormGroup = new FormGroup({});
+	ownerForm!: FormGroup;
 	ownerDetails!: companyowner[];
 	filteredIdTypes: any;
 

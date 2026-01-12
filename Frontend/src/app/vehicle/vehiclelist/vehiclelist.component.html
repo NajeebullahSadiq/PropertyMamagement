@@ -49,7 +49,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">فروشنده</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">خریدار</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">حالت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700" colspan="2">عملیات</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700" colspan="3">عملیات</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -78,10 +78,17 @@
                 </ng-template>
               </td>
               <td class="px-4 py-3">
-                <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" (click)="onEdit(property.id)" title="ویرایش">
+                <button class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" (click)="onView(property.id)" title="نمایش جزئیات">
+                  <i class="fas fa-eye"></i>
+                  <span>نمایش</span>
+                </button>
+              </td>
+              <td class="px-4 py-3">
+                <button *ngIf="!isViewOnly" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" (click)="onEdit(property.id)" title="ویرایش">
                   <i class="fas fa-edit"></i>
                   <span>ویرایش</span>
                 </button>
+                <span *ngIf="isViewOnly" class="text-gray-400 text-sm">-</span>
               </td>
               <td class="px-4 py-3">
                 <button [disabled]="!property.iscomplete" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 mx-auto" (click)="onPrint(property.id)" title="چاپ">

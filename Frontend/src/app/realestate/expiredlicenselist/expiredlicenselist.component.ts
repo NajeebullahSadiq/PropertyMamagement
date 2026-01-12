@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { companydetailsList } from 'src/app/models/companydetails';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
+import { RbacService } from 'src/app/shared/rbac.service';
 
 @Component({
   selector: 'app-expiredlicenselist',
@@ -18,7 +19,17 @@ export class ExpiredlicenselistComponent {
   count: number = 0;
   tableSize: number = 10;
   tableSizes: any = [10,50,100];
-  constructor(private http: HttpClient, private comservice:CompnaydetailService, private toastr: ToastrService, private router: Router) {}
+  isViewOnly: boolean = false;
+
+  constructor(
+    private http: HttpClient, 
+    private comservice: CompnaydetailService, 
+    private toastr: ToastrService, 
+    private router: Router,
+    private rbacService: RbacService
+  ) {
+    this.isViewOnly = this.rbacService.isViewOnly();
+  }
 
   ngOnInit() {
     this.loadData();
@@ -33,7 +44,11 @@ export class ExpiredlicenselistComponent {
   }
 
   onEdit(propertyId: number) {
-    this.router.navigate(['/dashboard/realestate'], { queryParams: { id: propertyId } });
+    this.router.navigate(['/realestate'], { queryParams: { id: propertyId } });
+  }
+
+  onView(propertyId: number) {
+    this.router.navigate(['/realestate/view', propertyId]);
   }
 
   onTableDataChange(event: any) {

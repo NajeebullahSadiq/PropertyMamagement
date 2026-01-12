@@ -202,7 +202,8 @@ namespace WebAPIBackend.Controllers
             var roles = await _userManager.GetRolesAsync(user);
 
             IQueryable<PropertyDetail> propertyQuery;
-            if (roles.Contains("ADMIN"))
+            // ADMIN and AUTHORITY can view all records
+            if (RbacHelper.CanViewAllRecords(roles, "property"))
             {
                 propertyQuery = _context.PropertyDetails;
             }

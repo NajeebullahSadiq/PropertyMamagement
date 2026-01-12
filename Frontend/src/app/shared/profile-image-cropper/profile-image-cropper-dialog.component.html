@@ -1,7 +1,7 @@
 <div class="cropper-dialog" dir="rtl">
   <h2 mat-dialog-title>برش عکس</h2>
 
-  <div mat-dialog-content>
+  <div mat-dialog-content class="dialog-content">
     <div *ngIf="error" class="text-danger mb-2">
       <small>{{ error }}</small>
     </div>
@@ -35,7 +35,7 @@
   </div>
 
   <div mat-dialog-actions align="end" class="dialog-actions">
-    <button type="button" class="btn btn-outline-secondary" (click)="cancel()">لغو</button>
+    <button type="button" class="btn btn-outline-secondary" mat-dialog-close>لغو</button>
     <button type="button" class="btn btn-success" (click)="save()" [disabled]="!croppedBlob">ذخیره</button>
   </div>
 </div>
