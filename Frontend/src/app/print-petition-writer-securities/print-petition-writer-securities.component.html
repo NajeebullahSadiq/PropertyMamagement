@@ -1,0 +1,86 @@
+<div class="print-container" *ngIf="!isLoading && item">
+  <!-- Header -->
+  <div class="print-header">
+    <div class="header-logo">
+      <img src="assets/img/mcitlogo.png" alt="Logo" class="logo">
+    </div>
+    <div class="header-title">
+      <h1>جمهوری اسلامی افغانستان</h1>
+      <h2>وزارت مخابرات و تکنالوژی معلوماتی</h2>
+      <h3>سند بهادار عریضه‌ نویسان</h3>
+    </div>
+    <div class="header-info">
+      <p>نمبر ثبت تعرفه: {{ item.registrationNumber }}</p>
+      <p>تاریخ توزیع: {{ item.distributionDateFormatted || '-' }}</p>
+    </div>
+  </div>
+
+  <!-- Section 1: مشخصات عریضه‌نویس -->
+  <div class="print-section">
+    <h4 class="section-title">مشخصات عریضه‌نویس</h4>
+    <table class="info-table">
+      <tr>
+        <td class="label">نمبر ثبت تعرفه:</td>
+        <td class="value">{{ item.registrationNumber }}</td>
+        <td class="label">نمبر جواز عریضه‌نویس:</td>
+        <td class="value">{{ item.licenseNumber }}</td>
+      </tr>
+      <tr>
+        <td class="label">اسم عریضه‌نویس:</td>
+        <td class="value">{{ item.petitionWriterName }}</td>
+        <td class="label">اسم پدر عریضه‌نویس:</td>
+        <td class="value">{{ item.petitionWriterFatherName }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Section 2: مشخصات سند بهادار عریضه -->
+  <div class="print-section">
+    <h4 class="section-title">مشخصات سند بهادار عریضه</h4>
+    <table class="info-table">
+      <tr>
+        <td class="label">تعداد عریضه:</td>
+        <td class="value">{{ item.petitionCount }}</td>
+        <td class="label">مبلغ پول:</td>
+        <td class="value total">{{ item.amount | number }} افغانی</td>
+      </tr>
+      <tr>
+        <td class="label">آویز نمبر بانکی:</td>
+        <td class="value">{{ item.bankReceiptNumber }}</td>
+        <td class="label">تاریخ توزیع عریضه:</td>
+        <td class="value">{{ item.distributionDateFormatted || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="label">آغاز سریال نمبر عریضه:</td>
+        <td class="value">{{ item.serialNumberStart }}</td>
+        <td class="label">ختم سریال نمبر عریضه:</td>
+        <td class="value">{{ item.serialNumberEnd }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Signatures -->
+  <div class="signatures">
+    <div class="signature-box">
+      <p>امضای گیرنده</p>
+      <div class="signature-line"></div>
+    </div>
+    <div class="signature-box">
+      <p>امضای توزیع کننده</p>
+      <div class="signature-line"></div>
+    </div>
+    <div class="signature-box">
+      <p>مهر و امضای مسئول</p>
+      <div class="signature-line"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="print-footer">
+    <p>این سند رسمی بوده و جعل آن جرم پنداشته می‌شود</p>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="loading">
+  <p>در حال بارگذاری...</p>
+</div>

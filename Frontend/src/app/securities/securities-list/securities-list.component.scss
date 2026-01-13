@@ -1,0 +1,11 @@
+table {
+  direction: rtl;
+  
+  th, td {
+    white-space: nowrap;
+  }
+}
+
+.space-y-1 > * + * {
+  margin-top: 0.25rem;
+}

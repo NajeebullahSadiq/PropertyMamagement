@@ -116,6 +116,8 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<CompanyAccountInfo> CompanyAccountInfos { get; set; }
         public virtual DbSet<CompanyCancellationInfo> CompanyCancellationInfos { get; set; }
+        public virtual DbSet<SecuritiesDistribution> SecuritiesDistributions { get; set; }
+        public virtual DbSet<PetitionWriterSecurities> PetitionWriterSecurities { get; set; }
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -218,6 +220,62 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.Company).WithMany(p => p.CompanyCancellationInfos)
                     .HasForeignKey(d => d.CompanyId)
                     .HasConstraintName("FK_CompanyCancellationInfo_CompanyDetails");
+            });
+
+            modelBuilder.Entity<SecuritiesDistribution>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("SecuritiesDistribution_pkey");
+
+                entity.ToTable("SecuritiesDistribution", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50);
+                entity.Property(e => e.RegistrationNumber).HasMaxLength(50);
+                entity.Property(e => e.LicenseOwnerName).HasMaxLength(200);
+                entity.Property(e => e.LicenseOwnerFatherName).HasMaxLength(200);
+                entity.Property(e => e.TransactionGuideName).HasMaxLength(200);
+                entity.Property(e => e.LicenseNumber).HasMaxLength(50);
+                entity.Property(e => e.PropertySaleSerialNumber).HasMaxLength(100);
+                entity.Property(e => e.BayWafaSerialNumber).HasMaxLength(100);
+                entity.Property(e => e.RentSerialNumber).HasMaxLength(100);
+                entity.Property(e => e.VehicleSaleSerialNumber).HasMaxLength(100);
+                entity.Property(e => e.VehicleExchangeSerialNumber).HasMaxLength(100);
+                entity.Property(e => e.BankReceiptNumber).HasMaxLength(100);
+                entity.Property(e => e.PricePerDocument).HasPrecision(18, 2);
+                entity.Property(e => e.TotalDocumentsPrice).HasPrecision(18, 2);
+                entity.Property(e => e.RegistrationBookPrice).HasPrecision(18, 2);
+                entity.Property(e => e.TotalSecuritiesPrice).HasPrecision(18, 2);
+
+                entity.HasIndex(e => e.RegistrationNumber).IsUnique();
+                entity.HasIndex(e => e.LicenseNumber);
+                entity.HasIndex(e => e.BankReceiptNumber);
+                entity.HasIndex(e => e.TransactionGuideName);
+            });
+
+            modelBuilder.Entity<PetitionWriterSecurities>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PetitionWriterSecurities_pkey");
+
+                entity.ToTable("PetitionWriterSecurities", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50);
+                entity.Property(e => e.RegistrationNumber).HasMaxLength(50);
+                entity.Property(e => e.PetitionWriterName).HasMaxLength(200);
+                entity.Property(e => e.PetitionWriterFatherName).HasMaxLength(200);
+                entity.Property(e => e.LicenseNumber).HasMaxLength(50);
+                entity.Property(e => e.BankReceiptNumber).HasMaxLength(100);
+                entity.Property(e => e.SerialNumberStart).HasMaxLength(100);
+                entity.Property(e => e.SerialNumberEnd).HasMaxLength(100);
+                entity.Property(e => e.Amount).HasPrecision(18, 2);
+
+                entity.HasIndex(e => e.RegistrationNumber).IsUnique();
+                entity.HasIndex(e => e.LicenseNumber);
+                entity.HasIndex(e => e.BankReceiptNumber);
             });
 
             modelBuilder.Entity<CompanyOwner>(entity =>

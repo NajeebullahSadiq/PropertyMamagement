@@ -1,0 +1,172 @@
+<div class="print-container" *ngIf="!isLoading && item">
+  <!-- Header -->
+  <div class="print-header">
+    <div class="header-logo">
+      <img src="assets/img/mcitlogo.png" alt="Logo" class="logo">
+    </div>
+    <div class="header-title">
+      <h1>جمهوری اسلامی افغانستان</h1>
+      <h2>وزارت مخابرات و تکنالوژی معلوماتی</h2>
+      <h3>اسناد بهادار رهنمای معاملات</h3>
+    </div>
+    <div class="header-info">
+      <p>نمبر ثبت: {{ item.registrationNumber }}</p>
+      <p>تاریخ توزیع: {{ item.distributionDateFormatted || '-' }}</p>
+    </div>
+  </div>
+
+  <!-- Section 1: مشخصات رهنمای معاملات -->
+  <div class="print-section">
+    <h4 class="section-title">مشخصات رهنمای معاملات</h4>
+    <table class="info-table">
+      <tr>
+        <td class="label">نمبر ثبت:</td>
+        <td class="value">{{ item.registrationNumber }}</td>
+        <td class="label">نمبر جواز:</td>
+        <td class="value">{{ item.licenseNumber }}</td>
+      </tr>
+      <tr>
+        <td class="label">اسم صاحب امتیاز جواز:</td>
+        <td class="value">{{ item.licenseOwnerName }}</td>
+        <td class="label">اسم پدر:</td>
+        <td class="value">{{ item.licenseOwnerFatherName }}</td>
+      </tr>
+      <tr>
+        <td class="label">نام رهنمای معاملات:</td>
+        <td class="value" colspan="3">{{ item.transactionGuideName }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Section 2: مشخصات اسناد توزیعی -->
+  <div class="print-section">
+    <h4 class="section-title">مشخصات اسناد توزیعی</h4>
+    <table class="info-table">
+      <tr>
+        <td class="label">نوعیت سته:</td>
+        <td class="value" colspan="3">{{ getDocumentTypeName(item.documentType) }}</td>
+      </tr>
+      
+      <!-- Property Documents -->
+      <tr *ngIf="item.documentType === 1">
+        <td class="label">نوع سته جایداد:</td>
+        <td class="value" colspan="3">{{ getPropertySubTypeName(item.propertySubType) }}</td>
+      </tr>
+      
+      <tr *ngIf="item.propertySaleCount || item.propertySaleSerialStart || item.propertySaleSerialEnd">
+        <td class="label">سته خرید و فروش جایداد:</td>
+        <td class="value">تعداد: {{ item.propertySaleCount || '-' }}</td>
+        <td class="label">سریال نمبر:</td>
+        <td class="value">{{ item.propertySaleSerialStart || '-' }} الی {{ item.propertySaleSerialEnd || '-' }}</td>
+      </tr>
+      
+      <tr *ngIf="item.bayWafaCount || item.bayWafaSerialStart || item.bayWafaSerialEnd">
+        <td class="label">سته بیع وفا:</td>
+        <td class="value">تعداد: {{ item.bayWafaCount || '-' }}</td>
+        <td class="label">سریال نمبر:</td>
+        <td class="value">{{ item.bayWafaSerialStart || '-' }} الی {{ item.bayWafaSerialEnd || '-' }}</td>
+      </tr>
+      
+      <tr *ngIf="item.rentCount || item.rentSerialStart || item.rentSerialEnd">
+        <td class="label">سته کرایی:</td>
+        <td class="value">تعداد: {{ item.rentCount || '-' }}</td>
+        <td class="label">سریال نمبر:</td>
+        <td class="value">{{ item.rentSerialStart || '-' }} الی {{ item.rentSerialEnd || '-' }}</td>
+      </tr>
+      
+      <!-- Vehicle Documents -->
+      <tr *ngIf="item.documentType === 2">
+        <td class="label">نوع سته وسایط:</td>
+        <td class="value" colspan="3">{{ getVehicleSubTypeName(item.vehicleSubType) }}</td>
+      </tr>
+      
+      <tr *ngIf="item.vehicleSaleCount || item.vehicleSaleSerialStart || item.vehicleSaleSerialEnd">
+        <td class="label">سته خرید و فروش وسایط:</td>
+        <td class="value">تعداد: {{ item.vehicleSaleCount || '-' }}</td>
+        <td class="label">سریال نمبر:</td>
+        <td class="value">{{ item.vehicleSaleSerialStart || '-' }} الی {{ item.vehicleSaleSerialEnd || '-' }}</td>
+      </tr>
+      
+      <tr *ngIf="item.vehicleExchangeCount || item.vehicleExchangeSerialStart || item.vehicleExchangeSerialEnd">
+        <td class="label">سته تبادله وسایط:</td>
+        <td class="value">تعداد: {{ item.vehicleExchangeCount || '-' }}</td>
+        <td class="label">سریال نمبر:</td>
+        <td class="value">{{ item.vehicleExchangeSerialStart || '-' }} الی {{ item.vehicleExchangeSerialEnd || '-' }}</td>
+      </tr>
+      
+      <!-- Registration Book -->
+      <tr *ngIf="item.registrationBookType">
+        <td class="label">کتاب ثبت:</td>
+        <td class="value">{{ getRegistrationBookTypeName(item.registrationBookType) }}</td>
+        <td class="label">تعداد:</td>
+        <td class="value">{{ item.registrationBookCount || item.duplicateBookCount || '-' }}</td>
+      </tr>
+      
+      <tr>
+        <td class="label">مجموع سته‌ها:</td>
+        <td class="value total" colspan="3">{{ getTotalDocumentCount() }} جلد</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Section 3: قیمت اسناد بهادار -->
+  <div class="print-section">
+    <h4 class="section-title">قیمت اسناد بهادار</h4>
+    <table class="info-table">
+      <tr>
+        <td class="label">قیمت فی جلد سته:</td>
+        <td class="value">{{ item.pricePerDocument | number }} افغانی</td>
+        <td class="label">قیمت مجموعی سته‌ها:</td>
+        <td class="value">{{ item.totalDocumentsPrice | number }} افغانی</td>
+      </tr>
+      <tr>
+        <td class="label">قیمت کتاب ثبت:</td>
+        <td class="value">{{ item.registrationBookPrice | number }} افغانی</td>
+        <td class="label">قیمت مجموعی اسناد:</td>
+        <td class="value total">{{ item.totalSecuritiesPrice | number }} افغانی</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Section 4: آویز و تاریخ -->
+  <div class="print-section">
+    <h4 class="section-title">مشخصات آویز تحویلی و تاریخ توزیع</h4>
+    <table class="info-table">
+      <tr>
+        <td class="label">آویز نمبر بانکی:</td>
+        <td class="value">{{ item.bankReceiptNumber || '-' }}</td>
+        <td class="label">تاریخ تحویلی:</td>
+        <td class="value">{{ item.deliveryDateFormatted || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="label">تاریخ توزیع:</td>
+        <td class="value" colspan="3">{{ item.distributionDateFormatted || '-' }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Signatures -->
+  <div class="signatures">
+    <div class="signature-box">
+      <p>امضای گیرنده</p>
+      <div class="signature-line"></div>
+    </div>
+    <div class="signature-box">
+      <p>امضای توزیع کننده</p>
+      <div class="signature-line"></div>
+    </div>
+    <div class="signature-box">
+      <p>مهر و امضای مسئول</p>
+      <div class="signature-line"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="print-footer">
+    <p>این سند رسمی بوده و جعل آن جرم پنداشته می‌شود</p>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="loading">
+  <p>در حال بارگذاری...</p>
+</div>

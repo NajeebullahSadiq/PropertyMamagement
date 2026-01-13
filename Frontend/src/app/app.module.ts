@@ -26,6 +26,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PrintComponent } from './print/print.component';
 import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
 import { PrintLicenseComponent } from './print-license/print-license.component';
+import { PrintSecuritiesComponent } from './print-securities/print-securities.component';
+import { PrintPetitionWriterSecuritiesComponent } from './print-petition-writer-securities/print-petition-writer-securities.component';
 import { SharedModule } from './shared/shared.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 
@@ -35,6 +37,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     PrintComponent,
     PrintvehicledataComponent,
     PrintLicenseComponent,
+    PrintSecuritiesComponent,
+    PrintPetitionWriterSecuritiesComponent,
     
   ],
   imports: [

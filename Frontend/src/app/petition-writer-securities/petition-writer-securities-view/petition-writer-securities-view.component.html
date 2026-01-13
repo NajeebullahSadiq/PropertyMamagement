@@ -1,0 +1,99 @@
+<section class="w-full bg-gray-50 py-6">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">جزئیات سند بهادار عریضه‌ نویسان</h1>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+    </div>
+
+    <div *ngIf="!isLoading && item">
+      <!-- Action Buttons -->
+      <div class="flex justify-between mb-4">
+        <button (click)="goBack()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex items-center gap-2">
+          <mat-icon>arrow_forward</mat-icon>
+          بازگشت به لیست
+        </button>
+        <div class="flex gap-2">
+          <button *ngIf="canEdit" (click)="editItem()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 flex items-center gap-2">
+            <mat-icon>edit</mat-icon>
+            ویرایش
+          </button>
+          <button (click)="printItem()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+            <mat-icon>print</mat-icon>
+            چاپ
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 1: مشخصات عریضه‌نویس -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+        <div (click)="toggleSection('tab1')" class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <mat-icon>person</mat-icon>
+            <span>مشخصات عریضه‌نویس</span>
+          </h2>
+          <mat-icon class="text-white">{{ sections.tab1 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div *ngIf="sections.tab1" class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <span class="text-sm text-gray-500">نمبر ثبت تعرفه</span>
+              <p class="font-semibold text-gray-800">{{ item.registrationNumber }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <span class="text-sm text-gray-500">اسم عریضه‌نویس</span>
+              <p class="font-semibold text-gray-800">{{ item.petitionWriterName }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <span class="text-sm text-gray-500">اسم پدر عریضه‌نویس</span>
+              <p class="font-semibold text-gray-800">{{ item.petitionWriterFatherName }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <span class="text-sm text-gray-500">نمبر جواز عریضه‌نویس</span>
+              <p class="font-semibold text-gray-800">{{ item.licenseNumber }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: مشخصات سند بهادار عریضه -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+        <div (click)="toggleSection('tab2')" class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <mat-icon>description</mat-icon>
+            <span>مشخصات سند بهادار عریضه</span>
+          </h2>
+          <mat-icon class="text-white">{{ sections.tab2 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div *ngIf="sections.tab2" class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <span class="text-sm text-gray-500">تعداد عریضه</span>
+              <p class="font-semibold text-gray-800">{{ item.petitionCount | number }}</p>
+            </div>
+            <div class="p-3 bg-green-100 rounded-lg">
+              <span class="text-sm text-green-700">مبلغ پول</span>
+              <p class="font-bold text-green-800 text-xl">{{ item.amount | number }} افغانی</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <span class="text-sm text-gray-500">آویز نمبر بانکی</span>
+              <p class="font-semibold text-gray-800">{{ item.bankReceiptNumber }}</p>
+            </div>
+            <div class="p-3 bg-blue-50 rounded-lg">
+              <span class="text-sm text-blue-700">سریال نمبر عریضه</span>
+              <p class="font-semibold text-blue-800">{{ item.serialNumberStart }} الی {{ item.serialNumberEnd }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <span class="text-sm text-gray-500">تاریخ توزیع عریضه</span>
+              <p class="font-semibold text-gray-800">{{ item.distributionDateFormatted || '-' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

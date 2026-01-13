@@ -69,10 +69,16 @@ public partial class SecuritiesDistribution
     public int? PropertySaleCount { get; set; }
 
     /// <summary>
-    /// سریال نمبر سته خرید و فروش
+    /// آغاز سریال نمبر سته خرید و فروش
     /// </summary>
     [MaxLength(100)]
-    public string? PropertySaleSerialNumber { get; set; }
+    public string? PropertySaleSerialStart { get; set; }
+
+    /// <summary>
+    /// ختم سریال نمبر خرید و فروش
+    /// </summary>
+    [MaxLength(100)]
+    public string? PropertySaleSerialEnd { get; set; }
 
     /// <summary>
     /// تعداد سته بیع وفا
@@ -80,10 +86,16 @@ public partial class SecuritiesDistribution
     public int? BayWafaCount { get; set; }
 
     /// <summary>
-    /// سریال نمبر سته بیع وفا
+    /// آغاز سریال نمبر سته بیع وفا
     /// </summary>
     [MaxLength(100)]
-    public string? BayWafaSerialNumber { get; set; }
+    public string? BayWafaSerialStart { get; set; }
+
+    /// <summary>
+    /// ختم سریال نمبر بیع وفا
+    /// </summary>
+    [MaxLength(100)]
+    public string? BayWafaSerialEnd { get; set; }
 
     /// <summary>
     /// تعداد سته کرایی
@@ -91,10 +103,16 @@ public partial class SecuritiesDistribution
     public int? RentCount { get; set; }
 
     /// <summary>
-    /// سریال نمبر سته کرایی
+    /// آغاز سریال نمبر سته کرایی
     /// </summary>
     [MaxLength(100)]
-    public string? RentSerialNumber { get; set; }
+    public string? RentSerialStart { get; set; }
+
+    /// <summary>
+    /// ختم سریال نمبر کرایی
+    /// </summary>
+    [MaxLength(100)]
+    public string? RentSerialEnd { get; set; }
 
     // Vehicle Document Counts
     /// <summary>
@@ -103,10 +121,16 @@ public partial class SecuritiesDistribution
     public int? VehicleSaleCount { get; set; }
 
     /// <summary>
-    /// سریال نمبر سته خرید و فروش وسایط
+    /// آغاز سریال نمبر سته خرید و فروش وسایط
     /// </summary>
     [MaxLength(100)]
-    public string? VehicleSaleSerialNumber { get; set; }
+    public string? VehicleSaleSerialStart { get; set; }
+
+    /// <summary>
+    /// ختم سریال نمبر خرید و فروش وسایط
+    /// </summary>
+    [MaxLength(100)]
+    public string? VehicleSaleSerialEnd { get; set; }
 
     /// <summary>
     /// تعداد سته تبادله
@@ -114,10 +138,16 @@ public partial class SecuritiesDistribution
     public int? VehicleExchangeCount { get; set; }
 
     /// <summary>
-    /// سریال نمبر سته تبادله
+    /// آغاز سریال نمبر سته تبادله وسایط
     /// </summary>
     [MaxLength(100)]
-    public string? VehicleExchangeSerialNumber { get; set; }
+    public string? VehicleExchangeSerialStart { get; set; }
+
+    /// <summary>
+    /// ختم سریال نمبر تبادله وسایط
+    /// </summary>
+    [MaxLength(100)]
+    public string? VehicleExchangeSerialEnd { get; set; }
 
     // Registration Book
     /// <summary>

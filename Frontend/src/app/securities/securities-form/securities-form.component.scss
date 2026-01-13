@@ -1,0 +1,40 @@
+.securities-tabs {
+  ::ng-deep .mat-mdc-tab-labels {
+    direction: rtl;
+  }
+  
+  ::ng-deep .mat-mdc-tab {
+    min-width: 160px;
+  }
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  
+  .form-control {
+    flex: 1;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  
+  .calendar-btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 1px solid #d1d5db;
+    border-right: none;
+    padding: 0.625rem 0.75rem;
+    background: #f9fafb;
+    
+    &:hover {
+      background: #f3f4f6;
+    }
+  }
+}
+
+.custom-ng-select {
+  ::ng-deep .ng-select-container {
+    border-radius: 0.5rem;
+    min-height: 42px;
+  }
+}

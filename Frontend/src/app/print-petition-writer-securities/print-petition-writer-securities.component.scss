@@ -1,0 +1,152 @@
+.print-container {
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 20mm;
+  font-family: 'Vazir', 'B Nazanin', Arial, sans-serif;
+  direction: rtl;
+  background: white;
+}
+
+.print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #333;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+
+  .header-logo {
+    .logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+  }
+
+  .header-title {
+    text-align: center;
+    flex: 1;
+
+    h1 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0 0 5px 0;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 5px 0;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
+      color: #333;
+    }
+  }
+
+  .header-info {
+    text-align: left;
+    font-size: 12px;
+
+    p {
+      margin: 3px 0;
+    }
+  }
+}
+
+.print-section {
+  margin-bottom: 20px;
+
+  .section-title {
+    background: #f0f0f0;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    border-right: 4px solid #333;
+  }
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+  }
+
+  .label {
+    background: #f9f9f9;
+    font-weight: bold;
+    width: 20%;
+  }
+
+  .value {
+    width: 30%;
+
+    &.total {
+      font-weight: bold;
+      color: #2e7d32;
+    }
+  }
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 20px;
+
+  .signature-box {
+    text-align: center;
+    width: 30%;
+
+    p {
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 40px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #333;
+      width: 100%;
+    }
+  }
+}
+
+.print-footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 11px;
+  color: #666;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 16px;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .print-container {
+    padding: 10mm;
+    max-width: 100%;
+  }
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}

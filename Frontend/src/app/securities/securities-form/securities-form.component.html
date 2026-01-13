@@ -1,0 +1,426 @@
+<section class="w-full bg-gray-50 py-6">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">
+        {{ isEditMode ? 'ویرایش' : 'ثبت' }} اسناد بهادار رهنمای معاملات
+      </h1>
+      <p class="text-center text-gray-600">لطفاً تمام معلومات را با دقت تکمیل نمایید</p>
+    </div>
+
+    <form [formGroup]="securitiesForm" (ngSubmit)="onSubmit()">
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="securities-tabs">
+        <!-- Tab 1: مشخصات رهنمای معاملات -->
+        <mat-tab>
+          <ng-template matTabLabel>
+            <mat-icon class="ml-2">description</mat-icon>
+            مشخصات رهنمای معاملات
+          </ng-template>
+          
+          <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-4">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-info-circle"></i>
+                <span>مشخصات رهنمای معاملات</span>
+              </h2>
+            </div>
+            <div class="px-6 py-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- نمبر ثبت -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    نمبر ثبت <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" formControlName="registrationNumber"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="نمبر ثبت را وارد کنید">
+                  <div *ngIf="registrationNumber?.invalid && registrationNumber?.touched">
+                    <small class="text-red-600 text-xs" *ngIf="registrationNumber?.errors?.['required']">این فیلد الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- اسم صاحب امتیاز جواز -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    اسم صاحب امتیاز جواز <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" formControlName="licenseOwnerName"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="اسم صاحب امتیاز جواز را وارد کنید">
+                  <div *ngIf="licenseOwnerName?.invalid && licenseOwnerName?.touched">
+                    <small class="text-red-600 text-xs" *ngIf="licenseOwnerName?.errors?.['required']">این فیلد الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- اسم پدر صاحب امتیاز جواز -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    اسم پدر صاحب امتیاز جواز <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" formControlName="licenseOwnerFatherName"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="اسم پدر صاحب امتیاز جواز را وارد کنید">
+                  <div *ngIf="licenseOwnerFatherName?.invalid && licenseOwnerFatherName?.touched">
+                    <small class="text-red-600 text-xs" *ngIf="licenseOwnerFatherName?.errors?.['required']">این فیلد الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- نام رهنمای معاملات -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    نام رهنمای معاملات <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" formControlName="transactionGuideName"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="نام رهنمای معاملات را وارد کنید">
+                  <div *ngIf="transactionGuideName?.invalid && transactionGuideName?.touched">
+                    <small class="text-red-600 text-xs" *ngIf="transactionGuideName?.errors?.['required']">این فیلد الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- نمبر جواز -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    نمبر جواز <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" formControlName="licenseNumber"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="نمبر جواز را وارد کنید">
+                  <div *ngIf="licenseNumber?.invalid && licenseNumber?.touched">
+                    <small class="text-red-600 text-xs" *ngIf="licenseNumber?.errors?.['required']">این فیلد الزامی است</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end mt-4">
+            <button type="button" (click)="nextTab()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              بعدی <mat-icon class="align-middle">arrow_back</mat-icon>
+            </button>
+          </div>
+        </mat-tab>
+
+        <!-- Tab 2: مشخصات اسناد توزیعی -->
+        <mat-tab>
+          <ng-template matTabLabel>
+            <mat-icon class="ml-2">folder</mat-icon>
+            مشخصات اسناد توزیعی
+          </ng-template>
+          
+          <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-4">
+            <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-folder-open"></i>
+                <span>مشخصات اسناد توزیعی</span>
+              </h2>
+            </div>
+            <div class="px-6 py-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- نوعیت سته -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت سته</label>
+                  <ng-select formControlName="documentType" [items]="documentTypes" bindLabel="name" bindValue="id"
+                    placeholder="انتخاب نوعیت سته" (change)="onDocumentTypeChange()"
+                    class="custom-ng-select"></ng-select>
+                </div>
+
+                <!-- Property Sub Type -->
+                <div *ngIf="showPropertyFields">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوع سته جایداد</label>
+                  <ng-select formControlName="propertySubType" [items]="propertySubTypes" bindLabel="name" bindValue="id"
+                    placeholder="انتخاب نوع سته" (change)="onPropertySubTypeChange()"
+                    class="custom-ng-select"></ng-select>
+                </div>
+
+                <!-- Vehicle Sub Type -->
+                <div *ngIf="showVehicleFields">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوع سته وسایط نقلیه</label>
+                  <ng-select formControlName="vehicleSubType" [items]="vehicleSubTypes" bindLabel="name" bindValue="id"
+                    placeholder="انتخاب نوع سته" (change)="onVehicleSubTypeChange()"
+                    class="custom-ng-select"></ng-select>
+                </div>
+              </div>
+
+              <!-- Property Sale Fields -->
+              <div *ngIf="showPropertySaleFields" class="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h3 class="font-semibold text-blue-800 mb-4">سته خرید و فروش جایداد</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">تعداد سته خرید و فروش جایداد</label>
+                    <input type="text" appNumericInput formControlName="propertySaleCount" (input)="calculateTotalPrice()"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="تعداد">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر سته خرید و فروش</label>
+                    <input type="text" formControlName="propertySaleSerialStart"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="آغاز سریال نمبر">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر خرید و فروش</label>
+                    <input type="text" formControlName="propertySaleSerialEnd"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="ختم سریال نمبر">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bay Wafa Fields -->
+              <div *ngIf="showBayWafaFields" class="mt-6 p-4 bg-purple-50 rounded-lg">
+                <h3 class="font-semibold text-purple-800 mb-4">سته بیع وفا</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">تعداد سته بیع وفا</label>
+                    <input type="text" appNumericInput formControlName="bayWafaCount" (input)="calculateTotalPrice()"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="تعداد">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر سته بیع وفا</label>
+                    <input type="text" formControlName="bayWafaSerialStart"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="آغاز سریال نمبر">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر بیع وفا</label>
+                    <input type="text" formControlName="bayWafaSerialEnd"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="ختم سریال نمبر">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rent Fields -->
+              <div *ngIf="showRentFields" class="mt-6 p-4 bg-orange-50 rounded-lg">
+                <h3 class="font-semibold text-orange-800 mb-4">سته کرایی</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">تعداد سته کرایی</label>
+                    <input type="text" appNumericInput formControlName="rentCount" (input)="calculateTotalPrice()"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="تعداد">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر سته کرایی</label>
+                    <input type="text" formControlName="rentSerialStart"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="آغاز سریال نمبر">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر کرایی</label>
+                    <input type="text" formControlName="rentSerialEnd"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="ختم سریال نمبر">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Vehicle Sale Fields -->
+              <div *ngIf="showVehicleSaleFields" class="mt-6 p-4 bg-teal-50 rounded-lg">
+                <h3 class="font-semibold text-teal-800 mb-4">سته خرید و فروش وسایط نقلیه</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">تعداد سته خرید و فروش وسایط نقلیه</label>
+                    <input type="text" appNumericInput formControlName="vehicleSaleCount" (input)="calculateTotalPrice()"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="تعداد">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر سته خرید و فروش وسایط</label>
+                    <input type="text" formControlName="vehicleSaleSerialStart"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="آغاز سریال نمبر">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر خرید و فروش وسایط</label>
+                    <input type="text" formControlName="vehicleSaleSerialEnd"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="ختم سریال نمبر">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Vehicle Exchange Fields -->
+              <div *ngIf="showVehicleExchangeFields" class="mt-6 p-4 bg-indigo-50 rounded-lg">
+                <h3 class="font-semibold text-indigo-800 mb-4">سته تبادله وسایط نقلیه</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">تعداد سته تبادله</label>
+                    <input type="text" appNumericInput formControlName="vehicleExchangeCount" (input)="calculateTotalPrice()"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="تعداد">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر سته تبادله وسایط</label>
+                    <input type="text" formControlName="vehicleExchangeSerialStart"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="آغاز سریال نمبر">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر تبادله وسایط</label>
+                    <input type="text" formControlName="vehicleExchangeSerialEnd"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="ختم سریال نمبر">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Registration Book Section -->
+              <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-semibold text-gray-800 mb-4">کتاب ثبت معاملات</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">نوع کتاب ثبت</label>
+                    <ng-select formControlName="registrationBookType" [items]="registrationBookTypes" bindLabel="name" bindValue="id"
+                      placeholder="انتخاب نوع کتاب" (change)="onRegistrationBookTypeChange()"
+                      class="custom-ng-select"></ng-select>
+                  </div>
+                  <div *ngIf="showRegistrationBookCount">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">تعداد کتاب ثبت</label>
+                    <input type="text" appNumericInput formControlName="registrationBookCount"
+                      (input)="calculateRegistrationBookPrice()"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="تعداد">
+                  </div>
+                  <div *ngIf="showDuplicateBookCount">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">تعداد کتاب ثبت مثنی</label>
+                    <input type="text" appNumericInput formControlName="duplicateBookCount"
+                      (input)="calculateRegistrationBookPrice()"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="تعداد">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between mt-4">
+            <button type="button" (click)="prevTab()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+              <mat-icon class="align-middle">arrow_forward</mat-icon> قبلی
+            </button>
+            <button type="button" (click)="nextTab()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              بعدی <mat-icon class="align-middle">arrow_back</mat-icon>
+            </button>
+          </div>
+        </mat-tab>
+
+        <!-- Tab 3: قیمت اسناد بهادار -->
+        <mat-tab>
+          <ng-template matTabLabel>
+            <mat-icon class="ml-2">attach_money</mat-icon>
+            قیمت اسناد بهادار
+          </ng-template>
+          
+          <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-4">
+            <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 px-6 py-4">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-money-bill"></i>
+                <span>قیمت اسناد بهادار</span>
+              </h2>
+            </div>
+            <div class="px-6 py-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- قیمت فی جلد سته -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">قیمت فی جلد سته</label>
+                  <input type="text" appNumericInput [allowDecimal]="true" formControlName="pricePerDocument"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100"
+                    placeholder="4000" readonly>
+                </div>
+
+                <!-- قیمت مجموعی سته‌ها -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">قیمت مجموعی سته‌ها</label>
+                  <input type="text" appNumericInput [allowDecimal]="true" formControlName="totalDocumentsPrice"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100"
+                    placeholder="محاسبه خودکار" readonly>
+                </div>
+
+                <!-- قیمت کتاب ثبت -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">قیمت کتاب ثبت / کتاب ثبت مثنی</label>
+                  <input type="text" appNumericInput [allowDecimal]="true" formControlName="registrationBookPrice"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100"
+                    placeholder="محاسبه خودکار" readonly>
+                </div>
+
+                <!-- قیمت مجموعی اسناد بهادار -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">قیمت مجموعی اسناد بهادار</label>
+                  <input type="text" appNumericInput [allowDecimal]="true" formControlName="totalSecuritiesPrice"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 font-bold text-green-700"
+                    placeholder="محاسبه خودکار" readonly>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between mt-4">
+            <button type="button" (click)="prevTab()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+              <mat-icon class="align-middle">arrow_forward</mat-icon> قبلی
+            </button>
+            <button type="button" (click)="nextTab()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              بعدی <mat-icon class="align-middle">arrow_back</mat-icon>
+            </button>
+          </div>
+        </mat-tab>
+
+        <!-- Tab 4: مشخصات آویز تحویلی و تاریخ توزیع -->
+        <mat-tab>
+          <ng-template matTabLabel>
+            <mat-icon class="ml-2">event</mat-icon>
+           مشخصات آویز تحویلی و تاریخ توزیع
+          </ng-template>
+          
+          <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-4">
+            <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-calendar-alt"></i>
+                <span>مشخصات آویز تحویلی و تاریخ توزیع</span>
+              </h2>
+            </div>
+            <div class="px-6 py-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- آویز نمبر بانکی -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">آویز نمبر بانکی</label>
+                  <input type="text" formControlName="bankReceiptNumber"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    placeholder="آویز نمبر بانکی">
+                </div>
+
+                <!-- تاریخ تحویلی -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">تاریخ تحویلی</label>
+                  <div class="input-group">
+                    <input class="form-control w-full px-4 py-2.5 border border-gray-300 rounded-lg"
+                      placeholder="yyyy-mm-dd" name="deliveryDate" formControlName="deliveryDate"
+                      ngbDatepicker #deliveryDatePicker="ngbDatepicker" [minDate]="minDate" [maxDate]="maxDate">
+                    <button class="btn btn-outline-secondary calendar-btn" (click)="deliveryDatePicker.toggle()" type="button">
+                      <i class="fa fa-calendar"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- تاریخ توزیع اسناد بهادار -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">تاریخ توزیع اسناد بهادار</label>
+                  <div class="input-group">
+                    <input class="form-control w-full px-4 py-2.5 border border-gray-300 rounded-lg"
+                      placeholder="yyyy-mm-dd" name="distributionDate" formControlName="distributionDate"
+                      ngbDatepicker #distributionDatePicker="ngbDatepicker" [minDate]="minDate" [maxDate]="maxDate">
+                    <button class="btn btn-outline-secondary calendar-btn" (click)="distributionDatePicker.toggle()" type="button">
+                      <i class="fa fa-calendar"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between mt-4">
+            <button type="button" (click)="prevTab()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+              <mat-icon class="align-middle">arrow_forward</mat-icon> قبلی
+            </button>
+            <div class="flex gap-2">
+              <button type="button" (click)="goToList()" class="px-6 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500">
+                انصراف
+              </button>
+              <button type="button" (click)="resetForm()" class="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                پاک کردن
+              </button>
+              <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                <mat-icon class="align-middle">save</mat-icon>
+                {{ isEditMode ? 'بروزرسانی' : 'ثبت' }}
+              </button>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </form>
+  </div>
+</section>

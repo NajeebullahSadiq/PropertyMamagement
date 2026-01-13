@@ -6,6 +6,8 @@ import { ForbiddenComponent } from './auth/forbidden/forbidden.component';
 import { PrintComponent } from './print/print.component';
 import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
 import { PrintLicenseComponent } from './print-license/print-license.component';
+import { PrintSecuritiesComponent } from './print-securities/print-securities.component';
+import { PrintPetitionWriterSecuritiesComponent } from './print-petition-writer-securities/print-petition-writer-securities.component';
 import { MasterlayoutComponent } from './dashboard/masterlayout/masterlayout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ReportComponent } from './dashboard/report/report.component';
@@ -82,6 +84,22 @@ const routes: Routes = [
       { path: '', loadChildren: () => import('./users/users.module').then(m => m.UsersModule) }
     ]
   },
+  { 
+    path: 'securities', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', loadChildren: () => import('./securities/securities.module').then(m => m.SecuritiesModule) }
+    ]
+  },
+  { 
+    path: 'petition-writer-securities', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', loadChildren: () => import('./petition-writer-securities/petition-writer-securities.module').then(m => m.PetitionWriterSecuritiesModule) }
+    ]
+  },
   { path: 'forbidden', component: ForbiddenComponent },
   { path: 'print/:id', component: PrintComponent },
   { path: 'print', component: PrintComponent },
@@ -89,6 +107,10 @@ const routes: Routes = [
   { path: 'printvehicledata', component: PrintvehicledataComponent },
   { path: 'printLicense/:id', component: PrintLicenseComponent },
   { path: 'printLicense', component: PrintLicenseComponent },
+  { path: 'printSecurities/:id', component: PrintSecuritiesComponent },
+  { path: 'printSecurities', component: PrintSecuritiesComponent },
+  { path: 'printPetitionWriterSecurities/:id', component: PrintPetitionWriterSecuritiesComponent },
+  { path: 'printPetitionWriterSecurities', component: PrintPetitionWriterSecuritiesComponent },
 ];
 
 @NgModule({

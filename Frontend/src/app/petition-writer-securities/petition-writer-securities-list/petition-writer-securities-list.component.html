@@ -1,0 +1,116 @@
+<section class="w-full bg-gray-50 py-6">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">جدول سند بهادار عریضه‌ نویسان</h1>
+      <p class="text-center text-gray-600">لیست تمام اسناد بهادار عریضه‌ نویسان ثبت شده</p>
+    </div>
+
+    <!-- Search and Actions Bar -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4 mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2 flex-1">
+          <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"
+            class="flex-1 max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="جستجو بر اساس نمبر ثبت، نمبر جواز، نام عریضه‌نویس یا آویز بانکی...">
+          <button (click)="onSearch()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <mat-icon>search</mat-icon>
+          </button>
+        </div>
+        <button *ngIf="canEdit" (click)="createNew()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+          <mat-icon>add</mat-icon>
+          ثبت جدید
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+    </div>
+
+    <!-- Data Table -->
+    <div *ngIf="!isLoading" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+            <tr>
+              <th class="px-4 py-3 text-right text-sm font-semibold">#</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">نمبر ثبت تعرفه</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">اسم عریضه نویس</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">نمبر جواز فعالیت عریضه نویس</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">تعداد عریضه</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">مبلغ پول</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">سریال نمبر (شروع – ختم)</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">آویز نمبر بانکی</th>
+              <th class="px-4 py-3 text-right text-sm font-semibold">تاریخ توزیع</th>
+              <th class="px-4 py-3 text-center text-sm font-semibold">عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of items; let i = index" class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="px-4 py-3 text-sm">{{ (page - 1) * pageSize + i + 1 }}</td>
+              <td class="px-4 py-3 text-sm font-medium">{{ item.registrationNumber }}</td>
+              <td class="px-4 py-3 text-sm">{{ item.petitionWriterName }}</td>
+              <td class="px-4 py-3 text-sm">{{ item.licenseNumber }}</td>
+              <td class="px-4 py-3 text-sm">{{ item.petitionCount | number }}</td>
+              <td class="px-4 py-3 text-sm font-semibold text-green-600">{{ item.amount | number }} افغانی</td>
+              <td class="px-4 py-3 text-sm">{{ item.serialNumberStart }} – {{ item.serialNumberEnd }}</td>
+              <td class="px-4 py-3 text-sm">{{ item.bankReceiptNumber }}</td>
+              <td class="px-4 py-3 text-sm">{{ item.distributionDateFormatted || '-' }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-1">
+                  <button (click)="viewDetails(item.id!)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="مشاهده">
+                    <mat-icon class="text-lg">visibility</mat-icon>
+                  </button>
+                  <button *ngIf="canEdit" (click)="editItem(item.id!)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded" title="ویرایش">
+                    <mat-icon class="text-lg">edit</mat-icon>
+                  </button>
+                  <button (click)="printItem(item.id!)" class="p-1.5 text-gray-600 hover:bg-gray-50 rounded" title="چاپ">
+                    <mat-icon class="text-lg">print</mat-icon>
+                  </button>
+                  <button *ngIf="canDelete" (click)="deleteItem(item.id!)" class="p-1.5 text-red-600 hover:bg-red-50 rounded" title="حذف">
+                    <mat-icon class="text-lg">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="items.length === 0">
+              <td colspan="10" class="px-4 py-8 text-center text-gray-500">
+                هیچ رکوردی یافت نشد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-gray-600">
+            نمایش {{ (page - 1) * pageSize + 1 }} تا {{ Math.min(page * pageSize, totalCount) }} از {{ totalCount }} رکورد
+          </div>
+          <div class="flex items-center gap-1">
+            <button (click)="onPageChange(1)" [disabled]="page === 1"
+              class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+              اول
+            </button>
+            <button (click)="onPageChange(page - 1)" [disabled]="page === 1"
+              class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+              قبلی
+            </button>
+            <span class="px-3 py-1">صفحه {{ page }} از {{ totalPages }}</span>
+            <button (click)="onPageChange(page + 1)" [disabled]="page === totalPages"
+              class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+              بعدی
+            </button>
+            <button (click)="onPageChange(totalPages)" [disabled]="page === totalPages"
+              class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+              آخر
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

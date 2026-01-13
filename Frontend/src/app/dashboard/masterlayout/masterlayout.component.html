@@ -128,6 +128,20 @@
       <a *ngIf="canAccessVehicle" routerLink="/vehicle/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>format_list_bulleted</mat-icon><span>{{ "vehiclelist" | translate }}</span>
       </a>
+        <div class="section-label">اسناد بهادار </div>
+      <a *ngIf="!isViewOnly" routerLink="/securities" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>receipt_long</mat-icon><span>اسناد بهادار رهنمای معاملات</span>
+      </a>
+      <a routerLink="/securities/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>list_alt</mat-icon><span>جدول اسناد بهادار رهنمای معاملات</span>
+      </a>
+      <div class="section-label">سند بهادار عریضه‌ نویسان</div>
+      <a *ngIf="!isViewOnly" routerLink="/petition-writer-securities" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>article</mat-icon><span>سند بهادار عریضه‌ نویسان</span>
+      </a>
+      <a routerLink="/petition-writer-securities/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>table_chart</mat-icon><span>جدول سند بهادار عریضه‌ نویسان</span>
+      </a>
       <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
       <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>
@@ -142,6 +156,7 @@
       <a *ngIf="canAccessUsers" routerLink="/Auth/Register" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>person_add</mat-icon><span>ایجاد کاربر جدید</span>
       </a>
+    
     </nav>
   </mat-sidenav>
   <mat-sidenav-content class="bg-slate-50">
