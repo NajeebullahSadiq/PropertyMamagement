@@ -106,9 +106,8 @@ export class SellerdetailComponent {
       const authLetterControl = this.SellerForm.get('authorizationLetter');
       const heirsLetterControl = this.SellerForm.get('heirsLetter');
       
-      // Check if it's an agent role (Sales Agent, Lease Agent, Agent for revocable sale)
-      const agentRoles = ['Sales Agent', 'Lease Agent', 'Agent for a revocable sale'];
-      const isAgent = agentRoles.includes(roleType);
+      // Check if it's an agent role (only Sales Agent for Vehicle module)
+      const isAgent = roleType === 'Sales Agent';
       
       // Check if it's heirs role
       const isHeirs = roleType === 'Heirs';
@@ -155,16 +154,13 @@ export class SellerdetailComponent {
     });
   }
   ngOnInit() {
-    // Initialize role types from localization service
+    // Initialize role types - restricted to only 4 approved options for Vehicle module
+    // فروشنده (Seller), فروشندگان (Sellers), وکیل فروش (Sales Agent), ورثه (Heirs)
     this.roleTypes = [
-      this.localizationService.roleTypes.seller,
-      this.localizationService.roleTypes.sellers,
-      this.localizationService.roleTypes.lessor,
-      this.localizationService.roleTypes.revocableSaleSeller,
-      this.localizationService.roleTypes.heirs,
-      this.localizationService.roleTypes.sellerAgent,
-      this.localizationService.roleTypes.leaseAgent,
-      this.localizationService.roleTypes.revocableSaleAgent
+      this.localizationService.roleTypes.seller,      // فروشنده - single seller
+      this.localizationService.roleTypes.sellers,     // فروشندگان - multiple sellers
+      this.localizationService.roleTypes.sellerAgent, // وکیل فروش - single seller
+      this.localizationService.roleTypes.heirs        // ورثه - multiple sellers
     ];
     
     this.selerService.getprovince().subscribe(res => {
@@ -462,8 +458,29 @@ profileImageUploaded = (dbPath: string) => {
 
 isAuthorizedAgent(): boolean {
   const roleType = this.SellerForm.get('roleType')?.value;
-  const agentRoles = ['Sales Agent', 'Lease Agent', 'Agent for a revocable sale'];
-  return agentRoles.includes(roleType);
+  // Only Sales Agent for Vehicle module seller
+  return roleType === 'Sales Agent';
+}
+
+// Check if role allows multiple sellers (فروشندگان or ورثه)
+allowsMultipleSellers(): boolean {
+  const roleType = this.SellerForm.get('roleType')?.value;
+  return roleType === 'Sellers' || roleType === 'Heirs';
+}
+
+// Check if role allows only single seller (فروشنده or وکیل فروش)
+isSingleSellerRole(): boolean {
+  const roleType = this.SellerForm.get('roleType')?.value;
+  return roleType === 'Seller' || roleType === 'Sales Agent';
+}
+
+// Check if can add more sellers based on role type
+canAddMoreSellers(): boolean {
+  if (this.allowsMultipleSellers()) {
+    return true; // Multiple sellers allowed
+  }
+  // Single seller roles - check if already has a seller
+  return this.SellerDetails?.length === 0;
 }
 
 isHeirs(): boolean {

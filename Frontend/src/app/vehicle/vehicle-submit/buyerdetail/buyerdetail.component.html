@@ -11,9 +11,18 @@
             </div>
         </div>
 
-        <form [formGroup]="buyerForm" (ngSubmit)="buyerForm.valid ? selectedbuyerId ? updateBuyerDetails() : addBuyerDetail() : null">
+        <form [formGroup]="buyerForm" (ngSubmit)="buyerForm.valid && canAddNewBuyer() ? selectedbuyerId ? updateBuyerDetails() : addBuyerDetail() : null">
             <div class="hidden">
                 <input type="hidden" formControlName="id" />
+            </div>
+
+            <div class="mb-6" *ngIf="!canAddNewBuyer() && !selectedbuyerId">
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg" role="alert">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 ml-3"></i>
+                        <span class="text-yellow-800 font-medium">برای نوعیت «خریدار» یا «وکیل خرید» فقط یک خریدار مجاز است. برای ثبت چندین خریدار، نوعیت «خریداران» را انتخاب کنید.</span>
+                    </div>
+                </div>
             </div>
 
             <div class="mb-6" *ngIf="duplicateError">
@@ -121,7 +130,7 @@
                 <div class="px-6 py-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label for="roleType" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت عاقد</label>
+                            <label for="roleType" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت خریدار</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-user-tag"></i>
@@ -281,11 +290,11 @@
             <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
                 <div class="px-6 py-6">
                     <div class="flex flex-wrap gap-3 justify-center">
-                        <button type="submit" [disabled]="buyerForm.invalid" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                        <button type="submit" [disabled]="buyerForm.invalid || (!canAddNewBuyer() && !selectedbuyerId)" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                             <i class="fas fa-save"></i>
                             <span>{{selectedbuyerId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
                         </button>
-                        <button type="reset" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2" (click)="resetChild()">
+                        <button type="reset" [disabled]="!canAddNewBuyer()" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2" (click)="resetChild()">
                             <i class="fas fa-plus-circle"></i>
                             <span>ثبت جدید</span>
                         </button>
@@ -315,7 +324,7 @@
                             <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام پدر کلان</th>
                             <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره تذکره</th>
                             <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره موبایل</th>
-                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">نوعیت عاقد</th>
+                            <th class="px-4 py-3 text-sm font-semibold text-gray-700">نوعیت خریدار</th>
                             <th class="px-4 py-3 text-sm font-semibold text-gray-700">عملیات</th>
                         </tr>
                     </thead>

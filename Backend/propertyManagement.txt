@@ -24,15 +24,16 @@ sudo chmod -R 755 /var/www/prmis/frontend
 
 
 cd /var/www/prmis/Backend
+sudo git pull origin main
 dotnet build WebAPIBackend.csproj --configuration Release
 dotnet publish WebAPIBackend.csproj --configuration Release --output ./publish
-sudo systemctl stop prmis-backend
-sudo rm -rf /var/www/prmis/backend/*
+sudo find /var/www/prmis/backend -mindepth 1 -maxdepth 1 ! -name 'Resources' -exec rm -rf {} +
 sudo cp -r ./publish/* /var/www/prmis/backend/
 sudo chown -R www-data:www-data /var/www/prmis/backend
 sudo chmod -R 755 /var/www/prmis/backend
-sudo systemctl start prmis-backend
-sudo systemctl status prmis-backend
+sudo systemctl restart prmis-backend
+sudo journalctl -u prmis-backend -n 30 --no-pager
+
 
 cd ~/PropertyMamagement/Backend
 dotnet build WebAPIBackend.csproj --configuration Release

@@ -22,17 +22,25 @@ export class LocalizationService {
     sellerAgent: { value: 'Sales Agent', label: 'وکیل فروش' },
     leaseAgent: { value: 'Lease Agent', label: 'وکیل کرایه' },
     revocableSaleAgent: { value: 'Agent for a revocable sale', label: 'وکیل بیع جایزی' },
-    // Buyer Role Types
+    // Buyer Role Types - Vehicle Module (Restricted to 3 options only)
     buyer: { value: 'Buyer', label: 'خریدار' },
     buyers: { value: 'Buyers', label: 'خریداران' },
+    buyerAgent: { value: 'Purchase Agent', label: 'وکیل خرید' },
+    // Legacy buyer types (kept for backward compatibility in other modules)
     revocableSaleBuyer: { value: 'Buyer in a revocable sale', label: 'مشتری بیع جایزی' },
     revocableSaleBuyers: { value: 'Buyers in a revocable sale', label: 'مشتریان بیع جایزی' },
     lessee: { value: 'Lessee', label: 'کرایه‌گیرنده' },
     lessees: { value: 'Lessees', label: 'کرایه‌گیرندگان' },
-    buyerAgent: { value: 'Purchase Agent', label: 'وکیل خرید' },
     revocableSaleBuyerAgent: { value: 'Agent for buyer in a revocable sale', label: 'وکیل مشتری بیع جایزی' },
     leaseReceiverAgent: { value: 'Agent for lessee', label: 'وکیل کرایه‌گیرنده' }
   };
+
+  // Vehicle Buyer Role Types - Restricted to 3 approved options only
+  vehicleBuyerRoleTypes = [
+    { value: 'Buyer', label: 'خریدار', allowMultiple: false },
+    { value: 'Buyers', label: 'خریداران', allowMultiple: true },
+    { value: 'Purchase Agent', label: 'وکیل خرید', allowMultiple: false }
+  ];
 
   // Vehicle Hand Options
   vehicleHandOptions = [

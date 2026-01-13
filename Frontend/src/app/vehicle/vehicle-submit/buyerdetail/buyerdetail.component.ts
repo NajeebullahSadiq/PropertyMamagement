@@ -36,6 +36,7 @@ export class BuyerdetailComponent {
   roleTypes: any = [];
   duplicateError: string = '';
   isDuplicateCheckLoading: boolean = false;
+  canAddMoreBuyers: boolean = true;
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   onNextClick() {
@@ -110,18 +111,12 @@ export class BuyerdetailComponent {
       const rentStartDateControl = this.buyerForm.get('rentStartDate');
       const rentEndDateControl = this.buyerForm.get('rentEndDate');
       
-      // Agent roles that require Power of Attorney (وکالت‌نامه)
-      const agentRoles = [
-        'Purchase Agent',
-        'Agent for buyer in a revocable sale',
-        'Agent for lessee'
-      ];
+      // Only Purchase Agent requires authorization letter in Vehicle module
+      const agentRoles = ['Purchase Agent'];
       
-      // Lessee roles that require rental dates
-      const lesseeRoles = [
-        'Lessee',
-        'Agent for lessee'
-      ];
+      // Update canAddMoreBuyers based on role type
+      // Only 'Buyers' (خریداران) allows multiple buyers
+      this.updateCanAddMoreBuyers(roleType);
       
       if (roleType && agentRoles.includes(roleType)) {
         authLetterControl?.setValidators([Validators.required]);
@@ -130,16 +125,11 @@ export class BuyerdetailComponent {
       }
       authLetterControl?.updateValueAndValidity();
 
-      // Set rental date validation based on lessee roles
-      if (roleType && lesseeRoles.includes(roleType)) {
-        rentStartDateControl?.setValidators([Validators.required]);
-        rentEndDateControl?.setValidators([Validators.required]);
-      } else {
-        rentStartDateControl?.clearValidators();
-        rentEndDateControl?.clearValidators();
-        rentStartDateControl?.reset();
-        rentEndDateControl?.reset();
-      }
+      // Clear rental date validation - not applicable for Vehicle buyer roles
+      rentStartDateControl?.clearValidators();
+      rentEndDateControl?.clearValidators();
+      rentStartDateControl?.reset();
+      rentEndDateControl?.reset();
       rentStartDateControl?.updateValueAndValidity();
       rentEndDateControl?.updateValueAndValidity();
     });
@@ -174,15 +164,8 @@ export class BuyerdetailComponent {
     });
   }
   ngOnInit() {
-    // Initialize role types from localization service
-    this.roleTypes = [
-      this.localizationService.roleTypes.buyer,
-      this.localizationService.roleTypes.revocableSaleBuyer,
-      this.localizationService.roleTypes.lessee,
-      this.localizationService.roleTypes.buyerAgent,
-      this.localizationService.roleTypes.revocableSaleBuyerAgent,
-      this.localizationService.roleTypes.leaseReceiverAgent
-    ];
+    // Initialize role types - Vehicle module restricted to 3 approved buyer types only
+    this.roleTypes = this.localizationService.vehicleBuyerRoleTypes;
     
     this.selerService.getprovince().subscribe(res => {
       this.province = res;
@@ -233,12 +216,17 @@ export class BuyerdetailComponent {
     if (!this.id || this.id === 0) {
       this.buyerDetails = [];
       this.selectedbuyerId = 0;
+      this.canAddMoreBuyers = true;
       return;
     }
     
     this.vehiclesubservice.getBuyerById(this.id)
     .subscribe(sellers => {
       this.buyerDetails = sellers || [];
+      // Update canAddMoreBuyers based on current role type and existing buyers
+      const currentRoleType = this.buyerForm.get('roleType')?.value || 'Buyer';
+      this.updateCanAddMoreBuyers(currentRoleType);
+      
       if (sellers && sellers.length > 0) {
         // Load first buyer for editing if exists
         const firstBuyer = sellers[0];
@@ -511,13 +499,44 @@ profileImageUploaded = (dbPath: string) => {
 
 isAuthorizedAgent(): boolean {
   const roleType = this.buyerForm.get('roleType')?.value;
-  // Agent roles that require Power of Attorney (وکالت‌نامه)
-  const agentRoles = [
-    'Purchase Agent',
-    'Agent for buyer in a revocable sale',
-    'Agent for lessee'
-  ];
+  // Only Purchase Agent requires authorization letter in Vehicle module
+  const agentRoles = ['Purchase Agent'];
   return roleType && agentRoles.includes(roleType);
+}
+
+/**
+ * Update whether more buyers can be added based on role type
+ * - خریدار (Buyer): Single buyer only
+ * - خریداران (Buyers): Multiple buyers allowed
+ * - وکیل خرید (Purchase Agent): Single buyer only
+ */
+updateCanAddMoreBuyers(roleType: string): void {
+  const multipleAllowedRoles = ['Buyers'];
+  const isMultipleAllowed = multipleAllowedRoles.includes(roleType);
+  
+  if (isMultipleAllowed) {
+    this.canAddMoreBuyers = true;
+  } else {
+    // For single-buyer roles, check if there's already a buyer
+    const existingBuyerCount = this.buyerDetails?.length || 0;
+    this.canAddMoreBuyers = existingBuyerCount === 0 || this.selectedbuyerId !== 0;
+  }
+}
+
+/**
+ * Check if adding new buyer is allowed based on current role type and existing buyers
+ */
+canAddNewBuyer(): boolean {
+  const roleType = this.buyerForm.get('roleType')?.value;
+  const multipleAllowedRoles = ['Buyers'];
+  
+  if (multipleAllowedRoles.includes(roleType)) {
+    return true;
+  }
+  
+  // For single-buyer roles, only allow if no buyers exist or editing existing
+  const existingBuyerCount = this.buyerDetails?.length || 0;
+  return existingBuyerCount === 0;
 }
 
 /**
@@ -574,8 +593,7 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   }
 
   isLesseeRole(): boolean {
-    const roleType = this.buyerForm.get('roleType')?.value;
-    const lesseeRoles = ['Lessee', 'Agent for lessee'];
-    return roleType && lesseeRoles.includes(roleType);
+    // Lessee roles are not applicable in Vehicle buyer module (restricted to 3 options)
+    return false;
   }
 }

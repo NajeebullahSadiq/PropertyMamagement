@@ -102,7 +102,7 @@
         <div class="px-6 py-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label for="roleType" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت عاقد</label>
+                            <label for="roleType" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت فروشنده</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-user-tag"></i>
@@ -316,11 +316,11 @@
       </div>
 
       <div class="flex flex-wrap gap-3 mb-6 justify-center">
-        <button type="submit" [disabled]="SellerForm.invalid" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+        <button type="submit" [disabled]="SellerForm.invalid || (!canAddMoreSellers() && !selectedSellerId)" class="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
           <i class="fas fa-save"></i>
           <span>{{selectedSellerId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
         </button>
-        <button type="reset" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2" (click)="resetChild()">
+        <button type="reset" [disabled]="!canAddMoreSellers()" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2" (click)="resetChild()">
           <i class="fas fa-plus-circle"></i>
           <span>ثبت جدید</span>
         </button>
@@ -328,6 +328,16 @@
           <i class="fas fa-arrow-left"></i>
           <span>مرحله بعدی</span>
         </button>
+      </div>
+
+      <!-- Single seller restriction message -->
+      <div class="mb-4" *ngIf="isSingleSellerRole() && sellerDetails.length > 0 && !selectedSellerId">
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+          <div class="flex items-center">
+            <i class="fas fa-info-circle text-yellow-500 ml-3"></i>
+            <span class="text-yellow-800 font-medium">برای نوعیت «فروشنده» یا «وکیل فروش» فقط یک فروشنده مجاز است. برای ثبت چندین فروشنده، نوعیت «فروشندگان» یا «ورثه» را انتخاب کنید.</span>
+          </div>
+        </div>
       </div>
         </form>
 
@@ -348,7 +358,7 @@
               <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام پدر کلان</th>
               <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره تذکره</th>
               <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره موبایل</th>
-              <th class="px-4 py-3 text-sm font-semibold text-gray-700">نوعیت عاقد</th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-700">نوعیت فروشنده</th>
               <th class="px-4 py-3 text-sm font-semibold text-gray-700">عملیات</th>
             </tr>
           </thead>

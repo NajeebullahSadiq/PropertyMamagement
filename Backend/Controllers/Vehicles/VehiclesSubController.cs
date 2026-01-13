@@ -17,10 +17,51 @@ namespace WebAPIBackend.Controllers.Vehicles
     {
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
+        
+        // Allowed seller role types for Vehicle module
+        private static readonly string[] AllowedSellerRoles = { "Seller", "Sellers", "Sales Agent", "Heirs" };
+        
+        // Allowed buyer role types for Vehicle module (restricted to 3 options)
+        private static readonly string[] AllowedBuyerRoles = { "Buyer", "Buyers", "Purchase Agent" };
+        
+        // Single-buyer roles (only one buyer allowed)
+        private static readonly string[] SingleBuyerRoles = { "Buyer", "Purchase Agent" };
+        
         public VehiclesSubController(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
+        }
+
+        /// <summary>
+        /// Get allowed seller role types for Vehicle module
+        /// </summary>
+        [HttpGet("AllowedSellerRoles")]
+        public IActionResult GetAllowedSellerRoles()
+        {
+            var roles = new[]
+            {
+                new { value = "Seller", label = "فروشنده", allowMultiple = false },
+                new { value = "Sellers", label = "فروشندگان", allowMultiple = true },
+                new { value = "Sales Agent", label = "وکیل فروش", allowMultiple = false },
+                new { value = "Heirs", label = "ورثه", allowMultiple = true }
+            };
+            return Ok(roles);
+        }
+
+        /// <summary>
+        /// Get allowed buyer role types for Vehicle module (restricted to 3 options)
+        /// </summary>
+        [HttpGet("AllowedBuyerRoles")]
+        public IActionResult GetAllowedBuyerRoles()
+        {
+            var roles = new[]
+            {
+                new { value = "Buyer", label = "خریدار", allowMultiple = false },
+                new { value = "Buyers", label = "خریداران", allowMultiple = true },
+                new { value = "Purchase Agent", label = "وکیل خرید", allowMultiple = false }
+            };
+            return Ok(roles);
         }
 
         [HttpPost("CheckDuplicateSeller")]
@@ -162,12 +203,36 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
 
             var userId = userIdClaim.Value;
-            // Allow multiple buyers - removed restriction
+            
             if (request.PropertyDetailsId.Equals(0))
             {
                 return StatusCode(312, "Main Table is Empty");
             }
-            //var user = await _userManager.GetUserAsync(User);
+
+            // Validate role type - only 3 approved options allowed for Vehicle buyers
+            var roleType = request.RoleType ?? "Buyer";
+            
+            if (!AllowedBuyerRoles.Contains(roleType))
+            {
+                return StatusCode(400, "Invalid buyer role type. Allowed values: Buyer, Buyers, Purchase Agent (خریدار، خریداران، وکیل خرید)");
+            }
+
+            // Single buyer roles (Buyer, Purchase Agent) - check if already has a buyer
+            if (SingleBuyerRoles.Contains(roleType))
+            {
+                var existingBuyerCount = await _context.VehiclesBuyerDetails
+                    .CountAsync(b => b.PropertyDetailsId == request.PropertyDetailsId);
+                if (existingBuyerCount > 0)
+                {
+                    return StatusCode(400, "برای نوعیت «خریدار» یا «وکیل خرید» فقط یک خریدار مجاز است. برای ثبت چندین خریدار، نوعیت «خریداران» را انتخاب کنید.");
+                }
+            }
+            
+            // If agent role (Purchase Agent), authorization letter is required
+            if (roleType == "Purchase Agent" && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            {
+                return StatusCode(400, "وکالت نامه برای وکیل خرید الزامی است");
+            }
 
             var seller = new VehiclesBuyerDetail
             {
@@ -187,7 +252,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 PropertyDetailsId = request.PropertyDetailsId,
                 Photo=request.Photo,
                 NationalIdCardPath = request.NationalIdCardPath,
-                RoleType=request.RoleType ?? "Buyer",
+                RoleType=roleType,
                 AuthorizationLetter=request.AuthorizationLetter,
                 RentStartDate = request.RentStartDate,
                 RentEndDate = request.RentEndDate,
@@ -224,6 +289,20 @@ namespace WebAPIBackend.Controllers.Vehicles
             if (existingProperty == null)
             {
                 return NotFound();
+            }
+
+            // Validate role type - only 3 approved options allowed for Vehicle buyers
+            var roleType = request.RoleType ?? "Buyer";
+            
+            if (!AllowedBuyerRoles.Contains(roleType))
+            {
+                return StatusCode(400, "Invalid buyer role type. Allowed values: Buyer, Buyers, Purchase Agent (خریدار، خریداران، وکیل خرید)");
+            }
+            
+            // If agent role (Purchase Agent), authorization letter is required
+            if (roleType == "Purchase Agent" && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            {
+                return StatusCode(400, "وکالت نامه برای وکیل خرید الزامی است");
             }
 
             // Store the original values of the CreatedBy and CreatedOn properties
@@ -285,18 +364,35 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
 
             var userId = userIdClaim.Value;
-            // Allow multiple sellers - removed restriction
+            
             if (request.PropertyDetailsId.Equals(0))
             {
                 return StatusCode(312, "Main Table is Empty");
             }
 
-            // Validate conditional document requirements based on role type
+            // Validate role type - only 4 approved options allowed
             var roleType = request.RoleType ?? "Seller";
-            var agentRoles = new[] { "Sales Agent", "Lease Agent", "Agent for a revocable sale" };
+            var allowedRoles = new[] { "Seller", "Sellers", "Sales Agent", "Heirs" };
             
-            // If agent role, authorization letter is required
-            if (agentRoles.Contains(roleType) && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            if (!allowedRoles.Contains(roleType))
+            {
+                return StatusCode(400, "Invalid seller role type. Allowed values: Seller, Sellers, Sales Agent, Heirs");
+            }
+
+            // Single seller roles (Seller, Sales Agent) - check if already has a seller
+            var singleSellerRoles = new[] { "Seller", "Sales Agent" };
+            if (singleSellerRoles.Contains(roleType))
+            {
+                var existingSellerCount = await _context.VehiclesSellerDetails
+                    .CountAsync(s => s.PropertyDetailsId == request.PropertyDetailsId);
+                if (existingSellerCount > 0)
+                {
+                    return StatusCode(400, "برای نوعیت «فروشنده» یا «وکیل فروش» فقط یک فروشنده مجاز است");
+                }
+            }
+            
+            // If agent role (Sales Agent), authorization letter is required
+            if (roleType == "Sales Agent" && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
             {
                 return StatusCode(400, "Authorization letter is required for agent roles");
             }
@@ -306,8 +402,6 @@ namespace WebAPIBackend.Controllers.Vehicles
             {
                 return StatusCode(400, "Heirs letter is required for heirs role");
             }
-
-            //var user = await _userManager.GetUserAsync(User);
 
             var seller = new VehiclesSellerDetail
             {
@@ -371,12 +465,17 @@ namespace WebAPIBackend.Controllers.Vehicles
                 return NotFound();
             }
 
-            // Validate conditional document requirements based on role type
+            // Validate role type - only 4 approved options allowed
             var roleType = request.RoleType ?? "Seller";
-            var agentRoles = new[] { "Sales Agent", "Lease Agent", "Agent for a revocable sale" };
+            var allowedRoles = new[] { "Seller", "Sellers", "Sales Agent", "Heirs" };
             
-            // If agent role, authorization letter is required
-            if (agentRoles.Contains(roleType) && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
+            if (!allowedRoles.Contains(roleType))
+            {
+                return StatusCode(400, "Invalid seller role type. Allowed values: Seller, Sellers, Sales Agent, Heirs");
+            }
+            
+            // If agent role (Sales Agent), authorization letter is required
+            if (roleType == "Sales Agent" && string.IsNullOrWhiteSpace(request.AuthorizationLetter))
             {
                 return StatusCode(400, "Authorization letter is required for agent roles");
             }
