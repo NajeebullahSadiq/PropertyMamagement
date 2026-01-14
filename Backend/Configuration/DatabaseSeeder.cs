@@ -796,7 +796,7 @@ namespace WebAPIBackend.Configuration
             try
             {
                 await context.Database.ExecuteSqlRawAsync(@"
-                    DO $
+                    DO $$
                     BEGIN
                         -- Add CreatedAt column to Area if not exists
                         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
@@ -863,7 +863,7 @@ namespace WebAPIBackend.Configuration
                             WHERE table_schema = 'look' AND table_name = 'PUnitType' AND column_name = 'CreatedAt') THEN
                             ALTER TABLE look.""PUnitType"" ADD COLUMN ""CreatedAt"" TIMESTAMP NULL;
                         END IF;
-                    END $;
+                    END $$;
                 ");
             }
             catch (Exception ex)

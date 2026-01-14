@@ -1,0 +1,665 @@
+<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+        <i class="fas fa-file-invoice-dollar text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ isEditMode ? 'ویرایش' : 'ثبت' }} کنټرول ورودی و خروجی اسناد بهادار</h1>
+      <p class="text-gray-500 max-w-md mx-auto">لطفاً تمام معلومات مربوط به کنټرول اسناد بهادار را با دقت تکمیل نمایید</p>
+    </div>
+
+    <form [formGroup]="securitiesControlForm" (ngSubmit)="onSubmit()">
+      <div class="hidden">
+        <input type="hidden" formControlName="id">
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+        <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="securities-control-tabs">
+          
+          <!-- Tab 1: معلومات عمومی و ثبت پیشنهاد -->
+          <mat-tab>
+            <ng-template matTabLabel>
+              <div class="flex items-center gap-2 py-2">
+                <i class="fas fa-info-circle"></i>
+                <span>معلومات عمومی و ثبت پیشنهاد</span>
+              </div>
+            </ng-template>
+            
+            <div class="p-6">
+              <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 -mx-6 -mt-6 mb-6">
+                <h2 class="text-lg font-bold text-white flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-info-circle text-sm"></i>
+                  </div>
+                  <span>معلومات عمومی و ثبت پیشنهاد</span>
+                </h2>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- شماره مسلسل -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">شماره مسلسل <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-hashtag"></i></span>
+                    <input type="text" formControlName="serialNumber"
+                      class="form-input w-full px-4 py-3 pl-12 border-2 rounded-xl transition-all"
+                      [ngClass]="{'border-red-300 focus:ring-red-500/20 focus:border-red-500': serialNumber?.invalid && serialNumber?.touched, 'border-gray-200 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500': !(serialNumber?.invalid && serialNumber?.touched)}"
+                      placeholder="شماره مسلسل را وارد کنید" readonly>
+                  </div>
+                  <div *ngIf="serialNumber?.invalid && serialNumber?.touched">
+                    <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>این فیلد الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- نوع سند بهادار -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نوع سند بهادار <span class="text-red-500">*</span></label>
+                  <ng-select formControlName="securityDocumentType" [items]="securityDocumentTypes" bindLabel="name" bindValue="id"
+                    placeholder="انتخاب نوع سند بهادار" (change)="onSecurityDocumentTypeChange()" class="custom-ng-select"></ng-select>
+                  <div *ngIf="securityDocumentType?.invalid && securityDocumentType?.touched">
+                    <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>این فیلد الزامی است</small>
+                  </div>
+                </div>
+
+                <!-- نمبر پیشنهاد -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر پیشنهاد</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-file-alt"></i></span>
+                    <input type="text" formControlName="proposalNumber"
+                      class="form-input w-full px-4 py-3 pl-12 border-2 rounded-xl transition-all"
+                      [ngClass]="{'border-red-300': proposalNumber?.invalid && proposalNumber?.touched, 'border-gray-200 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500': !(proposalNumber?.invalid && proposalNumber?.touched)}"
+                      placeholder="نمبر پیشنهاد">
+                  </div>
+                </div>
+
+                <!-- تاریخ پیشنهاد -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">تاریخ پیشنهاد</label>
+                  <div class="input-group">
+                    <input class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      placeholder="yyyy-mm-dd" name="proposalDate" formControlName="proposalDate" ngbDatepicker #proposalDatePicker="ngbDatepicker"
+                      [minDate]="minDate" [maxDate]="maxDate" (click)="proposalDatePicker.toggle()">
+                    <button type="button" class="input-group-append bg-gray-100 border border-l-0 border-gray-200 rounded-r-lg px-4" (click)="proposalDatePicker.toggle()">
+                      <i class="fas fa-calendar-alt text-gray-500"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- نمبر تکت توزیع -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر تکت توزیع</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-ticket-alt"></i></span>
+                    <input type="text" formControlName="distributionTicketNumber"
+                      class="form-input w-full px-4 py-3 pl-12 border-2 rounded-xl transition-all"
+                      placeholder="نمبر تکت توزیع">
+                  </div>
+                </div>
+
+                <!-- تاریخ تسلیمی -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">تاریخ تسلیمی</label>
+                  <div class="input-group">
+                    <input class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      placeholder="yyyy-mm-dd" name="deliveryDate" formControlName="deliveryDate" ngbDatepicker #deliveryDatePicker="ngbDatepicker"
+                      [minDate]="minDate" [maxDate]="maxDate" (click)="deliveryDatePicker.toggle()">
+                    <button type="button" class="input-group-append bg-gray-100 border border-l-0 border-gray-200 rounded-r-lg px-4" (click)="deliveryDatePicker.toggle()">
+                      <i class="fas fa-calendar-alt text-gray-500"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 1 Navigation Buttons -->
+              <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
+                <button type="button" (click)="nextTab()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                  <span>بعدی</span>
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Tab 2: مشخصات اسناد بهادار و تعداد آنها -->
+          <mat-tab>
+            <ng-template matTabLabel>
+              <div class="flex items-center gap-2 py-2">
+                <i class="fas fa-folder-open"></i>
+                <span>مشخصات اسناد بهادار و تعداد آنها</span>
+              </div>
+            </ng-template>
+            
+            <div class="p-6">
+              <div class="bg-gradient-to-r from-emerald-600 to-green-600 px-6 py-4 -mx-6 -mt-6 mb-6">
+                <h2 class="text-lg font-bold text-white flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-folder-open text-sm"></i>
+                  </div>
+                  <span>مشخصات اسناد بهادار و تعداد آنها</span>
+                </h2>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- انواع اسناد بهادار -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">انواع اسناد بهادار</label>
+                  <ng-select formControlName="securitiesType" [items]="securitiesTypes" bindLabel="name" bindValue="id"
+                    placeholder="انتخاب نوع اسناد بهادار" (change)="onSecuritiesTypeChange()" class="custom-ng-select"></ng-select>
+                </div>
+              </div>
+
+              <!-- Single Type Options -->
+              <div *ngIf="showSingleTypeFields">
+                <!-- ستههای خرید و فروش جایداد -->
+                <div *ngIf="showPropertySaleFields" class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 mb-4">
+                  <h3 class="font-bold text-blue-800 mb-4 flex items-center gap-2"><i class="fas fa-home"></i> ستههای خرید و فروش جایداد</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                      <input type="text" appNumericInput formControlName="propertySaleCount"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="تعداد">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                      <input type="text" formControlName="propertySaleSerialStart"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="آغاز سریال نمبر">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                      <input type="text" formControlName="propertySaleSerialEnd"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="ختم سریال نمبر">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ستههای بیع وفا -->
+                <div *ngIf="showBayWafaFields" class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
+                  <h3 class="font-bold text-purple-800 mb-4 flex items-center gap-2"><i class="fas fa-handshake"></i> ستههای بیع وفا</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                      <input type="text" appNumericInput formControlName="bayWafaCount"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="تعداد">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                      <input type="text" formControlName="bayWafaSerialStart"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="آغاز سریال نمبر">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                      <input type="text" formControlName="bayWafaSerialEnd"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="ختم سریال نمبر">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ستههای کرایی -->
+                <div *ngIf="showRentFields" class="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200 mb-4">
+                  <h3 class="font-bold text-orange-800 mb-4 flex items-center gap-2"><i class="fas fa-key"></i> ستههای کرایی</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                      <input type="text" appNumericInput formControlName="rentCount"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="تعداد">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                      <input type="text" formControlName="rentSerialStart"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="آغاز سریال نمبر">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                      <input type="text" formControlName="rentSerialEnd"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="ختم سریال نمبر">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ستههای خرید و فروش وسایط نقلیه -->
+                <div *ngIf="showVehicleSaleFields" class="p-5 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-200 mb-4">
+                  <h3 class="font-bold text-teal-800 mb-4 flex items-center gap-2"><i class="fas fa-car"></i> ستههای خرید و فروش وسایط نقلیه</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                      <input type="text" appNumericInput formControlName="vehicleSaleCount"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500" placeholder="تعداد">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                      <input type="text" formControlName="vehicleSaleSerialStart"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500" placeholder="آغاز سریال نمبر">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                      <input type="text" formControlName="vehicleSaleSerialEnd"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500" placeholder="ختم سریال نمبر">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ستههای تبادله -->
+                <div *ngIf="showExchangeFields" class="p-5 bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl border border-indigo-200 mb-4">
+                  <h3 class="font-bold text-indigo-800 mb-4 flex items-center gap-2"><i class="fas fa-exchange-alt"></i> ستههای تبادله</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                      <input type="text" appNumericInput formControlName="exchangeCount"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="تعداد">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                      <input type="text" formControlName="exchangeSerialStart"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="آغاز سریال نمبر">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                      <input type="text" formControlName="exchangeSerialEnd"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500" placeholder="ختم سریال نمبر">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- کتاب ثبت معاملات -->
+                <div *ngIf="showRegistrationBookFields" class="p-5 bg-gradient-to-br from-gray-50 to-slate-100 rounded-xl border border-gray-200 mb-4">
+                  <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-book"></i> کتاب ثبت معاملات</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد کتاب</label>
+                      <input type="text" appNumericInput formControlName="registrationBookCount"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500" placeholder="تعداد">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                      <input type="text" formControlName="registrationBookSerialStart"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500" placeholder="آغاز سریال نمبر">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                      <input type="text" formControlName="registrationBookSerialEnd"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-500/20 focus:border-gray-500" placeholder="ختم سریال نمبر">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- عرایض مطبوع -->
+                <div *ngIf="showPrintedPetitionFields" class="p-5 bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl border border-rose-200 mb-4">
+                  <h3 class="font-bold text-rose-800 mb-4 flex items-center gap-2"><i class="fas fa-file-alt"></i> عرایض مطبوع</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد عریضه</label>
+                      <input type="text" appNumericInput formControlName="printedPetitionCount"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500" placeholder="تعداد">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                      <input type="text" formControlName="printedPetitionSerialStart"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500" placeholder="آغاز سریال نمبر">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                      <input type="text" formControlName="printedPetitionSerialEnd"
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500" placeholder="ختم سریال نمبر">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Combined Type Options -->
+              <div *ngIf="showCombinedTypeFields">
+                <!-- ستههای خرید و فروش جایداد و بیع وفا -->
+                <div *ngIf="showPropertySaleBayWafaFields" class="mb-4">
+                  <!-- Property Sale Fields -->
+                  <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 mb-4">
+                    <h3 class="font-bold text-blue-800 mb-4 flex items-center gap-2"><i class="fas fa-home"></i> ستههای خرید و فروش جایداد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="propertySaleCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="propertySaleSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="propertySaleSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Bay Wafa Fields -->
+                  <div class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
+                    <h3 class="font-bold text-purple-800 mb-4 flex items-center gap-2"><i class="fas fa-handshake"></i> ستههای بیع وفا</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="bayWafaCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="bayWafaSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="bayWafaSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ستههای خرید و فروش جایداد و کرایی -->
+                <div *ngIf="showPropertySaleRentFields" class="mb-4">
+                  <!-- Property Sale Fields -->
+                  <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 mb-4">
+                    <h3 class="font-bold text-blue-800 mb-4 flex items-center gap-2"><i class="fas fa-home"></i> ستههای خرید و فروش جایداد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="propertySaleCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="propertySaleSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="propertySaleSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Rent Fields -->
+                  <div class="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200 mb-4">
+                    <h3 class="font-bold text-orange-800 mb-4 flex items-center gap-2"><i class="fas fa-key"></i> ستههای کرایی</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="rentCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="rentSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="rentSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ستههای بیع وفا و کرایی -->
+                <div *ngIf="showBayWafaRentFields" class="mb-4">
+                  <!-- Bay Wafa Fields -->
+                  <div class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
+                    <h3 class="font-bold text-purple-800 mb-4 flex items-center gap-2"><i class="fas fa-handshake"></i> ستههای بیع وفا</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="bayWafaCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="bayWafaSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="bayWafaSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Rent Fields -->
+                  <div class="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200 mb-4">
+                    <h3 class="font-bold text-orange-800 mb-4 flex items-center gap-2"><i class="fas fa-key"></i> ستههای کرایی</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="rentCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="rentSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="rentSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- تمام انواع ستههای جایداد -->
+                <div *ngIf="showAllPropertyFields" class="mb-4">
+                  <!-- Property Sale Fields -->
+                  <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 mb-4">
+                    <h3 class="font-bold text-blue-800 mb-4 flex items-center gap-2"><i class="fas fa-home"></i> ستههای خرید و فروش جایداد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="propertySaleCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="propertySaleSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="propertySaleSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Bay Wafa Fields -->
+                  <div class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
+                    <h3 class="font-bold text-purple-800 mb-4 flex items-center gap-2"><i class="fas fa-handshake"></i> ستههای بیع وفا</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="bayWafaCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="bayWafaSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="bayWafaSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Rent Fields -->
+                  <div class="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200 mb-4">
+                    <h3 class="font-bold text-orange-800 mb-4 flex items-center gap-2"><i class="fas fa-key"></i> ستههای کرایی</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">تعداد ستهها</label>
+                        <input type="text" appNumericInput formControlName="rentCount"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="تعداد">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
+                        <input type="text" formControlName="rentSerialStart"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="آغاز سریال نمبر">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
+                        <input type="text" formControlName="rentSerialEnd"
+                          class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500" placeholder="ختم سریال نمبر">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 2 Navigation Buttons -->
+              <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                <button type="button" (click)="prevTab()" class="px-6 py-2.5 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                  <i class="fas fa-arrow-right"></i>
+                  <span>قبلی</span>
+                </button>
+                <button type="button" (click)="nextTab()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                  <span>بعدی</span>
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Tab 3: ثبت و کنترول توزیع اسناد -->
+          <mat-tab>
+            <ng-template matTabLabel>
+              <div class="flex items-center gap-2 py-2">
+                <i class="fas fa-clipboard-list"></i>
+                <span>ثبت و کنترول توزیع اسناد</span>
+              </div>
+            </ng-template>
+            
+            <div class="p-6">
+              <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 -mx-6 -mt-6 mb-6">
+                <h2 class="text-lg font-bold text-white flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-clipboard-list text-sm"></i>
+                  </div>
+                  <span>ثبت و کنترول توزیع اسناد</span>
+                </h2>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- نمبر ثبت آغاز توزیع -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر ثبت آغاز توزیع</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-list-ol"></i></span>
+                    <input type="text" formControlName="distributionStartNumber"
+                      class="form-input w-full px-4 py-3 pl-12 border-2 rounded-xl transition-all"
+                      [ngClass]="{'border-red-300': securitiesControlForm.get('distributionStartNumber')?.invalid && securitiesControlForm.get('distributionStartNumber')?.touched, 'border-gray-200 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500': !(securitiesControlForm.get('distributionStartNumber')?.invalid && securitiesControlForm.get('distributionStartNumber')?.touched)}"
+                      placeholder="نمبر ثبت آغاز توزیع">
+                  </div>
+                </div>
+
+                <!-- نمبر ثبت ختم توزیع -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر ثبت ختم توزیع</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-list-ol"></i></span>
+                    <input type="text" formControlName="distributionEndNumber"
+                      class="form-input w-full px-4 py-3 pl-12 border-2 rounded-xl transition-all"
+                      [ngClass]="{'border-red-300': securitiesControlForm.get('distributionEndNumber')?.invalid && securitiesControlForm.get('distributionEndNumber')?.touched, 'border-gray-200 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500': !(securitiesControlForm.get('distributionEndNumber')?.invalid && securitiesControlForm.get('distributionEndNumber')?.touched)}"
+                      placeholder="نمبر ثبت ختم توزیع">
+                  </div>
+                </div>
+
+                <!-- تعداد افرادی که اسناد بر آنان توزیع شده است -->
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد افرادی که اسناد بر آنان توزیع شده است</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-users"></i></span>
+                    <input type="text" appNumericInput formControlName="distributedPersonsCount"
+                      class="form-input w-full px-4 py-3 pl-12 border-2 rounded-xl transition-all"
+                      [ngClass]="{'border-red-300': securitiesControlForm.get('distributedPersonsCount')?.invalid && securitiesControlForm.get('distributedPersonsCount')?.touched, 'border-gray-200 focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500': !(securitiesControlForm.get('distributedPersonsCount')?.invalid && securitiesControlForm.get('distributedPersonsCount')?.touched)}"
+                      placeholder="تعداد افراد">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 3 Navigation Buttons -->
+              <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                <button type="button" (click)="prevTab()" class="px-6 py-2.5 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                  <i class="fas fa-arrow-right"></i>
+                  <span>قبلی</span>
+                </button>
+                <button type="button" (click)="nextTab()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                  <span>بعدی</span>
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Tab 4: ملاحظات و توضیحات -->
+          <mat-tab>
+            <ng-template matTabLabel>
+              <div class="flex items-center gap-2 py-2">
+                <i class="fas fa-sticky-note"></i>
+                <span>ملاحظات و توضیحات</span>
+              </div>
+            </ng-template>
+            
+            <div class="p-6">
+              <div class="bg-gradient-to-r from-purple-600 to-violet-600 px-6 py-4 -mx-6 -mt-6 mb-6">
+                <h2 class="text-lg font-bold text-white flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-sticky-note text-sm"></i>
+                  </div>
+                  <span>ملاحظات و توضیحات</span>
+                </h2>
+              </div>
+
+              <div class="form-group">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظه</label>
+                <textarea formControlName="remarks" rows="6"
+                  class="form-input w-full px-4 py-3 border-2 rounded-xl transition-all"
+                  [ngClass]="{'border-red-300': securitiesControlForm.get('remarks')?.invalid && securitiesControlForm.get('remarks')?.touched, 'border-gray-200 focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500': !(securitiesControlForm.get('remarks')?.invalid && securitiesControlForm.get('remarks')?.touched)}"
+                  placeholder="ملاحظات و توضیحات اضافی"></textarea>
+                <small class="text-gray-500 text-xs mt-1">حداکثر ۲۰۰۰ کاراکتر</small>
+              </div>
+
+              <!-- Tab 4 Action Buttons -->
+              <div class="flex flex-wrap gap-4 justify-between mt-6 pt-4 border-t border-gray-200">
+                <button type="button" (click)="prevTab()" class="px-6 py-2.5 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                  <i class="fas fa-arrow-right"></i>
+                  <span>قبلی</span>
+                </button>
+                <div class="flex flex-wrap gap-3">
+                  <button type="submit" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 flex items-center gap-3 hover:-translate-y-0.5 active:translate-y-0">
+                    <i class="fas fa-save"></i>
+                    <span>{{ isEditMode ? 'ذخیره تغییرات' : 'ثبت معلومات' }}</span>
+                  </button>
+                  <button type="button" (click)="resetForm()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>ثبت جدید</span>
+                  </button>
+                  <button type="button" (click)="goToList()" class="px-6 py-3 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-bold rounded-xl shadow-lg shadow-gray-400/30 hover:shadow-xl hover:shadow-gray-400/40 transition-all duration-300 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0">
+                    <i class="fas fa-times"></i>
+                    <span>لغو</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+        </mat-tab-group>
+      </div>
+    </form>
+  </div>
+</section>

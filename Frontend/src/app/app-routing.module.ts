@@ -93,6 +93,14 @@ const routes: Routes = [
     ]
   },
   { 
+    path: 'securities-control', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', loadChildren: () => import('./securities-control/securities-control.module').then(m => m.SecuritiesControlModule) }
+    ]
+  },
+  { 
     path: 'petition-writer-securities', 
     component: MasterlayoutComponent,
     canActivate: [AuthGuard],
@@ -106,6 +114,14 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: '', loadChildren: () => import('./securities-report/securities-report.module').then(m => m.SecuritiesReportModule) }
+    ]
+  },
+  { 
+    path: 'petition-writer-report', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', loadChildren: () => import('./petition-writer-report/petition-writer-report.module').then(m => m.PetitionWriterReportModule) }
     ]
   },
   { path: 'forbidden', component: ForbiddenComponent },

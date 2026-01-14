@@ -118,6 +118,7 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<CompanyCancellationInfo> CompanyCancellationInfos { get; set; }
         public virtual DbSet<SecuritiesDistribution> SecuritiesDistributions { get; set; }
         public virtual DbSet<PetitionWriterSecurities> PetitionWriterSecurities { get; set; }
+        public virtual DbSet<SecuritiesControl> SecuritiesControls { get; set; }
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -1115,6 +1116,42 @@ namespace WebAPIBackend.Configuration
                 entity
                     .HasNoKey()
                     .ToView("UserProfileWithCompany");
+            });
+
+            modelBuilder.Entity<SecuritiesControl>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("SecuritiesControl_pkey");
+
+                entity.ToTable("SecuritiesControl", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50);
+                entity.Property(e => e.SerialNumber).HasMaxLength(50);
+                entity.Property(e => e.ProposalNumber).HasMaxLength(100);
+                entity.Property(e => e.DistributionTicketNumber).HasMaxLength(100);
+                entity.Property(e => e.PropertySaleSerialStart).HasMaxLength(100);
+                entity.Property(e => e.PropertySaleSerialEnd).HasMaxLength(100);
+                entity.Property(e => e.BayWafaSerialStart).HasMaxLength(100);
+                entity.Property(e => e.BayWafaSerialEnd).HasMaxLength(100);
+                entity.Property(e => e.RentSerialStart).HasMaxLength(100);
+                entity.Property(e => e.RentSerialEnd).HasMaxLength(100);
+                entity.Property(e => e.VehicleSaleSerialStart).HasMaxLength(100);
+                entity.Property(e => e.VehicleSaleSerialEnd).HasMaxLength(100);
+                entity.Property(e => e.ExchangeSerialStart).HasMaxLength(100);
+                entity.Property(e => e.ExchangeSerialEnd).HasMaxLength(100);
+                entity.Property(e => e.RegistrationBookSerialStart).HasMaxLength(100);
+                entity.Property(e => e.RegistrationBookSerialEnd).HasMaxLength(100);
+                entity.Property(e => e.PrintedPetitionSerialStart).HasMaxLength(100);
+                entity.Property(e => e.PrintedPetitionSerialEnd).HasMaxLength(100);
+                entity.Property(e => e.DistributionStartNumber).HasMaxLength(100);
+                entity.Property(e => e.DistributionEndNumber).HasMaxLength(100);
+                entity.Property(e => e.Remarks).HasMaxLength(2000);
+
+                entity.HasIndex(e => e.SerialNumber).IsUnique();
+                entity.HasIndex(e => e.ProposalNumber);
+                entity.HasIndex(e => e.DistributionTicketNumber);
             });
 
         }

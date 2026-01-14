@@ -1,0 +1,294 @@
+<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+        <i class="fas fa-file-invoice-dollar text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">مشاهده جزئیات کنټرول ورودی و خروجی اسناد بهادار</h1>
+      <p class="text-gray-500 max-w-md mx-auto">اطلاعات جزئیات کنټرول اسناد بهادار</p>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error && !isLoading" class="bg-red-50 border border-red-200 rounded-xl p-6 text-center mb-6">
+      <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
+      <p class="text-red-700">{{ error }}</p>
+      <button (click)="goToList()" class="mt-4 px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg">
+        بازگشت به لیست
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && !error && item" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      <!-- Action Buttons -->
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 flex flex-wrap justify-between items-center">
+        <h2 class="text-lg font-bold text-white flex items-center gap-3">
+          <i class="fas fa-info-circle"></i>
+          <span>جزئیات کنټرول اسناد بهادار</span>
+        </h2>
+        <div class="flex flex-wrap gap-3 mt-2 sm:mt-0">
+          <button (click)="editItem()" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+            <i class="fas fa-edit"></i>
+            ویرایش
+          </button>
+          <button (click)="printItem()" class="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+            <i class="fas fa-print"></i>
+            چاپ
+          </button>
+          <button (click)="goToList()" class="px-6 py-2 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+            <i class="fas fa-arrow-right"></i>
+            لیست
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="p-6">
+        <mat-tab-group>
+          <!-- Tab 1: معلومات عمومی و ثبت پیشنهاد -->
+          <mat-tab label="معلومات عمومی و ثبت پیشنهاد">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-bold text-gray-800 mb-3">اطلاعات عمومی</h3>
+                
+                <div class="space-y-3">
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">شماره مسلسل:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.serialNumber || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">نوع سند بهادار:</span>
+                    <span class="font-semibold text-gray-800">{{ getSecurityDocumentTypeName(item?.securityDocumentType!) }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">نمبر پیشنهاد:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.proposalNumber || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">تاریخ پیشنهاد:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.proposalDateFormatted || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">نمبر تکت توزیع:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.distributionTicketNumber || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">تاریخ تسلیمی:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.deliveryDateFormatted || '-' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Tab 2: مشخصات اسناد بهادار و تعداد آنها -->
+          <mat-tab label="مشخصات اسناد بهادار و تعداد آنها">
+            <div class="grid grid-cols-1 gap-6 mt-4">
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-bold text-gray-800 mb-3">اطلاعات اسناد بهادار</h3>
+                
+                <div class="space-y-3">
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">نوع اسناد بهادار:</span>
+                    <span class="font-semibold text-gray-800">{{ getSecuritiesTypeName(item?.securitiesType) }}</span>
+                  </div>
+                  
+                  <!-- Property Sale Fields -->
+                  <div *ngIf="item?.propertySaleCount" class="mt-4">
+                    <h4 class="font-semibold text-blue-700 mb-2">ستههای خرید و فروش جایداد</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">تعداد:</span>
+                        <span class="font-semibold text-gray-800">{{ item.propertySaleCount }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">آغاز سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.propertySaleSerialStart || '-' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">ختم سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.propertySaleSerialEnd || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Bay Wafa Fields -->
+                  <div *ngIf="item?.bayWafaCount" class="mt-4">
+                    <h4 class="font-semibold text-purple-700 mb-2">ستههای بیع وفا</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">تعداد:</span>
+                        <span class="font-semibold text-gray-800">{{ item.bayWafaCount }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">آغاز سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.bayWafaSerialStart || '-' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">ختم سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.bayWafaSerialEnd || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Rent Fields -->
+                  <div *ngIf="item?.rentCount" class="mt-4">
+                    <h4 class="font-semibold text-orange-700 mb-2">ستههای کرایی</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">تعداد:</span>
+                        <span class="font-semibold text-gray-800">{{ item.rentCount }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">آغاز سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.rentSerialStart || '-' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">ختم سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.rentSerialEnd || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Vehicle Sale Fields -->
+                  <div *ngIf="item?.vehicleSaleCount" class="mt-4">
+                    <h4 class="font-semibold text-teal-700 mb-2">ستههای خرید و فروش وسایط نقلیه</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">تعداد:</span>
+                        <span class="font-semibold text-gray-800">{{ item.vehicleSaleCount }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">آغاز سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.vehicleSaleSerialStart || '-' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">ختم سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.vehicleSaleSerialEnd || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Exchange Fields -->
+                  <div *ngIf="item?.exchangeCount" class="mt-4">
+                    <h4 class="font-semibold text-indigo-700 mb-2">ستههای تبادله</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">تعداد:</span>
+                        <span class="font-semibold text-gray-800">{{ item.exchangeCount }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">آغاز سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.exchangeSerialStart || '-' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">ختم سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.exchangeSerialEnd || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Registration Book Fields -->
+                  <div *ngIf="item?.registrationBookCount" class="mt-4">
+                    <h4 class="font-semibold text-gray-700 mb-2">کتاب ثبت معاملات</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">تعداد:</span>
+                        <span class="font-semibold text-gray-800">{{ item.registrationBookCount }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">آغاز سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.registrationBookSerialStart || '-' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">ختم سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.registrationBookSerialEnd || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Printed Petition Fields -->
+                  <div *ngIf="item?.printedPetitionCount" class="mt-4">
+                    <h4 class="font-semibold text-rose-700 mb-2">عرایض مطبوع</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">تعداد:</span>
+                        <span class="font-semibold text-gray-800">{{ item.printedPetitionCount }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">آغاز سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.printedPetitionSerialStart || '-' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">ختم سریال:</span>
+                        <span class="font-semibold text-gray-800">{{ item.printedPetitionSerialEnd || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Tab 3: ثبت و کنترول توزیع اسناد -->
+          <mat-tab label="ثبت و کنترول توزیع اسناد">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-bold text-gray-800 mb-3">اطلاعات توزیع</h3>
+                
+                <div class="space-y-3">
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">نمبر ثبت آغاز توزیع:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.distributionStartNumber || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">نمبر ثبت ختم توزیع:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.distributionEndNumber || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">تعداد دریافتکنندگان اسناد:</span>
+                    <span class="font-semibold text-gray-800">{{ item?.distributedPersonsCount || 0 }}</span>
+                  </div>
+                  <div class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">تعداد کل اسناد توزیع شده:</span>
+                    <span class="font-semibold text-gray-800">{{ getTotalDocumentCount() }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Tab 4: ملاحظات و توضیحات -->
+          <mat-tab label="ملاحظات و توضیحات">
+            <div class="mt-4">
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-bold text-gray-800 mb-3">ملاحظات و توضیحات</h3>
+                <div class="prose max-w-none">
+                  <p class="text-gray-700 whitespace-pre-line" *ngIf="item?.remarks; else noRemarks">{{ item.remarks }}</p>
+                  <ng-template #noRemarks>
+                    <p class="text-gray-500 italic">هیچ ملاحظه‌ای ثبت نشده است.</p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+
+    <!-- Back to list button when no data -->
+    <div *ngIf="!isLoading && !error && !item" class="text-center py-8">
+      <i class="fas fa-exclamation-triangle text-4xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500 mb-4">هیچ اطلاعاتی یافت نشد</p>
+      <button (click)="goToList()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg">
+        بازگشت به لیست
+      </button>
+    </div>
+  </div>
+</section>

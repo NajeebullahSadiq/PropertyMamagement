@@ -1,0 +1,73 @@
+/* Securities Control View Component Styles */
+
+.view-container {
+    @apply bg-white rounded-xl shadow overflow-hidden;
+}
+
+.section-header {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4;
+}
+
+.section-title {
+    @apply text-lg font-bold text-white flex items-center gap-3;
+}
+
+.action-buttons {
+    @apply flex space-x-3;
+}
+
+.info-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6 mt-4;
+}
+
+.info-card {
+    @apply p-4 bg-gray-50 rounded-lg;
+}
+
+.card-title {
+    @apply font-bold text-gray-800 mb-3;
+}
+
+.info-row {
+    @apply flex justify-between border-b pb-2;
+}
+
+.label {
+    @apply text-gray-600;
+}
+
+.value {
+    @apply font-semibold text-gray-800;
+}
+
+.tab-content {
+    @apply p-6;
+}
+
+.btn-primary {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+}
+
+.btn-secondary {
+    @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+}
+
+.btn-warning {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500;
+}
+
+.btn-success {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+}
+
+.loading-container {
+    @apply text-center py-8;
+}
+
+.error-container {
+    @apply bg-red-50 border border-red-200 rounded-xl p-6 text-center;
+}
+
+.error-message {
+    @apply text-red-700;
+}

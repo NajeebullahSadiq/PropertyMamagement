@@ -52,7 +52,8 @@ namespace WebAPIBackend.Controllers.Securities
                 var totalCount = await query.CountAsync();
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-                var items = await query
+                // First fetch the raw data from the database
+                var rawItems = await query
                     .OrderByDescending(x => x.CreatedAt)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -69,11 +70,29 @@ namespace WebAPIBackend.Controllers.Securities
                         x.SerialNumberStart,
                         x.SerialNumberEnd,
                         x.DistributionDate,
-                        DistributionDateFormatted = DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar),
                         x.CreatedAt,
                         x.CreatedBy
                     })
                     .ToListAsync();
+
+                // Apply date formatting in memory after data is materialized
+                var items = rawItems.Select(x => new
+                {
+                    x.Id,
+                    x.RegistrationNumber,
+                    x.PetitionWriterName,
+                    x.PetitionWriterFatherName,
+                    x.LicenseNumber,
+                    x.PetitionCount,
+                    x.Amount,
+                    x.BankReceiptNumber,
+                    x.SerialNumberStart,
+                    x.SerialNumberEnd,
+                    x.DistributionDate,
+                    DistributionDateFormatted = DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar),
+                    x.CreatedAt,
+                    x.CreatedBy
+                }).ToList();
 
                 return Ok(new
                 {
@@ -86,7 +105,7 @@ namespace WebAPIBackend.Controllers.Securities
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "خطا در دریافت اطلاعات", error = ex.Message });
+                return StatusCode(500, new { message = "خطا در دریافت اطلاعات", error = ex.Message, innerError = ex.InnerException?.Message });
             }
         }
 
