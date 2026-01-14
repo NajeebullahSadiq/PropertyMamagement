@@ -17,7 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Get Connection String
 builder.Services.AddDbContext<AppDbContext>(opts =>
-               opts.UseNpgsql(builder.Configuration["connection:connectionString"]));
+               opts.UseNpgsql(builder.Configuration["connection:connectionString"], 
+                   npgsqlOpts => npgsqlOpts.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 //Get data from appsettings.json and store to ApplicationSettings model than we use in our classes and Controller like Login Controller
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
 builder.Services.AddMvc();

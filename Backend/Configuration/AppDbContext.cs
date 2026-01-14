@@ -711,11 +711,6 @@ namespace WebAPIBackend.Configuration
                 entity.ToTable("TransactionType", "look");
             });
 
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-            });
-
             modelBuilder.Entity<VehiclesBuyerDetail>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("VehiclesBuyerDetails_pkey");
