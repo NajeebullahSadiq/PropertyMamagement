@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
+import { NumeralService } from 'src/app/shared/numeral.service';
 
 const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
 const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
@@ -91,7 +92,8 @@ export class LicensedetailsComponent {
 		private propertyDetailsService: PropertyService,
 		private router: Router,
 		private calendarConversionService: CalendarConversionService,
-		private calendarService: CalendarService
+		private calendarService: CalendarService,
+		private numeralService: NumeralService
 	) {
 		this.licenseForm = this.fb.group({
 			id: [0],
@@ -213,6 +215,19 @@ export class LicensedetailsComponent {
 			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
 		}
 
+		// Convert Persian/Dari numerals to Western numerals for numeric fields
+		if (details.royaltyAmount) {
+			const parsed = this.numeralService.parseNumber(String(details.royaltyAmount));
+			details.royaltyAmount = isNaN(parsed) ? undefined : parsed;
+		}
+		if (details.penaltyAmount) {
+			const parsed = this.numeralService.parseNumber(String(details.penaltyAmount));
+			details.penaltyAmount = isNaN(parsed) ? undefined : parsed;
+		}
+		if (details.hrLetter) {
+			details.hrLetter = this.numeralService.toWesternArabic(details.hrLetter);
+		}
+
 		details.calendarType = currentCalendar;
 		details.companyId = this.comservice.mainTableId;
 		details.docPath = this.imageName;
@@ -249,6 +264,19 @@ export class LicensedetailsComponent {
 		}
 		if (penaltyDateValue) {
 			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
+		}
+
+		// Convert Persian/Dari numerals to Western numerals for numeric fields
+		if (details.royaltyAmount) {
+			const parsed = this.numeralService.parseNumber(String(details.royaltyAmount));
+			details.royaltyAmount = isNaN(parsed) ? undefined : parsed;
+		}
+		if (details.penaltyAmount) {
+			const parsed = this.numeralService.parseNumber(String(details.penaltyAmount));
+			details.penaltyAmount = isNaN(parsed) ? undefined : parsed;
+		}
+		if (details.hrLetter) {
+			details.hrLetter = this.numeralService.toWesternArabic(details.hrLetter);
 		}
 
 		details.calendarType = currentCalendar;

@@ -11,7 +11,7 @@ using WebAPIBackend.Models.RequestData;
 
 namespace WebAPIBackend.Controllers.Companies
 {
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN,AUTHORITY,COMPANY_REGISTRAR,LICENSE_REVIEWER")]
     [Route("api/[controller]")]
     [ApiController]
     public class LicenseDetailController : ControllerBase
@@ -301,12 +301,17 @@ namespace WebAPIBackend.Controllers.Companies
         [HttpGet("GetLicenseView/{id}")]
         public async Task<IActionResult> GetLicenseViewById(int id, [FromQuery] string? calendarType = null)
         {
-            var data = await _context.LicenseView
-                .FirstOrDefaultAsync(x => x.CompanyId == id);
-            if (data == null)
+            try
             {
-                return NotFound();
-            }
+                // First, ensure the LicenseView exists by trying to create it
+                await EnsureLicenseViewExists();
+                
+                var data = await _context.LicenseView
+                    .FirstOrDefaultAsync(x => x.CompanyId == id);
+                if (data == null)
+                {
+                    return NotFound();
+                }
 
             var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
@@ -369,6 +374,129 @@ namespace WebAPIBackend.Controllers.Companies
             };
 
             return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error loading license view: {ex.Message}");
+        }
+        }
+
+        /// <summary>
+        /// Ensures the LicenseView database view exists with all required columns
+        /// </summary>
+        private async Task EnsureLicenseViewExists()
+        {
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(@"
+                    DO $$
+                    BEGIN
+                        -- Add missing columns to CompanyOwner if needed
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PermanentProvinceId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PermanentProvinceId"" INTEGER NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PermanentDistrictId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PermanentDistrictId"" INTEGER NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PermanentVillage') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PermanentVillage"" TEXT NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryProvinceId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryProvinceId"" INTEGER NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryDistrictId') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryDistrictId"" INTEGER NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryVillage') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryVillage"" TEXT NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PhoneNumber') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PhoneNumber"" VARCHAR(20) NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'WhatsAppNumber') THEN
+                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""WhatsAppNumber"" VARCHAR(20) NULL;
+                        END IF;
+                        
+                        -- Add missing columns to LicenseDetails if needed
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'RoyaltyAmount') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""RoyaltyAmount"" NUMERIC(18,2) NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'RoyaltyDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""RoyaltyDate"" DATE NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'PenaltyAmount') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""PenaltyAmount"" NUMERIC(18,2) NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'PenaltyDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""PenaltyDate"" DATE NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'HrLetter') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""HrLetter"" VARCHAR(255) NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'HrLetterDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""HrLetterDate"" DATE NULL;
+                        END IF;
+                    END $$;
+
+                    -- Recreate the LicenseView
+                    DROP VIEW IF EXISTS public.""LicenseView"";
+                    
+                    CREATE OR REPLACE VIEW public.""LicenseView"" AS
+                    SELECT 
+                        cd.""Id"" AS ""CompanyId"",
+                        co.""PhoneNumber"",
+                        co.""WhatsAppNumber"",
+                        cd.""Title"",
+                        cd.""TIN"",
+                        co.""FirstName"",
+                        co.""FatherName"",
+                        co.""GrandFatherName"",
+                        co.""DateofBirth"",
+                        co.""IndentityCardNumber"",
+                        co.""PothoPath"" AS ""OwnerPhoto"",
+                        ld.""LicenseNumber"",
+                        ld.""OfficeAddress"",
+                        ld.""IssueDate"",
+                        ld.""ExpireDate"",
+                        pp.""Dari"" AS ""PermanentProvinceName"",
+                        pd.""Dari"" AS ""PermanentDistrictName"",
+                        co.""PermanentVillage"",
+                        tp.""Dari"" AS ""TemporaryProvinceName"",
+                        td.""Dari"" AS ""TemporaryDistrictName"",
+                        co.""TemporaryVillage"",
+                        ld.""RoyaltyAmount"",
+                        ld.""RoyaltyDate"",
+                        ld.""PenaltyAmount"",
+                        ld.""PenaltyDate"",
+                        ld.""HrLetter"",
+                        ld.""HrLetterDate""
+                    FROM org.""CompanyDetails"" cd
+                    LEFT JOIN org.""CompanyOwner"" co ON cd.""Id"" = co.""CompanyId""
+                    LEFT JOIN org.""LicenseDetails"" ld ON cd.""Id"" = ld.""CompanyId""
+                    LEFT JOIN look.""Location"" pp ON co.""PermanentProvinceId"" = pp.""ID""
+                    LEFT JOIN look.""Location"" pd ON co.""PermanentDistrictId"" = pd.""ID""
+                    LEFT JOIN look.""Location"" tp ON co.""TemporaryProvinceId"" = tp.""ID""
+                    LEFT JOIN look.""Location"" td ON co.""TemporaryDistrictId"" = td.""ID"";
+                ");
+            }
+            catch (Exception)
+            {
+                // View creation failed, but we'll try to query anyway
+            }
         }
     }
 }

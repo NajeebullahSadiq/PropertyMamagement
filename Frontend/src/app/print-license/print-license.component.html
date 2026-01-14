@@ -4,7 +4,11 @@
   <p>در حال بارگذاری معلومات جواز...</p>
 </div>
 
-<div class="certificate-page" *ngIf="!isLoading">
+<div *ngIf="!isLoading && error" class="loading-container">
+  <p>{{ error }}</p>
+</div>
+
+<div class="certificate-page" *ngIf="!isLoading && !error">
   <div class="certificate-wrapper">
     <!-- Decorative Blue Border Frame -->
     <div class="decorative-border">

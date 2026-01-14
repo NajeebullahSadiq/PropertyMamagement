@@ -94,20 +94,21 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-phone"></i>
                 </span>
-                <input type="text" formControlName="phoneNumber" placeholder="0700000000" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" [ngClass]="{'border-red-500': isPhoneDuplicate}">
+                <input type="text" formControlName="phoneNumber" placeholder="0700000000" (input)="onPhoneNumberChange()" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
               </div>
             </div>
 
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">شماره واتساپ</label>
+              <div class="flex items-center gap-2 mb-2">
+                <input type="checkbox" id="sameAsPhone" [checked]="sameAsPhone" (change)="toggleSameAsPhone()" class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                <label for="sameAsPhone" class="text-sm text-gray-600 cursor-pointer">همان شماره تماس</label>
+              </div>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-green-500">
                   <i class="fab fa-whatsapp"></i>
                 </span>
-                <input type="text" formControlName="whatsAppNumber" placeholder="0700000000" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" [ngClass]="{'border-red-500': isPhoneDuplicate}">
-              </div>
-              <div *ngIf="isPhoneDuplicate">
-                <small class="text-red-600 text-xs mt-1 block">شماره تماس و شماره واتساپ نباید یکسان باشد</small>
+                <input type="text" formControlName="whatsAppNumber" placeholder="0700000000" [readonly]="sameAsPhone" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" [ngClass]="{'bg-gray-100': sameAsPhone}">
               </div>
             </div>
           </div>

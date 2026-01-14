@@ -1,15 +1,7 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-    NgbDate,
-    NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { SecuritiesControlService } from 'src/app/shared/securities-control.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -19,32 +11,12 @@ import {
     SecuritiesTypes
 } from 'src/app/models/SecuritiesControl';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) { return WEEKDAYS_SHORT[weekday - 1]; }
-    getMonthShortName(month: number) { return MONTHS[month - 1]; }
-    getMonthFullName(month: number) { return MONTHS[month - 1]; }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
-
 @Component({
     selector: 'app-securities-control-form',
     templateUrl: './securities-control-form.component.html',
-    styleUrls: ['./securities-control-form.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
+    styleUrls: ['./securities-control-form.component.scss']
 })
 export class SecuritiesControlFormComponent implements OnInit {
-    maxDate = { year: 1410, month: 12, day: 31 };
-    minDate = { year: 1320, month: 12, day: 31 };
-
     securitiesControlForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
@@ -80,8 +52,7 @@ export class SecuritiesControlFormComponent implements OnInit {
         private toastr: ToastrService,
         private securitiesControlService: SecuritiesControlService,
         private calendarService: CalendarService,
-        private calendarConversionService: CalendarConversionService,
-        private ngbDateParserFormatter: NgbDateParserFormatter
+        private calendarConversionService: CalendarConversionService
     ) {
         this.initForm();
     }
@@ -162,7 +133,9 @@ export class SecuritiesControlFormComponent implements OnInit {
                     serialNumber: data.serialNumber,
                     securityDocumentType: data.securityDocumentType,
                     proposalNumber: data.proposalNumber,
+                    proposalDate: data.proposalDateFormatted || null,
                     distributionTicketNumber: data.distributionTicketNumber,
+                    deliveryDate: data.deliveryDateFormatted || null,
                     securitiesType: data.securitiesType,
                     propertySaleCount: data.propertySaleCount,
                     propertySaleSerialStart: data.propertySaleSerialStart,
@@ -190,20 +163,6 @@ export class SecuritiesControlFormComponent implements OnInit {
                     distributedPersonsCount: data.distributedPersonsCount,
                     remarks: data.remarks
                 });
-
-                // Parse dates
-                if (data.proposalDateFormatted) {
-                    const parsed = this.ngbDateParserFormatter.parse(data.proposalDateFormatted);
-                    if (parsed) {
-                        this.securitiesControlForm.patchValue({ proposalDate: parsed });
-                    }
-                }
-                if (data.deliveryDateFormatted) {
-                    const parsed = this.ngbDateParserFormatter.parse(data.deliveryDateFormatted);
-                    if (parsed) {
-                        this.securitiesControlForm.patchValue({ deliveryDate: parsed });
-                    }
-                }
 
                 // Set visibility based on loaded data
                 this.onSecuritiesTypeChange();
@@ -325,21 +284,24 @@ export class SecuritiesControlFormComponent implements OnInit {
         });
     }
 
-    formatDateForBackend(date: NgbDate | null): string | undefined {
-        if (!date) return undefined;
-        const calendar = this.calendarService.getSelectedCalendar();
-        const calendarDate = {
-            year: date.year,
-            month: date.month,
-            day: date.day,
-            calendarType: calendar
-        };
-        const gregorianDate = this.calendarConversionService.toGregorian(calendarDate);
-        if (gregorianDate) {
-            const year = gregorianDate.getFullYear();
-            const month = String(gregorianDate.getMonth() + 1).padStart(2, '0');
-            const day = String(gregorianDate.getDate()).padStart(2, '0');
+    formatDateForBackend(dateValue: any): string | undefined {
+        if (!dateValue) return undefined;
+        
+        const currentCalendar = this.calendarService.getSelectedCalendar();
+        
+        if (dateValue instanceof Date) {
+            const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+            const year = calendarDate.year;
+            const month = String(calendarDate.month).padStart(2, '0');
+            const day = String(calendarDate.day).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        } else if (typeof dateValue === 'object' && dateValue.year) {
+            const year = dateValue.year;
+            const month = String(dateValue.month).padStart(2, '0');
+            const day = String(dateValue.day).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        } else if (typeof dateValue === 'string') {
+            return dateValue.replace(/\//g, '-');
         }
         return undefined;
     }
@@ -352,10 +314,13 @@ export class SecuritiesControlFormComponent implements OnInit {
         }
 
         const formValue = this.securitiesControlForm.value;
+        const currentCalendar = this.calendarService.getSelectedCalendar();
+        
         const data: SecuritiesControlData = {
             ...formValue,
             proposalDate: this.formatDateForBackend(formValue.proposalDate),
-            deliveryDate: this.formatDateForBackend(formValue.deliveryDate)
+            deliveryDate: this.formatDateForBackend(formValue.deliveryDate),
+            calendarType: currentCalendar
         };
 
         if (this.isEditMode && this.editId) {

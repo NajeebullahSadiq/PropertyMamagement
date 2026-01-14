@@ -181,11 +181,24 @@ export class CompanyownerComponent {
 		}
 	}
 
-	// Check if phone numbers are duplicate (for template use)
-	get isPhoneDuplicate(): boolean {
-		const phoneNumber = this.ownerForm.get('phoneNumber')?.value?.trim();
-		const whatsAppNumber = this.ownerForm.get('whatsAppNumber')?.value?.trim();
-		return !!(phoneNumber && whatsAppNumber && phoneNumber === whatsAppNumber);
+	// Property to track if WhatsApp should be same as phone
+	sameAsPhone: boolean = false;
+
+	// Toggle same as phone checkbox
+	toggleSameAsPhone(): void {
+		this.sameAsPhone = !this.sameAsPhone;
+		if (this.sameAsPhone) {
+			const phoneNumber = this.ownerForm.get('phoneNumber')?.value;
+			this.ownerForm.patchValue({ whatsAppNumber: phoneNumber });
+		}
+	}
+
+	// Sync WhatsApp when phone changes (if sameAsPhone is checked)
+	onPhoneNumberChange(): void {
+		if (this.sameAsPhone) {
+			const phoneNumber = this.ownerForm.get('phoneNumber')?.value;
+			this.ownerForm.patchValue({ whatsAppNumber: phoneNumber });
+		}
 	}
 
 	ngOnInit() {
@@ -520,11 +533,6 @@ export class CompanyownerComponent {
 	}
 
 	addOwner(): void {
-		// Check for duplicate phone numbers before submission
-		if (this.isPhoneDuplicate) {
-			this.toastr.error("شماره تماس و شماره واتساپ نباید یکسان باشد");
-			return;
-		}
 
 		const details = this.ownerForm.value as companyowner;
 		const dateValue = this.ownerForm.get('dateofBirth')?.value;
@@ -582,12 +590,6 @@ export class CompanyownerComponent {
 	}
 
 	updateOwner(): void {
-		// Check for duplicate phone numbers before submission
-		if (this.isPhoneDuplicate) {
-			this.toastr.error("شماره تماس و شماره واتساپ نباید یکسان باشد");
-			return;
-		}
-
 		const details = this.ownerForm.value as companyowner;
 		const dateValue = this.ownerForm.get('dateofBirth')?.value;
 		const currentCalendar = this.calendarService.getSelectedCalendar();

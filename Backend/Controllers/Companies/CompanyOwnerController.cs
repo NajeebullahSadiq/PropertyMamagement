@@ -173,13 +173,6 @@ namespace WebAPIBackend.Controllers.Companies
                 return StatusCode(312, "Main Table is Empty");
             }
 
-            // Validate phone numbers are not identical
-            if (!string.IsNullOrEmpty(request.PhoneNumber) && !string.IsNullOrEmpty(request.WhatsAppNumber) 
-                && request.PhoneNumber.Trim() == request.WhatsAppNumber.Trim())
-            {
-                return BadRequest("شماره تماس و شماره واتساپ نباید یکسان باشد");
-            }
-
             var userId = userIdClaim.Value;
 
             // Parse date using multi-calendar helper
@@ -234,13 +227,6 @@ namespace WebAPIBackend.Controllers.Companies
             if (!DateConversionHelper.TryParseToDateOnly(request.DateofBirth, request.CalendarType, out var pdate))
             {
                 return BadRequest("DateofBirth must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
-            }
-
-            // Validate phone numbers are not identical
-            if (!string.IsNullOrEmpty(request.PhoneNumber) && !string.IsNullOrEmpty(request.WhatsAppNumber) 
-                && request.PhoneNumber.Trim() == request.WhatsAppNumber.Trim())
-            {
-                return BadRequest("شماره تماس و شماره واتساپ نباید یکسان باشد");
             }
 
             var userIdClaim = HttpContext.User.FindFirst("UserID");

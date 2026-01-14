@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { combineLatest } from 'rxjs';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
 import { CompnaydetailService } from '../shared/compnaydetail.service';
@@ -17,6 +18,7 @@ export class PrintLicenseComponent implements OnInit {
   data: any = {};
   accountInfo: AccountInfo | null = null;
   isLoading: boolean = true;
+  error: string | null = null;
 
   constructor(
     public service: AuthService,
@@ -26,25 +28,45 @@ export class PrintLicenseComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const code = this.route.snapshot.paramMap.get('id');
-    if (code) {
+    console.log('[PrintLicense] init');
+
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([paramMap, queryParamMap]) => {
+      this.error = null;
+      this.isLoading = true;
+
+      const codeFromParam = paramMap.get('id');
+      const codeFromQuery = queryParamMap.get('id');
+      const code = codeFromParam || codeFromQuery;
+
+      console.log('[PrintLicense] route id:', code);
+
+      if (!code) {
+        this.error = 'شناسه چاپ موجود نیست';
+        this.isLoading = false;
+        return;
+      }
+
+      console.log('[PrintLicense] calling API getLicensePrintData');
+
       this.pservice.getLicensePrintData(code).subscribe({
         next: (res) => {
-          this.data = res;
-          if (res.ownerPhoto) {
-            this.filePath = this.baseUrl + res.ownerPhoto;
+          const payload = (res && (res.data || res.result || res.payload)) ? (res.data || res.result || res.payload) : res;
+
+          this.data = this.toCamelCaseDeep(payload || {});
+
+          if (this.data && this.data.ownerPhoto) {
+            this.filePath = this.baseUrl + this.data.ownerPhoto;
           }
 
           // Fetch Account Info for the company
-          if (res.companyId) {
-            this.companyService.getAccountInfoByCompanyId(res.companyId).subscribe({
+          if (this.data && this.data.companyId) {
+            this.companyService.getAccountInfoByCompanyId(this.data.companyId).subscribe({
               next: (info) => {
                 this.accountInfo = info;
                 this.isLoading = false;
                 this.triggerPrint();
               },
-              error: (err) => {
-                console.log('No account info found for this company');
+              error: () => {
                 this.isLoading = false;
                 this.triggerPrint();
               }
@@ -56,15 +78,43 @@ export class PrintLicenseComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error loading license data:', err);
+
+          if (err?.status === 404) {
+            this.error = 'رکورد برای چاپ پیدا نشد';
+          } else if (err?.status === 401 || err?.status === 403) {
+            this.error = 'دسترسی برای چاپ ندارید';
+          } else {
+            this.error = 'خطا در دریافت معلومات چاپ';
+          }
+
           this.isLoading = false;
         }
       });
-    } else {
-      this.isLoading = false;
+    });
+  }
+
+  private toCamelCaseDeep(value: any): any {
+    if (Array.isArray(value)) {
+      return value.map(v => this.toCamelCaseDeep(v));
     }
+
+    if (value && typeof value === 'object' && value.constructor === Object) {
+      const result: any = {};
+      for (const [k, v] of Object.entries(value)) {
+        const camelKey = k ? (k.charAt(0).toLowerCase() + k.slice(1)) : k;
+        result[camelKey] = this.toCamelCaseDeep(v);
+      }
+      return result;
+    }
+
+    return value;
   }
 
   private triggerPrint(): void {
+    if (this.error) {
+      return;
+    }
+
     // Wait for images to load before printing
     setTimeout(() => {
       window.print();
