@@ -1,50 +1,21 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-    NgbDate,
-    NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { PetitionWriterSecuritiesService } from 'src/app/shared/petition-writer-securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { PetitionWriterSecuritiesData } from 'src/app/models/PetitionWriterSecurities';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) { return WEEKDAYS_SHORT[weekday - 1]; }
-    getMonthShortName(month: number) { return MONTHS[month - 1]; }
-    getMonthFullName(month: number) { return MONTHS[month - 1]; }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
-
 @Component({
     selector: 'app-petition-writer-securities-form',
     templateUrl: './petition-writer-securities-form.component.html',
-    styleUrls: ['./petition-writer-securities-form.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
+    styleUrls: ['./petition-writer-securities-form.component.scss']
 })
 export class PetitionWriterSecuritiesFormComponent implements OnInit {
-    maxDate = { year: 1410, month: 12, day: 31 };
-    minDate = { year: 1320, month: 12, day: 31 };
-
     petitionForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
-    selectedTabIndex = 0;
 
     constructor(
         private fb: FormBuilder,
@@ -53,8 +24,7 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
         private toastr: ToastrService,
         private petitionService: PetitionWriterSecuritiesService,
         private calendarService: CalendarService,
-        private calendarConversionService: CalendarConversionService,
-        private ngbDateParserFormatter: NgbDateParserFormatter
+        private calendarConversionService: CalendarConversionService
     ) {
         this.initForm();
     }
@@ -66,17 +36,23 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
             this.editId = parseInt(id, 10);
             this.loadData(this.editId);
         }
+        
+        this.route.queryParams.subscribe(params => {
+            if (params['id']) {
+                this.isEditMode = true;
+                this.editId = parseInt(params['id'], 10);
+                this.loadData(this.editId);
+            }
+        });
     }
 
     initForm(): void {
         this.petitionForm = this.fb.group({
             id: [null],
-            // Tab 1: مشخصات عریضه‌نویس
             registrationNumber: ['', [Validators.required, Validators.maxLength(50)]],
             petitionWriterName: ['', [Validators.required, Validators.maxLength(200)]],
             petitionWriterFatherName: ['', [Validators.required, Validators.maxLength(200)]],
             licenseNumber: ['', [Validators.required, Validators.maxLength(50)]],
-            // Tab 2: مشخصات سند بهادار عریضه
             petitionCount: [null, [Validators.required, Validators.min(1)]],
             amount: [null, [Validators.required, Validators.min(0)]],
             bankReceiptNumber: ['', [Validators.required, Validators.maxLength(100)]],
@@ -102,13 +78,8 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
                     serialNumberStart: data.serialNumberStart,
                     serialNumberEnd: data.serialNumberEnd
                 });
-
-                // Parse date
                 if (data.distributionDateFormatted) {
-                    const parsed = this.ngbDateParserFormatter.parse(data.distributionDateFormatted);
-                    if (parsed) {
-                        this.petitionForm.patchValue({ distributionDate: parsed });
-                    }
+                    this.petitionForm.patchValue({ distributionDate: data.distributionDateFormatted });
                 }
             },
             error: (err) => {
@@ -118,46 +89,33 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
         });
     }
 
-    formatDateForBackend(date: NgbDate | null): string | undefined {
-        if (!date) return undefined;
-        const calendar = this.calendarService.getSelectedCalendar();
-        const calendarDate = {
-            year: date.year,
-            month: date.month,
-            day: date.day,
-            calendarType: calendar
-        };
-        const gregorianDate = this.calendarConversionService.toGregorian(calendarDate);
-        if (gregorianDate) {
-            const year = gregorianDate.getFullYear();
-            const month = String(gregorianDate.getMonth() + 1).padStart(2, '0');
-            const day = String(gregorianDate.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+    private formatDateForBackend(dateValue: any): string {
+        const currentCalendar = this.calendarService.getSelectedCalendar();
+        if (dateValue instanceof Date) {
+            const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+            return `${calendarDate.year}-${String(calendarDate.month).padStart(2, '0')}-${String(calendarDate.day).padStart(2, '0')}`;
+        } else if (typeof dateValue === 'object' && dateValue.year) {
+            return `${dateValue.year}-${String(dateValue.month).padStart(2, '0')}-${String(dateValue.day).padStart(2, '0')}`;
+        } else if (typeof dateValue === 'string') {
+            return dateValue.replace(/\//g, '-');
         }
-        return undefined;
+        return '';
     }
 
     validateSerialNumbers(): boolean {
         const start = this.petitionForm.get('serialNumberStart')?.value;
         const end = this.petitionForm.get('serialNumberEnd')?.value;
-        
         if (!start || !end) return true;
-
-        // Try numeric comparison first
         const startNum = parseInt(start, 10);
         const endNum = parseInt(end, 10);
-        
         if (!isNaN(startNum) && !isNaN(endNum)) {
             if (startNum > endNum) {
                 this.toastr.error('آغاز سریال نمبر باید کمتر یا مساوی ختم سریال نمبر باشد');
                 return false;
             }
-        } else {
-            // String comparison
-            if (start > end) {
-                this.toastr.error('آغاز سریال نمبر باید کمتر یا مساوی ختم سریال نمبر باشد');
-                return false;
-            }
+        } else if (start > end) {
+            this.toastr.error('آغاز سریال نمبر باید کمتر یا مساوی ختم سریال نمبر باشد');
+            return false;
         }
         return true;
     }
@@ -168,38 +126,43 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
             this.markFormGroupTouched();
             return;
         }
-
-        if (!this.validateSerialNumbers()) {
-            return;
-        }
+        if (!this.validateSerialNumbers()) return;
 
         const formValue = this.petitionForm.value;
         const data: PetitionWriterSecuritiesData = {
             ...formValue,
-            distributionDate: this.formatDateForBackend(formValue.distributionDate)
+            distributionDate: formValue.distributionDate ? this.formatDateForBackend(formValue.distributionDate) : undefined,
+            calendarType: this.calendarService.getSelectedCalendar()
         };
 
         if (this.isEditMode && this.editId) {
-            this.petitionService.update(this.editId, data).subscribe({
-                next: (res) => {
-                    this.toastr.success(res.message || 'رکورد با موفقیت بروزرسانی شد');
-                    this.router.navigate(['/petition-writer-securities/list']);
-                },
-                error: (err) => {
-                    this.toastr.error(err.error?.message || 'خطا در بروزرسانی اطلاعات');
-                }
-            });
+            this.updateRecord(data);
         } else {
-            this.petitionService.create(data).subscribe({
-                next: (res) => {
-                    this.toastr.success(res.message || 'رکورد با موفقیت ثبت شد');
-                    this.router.navigate(['/petition-writer-securities/list']);
-                },
-                error: (err) => {
-                    this.toastr.error(err.error?.message || 'خطا در ثبت اطلاعات');
-                }
-            });
+            this.createRecord(data);
         }
+    }
+
+    private createRecord(data: PetitionWriterSecuritiesData): void {
+        this.petitionService.create(data).subscribe({
+            next: (res) => {
+                this.toastr.success('معلومات موفقانه ثبت شد');
+                this.editId = res.id;
+                this.isEditMode = true;
+                this.petitionService.dataChanged.next();
+                this.router.navigate(['/petition-writer-securities/list']);
+            },
+            error: (err) => this.toastr.error(err.error?.message || 'خطا در ثبت اطلاعات')
+        });
+    }
+
+    private updateRecord(data: PetitionWriterSecuritiesData): void {
+        this.petitionService.update(this.editId!, data).subscribe({
+            next: () => {
+                this.toastr.info('معلومات موفقانه تغیر یافت');
+                this.petitionService.dataChanged.next();
+            },
+            error: (err) => this.toastr.error(err.error?.message || 'خطا در بروزرسانی اطلاعات')
+        });
     }
 
     markFormGroupTouched(): void {
@@ -210,25 +173,15 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
 
     resetForm(): void {
         this.petitionForm.reset();
+        this.isEditMode = false;
+        this.editId = null;
+        this.router.navigate(['/petition-writer-securities']);
     }
 
     goToList(): void {
         this.router.navigate(['/petition-writer-securities/list']);
     }
 
-    nextTab(): void {
-        if (this.selectedTabIndex < 1) {
-            this.selectedTabIndex++;
-        }
-    }
-
-    prevTab(): void {
-        if (this.selectedTabIndex > 0) {
-            this.selectedTabIndex--;
-        }
-    }
-
-    // Form control getters
     get registrationNumber() { return this.petitionForm.get('registrationNumber'); }
     get petitionWriterName() { return this.petitionForm.get('petitionWriterName'); }
     get petitionWriterFatherName() { return this.petitionForm.get('petitionWriterFatherName'); }

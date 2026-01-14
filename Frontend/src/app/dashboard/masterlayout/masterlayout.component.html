@@ -142,6 +142,10 @@
       <a routerLink="/petition-writer-securities/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>table_chart</mat-icon><span>جدول سند بهادار عریضه‌ نویسان</span>
       </a>
+      <div class="section-label">گزارش‌گیری اسناد بهادار</div>
+      <a routerLink="/securities-report" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>assessment</mat-icon><span>گزارش‌گیری اسناد بهادار رهنمای معاملات</span>
+      </a>
       <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
       <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>

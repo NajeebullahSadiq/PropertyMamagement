@@ -1,40 +1,188 @@
+// Tab styling
 .securities-tabs {
   ::ng-deep .mat-mdc-tab-labels {
     direction: rtl;
+    background: linear-gradient(to right, #f8fafc, #f1f5f9);
+    border-bottom: 2px solid #e2e8f0;
   }
   
   ::ng-deep .mat-mdc-tab {
-    min-width: 160px;
+    min-width: 180px;
+    padding: 0 24px;
+    
+    .mdc-tab__text-label {
+      color: #64748b;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    &.mdc-tab--active .mdc-tab__text-label {
+      color: #3b82f6;
+    }
+    
+    .mdc-tab-indicator__content--underline {
+      border-color: #3b82f6;
+      border-width: 3px;
+      border-radius: 3px 3px 0 0;
+    }
+  }
+  
+  ::ng-deep .mat-mdc-tab-body-wrapper {
+    flex: 1;
   }
 }
 
+// Form input styling
+.form-input {
+  direction: rtl;
+  text-align: right;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+// Input group for datepickers
 .input-group {
   display: flex;
   align-items: center;
   
-  .form-control {
+  .form-input {
     flex: 1;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    cursor: pointer;
   }
-  
-  .calendar-btn {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border: 1px solid #d1d5db;
-    border-right: none;
-    padding: 0.625rem 0.75rem;
-    background: #f9fafb;
+}
+
+// Custom ng-select styling
+.custom-ng-select {
+  ::ng-deep .ng-select-container {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    min-height: 48px;
+    padding: 0 0.5rem;
+    transition: all 0.2s;
     
     &:hover {
-      background: #f3f4f6;
+      border-color: #d1d5db;
+    }
+  }
+  
+  ::ng-deep .ng-select.ng-select-focused .ng-select-container {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+  
+  ::ng-deep .ng-dropdown-panel {
+    border-radius: 0.75rem;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    margin-top: 4px;
+  }
+  
+  ::ng-deep .ng-option {
+    padding: 0.75rem 1rem;
+    
+    &.ng-option-selected {
+      background-color: #eff6ff;
+      color: #1d4ed8;
+    }
+    
+    &.ng-option-marked {
+      background-color: #f3f4f6;
+    }
+  }
+  
+  ::ng-deep .ng-value {
+    font-weight: 500;
+  }
+  
+  ::ng-deep .ng-placeholder {
+    color: #9ca3af;
+  }
+}
+
+// Datepicker styling
+::ng-deep ngb-datepicker {
+  direction: ltr;
+  border-radius: 0.75rem;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  .ngb-dp-header {
+    background: linear-gradient(to right, #3b82f6, #6366f1);
+    border-radius: 0.75rem 0.75rem 0 0;
+    padding: 0.5rem;
+  }
+  
+  .ngb-dp-arrow-btn {
+    color: white;
+  }
+  
+  .ngb-dp-navigation-select {
+    select {
+      color: white;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0.5rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+  
+  .ngb-dp-weekday {
+    color: #6b7280;
+    font-weight: 600;
+  }
+  
+  .ngb-dp-day {
+    .btn-light {
+      border-radius: 0.5rem;
+      
+      &:hover {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+      }
+      
+      &.bg-primary {
+        background: linear-gradient(to right, #3b82f6, #6366f1) !important;
+        border-radius: 0.5rem;
+      }
     }
   }
 }
 
-.custom-ng-select {
-  ::ng-deep .ng-select-container {
-    border-radius: 0.5rem;
+// Validation styling
+.border-red-300 {
+  border-color: #fca5a5 !important;
+  
+  &:focus {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .securities-tabs {
+    ::ng-deep .mat-mdc-tab {
+      min-width: 120px;
+      padding: 0 12px;
+      
+      .mdc-tab__text-label {
+        font-size: 0.75rem;
+      }
+    }
+  }
+  
+  .form-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .custom-ng-select ::ng-deep .ng-select-container {
     min-height: 42px;
   }
 }

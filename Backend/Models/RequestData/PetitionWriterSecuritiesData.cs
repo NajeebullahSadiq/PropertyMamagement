@@ -15,15 +15,15 @@ public class PetitionWriterSecuritiesData
     [MaxLength(50)]
     public string RegistrationNumber { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "اسم عریضه‌نویس الزامی است")]
+    [Required(ErrorMessage = "اسم عریضه نویس / وکیل الزامی است")]
     [MaxLength(200)]
     public string PetitionWriterName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "اسم پدر عریضه‌نویس الزامی است")]
+    [Required(ErrorMessage = "اسم پدر عریضه‌نویس / وکیل الزامی است")]
     [MaxLength(200)]
     public string PetitionWriterFatherName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "نمبر جواز عریضه‌نویس الزامی است")]
+    [Required(ErrorMessage = "نمبر جواز عریضه‌نویس / وکیل الزامی است")]
     [MaxLength(50)]
     public string LicenseNumber { get; set; } = string.Empty;
 

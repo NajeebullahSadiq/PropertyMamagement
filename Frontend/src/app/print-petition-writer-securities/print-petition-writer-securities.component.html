@@ -10,25 +10,28 @@
       <h3>سند بهادار عریضه‌ نویسان</h3>
     </div>
     <div class="header-info">
-      <p>نمبر ثبت تعرفه: {{ item.registrationNumber }}</p>
-      <p>تاریخ توزیع: {{ item.distributionDateFormatted || '-' }}</p>
+      <p><strong>نمبر ثبت تعرفه:</strong> {{ item.registrationNumber }}</p>
+      <p><strong>تاریخ توزیع:</strong> {{ item.distributionDateFormatted || '-' }}</p>
     </div>
   </div>
 
   <!-- Section 1: مشخصات عریضه‌نویس -->
   <div class="print-section">
-    <h4 class="section-title">مشخصات عریضه‌نویس</h4>
+    <h4 class="section-title">
+      <i class="fas fa-user"></i>
+      مشخصات عریضه‌نویس
+    </h4>
     <table class="info-table">
       <tr>
         <td class="label">نمبر ثبت تعرفه:</td>
         <td class="value">{{ item.registrationNumber }}</td>
-        <td class="label">نمبر جواز عریضه‌نویس:</td>
+        <td class="label">نمبر جواز عریضه‌نویس / وکیل:</td>
         <td class="value">{{ item.licenseNumber }}</td>
       </tr>
       <tr>
-        <td class="label">اسم عریضه‌نویس:</td>
+        <td class="label">اسم عریضه نویس / وکیل:</td>
         <td class="value">{{ item.petitionWriterName }}</td>
-        <td class="label">اسم پدر عریضه‌نویس:</td>
+        <td class="label">اسم پدر عریضه‌نویس / وکیل:</td>
         <td class="value">{{ item.petitionWriterFatherName }}</td>
       </tr>
     </table>
@@ -36,11 +39,14 @@
 
   <!-- Section 2: مشخصات سند بهادار عریضه -->
   <div class="print-section">
-    <h4 class="section-title">مشخصات سند بهادار عریضه</h4>
+    <h4 class="section-title">
+      <i class="fas fa-file-alt"></i>
+      مشخصات سند بهادار عریضه
+    </h4>
     <table class="info-table">
       <tr>
         <td class="label">تعداد عریضه:</td>
-        <td class="value">{{ item.petitionCount }}</td>
+        <td class="value">{{ item.petitionCount | number }}</td>
         <td class="label">مبلغ پول:</td>
         <td class="value total">{{ item.amount | number }} افغانی</td>
       </tr>
@@ -52,9 +58,9 @@
       </tr>
       <tr>
         <td class="label">آغاز سریال نمبر عریضه:</td>
-        <td class="value">{{ item.serialNumberStart }}</td>
+        <td class="value highlight">{{ item.serialNumberStart }}</td>
         <td class="label">ختم سریال نمبر عریضه:</td>
-        <td class="value">{{ item.serialNumberEnd }}</td>
+        <td class="value highlight">{{ item.serialNumberEnd }}</td>
       </tr>
     </table>
   </div>
@@ -62,15 +68,16 @@
   <!-- Signatures -->
   <div class="signatures">
     <div class="signature-box">
-      <p>امضای گیرنده</p>
+      <p class="signature-label">امضای گیرنده</p>
+      <div class="signature-line"></div>
+      <p class="signature-name">{{ item.petitionWriterName }}</p>
+    </div>
+    <div class="signature-box">
+      <p class="signature-label">امضای توزیع کننده</p>
       <div class="signature-line"></div>
     </div>
     <div class="signature-box">
-      <p>امضای توزیع کننده</p>
-      <div class="signature-line"></div>
-    </div>
-    <div class="signature-box">
-      <p>مهر و امضای مسئول</p>
+      <p class="signature-label">مهر و امضای مسئول</p>
       <div class="signature-line"></div>
     </div>
   </div>
@@ -78,9 +85,19 @@
   <!-- Footer -->
   <div class="print-footer">
     <p>این سند رسمی بوده و جعل آن جرم پنداشته می‌شود</p>
+    <p class="print-date">تاریخ چاپ: {{ printDate }}</p>
   </div>
 </div>
 
-<div *ngIf="isLoading" class="loading">
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-spinner"></div>
   <p>در حال بارگذاری...</p>
+</div>
+
+<!-- Error State -->
+<div *ngIf="!isLoading && error" class="error-container">
+  <i class="fas fa-exclamation-triangle"></i>
+  <p>{{ error }}</p>
+  <button (click)="goBack()" class="back-btn">بازگشت</button>
 </div>

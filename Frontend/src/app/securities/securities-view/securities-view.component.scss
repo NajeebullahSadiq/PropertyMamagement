@@ -1,1 +1,102 @@
-// View component styles
+// View component styling
+.section-header {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+  
+  &:hover {
+    opacity: 0.95;
+  }
+}
+
+// Data display cards
+.data-card {
+  padding: 1rem;
+  background: linear-gradient(to bottom right, #f9fafb, #f1f5f9);
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  
+  .label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .value {
+    font-weight: 700;
+    color: #1f2937;
+    margin-top: 0.25rem;
+  }
+}
+
+// Document type sections
+.document-section {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  
+  h3 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .grid {
+    display: grid;
+    gap: 1rem;
+  }
+}
+
+// Price highlight
+.price-highlight {
+  background: linear-gradient(to bottom right, #ecfdf5, #d1fae5);
+  border: 1px solid #a7f3d0;
+  
+  .value {
+    color: #047857;
+    font-size: 1.5rem;
+  }
+}
+
+// Collapsible animation
+.section-content {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .data-card {
+    padding: 0.75rem;
+    
+    .label {
+      font-size: 0.75rem;
+    }
+    
+    .value {
+      font-size: 0.875rem;
+    }
+  }
+  
+  .document-section {
+    padding: 1rem;
+    
+    h3 {
+      font-size: 0.875rem;
+    }
+  }
+}

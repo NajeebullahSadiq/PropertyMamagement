@@ -1,39 +1,112 @@
-.petition-tabs {
-  ::ng-deep .mat-mdc-tab-header {
-    background: white;
-    border-radius: 0.75rem 0.75rem 0 0;
-    border: 1px solid #e5e7eb;
-    border-bottom: none;
-  }
+// Form styles matching Property and Vehicle modules
+.form-group {
+  margin-bottom: 0;
+}
 
-  ::ng-deep .mat-mdc-tab {
-    min-width: 180px;
+.form-input {
+  &:focus {
+    outline: none;
   }
 }
 
-.input-group {
-  display: flex;
-  align-items: stretch;
-
-  .form-control {
-    flex: 1;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .calendar-btn {
-    border-top-left-radius: 0.5rem;
-    border-bottom-left-radius: 0.5rem;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border: 1px solid #d1d5db;
-    border-right: none;
-    background: #f9fafb;
-    padding: 0 1rem;
-    cursor: pointer;
-
+// Custom ng-select styling
+::ng-deep .custom-ng-select {
+  .ng-select-container {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    min-height: 48px;
+    padding: 0.25rem 0.5rem;
+    
     &:hover {
-      background: #f3f4f6;
+      border-color: #d1d5db;
+    }
+  }
+  
+  &.ng-select-focused {
+    .ng-select-container {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+  }
+  
+  .ng-dropdown-panel {
+    border-radius: 0.75rem;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    
+    .ng-option {
+      padding: 0.75rem 1rem;
+      
+      &.ng-option-marked {
+        background-color: #eff6ff;
+      }
+      
+      &.ng-option-selected {
+        background-color: #dbeafe;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Validation error styling
+.border-red-300 {
+  border-color: #fca5a5 !important;
+}
+
+// Calendar datepicker styling
+::ng-deep {
+  .input-group {
+    display: flex;
+    align-items: stretch;
+    
+    .form-control {
+      flex: 1;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    
+    .calendar-btn {
+      border: 2px solid #e5e7eb;
+      border-right: none;
+      border-radius: 0.75rem 0 0 0.75rem;
+      background: #f9fafb;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+      }
+      
+      i {
+        color: #6b7280;
+      }
+    }
+  }
+  
+  ngb-datepicker {
+    border-radius: 0.75rem;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .flex-wrap {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
     }
   }
 }

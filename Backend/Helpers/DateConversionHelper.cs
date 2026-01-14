@@ -199,5 +199,21 @@ namespace WebAPIBackend.Helpers
                     return "";
             }
         }
+
+        /// <summary>
+        /// Parse a date string and return DateOnly (Gregorian)
+        /// </summary>
+        public static DateOnly? ParseDateOnly(string? dateString, CalendarType calendarType)
+        {
+            if (string.IsNullOrWhiteSpace(dateString))
+                return null;
+
+            var gregorianDate = ParseDateString(dateString, calendarType);
+            if (gregorianDate.HasValue)
+            {
+                return DateOnly.FromDateTime(gregorianDate.Value);
+            }
+            return null;
+        }
     }
 }

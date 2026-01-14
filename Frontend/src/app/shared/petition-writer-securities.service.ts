@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { 
     PetitionWriterSecurities, 
@@ -13,6 +13,9 @@ import {
 })
 export class PetitionWriterSecuritiesService {
     private baseUrl = environment.apiURL + '/PetitionWriterSecurities';
+    
+    // Subject to notify when data changes (like PropertyService.propertyAdded)
+    dataChanged = new Subject<void>();
 
     constructor(private http: HttpClient) { }
 

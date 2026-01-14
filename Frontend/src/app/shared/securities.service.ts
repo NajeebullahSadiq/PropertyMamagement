@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { 
     SecuritiesDistribution, 
@@ -13,8 +13,16 @@ import {
 })
 export class SecuritiesService {
     private baseUrl = environment.apiURL + '/SecuritiesDistribution';
+    
+    // Subject to notify list component of data changes
+    private dataChangedSubject = new Subject<void>();
+    dataChanged$ = this.dataChangedSubject.asObservable();
 
     constructor(private http: HttpClient) { }
+
+    notifyDataChanged(): void {
+        this.dataChangedSubject.next();
+    }
 
     /**
      * Get all securities distributions with pagination and search
@@ -54,20 +62,26 @@ export class SecuritiesService {
      * Create new securities distribution
      */
     create(data: SecuritiesDistributionData): Observable<{ id: number; message: string }> {
-        return this.http.post<{ id: number; message: string }>(this.baseUrl, data);
+        return this.http.post<{ id: number; message: string }>(this.baseUrl, data).pipe(
+            tap(() => this.notifyDataChanged())
+        );
     }
 
     /**
      * Update securities distribution
      */
     update(id: number, data: SecuritiesDistributionData): Observable<{ id: number; message: string }> {
-        return this.http.put<{ id: number; message: string }>(`${this.baseUrl}/${id}`, data);
+        return this.http.put<{ id: number; message: string }>(`${this.baseUrl}/${id}`, data).pipe(
+            tap(() => this.notifyDataChanged())
+        );
     }
 
     /**
      * Delete securities distribution
      */
     delete(id: number): Observable<{ message: string }> {
-        return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`);
+        return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`).pipe(
+            tap(() => this.notifyDataChanged())
+        );
     }
 }

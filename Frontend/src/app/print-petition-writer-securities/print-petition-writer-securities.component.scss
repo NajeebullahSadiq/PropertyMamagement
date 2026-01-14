@@ -1,55 +1,64 @@
+// Print styles for Petition Writer Securities
 .print-container {
   max-width: 210mm;
   margin: 0 auto;
   padding: 20mm;
-  font-family: 'Vazir', 'B Nazanin', Arial, sans-serif;
-  direction: rtl;
   background: white;
+  font-family: 'Vazir', 'B Nazanin', 'Tahoma', sans-serif;
+  direction: rtl;
+  color: #333;
 }
 
+// Header
 .print-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 2px solid #333;
+  border-bottom: 3px double #1e3a5f;
   padding-bottom: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 
   .header-logo {
     .logo {
       width: 80px;
-      height: 80px;
-      object-fit: contain;
+      height: auto;
     }
   }
 
   .header-title {
     text-align: center;
     flex: 1;
+    padding: 0 20px;
 
     h1 {
       font-size: 18px;
       font-weight: bold;
       margin: 0 0 5px 0;
+      color: #1e3a5f;
     }
 
     h2 {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: bold;
       margin: 0 0 5px 0;
+      color: #2c5282;
     }
 
     h3 {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: bold;
-      margin: 0;
-      color: #333;
+      margin: 10px 0 0 0;
+      color: #1e3a5f;
+      background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+      padding: 8px 20px;
+      border-radius: 4px;
     }
   }
 
   .header-info {
     text-align: left;
-    font-size: 12px;
+    font-size: 11px;
+    color: #4a5568;
 
     p {
       margin: 3px 0;
@@ -57,96 +66,222 @@
   }
 }
 
+// Sections
 .print-section {
   margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
 
   .section-title {
-    background: #f0f0f0;
-    padding: 8px 15px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    color: white;
+    padding: 10px 15px;
+    margin: 0;
     font-size: 14px;
     font-weight: bold;
-    margin: 0 0 10px 0;
-    border-right: 4px solid #333;
-  }
-}
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-.info-table {
-  width: 100%;
-  border-collapse: collapse;
-
-  td {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    font-size: 12px;
-  }
-
-  .label {
-    background: #f9f9f9;
-    font-weight: bold;
-    width: 20%;
-  }
-
-  .value {
-    width: 30%;
-
-    &.total {
-      font-weight: bold;
-      color: #2e7d32;
+    i {
+      font-size: 12px;
     }
   }
 }
 
+// Info Table
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  tr {
+    &:nth-child(even) {
+      background-color: #f7fafc;
+    }
+  }
+
+  td {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    font-size: 12px;
+    vertical-align: middle;
+
+    &.label {
+      background-color: #edf2f7;
+      font-weight: bold;
+      color: #2d3748;
+      width: 20%;
+      white-space: nowrap;
+    }
+
+    &.value {
+      color: #1a202c;
+      width: 30%;
+
+      &.total {
+        font-weight: bold;
+        color: #276749;
+        font-size: 14px;
+      }
+
+      &.highlight {
+        font-weight: bold;
+        color: #2b6cb0;
+        background-color: #ebf8ff;
+      }
+    }
+  }
+}
+
+// Signatures
 .signatures {
   display: flex;
   justify-content: space-between;
   margin-top: 40px;
   padding-top: 20px;
+  border-top: 1px dashed #cbd5e0;
 
   .signature-box {
     text-align: center;
     width: 30%;
 
-    p {
+    .signature-label {
       font-size: 12px;
       font-weight: bold;
+      color: #4a5568;
       margin-bottom: 40px;
     }
 
     .signature-line {
-      border-top: 1px solid #333;
-      width: 100%;
+      border-bottom: 1px solid #2d3748;
+      margin: 0 10px 5px 10px;
+    }
+
+    .signature-name {
+      font-size: 11px;
+      color: #718096;
+      margin-top: 5px;
     }
   }
 }
 
+// Footer
 .print-footer {
   margin-top: 30px;
+  padding-top: 15px;
+  border-top: 2px solid #1e3a5f;
   text-align: center;
-  font-size: 11px;
-  color: #666;
-  border-top: 1px solid #ddd;
-  padding-top: 10px;
+
+  p {
+    font-size: 11px;
+    color: #718096;
+    margin: 5px 0;
+
+    &:first-child {
+      font-weight: bold;
+      color: #c53030;
+    }
+  }
+
+  .print-date {
+    font-size: 10px;
+    color: #a0aec0;
+  }
 }
 
-.loading {
-  text-align: center;
-  padding: 50px;
-  font-size: 16px;
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #4a5568;
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #3182ce;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    margin-top: 15px;
+    font-size: 14px;
+  }
 }
 
+// Error
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #c53030;
+
+  i {
+    font-size: 48px;
+    margin-bottom: 15px;
+  }
+
+  p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .back-btn {
+    padding: 10px 20px;
+    background: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+      background: #2c5282;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Print Media Query
 @media print {
-  body {
-    margin: 0;
-    padding: 0;
-  }
-
-  .print-container {
-    padding: 10mm;
-    max-width: 100%;
-  }
-
   @page {
     size: A4;
     margin: 10mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-container {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-section .section-title {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .info-table td.label {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

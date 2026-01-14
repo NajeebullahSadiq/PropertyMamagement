@@ -19,21 +19,21 @@ public partial class PetitionWriterSecurities
     public string RegistrationNumber { get; set; } = string.Empty;
 
     /// <summary>
-    /// اسم عریضه‌نویس - Petition Writer Name
+    /// اسم عریضه نویس / وکیل - Petition Writer Name
     /// </summary>
     [Required]
     [MaxLength(200)]
     public string PetitionWriterName { get; set; } = string.Empty;
 
     /// <summary>
-    /// اسم پدر عریضه‌نویس - Petition Writer Father Name
+    /// اسم پدر عریضه‌نویس / وکیل - Petition Writer Father Name
     /// </summary>
     [Required]
     [MaxLength(200)]
     public string PetitionWriterFatherName { get; set; } = string.Empty;
 
     /// <summary>
-    /// نمبر جواز عریضه‌نویس - Petition Writer License Number
+    /// نمبر جواز عریضه‌نویس / وکیل - Petition Writer License Number
     /// </summary>
     [Required]
     [MaxLength(50)]

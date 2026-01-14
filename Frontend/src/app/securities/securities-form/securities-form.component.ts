@@ -14,7 +14,6 @@ import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { 
-    SecuritiesDistribution, 
     SecuritiesDistributionData,
     DocumentTypes,
     PropertySubTypes,
@@ -378,7 +377,7 @@ export class SecuritiesFormComponent implements OnInit {
             this.securitiesService.update(this.editId, data).subscribe({
                 next: (res) => {
                     this.toastr.success(res.message || 'رکورد با موفقیت بروزرسانی شد');
-                    this.router.navigate(['/securities/list']);
+                    // Stay on page for edit mode - just show success message
                 },
                 error: (err) => {
                     this.toastr.error(err.error?.message || 'خطا در بروزرسانی اطلاعات');
@@ -388,6 +387,7 @@ export class SecuritiesFormComponent implements OnInit {
             this.securitiesService.create(data).subscribe({
                 next: (res) => {
                     this.toastr.success(res.message || 'رکورد با موفقیت ثبت شد');
+                    // Redirect to list for create mode
                     this.router.navigate(['/securities/list']);
                 },
                 error: (err) => {
@@ -414,6 +414,13 @@ export class SecuritiesFormComponent implements OnInit {
         this.showVehicleExchangeFields = false;
         this.showRegistrationBookCount = false;
         this.showDuplicateBookCount = false;
+        
+        // If in edit mode, navigate to create page
+        if (this.isEditMode) {
+            this.isEditMode = false;
+            this.editId = null;
+            this.router.navigate(['/securities']);
+        }
     }
 
     goToList(): void {

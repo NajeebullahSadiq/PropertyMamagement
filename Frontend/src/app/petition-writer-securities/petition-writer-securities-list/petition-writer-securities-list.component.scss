@@ -1,8 +1,154 @@
-// List component styles
+// List styles matching Property and Vehicle modules
+
+// Table hover effects
 table {
-  border-collapse: collapse;
+  tbody {
+    tr {
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: #eff6ff;
+      }
+    }
+  }
+}
+
+// Action buttons
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
   
-  th, td {
-    white-space: nowrap;
+  &:hover {
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Pagination styling
+::ng-deep {
+  .ngx-pagination {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    
+    li {
+      a, span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.5rem;
+        height: 2.5rem;
+        padding: 0 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: #374151;
+        background: white;
+        border: 1px solid #e5e7eb;
+      }
+      
+      a:hover {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #3b82f6;
+      }
+      
+      &.current {
+        span {
+          background: #3b82f6;
+          border-color: #3b82f6;
+          color: white;
+        }
+      }
+      
+      &.disabled {
+        span {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+// Search input styling
+input[type="text"] {
+  &:focus {
+    outline: none;
+  }
+}
+
+// Empty state
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #9ca3af;
+  
+  i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    font-size: 1rem;
+  }
+}
+
+// Loading spinner
+.loading-spinner {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+  
+  table {
+    font-size: 0.75rem;
+    
+    th, td {
+      padding: 0.5rem 0.25rem;
+    }
+    
+    .action-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      
+      span {
+        display: none;
+      }
+    }
   }
 }

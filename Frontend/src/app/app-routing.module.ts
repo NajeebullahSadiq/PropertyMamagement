@@ -100,6 +100,14 @@ const routes: Routes = [
       { path: '', loadChildren: () => import('./petition-writer-securities/petition-writer-securities.module').then(m => m.PetitionWriterSecuritiesModule) }
     ]
   },
+  { 
+    path: 'securities-report', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', loadChildren: () => import('./securities-report/securities-report.module').then(m => m.SecuritiesReportModule) }
+    ]
+  },
   { path: 'forbidden', component: ForbiddenComponent },
   { path: 'print/:id', component: PrintComponent },
   { path: 'print', component: PrintComponent },

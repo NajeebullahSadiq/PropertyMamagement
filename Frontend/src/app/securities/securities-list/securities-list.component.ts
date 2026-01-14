@@ -1,30 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
-import { SecuritiesDistribution, PropertySubTypes, VehicleSubTypes } from 'src/app/models/SecuritiesDistribution';
+import { SecuritiesDistribution } from 'src/app/models/SecuritiesDistribution';
 
 @Component({
     selector: 'app-securities-list',
     templateUrl: './securities-list.component.html',
     styleUrls: ['./securities-list.component.scss']
 })
-export class SecuritiesListComponent implements OnInit {
+export class SecuritiesListComponent implements OnInit, OnDestroy {
     items: SecuritiesDistribution[] = [];
+    filteredItems: SecuritiesDistribution[] = [];
     totalCount = 0;
     page = 1;
     pageSize = 10;
-    totalPages = 0;
+    pageSizes = [5, 10, 25, 50];
     searchTerm = '';
     isLoading = false;
-    Math = Math; // Make Math available in template
 
     // RBAC
     canEdit = false;
     canDelete = false;
     isViewOnly = false;
+
+    private dataChangedSub?: Subscription;
 
     constructor(
         private securitiesService: SecuritiesService,
@@ -37,6 +40,15 @@ export class SecuritiesListComponent implements OnInit {
     ngOnInit(): void {
         this.checkPermissions();
         this.loadData();
+
+        // Subscribe to data changes
+        this.dataChangedSub = this.securitiesService.dataChanged$.subscribe(() => {
+            this.loadData();
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.dataChangedSub?.unsubscribe();
     }
 
     checkPermissions(): void {
@@ -50,11 +62,11 @@ export class SecuritiesListComponent implements OnInit {
         this.isLoading = true;
         const calendar = this.calendarService.getSelectedCalendar();
         
-        this.securitiesService.getAll(this.page, this.pageSize, this.searchTerm, calendar).subscribe({
+        this.securitiesService.getAll(1, 1000, '', calendar).subscribe({
             next: (response) => {
                 this.items = response.items;
                 this.totalCount = response.totalCount;
-                this.totalPages = response.totalPages;
+                this.applyFilter();
                 this.isLoading = false;
             },
             error: (err) => {
@@ -65,14 +77,35 @@ export class SecuritiesListComponent implements OnInit {
         });
     }
 
+    applyFilter(): void {
+        if (!this.searchTerm.trim()) {
+            this.filteredItems = [...this.items];
+        } else {
+            const term = this.searchTerm.toLowerCase().trim();
+            this.filteredItems = this.items.filter(item =>
+                (item.registrationNumber?.toLowerCase().includes(term)) ||
+                (item.transactionGuideName?.toLowerCase().includes(term)) ||
+                (item.licenseNumber?.toLowerCase().includes(term)) ||
+                (item.bankReceiptNumber?.toLowerCase().includes(term)) ||
+                (item.licenseOwnerName?.toLowerCase().includes(term))
+            );
+        }
+        this.totalCount = this.filteredItems.length;
+        // Reset items to filtered for pagination
+        this.items = this.filteredItems;
+    }
+
     onSearch(): void {
         this.page = 1;
-        this.loadData();
+        this.applyFilter();
     }
 
     onPageChange(page: number): void {
         this.page = page;
-        this.loadData();
+    }
+
+    onPageSizeChange(): void {
+        this.page = 1;
     }
 
     viewDetails(id: number): void {
@@ -103,18 +136,6 @@ export class SecuritiesListComponent implements OnInit {
 
     createNew(): void {
         this.router.navigate(['/securities']);
-    }
-
-    getPropertySubTypeName(subType: number | undefined): string {
-        if (!subType) return '-';
-        const found = PropertySubTypes.find(x => x.id === subType);
-        return found ? found.name : '-';
-    }
-
-    getVehicleSubTypeName(subType: number | undefined): string {
-        if (!subType) return '-';
-        const found = VehicleSubTypes.find(x => x.id === subType);
-        return found ? found.name : '-';
     }
 
     getTotalDocumentCount(item: SecuritiesDistribution): number {

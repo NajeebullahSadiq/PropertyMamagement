@@ -14,13 +14,8 @@ import { PetitionWriterSecurities } from 'src/app/models/PetitionWriterSecuritie
 export class PetitionWriterSecuritiesViewComponent implements OnInit {
     item: PetitionWriterSecurities | null = null;
     isLoading = true;
+    error: string | null = null;
     canEdit = false;
-
-    // Collapsible sections
-    sections = {
-        tab1: true,
-        tab2: true
-    };
 
     constructor(
         private route: ActivatedRoute,
@@ -36,6 +31,9 @@ export class PetitionWriterSecuritiesViewComponent implements OnInit {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             this.loadData(parseInt(id, 10));
+        } else {
+            this.error = 'شناسه سند یافت نشد';
+            this.isLoading = false;
         }
     }
 
@@ -52,15 +50,11 @@ export class PetitionWriterSecuritiesViewComponent implements OnInit {
                 this.isLoading = false;
             },
             error: (err) => {
-                this.toastr.error('خطا در بارگذاری اطلاعات');
+                this.error = 'خطا در بارگذاری اطلاعات';
                 this.isLoading = false;
                 console.error(err);
             }
         });
-    }
-
-    toggleSection(section: keyof typeof this.sections): void {
-        this.sections[section] = !this.sections[section];
     }
 
     editItem(): void {
@@ -71,7 +65,15 @@ export class PetitionWriterSecuritiesViewComponent implements OnInit {
 
     printItem(): void {
         if (this.item?.id) {
-            window.open(`/printPetitionWriterSecurities/${this.item.id}`, '_blank');
+            const tree = this.router.createUrlTree(['/printPetitionWriterSecurities', this.item.id]);
+            const url = tree.toString();
+            const absoluteUrl = `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
+            const newWindow = window.open(absoluteUrl, '_blank', 'noopener,noreferrer');
+            if (newWindow) {
+                newWindow.opener = null;
+            } else {
+                this.router.navigateByUrl(tree);
+            }
         }
     }
 

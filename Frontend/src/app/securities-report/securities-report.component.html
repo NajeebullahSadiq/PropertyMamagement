@@ -1,0 +1,456 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 print:p-0 print:bg-white">
+  <!-- Header Section -->
+  <div class="mb-6 print:mb-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-dari-3xl font-dari-bold text-slate-800 mb-1">گزارش‌گیری اسناد بهادار رهنمای معاملات</h1>
+        <p class="text-slate-500 text-sm">تولید گزارش‌های پویا و قابل تنظیم</p>
+      </div>
+      <div class="flex gap-2 print:hidden">
+        <button (click)="exportToPdf()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center gap-2 transition-colors">
+          <mat-icon class="text-lg">picture_as_pdf</mat-icon>
+          <span>چاپ / PDF</span>
+        </button>
+        <button (click)="exportToExcel()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center gap-2 transition-colors">
+          <mat-icon class="text-lg">table_chart</mat-icon>
+          <span>Excel</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Panel -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 print:hidden">
+    <div class="p-4 border-b border-slate-200 flex items-center justify-between cursor-pointer" (click)="isFilterPanelOpen = !isFilterPanelOpen">
+      <div class="flex items-center gap-2">
+        <mat-icon class="text-primary">filter_list</mat-icon>
+        <span class="font-dari-semibold text-slate-700">فیلترها و تنظیمات گزارش</span>
+      </div>
+      <mat-icon class="text-slate-400 transition-transform" [class.rotate-180]="isFilterPanelOpen">expand_more</mat-icon>
+    </div>
+    
+    <div *ngIf="isFilterPanelOpen" class="p-4">
+      <!-- Date Filters -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">از تاریخ</label>
+          <app-multi-calendar-datepicker [(ngModel)]="startDate" class="block"></app-multi-calendar-datepicker>
+        </div>
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">الی تاریخ</label>
+          <app-multi-calendar-datepicker [(ngModel)]="endDate" class="block"></app-multi-calendar-datepicker>
+        </div>
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">نام رهنمای معاملات</label>
+          <input type="text" [(ngModel)]="transactionGuideName" 
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                 placeholder="جستجو...">
+        </div>
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">نمبر جواز</label>
+          <input type="text" [(ngModel)]="licenseNumber" 
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                 placeholder="جستجو...">
+        </div>
+      </div>
+
+      <!-- Entity Filters -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">نوع سته</label>
+          <select [(ngModel)]="documentType" 
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
+            <option [ngValue]="null">همه</option>
+            <option *ngFor="let type of config?.documentTypes" [ngValue]="type.id">{{ type.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">نوع کتاب ثبت</label>
+          <select [(ngModel)]="registrationBookType" 
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
+            <option [ngValue]="null">همه</option>
+            <option *ngFor="let type of config?.bookTypes" [ngValue]="type.id">{{ type.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">حداقل مبلغ</label>
+          <input type="number" [(ngModel)]="minAmount" 
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                 placeholder="0">
+        </div>
+        <div>
+          <label class="block text-xs font-dari-medium text-slate-600 mb-1">حداکثر مبلغ</label>
+          <input type="number" [(ngModel)]="maxAmount" 
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                 placeholder="0">
+        </div>
+      </div>
+
+      <!-- Grouping Options -->
+      <div class="mb-4">
+        <label class="block text-xs font-dari-medium text-slate-600 mb-2">گروه‌بندی بر اساس</label>
+        <div class="flex flex-wrap gap-2">
+          <button *ngFor="let option of config?.groupByOptions"
+                  (click)="toggleGroupBy(option.id)"
+                  [class.bg-primary]="isGroupBySelected(option.id)"
+                  [class.text-white]="isGroupBySelected(option.id)"
+                  [class.bg-slate-100]="!isGroupBySelected(option.id)"
+                  [class.text-slate-700]="!isGroupBySelected(option.id)"
+                  class="px-3 py-1.5 rounded-full text-xs font-dari-medium transition-colors">
+            {{ option.name }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-2 pt-4 border-t border-slate-200">
+        <button (click)="applyFilters()" 
+                class="px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-dari-medium transition-colors flex items-center gap-2">
+          <mat-icon class="text-lg">search</mat-icon>
+          اعمال فیلتر
+        </button>
+        <button (click)="generateReport()" 
+                class="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-dari-medium transition-colors flex items-center gap-2">
+          <mat-icon class="text-lg">assessment</mat-icon>
+          تولید گزارش
+        </button>
+        <button (click)="resetFilters()" 
+                class="px-6 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-dari-medium transition-colors flex items-center gap-2">
+          <mat-icon class="text-lg">refresh</mat-icon>
+          پاک کردن
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Tabs -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 print:shadow-none print:border-0">
+    <!-- Tab Navigation -->
+    <div class="flex border-b border-slate-200 overflow-x-auto print:hidden">
+      <button (click)="onTabChange('summary')" 
+              [class.border-primary]="activeTab === 'summary'"
+              [class.text-primary]="activeTab === 'summary'"
+              [class.border-transparent]="activeTab !== 'summary'"
+              class="px-4 py-3 text-sm font-dari-medium border-b-2 whitespace-nowrap transition-colors hover:text-primary">
+        <mat-icon class="text-lg align-middle ml-1">summarize</mat-icon>
+        خلاصه آماری
+      </button>
+      <button (click)="onTabChange('byGuide')" 
+              [class.border-primary]="activeTab === 'byGuide'"
+              [class.text-primary]="activeTab === 'byGuide'"
+              [class.border-transparent]="activeTab !== 'byGuide'"
+              class="px-4 py-3 text-sm font-dari-medium border-b-2 whitespace-nowrap transition-colors hover:text-primary">
+        <mat-icon class="text-lg align-middle ml-1">business</mat-icon>
+        به تفکیک رهنمای معاملات
+      </button>
+      <button (click)="onTabChange('byDocumentType')" 
+              [class.border-primary]="activeTab === 'byDocumentType'"
+              [class.text-primary]="activeTab === 'byDocumentType'"
+              [class.border-transparent]="activeTab !== 'byDocumentType'"
+              class="px-4 py-3 text-sm font-dari-medium border-b-2 whitespace-nowrap transition-colors hover:text-primary">
+        <mat-icon class="text-lg align-middle ml-1">description</mat-icon>
+        به تفکیک نوع سته
+      </button>
+      <button (click)="onTabChange('byBookType')" 
+              [class.border-primary]="activeTab === 'byBookType'"
+              [class.text-primary]="activeTab === 'byBookType'"
+              [class.border-transparent]="activeTab !== 'byBookType'"
+              class="px-4 py-3 text-sm font-dari-medium border-b-2 whitespace-nowrap transition-colors hover:text-primary">
+        <mat-icon class="text-lg align-middle ml-1">menu_book</mat-icon>
+        به تفکیک کتاب ثبت
+      </button>
+      <button (click)="onTabChange('monthlyTrend')" 
+              [class.border-primary]="activeTab === 'monthlyTrend'"
+              [class.text-primary]="activeTab === 'monthlyTrend'"
+              [class.border-transparent]="activeTab !== 'monthlyTrend'"
+              class="px-4 py-3 text-sm font-dari-medium border-b-2 whitespace-nowrap transition-colors hover:text-primary">
+        <mat-icon class="text-lg align-middle ml-1">trending_up</mat-icon>
+        روند ماهانه
+      </button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="p-8 text-center">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+      <p class="mt-2 text-slate-500">در حال بارگذاری...</p>
+    </div>
+
+    <!-- Summary Tab -->
+    <div *ngIf="activeTab === 'summary' && !isLoading && summary" class="p-4">
+      <h2 class="text-lg font-dari-bold text-slate-800 mb-4 print:text-center">خلاصه آماری اسناد بهادار</h2>
+      
+      <!-- Quantitative Stats -->
+      <div class="mb-6">
+        <h3 class="text-sm font-dari-semibold text-slate-600 mb-3 flex items-center gap-2">
+          <mat-icon class="text-emerald-500">analytics</mat-icon>
+          گزارش‌های کمی
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
+            <div class="text-2xl font-dari-bold text-emerald-700">{{ formatNumber(summary.totalDocuments) }}</div>
+            <div class="text-xs text-emerald-600">تعداد مجموعی سته‌ها</div>
+          </div>
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+            <div class="text-2xl font-dari-bold text-blue-700">{{ formatNumber(summary.propertySaleCount) }}</div>
+            <div class="text-xs text-blue-600">سته خرید و فروش جایداد</div>
+          </div>
+          <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+            <div class="text-2xl font-dari-bold text-purple-700">{{ formatNumber(summary.bayWafaCount) }}</div>
+            <div class="text-xs text-purple-600">سته بیع وفا</div>
+          </div>
+          <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
+            <div class="text-2xl font-dari-bold text-amber-700">{{ formatNumber(summary.rentCount) }}</div>
+            <div class="text-xs text-amber-600">سته کرایی</div>
+          </div>
+          <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 border border-cyan-200">
+            <div class="text-2xl font-dari-bold text-cyan-700">{{ formatNumber(summary.vehicleSaleCount) }}</div>
+            <div class="text-xs text-cyan-600">سته خرید و فروش وسایط</div>
+          </div>
+          <div class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-4 border border-pink-200">
+            <div class="text-2xl font-dari-bold text-pink-700">{{ formatNumber(summary.vehicleExchangeCount) }}</div>
+            <div class="text-xs text-pink-600">سته تبادله</div>
+          </div>
+          <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 border border-indigo-200">
+            <div class="text-2xl font-dari-bold text-indigo-700">{{ formatNumber(summary.registrationBookCount) }}</div>
+            <div class="text-xs text-indigo-600">کتاب ثبت</div>
+          </div>
+          <div class="bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl p-4 border border-rose-200">
+            <div class="text-2xl font-dari-bold text-rose-700">{{ formatNumber(summary.duplicateBookCount) }}</div>
+            <div class="text-xs text-rose-600">کتاب ثبت مثنی</div>
+          </div>
+          <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-4 border border-teal-200">
+            <div class="text-2xl font-dari-bold text-teal-700">{{ formatNumber(summary.totalBookCount) }}</div>
+            <div class="text-xs text-teal-600">مجموع کتاب ثبت</div>
+          </div>
+          <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
+            <div class="text-2xl font-dari-bold text-slate-700">{{ formatNumber(summary.totalRecords) }}</div>
+            <div class="text-xs text-slate-600">تعداد رکوردها</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Stats -->
+      <div>
+        <h3 class="text-sm font-dari-semibold text-slate-600 mb-3 flex items-center gap-2">
+          <mat-icon class="text-amber-500">payments</mat-icon>
+          گزارش‌های مالی
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
+            <div class="text-3xl font-dari-bold text-green-700">{{ formatNumber(summary.totalDocumentsPrice) }}</div>
+            <div class="text-sm text-green-600 mt-1">مبلغ پول مجموعه سته‌ها (افغانی)</div>
+          </div>
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
+            <div class="text-3xl font-dari-bold text-blue-700">{{ formatNumber(summary.totalRegistrationBookPrice) }}</div>
+            <div class="text-sm text-blue-600 mt-1">مبلغ پول کتاب ثبت (افغانی)</div>
+          </div>
+          <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
+            <div class="text-3xl font-dari-bold text-purple-700">{{ formatNumber(summary.totalSecuritiesPrice) }}</div>
+            <div class="text-sm text-purple-600 mt-1">مبلغ پول مجموع اسناد بهادار (افغانی)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- By Guide Tab -->
+    <div *ngIf="activeTab === 'byGuide' && !isLoading" class="p-4">
+      <h2 class="text-lg font-dari-bold text-slate-800 mb-4">گزارش به تفکیک رهنمای معاملات</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">#</th>
+              <th class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">نام رهنمای معاملات</th>
+              <th class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">نمبر جواز</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">تعداد رکورد</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">سته جایداد</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">سته وسایط</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">کتاب ثبت</th>
+              <th class="px-3 py-2 text-left font-dari-semibold text-slate-600 border-b">مبلغ مجموع</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of byGuideData; let i = index" class="hover:bg-slate-50 border-b border-slate-100">
+              <td class="px-3 py-2 text-slate-500">{{ i + 1 }}</td>
+              <td class="px-3 py-2 font-dari-medium text-slate-800">{{ row.transactionGuideName }}</td>
+              <td class="px-3 py-2 text-slate-600">{{ row.licenseNumber }}</td>
+              <td class="px-3 py-2 text-center">{{ row.recordCount }}</td>
+              <td class="px-3 py-2 text-center">
+                <span class="text-blue-600">{{ row.propertySaleCount + row.bayWafaCount + row.rentCount }}</span>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <span class="text-purple-600">{{ row.vehicleSaleCount + row.vehicleExchangeCount }}</span>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <span class="text-amber-600">{{ row.registrationBookCount + row.duplicateBookCount }}</span>
+              </td>
+              <td class="px-3 py-2 text-left font-dari-semibold text-emerald-600">{{ formatNumber(row.totalSecuritiesPrice) }}</td>
+            </tr>
+          </tbody>
+          <tfoot class="bg-slate-100">
+            <tr>
+              <td colspan="3" class="px-3 py-2 font-dari-bold text-slate-800">مجموع</td>
+              <td class="px-3 py-2 text-center font-dari-bold">{{ getByGuideTotal('recordCount') }}</td>
+              <td class="px-3 py-2 text-center font-dari-bold text-blue-600">{{ getByGuideTotal('propertyDocs') }}</td>
+              <td class="px-3 py-2 text-center font-dari-bold text-purple-600">{{ getByGuideTotal('vehicleDocs') }}</td>
+              <td class="px-3 py-2 text-center font-dari-bold text-amber-600">{{ getByGuideTotal('books') }}</td>
+              <td class="px-3 py-2 text-left font-dari-bold text-emerald-600">{{ formatNumber(getByGuideTotal('totalPrice')) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      
+      <div *ngIf="byGuideData.length === 0" class="text-center py-8 text-slate-500">
+        <mat-icon class="text-4xl text-slate-300">inbox</mat-icon>
+        <p class="mt-2">داده‌ای یافت نشد</p>
+      </div>
+    </div>
+
+    <!-- By Document Type Tab -->
+    <div *ngIf="activeTab === 'byDocumentType' && !isLoading" class="p-4">
+      <h2 class="text-lg font-dari-bold text-slate-800 mb-4">گزارش به تفکیک نوع سته</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngFor="let docType of byDocumentTypeData" class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-primary to-primary-dark p-4">
+            <h3 class="text-white font-dari-bold">{{ docType.documentTypeName }}</h3>
+          </div>
+          <div class="p-4">
+            <div *ngFor="let subType of docType.subTypes" class="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
+              <div>
+                <div class="font-dari-medium text-slate-800">{{ subType.name }}</div>
+                <div class="text-xs text-slate-500">تعداد: {{ formatNumber(subType.count) }}</div>
+              </div>
+              <div class="text-left">
+                <div class="font-dari-bold text-emerald-600">{{ formatNumber(subType.amount) }}</div>
+                <div class="text-xs text-slate-500">افغانی</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="byDocumentTypeData.length === 0" class="text-center py-8 text-slate-500">
+        <mat-icon class="text-4xl text-slate-300">inbox</mat-icon>
+        <p class="mt-2">داده‌ای یافت نشد</p>
+      </div>
+    </div>
+
+    <!-- By Book Type Tab -->
+    <div *ngIf="activeTab === 'byBookType' && !isLoading && byBookTypeData" class="p-4">
+      <h2 class="text-lg font-dari-bold text-slate-800 mb-4">گزارش به تفکیک کتاب ثبت</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-5 border border-indigo-200">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-white">menu_book</mat-icon>
+            </div>
+            <div class="font-dari-bold text-indigo-800">{{ byBookTypeData.newBooks?.name }}</div>
+          </div>
+          <div class="text-3xl font-dari-bold text-indigo-700">{{ formatNumber(byBookTypeData.newBooks?.count || 0) }}</div>
+          <div class="text-sm text-indigo-600 mt-1">مبلغ: {{ formatNumber(byBookTypeData.newBooks?.amount || 0) }} افغانی</div>
+        </div>
+        
+        <div class="bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl p-5 border border-rose-200">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-white">content_copy</mat-icon>
+            </div>
+            <div class="font-dari-bold text-rose-800">{{ byBookTypeData.duplicateBooks?.name }}</div>
+          </div>
+          <div class="text-3xl font-dari-bold text-rose-700">{{ formatNumber(byBookTypeData.duplicateBooks?.count || 0) }}</div>
+          <div class="text-sm text-rose-600 mt-1">مبلغ: {{ formatNumber(byBookTypeData.duplicateBooks?.amount || 0) }} افغانی</div>
+        </div>
+        
+        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-5 border border-emerald-200">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-white">library_books</mat-icon>
+            </div>
+            <div class="font-dari-bold text-emerald-800">مجموع کتاب ثبت</div>
+          </div>
+          <div class="text-3xl font-dari-bold text-emerald-700">{{ formatNumber(byBookTypeData.totalBooks?.count || 0) }}</div>
+          <div class="text-sm text-emerald-600 mt-1">مبلغ: {{ formatNumber(byBookTypeData.totalBooks?.amount || 0) }} افغانی</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Trend Tab -->
+    <div *ngIf="activeTab === 'monthlyTrend' && !isLoading" class="p-4">
+      <h2 class="text-lg font-dari-bold text-slate-800 mb-4">روند ماهانه توزیع اسناد بهادار</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">سال</th>
+              <th class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">ماه</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">تعداد رکورد</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">تعداد سته‌ها</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">تعداد کتاب ثبت</th>
+              <th class="px-3 py-2 text-left font-dari-semibold text-slate-600 border-b">مبلغ مجموع</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of monthlyTrendData" class="hover:bg-slate-50 border-b border-slate-100">
+              <td class="px-3 py-2 text-slate-800">{{ row.year }}</td>
+              <td class="px-3 py-2 font-dari-medium text-slate-800">{{ row.monthName }}</td>
+              <td class="px-3 py-2 text-center">{{ row.recordCount }}</td>
+              <td class="px-3 py-2 text-center text-blue-600">{{ formatNumber(row.totalDocuments) }}</td>
+              <td class="px-3 py-2 text-center text-purple-600">{{ formatNumber(row.totalBooks) }}</td>
+              <td class="px-3 py-2 text-left font-dari-semibold text-emerald-600">{{ formatNumber(row.totalAmount) }}</td>
+            </tr>
+          </tbody>
+          <tfoot class="bg-slate-100" *ngIf="monthlyTrendData.length > 0">
+            <tr>
+              <td colspan="2" class="px-3 py-2 font-dari-bold text-slate-800">مجموع</td>
+              <td class="px-3 py-2 text-center font-dari-bold">{{ getMonthlyTotal('recordCount') }}</td>
+              <td class="px-3 py-2 text-center font-dari-bold text-blue-600">{{ formatNumber(getMonthlyTotal('totalDocuments')) }}</td>
+              <td class="px-3 py-2 text-center font-dari-bold text-purple-600">{{ formatNumber(getMonthlyTotal('totalBooks')) }}</td>
+              <td class="px-3 py-2 text-left font-dari-bold text-emerald-600">{{ formatNumber(getMonthlyTotal('totalAmount')) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      
+      <div *ngIf="monthlyTrendData.length === 0" class="text-center py-8 text-slate-500">
+        <mat-icon class="text-4xl text-slate-300">inbox</mat-icon>
+        <p class="mt-2">داده‌ای یافت نشد</p>
+      </div>
+    </div>
+
+    <!-- Custom Report Data (when generated) -->
+    <div *ngIf="reportData.length > 0 && !isLoading" class="p-4 border-t border-slate-200">
+      <h2 class="text-lg font-dari-bold text-slate-800 mb-4">نتایج گزارش سفارشی</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">#</th>
+              <th *ngIf="selectedGroupBy.includes('transaction_guide')" class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">رهنمای معاملات</th>
+              <th *ngIf="selectedGroupBy.includes('license_number')" class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">نمبر جواز</th>
+              <th *ngIf="selectedGroupBy.includes('document_type')" class="px-3 py-2 text-right font-dari-semibold text-slate-600 border-b">نوع سته</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">تعداد سته‌ها</th>
+              <th class="px-3 py-2 text-center font-dari-semibold text-slate-600 border-b">تعداد کتاب ثبت</th>
+              <th class="px-3 py-2 text-left font-dari-semibold text-slate-600 border-b">مبلغ مجموع</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of reportData; let i = index" class="hover:bg-slate-50 border-b border-slate-100">
+              <td class="px-3 py-2 text-slate-500">{{ i + 1 }}</td>
+              <td *ngIf="selectedGroupBy.includes('transaction_guide')" class="px-3 py-2 font-dari-medium text-slate-800">{{ row.transactionGuideName }}</td>
+              <td *ngIf="selectedGroupBy.includes('license_number')" class="px-3 py-2 text-slate-600">{{ row.licenseNumber }}</td>
+              <td *ngIf="selectedGroupBy.includes('document_type')" class="px-3 py-2 text-slate-600">{{ row.documentTypeName }}</td>
+              <td class="px-3 py-2 text-center text-blue-600">{{ row.totalDocuments }}</td>
+              <td class="px-3 py-2 text-center text-purple-600">{{ row.totalBooks }}</td>
+              <td class="px-3 py-2 text-left font-dari-semibold text-emerald-600">{{ formatNumber(row.totalSecuritiesPrice) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
