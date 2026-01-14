@@ -11,227 +11,156 @@ namespace WebAPIBackend.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Add new start/end columns for Property Sale
-            migrationBuilder.AddColumn<string>(
-                name: "PropertySaleSerialStart",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "PropertySaleSerialEnd",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            // Add new start/end columns for Bay Wafa
-            migrationBuilder.AddColumn<string>(
-                name: "BayWafaSerialStart",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "BayWafaSerialEnd",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            // Add new start/end columns for Rent
-            migrationBuilder.AddColumn<string>(
-                name: "RentSerialStart",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "RentSerialEnd",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            // Add new start/end columns for Vehicle Sale
-            migrationBuilder.AddColumn<string>(
-                name: "VehicleSaleSerialStart",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "VehicleSaleSerialEnd",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            // Add new start/end columns for Vehicle Exchange
-            migrationBuilder.AddColumn<string>(
-                name: "VehicleExchangeSerialStart",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "VehicleExchangeSerialEnd",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            // Migrate existing data: copy old serial numbers to start fields
+            // Use raw SQL to add columns with correct schema
             migrationBuilder.Sql(@"
-                UPDATE ""SecuritiesDistributions""
-                SET ""PropertySaleSerialStart"" = ""PropertySaleSerialNumber""
-                WHERE ""PropertySaleSerialNumber"" IS NOT NULL;
+                -- Add new start/end columns for Property Sale
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""PropertySaleSerialStart"" VARCHAR(100);
 
-                UPDATE ""SecuritiesDistributions""
-                SET ""BayWafaSerialStart"" = ""BayWafaSerialNumber""
-                WHERE ""BayWafaSerialNumber"" IS NOT NULL;
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""PropertySaleSerialEnd"" VARCHAR(100);
 
-                UPDATE ""SecuritiesDistributions""
-                SET ""RentSerialStart"" = ""RentSerialNumber""
-                WHERE ""RentSerialNumber"" IS NOT NULL;
+                -- Add new start/end columns for Bay Wafa
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""BayWafaSerialStart"" VARCHAR(100);
 
-                UPDATE ""SecuritiesDistributions""
-                SET ""VehicleSaleSerialStart"" = ""VehicleSaleSerialNumber""
-                WHERE ""VehicleSaleSerialNumber"" IS NOT NULL;
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""BayWafaSerialEnd"" VARCHAR(100);
 
-                UPDATE ""SecuritiesDistributions""
-                SET ""VehicleExchangeSerialStart"" = ""VehicleExchangeSerialNumber""
-                WHERE ""VehicleExchangeSerialNumber"" IS NOT NULL;
+                -- Add new start/end columns for Rent
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""RentSerialStart"" VARCHAR(100);
+
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""RentSerialEnd"" VARCHAR(100);
+
+                -- Add new start/end columns for Vehicle Sale
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""VehicleSaleSerialStart"" VARCHAR(100);
+
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""VehicleSaleSerialEnd"" VARCHAR(100);
+
+                -- Add new start/end columns for Vehicle Exchange
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""VehicleExchangeSerialStart"" VARCHAR(100);
+
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""VehicleExchangeSerialEnd"" VARCHAR(100);
+
+                -- Migrate existing data if old columns exist
+                DO $$
+                BEGIN
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                               WHERE table_schema = 'org' 
+                               AND table_name = 'SecuritiesDistribution' 
+                               AND column_name = 'PropertySaleSerialNumber') THEN
+                        UPDATE org.""SecuritiesDistribution""
+                        SET ""PropertySaleSerialStart"" = ""PropertySaleSerialNumber""
+                        WHERE ""PropertySaleSerialNumber"" IS NOT NULL;
+
+                        ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN ""PropertySaleSerialNumber"";
+                    END IF;
+
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                               WHERE table_schema = 'org' 
+                               AND table_name = 'SecuritiesDistribution' 
+                               AND column_name = 'BayWafaSerialNumber') THEN
+                        UPDATE org.""SecuritiesDistribution""
+                        SET ""BayWafaSerialStart"" = ""BayWafaSerialNumber""
+                        WHERE ""BayWafaSerialNumber"" IS NOT NULL;
+
+                        ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN ""BayWafaSerialNumber"";
+                    END IF;
+
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                               WHERE table_schema = 'org' 
+                               AND table_name = 'SecuritiesDistribution' 
+                               AND column_name = 'RentSerialNumber') THEN
+                        UPDATE org.""SecuritiesDistribution""
+                        SET ""RentSerialStart"" = ""RentSerialNumber""
+                        WHERE ""RentSerialNumber"" IS NOT NULL;
+
+                        ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN ""RentSerialNumber"";
+                    END IF;
+
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                               WHERE table_schema = 'org' 
+                               AND table_name = 'SecuritiesDistribution' 
+                               AND column_name = 'VehicleSaleSerialNumber') THEN
+                        UPDATE org.""SecuritiesDistribution""
+                        SET ""VehicleSaleSerialStart"" = ""VehicleSaleSerialNumber""
+                        WHERE ""VehicleSaleSerialNumber"" IS NOT NULL;
+
+                        ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN ""VehicleSaleSerialNumber"";
+                    END IF;
+
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                               WHERE table_schema = 'org' 
+                               AND table_name = 'SecuritiesDistribution' 
+                               AND column_name = 'VehicleExchangeSerialNumber') THEN
+                        UPDATE org.""SecuritiesDistribution""
+                        SET ""VehicleExchangeSerialStart"" = ""VehicleExchangeSerialNumber""
+                        WHERE ""VehicleExchangeSerialNumber"" IS NOT NULL;
+
+                        ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN ""VehicleExchangeSerialNumber"";
+                    END IF;
+                END $$;
             ");
-
-            // Drop old columns
-            migrationBuilder.DropColumn(
-                name: "PropertySaleSerialNumber",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "BayWafaSerialNumber",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "RentSerialNumber",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "VehicleSaleSerialNumber",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "VehicleExchangeSerialNumber",
-                table: "SecuritiesDistributions");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Re-add old columns
-            migrationBuilder.AddColumn<string>(
-                name: "PropertySaleSerialNumber",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "BayWafaSerialNumber",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "RentSerialNumber",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "VehicleSaleSerialNumber",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "VehicleExchangeSerialNumber",
-                table: "SecuritiesDistributions",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: true);
-
-            // Migrate data back: copy start fields to old serial number columns
             migrationBuilder.Sql(@"
-                UPDATE ""SecuritiesDistributions""
+                -- Re-add old columns
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""PropertySaleSerialNumber"" VARCHAR(100);
+
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""BayWafaSerialNumber"" VARCHAR(100);
+
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""RentSerialNumber"" VARCHAR(100);
+
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""VehicleSaleSerialNumber"" VARCHAR(100);
+
+                ALTER TABLE org.""SecuritiesDistribution"" 
+                ADD COLUMN IF NOT EXISTS ""VehicleExchangeSerialNumber"" VARCHAR(100);
+
+                -- Migrate data back
+                UPDATE org.""SecuritiesDistribution""
                 SET ""PropertySaleSerialNumber"" = ""PropertySaleSerialStart""
                 WHERE ""PropertySaleSerialStart"" IS NOT NULL;
 
-                UPDATE ""SecuritiesDistributions""
+                UPDATE org.""SecuritiesDistribution""
                 SET ""BayWafaSerialNumber"" = ""BayWafaSerialStart""
                 WHERE ""BayWafaSerialStart"" IS NOT NULL;
 
-                UPDATE ""SecuritiesDistributions""
+                UPDATE org.""SecuritiesDistribution""
                 SET ""RentSerialNumber"" = ""RentSerialStart""
                 WHERE ""RentSerialStart"" IS NOT NULL;
 
-                UPDATE ""SecuritiesDistributions""
+                UPDATE org.""SecuritiesDistribution""
                 SET ""VehicleSaleSerialNumber"" = ""VehicleSaleSerialStart""
                 WHERE ""VehicleSaleSerialStart"" IS NOT NULL;
 
-                UPDATE ""SecuritiesDistributions""
+                UPDATE org.""SecuritiesDistribution""
                 SET ""VehicleExchangeSerialNumber"" = ""VehicleExchangeSerialStart""
                 WHERE ""VehicleExchangeSerialStart"" IS NOT NULL;
+
+                -- Drop new columns
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""PropertySaleSerialStart"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""PropertySaleSerialEnd"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""BayWafaSerialStart"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""BayWafaSerialEnd"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""RentSerialStart"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""RentSerialEnd"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""VehicleSaleSerialStart"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""VehicleSaleSerialEnd"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""VehicleExchangeSerialStart"";
+                ALTER TABLE org.""SecuritiesDistribution"" DROP COLUMN IF EXISTS ""VehicleExchangeSerialEnd"";
             ");
-
-            // Drop new columns
-            migrationBuilder.DropColumn(
-                name: "PropertySaleSerialStart",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "PropertySaleSerialEnd",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "BayWafaSerialStart",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "BayWafaSerialEnd",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "RentSerialStart",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "RentSerialEnd",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "VehicleSaleSerialStart",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "VehicleSaleSerialEnd",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "VehicleExchangeSerialStart",
-                table: "SecuritiesDistributions");
-
-            migrationBuilder.DropColumn(
-                name: "VehicleExchangeSerialEnd",
-                table: "SecuritiesDistributions");
         }
     }
 }

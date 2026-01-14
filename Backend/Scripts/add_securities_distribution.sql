@@ -17,19 +17,24 @@ CREATE TABLE IF NOT EXISTS org."SecuritiesDistribution" (
     "PropertySubType" INTEGER,
     "VehicleSubType" INTEGER,
     
-    -- Property Document Fields
+    -- Property Document Fields (with start/end serial numbers)
     "PropertySaleCount" INTEGER,
-    "PropertySaleSerialNumber" VARCHAR(100),
+    "PropertySaleSerialStart" VARCHAR(100),
+    "PropertySaleSerialEnd" VARCHAR(100),
     "BayWafaCount" INTEGER,
-    "BayWafaSerialNumber" VARCHAR(100),
+    "BayWafaSerialStart" VARCHAR(100),
+    "BayWafaSerialEnd" VARCHAR(100),
     "RentCount" INTEGER,
-    "RentSerialNumber" VARCHAR(100),
+    "RentSerialStart" VARCHAR(100),
+    "RentSerialEnd" VARCHAR(100),
     
-    -- Vehicle Document Fields
+    -- Vehicle Document Fields (with start/end serial numbers)
     "VehicleSaleCount" INTEGER,
-    "VehicleSaleSerialNumber" VARCHAR(100),
+    "VehicleSaleSerialStart" VARCHAR(100),
+    "VehicleSaleSerialEnd" VARCHAR(100),
     "VehicleExchangeCount" INTEGER,
-    "VehicleExchangeSerialNumber" VARCHAR(100),
+    "VehicleExchangeSerialStart" VARCHAR(100),
+    "VehicleExchangeSerialEnd" VARCHAR(100),
     
     -- Registration Book Fields
     "RegistrationBookType" INTEGER,

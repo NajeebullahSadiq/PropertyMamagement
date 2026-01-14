@@ -114,7 +114,7 @@ namespace WebAPIBackend.Controllers.Securities
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "خطا در دریافت اطلاعات", error = ex.Message });
+                return StatusCode(500, new { message = "خطا در دریافت اطلاعات", error = ex.Message, innerError = ex.InnerException?.Message });
             }
         }
 
