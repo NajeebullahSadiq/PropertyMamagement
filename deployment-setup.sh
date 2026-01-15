@@ -148,8 +148,8 @@ Wants=postgresql.service
 [Service]
 Type=notify
 User=www-data
-WorkingDirectory=/var/www/prmis/backend/publish
-ExecStart=/usr/bin/dotnet /var/www/prmis/backend/publish/WebAPIBackend.dll
+WorkingDirectory=/var/www/prmis/backend
+ExecStart=/usr/bin/dotnet /var/www/prmis/backend/WebAPIBackend.dll
 Restart=always
 RestartSec=10
 StandardOutput=journal

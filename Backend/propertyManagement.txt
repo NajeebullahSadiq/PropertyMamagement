@@ -1,30 +1,39 @@
-propertyManagement 
-
-user: moj@103.132.98.92
-pass:moJ@321$%
-
-
-
-curl -X POST http://localhost:5000/api/ApplicationUser/Login \
-  -H "Content-Type: application/json" \
-  -d '{"UserName": "admin", "Password": "Admin@123"}' \
-  -v
+# ============================================
+# PRMIS Production Deployment Guide
+# ============================================
+# Repository: ~/PropertyMamagement (contains both Frontend and Backend)
+# 
+# File Storage: /var/www/prmis/storage/Resources/ (persists across deployments)
+# Frontend: /var/www/prmis/frontend/
+# Backend: /var/www/prmis/backend/
+# ============================================
 
 
+# ============================================
+# DEPLOY FRONTEND ONLY
+# ============================================
+# Run this when you only changed Angular/Frontend code
 
-
-cd ~/PropertyMamagement/Frontend
+cd ~/PropertyMamagement
 git pull origin main
+cd Frontend
 npm install --legacy-peer-deps
 npx ng build --configuration production
 sudo rm -rf /var/www/prmis/frontend/*
-sudo cp -r ~/PropertyMamagement/Frontend/dist/property-registeration-mis/* /var/www/prmis/frontend/
+sudo cp -r dist/property-registeration-mis/* /var/www/prmis/frontend/
 sudo chown -R www-data:www-data /var/www/prmis/frontend
 sudo chmod -R 755 /var/www/prmis/frontend
+echo "Frontend deployed successfully!"
 
 
-cd /var/www/prmis/Backend
-sudo git pull origin main
+# ============================================
+# DEPLOY BACKEND ONLY
+# ============================================
+# Run this when you only changed .NET/Backend code
+
+cd ~/PropertyMamagement
+git pull origin main
+cd Backend
 dotnet build WebAPIBackend.csproj --configuration Release
 dotnet publish WebAPIBackend.csproj --configuration Release --output ./publish
 sudo find /var/www/prmis/backend -mindepth 1 -maxdepth 1 ! -name 'Resources' -exec rm -rf {} +
@@ -32,41 +41,62 @@ sudo cp -r ./publish/* /var/www/prmis/backend/
 sudo chown -R www-data:www-data /var/www/prmis/backend
 sudo chmod -R 755 /var/www/prmis/backend
 sudo systemctl restart prmis-backend
-sudo journalctl -u prmis-backend -n 30 --no-pager
+sudo systemctl status prmis-backend
+echo "Backend deployed successfully!"
 
 
-cd ~/PropertyMamagement/Backend
+# ============================================
+# DEPLOY BOTH FRONTEND AND BACKEND
+# ============================================
+# Run this when you changed both Frontend and Backend code
+
+cd ~/PropertyMamagement
+git pull origin main
+
+# Build and deploy Frontend
+cd Frontend
+npm install --legacy-peer-deps
+npx ng build --configuration production
+sudo rm -rf /var/www/prmis/frontend/*
+sudo cp -r dist/property-registeration-mis/* /var/www/prmis/frontend/
+sudo chown -R www-data:www-data /var/www/prmis/frontend
+sudo chmod -R 755 /var/www/prmis/frontend
+
+# Build and deploy Backend
+cd ../Backend
 dotnet build WebAPIBackend.csproj --configuration Release
 dotnet publish WebAPIBackend.csproj --configuration Release --output ./publish
-
-sudo systemctl stop prmis-backend
-sudo rm -rf /var/www/prmis/backend/*
+sudo find /var/www/prmis/backend -mindepth 1 -maxdepth 1 ! -name 'Resources' -exec rm -rf {} +
 sudo cp -r ./publish/* /var/www/prmis/backend/
 sudo chown -R www-data:www-data /var/www/prmis/backend
 sudo chmod -R 755 /var/www/prmis/backend
-sudo systemctl start prmis-backend
-sudo systemctl status prmis-backend --no-pager
-
-
-for Build
-dotnet build WebAPIBackend.csproj
-for migration
-dotnet ef database update --context AppDbContext
-
-
-
-# Create the missing Resources directory
-sudo mkdir -p /var/www/prmis/backend/Resources
-
-# Set proper permissions
-sudo chown -R www-data:www-data /var/www/prmis/backend
-sudo chmod -R 755 /var/www/prmis/backend
-
-# Restart the backend service
 sudo systemctl restart prmis-backend
-
-# Check if it's running now
 sudo systemctl status prmis-backend
+echo "Full deployment completed!"
 
-# Check the logs
-sudo journalctl -u prmis-backend -n 20 --no-pager
+
+# ============================================
+# CHECK BACKEND LOGS (if issues occur)
+# ============================================
+sudo journalctl -u prmis-backend -n 50 --no-pager
+
+
+# ============================================
+# ONE-TIME SETUP (already done - for reference)
+# ============================================
+# These commands only need to be run once on a new server:
+#
+# # Create storage directory for uploaded files
+# sudo mkdir -p /var/www/prmis/storage/Resources/Documents/{Profile,Identity,Property,Vehicle,Company,License}
+# sudo mkdir -p /var/www/prmis/storage/Resources/Images
+# sudo chown -R www-data:www-data /var/www/prmis/storage
+# sudo chmod -R 755 /var/www/prmis/storage
+#
+# # Create .dotnet directory for www-data user
+# sudo mkdir -p /var/www/.dotnet
+# sudo chown -R www-data:www-data /var/www/.dotnet
+# sudo chmod -R 755 /var/www/.dotnet
+#
+# # Update systemd service to use correct path
+# sudo sed -i 's|/var/www/prmis/backend/publish|/var/www/prmis/backend|g' /etc/systemd/system/prmis-backend.service
+# sudo systemctl daemon-reload
