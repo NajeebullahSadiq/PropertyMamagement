@@ -119,6 +119,12 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<SecuritiesDistribution> SecuritiesDistributions { get; set; }
         public virtual DbSet<PetitionWriterSecurities> PetitionWriterSecurities { get; set; }
         public virtual DbSet<SecuritiesControl> SecuritiesControls { get; set; }
+        
+        // License Applications Module
+        public virtual DbSet<WebAPIBackend.Models.LicenseApplication.LicenseApplicationEntity> LicenseApplications { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.LicenseApplication.LicenseApplicationGuarantor> LicenseApplicationGuarantors { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.LicenseApplication.LicenseApplicationWithdrawal> LicenseApplicationWithdrawals { get; set; }
+        
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -282,6 +288,99 @@ namespace WebAPIBackend.Configuration
                 entity.HasIndex(e => e.RegistrationNumber).IsUnique();
                 entity.HasIndex(e => e.LicenseNumber);
                 entity.HasIndex(e => e.BankReceiptNumber);
+            });
+
+            // License Applications Module Configuration
+            modelBuilder.Entity<WebAPIBackend.Models.LicenseApplication.LicenseApplicationEntity>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("LicenseApplications_pkey");
+                entity.ToTable("LicenseApplications", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50);
+                entity.Property(e => e.RequestSerialNumber).HasMaxLength(50);
+                entity.Property(e => e.ApplicantName).HasMaxLength(200);
+                entity.Property(e => e.ProposedGuideName).HasMaxLength(200);
+                entity.Property(e => e.PermanentVillage).HasMaxLength(500);
+                entity.Property(e => e.CurrentVillage).HasMaxLength(500);
+
+                entity.HasIndex(e => e.RequestSerialNumber).IsUnique();
+                entity.HasIndex(e => e.ApplicantName);
+                entity.HasIndex(e => e.ProposedGuideName);
+
+                entity.HasOne(d => d.PermanentProvince).WithMany()
+                    .HasForeignKey(d => d.PermanentProvinceId)
+                    .HasConstraintName("LicenseApplications_PermanentProvinceId_fkey");
+
+                entity.HasOne(d => d.PermanentDistrict).WithMany()
+                    .HasForeignKey(d => d.PermanentDistrictId)
+                    .HasConstraintName("LicenseApplications_PermanentDistrictId_fkey");
+
+                entity.HasOne(d => d.CurrentProvince).WithMany()
+                    .HasForeignKey(d => d.CurrentProvinceId)
+                    .HasConstraintName("LicenseApplications_CurrentProvinceId_fkey");
+
+                entity.HasOne(d => d.CurrentDistrict).WithMany()
+                    .HasForeignKey(d => d.CurrentDistrictId)
+                    .HasConstraintName("LicenseApplications_CurrentDistrictId_fkey");
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.LicenseApplication.LicenseApplicationGuarantor>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("LicenseApplicationGuarantors_pkey");
+                entity.ToTable("LicenseApplicationGuarantors", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.GuarantorName).HasMaxLength(200);
+                entity.Property(e => e.GuarantorFatherName).HasMaxLength(200);
+                entity.Property(e => e.ShariaDeedNumber).HasMaxLength(100);
+                entity.Property(e => e.CustomaryDeedSerialNumber).HasMaxLength(100);
+                entity.Property(e => e.PermanentVillage).HasMaxLength(500);
+                entity.Property(e => e.CurrentVillage).HasMaxLength(500);
+                entity.Property(e => e.CashAmount).HasPrecision(18, 2);
+
+                entity.HasOne(d => d.LicenseApplication).WithMany(p => p.Guarantors)
+                    .HasForeignKey(d => d.LicenseApplicationId)
+                    .HasConstraintName("LicenseApplicationGuarantors_LicenseApplicationId_fkey");
+
+                entity.HasOne(d => d.GuaranteeType).WithMany()
+                    .HasForeignKey(d => d.GuaranteeTypeId)
+                    .HasConstraintName("LicenseApplicationGuarantors_GuaranteeTypeId_fkey");
+
+                entity.HasOne(d => d.PermanentProvince).WithMany()
+                    .HasForeignKey(d => d.PermanentProvinceId)
+                    .HasConstraintName("LicenseApplicationGuarantors_PermanentProvinceId_fkey");
+
+                entity.HasOne(d => d.PermanentDistrict).WithMany()
+                    .HasForeignKey(d => d.PermanentDistrictId)
+                    .HasConstraintName("LicenseApplicationGuarantors_PermanentDistrictId_fkey");
+
+                entity.HasOne(d => d.CurrentProvince).WithMany()
+                    .HasForeignKey(d => d.CurrentProvinceId)
+                    .HasConstraintName("LicenseApplicationGuarantors_CurrentProvinceId_fkey");
+
+                entity.HasOne(d => d.CurrentDistrict).WithMany()
+                    .HasForeignKey(d => d.CurrentDistrictId)
+                    .HasConstraintName("LicenseApplicationGuarantors_CurrentDistrictId_fkey");
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.LicenseApplication.LicenseApplicationWithdrawal>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("LicenseApplicationWithdrawals_pkey");
+                entity.ToTable("LicenseApplicationWithdrawals", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.WithdrawalReason).HasMaxLength(1000);
+
+                entity.HasIndex(e => e.LicenseApplicationId).IsUnique();
+
+                entity.HasOne(d => d.LicenseApplication).WithOne(p => p.Withdrawal)
+                    .HasForeignKey<WebAPIBackend.Models.LicenseApplication.LicenseApplicationWithdrawal>(d => d.LicenseApplicationId)
+                    .HasConstraintName("LicenseApplicationWithdrawals_LicenseApplicationId_fkey");
             });
 
             modelBuilder.Entity<CompanyOwner>(entity =>

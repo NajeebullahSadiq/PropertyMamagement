@@ -124,6 +124,14 @@ const routes: Routes = [
       { path: '', loadChildren: () => import('./petition-writer-report/petition-writer-report.module').then(m => m.PetitionWriterReportModule) }
     ]
   },
+  { 
+    path: 'license-applications', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard, CompanyModuleGuard],
+    children: [
+      { path: '', loadChildren: () => import('./license-applications/license-applications.module').then(m => m.LicenseApplicationsModule) }
+    ]
+  },
   { path: 'forbidden', component: ForbiddenComponent },
   { path: 'print/:id', component: PrintComponent },
   { path: 'print', component: PrintComponent },

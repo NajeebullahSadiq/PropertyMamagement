@@ -156,6 +156,13 @@
       <a routerLink="/petition-writer-report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>analytics</mat-icon><span>گزارش‌گیری سند بهادار عریضه‌نویسان</span>
       </a>
+      <div *ngIf="canAccessCompany" class="section-label">درخواست جواز رهنمای معاملات</div>
+      <a *ngIf="canAccessCompany && !isViewOnly" routerLink="/license-applications" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>assignment</mat-icon><span>ثبت درخواست متقاضیان</span>
+      </a>
+      <a *ngIf="canAccessCompany" routerLink="/license-applications/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>list_alt</mat-icon><span>جدول ثبت درخواست متقاضیان</span>
+      </a>
       <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
       <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>

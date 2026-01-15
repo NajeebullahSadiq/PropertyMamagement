@@ -1,0 +1,377 @@
+<div class="container">
+  <mat-tab-group #tabGroup [(selectedIndex)]="selectedTabIndex">
+    <!-- Tab 1: مشخصات درخواست متقاضی -->
+    <mat-tab>
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">person</mat-icon>
+        مشخصات درخواست متقاضی
+      </ng-template>
+      <section class="w-full bg-gray-50 py-8">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">ثبت درخواست متقاضیان جواز رهنمای معاملات</h1>
+            <p class="text-center text-gray-600">لطفا معلومات درخواست متقاضی را با دقت تکمیل نمایید</p>
+          </div>
+          <form [formGroup]="applicationForm" (ngSubmit)="saveApplication()">
+            <!-- Basic Info Section -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+              <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fas fa-info-circle"></i>
+                  <span>معلومات اساسی درخواست</span>
+                </h2>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div>
+                    <app-multi-calendar-datepicker formControlName="requestDate" label="تاریخ درخواست" [required]="true">
+                    </app-multi-calendar-datepicker>
+                    <div *ngIf="requestDate?.invalid && (requestDate?.dirty || requestDate?.touched)">
+                      <small class="text-red-600 text-xs mt-1 block" *ngIf="requestDate?.errors?.['required']">این فیلد الزامی است</small>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مسلسل درخواست <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="requestSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <div *ngIf="requestSerialNumber?.invalid && (requestSerialNumber?.dirty || requestSerialNumber?.touched)">
+                      <small class="text-red-600 text-xs mt-1 block" *ngIf="requestSerialNumber?.errors?.['required']">این فیلد الزامی است</small>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت متقاضی <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="applicantName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <div *ngIf="applicantName?.invalid && (applicantName?.dirty || applicantName?.touched)">
+                      <small class="text-red-600 text-xs mt-1 block" *ngIf="applicantName?.errors?.['required']">این فیلد الزامی است</small>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">نام پیشنهادی رهنما <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="proposedGuideName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <div *ngIf="proposedGuideName?.invalid && (proposedGuideName?.dirty || proposedGuideName?.touched)">
+                      <small class="text-red-600 text-xs mt-1 block" *ngIf="proposedGuideName?.errors?.['required']">این فیلد الزامی است</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Permanent Address Section -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+              <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>سکونت اصلی</span>
+                </h2>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="permanentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onPermanentProvinceChange($event)" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="permanentDistrictId" [items]="permanentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">قریه / گذر <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="permanentVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Current Address Section -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+              <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>سکونت فعلی</span>
+                </h2>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="currentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onCurrentProvinceChange($event)" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="currentDistrictId" [items]="currentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">قریه / گذر <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="currentVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-4 justify-center pb-6">
+              <button type="submit" [disabled]="applicationForm.invalid || isViewOnly" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas" [ngClass]="isEditMode ? 'fa-edit' : 'fa-save'"></i>
+                <span>{{isEditMode ? 'تغییر معلومات' : 'ثبت معلومات'}}</span>
+              </button>
+              <button type="button" (click)="resetAll()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-plus-circle"></i>
+                <span>جدید</span>
+              </button>
+              <button type="button" (click)="goToList()" class="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-list"></i>
+                <span>لیست</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </mat-tab>
+
+    <!-- Tab 2: تضمین‌کنندگان -->
+    <mat-tab [disabled]="!licenseAppService.mainTableId">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">security</mat-icon>
+        تضمین‌کنندگان
+      </ng-template>
+      <section class="w-full bg-gray-50 py-8">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات تضمین‌کنندگان</h1>
+            <p class="text-center text-gray-600">لطفا معلومات تضمین‌کننده را با دقت تکمیل نمایید</p>
+          </div>
+          <form [formGroup]="guarantorForm" (ngSubmit)="saveGuarantor()">
+            <!-- Guarantor Info Section -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+              <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fas fa-user-shield"></i>
+                  <span>معلومات تضمین‌کننده</span>
+                </h2>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت تضمین‌کننده <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="guarantorName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ولد</label>
+                    <input type="text" formControlName="guarantorFatherName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ضمانت <span class="text-red-500">*</span></label>
+                    <ng-select [items]="guaranteeTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="guaranteeTypeId" (change)="onGuaranteeTypeChange()" class="custom-ng-select"></ng-select>
+                  </div>
+                </div>
+
+                <!-- Conditional Fields - Cash -->
+                <div *ngIf="showCashFields" class="border-t border-gray-200 pt-6 mt-6">
+                  <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <i class="fas fa-money-bill-wave text-green-600"></i>
+                    <span>معلومات پول نقد</span>
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">مبلغ پول نقد</label>
+                      <input type="number" formControlName="cashAmount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Conditional Fields - Sharia Deed -->
+                <div *ngIf="showShariaDeedFields" class="border-t border-gray-200 pt-6 mt-6">
+                  <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <i class="fas fa-gavel text-amber-600"></i>
+                    <span>معلومات قباله شرعی</span>
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر قباله شرعی</label>
+                      <input type="text" formControlName="shariaDeedNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    </div>
+                    <div>
+                      <app-multi-calendar-datepicker formControlName="shariaDeedDate" label="تاریخ قباله شرعی"></app-multi-calendar-datepicker>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Conditional Fields - Customary Deed -->
+                <div *ngIf="showCustomaryDeedFields" class="border-t border-gray-200 pt-6 mt-6">
+                  <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <i class="fas fa-scroll text-orange-600"></i>
+                    <span>معلومات قباله عرفی</span>
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">سریال نمبر سته قباله عرفی</label>
+                      <input type="text" formControlName="customaryDeedSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guarantor Permanent Address -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+              <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>سکونت اصلی تضمین‌کننده</span>
+                </h2>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="permanentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onGuarantorPermanentProvinceChange($event)" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="permanentDistrictId" [items]="guarantorPermanentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">قریه / گذر <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="permanentVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guarantor Current Address -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+              <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>سکونت فعلی تضمین‌کننده</span>
+                </h2>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="currentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onGuarantorCurrentProvinceChange($event)" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی <span class="text-red-500">*</span></label>
+                    <ng-select formControlName="currentDistrictId" [items]="guarantorCurrentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">قریه / گذر <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="currentVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-4 justify-center pb-6">
+              <button type="submit" [disabled]="guarantorForm.invalid || isViewOnly" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas" [ngClass]="selectedGuarantorId ? 'fa-edit' : 'fa-save'"></i>
+                <span>{{selectedGuarantorId ? 'تغییر معلومات' : 'ثبت معلومات'}}</span>
+              </button>
+              <button type="button" (click)="resetGuarantorForm()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-plus-circle"></i>
+                <span>جدید</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Guarantors List Table -->
+          <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-8">
+            <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-table"></i>
+                <span>لیست تضمین‌کنندگان</span>
+              </h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50 border-b-2 border-gray-200">
+                  <tr class="text-center">
+                    <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت</th>
+                    <th class="px-4 py-4 text-sm font-bold text-gray-700">ولد</th>
+                    <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت ضمانت</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <tr *ngFor="let g of guarantorsList" class="text-center hover:bg-orange-50 transition-colors cursor-pointer" (click)="selectGuarantor(g)">
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ g.guarantorName }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ g.guarantorFatherName || '-' }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ getGuaranteeTypeName(g.guaranteeTypeId) }}</td>
+                  </tr>
+                  <tr *ngIf="guarantorsList.length === 0">
+                    <td colspan="3" class="px-4 py-8 text-center text-gray-500">هیچ تضمین‌کننده‌ای ثبت نشده است</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </mat-tab>
+
+    <!-- Tab 3: انصراف -->
+    <mat-tab [disabled]="!licenseAppService.mainTableId">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">cancel</mat-icon>
+        انصراف
+      </ng-template>
+      <section class="w-full bg-gray-50 py-8">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">ثبت معلومات انصراف</h1>
+            <p class="text-center text-gray-600">در صورت انصراف متقاضی، معلومات ذیل را تکمیل نمایید</p>
+          </div>
+          <form [formGroup]="withdrawalForm" (ngSubmit)="saveWithdrawal()">
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+              <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                  <i class="fas fa-times-circle"></i>
+                  <span>معلومات انصراف</span>
+                </h2>
+              </div>
+              <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">علت انصراف <span class="text-red-500">*</span></label>
+                    <textarea formControlName="withdrawalReason" rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                  </div>
+                  <div>
+                    <app-multi-calendar-datepicker formControlName="withdrawalDate" label="تاریخ انصراف" [required]="true"></app-multi-calendar-datepicker>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-4 justify-center pb-6">
+              <button type="submit" [disabled]="withdrawalForm.invalid || isViewOnly" class="px-8 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-save"></i>
+                <span>ثبت انصراف</span>
+              </button>
+              <button *ngIf="withdrawalData" type="button" (click)="deleteWithdrawal()" [disabled]="isViewOnly" class="px-8 py-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-trash"></i>
+                <span>حذف انصراف</span>
+              </button>
+            </div>
+
+            <!-- Withdrawal Status Display -->
+            <div *ngIf="withdrawalData" class="bg-red-50 border border-red-200 rounded-xl p-6 mt-6">
+              <h3 class="text-lg font-bold text-red-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>وضعیت: منصرف‌شده</span>
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span class="text-sm text-gray-600">علت انصراف:</span>
+                  <p class="font-semibold text-gray-800">{{ withdrawalData.withdrawalReason }}</p>
+                </div>
+                <div>
+                  <span class="text-sm text-gray-600">تاریخ انصراف:</span>
+                  <p class="font-semibold text-gray-800">{{ withdrawalData.withdrawalDateFormatted || '-' }}</p>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+    </mat-tab>
+  </mat-tab-group>
+</div>

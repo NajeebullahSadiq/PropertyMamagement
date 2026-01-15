@@ -1,0 +1,56 @@
+.container {
+  padding: 1rem;
+}
+
+::ng-deep .mat-mdc-tab-group {
+  .mat-mdc-tab-header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+    border-radius: 12px 12px 0 0;
+    padding: 0.5rem;
+  }
+
+  .mat-mdc-tab {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    min-width: 140px;
+
+    &.mdc-tab--active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+    }
+
+    .mat-icon {
+      margin-left: 8px;
+      font-size: 20px;
+    }
+  }
+
+  .mat-mdc-tab-body-wrapper {
+    background: #f8fafc;
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+.large-icon {
+  font-size: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+::ng-deep .custom-ng-select {
+  .ng-select-container {
+    border-radius: 0.5rem;
+    border-color: #d1d5db;
+    min-height: 42px;
+
+    &:hover {
+      border-color: #9ca3af;
+    }
+  }
+
+  &.ng-select-focused .ng-select-container {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+}
