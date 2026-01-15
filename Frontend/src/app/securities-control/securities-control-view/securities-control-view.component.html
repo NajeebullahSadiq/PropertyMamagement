@@ -60,27 +60,27 @@
                 <div class="space-y-3">
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">شماره مسلسل:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.serialNumber || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.serialNumber || '-' }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">نوع سند بهادار:</span>
-                    <span class="font-semibold text-gray-800">{{ getSecurityDocumentTypeName(item?.securityDocumentType!) }}</span>
+                    <span class="font-semibold text-gray-800">{{ getSecurityDocumentTypeName(item.securityDocumentType) }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">نمبر پیشنهاد:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.proposalNumber || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.proposalNumber || '-' }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">تاریخ پیشنهاد:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.proposalDateFormatted || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.proposalDateFormatted || '-' }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">نمبر تکت توزیع:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.distributionTicketNumber || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.distributionTicketNumber || '-' }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">تاریخ تسلیمی:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.deliveryDateFormatted || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.deliveryDateFormatted || '-' }}</span>
                   </div>
                 </div>
               </div>
@@ -96,7 +96,7 @@
                 <div class="space-y-3">
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">نوع اسناد بهادار:</span>
-                    <span class="font-semibold text-gray-800">{{ getSecuritiesTypeName(item?.securitiesType) }}</span>
+                    <span class="font-semibold text-gray-800">{{ getSecuritiesTypeName(item.securitiesType) }}</span>
                   </div>
                   
                   <!-- Property Sale Fields -->
@@ -245,15 +245,15 @@
                 <div class="space-y-3">
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">نمبر ثبت آغاز توزیع:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.distributionStartNumber || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.distributionStartNumber || '-' }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">نمبر ثبت ختم توزیع:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.distributionEndNumber || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.distributionEndNumber || '-' }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">تعداد دریافتکنندگان اسناد:</span>
-                    <span class="font-semibold text-gray-800">{{ item?.distributedPersonsCount || 0 }}</span>
+                    <span class="font-semibold text-gray-800">{{ item.distributedPersonsCount || 0 }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">تعداد کل اسناد توزیع شده:</span>
