@@ -19,6 +19,8 @@ const routes: Routes = [
   { path: '', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) }, 
   { path: 'Auth', redirectTo: '', pathMatch: 'full' },
   { path: 'Auth/Login', redirectTo: '', pathMatch: 'full' },
+  // Public verification portal (no auth required)
+  { path: 'verify', loadChildren: () => import('./verify/verify.module').then(m => m.VerifyModule) },
   // Register page with master layout (authenticated)
   { 
     path: 'Auth/Register', 

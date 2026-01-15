@@ -103,6 +103,15 @@
             دیتابیس
             قیمت جواز نامه: <span class="val">(پانزده هزار افغانی)</span>
           </p>
+
+          <!-- QR Code Verification Section -->
+          <div class="verification-section" *ngIf="verificationCode">
+            <div class="qr-code-container">
+              <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" *ngIf="qrCodeUrl">
+              <p class="verification-code">{{ verificationCode }}</p>
+              <p class="verification-label">کود تصدیق سند</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

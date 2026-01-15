@@ -4,6 +4,7 @@ import { combineLatest } from 'rxjs';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
 import { CompnaydetailService } from '../shared/compnaydetail.service';
+import { VerificationService } from '../shared/verification.service';
 import { environment } from 'src/environments/environment';
 import { AccountInfo } from '../models/AccountInfo';
 
@@ -19,12 +20,19 @@ export class PrintLicenseComponent implements OnInit {
   accountInfo: AccountInfo | null = null;
   isLoading: boolean = true;
   error: string | null = null;
+  
+  // Verification properties
+  verificationCode: string = '';
+  verificationUrl: string = '';
+  qrCodeUrl: string = '';
+  verificationError: string | null = null;
 
   constructor(
     public service: AuthService,
     private route: ActivatedRoute,
     private pservice: PropertyService,
-    private companyService: CompnaydetailService
+    private companyService: CompnaydetailService,
+    private verificationService: VerificationService
   ) {}
 
   ngOnInit(): void {
@@ -63,17 +71,16 @@ export class PrintLicenseComponent implements OnInit {
             this.companyService.getAccountInfoByCompanyId(this.data.companyId).subscribe({
               next: (info) => {
                 this.accountInfo = info;
-                this.isLoading = false;
-                this.triggerPrint();
+                // Fetch verification code after account info
+                this.fetchVerificationCode();
               },
               error: () => {
-                this.isLoading = false;
-                this.triggerPrint();
+                // Still try to fetch verification code even if account info fails
+                this.fetchVerificationCode();
               }
             });
           } else {
-            this.isLoading = false;
-            this.triggerPrint();
+            this.fetchVerificationCode();
           }
         },
         error: (err) => {
@@ -90,6 +97,34 @@ export class PrintLicenseComponent implements OnInit {
           this.isLoading = false;
         }
       });
+    });
+  }
+
+  private fetchVerificationCode(): void {
+    // Get the license ID from the data
+    const licenseId = this.data?.licenseId || this.data?.id;
+    
+    if (!licenseId) {
+      console.warn('[PrintLicense] No license ID found for verification');
+      this.isLoading = false;
+      this.triggerPrint();
+      return;
+    }
+
+    this.verificationService.generateVerificationCode(licenseId, 'RealEstateLicense').subscribe({
+      next: (result) => {
+        this.verificationCode = result.verificationCode;
+        this.verificationUrl = result.verificationUrl;
+        this.qrCodeUrl = this.verificationService.generateQrCodeUrl(result.verificationUrl);
+        this.isLoading = false;
+        this.triggerPrint();
+      },
+      error: (err) => {
+        console.error('[PrintLicense] Error fetching verification code:', err);
+        this.verificationError = 'خطا در دریافت کود تصدیق';
+        this.isLoading = false;
+        this.triggerPrint();
+      }
     });
   }
 

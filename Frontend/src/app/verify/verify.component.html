@@ -1,0 +1,127 @@
+<div class="verify-container">
+  <!-- Header -->
+  <div class="verify-header">
+    <img src="/assets/img/afg.png" alt="نشان ملی افغانستان" class="national-emblem">
+    <h1>سیستم تصدیق اسناد</h1>
+    <p>وزارت عدلیه - ریاست امور رهنمای معاملات و عریضه نویسان</p>
+  </div>
+
+  <!-- Search Form -->
+  <div class="search-section">
+    <div class="search-box">
+      <label for="verificationCode">کود تصدیق سند را وارد کنید:</label>
+      <div class="input-group">
+        <input 
+          type="text" 
+          id="verificationCode"
+          [(ngModel)]="verificationCode" 
+          placeholder="مثال: LIC-2026-ABC123"
+          (keyup.enter)="verifyDocument()"
+          [disabled]="isLoading"
+          class="verification-input"
+          dir="ltr"
+        >
+        <button 
+          (click)="verifyDocument()" 
+          [disabled]="isLoading || !verificationCode"
+          class="verify-btn"
+        >
+          <span *ngIf="!isLoading">تصدیق</span>
+          <span *ngIf="isLoading">در حال بررسی...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-section">
+    <div class="spinner"></div>
+    <p>در حال تصدیق سند...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !isLoading" class="error-section">
+    <div class="error-icon">⚠️</div>
+    <p>{{ error }}</p>
+    <button (click)="resetSearch()" class="retry-btn">تلاش مجدد</button>
+  </div>
+
+  <!-- Result Section -->
+  <div *ngIf="result && !isLoading" class="result-section">
+    <!-- Status Banner -->
+    <div class="status-banner" [ngClass]="getStatusClass()">
+      <div class="status-icon">
+        <span *ngIf="result.status === 'Valid'">✓</span>
+        <span *ngIf="result.status === 'Expired'">⏰</span>
+        <span *ngIf="result.status === 'Revoked'">✗</span>
+        <span *ngIf="result.status === 'Invalid'">✗</span>
+      </div>
+      <div class="status-text">
+        <h2>{{ getStatusText() }}</h2>
+        <p *ngIf="result.status === 'Valid'">این سند معتبر و قابل اعتماد است</p>
+        <p *ngIf="result.status === 'Expired'">مدت اعتبار این سند به پایان رسیده است</p>
+        <p *ngIf="result.status === 'Revoked'">این سند لغو شده است: {{ result.revokedReason }}</p>
+        <p *ngIf="result.status === 'Invalid'">این کود تصدیق معتبر نیست</p>
+      </div>
+    </div>
+
+    <!-- Document Details (only show if valid or expired) -->
+    <div *ngIf="result.isValid || result.status === 'Expired'" class="document-details">
+      <div class="detail-header">
+        <h3>معلومات سند</h3>
+        <span class="document-type">{{ getDocumentTypeText() }}</span>
+      </div>
+
+      <div class="detail-content">
+        <!-- Photo -->
+        <div class="photo-section">
+          <img [src]="getPhotoUrl()" alt="عکس دارنده جواز" class="holder-photo" onerror="this.src='assets/img/avatar2.png'">
+        </div>
+
+        <!-- Info Grid -->
+        <div class="info-grid">
+          <div class="info-item" *ngIf="result.licenseNumber">
+            <label>شماره جواز:</label>
+            <span>{{ result.licenseNumber }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.holderName">
+            <label>نام دارنده:</label>
+            <span>{{ result.holderName }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.companyTitle">
+            <label>نام شرکت:</label>
+            <span>{{ result.companyTitle }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.issueDate">
+            <label>تاریخ صدور:</label>
+            <span>{{ result.issueDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.expiryDate">
+            <label>تاریخ انقضا:</label>
+            <span>{{ result.expiryDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="info-item full-width" *ngIf="result.officeAddress">
+            <label>آدرس دفتر:</label>
+            <span>{{ result.officeAddress }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="verification-info">
+        <p>کود تصدیق: <strong dir="ltr">{{ result.verificationCode }}</strong></p>
+        <p>تاریخ تصدیق: {{ result.verifiedAt | date:'yyyy/MM/dd HH:mm' }}</p>
+      </div>
+    </div>
+
+    <!-- Search Again Button -->
+    <div class="action-section">
+      <button (click)="resetSearch()" class="search-again-btn">تصدیق سند دیگر</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="verify-footer">
+    <p>© {{ 'now' | date:'yyyy' }} وزارت عدلیه - تمام حقوق محفوظ است</p>
+    <p class="help-text">برای تصدیق سند، کود QR روی سند را اسکن کنید یا کود تصدیق را وارد نمایید</p>
+  </div>
+</div>
