@@ -1,0 +1,35 @@
+.container {
+  direction: rtl;
+}
+
+.large-icon {
+  font-size: 20px;
+  margin-left: 8px;
+}
+
+::ng-deep .mat-mdc-tab-labels {
+  direction: rtl;
+}
+
+::ng-deep .mat-mdc-tab {
+  min-width: 160px;
+}
+
+::ng-deep .custom-ng-select {
+  .ng-select-container {
+    border-radius: 0.5rem;
+    border-color: #d1d5db;
+    min-height: 42px;
+    
+    &:hover {
+      border-color: #9ca3af;
+    }
+  }
+  
+  &.ng-select-focused {
+    .ng-select-container {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+  }
+}

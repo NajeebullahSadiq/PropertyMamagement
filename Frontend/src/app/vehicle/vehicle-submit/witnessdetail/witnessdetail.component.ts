@@ -17,6 +17,7 @@ export class WitnessdetailComponent {
   selectedId: number=0;
   witnessDetails!: witnessDetail[];
   nationalIdCardName: string = '';
+  private formInitialized = false;
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   @ViewChild('nationalIdComponent') nationalIdComponent!: VehicleNationalidUploadComponent;
@@ -42,8 +43,9 @@ export class WitnessdetailComponent {
         nationalIdCardPath: ['', Validators.required]
       });
 
+      // Only log invalid controls after form has been initialized and user has interacted
       this.withnessForm.statusChanges.subscribe(status => {
-        if (status === 'INVALID') {
+        if (status === 'INVALID' && this.formInitialized) {
           this.logInvalidControls();
         }
       });
@@ -81,6 +83,8 @@ export class WitnessdetailComponent {
         this.witnessDetails = [];
         this.selectedId = 0;
         this.setNationalIdRequired(true);
+        // Mark form as initialized after a short delay to avoid initial validation warnings
+        setTimeout(() => this.formInitialized = true, 100);
         return;
       }
       
@@ -90,6 +94,7 @@ export class WitnessdetailComponent {
         if (!witness || witness.length === 0) {
           this.selectedId = 0;
           this.setNationalIdRequired(true);
+          setTimeout(() => this.formInitialized = true, 100);
           return;
         }
         const existingNationalIdPath = witness?.[0]?.nationalIdCardPath || witness?.[0]?.nationalIdCard || '';
@@ -110,7 +115,8 @@ export class WitnessdetailComponent {
 
         this.withnessForm.updateValueAndValidity();
         
-        
+        // Mark form as initialized after data is loaded
+        setTimeout(() => this.formInitialized = true, 100);
       });
     }
     addwithnessDetails(): void {

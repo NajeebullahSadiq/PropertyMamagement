@@ -163,6 +163,13 @@
       <a *ngIf="canAccessCompany" routerLink="/license-applications/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>list_alt</mat-icon><span>جدول ثبت درخواست متقاضیان</span>
       </a>
+      <div class="section-label">ثبت جواز عریضه‌نویسان</div>
+      <a *ngIf="!isViewOnly" routerLink="/petition-writer-license" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>edit_note</mat-icon><span>ثبت جواز عریضه‌نویسان</span>
+      </a>
+      <a routerLink="/petition-writer-license/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>table_view</mat-icon><span>جدول ثبت جواز عریضه‌نویسان</span>
+      </a>
       <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
       <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>

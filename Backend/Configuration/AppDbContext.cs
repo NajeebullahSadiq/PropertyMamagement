@@ -125,6 +125,10 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<WebAPIBackend.Models.LicenseApplication.LicenseApplicationGuarantor> LicenseApplicationGuarantors { get; set; }
         public virtual DbSet<WebAPIBackend.Models.LicenseApplication.LicenseApplicationWithdrawal> LicenseApplicationWithdrawals { get; set; }
         
+        // Petition Writer License Module
+        public virtual DbSet<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterLicenseEntity> PetitionWriterLicenses { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterRelocation> PetitionWriterRelocations { get; set; }
+        
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -381,6 +385,70 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.LicenseApplication).WithOne(p => p.Withdrawal)
                     .HasForeignKey<WebAPIBackend.Models.LicenseApplication.LicenseApplicationWithdrawal>(d => d.LicenseApplicationId)
                     .HasConstraintName("LicenseApplicationWithdrawals_LicenseApplicationId_fkey");
+            });
+
+            // Petition Writer License Module Configuration
+            modelBuilder.Entity<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterLicenseEntity>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PetitionWriterLicenses_pkey");
+                entity.ToTable("PetitionWriterLicenses", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50);
+                entity.Property(e => e.LicenseNumber).HasMaxLength(50);
+                entity.Property(e => e.ApplicantName).HasMaxLength(200);
+                entity.Property(e => e.ApplicantFatherName).HasMaxLength(200);
+                entity.Property(e => e.ApplicantGrandFatherName).HasMaxLength(200);
+                entity.Property(e => e.ElectronicIdNumber).HasMaxLength(50);
+                entity.Property(e => e.PaperIdNumber).HasMaxLength(50);
+                entity.Property(e => e.PaperIdVolume).HasMaxLength(20);
+                entity.Property(e => e.PaperIdPage).HasMaxLength(20);
+                entity.Property(e => e.PaperIdRegNumber).HasMaxLength(50);
+                entity.Property(e => e.PermanentVillage).HasMaxLength(500);
+                entity.Property(e => e.CurrentVillage).HasMaxLength(500);
+                entity.Property(e => e.ActivityLocation).HasMaxLength(500);
+                entity.Property(e => e.BankReceiptNumber).HasMaxLength(100);
+                entity.Property(e => e.LicenseType).HasMaxLength(50);
+
+                entity.HasIndex(e => e.LicenseNumber).IsUnique();
+                entity.HasIndex(e => e.ApplicantName);
+                entity.HasIndex(e => e.LicenseStatus);
+
+                entity.HasOne(d => d.PermanentProvince).WithMany()
+                    .HasForeignKey(d => d.PermanentProvinceId)
+                    .HasConstraintName("PetitionWriterLicenses_PermanentProvinceId_fkey");
+
+                entity.HasOne(d => d.PermanentDistrict).WithMany()
+                    .HasForeignKey(d => d.PermanentDistrictId)
+                    .HasConstraintName("PetitionWriterLicenses_PermanentDistrictId_fkey");
+
+                entity.HasOne(d => d.CurrentProvince).WithMany()
+                    .HasForeignKey(d => d.CurrentProvinceId)
+                    .HasConstraintName("PetitionWriterLicenses_CurrentProvinceId_fkey");
+
+                entity.HasOne(d => d.CurrentDistrict).WithMany()
+                    .HasForeignKey(d => d.CurrentDistrictId)
+                    .HasConstraintName("PetitionWriterLicenses_CurrentDistrictId_fkey");
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterRelocation>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PetitionWriterRelocations_pkey");
+                entity.ToTable("PetitionWriterRelocations", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.NewActivityLocation).HasMaxLength(500);
+                entity.Property(e => e.Remarks).HasMaxLength(1000);
+
+                entity.HasIndex(e => e.PetitionWriterLicenseId);
+
+                entity.HasOne(d => d.PetitionWriterLicense).WithMany(p => p.Relocations)
+                    .HasForeignKey(d => d.PetitionWriterLicenseId)
+                    .HasConstraintName("PetitionWriterRelocations_PetitionWriterLicenseId_fkey")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<CompanyOwner>(entity =>
