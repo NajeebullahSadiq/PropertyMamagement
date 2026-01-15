@@ -84,8 +84,17 @@ print_status "Nginx installed and enabled"
 # ============================================
 print_info "Phase 6: Creating application directories..."
 mkdir -p /var/www/prmis/backend
+mkdir -p /var/www/prmis/backend/publish
 mkdir -p /var/www/prmis/frontend
-mkdir -p /var/www/prmis/backend/Resources
+mkdir -p /var/www/prmis/storage/Resources
+mkdir -p /var/www/prmis/storage/Resources/Images
+mkdir -p /var/www/prmis/storage/Resources/Documents
+mkdir -p /var/www/prmis/storage/Resources/Documents/Identity
+mkdir -p /var/www/prmis/storage/Resources/Documents/Profile
+mkdir -p /var/www/prmis/storage/Resources/Documents/Property
+mkdir -p /var/www/prmis/storage/Resources/Documents/Vehicle
+mkdir -p /var/www/prmis/storage/Resources/Documents/Company
+mkdir -p /var/www/prmis/storage/Resources/Documents/License
 mkdir -p /var/www/prmis/backups
 mkdir -p /var/log/prmis
 
@@ -154,7 +163,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/www/prmis/backend/publish/Resources
+ReadWritePaths=/var/www/prmis/storage
 
 [Install]
 WantedBy=multi-user.target
@@ -229,7 +238,14 @@ server {
     }
 
     location /Resources/ {
-        alias /var/www/prmis/backend/publish/Resources/;
+        alias /var/www/prmis/storage/Resources/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    location /api/Resources/ {
+        alias /var/www/prmis/storage/Resources/;
         expires 30d;
         add_header Cache-Control "public, immutable";
         access_log off;

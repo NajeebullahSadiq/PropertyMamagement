@@ -22,7 +22,7 @@ NoNewPrivileges=true
 PrivateTmp=false
 ProtectSystem=full
 ProtectHome=true
-ReadWritePaths=/var/www/prmis/backend/publish
+ReadWritePaths=/var/www/prmis/storage
 
 [Install]
 WantedBy=multi-user.target
