@@ -6,8 +6,28 @@
     <p>وزارت عدلیه - ریاست امور رهنمای معاملات و عریضه نویسان</p>
   </div>
 
-  <!-- Search Form -->
-  <div class="search-section">
+  <!-- Input Mode Tabs -->
+  <div class="input-mode-tabs" *ngIf="!hasSearched">
+    <button 
+      class="tab-btn" 
+      [class.active]="inputMode === 'manual'"
+      (click)="switchToManual()"
+    >
+      <span class="tab-icon">⌨️</span>
+      <span>وارد کردن کود</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="inputMode === 'scanner'"
+      (click)="switchToScanner()"
+    >
+      <span class="tab-icon">📷</span>
+      <span>اسکن QR کود</span>
+    </button>
+  </div>
+
+  <!-- Manual Input Section -->
+  <div class="search-section" *ngIf="inputMode === 'manual' && !hasSearched">
     <div class="search-box">
       <label for="verificationCode">کود تصدیق سند را وارد کنید:</label>
       <div class="input-group">
@@ -30,6 +50,49 @@
           <span *ngIf="isLoading">در حال بررسی...</span>
         </button>
       </div>
+      <p class="input-hint">کود تصدیق در پایین سند چاپ شده قرار دارد</p>
+    </div>
+  </div>
+
+  <!-- QR Scanner Section -->
+  <div class="scanner-section" *ngIf="inputMode === 'scanner' && !hasSearched">
+    <div class="scanner-box">
+      <div class="scanner-header">
+        <h3>اسکن QR کود</h3>
+        <p>QR کود روی سند را مقابل کمره قرار دهید</p>
+      </div>
+
+      <!-- Scanner Error -->
+      <div *ngIf="scannerError" class="scanner-error">
+        <span class="error-icon">⚠️</span>
+        <p>{{ scannerError }}</p>
+        <button (click)="startScanner()" class="retry-scanner-btn">تلاش مجدد</button>
+      </div>
+
+      <!-- Video Preview -->
+      <div class="video-container" *ngIf="!scannerError">
+        <video #videoElement playsinline autoplay muted class="scanner-video"></video>
+        <canvas #canvasElement class="scanner-canvas"></canvas>
+        
+        <!-- Scanning Overlay -->
+        <div class="scan-overlay" *ngIf="isScanning">
+          <div class="scan-frame">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+            <div class="scan-line"></div>
+          </div>
+        </div>
+
+        <!-- Loading Camera -->
+        <div class="camera-loading" *ngIf="!isScanning && !scannerError">
+          <div class="spinner"></div>
+          <p>در حال فعال‌سازی کمره...</p>
+        </div>
+      </div>
+
+      <p class="scanner-hint">کود به صورت خودکار شناسایی می‌شود</p>
     </div>
   </div>
 

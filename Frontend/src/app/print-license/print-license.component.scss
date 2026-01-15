@@ -611,3 +611,16 @@
     color: #1565c0 !important;
   }
 }
+
+/* Verification error styling */
+.qr-code-container.error {
+  border-color: #f44336;
+  background: #ffebee;
+}
+
+.verification-error-text {
+  font-size: 10px;
+  color: #c62828;
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}

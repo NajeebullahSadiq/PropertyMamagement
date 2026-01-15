@@ -101,26 +101,35 @@ export class PrintLicenseComponent implements OnInit {
   }
 
   private fetchVerificationCode(): void {
-    // Get the license ID from the data
-    const licenseId = this.data?.licenseId || this.data?.id;
+    // Get the license ID from the data - the API returns CompanyId as the main identifier
+    // After camelCase conversion, it becomes companyId
+    const licenseId = this.data?.companyId || this.data?.licenseId || this.data?.licenseDetailId || this.data?.id;
     
+    console.log('[PrintLicense] Data object keys:', Object.keys(this.data || {}));
+    console.log('[PrintLicense] Looking for license ID, found:', licenseId);
+
     if (!licenseId) {
-      console.warn('[PrintLicense] No license ID found for verification');
+      console.warn('[PrintLicense] No license ID found for verification. Data:', this.data);
       this.isLoading = false;
       this.triggerPrint();
       return;
     }
 
+    console.log('[PrintLicense] Calling generateVerificationCode with ID:', licenseId);
+
     this.verificationService.generateVerificationCode(licenseId, 'RealEstateLicense').subscribe({
       next: (result) => {
+        console.log('[PrintLicense] Verification result:', result);
         this.verificationCode = result.verificationCode;
         this.verificationUrl = result.verificationUrl;
         this.qrCodeUrl = this.verificationService.generateQrCodeUrl(result.verificationUrl);
+        console.log('[PrintLicense] QR Code URL:', this.qrCodeUrl);
         this.isLoading = false;
         this.triggerPrint();
       },
       error: (err) => {
         console.error('[PrintLicense] Error fetching verification code:', err);
+        console.error('[PrintLicense] Error details:', err?.error || err?.message);
         this.verificationError = 'خطا در دریافت کود تصدیق';
         this.isLoading = false;
         this.triggerPrint();

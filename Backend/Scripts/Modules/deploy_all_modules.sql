@@ -14,6 +14,9 @@
 -- 5. Vehicle (tr schema)
 -- 6. Securities (org schema)
 -- 7. Audit (log schema)
+-- 8. LicenseApplication (org schema)
+-- 9. PetitionWriterLicense (org schema)
+-- 10. Verification (org schema)
 
 \echo '=========================================='
 \echo 'Starting PRMIS Module Deployment'
@@ -46,6 +49,18 @@
 -- Module 7: Audit
 \echo 'Deploying Module 7: Audit...'
 \i 07_Audit_Initial.sql
+
+-- Module 8: LicenseApplication
+\echo 'Deploying Module 8: LicenseApplication...'
+\i 08_LicenseApplication_Initial.sql
+
+-- Module 9: PetitionWriterLicense
+\echo 'Deploying Module 9: PetitionWriterLicense...'
+\i 09_PetitionWriterLicense_Initial.sql
+
+-- Module 10: Verification
+\echo 'Deploying Module 10: Verification...'
+\i 10_Verification_Initial.sql
 
 \echo '=========================================='
 \echo 'PRMIS Module Deployment Complete!'

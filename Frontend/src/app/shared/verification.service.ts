@@ -84,8 +84,8 @@ export class VerificationService {
    * Generate QR code data URL from verification URL
    */
   generateQrCodeUrl(verificationUrl: string): string {
-    // Use Google Charts API for QR code generation (simple, no library needed)
+    // Use QR Server API for QR code generation (free, reliable, no library needed)
     const encodedUrl = encodeURIComponent(verificationUrl);
-    return `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${encodedUrl}&choe=UTF-8`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodedUrl}`;
   }
 }

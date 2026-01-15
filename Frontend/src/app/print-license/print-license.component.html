@@ -112,6 +112,14 @@
               <p class="verification-label">کود تصدیق سند</p>
             </div>
           </div>
+          
+          <!-- Show error message if verification failed -->
+          <div class="verification-section verification-error" *ngIf="verificationError && !verificationCode">
+            <div class="qr-code-container error">
+              <p class="verification-error-text">{{ verificationError }}</p>
+              <p class="verification-label">برای تصدیق با اداره تماس بگیرید</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
