@@ -105,6 +105,10 @@ namespace WebAPIBackend.Controllers
         {
             // Resolve the user via their email
             var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return BadRequest(new { error = "User not found" });
+            }
             // Get the roles for the user
             var roles = await _userManager.GetRolesAsync(user);
             return Ok(roles);

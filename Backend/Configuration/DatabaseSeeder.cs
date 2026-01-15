@@ -147,23 +147,28 @@ namespace WebAPIBackend.Configuration
             }
             catch (Exception) { /* View may already exist */ }
 
-            // Create LicenseView
+            // Create LicenseView - drop first to handle column changes
             try
             {
                 await context.Database.ExecuteSqlRawAsync(@"
-                    CREATE OR REPLACE VIEW public.""LicenseView"" AS
+                    DROP VIEW IF EXISTS public.""LicenseView"";
+                    CREATE VIEW public.""LicenseView"" AS
                     SELECT 
                         cd.""Id"" AS ""CompanyId"",
                         co.""PhoneNumber"",
                         co.""WhatsAppNumber"",
                         cd.""Title"",
                         cd.""TIN"" AS ""Tin"",
-                        co.""Name"" AS ""FirstName"",
+                        co.""FirstName"",
                         co.""FatherName"",
                         co.""GrandFatherName"",
-                        ld.""LicenseNumber"",
-                        ld.""LicenseDate"" AS ""IssueDate"",
-                        ld.""LicenseExpireDate"" AS ""ExpireDate"",
+                        co.""DateofBirth"",
+                        co.""IndentityCardNumber"",
+                        co.""PothoPath"" AS ""OwnerPhoto"",
+                        ld.""LicenseNumber""::text AS ""LicenseNumber"",
+                        ld.""OfficeAddress"",
+                        ld.""IssueDate"",
+                        ld.""ExpireDate"",
                         pp.""Dari"" AS ""PermanentProvinceName"",
                         pd.""Dari"" AS ""PermanentDistrictName"",
                         co.""PermanentVillage"",
@@ -179,7 +184,11 @@ namespace WebAPIBackend.Configuration
                     LEFT JOIN look.""Location"" td ON co.""TemporaryDistrictId"" = td.""ID"";
                 ");
             }
-            catch (Exception) { /* View may already exist */ }
+            catch (Exception ex) 
+            { 
+                // Log but don't fail - view creation is optional
+                Console.WriteLine($"Note: LicenseView creation skipped (may need schema update): {ex.Message}");
+            }
 
             // Create GetPrintType view for property printing
             try

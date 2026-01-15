@@ -18,16 +18,16 @@ namespace WebAPIBackend.Models.ViewModels
         public int? NumofRooms { get; set; }
 
         [Column("north")]
-        public string North { get; set; }
+        public string? North { get; set; }
 
         [Column("south")]
-        public string South { get; set; }
+        public string? South { get; set; }
 
         [Column("west")]
-        public string West { get; set; }
+        public string? West { get; set; }
 
         [Column("east")]
-        public string East { get; set; }
+        public string? East { get; set; }
         public double? Price { get; set; }
         public string? PriceText { get; set; }
         public double? RoyaltyAmount { get; set; }

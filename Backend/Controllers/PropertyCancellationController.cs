@@ -65,7 +65,7 @@ namespace WebAPIBackend.Controllers
                     {
                         p.Id,
                         p.CreatedAt,
-                        TransactionTypeName = p.TransactionType.Name,
+                        TransactionTypeName = p.TransactionType != null ? p.TransactionType.Name : "",
                         SellerName = p.SellerDetails.FirstOrDefault() != null ? 
                             $"{p.SellerDetails.First().FirstName} {p.SellerDetails.First().FatherName} {p.SellerDetails.First().GrandFather}" : "",
                         BuyerName = p.BuyerDetails.FirstOrDefault() != null ? 
@@ -114,15 +114,15 @@ namespace WebAPIBackend.Controllers
                 else
                 {
                     cancellationQuery = _context.PropertyCancellations
-                        .Where(c => c.PropertyDetails.CreatedBy == userId);
+                        .Where(c => c.PropertyDetails != null && c.PropertyDetails.CreatedBy == userId);
                 }
 
                 var cancelledTransactions = await cancellationQuery
-                    .Include(c => c.PropertyDetails)
+                    .Include(c => c.PropertyDetails!)
                     .ThenInclude(p => p.SellerDetails)
-                    .Include(c => c.PropertyDetails)
+                    .Include(c => c.PropertyDetails!)
                     .ThenInclude(p => p.BuyerDetails)
-                    .Include(c => c.PropertyDetails)
+                    .Include(c => c.PropertyDetails!)
                     .ThenInclude(p => p.TransactionType)
                     .Include(c => c.PropertyCancellationDocuments)
                     .Select(c => new
@@ -134,11 +134,11 @@ namespace WebAPIBackend.Controllers
                         c.CancelledBy,
                         c.Status,
                         c.CreatedAt,
-                        TransactionTypeName = c.PropertyDetails.TransactionType.Name,
-                        PropertyNumber = c.PropertyDetails.Pnumber,
-                        SellerName = c.PropertyDetails.SellerDetails.FirstOrDefault() != null ? 
+                        TransactionTypeName = c.PropertyDetails != null && c.PropertyDetails.TransactionType != null ? c.PropertyDetails.TransactionType.Name : "",
+                        PropertyNumber = c.PropertyDetails != null ? c.PropertyDetails.Pnumber : 0,
+                        SellerName = c.PropertyDetails != null && c.PropertyDetails.SellerDetails.FirstOrDefault() != null ? 
                             $"{c.PropertyDetails.SellerDetails.First().FirstName} {c.PropertyDetails.SellerDetails.First().FatherName} {c.PropertyDetails.SellerDetails.First().GrandFather}" : "",
-                        BuyerName = c.PropertyDetails.BuyerDetails.FirstOrDefault() != null ? 
+                        BuyerName = c.PropertyDetails != null && c.PropertyDetails.BuyerDetails.FirstOrDefault() != null ? 
                             $"{c.PropertyDetails.BuyerDetails.First().FirstName} {c.PropertyDetails.BuyerDetails.First().FatherName} {c.PropertyDetails.BuyerDetails.First().GrandFather}" : "",
                         Documents = c.PropertyCancellationDocuments
                             .OrderByDescending(d => d.CreatedAt)
@@ -255,7 +255,7 @@ namespace WebAPIBackend.Controllers
 
                 if (!roles.Contains("ADMIN"))
                 {
-                    cancellationQuery = cancellationQuery.Where(c => c.PropertyDetails.CreatedBy == userId);
+                    cancellationQuery = cancellationQuery.Where(c => c.PropertyDetails != null && c.PropertyDetails.CreatedBy == userId);
                 }
 
                 var cancellation = await cancellationQuery

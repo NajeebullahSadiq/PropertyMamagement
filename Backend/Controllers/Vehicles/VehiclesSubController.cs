@@ -93,16 +93,16 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Find all active registrations with same seller identity (excluding cancelled ones)
                 var duplicates = await _context.VehiclesSellerDetails
                     .Where(s => 
-                        s.FirstName.Trim() == firstName &&
-                        s.FatherName.Trim() == fatherName &&
-                        s.GrandFather.Trim() == grandFather &&
+                        (s.FirstName ?? "").Trim() == firstName &&
+                        (s.FatherName ?? "").Trim() == fatherName &&
+                        (s.GrandFather ?? "").Trim() == grandFather &&
                         s.PropertyDetails != null &&
                         s.PropertyDetails.TransactionTypeId.HasValue &&
                         restrictedTransactionTypeIds.Contains(s.PropertyDetails.TransactionTypeId.Value) &&
                         !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == s.PropertyDetailsId) &&
                         s.Id != request.SellerId) // Exclude current seller if editing
                     .Include(s => s.PropertyDetails)
-                    .ThenInclude(p => p.TransactionType)
+                    .ThenInclude(p => p!.TransactionType)
                     .ToListAsync();
 
                 if (duplicates.Count > 0)
@@ -152,16 +152,16 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Find all active registrations with same buyer identity (excluding cancelled ones)
                 var duplicates = await _context.VehiclesBuyerDetails
                     .Where(b => 
-                        b.FirstName.Trim() == firstName &&
-                        b.FatherName.Trim() == fatherName &&
-                        b.GrandFather.Trim() == grandFather &&
+                        (b.FirstName ?? "").Trim() == firstName &&
+                        (b.FatherName ?? "").Trim() == fatherName &&
+                        (b.GrandFather ?? "").Trim() == grandFather &&
                         b.PropertyDetails != null &&
                         b.PropertyDetails.TransactionTypeId.HasValue &&
                         restrictedTransactionTypeIds.Contains(b.PropertyDetails.TransactionTypeId.Value) &&
                         !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == b.PropertyDetailsId) &&
                         b.Id != request.SellerId) // Exclude current buyer if editing
                     .Include(b => b.PropertyDetails)
-                    .ThenInclude(p => p.TransactionType)
+                    .ThenInclude(p => p!.TransactionType)
                     .ToListAsync();
 
                 if (duplicates.Count > 0)
@@ -574,13 +574,16 @@ namespace WebAPIBackend.Controllers.Vehicles
                 await _context.SaveChangesAsync();
 
                 // Update the IsComplete column of the PropertyDetails entity to true
-                var propertyDetails = await _context.VehiclesPropertyDetails.FindAsync(request.PropertyDetailsId.Value);
-                if (propertyDetails == null)
+                if (request.PropertyDetailsId.HasValue)
                 {
-                    return NotFound("PropertyDetails not found");
+                    var propertyDetails = await _context.VehiclesPropertyDetails.FindAsync(request.PropertyDetailsId.Value);
+                    if (propertyDetails == null)
+                    {
+                        return NotFound("PropertyDetails not found");
+                    }
+                    propertyDetails.iscomplete = true;
+                    await _context.SaveChangesAsync();
                 }
-                propertyDetails.iscomplete = true;
-                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {

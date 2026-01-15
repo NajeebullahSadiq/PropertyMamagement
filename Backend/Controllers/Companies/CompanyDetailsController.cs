@@ -484,7 +484,7 @@ namespace WebAPIBackend.Controllers.Companies
         public class Companies
         {
             public int Id { get; set; }
-            public string Title { get; set; }
+            public string? Title { get; set; }
         }
     }
 }

@@ -432,17 +432,18 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetPropertyTypesByMonth()
         {
             var propertyTypesByMonth = _context.PropertyDetails
-                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue) // Ensure CreatedAt has a value
+                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue)
+                .Select(b => new { b.PropertyTypeId, b.Price, b.CreatedAt })
+                .AsEnumerable()
                 .GroupBy(b => new
                 {
-                    PropertyTypeId = b.PropertyTypeId.Value,
-                    Month = new DateTime(b.CreatedAt.Value.Year, b.CreatedAt.Value.Month, 1)
+                    PropertyTypeId = b.PropertyTypeId!.Value,
+                    Month = new DateTime(b.CreatedAt!.Value.Year, b.CreatedAt.Value.Month, 1)
                 })
                 .Select(g => new
                 {
                     PropertyTypeId = g.Key.PropertyTypeId,
                     Month = g.Key.Month,
-                  //  TotalPropertiesCreated = g.Count(),
                     TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
                 })
                 .OrderBy(g => g.Month)
@@ -472,17 +473,18 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetTransactionTypesByMonth()
         {
             var propertyTypesByMonth = _context.PropertyDetails
-                .Where(b => b.TransactionTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue) // Ensure CreatedAt has a value
+                .Where(b => b.TransactionTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue)
+                .Select(b => new { b.TransactionTypeId, b.Price, b.CreatedAt })
+                .AsEnumerable()
                 .GroupBy(b => new
                 {
-                    TransactionTypeId = b.TransactionTypeId.Value,
-                    Month = new DateTime(b.CreatedAt.Value.Year, b.CreatedAt.Value.Month, 1)
+                    TransactionTypeId = b.TransactionTypeId!.Value,
+                    Month = new DateTime(b.CreatedAt!.Value.Year, b.CreatedAt.Value.Month, 1)
                 })
                 .Select(g => new
                 {
                     TransactionTypeId = g.Key.TransactionTypeId,
                     Month = g.Key.Month,
-                   // TotalPropertiesCreated = g.Count(),
                     TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
                 })
                 .OrderBy(g => g.Month)
@@ -498,7 +500,6 @@ namespace WebAPIBackend.Controllers.Report
                     Data = g.Select(p => new
                     {
                         Month = p.Month.ToString("MMM yyyy"),
-                      //  TotalPropertiesCreated = p.TotalPropertiesCreated,
                         TotalPriceOfProperties = p.TotalPriceOfProperties
                     }).ToList()
                 })
@@ -513,23 +514,19 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetVehicleReportByMonth()
         {
             var propertyTypesByMonth = _context.VehiclesPropertyDetails
-                .Where(b => b.Price.HasValue && b.CreatedAt.HasValue) // Ensure CreatedAt has a value
+                .Where(b => b.Price.HasValue && b.CreatedAt.HasValue)
+                .Select(b => new { b.Price, b.CreatedAt })
+                .AsEnumerable()
                 .GroupBy(b => new
                 {
-                    Month = new DateTime(b.CreatedAt.Value.Year, b.CreatedAt.Value.Month,1)
+                    Month = new DateTime(b.CreatedAt!.Value.Year, b.CreatedAt.Value.Month, 1)
                 })
                 .Select(g => new
                 {
-                    Month = g.Key.Month, // Store the DateTime without formatting
-            TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    Month = g.Key.Month.ToString("MMM yyyy"),
+                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
                 })
                 .OrderBy(g => g.Month)
-                .AsEnumerable() // Switch to client-side evaluation after retrieving the data
-                .Select(g => new
-                {
-                    Month = g.Month.ToString("MMM yyyy"), // Format the DateTime here
-            g.TotalPriceOfProperties
-                })
                 .ToList();
 
             return Ok(propertyTypesByMonth);
@@ -546,7 +543,8 @@ namespace WebAPIBackend.Controllers.Report
             }
 
             var topUsersSummary = _context.PropertyDetails
-                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue && b.CreatedAt.Value.Date >= gregoriansDate.Date &&
+                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue && 
+                           b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date)
                 .GroupBy(b => b.CreatedBy)
                 .Select(g => new
@@ -607,7 +605,8 @@ namespace WebAPIBackend.Controllers.Report
             }
 
             var topUsersSummary = _context.VehiclesPropertyDetails
-                .Where(b => b.Price.HasValue && b.CreatedAt.Value.Date >= gregoriansDate.Date &&
+                .Where(b => b.Price.HasValue && b.CreatedAt.HasValue && 
+                           b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date)
                 .GroupBy(b => b.CreatedBy)
                 .Select(g => new

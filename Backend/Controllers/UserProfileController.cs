@@ -36,6 +36,10 @@ namespace WebAPI.Controllers
             List<string> ClaimType = new List<string>();
             string userId = User.Claims.First(c => c.Type == "UserID").Value;
             var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return StatusCode(420);
+            }
             var userroles = await _userManager.GetRolesAsync(user);
             var primaryRole = userroles.FirstOrDefault() ?? user.UserRole ?? "";
             var permissions = RolePermissions.GetPermissionsForRole(primaryRole);
@@ -43,6 +47,7 @@ namespace WebAPI.Controllers
             foreach (var userRole in userroles)
             {
                 var role = await _roleManager.FindByNameAsync(userRole);
+                if (role == null) continue;
                 var roleClaims = await _roleManager.GetClaimsAsync(role);
                 foreach (var c in roleClaims)
                 {

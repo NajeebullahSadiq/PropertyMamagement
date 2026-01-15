@@ -77,23 +77,26 @@ namespace WebAPI.Controllers
             try
             {
                 // Ensure role exists
-                if (!await _roleManager.RoleExistsAsync(model.Role))
+                if (!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
                 {
                     await _roleManager.CreateAsync(new IdentityRole(model.Role));
                     
                     // Add permissions to role
                     var role = await _roleManager.FindByNameAsync(model.Role);
-                    var permissions = RolePermissions.GetPermissionsForRole(model.Role);
-                    foreach (var permission in permissions)
+                    if (role != null)
                     {
-                        await _roleManager.AddClaimAsync(role, new Claim(CustomClaimTypes.Permission, permission));
+                        var permissions = RolePermissions.GetPermissionsForRole(model.Role);
+                        foreach (var permission in permissions)
+                        {
+                            await _roleManager.AddClaimAsync(role, new Claim(CustomClaimTypes.Permission, permission));
+                        }
                     }
                 }
 
-                var result = await _userManager.CreateAsync(applicationUser, model.Password);
+                var result = await _userManager.CreateAsync(applicationUser, model.Password ?? "");
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(applicationUser, model.Role);
+                    await _userManager.AddToRoleAsync(applicationUser, model.Role ?? "USER");
                     return Ok(new { 
                         succeeded = true, 
                         userId = applicationUser.Id,
@@ -115,9 +118,9 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var user = await _userManager.FindByNameAsync(model.UserName);
+                var user = await _userManager.FindByNameAsync(model.UserName ?? "");
                
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password ?? ""))
                 {
                     if (user.IsLocked.Equals(true))
                     {
@@ -169,7 +172,7 @@ namespace WebAPI.Controllers
                         Subject = new ClaimsIdentity(customClaims.Union(userClaims).Union(userRoles).Union(allRoleClaims)),
                         Expires = DateTime.UtcNow.AddDays(1),
                         SigningCredentials = new SigningCredentials(
-                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), 
+                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret ?? "")), 
                             SecurityAlgorithms.HmacSha256Signature)
                     };
 
@@ -206,7 +209,7 @@ namespace WebAPI.Controllers
 
             if (user != null)
             {
-                var result = await _userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
+                var result = await _userManager.ChangePasswordAsync(user, model.Password ?? "", model.NewPassword ?? "");
                 if (result.Succeeded)
                 {
                     await _singInManager.RefreshSignInAsync(user);
@@ -226,14 +229,14 @@ namespace WebAPI.Controllers
         [Route("ResetPassword")]
         public async Task<IActionResult> ResetPassword(LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
+            var user = await _userManager.FindByNameAsync(model.UserName ?? "");
             if (user == null)
             {
                 return NotFound(new { message = "کاربر یافت نشد" });
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword ?? "");
             return Ok(result);
         }
 
@@ -244,7 +247,7 @@ namespace WebAPI.Controllers
         {
             var userInfos = await _context.Users
                 .OrderBy(u => u.Id)
-                .Select(u => new UserInfo { UserId = u.Id.ToString(), UserName = u.UserName })
+                .Select(u => new UserInfo { UserId = u.Id.ToString(), UserName = u.UserName ?? "" })
                 .ToListAsync();
 
             return userInfos;
@@ -385,10 +388,13 @@ namespace WebAPI.Controllers
                 {
                     await _roleManager.CreateAsync(new IdentityRole(role));
                     var roleEntity = await _roleManager.FindByNameAsync(role);
-                    var permissions = RolePermissions.GetPermissionsForRole(role);
-                    foreach (var permission in permissions)
+                    if (roleEntity != null)
                     {
-                        await _roleManager.AddClaimAsync(roleEntity, new Claim(CustomClaimTypes.Permission, permission));
+                        var permissions = RolePermissions.GetPermissionsForRole(role);
+                        foreach (var permission in permissions)
+                        {
+                            await _roleManager.AddClaimAsync(roleEntity, new Claim(CustomClaimTypes.Permission, permission));
+                        }
                     }
                 }
 

@@ -36,9 +36,9 @@ namespace WebAPIBackend.Controllers.Companies
                                 p.DistrictId,
                                 p.Village,
                               
-                                province = p.Province.Dari,
-                                district = p.District.Dari,
-                                AddressType = p.AddressType.Name,
+                                province = p.Province != null ? p.Province.Dari : "",
+                                district = p.District != null ? p.District.Dari : "",
+                                AddressType = p.AddressType != null ? p.AddressType.Name : "",
                                
                             };
                 return Ok(query);

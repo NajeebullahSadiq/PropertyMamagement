@@ -44,16 +44,18 @@ namespace WebAPIBackend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllClaims(string email)
         {
-            // var roleClaims;
             var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return BadRequest(new { error = "User not found" });
+            }
             var userRoles = await _userManager.GetRolesAsync(user);
            
-            // var roleclaim = await _roleManager.GetClaimsAsync(role);
-            // var roleclaim = await _roleManager.GetClaimsAsync((IdentityRole)role);
             foreach (var userRole in userRoles)
             {
                 var role = await _roleManager.FindByNameAsync(userRole);
-               var roleClaims = await _roleManager.GetClaimsAsync(role);
+                if (role == null) continue;
+                var roleClaims = await _roleManager.GetClaimsAsync(role);
                 return Ok(roleClaims);
             }
             return BadRequest();
