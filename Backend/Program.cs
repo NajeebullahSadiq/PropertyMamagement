@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Services.Verification;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -100,6 +101,11 @@ builder.Services.Configure<FormOptions>(o =>
     o.MultipartBodyLengthLimit = int.MaxValue;
     o.MemoryBufferThreshold = int.MaxValue;
 });
+
+// Register Verification Services
+builder.Services.AddScoped<IVerificationCodeGenerator, VerificationCodeGenerator>();
+builder.Services.AddScoped<ISignatureService, SignatureService>();
+builder.Services.AddScoped<IVerificationService, VerificationService>();
 
 
 

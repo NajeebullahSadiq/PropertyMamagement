@@ -129,6 +129,10 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterLicenseEntity> PetitionWriterLicenses { get; set; }
         public virtual DbSet<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterRelocation> PetitionWriterRelocations { get; set; }
         
+        // Document Verification Module
+        public virtual DbSet<WebAPIBackend.Models.Verification.DocumentVerification> DocumentVerifications { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.Verification.VerificationLog> VerificationLogs { get; set; }
+        
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -449,6 +453,39 @@ namespace WebAPIBackend.Configuration
                     .HasForeignKey(d => d.PetitionWriterLicenseId)
                     .HasConstraintName("PetitionWriterRelocations_PetitionWriterLicenseId_fkey")
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Document Verification Module Configuration
+            modelBuilder.Entity<WebAPIBackend.Models.Verification.DocumentVerification>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("DocumentVerifications_pkey");
+                entity.ToTable("DocumentVerifications", "org");
+
+                entity.Property(e => e.VerificationCode).HasMaxLength(20).IsRequired();
+                entity.Property(e => e.DocumentType).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.DigitalSignature).HasMaxLength(128).IsRequired();
+                entity.Property(e => e.DocumentSnapshot).HasColumnType("jsonb");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp with time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.RevokedAt).HasColumnType("timestamp with time zone");
+                entity.Property(e => e.RevokedBy).HasMaxLength(50);
+                entity.Property(e => e.RevokedReason).HasMaxLength(500);
+
+                entity.HasIndex(e => e.VerificationCode).IsUnique();
+                entity.HasIndex(e => new { e.DocumentId, e.DocumentType });
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.Verification.VerificationLog>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("VerificationLogs_pkey");
+                entity.ToTable("VerificationLogs", "org");
+
+                entity.Property(e => e.VerificationCode).HasMaxLength(20).IsRequired();
+                entity.Property(e => e.AttemptedAt).HasColumnType("timestamp with time zone");
+                entity.Property(e => e.IpAddress).HasMaxLength(45);
+                entity.Property(e => e.FailureReason).HasMaxLength(50);
+
+                entity.HasIndex(e => new { e.VerificationCode, e.AttemptedAt });
             });
 
             modelBuilder.Entity<CompanyOwner>(entity =>
