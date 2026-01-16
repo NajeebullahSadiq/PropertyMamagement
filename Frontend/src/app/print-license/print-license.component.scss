@@ -224,6 +224,7 @@
   border: 3px solid var(--primary-700);
   border-radius: 2px;
   background: transparent;
+  overflow: hidden; /* Prevent content overflow */
   
   /* Inner border effect */
   &::before {
@@ -288,6 +289,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow: hidden; /* Prevent content overflow */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -342,6 +344,46 @@
     font-weight: 800;
     font-family: var(--font-heading);
     letter-spacing: 0.3px;
+    display: inline-block;
+    
+    /* Enhanced security watermark effect for license number */
+    position: relative;
+    text-shadow: 
+      0 0 1px rgba(255, 255, 255, 0.8),
+      0 1px 2px rgba(25, 118, 210, 0.12),
+      0 2px 4px rgba(25, 118, 210, 0.08);
+    
+    /* More visible microprint background */
+    background: 
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        rgba(25, 118, 210, 0.05) 2px,
+        rgba(25, 118, 210, 0.05) 3px
+      ),
+      linear-gradient(135deg, rgba(227, 242, 253, 0.3) 0%, rgba(255, 255, 255, 0.5) 100%);
+    padding: 2px 6px;
+    border-radius: 2px;
+    
+    /* Microprint pattern */
+    &::before {
+      content: '━━━━━━━━━━━━━━━━━━━━';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      font-size: 4px;
+      line-height: 1;
+      color: var(--primary-400);
+      opacity: 0.15;
+      z-index: -1;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+      overflow: hidden;
+      white-space: nowrap;
+    }
   }
 }
 
@@ -536,13 +578,15 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .certificate-body {
   flex: 1;
-  padding: 5px 10px;
+  padding: 4px 10px;
   position: relative;
+  min-height: 0; /* Allow flex shrinking */
+  overflow-y: auto; /* Allow scrolling if needed */
 }
 
 .info-card {
-  margin-bottom: 8px;
-  padding: 8px 12px;
+  margin-bottom: 6px;
+  padding: 7px 12px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
   border-radius: 4px;
   border-right: 3px solid var(--primary-500);
@@ -550,8 +594,8 @@
 }
 
 .info-paragraph {
-  font-size: 14px;
-  line-height: 2.2;
+  font-size: 13px;
+  line-height: 2;
   margin: 0;
   color: var(--neutral-800);
   font-weight: 600;
@@ -564,8 +608,71 @@
   color: var(--primary-800);
   font-weight: 800;
   font-family: var(--font-heading);
-  padding: 0 2px;
+  padding: 2px 4px;
   letter-spacing: 0.2px;
+  display: inline-block;
+  
+  /* Enhanced watermark/security effect - more visible like currency */
+  position: relative;
+  
+  /* Multi-layer text shadow for depth */
+  text-shadow: 
+    0 0 1px rgba(255, 255, 255, 0.8),
+    0 1px 2px rgba(25, 118, 210, 0.12),
+    0 2px 4px rgba(25, 118, 210, 0.08);
+  
+  /* More visible background pattern - crosshatch like money */
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(25, 118, 210, 0.04) 2px,
+      rgba(25, 118, 210, 0.04) 3px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 2px,
+      rgba(25, 118, 210, 0.04) 2px,
+      rgba(25, 118, 210, 0.04) 3px
+    ),
+    linear-gradient(135deg, rgba(227, 242, 253, 0.3) 0%, rgba(255, 255, 255, 0.5) 100%);
+  background-size: 4px 4px, 4px 4px, 100% 100%;
+  border-radius: 2px;
+  
+  /* Microprint effect - more visible */
+  &::before {
+    content: '◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    font-size: 5px;
+    line-height: 1;
+    color: var(--primary-400);
+    opacity: 0.15;
+    z-index: -1;
+    letter-spacing: 1px;
+    pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  
+  /* Security checkmark - more visible */
+  &::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    color: var(--primary-300);
+    opacity: 0.12;
+    z-index: -1;
+    pointer-events: none;
+  }
 }
 
 .label-accent {
@@ -644,20 +751,23 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .certificate-footer {
   border-top: 2px solid var(--primary-200);
-  padding-top: 8px;
+  padding-top: 6px;
+  padding-bottom: 4px;
   margin-top: auto;
   background: linear-gradient(180deg, rgba(227, 242, 253, 0.3) 0%, transparent 100%);
   position: relative;
+  flex-shrink: 0; /* Prevent footer from being compressed */
 }
 
 .footer-row {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   font-family: var(--font-body);
   color: var(--neutral-700);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   padding: 0 10px;
   letter-spacing: 0.2px;
+  line-height: 1.6;
 }
 
 .footer-label {
@@ -670,6 +780,45 @@
   font-weight: 800;
   font-family: var(--font-heading);
   letter-spacing: 0.2px;
+  display: inline-block;
+  padding: 1px 4px;
+  
+  /* Apply watermark effect to footer values */
+  position: relative;
+  text-shadow: 
+    0 0 1px rgba(255, 255, 255, 0.8),
+    0 1px 2px rgba(25, 118, 210, 0.12),
+    0 2px 4px rgba(25, 118, 210, 0.08);
+  
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(25, 118, 210, 0.04) 2px,
+      rgba(25, 118, 210, 0.04) 3px
+    ),
+    linear-gradient(135deg, rgba(227, 242, 253, 0.3) 0%, rgba(255, 255, 255, 0.5) 100%);
+  border-radius: 2px;
+  
+  /* Microprint effect */
+  &::before {
+    content: '━━━━━━━━━━━━━━━━━━━━';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    font-size: 4px;
+    line-height: 1;
+    color: var(--primary-400);
+    opacity: 0.12;
+    z-index: -1;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+  }
   
   &.underline {
     border-bottom: 1px dotted var(--neutral-400);
@@ -680,26 +829,33 @@
 .details-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 10px;
   justify-content: flex-start;
+  align-items: center;
+  
+  span {
+    white-space: nowrap;
+    font-size: 11px;
+  }
 }
 
 .validity-notice {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 5px;
+  padding: 5px 10px;
   background: linear-gradient(135deg, var(--gold-100) 0%, #fffde7 100%);
   border-radius: 4px;
   border-right: 3px solid var(--gold-500);
-  margin: 5px 10px;
-  font-size: 12px;
+  margin: 4px 10px;
+  font-size: 11px;
   font-weight: 700;
   font-family: var(--font-body);
   letter-spacing: 0.2px;
+  line-height: 1.4;
   
   .notice-icon {
-    font-size: 12px;
+    font-size: 11px;
   }
   
   .notice-label {
