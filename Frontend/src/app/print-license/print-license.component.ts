@@ -161,7 +161,16 @@ export class PrintLicenseComponent implements OnInit {
 
     // Wait for images to load before printing
     setTimeout(() => {
+      // Store original title and set empty to hide from print header
+      const originalTitle = document.title;
+      document.title = ' ';
+      
       window.print();
+      
+      // Restore original title after print dialog
+      setTimeout(() => {
+        document.title = originalTitle;
+      }, 100);
     }, 500);
   }
 

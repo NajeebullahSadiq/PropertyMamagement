@@ -1,126 +1,231 @@
 <!-- Loading Indicator -->
 <div *ngIf="isLoading" class="loading-container">
-  <div class="loading-spinner"></div>
+  <div class="loading-spinner">
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+  </div>
   <p>در حال بارگذاری معلومات جواز...</p>
 </div>
 
-<div *ngIf="!isLoading && error" class="loading-container">
+<div *ngIf="!isLoading && error" class="error-container">
+  <div class="error-icon">⚠</div>
   <p>{{ error }}</p>
 </div>
 
 <div class="certificate-page" *ngIf="!isLoading && !error">
   <div class="certificate-wrapper">
-    <!-- Decorative Blue Border Frame -->
-    <div class="decorative-border">
-      <!-- Corner Decorations -->
-      <div class="corner-decoration top-right"></div>
-      <div class="corner-decoration top-left"></div>
-      <div class="corner-decoration bottom-right"></div>
-      <div class="corner-decoration bottom-left"></div>
-      
+    <!-- Watermark Background -->
+    <div class="watermark-layer">
+      <div class="watermark-emblem"></div>
+    </div>
+    
+    <!-- Guilloche Pattern Border -->
+    <div class="guilloche-border">
+      <svg class="guilloche-pattern" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="guillochePattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(25, 118, 210, 0.15)" stroke-width="0.5"/>
+            <circle cx="10" cy="10" r="5" fill="none" stroke="rgba(25, 118, 210, 0.1)" stroke-width="0.3"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#guillochePattern)"/>
+      </svg>
+    </div>
+
+    <!-- Main Certificate Frame -->
+    <div class="certificate-frame">
+      <!-- Ornate Corner Decorations -->
+      <div class="corner-ornament top-right">
+        <svg viewBox="0 0 60 60">
+          <path d="M0,60 Q0,0 60,0" fill="none" stroke="#1565c0" stroke-width="2"/>
+          <path d="M5,60 Q5,5 60,5" fill="none" stroke="#42a5f5" stroke-width="1"/>
+          <circle cx="15" cy="45" r="3" fill="#1976d2"/>
+          <circle cx="45" cy="15" r="3" fill="#1976d2"/>
+        </svg>
+      </div>
+      <div class="corner-ornament top-left">
+        <svg viewBox="0 0 60 60">
+          <path d="M60,60 Q60,0 0,0" fill="none" stroke="#1565c0" stroke-width="2"/>
+          <path d="M55,60 Q55,5 0,5" fill="none" stroke="#42a5f5" stroke-width="1"/>
+          <circle cx="45" cy="45" r="3" fill="#1976d2"/>
+          <circle cx="15" cy="15" r="3" fill="#1976d2"/>
+        </svg>
+      </div>
+      <div class="corner-ornament bottom-right">
+        <svg viewBox="0 0 60 60">
+          <path d="M0,0 Q0,60 60,60" fill="none" stroke="#1565c0" stroke-width="2"/>
+          <path d="M5,0 Q5,55 60,55" fill="none" stroke="#42a5f5" stroke-width="1"/>
+          <circle cx="15" cy="15" r="3" fill="#1976d2"/>
+          <circle cx="45" cy="45" r="3" fill="#1976d2"/>
+        </svg>
+      </div>
+      <div class="corner-ornament bottom-left">
+        <svg viewBox="0 0 60 60">
+          <path d="M60,0 Q60,60 0,60" fill="none" stroke="#1565c0" stroke-width="2"/>
+          <path d="M55,0 Q55,55 0,55" fill="none" stroke="#42a5f5" stroke-width="1"/>
+          <circle cx="45" cy="15" r="3" fill="#1976d2"/>
+          <circle cx="15" cy="45" r="3" fill="#1976d2"/>
+        </svg>
+      </div>
+
+      <!-- Certificate Content -->
       <div class="certificate-content">
-        <!-- Header Section - 3 Columns -->
-        <table class="header-table">
-          <tr>
-            <!-- RIGHT side: National Emblem + License Info -->
-            <td class="header-col-right">
+        <!-- Header Section -->
+        <header class="certificate-header">
+          <!-- Right Column: National Emblem & License Info -->
+          <div class="header-right">
+            <div class="emblem-container">
               <img src="/assets/img/afg.png" alt="نشان ملی افغانستان" class="national-emblem">
-              <p class="license-info">شماره جوازنامه <span>({{data.licenseNumber || '     '}})</span></p>
-              <p class="license-info">تاریخ صدور: <span>{{data.issueDateFormatted || (data.issueDate | calendarDate) || '     '}}</span></p>
-              <p class="license-info">تاریخ ختم: <span>{{data.expireDateFormatted || (data.expireDate | calendarDate) || '     '}}</span></p>
-            </td>
-            <!-- CENTER: Ministry Info -->
-            <td class="header-col-center">
-              <p class="ministry-line-1">امارت اسلامی افغانستان</p>
-              <p class="ministry-line-2">وزارت عدلیه</p>
-              <p class="ministry-line-3">ریاست عمومی انسجام</p>
-              <p class="ministry-line-4">ریاست امور رهنمای معاملات و عریضه نویسان</p>
-            </td>
-            <!-- LEFT side: Ministry Logo + Photo (stacked vertically) -->
-            <td class="header-col-left">
-              <div class="left-column-content">
-                <img src="/assets/img/mcitlogo.png" alt="لوگو وزارت" class="ministry-logo">
+            </div>
+            <div class="license-meta">
+              <div class="meta-item">
+                <span class="meta-label">شماره جوازنامه</span>
+                <span class="meta-value">({{data.licenseNumber || '—'}})</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">تاریخ صدور:</span>
+                <span class="meta-value">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">تاریخ ختم:</span>
+                <span class="meta-value">{{data.expireDateFormatted || (data.expireDate | calendarDate) || '—'}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center Column: Ministry Info -->
+          <div class="header-center">
+            <h1 class="ministry-title">امارت اسلامی افغانستان</h1>
+            <div class="ministry-divider">
+              <span class="divider-line"></span>
+              <span class="divider-diamond">◆</span>
+              <span class="divider-line"></span>
+            </div>
+            <h2 class="ministry-name">وزارت عدلیه</h2>
+            <h3 class="department-name">ریاست عمومی انسجام</h3>
+            <h4 class="sub-department">ریاست امور رهنمای معاملات و عریضه نویسان</h4>
+          </div>
+
+          <!-- Left Column: Logo & Photo -->
+          <div class="header-left">
+            <div class="logo-photo-stack">
+              <img src="/assets/img/mcitlogo.png" alt="لوگو وزارت" class="ministry-logo">
+              <div class="photo-container">
                 <div class="photo-frame">
                   <img [src]="filePath" alt="عکس" class="owner-photo" onerror="this.src='assets/img/avatar2.png'">
                 </div>
+                <div class="photo-label">عکس دارنده جواز</div>
               </div>
-            </td>
-          </tr>
-        </table>
-
-        <!-- Title Section -->
-        <div class="title-section">
-          <p class="certificate-title">جوازنامه فعالیت رهنمای معاملات <span>({{data.title || '     '}})</span></p>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-          <!-- Line 1 -->
-          <p class="info-line">
-            محترم <span class="val">({{data.firstName || '     '}})</span>
-            ولد <span class="val">({{data.fatherName || '     '}})</span>
-            ولدیت <span class="val">({{data.grandFatherName || '     '}})</span>
-            متولد سال <span class="val">({{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate) || '     '}})</span>
-           دارنده تذکره الکټرونیکی ()
-          </p>
-
-          <!-- Line 2 -->
-          <p class="info-line">
-            <span class="red">مسکونه اصلی ولسوالی</span> <span class="val">({{data.permanentDistrictName || '     '}})</span>
-            <span class="red">ولایت</span> <span class="val">({{data.permanentProvinceName || '     '}})</span>
-            <span class="red">مسکونه فعلی ناحیه یا ولسوالی</span> <span class="val">({{data.temporaryDistrictName || '     '}})</span>
-            <span class="red">ولایت</span> <span class="val">({{data.temporaryProvinceName || '     '}})</span>
-          </p>
-
-          <!-- Authorization Line -->
-          <p class="info-line">
-            <span class="red">واقع ناحیه</span> <span class="val">({{data.temporaryVillage || data.permanentVillage || '     '}})</span>
-            با در نظرداشت احکام مندرج فقره (4) ماده (13) قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
-          </p>
-
-          <!-- Inquiry Line -->
-          <p class="info-line small">
-            ذریعه استعلام نمبر <span class="val underline">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</span> به مطبعه معرفی شد.
-          </p>
-
-          <!-- Signature -->
-          <div class="signature-block">
-            <p>بااحترام</p>
-            <p class="sig-title">رئیس عمومی انسجام</p>
+            </div>
           </div>
+        </header>
+
+        <!-- Title Banner -->
+        <div class="title-banner">
+          <div class="banner-decoration left"></div>
+          <h2 class="certificate-title">
+            <span class="title-icon">📜</span>
+            جوازنامه فعالیت رهنمای معاملات
+            <span class="title-highlight">({{data.title || '—'}})</span>
+          </h2>
+          <div class="banner-decoration right"></div>
         </div>
+
+        <!-- Main Body -->
+        <main class="certificate-body">
+          <!-- Personal Information Card -->
+          <div class="info-card personal-info">
+            <p class="info-paragraph">
+              محترم <span class="highlight-value">({{data.firstName || '—'}})</span>
+              ولد <span class="highlight-value">({{data.fatherName || '—'}})</span>
+              ولدیت <span class="highlight-value">({{data.grandFatherName || '—'}})</span>
+              متولد سال <span class="highlight-value">({{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate) || '—'}})</span>
+              دارنده تذکره الکترونیکی             </p>
+          </div>
+
+          <!-- Address Information -->
+          <div class="info-card address-info">
+            <p class="info-paragraph">
+              <span class="label-accent">مسکونه اصلی ولسوالی</span>
+              <span class="highlight-value">({{data.permanentDistrictName || '—'}})</span>
+              <span class="label-accent">ولایت</span>
+              <span class="highlight-value">({{data.permanentProvinceName || '—'}})</span>
+              <span class="label-accent">مسکونه فعلی ناحیه یا ولسوالی</span>
+              <span class="highlight-value">({{data.temporaryDistrictName || '—'}})</span>
+              <span class="label-accent">ولایت</span>
+              <span class="highlight-value">({{data.temporaryProvinceName || '—'}})</span>
+            </p>
+          </div>
+
+          <!-- Authorization Statement -->
+          <div class="info-card authorization-card">
+            <p class="info-paragraph">
+              <span class="label-accent">واقع ناحیه</span>
+              <span class="highlight-value">({{data.temporaryVillage || data.permanentVillage || '—'}})</span>
+              با در نظرداشت احکام مندرج فقره (4) ماده (13) قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
+            </p>
+          </div>
+
+          <!-- Inquiry Reference -->
+          <div class="inquiry-line">
+            <span>ذریعه استعلام نمبر</span>
+            <span class="inquiry-field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span>به مطبعه معرفی شد.</span>
+          </div>
+
+          <!-- Signature Section -->
+          <div class="signature-section">
+            <div class="signature-block">
+              <p class="signature-greeting">بااحترام</p>
+              <div class="signature-line"></div>
+              <p class="signature-title">رئیس عمومی انسجام</p>
+            </div>
+          </div>
+        </main>
 
         <!-- Footer Section -->
-        <div class="footer-section">
-          <p class="footer-line">آدرس دفتر رهنمای معاملات: <span class="val">({{data.officeAddress || '     '}})</span></p>
-          
-          <p class="note-line"><span class="note-label">نوت:</span> مدت اعتبار این جوازنامه از تاریخ صدور برای مدت سه سال می باشد.</p>
-          
-          <p class="footer-line">
-            شماره تماس دارنده جوازنامه: <span class="val">({{data.phoneNumber || '     '}})</span>
-            نمبر تشخیصیه <span class="val">({{data.tin || '     '}})</span>
-            شماره ثبت <span class="val underline">(     )</span>
-            دیتابیس
-            قیمت جواز نامه: <span class="val">(پانزده هزار افغانی)</span>
-          </p>
+        <footer class="certificate-footer">
+          <!-- Office Address -->
+          <div class="footer-row address-row">
+            <span class="footer-label">آدرس دفتر رهنمای معاملات:</span>
+            <span class="footer-value">({{data.officeAddress || '—'}})</span>
+          </div>
 
-          <!-- QR Code Verification Section -->
-          <div class="verification-section" *ngIf="verificationCode">
-            <div class="qr-code-container">
+          <!-- Important Note -->
+          <div class="validity-notice">
+            <span class="notice-icon">📌</span>
+            <span class="notice-label">نوت:</span>
+            <span class="notice-text">مدت اعتبار این جوازنامه از تاریخ صدور برای مدت سه سال می باشد.</span>
+          </div>
+
+          <!-- License Details Row -->
+          <div class="footer-row details-row">
+            <span>شماره تماس دارنده جوازنامه: <strong class="footer-value">({{data.phoneNumber || '—'}})</strong></span>
+            <span>نمبر تشخیصیه <strong class="footer-value">({{data.tin || '—'}})</strong></span>
+            <span>شماره ثبت <strong class="footer-value underline">(     )</strong> دیتابیس</span>
+            <span>قیمت جواز نامه: <strong class="footer-value">(پانزده هزار افغانی)</strong></span>
+          </div>
+
+          <!-- QR Code Verification -->
+          <div class="verification-panel" *ngIf="verificationCode">
+            <div class="qr-section">
               <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" *ngIf="qrCodeUrl">
-              <p class="verification-code">{{ verificationCode }}</p>
-              <p class="verification-label">کود تصدیق سند</p>
+              <div class="verification-info">
+                <span class="verification-code">{{ verificationCode }}</span>
+                <span class="verification-label">کود تصدیق سند</span>
+              </div>
             </div>
           </div>
-          
-          <!-- Show error message if verification failed -->
-          <div class="verification-section verification-error" *ngIf="verificationError && !verificationCode">
-            <div class="qr-code-container error">
-              <p class="verification-error-text">{{ verificationError }}</p>
-              <p class="verification-label">برای تصدیق با اداره تماس بگیرید</p>
+
+          <!-- Verification Error -->
+          <div class="verification-panel error" *ngIf="verificationError && !verificationCode">
+            <div class="qr-section error">
+              <span class="error-text">{{ verificationError }}</span>
+              <span class="verification-label">برای تصدیق با اداره تماس بگیرید</span>
             </div>
           </div>
-        </div>
+        </footer>
       </div>
     </div>
   </div>
