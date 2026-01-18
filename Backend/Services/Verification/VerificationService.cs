@@ -25,7 +25,8 @@ namespace WebAPIBackend.Services.Verification
             { "RealEstateLicense", "LIC" },
             { "PetitionWriterLicense", "PWL" },
             { "Securities", "SEC" },
-            { "PetitionWriterSecurities", "PWS" }
+            { "PetitionWriterSecurities", "PWS" },
+            { "PropertyDocument", "PRO" }
         };
 
         public VerificationService(
@@ -325,6 +326,7 @@ namespace WebAPIBackend.Services.Verification
             {
                 "RealEstateLicense" => await GetRealEstateLicenseDataAsync(documentId),
                 "PetitionWriterLicense" => await GetPetitionWriterLicenseDataAsync(documentId),
+                "PropertyDocument" => await GetPropertyDocumentDataAsync(documentId),
                 _ => null
             };
         }
@@ -369,6 +371,25 @@ namespace WebAPIBackend.Services.Verification
                 ExpiryDate = license.LicenseExpiryDate?.ToDateTime(TimeOnly.MinValue),
                 CompanyTitle = null,
                 OfficeAddress = license.ActivityLocation
+            };
+        }
+
+        private async Task<DocumentDataDto?> GetPropertyDocumentDataAsync(int propertyId)
+        {
+            var property = await _context.GetPrintType
+                .FirstOrDefaultAsync(p => p.Id == propertyId);
+
+            if (property == null) return null;
+
+            return new DocumentDataDto
+            {
+                LicenseNumber = property.IssuanceNumber ?? property.PNumber.ToString(),
+                HolderName = $"{property.SellerFirstName} - {property.BuyerFirstName}",
+                HolderPhoto = property.SellerPhoto,
+                IssueDate = property.CreatedAt,
+                ExpiryDate = null, // Property documents don't expire
+                CompanyTitle = null,
+                OfficeAddress = $"{property.ProvinceDari ?? property.Province}, {property.DistrictDari ?? property.District}"
             };
         }
     }

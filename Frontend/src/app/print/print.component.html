@@ -35,6 +35,13 @@
             <h3 *ngIf="documentData.transactionType === 'معامله فروش'" style="font-size: 22px;font-weight: bold;">سته/سند معامله بیع قطعی (خرید و فروش جایداد)</h3>
             <h3 *ngIf="documentData.transactionType === 'معامله گرویی'" style="font-size: 22px;font-weight: bold;">سته/سند معامله بیع وفا ( گرویی)</h3>
             <h3 *ngIf="documentData.transactionType === 'معامله کرایی'" style="font-size: 22px;font-weight: bold;">سته/سند معامله(کرایی)</h3>
+            
+            <!-- QR Code in Header -->
+            <div *ngIf="verificationCode" style="margin-top: 15px;">
+                <img [src]="qrCodeUrl" alt="QR Code" style="width: 80px; height: 80px; border: 1px solid #1976d2; padding: 3px; background: white;" *ngIf="qrCodeUrl">
+                <p style="margin-top: 5px; font-size: 11px; font-weight: bold; color: #1976d2;">{{ verificationCode }}</p>
+                <p style="margin-top: 2px; font-size: 10px; color: #555;">کود تصدیق سند</p>
+            </div>
           </td>
           <td  colspan="4">
             <img [src]="BuyerfilePath" style="height: 100px; width:95px;">
@@ -507,4 +514,7 @@
             </div>
           
         </div>
+
+        
+
 </div>

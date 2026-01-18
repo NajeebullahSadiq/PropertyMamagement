@@ -100,3 +100,7 @@ sudo journalctl -u prmis-backend -n 50 --no-pager
 # # Update systemd service to use correct path
 # sudo sed -i 's|/var/www/prmis/backend/publish|/var/www/prmis/backend|g' /etc/systemd/system/prmis-backend.service
 # sudo systemctl daemon-reload
+
+
+# database migratin Apply
+sudo -u postgres psql -d PRMIS -f Scripts/Modules/02_UserManagement_Initial.sql

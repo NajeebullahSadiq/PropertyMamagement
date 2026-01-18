@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
 import { LocalizationService } from '../shared/localization.service';
+import { VerificationService } from '../shared/verification.service';
 import { environment } from 'src/environments/environment';
 import { catchError, of } from 'rxjs';
 
@@ -23,12 +24,19 @@ export class PrintComponent implements OnInit {
   propertyImagePath: string = '';
   previousDocsPath: string = '';
   existingDocsPath: string = '';
+  
+  // Verification properties
+  verificationCode: string = '';
+  verificationUrl: string = '';
+  qrCodeUrl: string = '';
+  verificationError: string | null = null;
 
   constructor(
     public service: AuthService,
     private route: ActivatedRoute,
     private pservice: PropertyService,
-    private localizationService: LocalizationService
+    private localizationService: LocalizationService,
+    private verificationService: VerificationService
   ) { }
 
   ngOnInit(): void {
@@ -81,7 +89,8 @@ export class PrintComponent implements OnInit {
           this.userDetails = user || {};
         });
 
-        this.waitForImagesToLoad();
+        // Fetch verification code after loading property data
+        this.fetchVerificationCode();
       },
       error: (err) => {
         console.error('Error loading print data:', err);
@@ -178,6 +187,39 @@ export class PrintComponent implements OnInit {
     const value = (propertyTypeValue ?? '').toString();
     const match = this.localizationService.propertyTypes.find(pt => pt.value === value);
     return match?.label || 'سایر';
+  }
+
+  private fetchVerificationCode(): void {
+    // Get the property ID from the data
+    const propertyId = this.documentData?.propertyId || this.documentData?.id || this.documentData?.propertyDetailId;
+    
+    console.log('[PrintProperty] Data object keys:', Object.keys(this.documentData || {}));
+    console.log('[PrintProperty] Looking for property ID, found:', propertyId);
+
+    if (!propertyId) {
+      console.warn('[PrintProperty] No property ID found for verification. Data:', this.documentData);
+      this.waitForImagesToLoad();
+      return;
+    }
+
+    console.log('[PrintProperty] Calling generateVerificationCode with ID:', propertyId);
+
+    this.verificationService.generateVerificationCode(propertyId, 'PropertyDocument').subscribe({
+      next: (result) => {
+        console.log('[PrintProperty] Verification result:', result);
+        this.verificationCode = result.verificationCode;
+        this.verificationUrl = result.verificationUrl;
+        this.qrCodeUrl = this.verificationService.generateQrCodeUrl(result.verificationUrl);
+        console.log('[PrintProperty] QR Code URL:', this.qrCodeUrl);
+        this.waitForImagesToLoad();
+      },
+      error: (err) => {
+        console.error('[PrintProperty] Error fetching verification code:', err);
+        console.error('[PrintProperty] Error details:', err?.error || err?.message);
+        this.verificationError = 'خطا در دریافت کود تصدیق';
+        this.waitForImagesToLoad();
+      }
+    });
   }
 
 }

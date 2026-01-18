@@ -17,7 +17,15 @@
   <div class="certificate-wrapper">
     <!-- Watermark Background -->
     <div class="watermark-layer">
-      <div class="watermark-emblem"></div>
+      <div class="watermark-circle">
+        <div class="watermark-text">
+          <div class="watermark-line">{{data.licenseNumber || '—'}}</div>
+          <div class="watermark-line">{{data.firstName || '—'}}</div>
+          <div class="watermark-line">{{data.fatherName || '—'}}</div>
+          <div class="watermark-line">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</div>
+          <div class="watermark-line">{{data.indentityCardNumber || '—'}}</div>
+        </div>
+      </div>
     </div>
     
     <!-- Guilloche Pattern Border -->
@@ -141,7 +149,8 @@
               ولد <span class="highlight-value">({{data.fatherName || '—'}})</span>
               ولدیت <span class="highlight-value">({{data.grandFatherName || '—'}})</span>
               متولد سال <span class="highlight-value">({{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate) || '—'}})</span>
-              دارنده تذکره الکترونیکی             </p>
+              دارنده تذکره الکترونیکی <span class="highlight-value">({{data.indentityCardNumber || '—'}})</span>
+            </p>
           </div>
 
           <!-- Address Information -->
@@ -206,20 +215,26 @@
             <span>قیمت جواز نامه: <strong class="footer-value">(پانزده هزار افغانی)</strong></span>
           </div>
 
-          <!-- QR Code Verification -->
-          <div class="verification-panel" *ngIf="verificationCode">
-            <div class="qr-section">
+          <!-- QR Code Verification Row -->
+          <div class="verification-row" *ngIf="verificationCode">
+            <div class="qr-code-container">
               <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" *ngIf="qrCodeUrl">
-              <div class="verification-info">
+            </div>
+            <div class="verification-details">
+              <div class="verification-item">
+                <span class="verification-label">کود تصدیق سند:</span>
                 <span class="verification-code">{{ verificationCode }}</span>
-                <span class="verification-label">کود تصدیق سند</span>
+              </div>
+              <div class="verification-item">
+                <span class="verification-label"> شهرت :</span>
+                <span class="verification-value">{{ data.firstName || '—' }} {{ data.fatherName || '—' }}</span>
               </div>
             </div>
           </div>
 
           <!-- Verification Error -->
-          <div class="verification-panel error" *ngIf="verificationError && !verificationCode">
-            <div class="qr-section error">
+          <div class="verification-row error" *ngIf="verificationError && !verificationCode">
+            <div class="error-content">
               <span class="error-text">{{ verificationError }}</span>
               <span class="verification-label">برای تصدیق با اداره تماس بگیرید</span>
             </div>

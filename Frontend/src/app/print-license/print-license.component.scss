@@ -170,7 +170,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Watermark Layer
+   Watermark Layer with Critical Info
    ───────────────────────────────────────────────────────────────────────────── */
 .watermark-layer {
   position: absolute;
@@ -183,15 +183,93 @@
   overflow: hidden;
 }
 
-.watermark-emblem {
+.watermark-circle {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px;
-  height: 400px;
-  background: url('/assets/img/afg.png') center/contain no-repeat;
-  opacity: 0.03;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  border: 3px solid rgba(25, 118, 210, 0.08);
+  background: 
+    radial-gradient(circle at center, 
+      rgba(227, 242, 253, 0.15) 0%, 
+      rgba(227, 242, 253, 0.08) 40%,
+      rgba(227, 242, 253, 0.03) 70%,
+      transparent 100%
+    );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Multiple concentric circles for security effect */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(25, 118, 210, 0.06);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    right: 40px;
+    bottom: 40px;
+    border-radius: 50%;
+    border: 1px dashed rgba(25, 118, 210, 0.05);
+  }
+}
+
+.watermark-text {
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: rgba(25, 118, 210, 0.12);
+  font-size: 32px;
+  line-height: 1.6;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  z-index: 2;
+  position: relative;
+  
+  /* Multiple text shadows for depth */
+  text-shadow: 
+    0 0 2px rgba(255, 255, 255, 0.8),
+    0 2px 4px rgba(25, 118, 210, 0.08),
+    0 4px 8px rgba(25, 118, 210, 0.05);
+}
+
+.watermark-line {
+  margin: 8px 0;
+  padding: 4px 12px;
+  background: rgba(227, 242, 253, 0.15);
+  border-radius: 4px;
+  
+  /* Microprint pattern in background */
+  position: relative;
+  
+  &::before {
+    content: '◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    font-size: 6px;
+    line-height: 1;
+    color: rgba(25, 118, 210, 0.08);
+    z-index: -1;
+    letter-spacing: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -601,7 +679,8 @@
   font-weight: 600;
   font-family: var(--font-body);
   letter-spacing: 0.3px;
-  text-align: justify;
+  text-align: center;
+  width: 100%;
 }
 
 .highlight-value {
@@ -711,8 +790,8 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .signature-section {
   display: flex;
-  justify-content: flex-start;
-  padding-right: 15%;
+  justify-content: flex-end;
+  padding-left: 15%;
   margin-top: 5px;
 }
 
@@ -871,19 +950,14 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   QR Code Verification Panel
+   QR Code Verification Row
    ───────────────────────────────────────────────────────────────────────────── */
-.verification-panel {
-  position: absolute;
-  bottom: 8px;
-  left: 15px;
-}
-
-.qr-section {
+.verification-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
   padding: 8px 12px;
+  margin: 6px 10px 0;
   background: linear-gradient(135deg, #fff 0%, var(--primary-50) 100%);
   border: 2px solid var(--primary-500);
   border-radius: 8px;
@@ -892,9 +966,12 @@
   &.error {
     border-color: var(--accent-red);
     background: linear-gradient(135deg, #fff 0%, #ffebee 100%);
-    flex-direction: column;
-    text-align: center;
+    justify-content: center;
   }
+}
+
+.qr-code-container {
+  flex-shrink: 0;
 }
 
 .qr-code {
@@ -902,41 +979,69 @@
   height: 70px;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: block;
 }
 
-.verification-info {
+.verification-details {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 6px;
+  flex: 1;
+}
+
+.verification-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.verification-label {
+  font-size: 11px;
+  color: var(--neutral-600);
+  font-weight: 600;
+  font-family: var(--font-body);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .verification-code {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--primary-800);
   letter-spacing: 1.5px;
   direction: ltr;
   background: var(--primary-50);
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 3px;
-  margin-bottom: 3px;
+  border: 1px solid var(--primary-200);
 }
 
-.verification-label {
-  font-size: 9px;
-  color: var(--neutral-500);
-  font-weight: 600;
-  font-family: var(--font-body);
-  letter-spacing: 0.2px;
+.verification-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary-800);
+  font-family: var(--font-heading);
+  letter-spacing: 0.3px;
+  background: var(--primary-50);
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid var(--primary-200);
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
 }
 
 .error-text {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--accent-red);
   font-weight: 700;
   font-family: var(--font-body);
-  margin-bottom: 3px;
   letter-spacing: 0.2px;
 }
 
@@ -1005,8 +1110,12 @@
     overflow: hidden !important;
   }
 
-  .watermark-emblem {
-    opacity: 0.025 !important;
+  .watermark-circle {
+    opacity: 0.5 !important;
+  }
+  
+  .watermark-text {
+    color: rgba(25, 118, 210, 0.15) !important;
   }
 
   .guilloche-pattern {
@@ -1110,9 +1219,22 @@
     background: #fff !important;
   }
 
+  .verification-row {
+    border-color: var(--primary-500) !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
   .verification-code {
     color: var(--primary-800) !important;
     background: var(--primary-50) !important;
+    border-color: var(--primary-200) !important;
+  }
+
+  .verification-value {
+    color: var(--primary-800) !important;
+    background: var(--primary-50) !important;
+    border-color: var(--primary-200) !important;
   }
 
   .banner-decoration {
@@ -1165,6 +1287,11 @@
   .info-card,
   .signature-section,
   .verification-panel {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .verification-row {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
