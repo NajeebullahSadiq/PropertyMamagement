@@ -21,7 +21,8 @@
       </div>
       <div class="pw-photo">
         <div class="pw-photo-box">
-          <img src="assets/img/avatar.png" alt="Photo" class="pw-photo-img" />
+          <img *ngIf="data.picturePath" [src]="getImageUrl(data.picturePath)" alt="Photo" class="pw-photo-img" onerror="this.src='assets/img/avatar.png'" />
+          <img *ngIf="!data.picturePath" src="assets/img/avatar.png" alt="Photo" class="pw-photo-img" />
         </div>
         <div class="pw-photo-text">فوتو</div>
       </div>
@@ -122,5 +123,51 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- QR Code Verification Section -->
+  <div class="pw-verification-section" *ngIf="verificationCode">
+    <div class="pw-verification-container">
+      <div class="pw-qr-code">
+        <img [src]="qrCodeUrl" alt="QR Code" class="pw-qr-image" *ngIf="qrCodeUrl">
+      </div>
+      <div class="pw-verification-info">
+        <div class="pw-verification-title">تصدیق اصالت سند</div>
+        <div class="pw-verification-row">
+          <span class="pw-verification-label">کود تصدیق:</span>
+          <span class="pw-verification-value">{{ verificationCode }}</span>
+        </div>
+        <div class="pw-verification-row">
+          <span class="pw-verification-label">نام عریضه نویس:</span>
+          <span class="pw-verification-value">{{ data.applicantName || '—' }}</span>
+        </div>
+        <div class="pw-verification-row">
+          <span class="pw-verification-label">نام پدر:</span>
+          <span class="pw-verification-value">{{ data.applicantFatherName || '—' }}</span>
+        </div>
+        <div class="pw-verification-row">
+          <span class="pw-verification-label">نمبر جواز:</span>
+          <span class="pw-verification-value">{{ data.licenseNumber || '—' }}</span>
+        </div>
+        <div class="pw-verification-row">
+          <span class="pw-verification-label">تاریخ صدور:</span>
+          <span class="pw-verification-value">{{ data.licenseIssueDateFormatted || '—' }}</span>
+        </div>
+        <div class="pw-verification-row">
+          <span class="pw-verification-label">محل فعالیت:</span>
+          <span class="pw-verification-value">{{ data.activityLocation || '—' }}</span>
+        </div>
+        <div class="pw-verification-note">
+          برای تصدیق اصالت این سند، کود QR را اسکن نمایید یا کود تصدیق را در پورتال تصدیق وزارت عدلیه وارد کنید.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verification Error -->
+  <div class="pw-verification-error" *ngIf="verificationError && !verificationCode">
+    <div class="pw-error-icon">⚠</div>
+    <div class="pw-error-text">{{ verificationError }}</div>
+    <div class="pw-error-note">برای تصدیق با اداره تماس بگیرید</div>
   </div>
 </div>

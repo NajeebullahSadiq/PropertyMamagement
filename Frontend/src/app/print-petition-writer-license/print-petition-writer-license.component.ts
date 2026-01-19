@@ -132,4 +132,12 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
   printPage(): void {
     window.print();
   }
+
+  getImageUrl(path: string): string {
+    if (!path) return 'assets/img/avatar.png';
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return this.baseUrl + path;
+  }
 }

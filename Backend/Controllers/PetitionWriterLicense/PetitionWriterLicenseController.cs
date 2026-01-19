@@ -79,6 +79,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
                         x.CurrentVillage,
                         x.ActivityLocation,
+                        x.PicturePath,
                         x.BankReceiptNumber,
                         x.BankReceiptDate,
                         BankReceiptDateFormatted = x.BankReceiptDate.HasValue
@@ -153,6 +154,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
                         x.CurrentVillage,
                         x.ActivityLocation,
+                        x.PicturePath,
                         x.BankReceiptNumber,
                         x.BankReceiptDate,
                         BankReceiptDateFormatted = x.BankReceiptDate.HasValue
@@ -232,6 +234,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     CurrentDistrictId = data.CurrentDistrictId,
                     CurrentVillage = data.CurrentVillage,
                     ActivityLocation = data.ActivityLocation,
+                    PicturePath = data.PicturePath,
                     BankReceiptNumber = data.BankReceiptNumber,
                     BankReceiptDate = DateConversionHelper.ParseDateOnly(data.BankReceiptDate, calendar),
                     LicenseType = data.LicenseType,
@@ -300,6 +303,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.CurrentDistrictId = data.CurrentDistrictId;
                 entity.CurrentVillage = data.CurrentVillage;
                 entity.ActivityLocation = data.ActivityLocation;
+                entity.PicturePath = data.PicturePath;
                 entity.BankReceiptNumber = data.BankReceiptNumber;
                 entity.BankReceiptDate = DateConversionHelper.ParseDateOnly(data.BankReceiptDate, calendar);
                 entity.LicenseType = data.LicenseType;

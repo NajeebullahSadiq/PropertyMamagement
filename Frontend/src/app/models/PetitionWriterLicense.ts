@@ -30,6 +30,9 @@ export interface PetitionWriterLicense {
     // Activity Location
     activityLocation?: string;
     
+    // Picture Path
+    picturePath?: string;
+    
     // Tab 2: ثبت مالیه و مشخصات جواز
     bankReceiptNumber?: string;
     bankReceiptDate?: Date | string;
@@ -113,6 +116,7 @@ export interface PetitionWriterLicenseData {
     currentDistrictId?: number;
     currentVillage?: string;
     activityLocation?: string;
+    picturePath?: string;
     bankReceiptNumber?: string;
     bankReceiptDate?: string;
     licenseType?: string;

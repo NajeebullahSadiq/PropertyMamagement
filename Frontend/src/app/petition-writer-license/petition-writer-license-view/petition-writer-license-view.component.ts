@@ -121,4 +121,14 @@ export class PetitionWriterLicenseViewComponent implements OnInit {
             this.router.navigate(['/printPetitionWriterLicense', this.item.id]);
         }
     }
+
+    getImageUrl(path: string): string {
+        if (!path) return '';
+        // If path already starts with http/https, return as is
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+            return path;
+        }
+        // Otherwise, construct the URL relative to the API
+        return `/api/${path}`;
+    }
 }

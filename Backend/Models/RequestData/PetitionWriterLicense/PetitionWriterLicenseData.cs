@@ -44,6 +44,9 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
         [MaxLength(500)]
         public string? ActivityLocation { get; set; }
 
+        [MaxLength(500)]
+        public string? PicturePath { get; set; }
+
         // Financial Info
         [MaxLength(100)]
         public string? BankReceiptNumber { get; set; }

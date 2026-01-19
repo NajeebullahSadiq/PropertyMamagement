@@ -69,6 +69,9 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     relocationsList: PetitionWriterRelocation[] = [];
     selectedRelocationId: number = 0;
 
+    // Picture upload
+    imageName: string = '';
+
     // RBAC
     canEdit = false;
     isViewOnly = false;
@@ -201,6 +204,9 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     activityLocation: data.activityLocation
                 });
 
+                // Set imageName from existing picturePath
+                this.imageName = data.picturePath || '';
+
                 // Load districts
                 if (data.permanentProvinceId) {
                     this.sellerService.getdistrict(data.permanentProvinceId).subscribe((d: any) => {
@@ -293,6 +299,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             licenseExpiryDate,
             licenseStatus: this.cancellationForm.value.licenseStatus,
             cancellationDate,
+            picturePath: this.imageName,
             calendarType: calendar
         };
 
@@ -449,5 +456,10 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     getStatusName(status: number): string {
         const found = this.licenseStatusTypes.find(s => s.id === status);
         return found ? found.name : '-';
+    }
+
+    onProfileImageUploaded(imagePath: string): void {
+        this.imageName = imagePath;
+        this.toastr.success('عکس پروفایل با موفقیت بارگذاری شد');
     }
 }

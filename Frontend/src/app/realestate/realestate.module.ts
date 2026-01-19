@@ -63,6 +63,9 @@ import { SharedModule } from '../shared/shared.module';
     NgxPaginationModule,
     ReactiveFormsModule,
     SharedModule
+  ],
+  exports: [
+    FileuploadComponent
   ]
 })
 export class RealestateModule { }

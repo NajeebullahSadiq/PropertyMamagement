@@ -55,6 +55,10 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         [MaxLength(500)]
         public string? ActivityLocation { get; set; }
 
+        // Picture Path (عکس)
+        [MaxLength(500)]
+        public string? PicturePath { get; set; }
+
         // Tab 2: ثبت مالیه و مشخصات جواز
         [MaxLength(100)]
         public string? BankReceiptNumber { get; set; }
