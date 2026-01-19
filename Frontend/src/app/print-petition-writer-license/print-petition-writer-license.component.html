@@ -15,9 +15,18 @@
 
 <div class="pw-page" *ngIf="!isLoading && !error" dir="rtl">
   <div class="pw-header">
-    <div class="pw-header-logo">
-      <img src="assets/img/mcitlogo.png" alt="Logo" class="pw-logo" />
+    <div class="pw-header-column pw-header-column--left">
+      <div class="pw-header-logo">
+        <img src="assets/img/mcitlogo.png" alt="Logo" class="pw-logo" />
+      </div>
+      <div class="pw-photo">
+        <div class="pw-photo-box">
+          <img src="assets/img/avatar.png" alt="Photo" class="pw-photo-img" />
+        </div>
+        <div class="pw-photo-text">فوتو</div>
+      </div>
     </div>
+    
     <div class="pw-header-title">
       <div class="pw-title-line">امارت اسلامی افغانستان</div>
       <div class="pw-title-line">وزارت عدلیه</div>
@@ -27,29 +36,25 @@
       <div class="pw-subtitle-line">مدیریت بررسی و ثبت جواز عریضه نویسان</div>
       <div class="pw-title-strong">جواز فعالیت عریضه نویسی</div>
     </div>
-    <div class="pw-header-logo pw-header-logo--right">
-      <img src="assets/img/afg.png" alt="Logo" class="pw-logo" />
-    </div>
-  </div>
-
-  <div class="pw-meta">
-    <div class="pw-meta-item">
-      <span class="pw-meta-label">نمبر جواز:</span>
-      <span class="pw-meta-value">{{ data.licenseNumber }}</span>
-    </div>
-    <div class="pw-meta-item">
-      <span class="pw-meta-label">تاریخ صدور:</span>
-      <span class="pw-meta-value">{{ data.licenseIssueDateFormatted || '-' }}</span>
+    
+    <div class="pw-header-column pw-header-column--right">
+      <div class="pw-header-logo">
+        <img src="assets/img/afg.png" alt="Logo" class="pw-logo" />
+      </div>
+      <div class="pw-meta">
+        <div class="pw-meta-item">
+          <span class="pw-meta-label">نمبر جواز:</span>
+          <span class="pw-meta-value">{{ data.licenseNumber }}</span>
+        </div>
+        <div class="pw-meta-item">
+          <span class="pw-meta-label">تاریخ صدور:</span>
+          <span class="pw-meta-value">{{ data.licenseIssueDateFormatted || '-' }}</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="pw-content">
-    <div class="pw-photo">
-      <div class="pw-photo-box">
-        <img src="assets/img/avatar.png" alt="Photo" class="pw-photo-img" />
-      </div>
-      <div class="pw-photo-text">فوتو</div>
-    </div>
 
     <div class="pw-form">
       <div class="pw-form-title">شهرت عریضه نویس</div>

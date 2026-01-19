@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { PetitionWriterLicenseService } from '../shared/petition-writer-license.service';
 import { CalendarService } from '../shared/calendar.service';
+import { VerificationService } from '../shared/verification.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -16,10 +17,17 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
+  // Verification properties
+  verificationCode: string = '';
+  verificationUrl: string = '';
+  qrCodeUrl: string = '';
+  verificationError: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private licenseService: PetitionWriterLicenseService,
-    private calendarService: CalendarService
+    private calendarService: CalendarService,
+    private verificationService: VerificationService
   ) {}
 
   ngOnInit(): void {
@@ -47,8 +55,7 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
       this.licenseService.getById(+id, calendar).subscribe({
         next: (res) => {
           this.data = res || {};
-          this.isLoading = false;
-          this.triggerPrint();
+          this.fetchVerificationCode();
         },
         error: (err) => {
           console.error('Error loading petition writer license data:', err);
@@ -64,6 +71,41 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
           this.isLoading = false;
         }
       });
+    });
+  }
+
+  private fetchVerificationCode(): void {
+    const licenseId = this.data?.id;
+    
+    console.log('[PrintPetitionWriterLicense] Data object keys:', Object.keys(this.data || {}));
+    console.log('[PrintPetitionWriterLicense] Looking for license ID, found:', licenseId);
+
+    if (!licenseId) {
+      console.warn('[PrintPetitionWriterLicense] No license ID found for verification. Data:', this.data);
+      this.isLoading = false;
+      this.triggerPrint();
+      return;
+    }
+
+    console.log('[PrintPetitionWriterLicense] Calling generateVerificationCode with ID:', licenseId);
+
+    this.verificationService.generateVerificationCode(licenseId, 'PetitionWriterLicense').subscribe({
+      next: (result) => {
+        console.log('[PrintPetitionWriterLicense] Verification result:', result);
+        this.verificationCode = result.verificationCode;
+        this.verificationUrl = result.verificationUrl;
+        this.qrCodeUrl = this.verificationService.generateQrCodeUrl(result.verificationUrl);
+        console.log('[PrintPetitionWriterLicense] QR Code URL:', this.qrCodeUrl);
+        this.isLoading = false;
+        this.triggerPrint();
+      },
+      error: (err) => {
+        console.error('[PrintPetitionWriterLicense] Error fetching verification code:', err);
+        console.error('[PrintPetitionWriterLicense] Error details:', err?.error || err?.message);
+        this.verificationError = 'خطا در دریافت کود تصدیق';
+        this.isLoading = false;
+        this.triggerPrint();
+      }
     });
   }
 

@@ -1,3 +1,9 @@
+// Force RTL for entire component
+:host {
+  display: block;
+  direction: rtl;
+}
+
 // Loading and Error Styles
 .loading-container,
 .error-container {
@@ -8,6 +14,7 @@
   min-height: 100vh;
   padding: 2rem;
   text-align: center;
+  direction: rtl;
 }
 
 .loading-spinner {
@@ -63,6 +70,7 @@
   body {
     margin: 0;
     padding: 0;
+    direction: rtl;
   }
 
   .loading-container,
@@ -81,6 +89,7 @@
   box-sizing: border-box;
   font-family: 'B Nazanin', 'Tahoma', sans-serif;
   direction: rtl;
+  text-align: right;
 }
 
 .pw-header {
@@ -90,25 +99,41 @@
   margin-bottom: 20px;
   border-bottom: 3px double #333;
   padding-bottom: 15px;
+  gap: 20px;
 }
 
-.pw-header-logo {
-  flex: 0 0 80px;
+.pw-header-column {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 }
 
-.pw-header-logo--right {
+.pw-header-column--left {
+  order: 1;
+}
+
+.pw-header-column--right {
   order: 3;
-}
-
-.pw-logo {
-  width: 80px;
-  height: auto;
 }
 
 .pw-header-title {
   flex: 1;
   text-align: center;
   padding: 0 20px;
+  order: 2;
+}
+
+.pw-header-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pw-logo {
+  width: 80px;
+  height: auto;
 }
 
 .pw-title-line {
@@ -131,25 +156,30 @@
 
 .pw-meta {
   display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px;
   background: #f5f5f5;
   border-radius: 5px;
+  min-width: 150px;
 }
 
 .pw-meta-item {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
 }
 
 .pw-meta-label {
   font-weight: bold;
+  font-size: 12px;
 }
 
 .pw-meta-value {
   color: #1976d2;
   font-weight: bold;
+  font-size: 14px;
 }
 
 .pw-content {
@@ -159,13 +189,16 @@
 }
 
 .pw-photo {
-  flex: 0 0 120px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 }
 
 .pw-photo-box {
-  width: 120px;
-  height: 140px;
+  width: 100px;
+  height: 120px;
   border: 2px solid #333;
   display: flex;
   align-items: center;
@@ -226,17 +259,21 @@
   padding: 8px;
   border: 1px solid #333;
   font-size: 13px;
+  text-align: right;
+  direction: rtl;
 }
 
 .pw-label {
   background: #f5f5f5;
   font-weight: bold;
   text-align: right;
+  direction: rtl;
 }
 
 .pw-value {
   background: white;
   text-align: right;
+  direction: rtl;
 }
 
 .pw-bottom {
@@ -265,6 +302,8 @@
   padding: 15px;
   min-height: 120px;
   font-size: 12px;
+  direction: rtl;
+  text-align: right;
 }
 
 .pw-bottom-center {
@@ -280,6 +319,7 @@
 .pw-bottom-text {
   line-height: 1.8;
   text-align: justify;
+  direction: rtl;
 }
 
 .pw-kv {
@@ -303,6 +343,7 @@
     margin: 0;
     padding: 10mm;
     box-shadow: none;
+    direction: rtl;
   }
 
   @page {
