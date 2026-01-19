@@ -81,11 +81,7 @@ export class SellerdetailComponent {
       firstName: ['', Validators.required],
       fatherName: ['', Validators.required],
       grandFather: ['', Validators.required],
-      indentityCardNumber: ['', Validators.required],
-      tazkiraType: ['', Validators.required],
-      tazkiraVolume: [''],
-      tazkiraPage: [''],
-      tazkiraNumber: [''],
+      electronicNationalIdNumber: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       paddressProvinceId: ['', Validators.required],
       paddressDistrictId: ['', Validators.required],
@@ -130,28 +126,6 @@ export class SellerdetailComponent {
       heirsLetterControl?.updateValueAndValidity();
     });
 
-    this.SellerForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
-      const volumeControl = this.SellerForm.get('tazkiraVolume');
-      const pageControl = this.SellerForm.get('tazkiraPage');
-      const numberControl = this.SellerForm.get('tazkiraNumber');
-      
-      if (tazkiraType === 'Paper') {
-        volumeControl?.setValidators([Validators.required]);
-        pageControl?.setValidators([Validators.required]);
-        numberControl?.setValidators([Validators.required]);
-      } else {
-        volumeControl?.clearValidators();
-        pageControl?.clearValidators();
-        numberControl?.clearValidators();
-        volumeControl?.reset();
-        pageControl?.reset();
-        numberControl?.reset();
-      }
-      
-      volumeControl?.updateValueAndValidity();
-      pageControl?.updateValueAndValidity();
-      numberControl?.updateValueAndValidity();
-    });
   }
   ngOnInit() {
     // Initialize role types - restricted to only 4 approved options for Vehicle module
@@ -188,11 +162,7 @@ export class SellerdetailComponent {
           firstName:firstSeller.firstName,
           fatherName: firstSeller.fatherName,
           grandFather: firstSeller.grandFather,
-          indentityCardNumber: firstSeller.indentityCardNumber,
-          tazkiraType: firstSeller.tazkiraType || '',
-          tazkiraVolume: firstSeller.tazkiraVolume || '',
-          tazkiraPage: firstSeller.tazkiraPage || '',
-          tazkiraNumber: firstSeller.tazkiraNumber || '',
+          electronicNationalIdNumber: firstSeller.electronicNationalIdNumber || '',
           phoneNumber: firstSeller.phoneNumber,
           propertyDetailsId: firstSeller.propertyDetailsId,
           paddressProvinceId: firstSeller.paddressProvinceId,
@@ -328,11 +298,7 @@ updateSellerDetails(): void {
       firstName: selectedSeller.firstName,
       fatherName: selectedSeller.fatherName,
       grandFather: selectedSeller.grandFather,
-      indentityCardNumber: selectedSeller.indentityCardNumber,
-      tazkiraType: selectedSeller.tazkiraType || '',
-      tazkiraVolume: selectedSeller.tazkiraVolume || '',
-      tazkiraPage: selectedSeller.tazkiraPage || '',
-      tazkiraNumber: selectedSeller.tazkiraNumber || '',
+      electronicNationalIdNumber: selectedSeller.electronicNationalIdNumber || '',
       phoneNumber: selectedSeller.phoneNumber,
       propertyDetailsId: selectedSeller.propertyDetailsId,
       paddressProvinceId: selectedSeller.paddressProvinceId,
@@ -488,19 +454,10 @@ isHeirs(): boolean {
   return roleType === 'Heirs';
 }
 
-isPaperTazkira(): boolean {
-  const tazkiraType = this.SellerForm.get('tazkiraType')?.value;
-  return tazkiraType === 'Paper';
-}
-
   get firstName() { return this.SellerForm.get('firstName'); }
   get fatherName() { return this.SellerForm.get('fatherName'); }
   get grandFather() { return this.SellerForm.get('grandFather'); }
-  get indentityCardNumber() { return this.SellerForm.get('indentityCardNumber'); }
-  get tazkiraType() { return this.SellerForm.get('tazkiraType'); }
-  get tazkiraVolume() { return this.SellerForm.get('tazkiraVolume'); }
-  get tazkiraPage() { return this.SellerForm.get('tazkiraPage'); }
-  get tazkiraNumber() { return this.SellerForm.get('tazkiraNumber'); }
+  get electronicNationalIdNumber() { return this.SellerForm.get('electronicNationalIdNumber'); }
   get phoneNumber() { return this.SellerForm.get('phoneNumber'); }
   get paddressProvinceId() { return this.SellerForm.get('paddressProvinceId'); }
   get paddressDistrictId() { return this.SellerForm.get('paddressDistrictId'); }

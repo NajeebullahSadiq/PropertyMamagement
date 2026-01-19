@@ -65,7 +65,6 @@ export class CompanyownerComponent {
 	province: any;
 	ownerDistrict: any;
 	permanentDistrict: any;
-	temporaryDistrict: any;
 
 	// Address change mode
 	isAddressChangeMode: boolean = false;
@@ -80,15 +79,11 @@ export class CompanyownerComponent {
 		permanentProvinceName?: string;
 		permanentDistrictName?: string;
 		permanentVillage?: string;
-		temporaryProvinceName?: string;
-		temporaryDistrictName?: string;
-		temporaryVillage?: string;
 	} = {};
 
 	// New address districts (for address change mode)
 	newOwnerDistrict: any;
 	newPermanentDistrict: any;
-	newTemporaryDistrict: any;
 
 	@Input() id: number = 0;
 	@Output() next = new EventEmitter<void>();
@@ -120,12 +115,8 @@ export class CompanyownerComponent {
 			grandFatherName: ['', Validators.required],
 			educationLevelId: ['', Validators.required],
 			dateofBirth: ['', Validators.required],
-			identityCardTypeId: ['', Validators.required],
-			indentityCardNumber: ['', Validators.required],
-			jild: [''],
-			safha: [''],
+			electronicNationalIdNumber: ['', Validators.required],
 			companyId: [''],
-			sabtNumber: [''],
 			pothoPath: [''],
 			// Contact Information
 			phoneNumber: [''],
@@ -133,25 +124,18 @@ export class CompanyownerComponent {
 			// Owner's Own Address Fields (آدرس اصلی مالک)
 			ownerProvinceId: ['', Validators.required],
 			ownerDistrictId: ['', Validators.required],
-			ownerVillage: ['', Validators.required],
+			ownerVillage: [''],
 			// Permanent Address Fields (آدرس دایمی) - Current Residence
 			permanentProvinceId: ['', Validators.required],
 			permanentDistrictId: ['', Validators.required],
 			permanentVillage: ['', Validators.required],
-			// Temporary Address Fields (آدرس موقت)
-			temporaryProvinceId: [''],
-			temporaryDistrictId: [''],
-			temporaryVillage: [''],
 			// New Address Fields (for address change mode)
 			newOwnerProvinceId: [''],
 			newOwnerDistrictId: [''],
 			newOwnerVillage: [''],
 			newPermanentProvinceId: [''],
 			newPermanentDistrictId: [''],
-			newPermanentVillage: [''],
-			newTemporaryProvinceId: [''],
-			newTemporaryDistrictId: [''],
-			newTemporaryVillage: ['']
+			newPermanentVillage: ['']
 		});
 
 		// Add cross-field validation for phone numbers
@@ -202,16 +186,6 @@ export class CompanyownerComponent {
 	}
 
 	ngOnInit() {
-		this.comservice.getIdentityTypes().subscribe(res => {
-			this.IdTypes = res;
-			this.filteredIdTypes = (res as any[]).filter((item: any) => {
-				const name = item.name || '';
-				return name === 'الکترونیکی' || name === 'کاغذی';
-			}).map((item: any) => ({
-				...item,
-				displayName: item.name
-			}));
-		});
 		this.comservice.getEducationLevel().subscribe(res => {
 			this.EducationLevel = res;
 		});
@@ -232,12 +206,8 @@ export class CompanyownerComponent {
 							grandFatherName: detail[0].grandFatherName,
 							educationLevelId: detail[0].educationLevelId,
 							dateofBirth: detail[0].dateofBirth,
-							identityCardTypeId: detail[0].identityCardTypeId,
-							indentityCardNumber: detail[0].indentityCardNumber != null ? String(detail[0].indentityCardNumber) : '',
-							jild: detail[0].jild,
-							safha: detail[0].safha,
+							electronicNationalIdNumber: detail[0].electronicNationalIdNumber || '',
 							companyId: detail[0].companyId,
-							sabtNumber: detail[0].sabtNumber,
 							pothoPath: detail[0].pothoPath,
 							phoneNumber: detail[0].phoneNumber || '',
 							whatsAppNumber: detail[0].whatsAppNumber || '',
@@ -246,10 +216,7 @@ export class CompanyownerComponent {
 							ownerVillage: detail[0].ownerVillage || '',
 							permanentProvinceId: detail[0].permanentProvinceId || '',
 							permanentDistrictId: detail[0].permanentDistrictId || '',
-							permanentVillage: detail[0].permanentVillage || '',
-							temporaryProvinceId: detail[0].temporaryProvinceId || '',
-							temporaryDistrictId: detail[0].temporaryDistrictId || '',
-							temporaryVillage: detail[0].temporaryVillage || ''
+							permanentVillage: detail[0].permanentVillage || ''
 						});
 
 						// Store current address for display
@@ -259,10 +226,7 @@ export class CompanyownerComponent {
 							ownerVillage: detail[0].ownerVillage,
 							permanentProvinceName: detail[0].permanentProvinceName,
 							permanentDistrictName: detail[0].permanentDistrictName,
-							permanentVillage: detail[0].permanentVillage,
-							temporaryProvinceName: detail[0].temporaryProvinceName,
-							temporaryDistrictName: detail[0].temporaryDistrictName,
-							temporaryVillage: detail[0].temporaryVillage
+							permanentVillage: detail[0].permanentVillage
 						};
 
 						this.comservice.ownerId = detail[0].id;
@@ -287,7 +251,6 @@ export class CompanyownerComponent {
 						if (parsedDate) {
 							this.selectedDate = parsedDate;
 						}
-						this.onPropertyTypeChange();
 
 						if (detail[0].ownerProvinceId) {
 							this.selerService.getdistrict(detail[0].ownerProvinceId).subscribe(res => {
@@ -297,11 +260,6 @@ export class CompanyownerComponent {
 						if (detail[0].permanentProvinceId) {
 							this.selerService.getdistrict(detail[0].permanentProvinceId).subscribe(res => {
 								this.permanentDistrict = res;
-							});
-						}
-						if (detail[0].temporaryProvinceId) {
-							this.selerService.getdistrict(detail[0].temporaryProvinceId).subscribe(res => {
-								this.temporaryDistrict = res;
 							});
 						}
 
@@ -342,14 +300,10 @@ export class CompanyownerComponent {
 			newOwnerVillage: '',
 			newPermanentProvinceId: '',
 			newPermanentDistrictId: '',
-			newPermanentVillage: '',
-			newTemporaryProvinceId: '',
-			newTemporaryDistrictId: '',
-			newTemporaryVillage: ''
+			newPermanentVillage: ''
 		});
 		this.newOwnerDistrict = [];
 		this.newPermanentDistrict = [];
-		this.newTemporaryDistrict = [];
 	}
 
 	// Cancel address change mode
@@ -361,10 +315,7 @@ export class CompanyownerComponent {
 			newOwnerVillage: '',
 			newPermanentProvinceId: '',
 			newPermanentDistrictId: '',
-			newPermanentVillage: '',
-			newTemporaryProvinceId: '',
-			newTemporaryDistrictId: '',
-			newTemporaryVillage: ''
+			newPermanentVillage: ''
 		});
 	}
 
@@ -394,19 +345,6 @@ export class CompanyownerComponent {
 		}
 	}
 
-	// Filter districts for new temporary address
-	filterNewTemporaryDistricts(event: any): void {
-		if (event && event.id) {
-			this.selerService.getdistrict(event.id).subscribe(res => {
-				this.newTemporaryDistrict = res;
-				this.ownerForm.patchValue({ newTemporaryDistrictId: '' });
-			});
-		} else {
-			this.newTemporaryDistrict = [];
-			this.ownerForm.patchValue({ newTemporaryDistrictId: '' });
-		}
-	}
-
 	filterPermanentDistricts(event: any) {
 		if (event && event.id) {
 			this.selerService.getdistrict(event.id).subscribe(res => {
@@ -431,18 +369,6 @@ export class CompanyownerComponent {
 		}
 	}
 
-	filterTemporaryDistricts(event: any) {
-		if (event && event.id) {
-			this.selerService.getdistrict(event.id).subscribe(res => {
-				this.temporaryDistrict = res;
-				this.ownerForm.patchValue({ temporaryDistrictId: '' });
-			});
-		} else {
-			this.temporaryDistrict = [];
-			this.ownerForm.patchValue({ temporaryDistrictId: '' });
-		}
-	}
-
 	uploadFinished = (event: string) => {
 		this.imageName = event;
 		this.imagePath = event ? (this.baseUrl + event) : 'assets/img/avatar.png';
@@ -464,52 +390,6 @@ export class CompanyownerComponent {
 		this.imageName = dbPath || '';
 		this.ownerForm.patchValue({ pothoPath: this.imageName });
 		this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
-	}
-
-	onPropertyTypeChange() {
-		const identityCardTypeId = this.ownerForm.get('identityCardTypeId')?.value;
-		const jild = this.ownerForm.get('jild');
-		const safha = this.ownerForm.get('safha');
-		const sabtNumber = this.ownerForm.get('sabtNumber');
-
-		const selectedType = (this.filteredIdTypes || []).find((item: any) => item.id === identityCardTypeId);
-		const selectedName = (selectedType?.name || '').toLowerCase();
-		const isElectricId = selectedName.includes('electric') || selectedName.includes('الکترونی');
-
-		if (isElectricId) {
-			jild?.setValue('');
-			jild?.clearAsyncValidators();
-			jild?.clearValidators();
-			jild?.disable();
-			jild?.updateValueAndValidity();
-
-			safha?.setValue('');
-			safha?.clearAsyncValidators();
-			safha?.clearValidators();
-			safha?.disable();
-			safha?.updateValueAndValidity();
-
-			sabtNumber?.setValue('');
-			sabtNumber?.clearAsyncValidators();
-			sabtNumber?.clearValidators();
-			sabtNumber?.disable();
-			sabtNumber?.updateValueAndValidity();
-		} else {
-			jild?.enable();
-			jild?.setValue('');
-			jild?.setValidators(Validators.required);
-			jild?.updateValueAndValidity();
-
-			safha?.enable();
-			safha?.setValue('');
-			safha?.setValidators(Validators.required);
-			safha?.updateValueAndValidity();
-
-			sabtNumber?.enable();
-			sabtNumber?.setValue('');
-			sabtNumber?.setValidators(Validators.required);
-			sabtNumber?.updateValueAndValidity();
-		}
 	}
 
 	private formatDateForBackend(dateValue: any): string {
@@ -545,8 +425,8 @@ export class CompanyownerComponent {
 			return;
 		}
 
-		if (details.indentityCardNumber != null) {
-			details.indentityCardNumber = String(details.indentityCardNumber);
+		if (details.electronicNationalIdNumber != null) {
+			details.electronicNationalIdNumber = String(details.electronicNationalIdNumber);
 		}
 
 		details.calendarType = currentCalendar;
@@ -568,10 +448,6 @@ export class CompanyownerComponent {
 		details.permanentProvinceId = this.ownerForm.get('permanentProvinceId')?.value || null;
 		details.permanentDistrictId = this.ownerForm.get('permanentDistrictId')?.value || null;
 		details.permanentVillage = this.ownerForm.get('permanentVillage')?.value || null;
-		// Temporary Address Fields (آدرس موقت)
-		details.temporaryProvinceId = this.ownerForm.get('temporaryProvinceId')?.value || null;
-		details.temporaryDistrictId = this.ownerForm.get('temporaryDistrictId')?.value || null;
-		details.temporaryVillage = this.ownerForm.get('temporaryVillage')?.value || null;
 
 		this.comservice.addcompanyOwner(details).subscribe(
 			result => {
@@ -601,8 +477,8 @@ export class CompanyownerComponent {
 			return;
 		}
 
-		if (details.indentityCardNumber != null) {
-			details.indentityCardNumber = String(details.indentityCardNumber);
+		if (details.electronicNationalIdNumber != null) {
+			details.electronicNationalIdNumber = String(details.electronicNationalIdNumber);
 		}
 
 		details.calendarType = currentCalendar;
@@ -625,9 +501,6 @@ export class CompanyownerComponent {
 			details.permanentProvinceId = this.ownerForm.get('newPermanentProvinceId')?.value || null;
 			details.permanentDistrictId = this.ownerForm.get('newPermanentDistrictId')?.value || null;
 			details.permanentVillage = this.ownerForm.get('newPermanentVillage')?.value || null;
-			details.temporaryProvinceId = this.ownerForm.get('newTemporaryProvinceId')?.value || null;
-			details.temporaryDistrictId = this.ownerForm.get('newTemporaryDistrictId')?.value || null;
-			details.temporaryVillage = this.ownerForm.get('newTemporaryVillage')?.value || null;
 			details.isAddressChange = true;
 		} else {
 			details.ownerProvinceId = this.ownerForm.get('ownerProvinceId')?.value || null;
@@ -636,9 +509,6 @@ export class CompanyownerComponent {
 			details.permanentProvinceId = this.ownerForm.get('permanentProvinceId')?.value || null;
 			details.permanentDistrictId = this.ownerForm.get('permanentDistrictId')?.value || null;
 			details.permanentVillage = this.ownerForm.get('permanentVillage')?.value || null;
-			details.temporaryProvinceId = this.ownerForm.get('temporaryProvinceId')?.value || null;
-			details.temporaryDistrictId = this.ownerForm.get('temporaryDistrictId')?.value || null;
-			details.temporaryVillage = this.ownerForm.get('temporaryVillage')?.value || null;
 			details.isAddressChange = false;
 		}
 
@@ -675,7 +545,6 @@ export class CompanyownerComponent {
 		this.selectedId = 0;
 		this.ownerDistrict = [];
 		this.permanentDistrict = [];
-		this.temporaryDistrict = [];
 		this.isAddressChangeMode = false;
 		this.addressHistory = [];
 		this.showAddressHistory = false;
@@ -686,12 +555,8 @@ export class CompanyownerComponent {
 	get grandFatherName() { return this.ownerForm.get('grandFatherName'); }
 	get educationLevelId() { return this.ownerForm.get('educationLevelId'); }
 	get dateofBirth() { return this.ownerForm.get('dateofBirth'); }
-	get identityCardTypeId() { return this.ownerForm.get('identityCardTypeId'); }
-	get indentityCardNumber() { return this.ownerForm.get('indentityCardNumber'); }
-	get jild() { return this.ownerForm.get('jild'); }
-	get safha() { return this.ownerForm.get('safha'); }
+	get electronicNationalIdNumber() { return this.ownerForm.get('electronicNationalIdNumber'); }
 	get companyId() { return this.ownerForm.get('companyId'); }
-	get sabtNumber() { return this.ownerForm.get('sabtNumber'); }
 	get pothoPath() { return this.ownerForm.get('pothoPath'); }
 	get phoneNumber() { return this.ownerForm.get('phoneNumber'); }
 	get whatsAppNumber() { return this.ownerForm.get('whatsAppNumber'); }
@@ -703,15 +568,4 @@ export class CompanyownerComponent {
 	get permanentProvinceId() { return this.ownerForm.get('permanentProvinceId'); }
 	get permanentDistrictId() { return this.ownerForm.get('permanentDistrictId'); }
 	get permanentVillage() { return this.ownerForm.get('permanentVillage'); }
-	// Temporary Address getters (آدرس موقت)
-	get temporaryProvinceId() { return this.ownerForm.get('temporaryProvinceId'); }
-	get temporaryDistrictId() { return this.ownerForm.get('temporaryDistrictId'); }
-	get temporaryVillage() { return this.ownerForm.get('temporaryVillage'); }
-
-	isElectricIdSelected(): boolean {
-		const identityCardTypeId = this.ownerForm.get('identityCardTypeId')?.value;
-		const selectedType = (this.filteredIdTypes || []).find((item: any) => item.id === identityCardTypeId);
-		const selectedName = selectedType?.name || '';
-		return selectedName === 'الکترونیکی';
-	}
 }

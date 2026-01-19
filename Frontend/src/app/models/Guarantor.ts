@@ -3,12 +3,8 @@ export interface Guarantor{
     firstName:string;
     fatherName:string;
     grandFatherName?:string;
-    identityCardTypeId:number;
-    indentityCardNumber:number;
-    jild:string;
-    safha:string;
+    electronicNationalIdNumber?:string;
     companyId:number;
-    sabtNumber:string;
     pothoPath:string;
     phoneNumber:string;
     paddressProvinceId:number;

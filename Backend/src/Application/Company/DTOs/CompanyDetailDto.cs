@@ -67,9 +67,6 @@ namespace WebAPIBackend.Application.Company.DTOs
         public string? PermanentProvinceName { get; set; }
         public string? PermanentDistrictName { get; set; }
         public string? PermanentVillage { get; set; }
-        public string? TemporaryProvinceName { get; set; }
-        public string? TemporaryDistrictName { get; set; }
-        public string? TemporaryVillage { get; set; }
     }
 
     public class LicenseDetailViewDto
@@ -78,6 +75,7 @@ namespace WebAPIBackend.Application.Company.DTOs
         public int? LicenseNumber { get; set; }
         public string? LicenseType { get; set; }
         public string? LicenseCategory { get; set; }
+        public int? RenewalRound { get; set; }
         public DateOnly? IssueDate { get; set; }
         public DateOnly? ExpireDate { get; set; }
         public string? OfficeAddress { get; set; }

@@ -19,8 +19,6 @@ import {
     PetitionWriterLicenseData,
     PetitionWriterRelocationData,
     PetitionWriterRelocation,
-    IdentityCardTypeEnum,
-    IdentityCardTypes,
     LicenseStatusEnum,
     LicenseStatusTypes,
     LicenseTypes
@@ -68,13 +66,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     provinces: any[] = [];
     permanentDistricts: any[] = [];
     currentDistricts: any[] = [];
-    identityCardTypes = IdentityCardTypes;
     licenseStatusTypes = LicenseStatusTypes;
     licenseTypes = LicenseTypes;
-
-    // Conditional visibility
-    showElectronicIdFields = false;
-    showPaperIdFields = false;
 
     // Relocation list
     relocationsList: PetitionWriterRelocation[] = [];
@@ -124,12 +117,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             applicantName: ['', Validators.required],
             applicantFatherName: [''],
             applicantGrandFatherName: [''],
-            identityCardType: [null, Validators.required],
-            electronicIdNumber: [''],
-            paperIdNumber: [''],
-            paperIdVolume: [''],
-            paperIdPage: [''],
-            paperIdRegNumber: [''],
+            electronicNationalIdNumber: ['', Validators.required],
             permanentProvinceId: [null],
             permanentDistrictId: [null],
             permanentVillage: [''],
@@ -197,26 +185,6 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         }
     }
 
-    onIdentityCardTypeChange(): void {
-        const type = this.licenseForm.get('identityCardType')?.value;
-        this.showElectronicIdFields = type === IdentityCardTypeEnum.Electronic;
-        this.showPaperIdFields = type === IdentityCardTypeEnum.Paper;
-
-        // Clear fields based on selection
-        if (this.showElectronicIdFields) {
-            this.licenseForm.patchValue({
-                paperIdNumber: '',
-                paperIdVolume: '',
-                paperIdPage: '',
-                paperIdRegNumber: ''
-            });
-        } else if (this.showPaperIdFields) {
-            this.licenseForm.patchValue({
-                electronicIdNumber: ''
-            });
-        }
-    }
-
     loadLicenseData(id: number): void {
         const calendar = this.calendarService.getSelectedCalendar();
         this.licenseService.getById(id, calendar).subscribe({
@@ -227,12 +195,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     applicantName: data.applicantName,
                     applicantFatherName: data.applicantFatherName,
                     applicantGrandFatherName: data.applicantGrandFatherName,
-                    identityCardType: data.identityCardType,
-                    electronicIdNumber: data.electronicIdNumber,
-                    paperIdNumber: data.paperIdNumber,
-                    paperIdVolume: data.paperIdVolume,
-                    paperIdPage: data.paperIdPage,
-                    paperIdRegNumber: data.paperIdRegNumber,
+                    electronicNationalIdNumber: data.electronicNationalIdNumber,
                     permanentProvinceId: data.permanentProvinceId,
                     permanentDistrictId: data.permanentDistrictId,
                     permanentVillage: data.permanentVillage,
@@ -255,9 +218,6 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                         this.licenseForm.patchValue({ currentDistrictId: data.currentDistrictId });
                     });
                 }
-
-                // Set identity card type visibility
-                this.onIdentityCardTypeChange();
 
                 // Patch financial form
                 this.financialForm.patchValue({
@@ -305,7 +265,6 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     // Form getters
     get licenseNumber() { return this.licenseForm.get('licenseNumber'); }
     get applicantName() { return this.licenseForm.get('applicantName'); }
-    get identityCardType() { return this.licenseForm.get('identityCardType'); }
 
     saveLicense(): void {
         if (this.licenseForm.invalid) {
@@ -472,8 +431,6 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         this.relocationForm.reset();
         this.relocationsList = [];
         this.selectedRelocationId = 0;
-        this.showElectronicIdFields = false;
-        this.showPaperIdFields = false;
         this.selectedTabIndex = 0;
         this.router.navigate(['/petition-writer-license']);
     }

@@ -1,18 +1,20 @@
-<section class="w-full bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات مالک(متقاضی) دفتر</h1>
-      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به مالک را با دقت تکمیل نمایید</p>
-    </div>
+<section id="owner" class="unified-section">
+  <div class="section-header mb-6 pb-4 border-b-2 border-purple-500">
+    <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+      <i class="fas fa-user text-purple-600"></i>
+      <span>مشخصات مالک</span>
+    </h3>
+  </div>
 
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-      <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+  <div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+      <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
           <i class="fas fa-camera"></i>
           <span>آپلود عکس مالک</span>
-        </h2>
+        </h3>
       </div>
-      <div class="px-6 py-6">
+      <div class="px-6 py-4">
         <app-profile-image-cropper #childComponent [initialImageUrl]="imagePath" documentType="company"
           [roundCropper]="true" (imageChanged)="profilePreviewChanged($event)"
           (imageUploaded)="profileImageUploaded($event)" style="text-align: left"></app-profile-image-cropper>
@@ -24,15 +26,15 @@
         <input type="hidden" formControlName="id">
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
             <i class="fas fa-user"></i>
             <span>معلومات شخصی</span>
-          </h2>
+          </h3>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="px-6 py-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">اسم</label>
               <div class="relative">
@@ -115,72 +117,25 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-3">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
             <i class="fas fa-id-card"></i>
             <span>معلومات تذکره</span>
-          </h2>
+          </h3>
         </div>
-        <div class="px-6 py-6">
+        <div class="px-6 py-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تذکره</label>
-              <ng-select [items]="filteredIdTypes" [selectOnTab]="true" bindLabel="displayName" bindValue="id" (change)="onPropertyTypeChange()" formControlName="identityCardTypeId" class="custom-ng-select"></ng-select>
-              <div *ngIf="identityCardTypeId?.invalid && (identityCardTypeId?.dirty || identityCardTypeId?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="identityCardTypeId?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره تذکره</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">الیکټرونیکی تذکره نمبر</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-id-card"></i>
                 </span>
-                <input type="text" id="indentityCardNumber" formControlName="indentityCardNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <input type="text" id="electronicNationalIdNumber" formControlName="electronicNationalIdNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="الیکټرونیکی تذکره نمبر">
               </div>
-              <div *ngIf="indentityCardNumber?.invalid && (indentityCardNumber?.dirty || indentityCardNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="indentityCardNumber?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
-            </div>
-
-            <div *ngIf="!isElectricIdSelected()">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">جلد</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-id-card"></i>
-                </span>
-                <input type="text" id="jild" formControlName="jild" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-              <div *ngIf="jild?.invalid && (jild?.dirty || jild?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="jild?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
-            </div>
-
-            <div *ngIf="!isElectricIdSelected()">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">صفحه</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-id-card"></i>
-                </span>
-                <input type="text" id="safha" formControlName="safha" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-              <div *ngIf="safha?.invalid && (safha?.dirty || safha?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="safha?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
-            </div>
-
-            <div *ngIf="!isElectricIdSelected()">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر ثبت</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-id-card"></i>
-                </span>
-                <input type="text" id="sabtNumber" formControlName="sabtNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-              <div *ngIf="sabtNumber?.invalid && (sabtNumber?.dirty || sabtNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="sabtNumber?.errors?.['required']">این فیلد الزامی است</small>
+              <div *ngIf="electronicNationalIdNumber?.invalid && (electronicNationalIdNumber?.dirty || electronicNationalIdNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="electronicNationalIdNumber?.errors?.['required']">این فیلد الزامی است</small>
               </div>
             </div>
           </div>
@@ -188,14 +143,14 @@
       </div>
 
       <!-- Owner's Own Address Section (آدرس اصلی مالک) -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
             <i class="fas fa-home"></i>
             <span>آدرس اصلی مالک</span>
-          </h2>
+          </h3>
         </div>
-        <div class="px-6 py-6">
+        <div class="px-6 py-4">
           <div *ngIf="!isAddressChangeMode">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
@@ -215,15 +170,12 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک (اختیاری)</label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                     <i class="fas fa-map-marker"></i>
                   </span>
                   <input type="text" formControlName="ownerVillage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                </div>
-                <div *ngIf="ownerVillage?.invalid && (ownerVillage?.dirty || ownerVillage?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="ownerVillage?.errors?.['required']">این فیلد الزامی است</small>
                 </div>
               </div>
             </div>
@@ -232,12 +184,12 @@
       </div>
 
       <!-- Permanent Address Section (آدرس دایمی) - Current Residence -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 flex justify-between items-center">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-3 flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
             <i class="fas fa-map-marker-alt"></i>
             <span>آدرس فعلی سکونت</span>
-          </h2>
+          </h3>
           <!-- Address Change Button - Only show when editing existing owner -->
           <div class="flex gap-2" *ngIf="selectedId > 0 && !isAddressChangeMode">
             <button type="button" (click)="enableAddressChangeMode()" 
@@ -252,7 +204,7 @@
             </button>
           </div>
         </div>
-        <div class="px-6 py-6">
+        <div class="px-6 py-4">
           <!-- Current Address Display (Read-only when in change mode) -->
           <div *ngIf="isAddressChangeMode" class="mb-6 p-4 bg-gray-100 rounded-lg border border-gray-300">
             <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -270,11 +222,7 @@
                 <p>{{ currentAddressDisplay.permanentProvinceName }} - {{ currentAddressDisplay.permanentDistrictName }}</p>
                 <p *ngIf="currentAddressDisplay.permanentVillage">{{ currentAddressDisplay.permanentVillage }}</p>
               </div>
-              <div *ngIf="currentAddressDisplay.temporaryProvinceName || currentAddressDisplay.temporaryDistrictName || currentAddressDisplay.temporaryVillage">
-                <p class="font-semibold text-teal-700 mb-1">آدرس موقت:</p>
-                <p>{{ currentAddressDisplay.temporaryProvinceName }} - {{ currentAddressDisplay.temporaryDistrictName }}</p>
-                <p *ngIf="currentAddressDisplay.temporaryVillage">{{ currentAddressDisplay.temporaryVillage }}</p>
-              </div>
+
             </div>
           </div>
 
@@ -312,7 +260,7 @@
                   <ng-select formControlName="newOwnerDistrictId" [items]="newOwnerDistrict" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک (اختیاری)</label>
                   <input type="text" formControlName="newOwnerVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                 </div>
               </div>
@@ -340,27 +288,7 @@
               </div>
             </div>
 
-            <!-- New Temporary Address -->
-            <div class="border-t border-yellow-300 pt-4">
-              <h4 class="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <i class="fas fa-location-arrow text-teal-600"></i>
-                <span>آدرس موقت جدید (اختیاری)</span>
-              </h4>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
-                  <ng-select formControlName="newTemporaryProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterNewTemporaryDistricts($event)" class="custom-ng-select"></ng-select>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
-                  <ng-select formControlName="newTemporaryDistrictId" [items]="newTemporaryDistrict" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
-                  <input type="text" formControlName="newTemporaryVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                </div>
-              </div>
-            </div>
+
           </div>
 
           <!-- Regular Address Fields (Not in change mode) -->
@@ -399,46 +327,13 @@
         </div>
       </div>
 
-      <!-- Temporary Address Section (آدرس موقت) -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" *ngIf="!isAddressChangeMode">
-        <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-location-arrow"></i>
-            <span>آدرس موقت (اختیاری)</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
-              <ng-select formControlName="temporaryProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterTemporaryDistricts($event)" class="custom-ng-select"></ng-select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
-              <ng-select formControlName="temporaryDistrictId" [items]="temporaryDistrict" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-map-marker"></i>
-                </span>
-                <input type="text" formControlName="temporaryVillage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Address History Section (Collapsible) -->
-      <div *ngIf="showAddressHistory && addressHistory.length > 0" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-gray-600 to-gray-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <div *ngIf="showAddressHistory && addressHistory.length > 0" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+        <div class="bg-gradient-to-r from-gray-600 to-gray-700 px-6 py-3">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
             <i class="fas fa-history"></i>
             <span>تاریخچه آدرس‌ها</span>
-          </h2>
+          </h3>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full">
@@ -470,7 +365,7 @@
         </div>
       </div>
 
-      <div class="flex gap-4 justify-center pb-6">
+      <div class="flex gap-4 justify-center pb-4">
         <button type="submit" [disabled]="ownerForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
           <i class="fas" [ngClass]="selectedId ? (isAddressChangeMode ? 'fa-exchange-alt' : 'fa-edit') : 'fa-save'"></i>
           <span>{{ isAddressChangeMode ? 'ثبت آدرس جدید' : (selectedId ? 'تغیر معلومات' : 'ثبت معلومات') }}</span>

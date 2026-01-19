@@ -98,12 +98,8 @@ export class GuaranatorsComponent {
       firstName: ['', Validators.required],
       fatherName: ['', Validators.required],
       grandFatherName: [''],
-      identityCardTypeId: ['', Validators.required],
-      indentityCardNumber: ['', Validators.required],
-      jild: ['', Validators.required],
-      safha: ['', Validators.required],
+      electronicNationalIdNumber: ['', Validators.required],
       companyId: [''],
-      sabtNumber: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       paddressProvinceId: ['', Validators.required],
       paddressDistrictId: ['', Validators.required],
@@ -140,9 +136,6 @@ export class GuaranatorsComponent {
   ngOnInit() {
     this.selerService.getprovince().subscribe(res => {
       this.province = res;
-    });
-    this.comservice.getIdentityTypes().subscribe(res => {
-      this.IdTypes = res;
     });
     this.comservice.getGuaranteeType().subscribe(res => {
       this.GuaranteeTypes = res;
@@ -329,28 +322,6 @@ export class GuaranatorsComponent {
     });
   }
 
-  onPropertyTypeChange() {
-    const identityCardTypeId = this.guaranatorForm.get('identityCardTypeId')?.value;
-    const jild = this.guaranatorForm.get('jild');
-    const safha = this.guaranatorForm.get('safha');
-    const sabtNumber = this.guaranatorForm.get('sabtNumber');
-    if (identityCardTypeId === 1) {
-      jild?.setValue(0);
-      jild?.disable();
-      safha?.setValue(0);
-      safha?.disable();
-      sabtNumber?.setValue(0);
-      sabtNumber?.disable();
-    } else {
-      jild?.enable();
-      jild?.setValue(null);
-      safha?.enable();
-      safha?.setValue(null);
-      sabtNumber?.enable();
-      sabtNumber?.setValue(null);
-    }
-  }
-
   /**
    * Handle guarantee type change - show/hide conditional fields and update validators
    */
@@ -460,12 +431,8 @@ export class GuaranatorsComponent {
         firstName: selectedOwnerAddress.firstName,
         fatherName: selectedOwnerAddress.fatherName,
         grandFatherName: selectedOwnerAddress.grandFatherName,
-        identityCardTypeId: selectedOwnerAddress.identityCardTypeId,
-        indentityCardNumber: selectedOwnerAddress.indentityCardNumber,
-        jild: selectedOwnerAddress.jild,
-        safha: selectedOwnerAddress.safha,
+        electronicNationalIdNumber: selectedOwnerAddress.electronicNationalIdNumber,
         companyId: selectedOwnerAddress.companyId,
-        sabtNumber: selectedOwnerAddress.sabtNumber,
         phoneNumber: selectedOwnerAddress.phoneNumber,
         paddressProvinceId: selectedOwnerAddress.paddressProvinceId,
         paddressDistrictId: selectedOwnerAddress.paddressDistrictId,
@@ -519,7 +486,6 @@ export class GuaranatorsComponent {
 
       // Parse guarantee dates
       this.parseAndSetDates(selectedOwnerAddress);
-      this.onPropertyTypeChange();
       
       // Set visibility flags based on loaded guarantee type (without clearing values)
       this.setGuaranteeTypeVisibility(selectedOwnerAddress.guaranteeTypeId);
@@ -622,12 +588,8 @@ export class GuaranatorsComponent {
   get firstName() { return this.guaranatorForm.get('firstName'); }
   get fatherName() { return this.guaranatorForm.get('fatherName'); }
   get grandFatherName() { return this.guaranatorForm.get('grandFatherName'); }
-  get identityCardTypeId() { return this.guaranatorForm.get('identityCardTypeId'); }
-  get indentityCardNumber() { return this.guaranatorForm.get('indentityCardNumber'); }
-  get jild() { return this.guaranatorForm.get('jild'); }
-  get safha() { return this.guaranatorForm.get('safha'); }
+  get electronicNationalIdNumber() { return this.guaranatorForm.get('electronicNationalIdNumber'); }
   get companyId() { return this.guaranatorForm.get('companyId'); }
-  get sabtNumber() { return this.guaranatorForm.get('sabtNumber'); }
   get pothoPath() { return this.guaranatorForm.get('pothoPath'); }
   get phoneNumber() { return this.guaranatorForm.get('phoneNumber'); }
   get paddressVillage() { return this.guaranatorForm.get('paddressVillage'); }

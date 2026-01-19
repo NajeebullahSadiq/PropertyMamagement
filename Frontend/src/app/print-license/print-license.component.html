@@ -27,17 +27,17 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Guilloche Pattern Border -->
     <div class="guilloche-border">
       <svg class="guilloche-pattern" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
           <pattern id="guillochePattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-            <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(25, 118, 210, 0.15)" stroke-width="0.5"/>
-            <circle cx="10" cy="10" r="5" fill="none" stroke="rgba(25, 118, 210, 0.1)" stroke-width="0.3"/>
+            <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(25, 118, 210, 0.15)" stroke-width="0.5" />
+            <circle cx="10" cy="10" r="5" fill="none" stroke="rgba(25, 118, 210, 0.1)" stroke-width="0.3" />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#guillochePattern)"/>
+        <rect width="100%" height="100%" fill="url(#guillochePattern)" />
       </svg>
     </div>
 
@@ -46,34 +46,34 @@
       <!-- Ornate Corner Decorations -->
       <div class="corner-ornament top-right">
         <svg viewBox="0 0 60 60">
-          <path d="M0,60 Q0,0 60,0" fill="none" stroke="#1565c0" stroke-width="2"/>
-          <path d="M5,60 Q5,5 60,5" fill="none" stroke="#42a5f5" stroke-width="1"/>
-          <circle cx="15" cy="45" r="3" fill="#1976d2"/>
-          <circle cx="45" cy="15" r="3" fill="#1976d2"/>
+          <path d="M0,60 Q0,0 60,0" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M5,60 Q5,5 60,5" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="15" cy="45" r="3" fill="#1976d2" />
+          <circle cx="45" cy="15" r="3" fill="#1976d2" />
         </svg>
       </div>
       <div class="corner-ornament top-left">
         <svg viewBox="0 0 60 60">
-          <path d="M60,60 Q60,0 0,0" fill="none" stroke="#1565c0" stroke-width="2"/>
-          <path d="M55,60 Q55,5 0,5" fill="none" stroke="#42a5f5" stroke-width="1"/>
-          <circle cx="45" cy="45" r="3" fill="#1976d2"/>
-          <circle cx="15" cy="15" r="3" fill="#1976d2"/>
+          <path d="M60,60 Q60,0 0,0" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M55,60 Q55,5 0,5" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="45" cy="45" r="3" fill="#1976d2" />
+          <circle cx="15" cy="15" r="3" fill="#1976d2" />
         </svg>
       </div>
       <div class="corner-ornament bottom-right">
         <svg viewBox="0 0 60 60">
-          <path d="M0,0 Q0,60 60,60" fill="none" stroke="#1565c0" stroke-width="2"/>
-          <path d="M5,0 Q5,55 60,55" fill="none" stroke="#42a5f5" stroke-width="1"/>
-          <circle cx="15" cy="15" r="3" fill="#1976d2"/>
-          <circle cx="45" cy="45" r="3" fill="#1976d2"/>
+          <path d="M0,0 Q0,60 60,60" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M5,0 Q5,55 60,55" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="15" cy="15" r="3" fill="#1976d2" />
+          <circle cx="45" cy="45" r="3" fill="#1976d2" />
         </svg>
       </div>
       <div class="corner-ornament bottom-left">
         <svg viewBox="0 0 60 60">
-          <path d="M60,0 Q60,60 0,60" fill="none" stroke="#1565c0" stroke-width="2"/>
-          <path d="M55,0 Q55,55 0,55" fill="none" stroke="#42a5f5" stroke-width="1"/>
-          <circle cx="45" cy="15" r="3" fill="#1976d2"/>
-          <circle cx="15" cy="45" r="3" fill="#1976d2"/>
+          <path d="M60,0 Q60,60 0,60" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M55,0 Q55,55 0,55" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="45" cy="15" r="3" fill="#1976d2" />
+          <circle cx="15" cy="45" r="3" fill="#1976d2" />
         </svg>
       </div>
 
@@ -148,7 +148,8 @@
               محترم <span class="highlight-value">({{data.firstName || '—'}})</span>
               ولد <span class="highlight-value">({{data.fatherName || '—'}})</span>
               ولدیت <span class="highlight-value">({{data.grandFatherName || '—'}})</span>
-              متولد سال <span class="highlight-value">({{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate) || '—'}})</span>
+              متولد سال <span class="highlight-value">({{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
+                || '—'}})</span>
               دارنده تذکره الکترونیکی <span class="highlight-value">({{data.indentityCardNumber || '—'}})</span>
             </p>
           </div>
@@ -164,22 +165,24 @@
               <span class="highlight-value">({{data.temporaryDistrictName || '—'}})</span>
               <span class="label-accent">ولایت</span>
               <span class="highlight-value">({{data.temporaryProvinceName || '—'}})</span>
+              <span class="label-accent">واقع ناحیه</span>
+              <span class="highlight-value">({{data.temporaryVillage || data.permanentVillage || '—'}})</span>
             </p>
           </div>
 
           <!-- Authorization Statement -->
           <div class="info-card authorization-card">
             <p class="info-paragraph">
-              <span class="label-accent">واقع ناحیه</span>
-              <span class="highlight-value">({{data.temporaryVillage || data.permanentVillage || '—'}})</span>
-              با در نظرداشت احکام مندرج فقره (4) ماده (13) قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
+              با در نظرداشت احکام مندرج فقره (4) ماده (13) قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف
+              میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
             </p>
           </div>
 
           <!-- Inquiry Reference -->
           <div class="inquiry-line">
             <span>ذریعه استعلام نمبر</span>
-            <span class="inquiry-field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span
+              class="inquiry-field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span>به مطبعه معرفی شد.</span>
           </div>
 

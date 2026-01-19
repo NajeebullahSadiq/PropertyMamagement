@@ -33,8 +33,11 @@ namespace WebAPIBackend.Controllers.Companies
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 foreach (var item in Pro)
                 {
-                    item.IssueDate = DateConversionHelper.ToCalendarDateOnly(item.IssueDate, calendar);
-                    item.ExpireDate = DateConversionHelper.ToCalendarDateOnly(item.ExpireDate, calendar);
+                    var originalIssueDate = item.IssueDate;
+                    item.IssueDate = DateConversionHelper.ToCalendarDateOnly(originalIssueDate, calendar);
+                    item.ExpireDate = originalIssueDate.HasValue
+                        ? DateConversionHelper.ToCalendarDateOnly(originalIssueDate.Value.AddYears(3), calendar)
+                        : DateConversionHelper.ToCalendarDateOnly(item.ExpireDate, calendar);
                     item.RoyaltyDate = DateConversionHelper.ToCalendarDateOnly(item.RoyaltyDate, calendar);
                     item.PenaltyDate = DateConversionHelper.ToCalendarDateOnly(item.PenaltyDate, calendar);
                     item.HrLetterDate = DateConversionHelper.ToCalendarDateOnly(item.HrLetterDate, calendar);
@@ -71,12 +74,23 @@ namespace WebAPIBackend.Controllers.Companies
             // Parse dates using multi-calendar helper
             if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
             {
-                return BadRequest("IssueDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                return BadRequest("تاریخ صدور جواز معتبر نیست / د جواز د صدور نېټه سمه نه ده");
             }
 
-            if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var expireDate))
+            var expectedExpireDate = issueDate.AddYears(3);
+
+            DateOnly expireDate = expectedExpireDate;
+            if (!string.IsNullOrWhiteSpace(request.ExpireDate))
             {
-                return BadRequest("ExpireDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
+                {
+                    return BadRequest("تاریخ ختم جواز معتبر نیست / د جواز د ختم نېټه سمه نه ده");
+                }
+
+                if (submittedExpireDate != expectedExpireDate)
+                {
+                    return BadRequest("تاریخ ختم جواز باید دقیقاً سه سال بعد از تاریخ صدور جواز باشد / د جواز د ختم نېټه باید دقیقاً د صدور له نېټې درې کاله وروسته وي");
+                }
             }
 
             // Validate LicenseCategory if provided
@@ -140,6 +154,7 @@ namespace WebAPIBackend.Controllers.Companies
                 DocPath = request.DocPath,
                 LicenseType = request.LicenseType,
                 LicenseCategory = request.LicenseCategory,
+                RenewalRound = request.RenewalRound,
                 RoyaltyAmount = request.RoyaltyAmount,
                 RoyaltyDate = royaltyDate,
                 PenaltyAmount = request.PenaltyAmount,
@@ -162,12 +177,23 @@ namespace WebAPIBackend.Controllers.Companies
             // Parse dates using multi-calendar helper
             if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
             {
-                return BadRequest("IssueDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                return BadRequest("تاریخ صدور جواز معتبر نیست / د جواز د صدور نېټه سمه نه ده");
             }
 
-            if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var expireDate))
+            var expectedExpireDate = issueDate.AddYears(3);
+
+            DateOnly expireDate = expectedExpireDate;
+            if (!string.IsNullOrWhiteSpace(request.ExpireDate))
             {
-                return BadRequest("ExpireDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
+                {
+                    return BadRequest("تاریخ ختم جواز معتبر نیست / د جواز د ختم نېټه سمه نه ده");
+                }
+
+                if (submittedExpireDate != expectedExpireDate)
+                {
+                    return BadRequest("تاریخ ختم جواز باید دقیقاً سه سال بعد از تاریخ صدور جواز باشد / د جواز د ختم نېټه باید دقیقاً د صدور له نېټې درې کاله وروسته وي");
+                }
             }
 
             var userIdClaim = HttpContext.User.FindFirst("UserID");
@@ -252,6 +278,7 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.DocPath = request.DocPath;
             existingProperty.LicenseType = request.LicenseType;
             existingProperty.LicenseCategory = request.LicenseCategory;
+            existingProperty.RenewalRound = request.RenewalRound;
             existingProperty.RoyaltyAmount = request.RoyaltyAmount;
             existingProperty.RoyaltyDate = royaltyDate;
             existingProperty.PenaltyAmount = request.PenaltyAmount;
@@ -358,9 +385,6 @@ namespace WebAPIBackend.Controllers.Companies
                 data.PermanentProvinceName,
                 data.PermanentDistrictName,
                 data.PermanentVillage,
-                data.TemporaryProvinceName,
-                data.TemporaryDistrictName,
-                data.TemporaryVillage,
                 // Financial and Administrative Fields
                 data.RoyaltyAmount,
                 data.RoyaltyDate,
@@ -403,18 +427,6 @@ namespace WebAPIBackend.Controllers.Companies
                         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
                             WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PermanentVillage') THEN
                             ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""PermanentVillage"" TEXT NULL;
-                        END IF;
-                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryProvinceId') THEN
-                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryProvinceId"" INTEGER NULL;
-                        END IF;
-                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryDistrictId') THEN
-                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryDistrictId"" INTEGER NULL;
-                        END IF;
-                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                            WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'TemporaryVillage') THEN
-                            ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""TemporaryVillage"" TEXT NULL;
                         END IF;
                         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
                             WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'PhoneNumber') THEN
@@ -475,9 +487,6 @@ namespace WebAPIBackend.Controllers.Companies
                         pp.""Dari"" AS ""PermanentProvinceName"",
                         pd.""Dari"" AS ""PermanentDistrictName"",
                         co.""PermanentVillage"",
-                        tp.""Dari"" AS ""TemporaryProvinceName"",
-                        td.""Dari"" AS ""TemporaryDistrictName"",
-                        co.""TemporaryVillage"",
                         ld.""RoyaltyAmount"",
                         ld.""RoyaltyDate"",
                         ld.""PenaltyAmount"",
@@ -488,9 +497,7 @@ namespace WebAPIBackend.Controllers.Companies
                     LEFT JOIN org.""CompanyOwner"" co ON cd.""Id"" = co.""CompanyId""
                     LEFT JOIN org.""LicenseDetails"" ld ON cd.""Id"" = ld.""CompanyId""
                     LEFT JOIN look.""Location"" pp ON co.""PermanentProvinceId"" = pp.""ID""
-                    LEFT JOIN look.""Location"" pd ON co.""PermanentDistrictId"" = pd.""ID""
-                    LEFT JOIN look.""Location"" tp ON co.""TemporaryProvinceId"" = tp.""ID""
-                    LEFT JOIN look.""Location"" td ON co.""TemporaryDistrictId"" = td.""ID"";
+                    LEFT JOIN look.""Location"" pd ON co.""PermanentDistrictId"" = pd.""ID"";
                 ");
             }
             catch (Exception)

@@ -10,14 +10,6 @@ public partial class CompanyDetail
 
     public string Title { get; set; } = null!;
 
-    public string? PhoneNumber { get; set; }
-
-    public string? LicenseNumber { get; set; }
-
-    public DateOnly? PetitionDate { get; set; }
-
-    public string? PetitionNumber { get; set; }
-
     public DateTime? CreatedAt { get; set; }
 
     public string? CreatedBy { get; set; }

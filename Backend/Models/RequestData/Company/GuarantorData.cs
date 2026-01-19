@@ -10,17 +10,10 @@ namespace WebAPIBackend.Models.RequestData
 
         public string? GrandFatherName { get; set; }
 
-        public int? IdentityCardTypeId { get; set; }
-
         public int? CompanyId { get; set; }
 
-        public double? IndentityCardNumber { get; set; }
-
-        public int? Jild { get; set; }
-
-        public int? Safha { get; set; }
-
-        public int? SabtNumber { get; set; }
+        // Electronic National ID - الیکټرونیکی تذکره
+        public string? ElectronicNationalIdNumber { get; set; }
 
         public string? PhoneNumber { get; set; }
 

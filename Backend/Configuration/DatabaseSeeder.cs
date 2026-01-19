@@ -171,17 +171,12 @@ namespace WebAPIBackend.Configuration
                         ld.""ExpireDate"",
                         pp.""Dari"" AS ""PermanentProvinceName"",
                         pd.""Dari"" AS ""PermanentDistrictName"",
-                        co.""PermanentVillage"",
-                        tp.""Dari"" AS ""TemporaryProvinceName"",
-                        td.""Dari"" AS ""TemporaryDistrictName"",
-                        co.""TemporaryVillage""
+                        co.""PermanentVillage""
                     FROM org.""CompanyDetails"" cd
                     LEFT JOIN org.""CompanyOwner"" co ON cd.""Id"" = co.""CompanyId""
                     LEFT JOIN org.""LicenseDetails"" ld ON cd.""Id"" = ld.""CompanyId""
                     LEFT JOIN look.""Location"" pp ON co.""PermanentProvinceId"" = pp.""ID""
-                    LEFT JOIN look.""Location"" pd ON co.""PermanentDistrictId"" = pd.""ID""
-                    LEFT JOIN look.""Location"" tp ON co.""TemporaryProvinceId"" = tp.""ID""
-                    LEFT JOIN look.""Location"" td ON co.""TemporaryDistrictId"" = td.""ID"";
+                    LEFT JOIN look.""Location"" pd ON co.""PermanentDistrictId"" = pd.""ID"";
                 ");
             }
             catch (Exception ex) 
@@ -370,21 +365,8 @@ namespace WebAPIBackend.Configuration
             }
             await context.SaveChangesAsync();
 
-            // Seed IdentityCardTypes
-            if (!context.IdentityCardTypes.Any())
-            {
-                var identityCardTypes = new[]
-                {
-                    new IdentityCardType { Name = "National ID Card (Tazkira)", Des = "Afghan national identity card" },
-                    new IdentityCardType { Name = "Passport", Des = "International passport" },
-                    new IdentityCardType { Name = "Driver's License", Des = "Driving license" },
-                    new IdentityCardType { Name = "Birth Certificate", Des = "Birth certificate" },
-                    new IdentityCardType { Name = "Military ID", Des = "Military identification" },
-                    new IdentityCardType { Name = "Student ID", Des = "Student identification" },
-                    new IdentityCardType { Name = "Employee ID", Des = "Employee identification" }
-                };
-                await context.IdentityCardTypes.AddRangeAsync(identityCardTypes);
-            }
+            // IdentityCardTypes removed - now using electronic IDs only
+            // Electronic National ID (الیکټرونیکی تذکره) is the only ID type
 
             // Seed AddressTypes
             if (!context.AddressTypes.Any())

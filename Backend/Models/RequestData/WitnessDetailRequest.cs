@@ -7,7 +7,8 @@ namespace WebAPIBackend.Models.RequestData
         public int Id { get; set; }
         public string FirstName { get; set; } = null!;
         public string FatherName { get; set; } = null!;
-        public string? IndentityCardNumber { get; set; } // String to handle large numbers from frontend
+        // Electronic National ID - الیکټرونیکی تذکره
+        public string? ElectronicNationalIdNumber { get; set; }
         public string? PhoneNumber { get; set; }
         public int? PropertyDetailsId { get; set; }
         public DateTime? CreatedAt { get; set; }

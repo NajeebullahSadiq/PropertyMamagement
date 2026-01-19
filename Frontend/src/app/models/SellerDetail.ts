@@ -43,11 +43,7 @@ export interface VBuyerDetail {
     firstName:string;
     fatherName:string;
     grandFather:string;
-    indentityCardNumber:number;
-    tazkiraType?:string;
-    tazkiraVolume?:string;
-    tazkiraPage?:string;
-    tazkiraNumber?:string;
+    electronicNationalIdNumber?:string;
     phoneNumber:string;
     paddressProvinceId:Number;
     paddressDistrictId:number;

@@ -41,6 +41,16 @@ export class RealestateComponent {
       this.tabGroup.selectedIndex = nextIndex % (tabCount || 1);
     }
   }
+  
+  scrollToNextSection(sectionId: string): void {
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
+  
   resetChild(){
     this.companydetails.resetChild();
     this.companyowner.resetForms();

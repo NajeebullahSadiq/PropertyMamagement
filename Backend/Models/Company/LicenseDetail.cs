@@ -30,6 +30,11 @@ public partial class LicenseDetail
     public string? LicenseCategory { get; set; }
 
     /// <summary>
+    /// دور تجدید - Renewal Round (only applicable when LicenseCategory is تجدید)
+    /// </summary>
+    public int? RenewalRound { get; set; }
+
+    /// <summary>
     /// مبلغ حق‌الامتیاز - Royalty/License Fee Amount
     /// </summary>
     public decimal? RoyaltyAmount { get; set; }

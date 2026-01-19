@@ -30,25 +30,10 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         [MaxLength(200)]
         public string? ApplicantGrandFatherName { get; set; }
 
-        // Identity Card Type (1 = Electronic, 2 = Paper)
-        public int IdentityCardType { get; set; }
-
-        // Electronic ID fields
+        // Electronic National ID - الیکټرونیکی تذکره
+        [Required]
         [MaxLength(50)]
-        public string? ElectronicIdNumber { get; set; }
-
-        // Paper ID fields
-        [MaxLength(50)]
-        public string? PaperIdNumber { get; set; }
-
-        [MaxLength(20)]
-        public string? PaperIdVolume { get; set; }
-
-        [MaxLength(20)]
-        public string? PaperIdPage { get; set; }
-
-        [MaxLength(50)]
-        public string? PaperIdRegNumber { get; set; }
+        public string ElectronicNationalIdNumber { get; set; } = string.Empty;
 
         // Permanent Address (سکونت اصلی)
         public int? PermanentProvinceId { get; set; }

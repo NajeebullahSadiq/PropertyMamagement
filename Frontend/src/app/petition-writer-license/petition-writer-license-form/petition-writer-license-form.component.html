@@ -54,41 +54,15 @@
               <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
                   <i class="fas fa-id-card"></i>
-                  <span>معلومات تذکره</span>
+                  <span>الیکټرونیکی تذکره</span>
                 </h2>
               </div>
               <div class="px-6 py-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">نوع تذکره <span class="text-red-500">*</span></label>
-                    <ng-select [items]="identityCardTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="identityCardType" (change)="onIdentityCardTypeChange()" class="custom-ng-select"></ng-select>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">الیکټرونیکی تذکره نمبر <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="electronicNationalIdNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="الیکټرونیکی تذکره نمبر">
                   </div>
-                  
-                  <!-- Electronic ID Fields -->
-                  <div *ngIf="showElectronicIdFields">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر تذکره الکترونیکی</label>
-                    <input type="text" formControlName="electronicIdNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                  </div>
-
-                  <!-- Paper ID Fields -->
-                  <ng-container *ngIf="showPaperIdFields">
-                    <div>
-                      <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر تذکره</label>
-                      <input type="text" formControlName="paperIdNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-gray-700 mb-2">جلد</label>
-                      <input type="text" formControlName="paperIdVolume" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-gray-700 mb-2">صفحه</label>
-                      <input type="text" formControlName="paperIdPage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر ثبت</label>
-                      <input type="text" formControlName="paperIdRegNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                  </ng-container>
                 </div>
               </div>
             </div>

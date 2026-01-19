@@ -37,12 +37,8 @@ namespace WebAPIBackend.Controllers.Companies
                         o.GrandFatherName,
                         o.EducationLevelId,
                         DateofBirth = o.DateofBirth,
-                        o.IdentityCardTypeId,
-                        o.IndentityCardNumber,
-                        o.Jild,
-                        o.Safha,
+                        o.ElectronicNationalIdNumber,
                         o.CompanyId,
-                        o.SabtNumber,
                         o.PothoPath,
                         // Contact Information
                         o.PhoneNumber,
@@ -55,17 +51,11 @@ namespace WebAPIBackend.Controllers.Companies
                         o.PermanentProvinceId,
                         o.PermanentDistrictId,
                         o.PermanentVillage,
-                        // Temporary Address Fields (آدرس موقت)
-                        o.TemporaryProvinceId,
-                        o.TemporaryDistrictId,
-                        o.TemporaryVillage,
                         // Location names for display
                         OwnerProvinceName = o.OwnerProvince != null ? o.OwnerProvince.Dari : null,
                         OwnerDistrictName = o.OwnerDistrict != null ? o.OwnerDistrict.Dari : null,
                         PermanentProvinceName = o.PermanentProvince != null ? o.PermanentProvince.Dari : null,
                         PermanentDistrictName = o.PermanentDistrict != null ? o.PermanentDistrict.Dari : null,
-                        TemporaryProvinceName = o.TemporaryProvince != null ? o.TemporaryProvince.Dari : null,
-                        TemporaryDistrictName = o.TemporaryDistrict != null ? o.TemporaryDistrict.Dari : null,
                     })
                     .ToListAsync();
 
@@ -79,12 +69,8 @@ namespace WebAPIBackend.Controllers.Companies
                     item.GrandFatherName,
                     item.EducationLevelId,
                     DateofBirth = DateConversionHelper.ToCalendarDateOnly(item.DateofBirth, calendar),
-                    item.IdentityCardTypeId,
-                    item.IndentityCardNumber,
-                    item.Jild,
-                    item.Safha,
+                    item.ElectronicNationalIdNumber,
                     item.CompanyId,
-                    item.SabtNumber,
                     item.PothoPath,
                     item.PhoneNumber,
                     item.WhatsAppNumber,
@@ -94,15 +80,10 @@ namespace WebAPIBackend.Controllers.Companies
                     item.PermanentProvinceId,
                     item.PermanentDistrictId,
                     item.PermanentVillage,
-                    item.TemporaryProvinceId,
-                    item.TemporaryDistrictId,
-                    item.TemporaryVillage,
                     item.OwnerProvinceName,
                     item.OwnerDistrictName,
                     item.PermanentProvinceName,
                     item.PermanentDistrictName,
-                    item.TemporaryProvinceName,
-                    item.TemporaryDistrictName,
                 }).ToList();
 
                 return Ok(result);
@@ -188,12 +169,8 @@ namespace WebAPIBackend.Controllers.Companies
                 GrandFatherName = request.GrandFatherName,
                 EducationLevelId = request.EducationLevelId,
                 DateofBirth = pdate,
-                IdentityCardTypeId = request.IdentityCardTypeId,
-                IndentityCardNumber = string.IsNullOrEmpty(request.IndentityCardNumber) ? null : double.TryParse(request.IndentityCardNumber, out var cardNum) ? cardNum : null,
-                Jild = request.Jild,
-                Safha = request.Safha,
+                ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 CompanyId = request.CompanyId,
-                SabtNumber = request.SabtNumber,
                 PothoPath = request.PothoPath,
                 // Contact Information
                 PhoneNumber = request.PhoneNumber?.Trim(),
@@ -208,10 +185,6 @@ namespace WebAPIBackend.Controllers.Companies
                 PermanentProvinceId = request.PermanentProvinceId,
                 PermanentDistrictId = request.PermanentDistrictId,
                 PermanentVillage = request.PermanentVillage,
-                // Temporary Address Fields (آدرس موقت)
-                TemporaryProvinceId = request.TemporaryProvinceId,
-                TemporaryDistrictId = request.TemporaryDistrictId,
-                TemporaryVillage = request.TemporaryVillage,
             };
 
             _context.Add(property);
@@ -263,12 +236,8 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.GrandFatherName = request.GrandFatherName;
             existingProperty.EducationLevelId = request.EducationLevelId;
             existingProperty.DateofBirth = pdate;
-            existingProperty.IdentityCardTypeId = request.IdentityCardTypeId;
-            existingProperty.IndentityCardNumber = string.IsNullOrEmpty(request.IndentityCardNumber) ? null : double.TryParse(request.IndentityCardNumber, out var cardNum) ? cardNum : null;
-            existingProperty.Jild = request.Jild;
-            existingProperty.Safha = request.Safha;
+            existingProperty.ElectronicNationalIdNumber = request.ElectronicNationalIdNumber;
             existingProperty.CompanyId = request.CompanyId;
-            existingProperty.SabtNumber = request.SabtNumber;
             existingProperty.PothoPath = request.PothoPath;
             // Contact Information
             existingProperty.PhoneNumber = request.PhoneNumber?.Trim();
@@ -281,10 +250,6 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.PermanentProvinceId = request.PermanentProvinceId;
             existingProperty.PermanentDistrictId = request.PermanentDistrictId;
             existingProperty.PermanentVillage = request.PermanentVillage;
-            // Temporary Address Fields (آدرس موقت)
-            existingProperty.TemporaryProvinceId = request.TemporaryProvinceId;
-            existingProperty.TemporaryDistrictId = request.TemporaryDistrictId;
-            existingProperty.TemporaryVillage = request.TemporaryVillage;
 
             // Restore the original values of the CreatedBy and CreatedAt properties
             existingProperty.CreatedBy = createdBy;
@@ -392,37 +357,6 @@ namespace WebAPIBackend.Controllers.Companies
                     CreatedBy = userId
                 };
                 _context.CompanyOwnerAddressHistories.Add(permanentHistory);
-            }
-
-            // Archive Temporary Address if exists
-            if (owner.TemporaryProvinceId.HasValue || owner.TemporaryDistrictId.HasValue || !string.IsNullOrEmpty(owner.TemporaryVillage))
-            {
-                // Mark any existing active temporary address history as inactive
-                var existingActiveTemporary = await _context.CompanyOwnerAddressHistories
-                    .Where(h => h.CompanyOwnerId == owner.Id && h.AddressType == "Temporary" && h.IsActive)
-                    .ToListAsync();
-
-                foreach (var existing in existingActiveTemporary)
-                {
-                    existing.IsActive = false;
-                    existing.EffectiveTo = now;
-                }
-
-                // Create new history record for the temporary address
-                var temporaryHistory = new CompanyOwnerAddressHistory
-                {
-                    CompanyOwnerId = owner.Id,
-                    ProvinceId = owner.TemporaryProvinceId,
-                    DistrictId = owner.TemporaryDistrictId,
-                    Village = owner.TemporaryVillage,
-                    AddressType = "Temporary",
-                    EffectiveFrom = owner.CreatedAt ?? now,
-                    EffectiveTo = now,
-                    IsActive = false,
-                    CreatedAt = now,
-                    CreatedBy = userId
-                };
-                _context.CompanyOwnerAddressHistories.Add(temporaryHistory);
             }
         }
     }

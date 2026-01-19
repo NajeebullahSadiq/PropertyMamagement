@@ -11,15 +11,8 @@ public partial class VehiclesWitnessDetail
 
     public string FatherName { get; set; } = null!;
 
-    public double? IndentityCardNumber { get; set; }
-
-    public string? TazkiraType { get; set; }
-
-    public string? TazkiraVolume { get; set; }
-
-    public string? TazkiraPage { get; set; }
-
-    public string? TazkiraNumber { get; set; }
+    // Electronic National ID - الیکټرونیکی تذکره
+    public string? ElectronicNationalIdNumber { get; set; }
 
     public string? PhoneNumber { get; set; }
 

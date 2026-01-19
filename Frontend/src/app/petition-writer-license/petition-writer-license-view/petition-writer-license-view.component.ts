@@ -8,8 +8,7 @@ import {
     PetitionWriterLicense,
     PetitionWriterRelocation,
     LicenseStatusEnum,
-    LicenseStatusTypes,
-    IdentityCardTypes
+    LicenseStatusTypes
 } from 'src/app/models/PetitionWriterLicense';
 
 @Component({
@@ -105,11 +104,6 @@ export class PetitionWriterLicenseViewComponent implements OnInit {
         if (!this.item) return 'نامشخص';
         const found = LicenseStatusTypes.find(s => s.id === this.item!.licenseStatus);
         return found ? found.name : 'نامشخص';
-    }
-
-    getIdentityCardTypeName(type: number): string {
-        const found = IdentityCardTypes.find(t => t.id === type);
-        return found ? found.name : '-';
     }
 
     goBack(): void {

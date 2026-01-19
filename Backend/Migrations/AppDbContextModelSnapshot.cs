@@ -812,15 +812,6 @@ namespace WebAPIBackend.Migrations
                     b.Property<bool?>("Status")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("TemporaryDistrictId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TemporaryProvinceId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TemporaryVillage")
-                        .HasColumnType("text");
-
                     b.Property<string>("WhatsAppNumber")
                         .HasColumnType("text");
 
@@ -840,10 +831,6 @@ namespace WebAPIBackend.Migrations
                     b.HasIndex("PermanentDistrictId");
 
                     b.HasIndex("PermanentProvinceId");
-
-                    b.HasIndex("TemporaryDistrictId");
-
-                    b.HasIndex("TemporaryProvinceId");
 
                     b.ToTable("CompanyOwner", "org");
                 });
@@ -1356,6 +1343,9 @@ namespace WebAPIBackend.Migrations
                     b.Property<DateOnly?>("PenaltyDate")
                         .HasColumnType("date");
 
+                    b.Property<int?>("RenewalRound")
+                        .HasColumnType("integer");
+
                     b.Property<decimal?>("RoyaltyAmount")
                         .HasColumnType("numeric");
 
@@ -1440,15 +1430,6 @@ namespace WebAPIBackend.Migrations
 
                     b.Property<DateOnly?>("RoyaltyDate")
                         .HasColumnType("date");
-
-                    b.Property<string>("TemporaryDistrictName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TemporaryProvinceName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TemporaryVillage")
-                        .HasColumnType("text");
 
                     b.Property<double?>("Tin")
                         .HasColumnType("double precision")
@@ -3944,10 +3925,6 @@ namespace WebAPIBackend.Migrations
                     b.Navigation("PermanentDistrict");
 
                     b.Navigation("PermanentProvince");
-
-                    b.Navigation("TemporaryDistrict");
-
-                    b.Navigation("TemporaryProvince");
                 });
 
             modelBuilder.Entity("WebAPIBackend.Models.CompanyOwnerAddress", b =>

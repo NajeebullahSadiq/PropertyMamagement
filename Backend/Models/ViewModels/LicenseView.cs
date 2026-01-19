@@ -40,11 +40,6 @@ public partial class LicenseView
     public string? PermanentDistrictName { get; set; }
     public string? PermanentVillage { get; set; }
 
-    // Temporary Address Fields (آدرس موقت)
-    public string? TemporaryProvinceName { get; set; }
-    public string? TemporaryDistrictName { get; set; }
-    public string? TemporaryVillage { get; set; }
-
     // Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
     /// <summary>
     /// مبلغ حق‌الامتیاز - Royalty/License Fee Amount

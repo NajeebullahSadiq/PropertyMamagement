@@ -12,10 +12,6 @@ CREATE SCHEMA IF NOT EXISTS org;
 CREATE TABLE IF NOT EXISTS org."CompanyDetails" (
     "Id" SERIAL PRIMARY KEY,
     "Title" TEXT NOT NULL,
-    "PhoneNumber" VARCHAR(13),
-    "LicenseNumber" TEXT,
-    "PetitionDate" DATE,
-    "PetitionNumber" VARCHAR(12),
     "CreatedAt" TIMESTAMP WITHOUT TIME ZONE,
     "CreatedBy" VARCHAR(50),
     "Status" BOOLEAN,

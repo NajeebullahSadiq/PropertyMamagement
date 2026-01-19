@@ -14,17 +14,10 @@ public partial class Guarantor
 
     public string? GrandFatherName { get; set; }
 
-    public int? IdentityCardTypeId { get; set; }
-
     public int? CompanyId { get; set; }
 
-    public double? IndentityCardNumber { get; set; }
-
-    public int? Jild { get; set; }
-
-    public int? Safha { get; set; }
-
-    public int? SabtNumber { get; set; }
+    // Electronic National ID - الیکټرونیکی تذکره
+    public string? ElectronicNationalIdNumber { get; set; }
 
     public string? PhoneNumber { get; set; }
 
@@ -87,8 +80,6 @@ public partial class Guarantor
     public virtual CompanyDetail? Company { get; set; }
 
     public virtual ICollection<Guarantorsaudit> Guarantorsaudits { get; } = new List<Guarantorsaudit>();
-
-    public virtual IdentityCardType? IdentityCardType { get; set; }
 
     public virtual GuaranteeType? GuaranteeType { get; set; }
 

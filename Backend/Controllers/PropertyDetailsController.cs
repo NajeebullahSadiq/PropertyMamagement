@@ -160,8 +160,8 @@ namespace WebAPIBackend.Controllers
                              p.iscomplete,
                              SellerName = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().FirstName : null,
                              BuyerName = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().FirstName : null,
-                             SellerIndentityCardNumber = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().IndentityCardNumber : null,
-                             BuyerIndentityCardNumber = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().IndentityCardNumber : null,
+                             SellerElectronicNationalIdNumber = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().ElectronicNationalIdNumber : null,
+                             BuyerElectronicNationalIdNumber = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().ElectronicNationalIdNumber : null,
                              p.CreatedBy
                          }).ToList();
 
@@ -275,11 +275,7 @@ namespace WebAPIBackend.Controllers
                             s.FatherName,
                             s.GrandFather,
                             s.PhoneNumber,
-                            s.IndentityCardNumber,
-                            s.TazkiraType,
-                            s.TazkiraVolume,
-                            s.TazkiraPage,
-                            s.TazkiraNumber,
+                            s.ElectronicNationalIdNumber,
                             s.RoleType,
                             s.TaxIdentificationNumber,
                             s.AdditionalDetails,
@@ -307,11 +303,7 @@ namespace WebAPIBackend.Controllers
                             b.FatherName,
                             b.GrandFather,
                             b.PhoneNumber,
-                            b.IndentityCardNumber,
-                            b.TazkiraType,
-                            b.TazkiraVolume,
-                            b.TazkiraPage,
-                            b.TazkiraNumber,
+                            b.ElectronicNationalIdNumber,
                             b.RoleType,
                             b.TaxIdentificationNumber,
                             b.AdditionalDetails,
@@ -345,11 +337,7 @@ namespace WebAPIBackend.Controllers
                             w.FirstName,
                             w.FatherName,
                             w.PhoneNumber,
-                            w.IndentityCardNumber,
-                            w.TazkiraType,
-                            w.TazkiraVolume,
-                            w.TazkiraPage,
-                            w.TazkiraNumber,
+                            w.ElectronicNationalIdNumber,
                             w.NationalIdCard
                         })
                         .ToList()

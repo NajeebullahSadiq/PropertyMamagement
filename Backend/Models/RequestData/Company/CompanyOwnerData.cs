@@ -14,17 +14,11 @@
 
         public string? DateofBirth { get; set; }
 
-        public int? IdentityCardTypeId { get; set; }
-
-        public string? IndentityCardNumber { get; set; }
-
-        public string? Jild { get; set; }
-
-        public string? Safha { get; set; }
+        // Electronic National ID - الیکټرونیکی تذکره
+        public string? ElectronicNationalIdNumber { get; set; }
 
         public int? CompanyId { get; set; }
 
-        public string? SabtNumber { get; set; }
         public string? PothoPath { get; set; }
 
         // Contact Information
@@ -45,11 +39,6 @@
         public int? PermanentProvinceId { get; set; }
         public int? PermanentDistrictId { get; set; }
         public string? PermanentVillage { get; set; }
-
-        // Temporary Address Fields (آدرس موقت)
-        public int? TemporaryProvinceId { get; set; }
-        public int? TemporaryDistrictId { get; set; }
-        public string? TemporaryVillage { get; set; }
 
         /// <summary>
         /// Flag to indicate if this is an address change operation.

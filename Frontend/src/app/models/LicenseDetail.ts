@@ -10,6 +10,8 @@ export interface LicenseDetail{
     licenseType:string;
     // License Category (نوعیت جواز): جدید, تجدید, مثنی
     licenseCategory?:string;
+    // Renewal Round (دور تجدید) - only applicable when licenseCategory is تجدید
+    renewalRound?:number;
     calendarType?:string;
     // Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
     royaltyAmount?:number;      // مبلغ حق‌الامتیاز

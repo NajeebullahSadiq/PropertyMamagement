@@ -109,17 +109,6 @@ export class LocalizationService {
     { value: 'Technical/Vocational', label: 'تعلیم فنی' }
   ];
 
-  // Identity Card Types (from backend lookup table)
-  identityCardTypes = [
-    { value: 'National ID Card (Tazkira)', label: 'تذکره ملی' },
-    { value: 'Passport', label: 'پاسپورت' },
-    { value: 'Driver\'s License', label: 'رخصت رانندگی' },
-    { value: 'Birth Certificate', label: 'سند تولد' },
-    { value: 'Military ID', label: 'شناسنامه نظامی' },
-    { value: 'Student ID', label: 'شناسنامه دانشجویی' },
-    { value: 'Employee ID', label: 'شناسنامه کارمندی' }
-  ];
-
   // Address Types (from backend lookup table)
   addressTypes = [
     { value: 'Permanent Address', label: 'آدرس دائمی' },

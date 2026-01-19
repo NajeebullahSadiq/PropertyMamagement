@@ -104,6 +104,7 @@ export class LicensedetailsComponent {
 			officeAddress: ['', Validators.required],
 			licenseType: ['', Validators.required],
 			licenseCategory: [''],
+			renewalRound: [null],
 			companyId: [''],
 			docPath: [''],
 			// Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
@@ -114,6 +115,80 @@ export class LicensedetailsComponent {
 			hrLetter: [''],
 			hrLetterDate: [''],
 		});
+
+		this.licenseForm.get('issueDate')?.valueChanges.subscribe((value) => {
+			this.applyAutoExpireDate(value);
+		});
+
+		// Watch for license category changes to show/hide renewal round field
+		this.licenseForm.get('licenseCategory')?.valueChanges.subscribe(value => {
+			if (value === 'تجدید') {
+				this.licenseForm.get('renewalRound')?.setValidators([Validators.required]);
+			} else {
+				this.licenseForm.get('renewalRound')?.clearValidators();
+				this.licenseForm.get('renewalRound')?.setValue(null);
+			}
+			this.licenseForm.get('renewalRound')?.updateValueAndValidity();
+		});
+	}
+
+	private applyAutoExpireDate(issueValue: any): void {
+		const expireCtrl = this.licenseForm.get('expireDate');
+		if (!expireCtrl) return;
+
+		if (!issueValue) {
+			expireCtrl.setValue('');
+			expireCtrl.markAsDirty();
+			expireCtrl.updateValueAndValidity();
+			return;
+		}
+
+		const currentCalendar = this.calendarService.getSelectedCalendar();
+		const issueDate = this.tryResolveGregorianDate(issueValue, currentCalendar);
+		if (!issueDate) {
+			expireCtrl.setValue('');
+			expireCtrl.updateValueAndValidity();
+			return;
+		}
+
+		const expireDate = new Date(issueDate);
+		expireDate.setFullYear(expireDate.getFullYear() + 3);
+		expireCtrl.setValue(expireDate);
+		expireCtrl.updateValueAndValidity();
+	}
+
+	private tryResolveGregorianDate(value: any, calendar: CalendarType): Date | null {
+		if (!value) return null;
+
+		if (value instanceof Date && !isNaN(value.getTime())) {
+			return value;
+		}
+
+		if (typeof value === 'object' && value.year && value.month && value.day) {
+			try {
+				return this.calendarConversionService.toGregorian({
+					year: value.year,
+					month: value.month,
+					day: value.day,
+					calendarType: calendar
+				});
+			} catch {
+				return null;
+			}
+		}
+
+		if (typeof value === 'string') {
+			const normalized = value.trim();
+			if (!normalized) return null;
+
+			const normalizedForParser = calendar === CalendarType.GREGORIAN
+				? normalized
+				: normalized.replace(/-/g, '/');
+
+			return this.calendarConversionService.parseInputDate(normalizedForParser, calendar);
+		}
+
+		return null;
 	}
 
 	ngOnInit() {
@@ -135,6 +210,7 @@ export class LicensedetailsComponent {
 							officeAddress: detail[0].officeAddress,
 							licenseType: detail[0].licenseType,
 							licenseCategory: detail[0].licenseCategory || '',
+							renewalRound: detail[0].renewalRound || null,
 							companyId: detail[0].companyId,
 							docPath: detail[0].docPath,
 							// Financial and Administrative Fields
@@ -145,6 +221,8 @@ export class LicensedetailsComponent {
 							hrLetter: detail[0].hrLetter || '',
 							hrLetterDate: detail[0].hrLetterDate || '',
 						});
+
+						this.applyAutoExpireDate(detail[0].issueDate);
 						this.selectedId = detail[0].id;
 						// Set imageName from existing docPath
 						this.imageName = detail[0].docPath || '';
@@ -199,6 +277,18 @@ export class LicensedetailsComponent {
 		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
 		const currentCalendar = this.calendarService.getSelectedCalendar();
 
+		if (!issueDateValue) {
+			this.toastr.warning('تاریخ صدور جواز الزامی است');
+			return;
+		}
+
+		const issueAsGregorian = this.tryResolveGregorianDate(issueDateValue, currentCalendar);
+		const expireAsGregorian = this.tryResolveGregorianDate(expireDateValue, currentCalendar);
+		if (!issueAsGregorian || !expireAsGregorian) {
+			this.toastr.warning('تاریخ ختم جواز به صورت سیستمی محاسبه نشد');
+			return;
+		}
+
 		if (issueDateValue) {
 			details.issueDate = this.formatDateForBackend(issueDateValue);
 		}
@@ -249,6 +339,18 @@ export class LicensedetailsComponent {
 		const royaltyDateValue = this.licenseForm.get('royaltyDate')?.value;
 		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
 		const currentCalendar = this.calendarService.getSelectedCalendar();
+
+		if (!issueDateValue) {
+			this.toastr.warning('تاریخ صدور جواز الزامی است');
+			return;
+		}
+
+		const issueAsGregorian = this.tryResolveGregorianDate(issueDateValue, currentCalendar);
+		const expireAsGregorian = this.tryResolveGregorianDate(expireDateValue, currentCalendar);
+		if (!issueAsGregorian || !expireAsGregorian) {
+			this.toastr.warning('تاریخ ختم جواز به صورت سیستمی محاسبه نشد');
+			return;
+		}
 
 		if (issueDateValue) {
 			details.issueDate = this.formatDateForBackend(issueDateValue);
@@ -342,6 +444,7 @@ export class LicensedetailsComponent {
 	get expireDate() { return this.licenseForm.get('expireDate'); }
 	get licenseType() { return this.licenseForm.get('licenseType'); }
 	get licenseCategory() { return this.licenseForm.get('licenseCategory'); }
+	get renewalRound() { return this.licenseForm.get('renewalRound'); }
 	get licenareaIdseNumber() { return this.licenseForm.get('areaId'); }
 	get companyId() { return this.licenseForm.get('companyId'); }
 	get docPath() { return this.licenseForm.get('docPath'); }

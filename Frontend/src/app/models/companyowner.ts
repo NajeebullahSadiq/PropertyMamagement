@@ -5,12 +5,8 @@ export interface companyowner{
     grandFatherName:string;
     educationLevelId:number;
     dateofBirth:string;
-    identityCardTypeId:number;
-    indentityCardNumber:string;
-    jild:string;
-    safha:string;
+    electronicNationalIdNumber?:string;
     companyId:number;
-    sabtNumber:string;
     pothoPath:string;
     calendarType?:string;
     // Contact Information
@@ -24,17 +20,11 @@ export interface companyowner{
     permanentProvinceId?:number;
     permanentDistrictId?:number;
     permanentVillage?:string;
-    // Temporary Address Fields (آدرس موقت)
-    temporaryProvinceId?:number;
-    temporaryDistrictId?:number;
-    temporaryVillage?:string;
     // Location names for display
     ownerProvinceName?:string;
     ownerDistrictName?:string;
     permanentProvinceName?:string;
     permanentDistrictName?:string;
-    temporaryProvinceName?:string;
-    temporaryDistrictName?:string;
     // Flag for address change operation
     isAddressChange?:boolean;
 }

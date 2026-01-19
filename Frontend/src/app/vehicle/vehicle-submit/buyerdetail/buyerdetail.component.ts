@@ -80,7 +80,7 @@ export class BuyerdetailComponent {
       firstName: ['', Validators.required],
       fatherName: ['', Validators.required],
       grandFather: ['', Validators.required],
-      indentityCardNumber: ['', Validators.required],
+      electronicNationalIdNumber: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       paddressProvinceId: ['', Validators.required],
       paddressDistrictId: ['', Validators.required],
@@ -236,7 +236,7 @@ export class BuyerdetailComponent {
           firstName:firstBuyer.firstName,
           fatherName: firstBuyer.fatherName,
           grandFather: firstBuyer.grandFather,
-          indentityCardNumber: firstBuyer.indentityCardNumber,
+          electronicNationalIdNumber: firstBuyer.electronicNationalIdNumber || '',
           phoneNumber: firstBuyer.phoneNumber,
           propertyDetailsId: firstBuyer.propertyDetailsId,
           paddressProvinceId: firstBuyer.paddressProvinceId,
@@ -381,7 +381,7 @@ updateBuyerDetails(): void {
       firstName: selectedBuyer.firstName,
       fatherName: selectedBuyer.fatherName,
       grandFather: selectedBuyer.grandFather,
-      indentityCardNumber: selectedBuyer.indentityCardNumber,
+      electronicNationalIdNumber: selectedBuyer.electronicNationalIdNumber || '',
       phoneNumber: selectedBuyer.phoneNumber,
       propertyDetailsId: selectedBuyer.propertyDetailsId,
       paddressProvinceId: selectedBuyer.paddressProvinceId,
@@ -557,7 +557,7 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   get firstName() { return this.buyerForm.get('firstName'); }
   get fatherName() { return this.buyerForm.get('fatherName'); }
   get grandFather() { return this.buyerForm.get('grandFather'); }
-  get indentityCardNumber() { return this.buyerForm.get('indentityCardNumber'); }
+  get electronicNationalIdNumber() { return this.buyerForm.get('electronicNationalIdNumber'); }
   get phoneNumber() { return this.buyerForm.get('phoneNumber'); }
   get paddressProvinceId() { return this.buyerForm.get('paddressProvinceId'); }
   get paddressDistrictId() { return this.buyerForm.get('paddressDistrictId'); }

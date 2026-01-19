@@ -122,6 +122,42 @@ catch (Exception ex)
     app.Logger.LogError(ex, "Database seeding/migration failed. The application will continue starting, but some features may not work until the database is fixed.");
 }
 
+try
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    await db.Database.ExecuteSqlRawAsync(@"
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'ElectronicNationalIdNumber'
+            ) THEN
+                ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""ElectronicNationalIdNumber"" VARCHAR(50) NULL;
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'ElectronicNationalIdNumber'
+            ) THEN
+                ALTER TABLE org.""Guarantors"" ADD COLUMN ""ElectronicNationalIdNumber"" VARCHAR(50) NULL;
+            END IF;
+
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'RenewalRound'
+            ) THEN
+                ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""RenewalRound"" INTEGER NULL;
+            END IF;
+        END $$;
+    ");
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Schema guard failed. The application will continue starting, but some Company module queries may fail until the database schema is updated.");
+}
+
 // Configure the HTTP request pipeline.
 // Use CORS (must be before UseAuthentication and UseAuthorization)
 app.UseCors();

@@ -223,7 +223,7 @@ namespace WebAPIBackend.Controllers
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
                 GrandFather = request.GrandFather,
-                IndentityCardNumber = request.IndentityCardNumber,
+                ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
                 PaddressProvinceId = request.PaddressProvinceId,
                 PaddressDistrictId = request.PaddressDistrictId,
@@ -511,7 +511,7 @@ namespace WebAPIBackend.Controllers
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
                 GrandFather = request.GrandFather,
-                IndentityCardNumber = request.IndentityCardNumber,
+                ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
                 PaddressProvinceId = request.PaddressProvinceId,
                 PaddressDistrictId = request.PaddressDistrictId,
@@ -724,31 +724,11 @@ namespace WebAPIBackend.Controllers
             }
             //var user = await _userManager.GetUserAsync(User);
           
-            // Parse identity card number safely from string input
-            double? identityCardNumber = null;
-            if (!string.IsNullOrEmpty(request.IndentityCardNumber))
-            {
-                string idString = request.IndentityCardNumber.Trim();
-                // Take first 15 digits to fit in double precision (double can handle up to ~15-17 significant digits)
-                if (idString.Length > 15)
-                {
-                    idString = idString.Substring(0, 15);
-                }
-                if (double.TryParse(idString, out double parsedId))
-                {
-                    identityCardNumber = parsedId;
-                }
-                else
-                {
-                    return StatusCode(400, "Invalid identity card number format");
-                }
-            }
-
             var witness = new WitnessDetail
             {
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
-                IndentityCardNumber = identityCardNumber,
+                ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId.ToString(),
@@ -998,20 +978,19 @@ namespace WebAPIBackend.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
-        [HttpGet("getIdentityCardType")]
-        public async Task<IActionResult> GetIdCardTypes()
-        {
-            try
-            {
-                var locations = await _context.IdentityCardTypes.ToListAsync();
-
-                return Ok(locations);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex}");
-            }
-        }
+        // [HttpGet("getIdentityCardType")]
+        // public async Task<IActionResult> GetIdCardTypes()
+        // {
+        //     try
+        //     {
+        //         // IdentityCardTypes table removed - now using electronic IDs only
+        //         return Ok(new List<object>());
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, $"Internal server error: {ex}");
+        //     }
+        // }
 
         [HttpGet("getEducationLevel")]
         public async Task<IActionResult> GetEducationLevel()

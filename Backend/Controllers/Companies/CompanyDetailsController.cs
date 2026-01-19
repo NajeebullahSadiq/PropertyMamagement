@@ -57,10 +57,9 @@ namespace WebAPIBackend.Controllers.Companies
                             {
                                 p.Id,
                                 p.Title,
-                                p.PhoneNumber,
                                 ownerFullName= (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
                                 ownerFatherName= (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                                ownerIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().IndentityCardNumber : null,
+                                ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
                                 licenseNumber= (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber:0,
                                 granator= (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName+" "+"فرزند"+" "+ p.Guarantors.First().FatherName : null,
                             };
@@ -105,10 +104,9 @@ namespace WebAPIBackend.Controllers.Companies
                             {
                                 p.Id,
                                 p.Title,
-                                p.PhoneNumber,
                                 ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
                                 ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                                ownerIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().IndentityCardNumber : null,
+                                ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
                                 licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : 0,
                                 granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "فرزند" + " " + p.Guarantors.First().FatherName : null,
                             };
@@ -126,13 +124,6 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 var Pro = await _context.CompanyDetails.Where(x => x.Id.Equals(id)).ToListAsync();
-
-                // Convert dates to the requested calendar type (defaults to HijriShamsi)
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
-                foreach (var item in Pro)
-                {
-                    item.PetitionDate = DateConversionHelper.ToCalendarDateOnly(item.PetitionDate, calendar);
-                }
 
                 return Ok(Pro);
             }
@@ -178,10 +169,6 @@ namespace WebAPIBackend.Controllers.Companies
                         // Basic Company Information
                         c.Id,
                         c.Title,
-                        c.PhoneNumber,
-                        c.LicenseNumber,
-                        c.PetitionDate,
-                        c.PetitionNumber,
                         c.Tin,
                         c.DocPath,
                         c.Status,
@@ -197,13 +184,9 @@ namespace WebAPIBackend.Controllers.Companies
                             o.DateofBirth,
                             o.PhoneNumber,
                             o.WhatsAppNumber,
-                            o.IndentityCardNumber,
-                            o.Jild,
-                            o.Safha,
-                            o.SabtNumber,
+                            o.ElectronicNationalIdNumber,
                             o.PothoPath,
                             EducationLevelName = o.EducationLevel != null ? o.EducationLevel.Dari : null,
-                            IdentityCardTypeName = o.IdentityCardType != null ? o.IdentityCardType.Name : null,
                             // Owner's Own Address
                             OwnerProvinceName = o.OwnerProvince != null ? o.OwnerProvince.Dari : null,
                             OwnerDistrictName = o.OwnerDistrict != null ? o.OwnerDistrict.Dari : null,
@@ -211,11 +194,7 @@ namespace WebAPIBackend.Controllers.Companies
                             // Permanent Address
                             PermanentProvinceName = o.PermanentProvince != null ? o.PermanentProvince.Dari : null,
                             PermanentDistrictName = o.PermanentDistrict != null ? o.PermanentDistrict.Dari : null,
-                            o.PermanentVillage,
-                            // Temporary Address
-                            TemporaryProvinceName = o.TemporaryProvince != null ? o.TemporaryProvince.Dari : null,
-                            TemporaryDistrictName = o.TemporaryDistrict != null ? o.TemporaryDistrict.Dari : null,
-                            o.TemporaryVillage
+                            o.PermanentVillage
                         }).FirstOrDefault(),
 
                         // License Details
@@ -225,6 +204,7 @@ namespace WebAPIBackend.Controllers.Companies
                             l.LicenseNumber,
                             l.LicenseType,
                             l.LicenseCategory,
+                            l.RenewalRound,
                             l.IssueDate,
                             l.ExpireDate,
                             l.OfficeAddress,
@@ -246,12 +226,8 @@ namespace WebAPIBackend.Controllers.Companies
                             g.FatherName,
                             g.GrandFatherName,
                             g.PhoneNumber,
-                            g.IndentityCardNumber,
-                            g.Jild,
-                            g.Safha,
-                            g.SabtNumber,
+                            g.ElectronicNationalIdNumber,
                             g.PothoPath,
-                            IdentityCardTypeName = g.IdentityCardType != null ? g.IdentityCardType.Name : null,
                             GuaranteeTypeName = g.GuaranteeType != null ? g.GuaranteeType.Name : null,
                             g.GuaranteeTypeId,
                             g.PropertyDocumentNumber,
@@ -339,27 +315,11 @@ namespace WebAPIBackend.Controllers.Companies
                     return BadRequest("Title is required.");
                 }
 
-                // Parse calendar type and validate date
-                if (string.IsNullOrWhiteSpace(request.PetitionDate))
-                {
-                    return BadRequest("PetitionDate is required.");
-                }
-
-                var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
-                if (!DateConversionHelper.TryParseToDateOnly(request.PetitionDate!, calendarType, out var pdate))
-                {
-                    return BadRequest($"PetitionDate must be a valid date in {calendarType} format (yyyy-MM-dd or yyyy/MM/dd).");
-                }
-
                 var userId = userIdClaim.Value;
 
                 var property = new CompanyDetail
                 {
                     Title = request.Title,
-                    PhoneNumber = request.PhoneNumber,
-                    LicenseNumber = request.LicenseNumber,
-                    PetitionNumber = request.PetitionNumber,
-                    PetitionDate = pdate,
                     Tin = request.Tin,
                     DocPath = request.DocPath,
                     CreatedAt = DateTime.Now,
@@ -386,13 +346,6 @@ namespace WebAPIBackend.Controllers.Companies
                 return BadRequest("Request body is required.");
             }
 
-            // Parse calendar type and validate date
-            var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
-            if (string.IsNullOrWhiteSpace(request.PetitionDate) || !DateConversionHelper.TryParseToDateOnly(request.PetitionDate!, calendarType, out var pdate))
-            {
-                return BadRequest($"PetitionDate is required and must be a valid date in {calendarType} format (yyyy-MM-dd or yyyy/MM/dd).");
-            }
-
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
             {
@@ -417,10 +370,6 @@ namespace WebAPIBackend.Controllers.Companies
 
             // Update the entity with the new values
             existingProperty.Title = request.Title;
-            existingProperty.PhoneNumber = request.PhoneNumber;
-            existingProperty.LicenseNumber = request.LicenseNumber;
-            existingProperty.PetitionNumber = request.PetitionNumber;
-            existingProperty.PetitionDate = pdate;
             existingProperty.Tin = request.Tin;
             existingProperty.DocPath = request.DocPath;
 

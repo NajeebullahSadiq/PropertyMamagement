@@ -31,9 +31,6 @@ export class CompnaydetailService {
     const url = `${this.baseUrl}/${propertyDetails.id}`;
     return this.http.put<companydetails>(url, propertyDetails);
   }
-  getIdentityTypes(){
-    return this.http.get(this.baseUrldropbdownlist+'/getIdentityCardType');
-  }
   getEducationLevel(){
     return this.http.get(this.baseUrldropbdownlist+'/getEducationLevel');
   }

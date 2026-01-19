@@ -1,25 +1,28 @@
 <div class="container">
   <mat-tab-group #tabGroup>
+    <!-- UNIFIED TAB: Office, Owner & License Information -->
     <mat-tab class="blue-tab">
       <ng-template matTabLabel>
-        <mat-icon class="large-icon">home</mat-icon>
-        دفتر رهنمایی معاملات
-      </ng-template>
-      <app-companydetails #companydetails [id]="PropertyId" (next)="nextTab()"></app-companydetails>
-    </mat-tab>
-    <mat-tab [disabled]="comservice.mainTableId === 0">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">person</mat-icon>
-        مشخصات مالک
-      </ng-template>
-      <app-companyowner #companyowner [id]="PropertyId" (next)="nextTab()"></app-companyowner>
-    </mat-tab>
-    <mat-tab [disabled]="comservice.mainTableId === 0">
-      <ng-template matTabLabel>
         <mat-icon class="large-icon">description</mat-icon>
-        مشخصات جواز
+        اطلاعات دفتر، مالک و جواز
       </ng-template>
-      <app-licensedetails #licensedetails [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
+      
+      <div class="unified-tab-container">
+        <!-- Section 1: Company Details -->
+        <div id="company-section">
+          <app-companydetails #companydetails [id]="PropertyId" (next)="scrollToNextSection('owner-section')"></app-companydetails>
+        </div>
+        
+        <!-- Section 2: Owner Details -->
+        <div id="owner-section">
+          <app-companyowner #companyowner [id]="PropertyId" (next)="scrollToNextSection('license-section')"></app-companyowner>
+        </div>
+        
+        <!-- Section 3: License Details -->
+        <div id="license-section">
+          <app-licensedetails #licensedetails [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
+        </div>
+      </div>
     </mat-tab>
 
     <mat-tab [disabled]="comservice.mainTableId === 0">

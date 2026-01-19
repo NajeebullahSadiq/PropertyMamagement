@@ -18,17 +18,10 @@ public partial class CompanyOwner
 
     public DateOnly? DateofBirth { get; set; }
 
-    public int? IdentityCardTypeId { get; set; }
-
-    public double? IndentityCardNumber { get; set; }
-
-    public string? Jild { get; set; }
-
-    public string? Safha { get; set; }
+    // Electronic National ID - الیکټرونیکی تذکره
+    public string? ElectronicNationalIdNumber { get; set; }
 
     public int? CompanyId { get; set; }
-
-    public string? SabtNumber { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -52,11 +45,6 @@ public partial class CompanyOwner
     public int? PermanentDistrictId { get; set; }
     public string? PermanentVillage { get; set; }
 
-    // Temporary Address Fields (آدرس موقت)
-    public int? TemporaryProvinceId { get; set; }
-    public int? TemporaryDistrictId { get; set; }
-    public string? TemporaryVillage { get; set; }
-
     public virtual CompanyDetail? Company { get; set; }
 
     public virtual ICollection<CompanyOwnerAddress> CompanyOwnerAddresses { get; } = new List<CompanyOwnerAddress>();
@@ -65,13 +53,9 @@ public partial class CompanyOwner
 
     public virtual EducationLevel? EducationLevel { get; set; }
 
-    public virtual IdentityCardType? IdentityCardType { get; set; }
-
     // Navigation properties for address locations
     public virtual Location? OwnerProvince { get; set; }
     public virtual Location? OwnerDistrict { get; set; }
     public virtual Location? PermanentProvince { get; set; }
     public virtual Location? PermanentDistrict { get; set; }
-    public virtual Location? TemporaryProvince { get; set; }
-    public virtual Location? TemporaryDistrict { get; set; }
 }

@@ -11,17 +11,8 @@ export interface PetitionWriterLicense {
     applicantFatherName?: string;
     applicantGrandFatherName?: string;
     
-    // Identity Card Type
-    identityCardType: IdentityCardTypeEnum;
-    
-    // Electronic ID fields
-    electronicIdNumber?: string;
-    
-    // Paper ID fields
-    paperIdNumber?: string;
-    paperIdVolume?: string;
-    paperIdPage?: string;
-    paperIdRegNumber?: string;
+    // Electronic National ID - الیکټرونیکی تذکره
+    electronicNationalIdNumber: string;
     
     // Addresses
     permanentProvinceId?: number;
@@ -80,14 +71,6 @@ export interface PetitionWriterRelocation {
 }
 
 /**
- * Identity Card Type Enum
- */
-export enum IdentityCardTypeEnum {
-    Electronic = 1,
-    Paper = 2
-}
-
-/**
  * License Status Enum
  */
 export enum LicenseStatusEnum {
@@ -95,14 +78,6 @@ export enum LicenseStatusEnum {
     Cancelled = 2,
     Withdrawn = 3
 }
-
-/**
- * Identity Card Types for dropdown
- */
-export const IdentityCardTypes = [
-    { id: IdentityCardTypeEnum.Electronic, name: 'تذکره الکترونیکی' },
-    { id: IdentityCardTypeEnum.Paper, name: 'تذکره کاغذی' }
-];
 
 /**
  * License Status Types for dropdown
@@ -130,12 +105,7 @@ export interface PetitionWriterLicenseData {
     applicantName: string;
     applicantFatherName?: string;
     applicantGrandFatherName?: string;
-    identityCardType: number;
-    electronicIdNumber?: string;
-    paperIdNumber?: string;
-    paperIdVolume?: string;
-    paperIdPage?: string;
-    paperIdRegNumber?: string;
+    electronicNationalIdNumber: string;
     permanentProvinceId?: number;
     permanentDistrictId?: number;
     permanentVillage?: string;

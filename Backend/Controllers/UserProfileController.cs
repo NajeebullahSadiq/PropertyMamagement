@@ -101,7 +101,6 @@ namespace WebAPI.Controllers
                 var permissions = RolePermissions.GetPermissionsForRole(primaryRole);
 
                 var companyName = string.Empty;
-                string? companyPhone = null;
                 if (user.CompanyId > 0)
                 {
                     var company = await _context.CompanyDetails
@@ -109,7 +108,6 @@ namespace WebAPI.Controllers
                         .FirstOrDefaultAsync(c => c.Id == user.CompanyId);
 
                     companyName = company?.Title ?? string.Empty;
-                    companyPhone = company?.PhoneNumber;
                 }
 
                 return Ok(new
@@ -122,7 +120,7 @@ namespace WebAPI.Controllers
                     PhotoPath = user.PhotoPath ?? string.Empty,
                     CompanyId = user.CompanyId,
                     CompanyName = companyName,
-                    PhoneNumber = companyPhone ?? user.PhoneNumber ?? string.Empty,
+                    PhoneNumber = user.PhoneNumber ?? string.Empty,
                     LicenseType = user.LicenseType ?? string.Empty,
                     Role = primaryRole,
                     RoleDari = UserRoles.GetDariName(primaryRole),

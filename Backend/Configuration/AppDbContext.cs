@@ -45,8 +45,6 @@ namespace WebAPIBackend.Configuration
 
         public virtual DbSet<Haqulemtyaz> Haqulemtyazs { get; set; }
 
-        public virtual DbSet<IdentityCardType> IdentityCardTypes { get; set; }
-
         public virtual DbSet<LicenseDetail> LicenseDetails { get; set; }
 
         public virtual DbSet<Location> Locations { get; set; }
@@ -198,8 +196,6 @@ namespace WebAPIBackend.Configuration
 
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
-                entity.Property(e => e.PetitionNumber).HasMaxLength(12);
-                entity.Property(e => e.PhoneNumber).HasMaxLength(13);
                 entity.Property(e => e.Tin).HasColumnName("TIN");
             });
 
@@ -405,11 +401,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.ApplicantName).HasMaxLength(200);
                 entity.Property(e => e.ApplicantFatherName).HasMaxLength(200);
                 entity.Property(e => e.ApplicantGrandFatherName).HasMaxLength(200);
-                entity.Property(e => e.ElectronicIdNumber).HasMaxLength(50);
-                entity.Property(e => e.PaperIdNumber).HasMaxLength(50);
-                entity.Property(e => e.PaperIdVolume).HasMaxLength(20);
-                entity.Property(e => e.PaperIdPage).HasMaxLength(20);
-                entity.Property(e => e.PaperIdRegNumber).HasMaxLength(50);
+                entity.Property(e => e.ElectronicNationalIdNumber).HasMaxLength(50).IsRequired();
                 entity.Property(e => e.PermanentVillage).HasMaxLength(500);
                 entity.Property(e => e.CurrentVillage).HasMaxLength(500);
                 entity.Property(e => e.ActivityLocation).HasMaxLength(500);
@@ -505,10 +497,6 @@ namespace WebAPIBackend.Configuration
                     .HasForeignKey(d => d.EducationLevelId)
                     .HasConstraintName("CompanyOwner_EducationLevelId_fkey");
 
-                entity.HasOne(d => d.IdentityCardType).WithMany(p => p.CompanyOwners)
-                    .HasForeignKey(d => d.IdentityCardTypeId)
-                    .HasConstraintName("CompanyOwner_IdentityCardTypeId_fkey");
-
                 // Owner's Own Address Navigation Properties
                 entity.HasOne(d => d.OwnerProvince).WithMany()
                     .HasForeignKey(d => d.OwnerProvinceId)
@@ -526,14 +514,6 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.PermanentDistrict).WithMany()
                     .HasForeignKey(d => d.PermanentDistrictId)
                     .HasConstraintName("CompanyOwner_PermanentDistrictId_fkey");
-
-                entity.HasOne(d => d.TemporaryProvince).WithMany()
-                    .HasForeignKey(d => d.TemporaryProvinceId)
-                    .HasConstraintName("CompanyOwner_TemporaryProvinceId_fkey");
-
-                entity.HasOne(d => d.TemporaryDistrict).WithMany()
-                    .HasForeignKey(d => d.TemporaryDistrictId)
-                    .HasConstraintName("CompanyOwner_TemporaryDistrictId_fkey");
             });
 
             modelBuilder.Entity<CompanyOwnerAddress>(entity =>
@@ -647,10 +627,6 @@ namespace WebAPIBackend.Configuration
                     .HasForeignKey(d => d.CompanyId)
                     .HasConstraintName("Guarantors_CompanyId_fkey");
 
-                entity.HasOne(d => d.IdentityCardType).WithMany(p => p.Guarantors)
-                    .HasForeignKey(d => d.IdentityCardTypeId)
-                    .HasConstraintName("Guarantors_IdentityCardTypeId_fkey");
-
                 entity.HasOne(d => d.GuaranteeType).WithMany(p => p.Guarantors)
                     .HasForeignKey(d => d.GuaranteeTypeId)
                     .HasConstraintName("Guarantors_GuaranteeTypeId_fkey");
@@ -696,13 +672,6 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.Company).WithMany(p => p.Haqulemtyazs)
                     .HasForeignKey(d => d.CompanyId)
                     .HasConstraintName("Haqulemtyaz_CompanyId_fkey");
-            });
-
-            modelBuilder.Entity<IdentityCardType>(entity =>
-            {
-                entity.HasKey(e => e.Id).HasName("IdentityCardType_pkey");
-
-                entity.ToTable("IdentityCardType", "look");
             });
 
             modelBuilder.Entity<LicenseDetail>(entity =>

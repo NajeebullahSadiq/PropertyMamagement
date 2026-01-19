@@ -192,12 +192,8 @@ namespace WebAPIBackend.Controllers.Companies
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
                 GrandFatherName = request.GrandFatherName,
-                IdentityCardTypeId = request.IdentityCardTypeId,
                 CompanyId = request.CompanyId,
-                IndentityCardNumber = request.IndentityCardNumber,
-                Jild = request.Jild,
-                Safha = request.Safha,
-                SabtNumber = request.SabtNumber,
+                ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
                 PothoPath = request.PothoPath,
                 PaddressProvinceId = request.PaddressProvinceId,
@@ -287,11 +283,7 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.FirstName = request.FirstName;
             existingProperty.FatherName = request.FatherName;
             existingProperty.GrandFatherName = request.GrandFatherName;
-            existingProperty.IdentityCardTypeId = request.IdentityCardTypeId;
-            existingProperty.IndentityCardNumber = request.IndentityCardNumber;
-            existingProperty.Jild = request.Jild;
-            existingProperty.Safha = request.Safha;
-            existingProperty.SabtNumber = request.SabtNumber;
+            existingProperty.ElectronicNationalIdNumber = request.ElectronicNationalIdNumber;
             existingProperty.CompanyId = companyId;
             existingProperty.PothoPath = request.PothoPath;
             existingProperty.PhoneNumber = request.PhoneNumber;

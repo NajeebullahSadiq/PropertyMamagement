@@ -27,6 +27,9 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
         public int IdentityCardType { get; set; }
 
         [MaxLength(50)]
+        public string? ElectronicNationalIdNumber { get; set; }
+
+        [MaxLength(50)]
         public string? ElectronicIdNumber { get; set; }
 
         [MaxLength(50)]
