@@ -42,15 +42,6 @@ export class RealestateComponent {
     }
   }
   
-  scrollToNextSection(sectionId: string): void {
-    setTimeout(() => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
-  }
-  
   resetChild(){
     this.companydetails.resetChild();
     this.companyowner.resetForms();

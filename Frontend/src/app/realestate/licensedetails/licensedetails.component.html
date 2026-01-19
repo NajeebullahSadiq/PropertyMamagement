@@ -1,11 +1,4 @@
-<section id="license" class="unified-section">
-  <div class="section-header mb-6 pb-4 border-b-2 border-blue-500">
-    <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
-      <i class="fas fa-certificate text-blue-600"></i>
-      <span>مشخصات جواز</span>
-    </h3>
-  </div>
-
+<div class="container p-6">
   <div class="max-w-7xl mx-auto">
     <form [formGroup]="licenseForm" (ngSubmit)="licenseForm.valid ? selectedId ? updateData() : addData() : null">
       <div class="hidden">
@@ -230,4 +223,4 @@
       </div>
     </form>
   </div>
-</section>
+</div>

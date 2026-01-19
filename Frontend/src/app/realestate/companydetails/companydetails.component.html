@@ -1,11 +1,4 @@
-<section class="unified-section">
-  <div class="section-header mb-6 pb-4 border-b-2 border-blue-500">
-    <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
-      <i class="fas fa-building text-blue-600"></i>
-      <span>دفتر رهنمایی معاملات</span>
-    </h2>
-  </div>
-
+<div class="container p-6">
   <div class="max-w-7xl mx-auto">
     <form [formGroup]="companyForm" (ngSubmit)="companyForm.valid ? selectedId ? updateCompanyDetails() : addCompanyDetails() : null">
       <div class="hidden">
@@ -83,4 +76,4 @@
       </div>
     </form>
   </div>
-</section>
+</div>

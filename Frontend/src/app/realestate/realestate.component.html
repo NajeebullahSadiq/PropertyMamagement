@@ -1,28 +1,30 @@
 <div class="container">
   <mat-tab-group #tabGroup>
-    <!-- UNIFIED TAB: Office, Owner & License Information -->
+    <!-- Tab 1: Office Information (اطلاعات دفتر) -->
     <mat-tab class="blue-tab">
       <ng-template matTabLabel>
-        <mat-icon class="large-icon">description</mat-icon>
-        اطلاعات دفتر، مالک و جواز
+        <mat-icon class="large-icon">business</mat-icon>
+        اطلاعات دفتر
       </ng-template>
-      
-      <div class="unified-tab-container">
-        <!-- Section 1: Company Details -->
-        <div id="company-section">
-          <app-companydetails #companydetails [id]="PropertyId" (next)="scrollToNextSection('owner-section')"></app-companydetails>
-        </div>
-        
-        <!-- Section 2: Owner Details -->
-        <div id="owner-section">
-          <app-companyowner #companyowner [id]="PropertyId" (next)="scrollToNextSection('license-section')"></app-companyowner>
-        </div>
-        
-        <!-- Section 3: License Details -->
-        <div id="license-section">
-          <app-licensedetails #licensedetails [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
-        </div>
-      </div>
+      <app-companydetails #companydetails [id]="PropertyId" (next)="nextTab()"></app-companydetails>
+    </mat-tab>
+
+    <!-- Tab 2: Owner Information (مالک) -->
+    <mat-tab [disabled]="comservice.mainTableId === 0">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">person</mat-icon>
+        مالک
+      </ng-template>
+      <app-companyowner #companyowner [id]="PropertyId" (next)="nextTab()"></app-companyowner>
+    </mat-tab>
+
+    <!-- Tab 3: License Information (جواز) -->
+    <mat-tab [disabled]="comservice.mainTableId === 0">
+      <ng-template matTabLabel>
+        <mat-icon class="large-icon">description</mat-icon>
+        جواز
+      </ng-template>
+      <app-licensedetails #licensedetails [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
     </mat-tab>
 
     <mat-tab [disabled]="comservice.mainTableId === 0">
