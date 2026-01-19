@@ -1,4 +1,113 @@
-<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+<div class="print-only" *ngIf="!isLoading && item" dir="rtl">
+  <div class="pw-page">
+    <div class="pw-header">
+      <div class="pw-header-logo">
+        <img src="assets/img/mcitlogo.png" alt="Logo" class="pw-logo" />
+      </div>
+      <div class="pw-header-title">
+        <div class="pw-title-line">امارت اسلامی افغانستان</div>
+        <div class="pw-title-line">وزارت عدلیه</div>
+        <div class="pw-subtitle-line">ریاست عمومی انسجام</div>
+        <div class="pw-subtitle-line">ریاست امور رهنمای معاملات و عریضه نویسان</div>
+        <div class="pw-subtitle-line">آمریت رهنمای معاملات و عریضه نویسان</div>
+        <div class="pw-subtitle-line">مدیریت بررسی و ثبت جواز عریضه نویسان</div>
+        <div class="pw-title-strong">جواز فعالیت عریضه نویسی</div>
+      </div>
+      <div class="pw-header-logo pw-header-logo--right">
+        <img src="assets/img/afg.png" alt="Logo" class="pw-logo" />
+      </div>
+    </div>
+
+    <div class="pw-meta">
+      <div class="pw-meta-item">
+        <span class="pw-meta-label">نمبر جواز:</span>
+        <span class="pw-meta-value">{{ item.licenseNumber }}</span>
+      </div>
+      <div class="pw-meta-item">
+        <span class="pw-meta-label">تاریخ صدور:</span>
+        <span class="pw-meta-value">{{ item.licenseIssueDateFormatted || '-' }}</span>
+      </div>
+    </div>
+
+    <div class="pw-content">
+      <div class="pw-photo">
+        <div class="pw-photo-box">
+          <img src="assets/img/avatar.png" alt="Photo" class="pw-photo-img" />
+        </div>
+        <div class="pw-photo-text">فوتو</div>
+      </div>
+
+      <div class="pw-form">
+        <div class="pw-form-title">شهرت عریضه نویس</div>
+
+        <div class="pw-grid-head">
+          <div>شهرت و سکونت اصلی</div>
+          <div>سکونت فعلی</div>
+        </div>
+
+        <div class="pw-grid">
+          <div class="pw-cell pw-label">نام و تخلص</div>
+          <div class="pw-cell pw-value">{{ item.applicantName || '-' }}</div>
+          <div class="pw-cell pw-label">ولایت</div>
+          <div class="pw-cell pw-value">{{ item.currentProvinceName || '-' }}</div>
+
+          <div class="pw-cell pw-label">ولد</div>
+          <div class="pw-cell pw-value">{{ item.applicantFatherName || '-' }}</div>
+          <div class="pw-cell pw-label">ولسوالی</div>
+          <div class="pw-cell pw-value">{{ item.currentDistrictName || '-' }}</div>
+
+          <div class="pw-cell pw-label">نمبر تذکره</div>
+          <div class="pw-cell pw-value">{{ item.electronicIdNumber || '-' }}</div>
+          <div class="pw-cell pw-label">ناحیه</div>
+          <div class="pw-cell pw-value">{{ item.currentVillage || '-' }}</div>
+
+          <div class="pw-cell pw-label">ولایت</div>
+          <div class="pw-cell pw-value">{{ item.permanentProvinceName || '-' }}</div>
+          <div class="pw-cell pw-label">محل فعالیت</div>
+          <div class="pw-cell pw-value">{{ item.activityLocation || '-' }}</div>
+
+          <div class="pw-cell pw-label">ولسوالی</div>
+          <div class="pw-cell pw-value">{{ item.permanentDistrictName || '-' }}</div>
+          <div class="pw-cell pw-label">قریه / گذر</div>
+          <div class="pw-cell pw-value">{{ item.currentVillage || '-' }}</div>
+
+          <div class="pw-cell pw-label">ناحیه / قریه</div>
+          <div class="pw-cell pw-value">{{ item.permanentVillage || '-' }}</div>
+          <div class="pw-cell pw-label"></div>
+          <div class="pw-cell pw-value"></div>
+        </div>
+
+        <div class="pw-bottom">
+          <div class="pw-bottom-col">
+            <div class="pw-bottom-title">مرجع صلاحیت و امضاء</div>
+            <div class="pw-bottom-body">
+              <div class="pw-bottom-center">ریاست عمومی انسجام</div>
+              <div class="pw-bottom-space"></div>
+              <div class="pw-bottom-center">امضاء رئیس</div>
+            </div>
+          </div>
+          <div class="pw-bottom-col">
+            <div class="pw-bottom-title">نظر به درمورد</div>
+            <div class="pw-bottom-body pw-bottom-text">
+              در اهلیت عریضه نویسی بعد از اخذ امتحان نظر هیئت داده شد، که این عریضه نویس به درجه اعلی، اوسط، ادنی لیاقت و اهلیت دارد.
+              <div class="pw-bottom-center">مهر</div>
+            </div>
+          </div>
+          <div class="pw-bottom-col">
+            <div class="pw-bottom-title">معلومات جواز عریضه نویسی</div>
+            <div class="pw-bottom-body">
+              <div class="pw-kv"><span>اعتبار از تاریخ:</span><span class="pw-kv-value">{{ item.licenseIssueDateFormatted || '-' }}</span></div>
+              <div class="pw-kv"><span>الی:</span><span class="pw-kv-value">{{ item.licenseExpiryDateFormatted || '-' }}</span></div>
+              <div class="pw-kv pw-kv-last"><span>نمبر ثبت:</span><span class="pw-kv-value">( )</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8 no-print">
   <div class="max-w-5xl mx-auto px-4 sm:px-6">
     <!-- Page Header -->
     <div class="mb-8 text-center">
@@ -76,7 +185,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-id-card text-purple-500"></i>الیکټرونیکی تذکره نمبر</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.electronicNationalIdNumber || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ item.electronicIdNumber || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-building text-purple-500"></i>محل فعالیت</span>

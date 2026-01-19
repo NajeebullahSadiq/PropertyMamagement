@@ -17,8 +17,6 @@ namespace WebAPIBackend.Models.RequestData
 
         public string? PhoneNumber { get; set; }
 
-        public string? PothoPath { get; set; }
-
         public int? PaddressProvinceId { get; set; }
 
         public int? PaddressDistrictId { get; set; }

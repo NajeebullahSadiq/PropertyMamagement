@@ -67,7 +67,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
-                        x.ElectronicNationalIdNumber,
+                        x.ElectronicIdNumber,
                         x.PermanentProvinceId,
                         PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
                         x.PermanentDistrictId,
@@ -141,13 +141,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
-                        x.ElectronicNationalIdNumber,
-                        IdentityCardType = (int?)null,
-                        ElectronicIdNumber = (string?)null,
-                        PaperIdNumber = (string?)null,
-                        PaperIdVolume = (string?)null,
-                        PaperIdPage = (string?)null,
-                        PaperIdRegNumber = (string?)null,
+                        x.ElectronicIdNumber,
                         x.PermanentProvinceId,
                         PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
                         x.PermanentDistrictId,
@@ -230,7 +224,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     ApplicantName = data.ApplicantName,
                     ApplicantFatherName = data.ApplicantFatherName,
                     ApplicantGrandFatherName = data.ApplicantGrandFatherName,
-                    ElectronicNationalIdNumber = data.ElectronicNationalIdNumber,
+                    ElectronicIdNumber = data.ElectronicIdNumber,
                     PermanentProvinceId = data.PermanentProvinceId,
                     PermanentDistrictId = data.PermanentDistrictId,
                     PermanentVillage = data.PermanentVillage,
@@ -298,7 +292,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.ApplicantName = data.ApplicantName;
                 entity.ApplicantFatherName = data.ApplicantFatherName;
                 entity.ApplicantGrandFatherName = data.ApplicantGrandFatherName;
-                entity.ElectronicNationalIdNumber = data.ElectronicNationalIdNumber;
+                entity.ElectronicIdNumber = data.ElectronicIdNumber;
                 entity.PermanentProvinceId = data.PermanentProvinceId;
                 entity.PermanentDistrictId = data.PermanentDistrictId;
                 entity.PermanentVillage = data.PermanentVillage;

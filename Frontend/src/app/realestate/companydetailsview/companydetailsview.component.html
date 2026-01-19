@@ -130,27 +130,31 @@
             <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.license.officeAddress) }}</p>
           </div>
           <!-- Financial Details -->
-          <div class="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200">
+          <div class="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200" *ngIf="viewData.license.royaltyAmount !== null && viewData.license.royaltyAmount !== undefined">
             <p class="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2">مبلغ حق‌الامتیاز</p>
             <p class="text-gray-900 font-bold text-lg">{{ formatCurrency(viewData.license.royaltyAmount) }}</p>
           </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ حق‌الامتیاز</p>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200" *ngIf="viewData.license.royaltyDate">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ پرداخت تعرفه</p>
             <p class="text-gray-900 font-semibold text-lg">{{ viewData.license.royaltyDate | calendarDate }}</p>
           </div>
-          <div class="p-5 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200" *ngIf="viewData.license.tariffNumber">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر تعرفه</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.license.tariffNumber) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200" *ngIf="viewData.license.penaltyAmount !== null && viewData.license.penaltyAmount !== undefined">
             <p class="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">مبلغ جریمه</p>
             <p class="text-gray-900 font-bold text-lg">{{ formatCurrency(viewData.license.penaltyAmount) }}</p>
           </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200" *ngIf="viewData.license.penaltyDate">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ جریمه</p>
             <p class="text-gray-900 font-semibold text-lg">{{ viewData.license.penaltyDate | calendarDate }}</p>
           </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200" *ngIf="viewData.license.hrLetter">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">مکتوب قوای بشری</p>
             <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.license.hrLetter) }}</p>
           </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200" *ngIf="viewData.license.hrLetterDate">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ مکتوب قوای بشری</p>
             <p class="text-gray-900 font-semibold text-lg">{{ viewData.license.hrLetterDate | calendarDate }}</p>
           </div>

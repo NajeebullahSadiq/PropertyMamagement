@@ -5,7 +5,6 @@ export interface Guarantor{
     grandFatherName?:string;
     electronicNationalIdNumber?:string;
     companyId:number;
-    pothoPath:string;
     phoneNumber:string;
     paddressProvinceId:number;
     paddressDistrictId:number;

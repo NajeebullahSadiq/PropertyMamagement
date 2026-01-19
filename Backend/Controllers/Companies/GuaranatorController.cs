@@ -195,7 +195,6 @@ namespace WebAPIBackend.Controllers.Companies
                 CompanyId = request.CompanyId,
                 ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
-                PothoPath = request.PothoPath,
                 PaddressProvinceId = request.PaddressProvinceId,
                 PaddressDistrictId = request.PaddressDistrictId,
                 PaddressVillage = request.PaddressVillage,
@@ -285,7 +284,6 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.GrandFatherName = request.GrandFatherName;
             existingProperty.ElectronicNationalIdNumber = request.ElectronicNationalIdNumber;
             existingProperty.CompanyId = companyId;
-            existingProperty.PothoPath = request.PothoPath;
             existingProperty.PhoneNumber = request.PhoneNumber;
             existingProperty.PaddressProvinceId = request.PaddressProvinceId;
             existingProperty.PaddressDistrictId = request.PaddressDistrictId;

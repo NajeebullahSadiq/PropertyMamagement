@@ -40,6 +40,8 @@
         /// </summary>
         public string? RoyaltyDate { get; set; }
 
+        public string? TariffNumber { get; set; }
+
         /// <summary>
         /// مبلغ جریمه - Penalty Amount
         /// </summary>

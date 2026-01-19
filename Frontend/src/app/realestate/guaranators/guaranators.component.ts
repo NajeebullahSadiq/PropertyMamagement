@@ -5,7 +5,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Guarantor, GuaranteeTypeEnum } from 'src/app/models/Guarantor';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
-import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
@@ -46,8 +45,6 @@ export class GuaranatorsComponent {
   minDate = { year: 1320, month: 12, day: 31 };
 
   baseUrl: string = environment.apiURL + '/';
-  imagePath: string = 'assets/img/avatar.png';
-  imageName: string = '';
   guaranteeDocName: string = '';
   selectedId: number = 0;
   IdTypes: any;
@@ -72,16 +69,7 @@ export class GuaranatorsComponent {
   onNextClick() {
     this.next.emit();
   }
-  @ViewChild('childComponent') childComponent!: ProfileImageCropperComponent;
   @ViewChild('guaranteeFileUpload') guaranteeFileUpload!: FileuploadComponent;
-  private pendingImagePath: string = '';
-
-  ngAfterViewInit(): void {
-    if (this.pendingImagePath && this.childComponent) {
-      this.childComponent.setExistingImage(this.pendingImagePath);
-      this.pendingImagePath = '';
-    }
-  }
 
   constructor(
     private fb: FormBuilder,
@@ -107,7 +95,6 @@ export class GuaranatorsComponent {
       taddressProvinceId: ['', Validators.required],
       taddressDistrictId: ['', Validators.required],
       taddressVillage: ['', Validators.required],
-      pothoPath: [''],
       // Guarantee fields
       guaranteeTypeId: ['', Validators.required],
       propertyDocumentNumber: [''],
@@ -168,31 +155,6 @@ export class GuaranatorsComponent {
     return '';
   }
 
-  uploadFinished = (event: string) => {
-    this.imageName = event;
-    this.imagePath = event ? (this.baseUrl + event) : 'assets/img/avatar.png';
-  }
-
-  profilePreviewChanged = (localObjectUrl: string) => {
-    if (localObjectUrl) {
-      this.imagePath = localObjectUrl;
-      return;
-    }
-
-    if (this.imageName) {
-      this.imagePath = this.baseUrl + this.imageName;
-      return;
-    }
-
-    this.imagePath = 'assets/img/avatar.png';
-  }
-
-  profileImageUploaded = (dbPath: string) => {
-    this.imageName = dbPath || '';
-    this.guaranatorForm.patchValue({ pothoPath: this.imageName });
-    this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
-  }
-
   guaranteeDocUploadFinished = (event: string) => {
     this.guaranteeDocName = event;
     this.guaranatorForm.patchValue({ guaranteeDocPath: this.guaranteeDocName });
@@ -202,7 +164,6 @@ export class GuaranatorsComponent {
     const details = this.guaranatorForm.value as Guarantor;
     const currentCalendar = this.calendarService.getSelectedCalendar();
 
-    details.pothoPath = this.imageName;
     details.companyId = this.comservice.mainTableId;
     details.guaranteeDocPath = this.guaranteeDocName;
     details.calendarType = currentCalendar;
@@ -256,7 +217,6 @@ export class GuaranatorsComponent {
     const currentCalendar = this.calendarService.getSelectedCalendar();
 
     details.companyId = this.comservice.mainTableId;
-    details.pothoPath = this.imageName;
     details.guaranteeDocPath = this.guaranteeDocName;
     details.calendarType = currentCalendar;
 
@@ -288,14 +248,9 @@ export class GuaranatorsComponent {
   }
 
   resetForms(): void {
-    if (this.childComponent) {
-      this.childComponent.reset();
-    }
     if (this.guaranteeFileUpload) {
       this.guaranteeFileUpload.reset();
     }
-    this.imagePath = 'assets/img/avatar.png';
-    this.imageName = '';
     this.guaranteeDocName = '';
     this.selectedId = 0;
     this.guaranatorForm.reset();
@@ -440,7 +395,6 @@ export class GuaranatorsComponent {
         taddressProvinceId: selectedOwnerAddress.taddressProvinceId,
         taddressDistrictId: selectedOwnerAddress.taddressDistrictId,
         taddressVillage: selectedOwnerAddress.taddressVillage,
-        pothoPath: selectedOwnerAddress.pothoPath,
         // Guarantee fields
         guaranteeTypeId: selectedOwnerAddress.guaranteeTypeId,
         propertyDocumentNumber: selectedOwnerAddress.propertyDocumentNumber,
@@ -472,17 +426,7 @@ export class GuaranatorsComponent {
         this.district2 = res;
       });
       this.selectedId = id;
-      this.imagePath = selectedOwnerAddress.pothoPath ? (this.baseUrl + selectedOwnerAddress.pothoPath) : 'assets/img/avatar.png';
-      this.imageName = selectedOwnerAddress.pothoPath || '';
       this.guaranteeDocName = selectedOwnerAddress.guaranteeDocPath || '';
-
-      if (selectedOwnerAddress.pothoPath) {
-        if (this.childComponent) {
-          this.childComponent.setExistingImage(this.baseUrl + selectedOwnerAddress.pothoPath);
-        } else {
-          this.pendingImagePath = this.baseUrl + selectedOwnerAddress.pothoPath;
-        }
-      }
 
       // Parse guarantee dates
       this.parseAndSetDates(selectedOwnerAddress);

@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -9,7 +9,6 @@ import {
     NgbCalendarPersian,
     NgbDateParserFormatter,
 } from '@ng-bootstrap/ng-bootstrap';
-import { MatTabGroup } from '@angular/material/tabs';
 import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -50,8 +49,6 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     maxDate = { year: 1410, month: 12, day: 31 };
     minDate = { year: 1320, month: 12, day: 31 };
 
-    @ViewChild('tabGroup') tabGroup!: MatTabGroup;
-
     // Forms
     licenseForm!: FormGroup;
     financialForm!: FormGroup;
@@ -60,7 +57,6 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
 
     isEditMode = false;
     editId: number | null = null;
-    selectedTabIndex = 0;
 
     // Dropdown data
     provinces: any[] = [];
@@ -117,7 +113,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             applicantName: ['', Validators.required],
             applicantFatherName: [''],
             applicantGrandFatherName: [''],
-            electronicNationalIdNumber: ['', Validators.required],
+            electronicIdNumber: [''],
             permanentProvinceId: [null],
             permanentDistrictId: [null],
             permanentVillage: [''],
@@ -195,7 +191,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     applicantName: data.applicantName,
                     applicantFatherName: data.applicantFatherName,
                     applicantGrandFatherName: data.applicantGrandFatherName,
-                    electronicNationalIdNumber: data.electronicNationalIdNumber,
+                    electronicIdNumber: data.electronicIdNumber,
                     permanentProvinceId: data.permanentProvinceId,
                     permanentDistrictId: data.permanentDistrictId,
                     permanentVillage: data.permanentVillage,
@@ -257,9 +253,16 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         return null;
     }
 
-    formatDate(date: NgbDateStruct | null): string {
+    formatDate(date: NgbDateStruct | Date | any | null | undefined): string {
         if (!date) return '';
-        return `${date.year}/${date.month.toString().padStart(2, '0')}/${date.day.toString().padStart(2, '0')}`;
+
+        const year = typeof date?.year === 'number' ? date.year : (typeof date?.getFullYear === 'function' ? date.getFullYear() : undefined);
+        const month = typeof date?.month === 'number' ? date.month : (typeof date?.getMonth === 'function' ? date.getMonth() + 1 : undefined);
+        const day = typeof date?.day === 'number' ? date.day : (typeof date?.getDate === 'function' ? date.getDate() : undefined);
+
+        if (!year || !month || !day) return '';
+
+        return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
     }
 
     // Form getters
@@ -276,15 +279,20 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         const formData = this.licenseForm.value;
         const financialData = this.financialForm.value;
 
+        const bankReceiptDate = this.formatDate(financialData.bankReceiptDate) || undefined;
+        const licenseIssueDate = this.formatDate(financialData.licenseIssueDate) || undefined;
+        const licenseExpiryDate = this.formatDate(financialData.licenseExpiryDate) || undefined;
+        const cancellationDate = this.formatDate(this.cancellationForm.value.cancellationDate) || undefined;
+
         const data: PetitionWriterLicenseData = {
             ...formData,
             bankReceiptNumber: financialData.bankReceiptNumber,
-            bankReceiptDate: this.formatDate(financialData.bankReceiptDate),
+            bankReceiptDate,
             licenseType: financialData.licenseType,
-            licenseIssueDate: this.formatDate(financialData.licenseIssueDate),
-            licenseExpiryDate: this.formatDate(financialData.licenseExpiryDate),
+            licenseIssueDate,
+            licenseExpiryDate,
             licenseStatus: this.cancellationForm.value.licenseStatus,
-            cancellationDate: this.formatDate(this.cancellationForm.value.cancellationDate),
+            cancellationDate,
             calendarType: calendar
         };
 
@@ -338,7 +346,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
 
         const data: PetitionWriterRelocationData = {
             newActivityLocation: formData.newActivityLocation,
-            relocationDate: this.formatDate(formData.relocationDate),
+            relocationDate: this.formatDate(formData.relocationDate) || undefined,
             remarks: formData.remarks,
             calendarType: calendar
         };
@@ -405,7 +413,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
 
         const calendar = this.calendarService.getSelectedCalendar();
         const status = this.cancellationForm.value.licenseStatus;
-        const cancellationDate = this.formatDate(this.cancellationForm.value.cancellationDate);
+        const cancellationDate = this.formatDate(this.cancellationForm.value.cancellationDate) || undefined;
 
         this.licenseService.updateStatus(this.licenseService.mainTableId, status, cancellationDate, calendar).subscribe({
             next: () => {
@@ -431,7 +439,6 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         this.relocationForm.reset();
         this.relocationsList = [];
         this.selectedRelocationId = 0;
-        this.selectedTabIndex = 0;
         this.router.navigate(['/petition-writer-license']);
     }
 

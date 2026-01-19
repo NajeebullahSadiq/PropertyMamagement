@@ -110,6 +110,7 @@ export class LicensedetailsComponent {
 			// Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
 			royaltyAmount: [null],
 			royaltyDate: [''],
+			tariffNumber: [''],
 			penaltyAmount: [null],
 			penaltyDate: [''],
 			hrLetter: [''],
@@ -216,6 +217,7 @@ export class LicensedetailsComponent {
 							// Financial and Administrative Fields
 							royaltyAmount: detail[0].royaltyAmount || null,
 							royaltyDate: detail[0].royaltyDate || '',
+							tariffNumber: detail[0].tariffNumber || '',
 							penaltyAmount: detail[0].penaltyAmount || null,
 							penaltyDate: detail[0].penaltyDate || '',
 							hrLetter: detail[0].hrLetter || '',
@@ -321,6 +323,7 @@ export class LicensedetailsComponent {
 		details.calendarType = currentCalendar;
 		details.companyId = this.comservice.mainTableId;
 		details.docPath = this.imageName;
+		details.tariffNumber = (this.licenseForm.get('tariffNumber')?.value ?? '').toString().trim();
 		if (details.id === 0 && this.selectedId !== 0 || this.selectedId !== null) {
 			details.id = this.selectedId;
 		}
@@ -384,6 +387,7 @@ export class LicensedetailsComponent {
 		details.calendarType = currentCalendar;
 		details.docPath = this.imageName;
 		details.companyId = this.comservice.mainTableId;
+		details.tariffNumber = (this.licenseForm.get('tariffNumber')?.value ?? '').toString().trim();
 		if (details.id === null) {
 			details.id = 0;
 		}

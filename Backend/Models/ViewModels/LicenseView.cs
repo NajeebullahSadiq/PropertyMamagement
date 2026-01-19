@@ -51,6 +51,8 @@ public partial class LicenseView
     /// </summary>
     public DateOnly? RoyaltyDate { get; set; }
 
+    public string? TariffNumber { get; set; }
+
     /// <summary>
     /// مبلغ جریمه - Penalty Amount
     /// </summary>

@@ -27,8 +27,6 @@ public partial class Guarantor
 
     public bool? Status { get; set; }
 
-    public string? PothoPath { get; set; }
-
     public int? PaddressProvinceId { get; set; }
 
     public int? PaddressDistrictId { get; set; }

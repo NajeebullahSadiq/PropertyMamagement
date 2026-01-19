@@ -112,6 +112,60 @@ builder.Services.AddScoped<IVerificationService, VerificationService>();
 
 var app = builder.Build();
 
+try
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    await db.Database.ExecuteSqlRawAsync(
+        "ALTER TABLE IF EXISTS org.\"CompanyOwner\" ADD COLUMN IF NOT EXISTS \"ElectronicNationalIdNumber\" VARCHAR(50) NULL;");
+
+    await db.Database.ExecuteSqlRawAsync(
+        "ALTER TABLE IF EXISTS org.\"Guarantors\" ADD COLUMN IF NOT EXISTS \"ElectronicNationalIdNumber\" VARCHAR(50) NULL;");
+
+    await db.Database.ExecuteSqlRawAsync(
+        "ALTER TABLE IF EXISTS org.\"LicenseDetails\" ADD COLUMN IF NOT EXISTS \"RenewalRound\" INTEGER NULL;");
+
+    await db.Database.ExecuteSqlRawAsync(
+        "ALTER TABLE IF EXISTS org.\"LicenseDetails\" ADD COLUMN IF NOT EXISTS \"TariffNumber\" VARCHAR(100) NULL;");
+
+    await db.Database.ExecuteSqlRawAsync(@"
+        DO $$
+        BEGIN
+            IF EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema='org' AND table_name='CompanyOwner' AND column_name='IndentityCardNumber'
+            ) THEN
+                UPDATE org.""CompanyOwner""
+                SET ""ElectronicNationalIdNumber"" = ""IndentityCardNumber""::text
+                WHERE ""ElectronicNationalIdNumber"" IS NULL;
+            END IF;
+
+            IF EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema='org' AND table_name='Guarantors' AND column_name='NationalIdNumber'
+            ) THEN
+                UPDATE org.""Guarantors""
+                SET ""ElectronicNationalIdNumber"" = ""NationalIdNumber""
+                WHERE ""ElectronicNationalIdNumber"" IS NULL;
+            END IF;
+
+            IF EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema='org' AND table_name='Guarantors' AND column_name='IndentityCardNumber'
+            ) THEN
+                UPDATE org.""Guarantors""
+                SET ""ElectronicNationalIdNumber"" = ""IndentityCardNumber""::text
+                WHERE ""ElectronicNationalIdNumber"" IS NULL;
+            END IF;
+        END $$;
+    ");
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Schema guard failed. The application will continue starting, but some Company module queries may fail until the database schema is updated.");
+}
+
 // Seed database and create admin user
 try
 {
@@ -120,42 +174,6 @@ try
 catch (Exception ex)
 {
     app.Logger.LogError(ex, "Database seeding/migration failed. The application will continue starting, but some features may not work until the database is fixed.");
-}
-
-try
-{
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    await db.Database.ExecuteSqlRawAsync(@"
-        DO $$
-        BEGIN
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_schema = 'org' AND table_name = 'CompanyOwner' AND column_name = 'ElectronicNationalIdNumber'
-            ) THEN
-                ALTER TABLE org.""CompanyOwner"" ADD COLUMN ""ElectronicNationalIdNumber"" VARCHAR(50) NULL;
-            END IF;
-
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_schema = 'org' AND table_name = 'Guarantors' AND column_name = 'ElectronicNationalIdNumber'
-            ) THEN
-                ALTER TABLE org.""Guarantors"" ADD COLUMN ""ElectronicNationalIdNumber"" VARCHAR(50) NULL;
-            END IF;
-
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'RenewalRound'
-            ) THEN
-                ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""RenewalRound"" INTEGER NULL;
-            END IF;
-        END $$;
-    ");
-}
-catch (Exception ex)
-{
-    app.Logger.LogError(ex, "Schema guard failed. The application will continue starting, but some Company module queries may fail until the database schema is updated.");
 }
 
 // Configure the HTTP request pipeline.

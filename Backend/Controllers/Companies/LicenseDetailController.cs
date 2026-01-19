@@ -102,33 +102,33 @@ namespace WebAPIBackend.Controllers.Companies
 
             // Parse HrLetterDate if provided
             DateOnly? hrLetterDate = null;
-            if (!string.IsNullOrEmpty(request.HrLetterDate))
+            if (!string.IsNullOrWhiteSpace(request.HrLetterDate))
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
                 {
-                    return BadRequest("HrLetterDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest("تاریخ مکتوب قوای بشری معتبر نیست");
                 }
                 hrLetterDate = parsedHrLetterDate;
             }
 
             // Parse RoyaltyDate if provided
             DateOnly? royaltyDate = null;
-            if (!string.IsNullOrEmpty(request.RoyaltyDate))
+            if (!string.IsNullOrWhiteSpace(request.RoyaltyDate))
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
                 {
-                    return BadRequest("RoyaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest("تاریخ پرداخت تعرفه معتبر نیست");
                 }
                 royaltyDate = parsedRoyaltyDate;
             }
 
             // Parse PenaltyDate if provided
             DateOnly? penaltyDate = null;
-            if (!string.IsNullOrEmpty(request.PenaltyDate))
+            if (!string.IsNullOrWhiteSpace(request.PenaltyDate))
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
                 {
-                    return BadRequest("PenaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest("تاریخ جریمه معتبر نیست");
                 }
                 penaltyDate = parsedPenaltyDate;
             }
@@ -157,6 +157,7 @@ namespace WebAPIBackend.Controllers.Companies
                 RenewalRound = request.RenewalRound,
                 RoyaltyAmount = request.RoyaltyAmount,
                 RoyaltyDate = royaltyDate,
+                TariffNumber = request.TariffNumber,
                 PenaltyAmount = request.PenaltyAmount,
                 PenaltyDate = penaltyDate,
                 HrLetter = request.HrLetter,
@@ -223,33 +224,33 @@ namespace WebAPIBackend.Controllers.Companies
 
             // Parse HrLetterDate if provided
             DateOnly? hrLetterDate = null;
-            if (!string.IsNullOrEmpty(request.HrLetterDate))
+            if (!string.IsNullOrWhiteSpace(request.HrLetterDate))
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
                 {
-                    return BadRequest("HrLetterDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest("تاریخ مکتوب قوای بشری معتبر نیست");
                 }
                 hrLetterDate = parsedHrLetterDate;
             }
 
             // Parse RoyaltyDate if provided
             DateOnly? royaltyDate = null;
-            if (!string.IsNullOrEmpty(request.RoyaltyDate))
+            if (!string.IsNullOrWhiteSpace(request.RoyaltyDate))
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
                 {
-                    return BadRequest("RoyaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest("تاریخ پرداخت تعرفه معتبر نیست");
                 }
                 royaltyDate = parsedRoyaltyDate;
             }
 
             // Parse PenaltyDate if provided
             DateOnly? penaltyDate = null;
-            if (!string.IsNullOrEmpty(request.PenaltyDate))
+            if (!string.IsNullOrWhiteSpace(request.PenaltyDate))
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
                 {
-                    return BadRequest("PenaltyDate must be a valid date (yyyy-MM-dd or yyyy/MM/dd).");
+                    return BadRequest("تاریخ جریمه معتبر نیست");
                 }
                 penaltyDate = parsedPenaltyDate;
             }
@@ -281,6 +282,7 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.RenewalRound = request.RenewalRound;
             existingProperty.RoyaltyAmount = request.RoyaltyAmount;
             existingProperty.RoyaltyDate = royaltyDate;
+            existingProperty.TariffNumber = request.TariffNumber;
             existingProperty.PenaltyAmount = request.PenaltyAmount;
             existingProperty.PenaltyDate = penaltyDate;
             existingProperty.HrLetter = request.HrLetter;
@@ -389,6 +391,7 @@ namespace WebAPIBackend.Controllers.Companies
                 data.RoyaltyAmount,
                 data.RoyaltyDate,
                 royaltyDateFormatted,
+                data.TariffNumber,
                 data.PenaltyAmount,
                 data.PenaltyDate,
                 penaltyDateFormatted,
@@ -447,6 +450,10 @@ namespace WebAPIBackend.Controllers.Companies
                             ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""RoyaltyDate"" DATE NULL;
                         END IF;
                         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'TariffNumber') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""TariffNumber"" VARCHAR(100) NULL;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
                             WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'PenaltyAmount') THEN
                             ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""PenaltyAmount"" NUMERIC(18,2) NULL;
                         END IF;
@@ -489,6 +496,7 @@ namespace WebAPIBackend.Controllers.Companies
                         co.""PermanentVillage"",
                         ld.""RoyaltyAmount"",
                         ld.""RoyaltyDate"",
+                        ld.""TariffNumber"",
                         ld.""PenaltyAmount"",
                         ld.""PenaltyDate"",
                         ld.""HrLetter"",

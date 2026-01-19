@@ -15,7 +15,8 @@ export interface LicenseDetail{
     calendarType?:string;
     // Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
     royaltyAmount?:number;      // مبلغ حق‌الامتیاز
-    royaltyDate?:string;        // تاریخ حق‌الامتیاز
+    royaltyDate?:string;        // تاریخ پرداخت تعرفه
+    tariffNumber?:string;       // نمبر تعرفه
     penaltyAmount?:number;      // مبلغ جریمه
     penaltyDate?:string;        // تاریخ جریمه
     hrLetter?:string;           // مکتوب قوای بشری

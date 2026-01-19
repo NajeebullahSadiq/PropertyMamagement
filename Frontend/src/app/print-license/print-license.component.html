@@ -99,6 +99,18 @@
                 <span class="meta-label">تاریخ ختم:</span>
                 <span class="meta-value">{{data.expireDateFormatted || (data.expireDate | calendarDate) || '—'}}</span>
               </div>
+              <div class="meta-item" *ngIf="data.tariffNumber">
+                <span class="meta-label">نمبر تعرفه:</span>
+                <span class="meta-value">{{data.tariffNumber}}</span>
+              </div>
+              <div class="meta-item" *ngIf="data.royaltyDateFormatted || data.royaltyDate">
+                <span class="meta-label">تاریخ پرداخت تعرفه:</span>
+                <span class="meta-value">{{data.royaltyDateFormatted || (data.royaltyDate | calendarDate)}}</span>
+              </div>
+              <div class="meta-item" *ngIf="data.royaltyAmount !== null && data.royaltyAmount !== undefined">
+                <span class="meta-label">مبلغ حق‌الامتیاز:</span>
+                <span class="meta-value">{{data.royaltyAmount | number}} </span>
+              </div>
             </div>
           </div>
 

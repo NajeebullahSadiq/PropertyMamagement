@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPIBackend.Models;
 
 namespace WebAPIBackend.Models.PetitionWriterLicense
 {
@@ -30,10 +31,10 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         [MaxLength(200)]
         public string? ApplicantGrandFatherName { get; set; }
 
+        // Identity Card Information
         // Electronic National ID - الیکټرونیکی تذکره
-        [Required]
         [MaxLength(50)]
-        public string ElectronicNationalIdNumber { get; set; } = string.Empty;
+        public string? ElectronicIdNumber { get; set; }
 
         // Permanent Address (سکونت اصلی)
         public int? PermanentProvinceId { get; set; }
