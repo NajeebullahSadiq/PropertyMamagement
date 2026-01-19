@@ -117,6 +117,8 @@ export class PetitionWriterLicenseViewComponent implements OnInit {
     }
 
     printItem(): void {
-        window.print();
+        if (this.item?.id) {
+            this.router.navigate(['/printPetitionWriterLicense', this.item.id]);
+        }
     }
 }

@@ -401,7 +401,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.ApplicantName).HasMaxLength(200);
                 entity.Property(e => e.ApplicantFatherName).HasMaxLength(200);
                 entity.Property(e => e.ApplicantGrandFatherName).HasMaxLength(200);
-                entity.Property(e => e.ElectronicIdNumber).HasMaxLength(50);
+                entity.Property(e => e.ElectronicIdNumber).HasMaxLength(50).IsRequired();
                 entity.Property(e => e.PermanentVillage).HasMaxLength(500);
                 entity.Property(e => e.CurrentVillage).HasMaxLength(500);
                 entity.Property(e => e.ActivityLocation).HasMaxLength(500);

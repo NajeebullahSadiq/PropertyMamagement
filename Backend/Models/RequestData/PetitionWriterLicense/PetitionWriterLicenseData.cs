@@ -23,26 +23,9 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
         [MaxLength(200)]
         public string? ApplicantGrandFatherName { get; set; }
 
-        [Required(ErrorMessage = "نوع تذکره الزامی است")]
-        public int IdentityCardType { get; set; }
-
+        [Required(ErrorMessage = "نمبر تذکره الکترونیکی الزامی است")]
         [MaxLength(50)]
-        public string? ElectronicNationalIdNumber { get; set; }
-
-        [MaxLength(50)]
-        public string? ElectronicIdNumber { get; set; }
-
-        [MaxLength(50)]
-        public string? PaperIdNumber { get; set; }
-
-        [MaxLength(20)]
-        public string? PaperIdVolume { get; set; }
-
-        [MaxLength(20)]
-        public string? PaperIdPage { get; set; }
-
-        [MaxLength(50)]
-        public string? PaperIdRegNumber { get; set; }
+        public string ElectronicIdNumber { get; set; } = string.Empty;
 
         // Permanent Address
         public int? PermanentProvinceId { get; set; }

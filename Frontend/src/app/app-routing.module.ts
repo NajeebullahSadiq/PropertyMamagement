@@ -8,6 +8,7 @@ import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.c
 import { PrintLicenseComponent } from './print-license/print-license.component';
 import { PrintSecuritiesComponent } from './print-securities/print-securities.component';
 import { PrintPetitionWriterSecuritiesComponent } from './print-petition-writer-securities/print-petition-writer-securities.component';
+import { PrintPetitionWriterLicenseComponent } from './print-petition-writer-license/print-petition-writer-license.component';
 import { MasterlayoutComponent } from './dashboard/masterlayout/masterlayout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ReportComponent } from './dashboard/report/report.component';
@@ -153,6 +154,8 @@ const routes: Routes = [
   { path: 'printSecurities', component: PrintSecuritiesComponent },
   { path: 'printPetitionWriterSecurities/:id', component: PrintPetitionWriterSecuritiesComponent },
   { path: 'printPetitionWriterSecurities', component: PrintPetitionWriterSecuritiesComponent },
+  { path: 'printPetitionWriterLicense/:id', component: PrintPetitionWriterLicenseComponent },
+  { path: 'printPetitionWriterLicense', component: PrintPetitionWriterLicenseComponent },
 ];
 
 @NgModule({

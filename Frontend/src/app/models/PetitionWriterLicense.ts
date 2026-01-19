@@ -105,7 +105,7 @@ export interface PetitionWriterLicenseData {
     applicantName: string;
     applicantFatherName?: string;
     applicantGrandFatherName?: string;
-    electronicIdNumber?: string;
+    electronicIdNumber: string;
     permanentProvinceId?: number;
     permanentDistrictId?: number;
     permanentVillage?: string;

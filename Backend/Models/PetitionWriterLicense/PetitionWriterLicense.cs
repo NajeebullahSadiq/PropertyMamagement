@@ -33,8 +33,9 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
 
         // Identity Card Information
         // Electronic National ID - الیکټرونیکی تذکره
+        [Required]
         [MaxLength(50)]
-        public string? ElectronicIdNumber { get; set; }
+        public string ElectronicIdNumber { get; set; } = string.Empty;
 
         // Permanent Address (سکونت اصلی)
         public int? PermanentProvinceId { get; set; }

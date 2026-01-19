@@ -113,7 +113,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             applicantName: ['', Validators.required],
             applicantFatherName: [''],
             applicantGrandFatherName: [''],
-            electronicIdNumber: [''],
+            electronicIdNumber: ['', Validators.required],
             permanentProvinceId: [null],
             permanentDistrictId: [null],
             permanentVillage: [''],

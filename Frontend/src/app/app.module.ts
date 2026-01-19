@@ -28,6 +28,7 @@ import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.c
 import { PrintLicenseComponent } from './print-license/print-license.component';
 import { PrintSecuritiesComponent } from './print-securities/print-securities.component';
 import { PrintPetitionWriterSecuritiesComponent } from './print-petition-writer-securities/print-petition-writer-securities.component';
+import { PrintPetitionWriterLicenseComponent } from './print-petition-writer-license/print-petition-writer-license.component';
 import { SharedModule } from './shared/shared.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 
@@ -39,6 +40,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     PrintLicenseComponent,
     PrintSecuritiesComponent,
     PrintPetitionWriterSecuritiesComponent,
+    PrintPetitionWriterLicenseComponent,
     
   ],
   imports: [
