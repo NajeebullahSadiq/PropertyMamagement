@@ -13,6 +13,8 @@ export class ProfileImageCropperComponent implements OnChanges {
   @Input() initialImageUrl: string = '';
   @Input() documentType: string = 'profile';
   @Input() roundCropper: boolean = true;
+  @Input() aspectRatio: number = 1; // Default 1:1 (square), use 4/3, 16/9, or 0 for free-form
+  @Input() maintainAspectRatio: boolean = true; // Set to false for free-form cropping
 
   @Output() imageUploaded = new EventEmitter<string>();
   @Output() imageChanged = new EventEmitter<string>();
@@ -64,7 +66,9 @@ export class ProfileImageCropperComponent implements OnChanges {
       data: {
         file,
         roundCropper: this.roundCropper,
-        resizeToWidth: 512
+        resizeToWidth: 512,
+        aspectRatio: this.aspectRatio,
+        maintainAspectRatio: this.maintainAspectRatio
       }
     });
 

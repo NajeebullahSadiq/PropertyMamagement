@@ -67,7 +67,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
-                        x.ElectronicIdNumber,
+                        x.ElectronicNationalIdNumber,
                         x.PermanentProvinceId,
                         PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
                         x.PermanentDistrictId,
@@ -142,7 +142,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
-                        x.ElectronicIdNumber,
+                        x.ElectronicNationalIdNumber,
                         x.PermanentProvinceId,
                         PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
                         x.PermanentDistrictId,
@@ -226,7 +226,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     ApplicantName = data.ApplicantName,
                     ApplicantFatherName = data.ApplicantFatherName,
                     ApplicantGrandFatherName = data.ApplicantGrandFatherName,
-                    ElectronicIdNumber = data.ElectronicIdNumber,
+                    ElectronicNationalIdNumber = data.ElectronicNationalIdNumber,
                     PermanentProvinceId = data.PermanentProvinceId,
                     PermanentDistrictId = data.PermanentDistrictId,
                     PermanentVillage = data.PermanentVillage,
@@ -295,7 +295,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.ApplicantName = data.ApplicantName;
                 entity.ApplicantFatherName = data.ApplicantFatherName;
                 entity.ApplicantGrandFatherName = data.ApplicantGrandFatherName;
-                entity.ElectronicIdNumber = data.ElectronicIdNumber;
+                entity.ElectronicNationalIdNumber = data.ElectronicNationalIdNumber;
                 entity.PermanentProvinceId = data.PermanentProvinceId;
                 entity.PermanentDistrictId = data.PermanentDistrictId;
                 entity.PermanentVillage = data.PermanentVillage;

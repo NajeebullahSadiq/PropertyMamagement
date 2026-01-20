@@ -6,6 +6,8 @@ export interface ProfileImageCropperDialogData {
   file: File;
   roundCropper: boolean;
   resizeToWidth?: number;
+  aspectRatio?: number;
+  maintainAspectRatio?: boolean;
 }
 
 export interface ProfileImageCropperDialogResult {

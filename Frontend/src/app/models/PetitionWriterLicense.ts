@@ -12,7 +12,7 @@ export interface PetitionWriterLicense {
     applicantGrandFatherName?: string;
     
     // Identity Card - تذکره
-    electronicIdNumber?: string;
+    electronicNationalIdNumber?: string;
     
     // Addresses
     permanentProvinceId?: number;
@@ -108,7 +108,7 @@ export interface PetitionWriterLicenseData {
     applicantName: string;
     applicantFatherName?: string;
     applicantGrandFatherName?: string;
-    electronicIdNumber: string;
+    electronicNationalIdNumber: string;
     permanentProvinceId?: number;
     permanentDistrictId?: number;
     permanentVillage?: string;

@@ -1,124 +1,145 @@
 <!-- Loading Indicator -->
-<div *ngIf="isLoading" class="loading-container">
-  <div class="loading-spinner">
-    <div class="spinner-ring"></div>
-    <div class="spinner-ring"></div>
-    <div class="spinner-ring"></div>
-  </div>
-  <p>در حال بارگذاری معلومات جواز...</p>
+<div *ngIf="isLoading" class="flex flex-col items-center justify-center min-h-screen">
+  <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+  <p class="mt-4 text-gray-700">در حال بارگذاری معلومات جواز...</p>
 </div>
 
-<div *ngIf="!isLoading && error" class="error-container">
-  <div class="error-icon">⚠</div>
-  <p>{{ error }}</p>
+<!-- Error Display -->
+<div *ngIf="!isLoading && error" class="flex flex-col items-center justify-center min-h-screen text-red-600">
+  <div class="text-5xl mb-4">⚠</div>
+  <p class="text-lg">{{ error }}</p>
 </div>
 
-<div class="pw-page" *ngIf="!isLoading && !error" dir="rtl">
-  <div class="pw-header">
-    <div class="pw-header-column pw-header-column--left">
-      <div class="pw-header-logo">
-        <img src="assets/img/mcitlogo.png" alt="Logo" class="pw-logo" />
+<!-- Main License Page -->
+<div class="print-page w-[210mm] bg-white p-1 mx-auto shadow-lg" *ngIf="!isLoading && !error" dir="rtl">
+  
+  <!-- Header Section -->
+  <div class="flex justify-between items-start border-b-2 border-blue-600 pb-1 mb-1">
+    <!-- Left Column: Logo & Photo -->
+    <div class="flex flex-col items-center gap-0.5 w-[18%]">
+      <img src="assets/img/mcitlogo.png" alt="Logo" class="h-9 w-auto" />
+      <div class="w-14 h-[70px] border-2 border-blue-600 rounded overflow-hidden bg-gray-100">
+        <img *ngIf="data.picturePath" [src]="getImageUrl(data.picturePath)" alt="Photo" class="w-full h-full object-cover" onerror="this.src='assets/img/avatar.png'" />
+        <img *ngIf="!data.picturePath" src="assets/img/avatar.png" alt="Photo" class="w-full h-full object-cover" />
       </div>
-      <div class="pw-photo">
-        <div class="pw-photo-box">
-          <img *ngIf="data.picturePath" [src]="getImageUrl(data.picturePath)" alt="Photo" class="pw-photo-img" onerror="this.src='assets/img/avatar.png'" />
-          <img *ngIf="!data.picturePath" src="assets/img/avatar.png" alt="Photo" class="pw-photo-img" />
-        </div>
-        <div class="pw-photo-text">فوتو</div>
+      <div class="text-[8px] text-gray-600 mt-0.5">فوتو</div>
+    </div>
+    
+    <!-- Center Column: Title -->
+    <div class="flex-1 text-center px-4">
+      <div class="text-xs font-bold text-gray-900 leading-tight">امارت اسلامی افغانستان</div>
+      <div class="text-xs font-bold text-gray-900 leading-tight">وزارت عدلیه</div>
+      <div class="text-[9px] font-semibold text-blue-600 leading-tight">ریاست عمومی انسجام</div>
+      <div class="text-[9px] font-semibold text-blue-600 leading-tight">ریاست امور رهنمای معاملات و عریضه نویسان</div>
+      <div class="text-[9px] font-semibold text-blue-600 leading-tight">آمریت رهنمای معاملات و عریضه نویسان</div>
+      <div class="text-[9px] font-semibold text-blue-600 leading-tight">مدیریت بررسی و ثبت جواز عریضه نویسان</div>
+      <div class="inline-block text-[13px] font-black text-blue-900 mt-1 px-2.5 py-0.5 bg-gradient-to-b from-blue-50 to-white rounded border-2 border-blue-600">
+        جواز فعالیت عریضه نویسی
       </div>
     </div>
     
-    <div class="pw-header-title">
-      <div class="pw-title-line">امارت اسلامی افغانستان</div>
-      <div class="pw-title-line">وزارت عدلیه</div>
-      <div class="pw-subtitle-line">ریاست عمومی انسجام</div>
-      <div class="pw-subtitle-line">ریاست امور رهنمای معاملات و عریضه نویسان</div>
-      <div class="pw-subtitle-line">آمریت رهنمای معاملات و عریضه نویسان</div>
-      <div class="pw-subtitle-line">مدیریت بررسی و ثبت جواز عریضه نویسان</div>
-      <div class="pw-title-strong">جواز فعالیت عریضه نویسی</div>
-    </div>
-    
-    <div class="pw-header-column pw-header-column--right">
-      <div class="pw-header-logo">
-        <img src="assets/img/afg.png" alt="Logo" class="pw-logo" />
-      </div>
-      <div class="pw-meta">
-        <div class="pw-meta-item">
-          <span class="pw-meta-label">نمبر جواز:</span>
-          <span class="pw-meta-value">{{ data.licenseNumber }}</span>
+    <!-- Right Column: Logo & Meta -->
+    <div class="flex flex-col items-center gap-0.5 w-[18%]">
+      <img src="assets/img/afg.png" alt="Logo" class="h-9 w-auto" />
+      <div class="flex flex-col gap-0.5 mt-0.5">
+        <div class="flex flex-col items-center text-center">
+          <span class="text-[8px] text-gray-600 font-semibold">نمبر جواز:</span>
+          <span class="text-[10px] text-blue-600 font-extrabold px-1 py-0.5 bg-blue-50 rounded mt-0.5">{{ data.licenseNumber }}</span>
         </div>
-        <div class="pw-meta-item">
-          <span class="pw-meta-label">تاریخ صدور:</span>
-          <span class="pw-meta-value">{{ data.licenseIssueDateFormatted || '-' }}</span>
+        <div class="flex flex-col items-center text-center">
+          <span class="text-[8px] text-gray-600 font-semibold">تاریخ صدور:</span>
+          <span class="text-[10px] text-blue-600 font-extrabold px-1 py-0.5 bg-blue-50 rounded mt-0.5">{{ data.licenseIssueDateFormatted || '-' }}</span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="pw-content">
-
-    <div class="pw-form">
-      <div class="pw-form-title">شهرت عریضه نویس</div>
-
-      <div class="pw-grid-head">
-        <div>شهرت و سکونت اصلی</div>
-        <div>سکونت فعلی</div>
+  <!-- Content Section -->
+  <div class="mt-1">
+    <div class="border-2 border-blue-600 rounded overflow-hidden">
+      <!-- Form Title -->
+      <div class="bg-gradient-to-b from-blue-600 to-blue-700 text-white text-[11px] font-bold text-center py-0.5">
+        شهرت عریضه نویس
       </div>
 
-      <div class="pw-grid">
-        <div class="pw-cell pw-label">نام و تخلص</div>
-        <div class="pw-cell pw-value">{{ data.applicantName || '-' }}</div>
-        <div class="pw-cell pw-label">ولایت</div>
-        <div class="pw-cell pw-value">{{ data.currentProvinceName || '-' }}</div>
-
-        <div class="pw-cell pw-label">ولد</div>
-        <div class="pw-cell pw-value">{{ data.applicantFatherName || '-' }}</div>
-        <div class="pw-cell pw-label">ولسوالی</div>
-        <div class="pw-cell pw-value">{{ data.currentDistrictName || '-' }}</div>
-
-        <div class="pw-cell pw-label">نمبر تذکره</div>
-        <div class="pw-cell pw-value">{{ data.electronicIdNumber || '-' }}</div>
-        <div class="pw-cell pw-label">ناحیه</div>
-        <div class="pw-cell pw-value">{{ data.currentVillage || '-' }}</div>
-
-        <div class="pw-cell pw-label">ولایت</div>
-        <div class="pw-cell pw-value">{{ data.permanentProvinceName || '-' }}</div>
-        <div class="pw-cell pw-label">محل فعالیت</div>
-        <div class="pw-cell pw-value">{{ data.activityLocation || '-' }}</div>
-
-        <div class="pw-cell pw-label">ولسوالی</div>
-        <div class="pw-cell pw-value">{{ data.permanentDistrictName || '-' }}</div>
-        <div class="pw-cell pw-label">قریه / گذر</div>
-        <div class="pw-cell pw-value">{{ data.currentVillage || '-' }}</div>
-
-        <div class="pw-cell pw-label">ناحیه / قریه</div>
-        <div class="pw-cell pw-value">{{ data.permanentVillage || '-' }}</div>
-        <div class="pw-cell pw-label"></div>
-        <div class="pw-cell pw-value"></div>
+      <!-- Grid Header -->
+      <div class="grid grid-cols-2 bg-blue-50">
+        <div class="p-0.5 text-[9px] font-bold text-center border border-blue-600">شهرت و سکونت اصلی</div>
+        <div class="p-0.5 text-[9px] font-bold text-center border border-blue-600">سکونت فعلی</div>
       </div>
 
-      <div class="pw-bottom">
-        <div class="pw-bottom-col">
-          <div class="pw-bottom-title">مرجع صلاحیت و امضاء</div>
-          <div class="pw-bottom-body">
-            <div class="pw-bottom-center">ریاست عمومی انسجام</div>
-            <div class="pw-bottom-space"></div>
-            <div class="pw-bottom-center">امضاء رئیس</div>
+      <!-- Data Grid -->
+      <div class="grid grid-cols-4 border-t-2 border-blue-600">
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">نام و تخلص</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.applicantName || '-' }}</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولایت</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentProvinceName || '-' }}</div>
+
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولد</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.applicantFatherName || '-' }}</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولسوالی</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentDistrictName || '-' }}</div>
+
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">نمبر تذکره</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.electronicNationalIdNumber || '-' }}</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ناحیه</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentVillage || '-' }}</div>
+
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولایت</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.permanentProvinceName || '-' }}</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">محل فعالیت</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.activityLocation || '-' }}</div>
+
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولسوالی</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.permanentDistrictName || '-' }}</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">قریه / گذر</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentVillage || '-' }}</div>
+
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ناحیه / قریه</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.permanentVillage || '-' }}</div>
+        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300"></div>
+        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300"></div>
+      </div>
+
+      <!-- Bottom Section -->
+      <div class="grid grid-cols-3 border-t-2 border-blue-600">
+        <!-- Column 1 -->
+        <div class="border border-blue-300 p-0.5">
+          <div class="text-[9px] font-bold text-blue-600 text-center py-0.5 bg-blue-50 rounded mb-0.5">مرجع صلاحیت و امضاء</div>
+          <div class="min-h-[50px] p-0.5">
+            <div class="text-center font-bold text-blue-600 text-[8px] my-0.5">ریاست عمومی انسجام</div>
+            <div class="h-4"></div>
+            <div class="text-center font-bold text-blue-600 text-[8px] my-0.5">امضاء رئیس</div>
           </div>
         </div>
-        <div class="pw-bottom-col">
-          <div class="pw-bottom-title">نظر به درمورد</div>
-          <div class="pw-bottom-body pw-bottom-text">
-            در اهلیت عریضه نویسی بعد از اخذ امتحان نظر هیئت داده شد، که این عریضه نویس به درجه اعلی، اوسط، ادنی لیاقت و اهلیت دارد.
-            <div class="pw-bottom-center">مهر</div>
+        
+        <!-- Column 2 -->
+        <div class="border border-blue-300 p-0.5">
+          <div class="text-[9px] font-bold text-blue-600 text-center py-0.5 bg-blue-50 rounded mb-0.5">نظر به درمورد</div>
+          <div class="min-h-[50px] p-0.5">
+            <div class="text-[7px] leading-snug text-justify text-gray-900">
+              در اهلیت عریضه نویسی بعد از اخذ امتحان نظر هیئت داده شد، که این عریضه نویس به درجه اعلی، اوسط، ادنی لیاقت و اهلیت دارد.
+            </div>
+            <div class="text-center font-bold text-blue-600 text-[8px] mt-1">مهر</div>
           </div>
         </div>
-        <div class="pw-bottom-col">
-          <div class="pw-bottom-title">معلومات جواز عریضه نویسی</div>
-          <div class="pw-bottom-body">
-            <div class="pw-kv"><span>اعتبار از تاریخ:</span><span class="pw-kv-value">{{ data.licenseIssueDateFormatted || '-' }}</span></div>
-            <div class="pw-kv"><span>الی:</span><span class="pw-kv-value">{{ data.licenseExpiryDateFormatted || '-' }}</span></div>
-            <div class="pw-kv pw-kv-last"><span>نمبر ثبت:</span><span class="pw-kv-value">( )</span></div>
+        
+        <!-- Column 3 -->
+        <div class="border border-blue-300 p-0.5">
+          <div class="text-[9px] font-bold text-blue-600 text-center py-0.5 bg-blue-50 rounded mb-0.5">معلومات جواز عریضه نویسی</div>
+          <div class="min-h-[50px] p-0.5">
+            <div class="flex justify-between items-center py-0.5 text-[8px] border-b border-dashed border-blue-300">
+              <span class="font-semibold text-gray-900">اعتبار از تاریخ:</span>
+              <span class="text-blue-600 font-extrabold px-1.5 py-0.5 bg-blue-50 rounded">{{ data.licenseIssueDateFormatted || '-' }}</span>
+            </div>
+            <div class="flex justify-between items-center py-0.5 text-[8px] border-b border-dashed border-blue-300">
+              <span class="font-semibold text-gray-900">الی:</span>
+              <span class="text-blue-600 font-extrabold px-1.5 py-0.5 bg-blue-50 rounded">{{ data.licenseExpiryDateFormatted || '-' }}</span>
+            </div>
+            <div class="flex justify-between items-center py-0.5 text-[8px]">
+              <span class="font-semibold text-gray-900">نمبر ثبت:</span>
+              <span class="text-blue-600 font-extrabold px-1.5 py-0.5 bg-blue-50 rounded">( )</span>
+            </div>
           </div>
         </div>
       </div>
@@ -126,48 +147,28 @@
   </div>
 
   <!-- QR Code Verification Section -->
-  <div class="pw-verification-section" *ngIf="verificationCode">
-    <div class="pw-verification-container">
-      <div class="pw-qr-code">
-        <img [src]="qrCodeUrl" alt="QR Code" class="pw-qr-image" *ngIf="qrCodeUrl">
+  <div class="mt-1 px-1" *ngIf="verificationCode">
+    <div class="flex items-center gap-1.5 p-1 bg-gradient-to-br from-white to-blue-50 border-2 border-blue-600 rounded shadow-sm">
+      <div class="flex-shrink-0">
+        <img [src]="qrCodeUrl" alt="QR Code" class="w-11 h-11 rounded shadow-sm" *ngIf="qrCodeUrl">
       </div>
-      <div class="pw-verification-info">
-        <div class="pw-verification-title">تصدیق اصالت سند</div>
-        <div class="pw-verification-row">
-          <span class="pw-verification-label">کود تصدیق:</span>
-          <span class="pw-verification-value">{{ verificationCode }}</span>
+      <div class="flex flex-col gap-0.5 flex-1">
+        <div class="flex items-center gap-1">
+          <span class="text-[7px] text-gray-600 font-semibold whitespace-nowrap">کود تصدیق سند:</span>
+          <span class="font-mono text-[8px] font-bold text-blue-600 tracking-wide ltr px-1 py-0.5 bg-blue-50 rounded border border-blue-300">{{ verificationCode }}</span>
         </div>
-        <div class="pw-verification-row">
-          <span class="pw-verification-label">نام عریضه نویس:</span>
-          <span class="pw-verification-value">{{ data.applicantName || '—' }}</span>
-        </div>
-        <div class="pw-verification-row">
-          <span class="pw-verification-label">نام پدر:</span>
-          <span class="pw-verification-value">{{ data.applicantFatherName || '—' }}</span>
-        </div>
-        <div class="pw-verification-row">
-          <span class="pw-verification-label">نمبر جواز:</span>
-          <span class="pw-verification-value">{{ data.licenseNumber || '—' }}</span>
-        </div>
-        <div class="pw-verification-row">
-          <span class="pw-verification-label">تاریخ صدور:</span>
-          <span class="pw-verification-value">{{ data.licenseIssueDateFormatted || '—' }}</span>
-        </div>
-        <div class="pw-verification-row">
-          <span class="pw-verification-label">محل فعالیت:</span>
-          <span class="pw-verification-value">{{ data.activityLocation || '—' }}</span>
-        </div>
-        <div class="pw-verification-note">
-          برای تصدیق اصالت این سند، کود QR را اسکن نمایید یا کود تصدیق را در پورتال تصدیق وزارت عدلیه وارد کنید.
+        <div class="flex items-center gap-1">
+          <span class="text-[7px] text-gray-600 font-semibold whitespace-nowrap">شهرت:</span>
+          <span class="font-mono text-[8px] font-bold text-blue-600 tracking-wide ltr px-1 py-0.5 bg-blue-50 rounded border border-blue-300">{{ data.applicantName || '—' }}</span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Verification Error -->
-  <div class="pw-verification-error" *ngIf="verificationError && !verificationCode">
-    <div class="pw-error-icon">⚠</div>
-    <div class="pw-error-text">{{ verificationError }}</div>
-    <div class="pw-error-note">برای تصدیق با اداره تماس بگیرید</div>
+  <div class="mt-1 mx-1 p-1 border-2 border-red-700 bg-gradient-to-br from-white to-red-50 rounded flex flex-col items-center text-center gap-0.5" *ngIf="verificationError && !verificationCode">
+    <div class="text-sm">⚠</div>
+    <div class="text-[7px] text-red-700 font-bold">{{ verificationError }}</div>
+    <div class="text-[7px] text-gray-600 font-semibold">برای تصدیق با اداره تماس بگیرید</div>
   </div>
 </div>

@@ -18,8 +18,8 @@
 
       <image-cropper
         [imageBase64]="imageBase64"
-        [maintainAspectRatio]="true"
-        [aspectRatio]="1 / 1"
+        [maintainAspectRatio]="data.maintainAspectRatio !== false"
+        [aspectRatio]="data.aspectRatio || 1"
         [roundCropper]="data.roundCropper"
         [transform]="{ scale: zoom }"
         [resizeToWidth]="data.resizeToWidth || 512"

@@ -25,7 +25,7 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
 
         [Required(ErrorMessage = "نمبر تذکره الکترونیکی الزامی است")]
         [MaxLength(50)]
-        public string ElectronicIdNumber { get; set; } = string.Empty;
+        public string ElectronicNationalIdNumber { get; set; } = string.Empty;
 
         // Permanent Address
         public int? PermanentProvinceId { get; set; }

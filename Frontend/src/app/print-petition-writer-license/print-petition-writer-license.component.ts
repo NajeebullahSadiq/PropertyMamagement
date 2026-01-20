@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { PetitionWriterLicenseService } from '../shared/petition-writer-license.service';
@@ -9,7 +9,8 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-print-petition-writer-license',
   templateUrl: './print-petition-writer-license.component.html',
-  styleUrls: ['./print-petition-writer-license.component.scss']
+  styleUrls: ['./print-petition-writer-license.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class PrintPetitionWriterLicenseComponent implements OnInit {
   baseUrl = environment.apiURL + '/';

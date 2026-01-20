@@ -129,6 +129,23 @@ try
     await db.Database.ExecuteSqlRawAsync(
         "ALTER TABLE IF EXISTS org.\"LicenseDetails\" ADD COLUMN IF NOT EXISTS \"TariffNumber\" VARCHAR(100) NULL;");
 
+    await db.Database.ExecuteSqlRawAsync(
+        "ALTER TABLE IF EXISTS org.\"PetitionWriterLicenses\" ADD COLUMN IF NOT EXISTS \"PicturePath\" VARCHAR(500) NULL;");
+
+    // Rename ElectronicIdNumber to ElectronicNationalIdNumber if the old column exists
+    await db.Database.ExecuteSqlRawAsync(@"
+        DO $$
+        BEGIN
+            IF EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema='org' AND table_name='PetitionWriterLicenses' AND column_name='ElectronicIdNumber'
+            ) THEN
+                ALTER TABLE org.""PetitionWriterLicenses""
+                RENAME COLUMN ""ElectronicIdNumber"" TO ""ElectronicNationalIdNumber"";
+            END IF;
+        END $$;
+    ");
+
     await db.Database.ExecuteSqlRawAsync(@"
         DO $$
         BEGIN
