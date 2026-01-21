@@ -1,0 +1,6 @@
+@echo off
+echo Applying ElectronicNationalIdNumber column fix...
+psql -U postgres -d PRMIS -f fix_electronic_id_columns.sql
+echo.
+echo Done! Press any key to exit...
+pause > nul
