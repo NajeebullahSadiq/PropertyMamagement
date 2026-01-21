@@ -34,8 +34,8 @@ export class PrintvehicledataComponent implements OnInit {
     if (code) {
       this.pservice.getVehiclePropertyPrintData(code).subscribe(res => {
         this.documentData = res;
-        this.SellerfilePath=this.baseUrl+res.sellerPhoto;
-        this.BuyerfilePath=this.baseUrl+res.buyerPhoto;
+        this.SellerfilePath = res.sellerPhoto ? `${this.baseUrl}api/Upload/view/${res.sellerPhoto}` : 'assets/img/avatar2.png';
+        this.BuyerfilePath = res.buyerPhoto ? `${this.baseUrl}api/Upload/view/${res.buyerPhoto}` : 'assets/img/avatar2.png';
        
       });
     }

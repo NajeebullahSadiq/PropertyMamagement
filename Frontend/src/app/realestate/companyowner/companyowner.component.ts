@@ -234,7 +234,8 @@ export class CompanyownerComponent {
 						const dateString = detail[0].dateofBirth;
 
 						if (detail[0].pothoPath) {
-							this.imagePath = this.baseUrl + detail[0].pothoPath;
+							// Use the Upload controller's view endpoint for proper file serving
+							this.imagePath = `${this.baseUrl}api/Upload/view/${detail[0].pothoPath}`;
 							this.imageName = detail[0].pothoPath;
 							if (this.childComponent) {
 								this.childComponent.setExistingImage(this.imagePath);
@@ -371,7 +372,7 @@ export class CompanyownerComponent {
 
 	uploadFinished = (event: string) => {
 		this.imageName = event;
-		this.imagePath = event ? (this.baseUrl + event) : 'assets/img/avatar.png';
+		this.imagePath = event ? `${this.baseUrl}api/Upload/view/${event}` : 'assets/img/avatar.png';
 	}
 
 	profilePreviewChanged = (localObjectUrl: string) => {
@@ -380,7 +381,7 @@ export class CompanyownerComponent {
 			return;
 		}
 		if (this.imageName) {
-			this.imagePath = this.baseUrl + this.imageName;
+			this.imagePath = `${this.baseUrl}api/Upload/view/${this.imageName}`;
 			return;
 		}
 		this.imagePath = 'assets/img/avatar.png';
@@ -389,7 +390,7 @@ export class CompanyownerComponent {
 	profileImageUploaded = (dbPath: string) => {
 		this.imageName = dbPath || '';
 		this.ownerForm.patchValue({ pothoPath: this.imageName });
-		this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
+		this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
 	}
 
 	private formatDateForBackend(dateValue: any): string {

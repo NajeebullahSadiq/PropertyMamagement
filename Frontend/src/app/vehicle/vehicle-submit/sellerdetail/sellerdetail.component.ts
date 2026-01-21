@@ -313,7 +313,7 @@ updateSellerDetails(): void {
       authorizationLetter: selectedSeller.authorizationLetter || '',
       heirsLetter: selectedSeller.heirsLetter || '',
     });
-    this.imagePath = this.baseUrl + (selectedSeller.photo || 'assets/img/avatar.png');
+    this.imagePath = selectedSeller.photo ? `${this.baseUrl}api/Upload/view/${selectedSeller.photo}` : 'assets/img/avatar.png';
     this.imageName = selectedSeller.photo || '';
     this.nationalIdFileName = selectedSeller.nationalIdCard || '';
     this.authorizationLetterName = selectedSeller.authorizationLetter || '';
@@ -419,7 +419,7 @@ profilePreviewChanged = (localObjectUrl: string) => {
 profileImageUploaded = (dbPath: string) => {
   this.imageName = dbPath || '';
   this.SellerForm.patchValue({ photo: this.imageName });
-  this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
+  this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
 }
 
 isAuthorizedAgent(): boolean {

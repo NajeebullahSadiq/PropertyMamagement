@@ -57,23 +57,23 @@ export class PrintComponent implements OnInit {
         this.documentData = property || {};
 
         if (this.documentData.sellerPhoto) {
-          this.SellerfilePath = this.baseUrl + this.documentData.sellerPhoto;
+          this.SellerfilePath = `${this.baseUrl}api/Upload/view/${this.documentData.sellerPhoto}`;
         }
         
         if (this.documentData.buyerPhoto) {
-          this.BuyerfilePath = this.baseUrl + this.documentData.buyerPhoto;
+          this.BuyerfilePath = `${this.baseUrl}api/Upload/view/${this.documentData.buyerPhoto}`;
         }
 
         if (this.documentData.filePath) {
-          this.propertyImagePath = this.baseUrl + this.documentData.filePath;
+          this.propertyImagePath = `${this.baseUrl}api/Upload/view/${this.documentData.filePath}`;
         }
 
         if (this.documentData.previousDocumentsPath) {
-          this.previousDocsPath = this.baseUrl + this.documentData.previousDocumentsPath;
+          this.previousDocsPath = `${this.baseUrl}api/Upload/view/${this.documentData.previousDocumentsPath}`;
         }
 
         if (this.documentData.existingDocumentsPath) {
-          this.existingDocsPath = this.baseUrl + this.documentData.existingDocumentsPath;
+          this.existingDocsPath = `${this.baseUrl}api/Upload/view/${this.documentData.existingDocumentsPath}`;
         }
 
         if (this.documentData.propertypeType) {

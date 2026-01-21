@@ -194,7 +194,7 @@
           <!-- Owner Photo -->
           <div class="flex justify-center mb-6" *ngIf="viewData.owner.pothoPath">
             <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-emerald-200 shadow-lg">
-              <img [src]="viewData.owner.pothoPath" alt="عکس مالک" class="w-full h-full object-cover" onerror="this.style.display='none'">
+              <img [src]="getImageUrl(viewData.owner.pothoPath)" alt="عکس مالک" class="w-full h-full object-cover" onerror="this.src='assets/img/avatar.png'">
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

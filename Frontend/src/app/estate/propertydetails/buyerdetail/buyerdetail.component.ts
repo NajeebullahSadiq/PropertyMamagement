@@ -500,7 +500,7 @@ updateBuyerDetails(): void {
     this.suppressTransactionTypeHandling = false;
     this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
     this.calculateDerivedAmounts();
-    this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
+    this.imagePath = selectedBuyer.photo ? `${this.baseUrl}api/Upload/view/${selectedBuyer.photo}` : 'assets/img/avatar.png';
     this.imageName = selectedBuyer.photo || '';
     this.nationalIdCardName = selectedBuyer.nationalIdCard || '';
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
@@ -713,7 +713,7 @@ profileImageUploaded = (dbPath: string) => {
   this.sellerForm.get('photo')?.markAsTouched();
   this.sellerForm.get('photo')?.markAsDirty();
   this.sellerForm.get('photo')?.updateValueAndValidity();
-  this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
+  this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
 }
 
 isAuthorizedAgent(): boolean {

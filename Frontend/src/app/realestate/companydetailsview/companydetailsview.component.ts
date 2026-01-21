@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { FileService } from 'src/app/shared/file.service';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-companydetailsview',
@@ -140,5 +141,20 @@ export class CompanydetailsviewComponent {
       case 'Duplicate': return 'مثنی';
       default: return category;
     }
+  }
+
+  getImageUrl(imagePath: string): string {
+    if (!imagePath) return 'assets/img/avatar.png';
+    // If path already starts with http/https or is a blob URL, return as is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('blob:')) {
+      return imagePath;
+    }
+    // If it's an assets path, return as is
+    if (imagePath.startsWith('assets/')) {
+      return imagePath;
+    }
+    // Otherwise, construct the full URL using the Upload controller's view endpoint
+    const baseUrl = environment.apiURL.replace('/api', ''); // Remove /api suffix if present
+    return `${baseUrl}/api/Upload/view/${imagePath}`;
   }
 }

@@ -405,7 +405,7 @@ updateBuyerDetails(): void {
       transactionType: selectedBuyer.transactionType || '',
       transactionTypeDescription: selectedBuyer.transactionTypeDescription || '',
     });
-    this.imagePath = this.baseUrl + (selectedBuyer.photo || 'assets/img/avatar.png');
+    this.imagePath = selectedBuyer.photo ? `${this.baseUrl}api/Upload/view/${selectedBuyer.photo}` : 'assets/img/avatar.png';
     this.imageName = selectedBuyer.photo || '';
     this.nationalIdFileName = existingNationalIdPath;
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
@@ -494,7 +494,7 @@ profilePreviewChanged = (localObjectUrl: string) => {
 profileImageUploaded = (dbPath: string) => {
   this.imageName = dbPath || '';
   this.buyerForm.patchValue({ photo: this.imageName });
-  this.imagePath = this.imageName ? (this.baseUrl + this.imageName) : 'assets/img/avatar.png';
+  this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
 }
 
 isAuthorizedAgent(): boolean {
