@@ -1,0 +1,102 @@
+<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+        <i class="fas fa-clipboard-check text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">جدول نظارت بر فعالیت دفاتر رهنمای معاملات و عریضه نویسان</h1>
+      <p class="text-gray-500 max-w-md mx-auto">لیست تمام رکوردهای نظارت بر فعالیت</p>
+    </div>
+
+    <!-- Search and Actions -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+      <div class="p-4">
+        <div class="flex flex-wrap gap-4 justify-between items-center">
+          <div class="flex-1 min-w-[200px] max-w-md">
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <i class="fas fa-search"></i>
+              </span>
+              <input type="text" [(ngModel)]="searchText" (keyup.enter)="onSearch()" placeholder="جستجو بر اساس نام دارنده جواز..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button *ngIf="canCreate" (click)="goToForm()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+              <i class="fas fa-plus"></i>
+              ثبت جدید
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+    </div>
+
+    <!-- Data Table -->
+    <div *ngIf="!isLoading" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200">
+            <tr class="text-center">
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت دارنده جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ تصفیه مالیاتی</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">مقدار مالیه</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ گزارش</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ نظارت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ثبت کننده</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-blue-50 transition-colors">
+              <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ item.id }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.taxClearanceDateFormatted || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.paidTaxAmount || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.inspectionDateFormatted || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.createdBy || '-' }}</td>
+              <td class="px-4 py-3">
+                <div class="flex justify-center gap-2">
+                  <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="items.length === 0">
+              <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
+                <p>هیچ رکوردی یافت نشد</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="items.length > 0" class="px-6 py-4 border-t border-gray-200 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">نمایش</span>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+            <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+          </select>
+          <span class="text-sm text-gray-600">مورد از {{ totalCount }}</span>
+        </div>
+        <pagination-controls (pageChange)="onPageChange($event)" previousLabel="قبلی" nextLabel="بعدی" class="custom-pagination"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</section>

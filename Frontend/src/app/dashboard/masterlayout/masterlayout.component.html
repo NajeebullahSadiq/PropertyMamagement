@@ -170,6 +170,13 @@
       <a routerLink="/petition-writer-license/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>table_view</mat-icon><span>جدول ثبت جواز عریضه‌نویسان</span>
       </a>
+      <div class="section-label">نظارت بر فعالیت‌ها</div>
+      <a *ngIf="!isViewOnly" routerLink="/activity-monitoring/form" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>fact_check</mat-icon><span>ثبت نظارت بر فعالیت‌ها</span>
+      </a>
+      <a routerLink="/activity-monitoring/list" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>list_alt</mat-icon><span>جدول نظارت بر فعالیت‌ها</span>
+      </a>
       <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
       <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>

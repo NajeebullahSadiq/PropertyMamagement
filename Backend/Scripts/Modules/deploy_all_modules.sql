@@ -17,6 +17,7 @@
 -- 8. LicenseApplication (org schema)
 -- 9. PetitionWriterLicense (org schema)
 -- 10. Verification (org schema)
+-- 11. ActivityMonitoring (org schema)
 
 \echo '=========================================='
 \echo 'Starting PRMIS Module Deployment'
@@ -61,6 +62,10 @@
 -- Module 10: Verification
 \echo 'Deploying Module 10: Verification...'
 \i 10_Verification_Initial.sql
+
+-- Module 11: ActivityMonitoring
+\echo 'Deploying Module 11: ActivityMonitoring...'
+\i 11_ActivityMonitoring_Initial.sql
 
 \echo '=========================================='
 \echo 'PRMIS Module Deployment Complete!'

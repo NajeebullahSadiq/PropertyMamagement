@@ -1,0 +1,62 @@
+// Match existing form styling
+.container {
+  font-family: 'Vazir', sans-serif;
+}
+
+// Custom ng-select styling
+::ng-deep .custom-ng-select {
+  .ng-select-container {
+    @apply border-gray-300 rounded-lg;
+    min-height: 42px;
+  }
+  
+  .ng-select-container:hover {
+    @apply border-blue-500;
+  }
+  
+  &.ng-select-focused .ng-select-container {
+    @apply border-blue-500 ring-2 ring-blue-500;
+  }
+}
+
+// Table styling
+table {
+  font-size: 0.9rem;
+  
+  th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+  }
+  
+  tbody tr:hover {
+    background-color: #f9fafb;
+  }
+}
+
+// Button hover effects
+button {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Input focus effects
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -143,6 +143,14 @@ const routes: Routes = [
       { path: '', loadChildren: () => import('./petition-writer-license/petition-writer-license.module').then(m => m.PetitionWriterLicenseModule) }
     ]
   },
+  { 
+    path: 'activity-monitoring', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule) }
+    ]
+  },
   { path: 'forbidden', component: ForbiddenComponent },
   { path: 'print/:id', component: PrintComponent },
   { path: 'print', component: PrintComponent },

@@ -1,0 +1,410 @@
+<div class="container">
+  <section class="w-full bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">{{ isEditMode ? 'ویرایش' : 'ثبت' }} نظارت بر فعالیت دفاتر رهنمای معاملات و عریضه نویسان</h1>
+        <p class="text-center text-gray-600">لطفا معلومات نظارت را با دقت تکمیل نمایید</p>
+      </div>
+      
+      <form [formGroup]="mainForm" (ngSubmit)="saveMainForm()">
+        <!-- Section 1: Financial Clearance -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-money-check-alt"></i>
+              <span>۱. تصفیه وجایب مالیاتی</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت دارنده جواز دفتر رهنمای معاملات <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="licenseHolderName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('licenseHolderName')?.invalid && (mainForm.get('licenseHolderName')?.dirty || mainForm.get('licenseHolderName')?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">تصفیه وجایب مالیاتی</label>
+                <input type="text" formControlName="taxClearanceStatus" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مکتوب تصفیه مالیاتی</label>
+                <input type="text" formControlName="taxClearanceLetterNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div>
+                <app-multi-calendar-datepicker
+                  formControlName="taxClearanceDate"
+                  label="تاریخ تصفیه مالیاتی"
+                  [required]="true">
+                </app-multi-calendar-datepicker>
+                <div *ngIf="mainForm.get('taxClearanceDate')?.invalid && (mainForm.get('taxClearanceDate')?.dirty || mainForm.get('taxClearanceDate')?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">مقدار مالیه پرداخت شده</label>
+                <input type="number" formControlName="paidTaxAmount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Annual Activity Report -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-file-alt"></i>
+              <span>۲. گزارش سالانه</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div>
+                <app-multi-calendar-datepicker
+                  formControlName="reportRegistrationDate"
+                  label="تاریخ ثبت گزارش">
+                </app-multi-calendar-datepicker>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">سته‌های فروش</label>
+                <input type="number" formControlName="saleDeedsCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">سته‌های کرایی</label>
+                <input type="number" formControlName="rentalDeedsCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">سته‌های بیع الوفا</label>
+                <input type="number" formControlName="baiUlWafaDeedsCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">سته‌های وسایط نقلیه</label>
+                <input type="number" formControlName="vehicleTransactionDeedsCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">معاملات مختلط ابطال شده</label>
+                <input type="number" formControlName="cancelledMixedTransactions" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">سته‌های مفقودی</label>
+                <input type="number" formControlName="lostDeedsCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              </div>
+            </div>
+            <div class="mt-6">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+              <textarea formControlName="annualReportRemarks" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Complaints Registration -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>۳. ثبت شکایات</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <form [formGroup]="complaintForm">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مسلسل <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="complaintSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عارض <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="complainantName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                </div>
+                <div>
+                  <app-multi-calendar-datepicker
+                    formControlName="complaintRegistrationDate"
+                    label="تاریخ ثبت شکایت"
+                    [required]="true">
+                  </app-multi-calendar-datepicker>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">موضوع شکایت <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="complaintSubject" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت معروض علیه <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="accusedPartyName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
+                  <textarea formControlName="actionsTaken" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+                  <textarea formControlName="remarks" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                </div>
+              </div>
+              <div class="mt-4 flex gap-3">
+                <button type="button" (click)="saveComplaint()" [disabled]="isViewOnly" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                  <i class="fas fa-plus mr-2"></i>{{ selectedComplaintId ? 'تغییر' : 'افزودن' }} شکایت
+                </button>
+                <button type="button" (click)="resetComplaintForm()" class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                  <i class="fas fa-times mr-2"></i>لغو
+                </button>
+              </div>
+            </form>
+
+            <div class="mt-6" *ngIf="complaintsList.length > 0">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">لیست شکایات</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">نمبر مسلسل</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">شهرت عارض</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">موضوع</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">تاریخ</th>
+                      <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of complaintsList" class="border-t hover:bg-gray-50">
+                      <td class="px-4 py-3 text-sm">{{ item.complaintSerialNumber }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.complainantName }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.complaintSubject }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.complaintRegistrationDateFormatted }}</td>
+                      <td class="px-4 py-3 text-center">
+                        <button type="button" (click)="selectComplaint(item)" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">ویرایش</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Real Estate Violations -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-ban"></i>
+              <span>۴. تخلفات دفاتر رهنمای معاملات</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <form [formGroup]="realEstateViolationForm">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مسلسل <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="violationSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت دارنده جواز <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="licenseHolderName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                </div>
+                <div>
+                  <app-multi-calendar-datepicker
+                    formControlName="violationDate"
+                    label="تاریخ ثبت تخلف"
+                    [required]="true">
+                  </app-multi-calendar-datepicker>
+                </div>
+              </div>
+              <div class="mt-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تخلف <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="violationType" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
+                  <textarea formControlName="actionsTaken" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+                  <textarea formControlName="remarks" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+                </div>
+              </div>
+              <div class="mt-4 flex gap-3">
+                <button type="button" (click)="saveRealEstateViolation()" [disabled]="isViewOnly" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                  <i class="fas fa-plus mr-2"></i>{{ selectedRealEstateViolationId ? 'تغییر' : 'افزودن' }} تخلف
+                </button>
+                <button type="button" (click)="resetRealEstateViolationForm()" class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                  <i class="fas fa-times mr-2"></i>لغو
+                </button>
+              </div>
+            </form>
+
+            <div class="mt-6" *ngIf="realEstateViolationsList.length > 0">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">لیست تخلفات</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">نمبر مسلسل</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">شهرت دارنده جواز</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">نوعیت تخلف</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">تاریخ</th>
+                      <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of realEstateViolationsList" class="border-t hover:bg-gray-50">
+                      <td class="px-4 py-3 text-sm">{{ item.violationSerialNumber }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.licenseHolderName }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.violationType }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.violationDateFormatted }}</td>
+                      <td class="px-4 py-3 text-center">
+                        <button type="button" (click)="selectRealEstateViolation(item)" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">ویرایش</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Petition Writer Violations -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-user-times"></i>
+              <span>۵. تخلفات عریضه نویسان</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <form [formGroup]="petitionWriterViolationForm">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مسلسل <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="violationSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عریضه نویس <span class="text-red-500">*</span></label>
+                  <input type="text" formControlName="petitionWriterName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                </div>
+                <div>
+                  <app-multi-calendar-datepicker
+                    formControlName="violationDate"
+                    label="تاریخ ثبت تخلف"
+                    [required]="true">
+                  </app-multi-calendar-datepicker>
+                </div>
+              </div>
+              <div class="mt-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تخلف <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="violationType" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
+                  <textarea formControlName="actionsTaken" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+                  <textarea formControlName="remarks" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"></textarea>
+                </div>
+              </div>
+              <div class="mt-4 flex gap-3">
+                <button type="button" (click)="savePetitionWriterViolation()" [disabled]="isViewOnly" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                  <i class="fas fa-plus mr-2"></i>{{ selectedPetitionWriterViolationId ? 'تغییر' : 'افزودن' }} تخلف
+                </button>
+                <button type="button" (click)="resetPetitionWriterViolationForm()" class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                  <i class="fas fa-times mr-2"></i>لغو
+                </button>
+              </div>
+            </form>
+
+            <div class="mt-6" *ngIf="petitionWriterViolationsList.length > 0">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">لیست تخلفات</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">نمبر مسلسل</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">شهرت عریضه نویس</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">نوعیت تخلف</th>
+                      <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">تاریخ</th>
+                      <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of petitionWriterViolationsList" class="border-t hover:bg-gray-50">
+                      <td class="px-4 py-3 text-sm">{{ item.violationSerialNumber }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.petitionWriterName }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.violationType }}</td>
+                      <td class="px-4 py-3 text-sm">{{ item.violationDateFormatted }}</td>
+                      <td class="px-4 py-3 text-center">
+                        <button type="button" (click)="selectPetitionWriterViolation(item)" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">ویرایش</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: Inspection & Supervision Summary -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-clipboard-check"></i>
+              <span>۶. خلاصه نظارت و سرپرستی</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <app-multi-calendar-datepicker
+                  formControlName="inspectionDate"
+                  label="تاریخ نظارت"
+                  [required]="true">
+                </app-multi-calendar-datepicker>
+                <div *ngIf="mainForm.get('inspectionDate')?.invalid && (mainForm.get('inspectionDate')?.dirty || mainForm.get('inspectionDate')?.touched)">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد دفاتر رهنمای معاملات نظارت شده</label>
+                <input type="number" formControlName="inspectedRealEstateOfficesCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد دفاتر مهرولاک شده</label>
+                <input type="number" formControlName="sealedOfficesCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد عریضه نویسان نظارت شده</label>
+                <input type="number" formControlName="inspectedPetitionWritersCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد عریضه نویسان متخلف</label>
+                <input type="number" formControlName="violatingPetitionWritersCount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="px-6 py-6">
+            <div class="flex flex-wrap gap-4 justify-center">
+              <button type="submit" [disabled]="isViewOnly || mainForm.invalid" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
+                <i class="fas fa-save"></i>
+                <span>ذخیره معلومات</span>
+              </button>
+              <button type="button" (click)="goToList()" class="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
+                <i class="fas fa-list"></i>
+                <span>برگشت به لیست</span>
+              </button>
+              <button type="button" (click)="resetAll()" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
+                <i class="fas fa-redo"></i>
+                <span>پاک کردن فورم</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>

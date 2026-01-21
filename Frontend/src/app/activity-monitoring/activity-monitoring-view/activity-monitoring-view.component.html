@@ -1,0 +1,164 @@
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>مشاهده نظارت بر فعالیت دفاتر رهنمای معاملات و عریضه نویسان</h4>
+            <div>
+                <button class="btn btn-primary" (click)="editRecord()">
+                    <i class="fa fa-edit"></i> ویرایش
+                </button>
+                <button class="btn btn-secondary ms-2" (click)="print()">
+                    <i class="fa fa-print"></i> چاپ
+                </button>
+                <button class="btn btn-outline-secondary ms-2" (click)="goToList()">
+                    <i class="fa fa-list"></i> برگشت
+                </button>
+            </div>
+        </div>
+        <div class="card-body" *ngIf="record">
+            <!-- Section 1: Financial Clearance -->
+            <h5 class="section-title">۱. تصفیه وجایب مالیاتی</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>شهرت دارنده جواز:</strong> {{ record.licenseHolderName }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>تصفیه وجایب مالیاتی:</strong> {{ record.taxClearanceStatus || '-' }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>نمبر مکتوب:</strong> {{ record.taxClearanceLetterNumber || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>تاریخ تصفیه:</strong> {{ record.taxClearanceDateFormatted || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>مقدار مالیه:</strong> {{ record.paidTaxAmount || '-' }}</p>
+                </div>
+            </div>
+
+            <!-- Section 2: Annual Report -->
+            <h5 class="section-title mt-4">۲. گزارش سالانه</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>تاریخ ثبت گزارش:</strong> {{ record.reportRegistrationDateFormatted || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>سته‌های فروش:</strong> {{ record.saleDeedsCount || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>سته‌های کرایی:</strong> {{ record.rentalDeedsCount || '-' }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>سته‌های بیع الوفا:</strong> {{ record.baiUlWafaDeedsCount || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>سته‌های وسایط نقلیه:</strong> {{ record.vehicleTransactionDeedsCount || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>معاملات مختلط ابطال شده:</strong> {{ record.cancelledMixedTransactions || '-' }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>سته‌های مفقودی:</strong> {{ record.lostDeedsCount || '-' }}</p>
+                </div>
+                <div class="col-md-8">
+                    <p><strong>ملاحظات:</strong> {{ record.annualReportRemarks || '-' }}</p>
+                </div>
+            </div>
+
+            <!-- Section 3: Complaints -->
+            <h5 class="section-title mt-4">۳. شکایات</h5>
+            <table class="table table-bordered" *ngIf="complaints.length > 0">
+                <thead>
+                    <tr>
+                        <th>نمبر مسلسل</th>
+                        <th>شهرت عارض</th>
+                        <th>موضوع شکایت</th>
+                        <th>تاریخ</th>
+                        <th>شهرت معروض علیه</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of complaints">
+                        <td>{{ item.complaintSerialNumber }}</td>
+                        <td>{{ item.complainantName }}</td>
+                        <td>{{ item.complaintSubject }}</td>
+                        <td>{{ item.complaintRegistrationDateFormatted }}</td>
+                        <td>{{ item.accusedPartyName }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p *ngIf="complaints.length === 0">هیچ شکایتی ثبت نشده است</p>
+
+            <!-- Section 4: Real Estate Violations -->
+            <h5 class="section-title mt-4">۴. تخلفات دفاتر رهنمای معاملات</h5>
+            <table class="table table-bordered" *ngIf="realEstateViolations.length > 0">
+                <thead>
+                    <tr>
+                        <th>نمبر مسلسل</th>
+                        <th>شهرت دارنده جواز</th>
+                        <th>نوعیت تخلف</th>
+                        <th>تاریخ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of realEstateViolations">
+                        <td>{{ item.violationSerialNumber }}</td>
+                        <td>{{ item.licenseHolderName }}</td>
+                        <td>{{ item.violationType }}</td>
+                        <td>{{ item.violationDateFormatted }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p *ngIf="realEstateViolations.length === 0">هیچ تخلفی ثبت نشده است</p>
+
+            <!-- Section 5: Petition Writer Violations -->
+            <h5 class="section-title mt-4">۵. تخلفات عریضه نویسان</h5>
+            <table class="table table-bordered" *ngIf="petitionWriterViolations.length > 0">
+                <thead>
+                    <tr>
+                        <th>نمبر مسلسل</th>
+                        <th>شهرت عریضه نویس</th>
+                        <th>نوعیت تخلف</th>
+                        <th>تاریخ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of petitionWriterViolations">
+                        <td>{{ item.violationSerialNumber }}</td>
+                        <td>{{ item.petitionWriterName }}</td>
+                        <td>{{ item.violationType }}</td>
+                        <td>{{ item.violationDateFormatted }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p *ngIf="petitionWriterViolations.length === 0">هیچ تخلفی ثبت نشده است</p>
+
+            <!-- Section 6: Inspection -->
+            <h5 class="section-title mt-4">۶. خلاصه نظارت و سرپرستی</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>تاریخ نظارت:</strong> {{ record.inspectionDateFormatted || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>دفاتر نظارت شده:</strong> {{ record.inspectedRealEstateOfficesCount || '-' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>دفاتر مهرولاک شده:</strong> {{ record.sealedOfficesCount || '-' }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>عریضه نویسان نظارت شده:</strong> {{ record.inspectedPetitionWritersCount || '-' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>عریضه نویسان متخلف:</strong> {{ record.violatingPetitionWritersCount || '-' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

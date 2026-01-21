@@ -106,4 +106,4 @@ sudo journalctl -u prmis-backend -n 50 --no-pager
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_Initial.sql
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/10_Verification_Initial.sql
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_AddPicturePath.sql
-sudo -u postgres psql -d PRMIS -f Scripts/Modules/fix_electronic_id_columns.sql
+sudo -u postgres psql -d PRMIS -f Scripts/11_ActivityMonitoring_Initial.sql

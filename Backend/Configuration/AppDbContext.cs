@@ -131,6 +131,12 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<WebAPIBackend.Models.Verification.DocumentVerification> DocumentVerifications { get; set; }
         public virtual DbSet<WebAPIBackend.Models.Verification.VerificationLog> VerificationLogs { get; set; }
         
+        // Activity Monitoring Module
+        public virtual DbSet<WebAPIBackend.Models.ActivityMonitoring.ActivityMonitoringRecord> ActivityMonitoringRecords { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.ActivityMonitoring.Complaint> ActivityMonitoringComplaints { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.ActivityMonitoring.RealEstateViolation> ActivityMonitoringRealEstateViolations { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.ActivityMonitoring.PetitionWriterViolation> ActivityMonitoringPetitionWriterViolations { get; set; }
+        
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         public DbSet<GetPrintType> GetPrintType { get; set; }
@@ -478,6 +484,94 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.FailureReason).HasMaxLength(50);
 
                 entity.HasIndex(e => new { e.VerificationCode, e.AttemptedAt });
+            });
+
+            // Activity Monitoring Module Configuration
+            modelBuilder.Entity<WebAPIBackend.Models.ActivityMonitoring.ActivityMonitoringRecord>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("ActivityMonitoringRecords_pkey");
+                entity.ToTable("ActivityMonitoringRecords", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50);
+                entity.Property(e => e.LicenseHolderName).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.TaxClearanceStatus).HasMaxLength(100);
+                entity.Property(e => e.TaxClearanceLetterNumber).HasMaxLength(100);
+                entity.Property(e => e.PaidTaxAmount).HasPrecision(18, 2);
+                entity.Property(e => e.AnnualReportRemarks).HasMaxLength(1000);
+
+                entity.HasIndex(e => e.LicenseHolderName);
+                entity.HasIndex(e => e.TaxClearanceDate);
+                entity.HasIndex(e => e.InspectionDate);
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.ActivityMonitoring.Complaint>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("ActivityMonitoringComplaints_pkey");
+                entity.ToTable("ActivityMonitoringComplaints", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.ComplaintSerialNumber).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.ComplainantName).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.ComplaintSubject).HasMaxLength(500).IsRequired();
+                entity.Property(e => e.AccusedPartyName).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.ActionsTaken).HasMaxLength(1000);
+                entity.Property(e => e.Remarks).HasMaxLength(1000);
+
+                entity.HasIndex(e => e.ActivityMonitoringRecordId);
+                entity.HasIndex(e => e.ComplaintSerialNumber);
+
+                entity.HasOne(d => d.ActivityMonitoringRecord).WithMany()
+                    .HasForeignKey(d => d.ActivityMonitoringRecordId)
+                    .HasConstraintName("ActivityMonitoringComplaints_ActivityMonitoringRecordId_fkey")
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.ActivityMonitoring.RealEstateViolation>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("ActivityMonitoringRealEstateViolations_pkey");
+                entity.ToTable("ActivityMonitoringRealEstateViolations", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.ViolationSerialNumber).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.LicenseHolderName).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.ViolationType).HasMaxLength(500).IsRequired();
+                entity.Property(e => e.ActionsTaken).HasMaxLength(1000);
+                entity.Property(e => e.Remarks).HasMaxLength(1000);
+
+                entity.HasIndex(e => e.ActivityMonitoringRecordId);
+                entity.HasIndex(e => e.ViolationSerialNumber);
+
+                entity.HasOne(d => d.ActivityMonitoringRecord).WithMany()
+                    .HasForeignKey(d => d.ActivityMonitoringRecordId)
+                    .HasConstraintName("ActivityMonitoringRealEstateViolations_ActivityMonitoringRecordId_fkey")
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.ActivityMonitoring.PetitionWriterViolation>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("ActivityMonitoringPetitionWriterViolations_pkey");
+                entity.ToTable("ActivityMonitoringPetitionWriterViolations", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.ViolationSerialNumber).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.PetitionWriterName).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.ViolationType).HasMaxLength(500).IsRequired();
+                entity.Property(e => e.ActionsTaken).HasMaxLength(1000);
+                entity.Property(e => e.Remarks).HasMaxLength(1000);
+
+                entity.HasIndex(e => e.ActivityMonitoringRecordId);
+                entity.HasIndex(e => e.ViolationSerialNumber);
+
+                entity.HasOne(d => d.ActivityMonitoringRecord).WithMany()
+                    .HasForeignKey(d => d.ActivityMonitoringRecordId)
+                    .HasConstraintName("ActivityMonitoringPetitionWriterViolations_ActivityMonitoringRecordId_fkey")
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<CompanyOwner>(entity =>
