@@ -1,174 +1,254 @@
 <!-- Loading Indicator -->
-<div *ngIf="isLoading" class="flex flex-col items-center justify-center min-h-screen">
-  <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
-  <p class="mt-4 text-gray-700">در حال بارگذاری معلومات جواز...</p>
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-spinner">
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+  </div>
+  <p>در حال بارگذاری معلومات جواز...</p>
 </div>
 
 <!-- Error Display -->
-<div *ngIf="!isLoading && error" class="flex flex-col items-center justify-center min-h-screen text-red-600">
-  <div class="text-5xl mb-4">⚠</div>
-  <p class="text-lg">{{ error }}</p>
+<div *ngIf="!isLoading && error" class="error-container">
+  <div class="error-icon">⚠</div>
+  <p>{{ error }}</p>
 </div>
 
 <!-- Main License Page -->
-<div class="print-page w-[210mm] bg-white p-1 mx-auto shadow-lg" *ngIf="!isLoading && !error" dir="rtl">
-  
-  <!-- Header Section -->
-  <div class="flex justify-between items-start border-b-2 border-blue-600 pb-1 mb-1">
-    <!-- Left Column: Logo & Photo -->
-    <div class="flex flex-col items-center gap-0.5 w-[18%]">
-      <img src="assets/img/mcitlogo.png" alt="Logo" class="h-9 w-auto" />
-      <div class="w-14 h-[70px] border-2 border-blue-600 rounded overflow-hidden bg-gray-100">
-        <img *ngIf="data.picturePath" [src]="getImageUrl(data.picturePath)" alt="Photo" class="w-full h-full object-cover" onerror="this.src='assets/img/avatar.png'" />
-        <img *ngIf="!data.picturePath" src="assets/img/avatar.png" alt="Photo" class="w-full h-full object-cover" />
-      </div>
-      <div class="text-[8px] text-gray-600 mt-0.5">فوتو</div>
-    </div>
-    
-    <!-- Center Column: Title -->
-    <div class="flex-1 text-center px-4">
-      <div class="text-xs font-bold text-gray-900 leading-tight">امارت اسلامی افغانستان</div>
-      <div class="text-xs font-bold text-gray-900 leading-tight">وزارت عدلیه</div>
-      <div class="text-[9px] font-semibold text-blue-600 leading-tight">ریاست عمومی انسجام</div>
-      <div class="text-[9px] font-semibold text-blue-600 leading-tight">ریاست امور رهنمای معاملات و عریضه نویسان</div>
-      <div class="text-[9px] font-semibold text-blue-600 leading-tight">آمریت رهنمای معاملات و عریضه نویسان</div>
-      <div class="text-[9px] font-semibold text-blue-600 leading-tight">مدیریت بررسی و ثبت جواز عریضه نویسان</div>
-      <div class="inline-block text-[13px] font-black text-blue-900 mt-1 px-2.5 py-0.5 bg-gradient-to-b from-blue-50 to-white rounded border-2 border-blue-600">
-        جواز فعالیت عریضه نویسی
-      </div>
-    </div>
-    
-    <!-- Right Column: Logo & Meta -->
-    <div class="flex flex-col items-center gap-0.5 w-[18%]">
-      <img src="assets/img/afg.png" alt="Logo" class="h-9 w-auto" />
-      <div class="flex flex-col gap-0.5 mt-0.5">
-        <div class="flex flex-col items-center text-center">
-          <span class="text-[8px] text-gray-600 font-semibold">نمبر جواز:</span>
-          <span class="text-[10px] text-blue-600 font-extrabold px-1 py-0.5 bg-blue-50 rounded mt-0.5">{{ data.licenseNumber }}</span>
-        </div>
-        <div class="flex flex-col items-center text-center">
-          <span class="text-[8px] text-gray-600 font-semibold">تاریخ صدور:</span>
-          <span class="text-[10px] text-blue-600 font-extrabold px-1 py-0.5 bg-blue-50 rounded mt-0.5">{{ data.licenseIssueDateFormatted || '-' }}</span>
+<div class="certificate-page" *ngIf="!isLoading && !error">
+  <div class="certificate-wrapper">
+    <!-- Watermark Background -->
+    <div class="watermark-layer">
+      <div class="watermark-circle">
+        <div class="watermark-text">
+          <div class="watermark-line">{{data.licenseNumber || '—'}}</div>
+          <div class="watermark-line">{{data.applicantName || '—'}}</div>
+          <div class="watermark-line">{{data.applicantFatherName || '—'}}</div>
+          <div class="watermark-line">{{data.licenseIssueDateFormatted || '—'}}</div>
+          <div class="watermark-line">{{data.electronicNationalIdNumber || '—'}}</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Content Section -->
-  <div class="mt-1">
-    <div class="border-2 border-blue-600 rounded overflow-hidden">
-      <!-- Form Title -->
-      <div class="bg-gradient-to-b from-blue-600 to-blue-700 text-white text-[11px] font-bold text-center py-0.5">
-        شهرت عریضه نویس
+    <!-- Guilloche Pattern Border -->
+    <div class="guilloche-border">
+      <svg class="guilloche-pattern" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="guillochePattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(25, 118, 210, 0.15)" stroke-width="0.5" />
+            <circle cx="10" cy="10" r="5" fill="none" stroke="rgba(25, 118, 210, 0.1)" stroke-width="0.3" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#guillochePattern)" />
+      </svg>
+    </div>
+
+    <!-- Main Certificate Frame -->
+    <div class="certificate-frame">
+      <!-- Ornate Corner Decorations -->
+      <div class="corner-ornament top-right">
+        <svg viewBox="0 0 60 60">
+          <path d="M0,60 Q0,0 60,0" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M5,60 Q5,5 60,5" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="15" cy="45" r="3" fill="#1976d2" />
+          <circle cx="45" cy="15" r="3" fill="#1976d2" />
+        </svg>
+      </div>
+      <div class="corner-ornament top-left">
+        <svg viewBox="0 0 60 60">
+          <path d="M60,60 Q60,0 0,0" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M55,60 Q55,5 0,5" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="45" cy="45" r="3" fill="#1976d2" />
+          <circle cx="15" cy="15" r="3" fill="#1976d2" />
+        </svg>
+      </div>
+      <div class="corner-ornament bottom-right">
+        <svg viewBox="0 0 60 60">
+          <path d="M0,0 Q0,60 60,60" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M5,0 Q5,55 60,55" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="15" cy="15" r="3" fill="#1976d2" />
+          <circle cx="45" cy="45" r="3" fill="#1976d2" />
+        </svg>
+      </div>
+      <div class="corner-ornament bottom-left">
+        <svg viewBox="0 0 60 60">
+          <path d="M60,0 Q60,60 0,60" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M55,0 Q55,55 0,55" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="45" cy="15" r="3" fill="#1976d2" />
+          <circle cx="15" cy="45" r="3" fill="#1976d2" />
+        </svg>
       </div>
 
-      <!-- Grid Header -->
-      <div class="grid grid-cols-2 bg-blue-50">
-        <div class="p-0.5 text-[9px] font-bold text-center border border-blue-600">شهرت و سکونت اصلی</div>
-        <div class="p-0.5 text-[9px] font-bold text-center border border-blue-600">سکونت فعلی</div>
-      </div>
-
-      <!-- Data Grid -->
-      <div class="grid grid-cols-4 border-t-2 border-blue-600">
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">نام و تخلص</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.applicantName || '-' }}</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولایت</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentProvinceName || '-' }}</div>
-
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولد</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.applicantFatherName || '-' }}</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولسوالی</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentDistrictName || '-' }}</div>
-
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">نمبر تذکره</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.electronicNationalIdNumber || '-' }}</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ناحیه</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentVillage || '-' }}</div>
-
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولایت</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.permanentProvinceName || '-' }}</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">محل فعالیت</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.activityLocation || '-' }}</div>
-
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ولسوالی</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.permanentDistrictName || '-' }}</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">قریه / گذر</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.currentVillage || '-' }}</div>
-
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300">ناحیه / قریه</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300">{{ data.permanentVillage || '-' }}</div>
-        <div class="p-0.5 text-[8px] leading-tight bg-blue-50 font-bold text-blue-600 border border-blue-300"></div>
-        <div class="p-0.5 text-[8px] leading-tight bg-white font-semibold text-gray-900 border border-blue-300"></div>
-      </div>
-
-      <!-- Bottom Section -->
-      <div class="grid grid-cols-3 border-t-2 border-blue-600">
-        <!-- Column 1 -->
-        <div class="border border-blue-300 p-0.5">
-          <div class="text-[9px] font-bold text-blue-600 text-center py-0.5 bg-blue-50 rounded mb-0.5">مرجع صلاحیت و امضاء</div>
-          <div class="min-h-[50px] p-0.5">
-            <div class="text-center font-bold text-blue-600 text-[8px] my-0.5">ریاست عمومی انسجام</div>
-            <div class="h-4"></div>
-            <div class="text-center font-bold text-blue-600 text-[8px] my-0.5">امضاء رئیس</div>
-          </div>
-        </div>
-        
-        <!-- Column 2 -->
-        <div class="border border-blue-300 p-0.5">
-          <div class="text-[9px] font-bold text-blue-600 text-center py-0.5 bg-blue-50 rounded mb-0.5">نظر به درمورد</div>
-          <div class="min-h-[50px] p-0.5">
-            <div class="text-[7px] leading-snug text-justify text-gray-900">
-              در اهلیت عریضه نویسی بعد از اخذ امتحان نظر هیئت داده شد، که این عریضه نویس به درجه اعلی، اوسط، ادنی لیاقت و اهلیت دارد.
+      <!-- Certificate Content -->
+      <div class="certificate-content" dir="rtl">
+        <!-- Header Section -->
+        <header class="certificate-header">
+          <!-- Right Column: National Emblem & License Info -->
+          <div class="header-right">
+            <div class="emblem-container">
+              <img src="/assets/img/afg.png" alt="نشان ملی افغانستان" class="national-emblem">
             </div>
-            <div class="text-center font-bold text-blue-600 text-[8px] mt-1">مهر</div>
-          </div>
-        </div>
-        
-        <!-- Column 3 -->
-        <div class="border border-blue-300 p-0.5">
-          <div class="text-[9px] font-bold text-blue-600 text-center py-0.5 bg-blue-50 rounded mb-0.5">معلومات جواز عریضه نویسی</div>
-          <div class="min-h-[50px] p-0.5">
-            <div class="flex justify-between items-center py-0.5 text-[8px] border-b border-dashed border-blue-300">
-              <span class="font-semibold text-gray-900">اعتبار از تاریخ:</span>
-              <span class="text-blue-600 font-extrabold px-1.5 py-0.5 bg-blue-50 rounded">{{ data.licenseIssueDateFormatted || '-' }}</span>
-            </div>
-            <div class="flex justify-between items-center py-0.5 text-[8px] border-b border-dashed border-blue-300">
-              <span class="font-semibold text-gray-900">الی:</span>
-              <span class="text-blue-600 font-extrabold px-1.5 py-0.5 bg-blue-50 rounded">{{ data.licenseExpiryDateFormatted || '-' }}</span>
-            </div>
-            <div class="flex justify-between items-center py-0.5 text-[8px]">
-              <span class="font-semibold text-gray-900">نمبر ثبت:</span>
-              <span class="text-blue-600 font-extrabold px-1.5 py-0.5 bg-blue-50 rounded">( )</span>
+            <div class="license-meta">
+              <div class="meta-item">
+                <span class="meta-label">نمبر جواز:</span>
+                <span class="meta-value">{{ data.licenseNumber }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">تاریخ صدور:</span>
+                <span class="meta-value">{{ data.licenseIssueDateFormatted || '-' }}</span>
+              </div>
             </div>
           </div>
-        </div>
+
+          <!-- Center Column: Ministry Info -->
+          <div class="header-center">
+            <h1 class="ministry-title">امارت اسلامی افغانستان</h1>
+            <div class="ministry-divider">
+              <span class="divider-line"></span>
+              <span class="divider-diamond">◆</span>
+              <span class="divider-line"></span>
+            </div>
+            <h2 class="ministry-name">وزارت عدلیه</h2>
+            <h3 class="department-name">ریاست عمومی انسجام</h3>
+            <h4 class="sub-department">ریاست امور رهنمای معاملات و عریضه نویسان</h4>
+            <h4 class="sub-department">آمریت رهنمای معاملات و عریضه نویسان</h4>
+            <h4 class="sub-department">مدیریت بررسی و ثبت جواز عریضه نویسان</h4>
+          </div>
+
+          <!-- Left Column: Logo & Photo -->
+          <div class="header-left">
+            <div class="logo-photo-stack">
+              <img src="/assets/img/mcitlogo.png" alt="لوگو وزارت" class="ministry-logo">
+              <div class="photo-container">
+                <div class="photo-frame">
+                  <img *ngIf="data.picturePath" [src]="getImageUrl(data.picturePath)" alt="عکس" class="owner-photo" onerror="this.src='assets/img/avatar.png'">
+                  <img *ngIf="!data.picturePath" src="assets/img/avatar.png" alt="عکس" class="owner-photo">
+                </div>
+                <div class="photo-label">فوتو</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Main Body -->
+        <main class="certificate-body">
+          <!-- Main Data Table -->
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th colspan="2" class="table-header">شهرت و سکونت اصلی</th>
+                <th colspan="2" class="table-header">سکونت فعلی</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-label">نام و تخلص</td>
+                <td class="table-value">{{ data.applicantName || '-' }}</td>
+                <td class="table-label">ولایت</td>
+                <td class="table-value">{{ data.currentProvinceName || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="table-label">ولد</td>
+                <td class="table-value">{{ data.applicantFatherName || '-' }}</td>
+                <td class="table-label">ولسوالی</td>
+                <td class="table-value">{{ data.currentDistrictName || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="table-label">نمبر تذکره</td>
+                <td class="table-value">{{ data.electronicNationalIdNumber || '-' }}</td>
+                <td class="table-label">ناحیه</td>
+                <td class="table-value">{{ data.currentVillage || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="table-label">ولایت</td>
+                <td class="table-value">{{ data.permanentProvinceName || '-' }}</td>
+                <td class="table-label">محل فعالیت</td>
+                <td class="table-value">{{ data.activityLocation || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="table-label">ولسوالی</td>
+                <td class="table-value">{{ data.permanentDistrictName || '-' }}</td>
+                <td class="table-label">قریه / گذر</td>
+                <td class="table-value">{{ data.currentVillage || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="table-label">ناحیه / قریه</td>
+                <td class="table-value">{{ data.permanentVillage || '-' }}</td>
+                <td class="table-label"></td>
+                <td class="table-value"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Bottom Three Columns Table -->
+          <table class="bottom-table">
+            <thead>
+              <tr>
+                <th class="bottom-header">مرجع صلاحیت و امضاء</th>
+                <th class="bottom-header">نظر به درمورد</th>
+                <th class="bottom-header">معلومات جواز عریضه نویسی</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="bottom-cell">
+                  <div class="bottom-text-center">ریاست عمومی انسجام</div>
+                  <div class="signature-space"></div>
+                  <div class="bottom-text-center">امضاء رئیس</div>
+                </td>
+                <td class="bottom-cell">
+                  <div class="bottom-text-justify">
+                    در اهلیت عریضه نویسی بعد از اخذ امتحان نظر هیئت داده شد، که این عریضه نویس به درجه اعلی، اوسط، ادنی لیاقت و اهلیت دارد.
+                  </div>
+                  <div class="bottom-text-center">مهر</div>
+                </td>
+                <td class="bottom-cell">
+                  <div class="info-row">
+                    <span>اعتبار از تاریخ:</span>
+                    <span class="info-value">{{ data.licenseIssueDateFormatted || '-' }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span>الی:</span>
+                    <span class="info-value">{{ data.licenseExpiryDateFormatted || '-' }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span>نمبر ثبت:</span>
+                    <span class="info-value">( )</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="certificate-footer">
+          <!-- QR Code Verification Row -->
+          <div class="verification-row" *ngIf="verificationCode">
+            <div class="qr-code-container">
+              <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" *ngIf="qrCodeUrl">
+            </div>
+            <div class="verification-details">
+              <div class="verification-item">
+                <span class="verification-label">کود تصدیق سند:</span>
+                <span class="verification-code">{{ verificationCode }}</span>
+              </div>
+              <div class="verification-item">
+                <span class="verification-label">شهرت:</span>
+                <span class="verification-value">{{ data.applicantName || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verification Error -->
+          <div class="verification-row error" *ngIf="verificationError && !verificationCode">
+            <div class="error-content">
+              <span class="error-text">{{ verificationError }}</span>
+              <span class="verification-label">برای تصدیق با اداره تماس بگیرید</span>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
-  </div>
-
-  <!-- QR Code Verification Section -->
-  <div class="mt-1 px-1" *ngIf="verificationCode">
-    <div class="flex items-center gap-1.5 p-1 bg-gradient-to-br from-white to-blue-50 border-2 border-blue-600 rounded shadow-sm">
-      <div class="flex-shrink-0">
-        <img [src]="qrCodeUrl" alt="QR Code" class="w-11 h-11 rounded shadow-sm" *ngIf="qrCodeUrl">
-      </div>
-      <div class="flex flex-col gap-0.5 flex-1">
-        <div class="flex items-center gap-1">
-          <span class="text-[7px] text-gray-600 font-semibold whitespace-nowrap">کود تصدیق سند:</span>
-          <span class="font-mono text-[8px] font-bold text-blue-600 tracking-wide ltr px-1 py-0.5 bg-blue-50 rounded border border-blue-300">{{ verificationCode }}</span>
-        </div>
-        <div class="flex items-center gap-1">
-          <span class="text-[7px] text-gray-600 font-semibold whitespace-nowrap">شهرت:</span>
-          <span class="font-mono text-[8px] font-bold text-blue-600 tracking-wide ltr px-1 py-0.5 bg-blue-50 rounded border border-blue-300">{{ data.applicantName || '—' }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Verification Error -->
-  <div class="mt-1 mx-1 p-1 border-2 border-red-700 bg-gradient-to-br from-white to-red-50 rounded flex flex-col items-center text-center gap-0.5" *ngIf="verificationError && !verificationCode">
-    <div class="text-sm">⚠</div>
-    <div class="text-[7px] text-red-700 font-bold">{{ verificationError }}</div>
-    <div class="text-[7px] text-gray-600 font-semibold">برای تصدیق با اداره تماس بگیرید</div>
   </div>
 </div>

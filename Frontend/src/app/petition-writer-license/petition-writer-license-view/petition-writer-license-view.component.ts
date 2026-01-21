@@ -123,12 +123,19 @@ export class PetitionWriterLicenseViewComponent implements OnInit {
     }
 
     getImageUrl(path: string): string {
-        if (!path) return '';
+        if (!path) return 'assets/img/avatar.png'; // Default fallback image
         // If path already starts with http/https, return as is
         if (path.startsWith('http://') || path.startsWith('https://')) {
             return path;
         }
-        // Otherwise, construct the URL relative to the API
-        return `/api/${path}`;
+        // Otherwise, construct the URL using the Upload controller's view endpoint
+        return `/api/Upload/view/${path}`;
+    }
+
+    onImageError(event: any): void {
+        // Prevent infinite loop by setting to a valid fallback image only once
+        if (event.target.src !== 'assets/img/avatar.png') {
+            event.target.src = 'assets/img/avatar.png';
+        }
     }
 }
