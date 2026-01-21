@@ -269,6 +269,7 @@ namespace UploadFilesServer.Controllers
                 "profile" => Path.Combine("Resources", "Documents", "Profile"),
                 "license" => Path.Combine("Resources", "Documents", "License"),
                 "identity" => Path.Combine("Resources", "Documents", "Identity"),
+                "petition-writer-picture" => Path.Combine("Resources", "Images"),
                 _ => Path.Combine("Resources", "Images")
             };
         }

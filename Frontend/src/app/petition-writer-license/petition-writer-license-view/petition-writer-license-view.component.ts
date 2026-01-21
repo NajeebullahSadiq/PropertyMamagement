@@ -10,6 +10,7 @@ import {
     LicenseStatusEnum,
     LicenseStatusTypes
 } from 'src/app/models/PetitionWriterLicense';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-petition-writer-license-view',
@@ -128,8 +129,9 @@ export class PetitionWriterLicenseViewComponent implements OnInit {
         if (path.startsWith('http://') || path.startsWith('https://')) {
             return path;
         }
-        // Otherwise, construct the URL using the Upload controller's view endpoint
-        return `/api/Upload/view/${path}`;
+        // Otherwise, construct the full URL using the environment API URL and Upload controller's view endpoint
+        const baseUrl = environment.apiURL.replace('/api', ''); // Remove /api suffix if present
+        return `${baseUrl}/api/Upload/view/${path}`;
     }
 
     onImageError(event: any): void {

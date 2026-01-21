@@ -170,4 +170,19 @@ export class ProfileImageCropperComponent implements OnChanges {
       this.error = 'خطا در بارگذاری تصویر';
     }
   }
+
+  getImageUrl(path: string): string {
+    if (!path) return 'assets/img/avatar.png';
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    // Otherwise, construct the full URL using the environment API URL and Upload controller's view endpoint
+    const baseUrl = environment.apiURL.replace('/api', ''); // Remove /api suffix if present
+    return `${baseUrl}/api/Upload/view/${path}`;
+  }
 }

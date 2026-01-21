@@ -139,6 +139,8 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-    return this.baseUrl + path;
+    // Use the Upload controller's view endpoint with full backend URL
+    const baseUrl = environment.apiURL.replace('/api', ''); // Remove /api suffix if present
+    return `${baseUrl}/api/Upload/view/${path}`;
   }
 }
