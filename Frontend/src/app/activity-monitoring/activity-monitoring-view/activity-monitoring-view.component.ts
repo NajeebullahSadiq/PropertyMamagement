@@ -21,6 +21,16 @@ export class ActivityMonitoringViewComponent implements OnInit {
     realEstateViolations: RealEstateViolation[] = [];
     petitionWriterViolations: PetitionWriterViolation[] = [];
     recordId: number = 0;
+    isLoading = false;
+
+    sections = {
+        financial: true,
+        annual: true,
+        complaints: true,
+        realEstateViolations: true,
+        petitionWriterViolations: true,
+        inspection: true
+    };
 
     constructor(
         private route: ActivatedRoute,
@@ -38,16 +48,23 @@ export class ActivityMonitoringViewComponent implements OnInit {
         }
     }
 
+    toggleSection(section: keyof typeof this.sections): void {
+        this.sections[section] = !this.sections[section];
+    }
+
     loadData(): void {
+        this.isLoading = true;
         const calendar = this.calendarService.getSelectedCalendar();
         
         this.service.getById(this.recordId, calendar).subscribe({
             next: (data) => {
                 this.record = data;
+                this.isLoading = false;
             },
             error: (err) => {
                 this.toastr.error('خطا در بارگذاری اطلاعات');
                 console.error(err);
+                this.isLoading = false;
             }
         });
 

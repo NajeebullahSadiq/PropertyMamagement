@@ -1,164 +1,284 @@
-<div class="container-fluid mt-4">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>مشاهده نظارت بر فعالیت دفاتر رهنمای معاملات و عریضه نویسان</h4>
-            <div>
-                <button class="btn btn-primary" (click)="editRecord()">
-                    <i class="fa fa-edit"></i> ویرایش
-                </button>
-                <button class="btn btn-secondary ms-2" (click)="print()">
-                    <i class="fa fa-print"></i> چاپ
-                </button>
-                <button class="btn btn-outline-secondary ms-2" (click)="goToList()">
-                    <i class="fa fa-list"></i> برگشت
-                </button>
-            </div>
-        </div>
-        <div class="card-body" *ngIf="record">
-            <!-- Section 1: Financial Clearance -->
-            <h5 class="section-title">۱. تصفیه وجایب مالیاتی</h5>
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>شهرت دارنده جواز:</strong> {{ record.licenseHolderName }}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>تصفیه وجایب مالیاتی:</strong> {{ record.taxClearanceStatus || '-' }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>نمبر مکتوب:</strong> {{ record.taxClearanceLetterNumber || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>تاریخ تصفیه:</strong> {{ record.taxClearanceDateFormatted || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>مقدار مالیه:</strong> {{ record.paidTaxAmount || '-' }}</p>
-                </div>
-            </div>
-
-            <!-- Section 2: Annual Report -->
-            <h5 class="section-title mt-4">۲. گزارش سالانه</h5>
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>تاریخ ثبت گزارش:</strong> {{ record.reportRegistrationDateFormatted || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>سته‌های فروش:</strong> {{ record.saleDeedsCount || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>سته‌های کرایی:</strong> {{ record.rentalDeedsCount || '-' }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>سته‌های بیع الوفا:</strong> {{ record.baiUlWafaDeedsCount || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>سته‌های وسایط نقلیه:</strong> {{ record.vehicleTransactionDeedsCount || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>معاملات مختلط ابطال شده:</strong> {{ record.cancelledMixedTransactions || '-' }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>سته‌های مفقودی:</strong> {{ record.lostDeedsCount || '-' }}</p>
-                </div>
-                <div class="col-md-8">
-                    <p><strong>ملاحظات:</strong> {{ record.annualReportRemarks || '-' }}</p>
-                </div>
-            </div>
-
-            <!-- Section 3: Complaints -->
-            <h5 class="section-title mt-4">۳. شکایات</h5>
-            <table class="table table-bordered" *ngIf="complaints.length > 0">
-                <thead>
-                    <tr>
-                        <th>نمبر مسلسل</th>
-                        <th>شهرت عارض</th>
-                        <th>موضوع شکایت</th>
-                        <th>تاریخ</th>
-                        <th>شهرت معروض علیه</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let item of complaints">
-                        <td>{{ item.complaintSerialNumber }}</td>
-                        <td>{{ item.complainantName }}</td>
-                        <td>{{ item.complaintSubject }}</td>
-                        <td>{{ item.complaintRegistrationDateFormatted }}</td>
-                        <td>{{ item.accusedPartyName }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p *ngIf="complaints.length === 0">هیچ شکایتی ثبت نشده است</p>
-
-            <!-- Section 4: Real Estate Violations -->
-            <h5 class="section-title mt-4">۴. تخلفات دفاتر رهنمای معاملات</h5>
-            <table class="table table-bordered" *ngIf="realEstateViolations.length > 0">
-                <thead>
-                    <tr>
-                        <th>نمبر مسلسل</th>
-                        <th>شهرت دارنده جواز</th>
-                        <th>نوعیت تخلف</th>
-                        <th>تاریخ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let item of realEstateViolations">
-                        <td>{{ item.violationSerialNumber }}</td>
-                        <td>{{ item.licenseHolderName }}</td>
-                        <td>{{ item.violationType }}</td>
-                        <td>{{ item.violationDateFormatted }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p *ngIf="realEstateViolations.length === 0">هیچ تخلفی ثبت نشده است</p>
-
-            <!-- Section 5: Petition Writer Violations -->
-            <h5 class="section-title mt-4">۵. تخلفات عریضه نویسان</h5>
-            <table class="table table-bordered" *ngIf="petitionWriterViolations.length > 0">
-                <thead>
-                    <tr>
-                        <th>نمبر مسلسل</th>
-                        <th>شهرت عریضه نویس</th>
-                        <th>نوعیت تخلف</th>
-                        <th>تاریخ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let item of petitionWriterViolations">
-                        <td>{{ item.violationSerialNumber }}</td>
-                        <td>{{ item.petitionWriterName }}</td>
-                        <td>{{ item.violationType }}</td>
-                        <td>{{ item.violationDateFormatted }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p *ngIf="petitionWriterViolations.length === 0">هیچ تخلفی ثبت نشده است</p>
-
-            <!-- Section 6: Inspection -->
-            <h5 class="section-title mt-4">۶. خلاصه نظارت و سرپرستی</h5>
-            <div class="row">
-                <div class="col-md-4">
-                    <p><strong>تاریخ نظارت:</strong> {{ record.inspectionDateFormatted || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>دفاتر نظارت شده:</strong> {{ record.inspectedRealEstateOfficesCount || '-' }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>دفاتر مهرولاک شده:</strong> {{ record.sealedOfficesCount || '-' }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>عریضه نویسان نظارت شده:</strong> {{ record.inspectedPetitionWritersCount || '-' }}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>عریضه نویسان متخلف:</strong> {{ record.violatingPetitionWritersCount || '-' }}</p>
-                </div>
-            </div>
-        </div>
+<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8 no-print">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+        <i class="fas fa-clipboard-check text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">جزئیات نظارت بر فعالیت</h1>
+      <p class="text-gray-500 max-w-md mx-auto">مشاهده جزئیات کامل نظارت بر فعالیت دفاتر رهنمای معاملات و عریضه نویسان</p>
     </div>
-</div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+    </div>
+
+    <div *ngIf="!isLoading && record">
+      <!-- Action Buttons -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+        <div class="p-4">
+          <div class="flex flex-wrap gap-4 justify-between">
+            <button (click)="goToList()" class="px-6 py-2.5 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+              <i class="fas fa-arrow-right"></i>
+              بازگشت به لیست
+            </button>
+            <div class="flex gap-3">
+              <button (click)="editRecord()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-edit"></i>
+                ویرایش
+              </button>
+              <button (click)="print()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-print"></i>
+                چاپ
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1: تصفیه وجایب مالیاتی -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('financial')" class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-money-check-alt text-sm"></i>
+            </div>
+            <span>۱. تصفیه وجایب مالیاتی</span>
+          </h2>
+          <i class="fas text-white" [ngClass]="sections.financial ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </div>
+        <div *ngIf="sections.financial" class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>شهرت دارنده جواز</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.licenseHolderName }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-check-circle text-blue-500"></i>تصفیه وجایب مالیاتی</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.taxClearanceStatus || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-file-alt text-blue-500"></i>نمبر مکتوب</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.taxClearanceLetterNumber || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-blue-500"></i>تاریخ تصفیه</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.taxClearanceDateFormatted || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-dollar-sign text-blue-500"></i>مقدار مالیه پرداخت شده</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.paidTaxAmount || '-' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: گزارش سالانه -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('annual')" class="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-file-alt text-sm"></i>
+            </div>
+            <span>۲. گزارش سالانه</span>
+          </h2>
+          <i class="fas text-white" [ngClass]="sections.annual ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </div>
+        <div *ngIf="sections.annual" class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-purple-500"></i>تاریخ ثبت گزارش</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.reportRegistrationDateFormatted || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-file text-purple-500"></i>سته‌های فروش</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.saleDeedsCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-file text-purple-500"></i>سته‌های کرایی</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.rentalDeedsCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-file text-purple-500"></i>سته‌های بیع الوفا</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.baiUlWafaDeedsCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-car text-purple-500"></i>سته‌های وسایط نقلیه</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.vehicleTransactionDeedsCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-times-circle text-purple-500"></i>معاملات مختلط ابطال شده</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.cancelledMixedTransactions || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-question-circle text-purple-500"></i>سته‌های مفقودی</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.lostDeedsCount || '-' }}</p>
+            </div>
+          </div>
+          <div *ngIf="record.annualReportRemarks" class="mt-4 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+            <span class="text-sm text-gray-500 flex items-center gap-2 mb-2"><i class="fas fa-comment text-purple-500"></i>ملاحظات</span>
+            <p class="text-gray-800">{{ record.annualReportRemarks }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: شکایات -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('complaints')" class="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-exclamation-triangle text-sm"></i>
+            </div>
+            <span>۳. شکایات ({{ complaints.length }})</span>
+          </h2>
+          <i class="fas text-white" [ngClass]="sections.complaints ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </div>
+        <div *ngIf="sections.complaints" class="p-6">
+          <div *ngIf="complaints.length === 0" class="text-center py-8 text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
+            <p>هیچ شکایتی ثبت نشده است</p>
+          </div>
+          <div class="overflow-x-auto" *ngIf="complaints.length > 0">
+            <table class="w-full">
+              <thead class="bg-gradient-to-r from-red-100 to-rose-100 border-b-2 border-red-200">
+                <tr class="text-center">
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">نمبر مسلسل</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">شهرت عارض</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">موضوع شکایت</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">تاریخ</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">شهرت معروض علیه</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr *ngFor="let item of complaints" class="text-center hover:bg-red-50 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintSerialNumber }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.complainantName }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintSubject }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintRegistrationDateFormatted }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.accusedPartyName }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: تخلفات دفاتر رهنمای معاملات -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('realEstateViolations')" class="bg-gradient-to-r from-orange-600 to-amber-600 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-ban text-sm"></i>
+            </div>
+            <span>۴. تخلفات دفاتر رهنمای معاملات ({{ realEstateViolations.length }})</span>
+          </h2>
+          <i class="fas text-white" [ngClass]="sections.realEstateViolations ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </div>
+        <div *ngIf="sections.realEstateViolations" class="p-6">
+          <div *ngIf="realEstateViolations.length === 0" class="text-center py-8 text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
+            <p>هیچ تخلفی ثبت نشده است</p>
+          </div>
+          <div class="overflow-x-auto" *ngIf="realEstateViolations.length > 0">
+            <table class="w-full">
+              <thead class="bg-gradient-to-r from-orange-100 to-amber-100 border-b-2 border-orange-200">
+                <tr class="text-center">
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">نمبر مسلسل</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">شهرت دارنده جواز</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">نوعیت تخلف</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">تاریخ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr *ngFor="let item of realEstateViolations" class="text-center hover:bg-orange-50 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationSerialNumber }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationType }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationDateFormatted }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: تخلفات عریضه نویسان -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('petitionWriterViolations')" class="bg-gradient-to-r from-yellow-600 to-amber-600 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-user-times text-sm"></i>
+            </div>
+            <span>۵. تخلفات عریضه نویسان ({{ petitionWriterViolations.length }})</span>
+          </h2>
+          <i class="fas text-white" [ngClass]="sections.petitionWriterViolations ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </div>
+        <div *ngIf="sections.petitionWriterViolations" class="p-6">
+          <div *ngIf="petitionWriterViolations.length === 0" class="text-center py-8 text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
+            <p>هیچ تخلفی ثبت نشده است</p>
+          </div>
+          <div class="overflow-x-auto" *ngIf="petitionWriterViolations.length > 0">
+            <table class="w-full">
+              <thead class="bg-gradient-to-r from-yellow-100 to-amber-100 border-b-2 border-yellow-200">
+                <tr class="text-center">
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">نمبر مسلسل</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">شهرت عریضه نویس</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">نوعیت تخلف</th>
+                  <th class="px-4 py-3 text-sm font-bold text-gray-700">تاریخ</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr *ngFor="let item of petitionWriterViolations" class="text-center hover:bg-yellow-50 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationSerialNumber }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationType }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationDateFormatted }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 6: خلاصه نظارت و سرپرستی -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('inspection')" class="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 cursor-pointer flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <i class="fas fa-clipboard-check text-sm"></i>
+            </div>
+            <span>۶. خلاصه نظارت و سرپرستی</span>
+          </h2>
+          <i class="fas text-white" [ngClass]="sections.inspection ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </div>
+        <div *ngIf="sections.inspection" class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-green-500"></i>تاریخ نظارت</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.inspectionDateFormatted || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-building text-green-500"></i>دفاتر نظارت شده</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.inspectedRealEstateOfficesCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-lock text-green-500"></i>دفاتر مهرولاک شده</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.sealedOfficesCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-users text-green-500"></i>عریضه نویسان نظارت شده</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.inspectedPetitionWritersCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user-times text-green-500"></i>عریضه نویسان متخلف</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.violatingPetitionWritersCount || '-' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
