@@ -105,3 +105,4 @@ sudo journalctl -u prmis-backend -n 50 --no-pager
 # database migratin Apply
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_Initial.sql
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/10_Verification_Initial.sql
+sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_AddPicturePath.sql
