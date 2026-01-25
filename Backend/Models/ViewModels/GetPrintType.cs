@@ -28,9 +28,9 @@ namespace WebAPIBackend.Models.ViewModels
 
         [Column("east")]
         public string? East { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
-        public double? RoyaltyAmount { get; set; }
+        public string? RoyaltyAmount { get; set; }
         public string? PropertypeType { get; set; }
         public DateTime? CreatedAt { get; set; }
 
@@ -44,7 +44,7 @@ namespace WebAPIBackend.Models.ViewModels
         // SellerDetails
         public string? SellerFirstName { get; set; }
         public string? SellerFatherName { get; set; }
-        public double? SellerIndentityCardNumber { get; set; }
+        public string? SellerIndentityCardNumber { get; set; }
         public string? SellerVillage { get; set; }
 
         [Column("TSellerVillage")]
@@ -72,7 +72,7 @@ namespace WebAPIBackend.Models.ViewModels
         // BuyerDetails
         public string? BuyerFirstName { get; set; }
         public string? BuyerFatherName { get; set; }
-        public double? BuyerIndentityCardNumber { get; set; }
+        public string? BuyerIndentityCardNumber { get; set; }
         public string? BuyerVillage { get; set; }
         public string? BuyerPhoto { get; set; } // Assuming photo is stored as byte[]
 
@@ -100,11 +100,11 @@ namespace WebAPIBackend.Models.ViewModels
         // WitnessDetails
         public string? WitnessOneFirstName { get; set; }
         public string? WitnessOneFatherName { get; set; }
-        public double? WitnessOneIndentityCardNumber { get; set; }
+        public string? WitnessOneIndentityCardNumber { get; set; }
 
         public string? WitnessTwoFirstName { get; set; }
         public string? WitnessTwoFatherName { get; set; }
-        public double? WitnessTwoIndentityCardNumber { get; set; }
+        public string? WitnessTwoIndentityCardNumber { get; set; }
 
         // PropertyUnitType and TransactionType
         public string? UnitType { get; set; }

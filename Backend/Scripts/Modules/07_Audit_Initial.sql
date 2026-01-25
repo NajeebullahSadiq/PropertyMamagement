@@ -75,14 +75,16 @@ CREATE TABLE IF NOT EXISTS log."Vehiclebuyeraudit" (
 );
 
 -- Licenseaudit
-CREATE TABLE IF NOT EXISTS log."Licenseaudit" (
+CREATE TABLE IF NOT EXISTS log."licenseaudit" (
     "Id" SERIAL PRIMARY KEY,
-    "LicenseDetailsId" INTEGER,
-    "Action" TEXT,
+    "LicenseId" INTEGER NOT NULL,
+    "PropertyName" TEXT,
     "OldValue" TEXT,
     "NewValue" TEXT,
-    "ChangedBy" TEXT,
-    "ChangedAt" TIMESTAMP WITHOUT TIME ZONE
+    "UpdatedBy" TEXT,
+    "UpdatedAt" TIMESTAMP WITHOUT TIME ZONE,
+    CONSTRAINT "FK_licenseaudit_LicenseDetails" FOREIGN KEY ("LicenseId") 
+        REFERENCES company."LicenseDetails"("Id") ON DELETE CASCADE
 );
 
 -- Guarantorsaudit

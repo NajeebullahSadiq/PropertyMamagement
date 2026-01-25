@@ -140,7 +140,7 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
       return path;
     }
     // Use the Upload controller's view endpoint with full backend URL
-    const baseUrl = environment.apiURL.replace('/api', ''); // Remove /api suffix if present
-    return `${baseUrl}/api/Upload/view/${path}`;
+    // environment.apiURL already includes /api, so just append the Upload/view path
+    return `${environment.apiURL}/Upload/view/${path}`;
   }
 }

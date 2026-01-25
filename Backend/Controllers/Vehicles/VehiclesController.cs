@@ -287,7 +287,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 PropertyTypeId = request.PropertyTypeId,
                 Price = request.Price,
                 PriceText = request.PriceText,
-                RoyaltyAmount = request.Price*0.01,
+                RoyaltyAmount = !string.IsNullOrWhiteSpace(request.Price) ? (decimal.Parse(request.Price) * 0.01m).ToString() : null,
                 TransactionTypeId = request.TransactionTypeId,
                 Des = request.Des,
                 CreatedAt = DateTime.Now,

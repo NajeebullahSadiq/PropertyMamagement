@@ -59,34 +59,10 @@ namespace WebAPIBackend.Controllers.Companies
                     })
                     .ToListAsync();
 
-                // Convert dates to the requested calendar type (defaults to HijriShamsi)
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
-                var result = Pro.Select(item => new
-                {
-                    item.Id,
-                    item.FirstName,
-                    item.FatherName,
-                    item.GrandFatherName,
-                    item.EducationLevelId,
-                    DateofBirth = DateConversionHelper.ToCalendarDateOnly(item.DateofBirth, calendar),
-                    item.ElectronicNationalIdNumber,
-                    item.CompanyId,
-                    item.PothoPath,
-                    item.PhoneNumber,
-                    item.WhatsAppNumber,
-                    item.OwnerProvinceId,
-                    item.OwnerDistrictId,
-                    item.OwnerVillage,
-                    item.PermanentProvinceId,
-                    item.PermanentDistrictId,
-                    item.PermanentVillage,
-                    item.OwnerProvinceName,
-                    item.OwnerDistrictName,
-                    item.PermanentProvinceName,
-                    item.PermanentDistrictName,
-                }).ToList();
+                // DO NOT convert dates - return them as Gregorian
+                // The frontend will handle calendar conversion
 
-                return Ok(result);
+                return Ok(Pro);
             }
             catch (Exception ex)
             {

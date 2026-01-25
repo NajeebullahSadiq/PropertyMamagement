@@ -101,15 +101,14 @@ export class PrintLicenseComponent implements OnInit {
   }
 
   private fetchVerificationCode(): void {
-    // Get the license ID from the data - the API returns CompanyId as the main identifier
-    // After camelCase conversion, it becomes companyId
-    const licenseId = this.data?.companyId || this.data?.licenseId || this.data?.licenseDetailId || this.data?.id;
+    // Get the license detail ID from the data - this is the actual LicenseDetails table ID
+    const licenseId = this.data?.licenseDetailId || this.data?.id;
     
     console.log('[PrintLicense] Data object keys:', Object.keys(this.data || {}));
-    console.log('[PrintLicense] Looking for license ID, found:', licenseId);
+    console.log('[PrintLicense] Looking for license detail ID, found:', licenseId);
 
     if (!licenseId) {
-      console.warn('[PrintLicense] No license ID found for verification. Data:', this.data);
+      console.warn('[PrintLicense] No license detail ID found for verification. Data:', this.data);
       this.isLoading = false;
       this.triggerPrint();
       return;

@@ -1,15 +1,7 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-    NgbDate,
-    NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -21,31 +13,15 @@ import {
     RegistrationBookTypes
 } from 'src/app/models/SecuritiesDistribution';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) { return WEEKDAYS_SHORT[weekday - 1]; }
-    getMonthShortName(month: number) { return MONTHS[month - 1]; }
-    getMonthFullName(month: number) { return MONTHS[month - 1]; }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
-
 @Component({
     selector: 'app-securities-form',
     templateUrl: './securities-form.component.html',
     styleUrls: ['./securities-form.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
 })
 export class SecuritiesFormComponent implements OnInit {
+    // Date range constraints (optional - can be removed if not needed)
+    minDate = { year: 1320, month: 1, day: 1 };
     maxDate = { year: 1410, month: 12, day: 31 };
-    minDate = { year: 1320, month: 12, day: 31 };
 
     securitiesForm!: FormGroup;
     isEditMode = false;
@@ -76,8 +52,7 @@ export class SecuritiesFormComponent implements OnInit {
         private toastr: ToastrService,
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService,
-        private calendarConversionService: CalendarConversionService,
-        private ngbDateParserFormatter: NgbDateParserFormatter
+        private calendarConversionService: CalendarConversionService
     ) {
         this.initForm();
     }
@@ -175,15 +150,15 @@ export class SecuritiesFormComponent implements OnInit {
 
                 // Parse dates
                 if (data.deliveryDateFormatted) {
-                    const parsed = this.ngbDateParserFormatter.parse(data.deliveryDateFormatted);
-                    if (parsed) {
-                        this.securitiesForm.patchValue({ deliveryDate: parsed });
+                    const deliveryDate = this.parseDate(data.deliveryDateFormatted);
+                    if (deliveryDate) {
+                        this.securitiesForm.patchValue({ deliveryDate });
                     }
                 }
                 if (data.distributionDateFormatted) {
-                    const parsed = this.ngbDateParserFormatter.parse(data.distributionDateFormatted);
-                    if (parsed) {
-                        this.securitiesForm.patchValue({ distributionDate: parsed });
+                    const distributionDate = this.parseDate(data.distributionDateFormatted);
+                    if (distributionDate) {
+                        this.securitiesForm.patchValue({ distributionDate });
                     }
                 }
 
@@ -340,21 +315,29 @@ export class SecuritiesFormComponent implements OnInit {
         });
     }
 
-    formatDateForBackend(date: NgbDate | null): string | undefined {
-        if (!date) return undefined;
-        const calendar = this.calendarService.getSelectedCalendar();
-        const calendarDate = {
-            year: date.year,
-            month: date.month,
-            day: date.day,
-            calendarType: calendar
-        };
-        const gregorianDate = this.calendarConversionService.toGregorian(calendarDate);
-        if (gregorianDate) {
-            const year = gregorianDate.getFullYear();
-            const month = String(gregorianDate.getMonth() + 1).padStart(2, '0');
-            const day = String(gregorianDate.getDate()).padStart(2, '0');
+    parseDate(dateStr: string): Date | null {
+        if (!dateStr) return null;
+        const date = new Date(dateStr);
+        return isNaN(date.getTime()) ? null : date;
+    }
+
+    formatDateForBackend(dateValue: any): string | undefined {
+        if (!dateValue) return undefined;
+        const currentCalendar = this.calendarService.getSelectedCalendar();
+
+        if (dateValue instanceof Date) {
+            const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+            const year = calendarDate.year;
+            const month = String(calendarDate.month).padStart(2, '0');
+            const day = String(calendarDate.day).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        } else if (typeof dateValue === 'object' && dateValue?.year) {
+            const year = dateValue.year;
+            const month = String(dateValue.month).padStart(2, '0');
+            const day = String(dateValue.day).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        } else if (typeof dateValue === 'string') {
+            return dateValue.replace(/\//g, '-');
         }
         return undefined;
     }

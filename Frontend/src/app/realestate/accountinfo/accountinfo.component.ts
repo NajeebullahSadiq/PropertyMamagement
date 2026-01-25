@@ -1,54 +1,21 @@
 import { Component, EventEmitter, Injectable, Input, Output } from '@angular/core';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-    NgbDate,
-    NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { NumeralService } from 'src/app/shared/numeral.service';
 import { AccountInfo, AccountInfoData } from 'src/app/models/AccountInfo';
-
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) {
-        return WEEKDAYS_SHORT[weekday - 1];
-    }
-    getMonthShortName(month: number) {
-        return MONTHS[month - 1];
-    }
-    getMonthFullName(month: number) {
-        return MONTHS[month - 1];
-    }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
 
 @Component({
     selector: 'app-accountinfo',
     templateUrl: './accountinfo.component.html',
     styleUrls: ['./accountinfo.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
 })
 export class AccountinfoComponent {
-    maxDate = { year: 1410, month: 12, day: 31 };
-    minDate = { year: 1320, month: 12, day: 31 };
 
     accountForm!: FormGroup;
     selectedId: number = 0;
-    selectedTaxPaymentDate!: NgbDate;
     accountInfo: AccountInfo | null = null;
 
     @Input() id: number = 0;
@@ -62,9 +29,9 @@ export class AccountinfoComponent {
         private fb: FormBuilder,
         private toastr: ToastrService,
         private comservice: CompnaydetailService,
-        private ngbDateParserFormatter: NgbDateParserFormatter,
         private calendarConversionService: CalendarConversionService,
-        private calendarService: CalendarService
+        private calendarService: CalendarService,
+        private numeralService: NumeralService
     ) {
         this.accountForm = this.fb.group({
             id: [0],
@@ -93,30 +60,32 @@ export class AccountinfoComponent {
                 next: (info) => {
                     if (info) {
                         this.accountInfo = info;
+                        
+                        // Parse taxPaymentDate properly for the multi-calendar datepicker
+                        let taxPaymentDateValue: Date | null = null;
+                        if (info.taxPaymentDate) {
+                            const dateString: any = info.taxPaymentDate;
+                            if (typeof dateString === 'string') {
+                                taxPaymentDateValue = new Date(dateString);
+                                if (isNaN(taxPaymentDateValue.getTime())) {
+                                    taxPaymentDateValue = null;
+                                }
+                            } else if (dateString instanceof Date) {
+                                taxPaymentDateValue = dateString;
+                            }
+                        }
+                        
                         this.accountForm.setValue({
                             id: info.id || 0,
                             companyId: info.companyId,
                             settlementInfo: info.settlementInfo || '',
                             taxPaymentAmount: info.taxPaymentAmount || '',
                             settlementYear: info.settlementYear || '',
-                            taxPaymentDate: info.taxPaymentDate || '',
+                            taxPaymentDate: taxPaymentDateValue,
                             transactionCount: info.transactionCount || '',
                             companyCommission: info.companyCommission || '',
                         });
                         this.selectedId = info.id || 0;
-
-                        // Parse tax payment date
-                        if (info.taxPaymentDate) {
-                            const dateString = info.taxPaymentDate.toString();
-                            const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-                            if (parsedDateStruct) {
-                                this.selectedTaxPaymentDate = new NgbDate(
-                                    parsedDateStruct.year,
-                                    parsedDateStruct.month,
-                                    parsedDateStruct.day
-                                );
-                            }
-                        }
                     }
                 },
                 error: (error) => {
@@ -156,15 +125,32 @@ export class AccountinfoComponent {
         const formValue = this.accountForm.value;
         const taxPaymentDateValue = this.accountForm.get('taxPaymentDate')?.value;
 
+        // Helper function to parse numbers safely with Dari/Pashto numeral support
+        const parseNumber = (value: any): number | undefined => {
+            if (value === null || value === undefined || value === '') return undefined;
+            // Convert Eastern Arabic numerals to Western before parsing
+            const westernValue = this.numeralService.toWesternArabic(value);
+            const parsed = parseFloat(westernValue);
+            return isNaN(parsed) ? undefined : parsed;
+        };
+
+        const parseInteger = (value: any): number | undefined => {
+            if (value === null || value === undefined || value === '') return undefined;
+            // Convert Eastern Arabic numerals to Western before parsing
+            const westernValue = this.numeralService.toWesternArabic(value);
+            const parsed = parseInt(westernValue, 10);
+            return isNaN(parsed) ? undefined : parsed;
+        };
+
         const data: AccountInfoData = {
             id: this.selectedId,
             companyId: this.comservice.mainTableId,
             settlementInfo: formValue.settlementInfo || undefined,
-            taxPaymentAmount: parseFloat(formValue.taxPaymentAmount) || 0,
-            settlementYear: formValue.settlementYear ? parseInt(formValue.settlementYear) : undefined,
+            taxPaymentAmount: parseNumber(formValue.taxPaymentAmount) || 0,
+            settlementYear: parseInteger(formValue.settlementYear),
             taxPaymentDate: taxPaymentDateValue ? this.formatDateForBackend(taxPaymentDateValue) : undefined,
-            transactionCount: formValue.transactionCount ? parseInt(formValue.transactionCount) : undefined,
-            companyCommission: formValue.companyCommission ? parseFloat(formValue.companyCommission) : undefined,
+            transactionCount: parseInteger(formValue.transactionCount),
+            companyCommission: parseNumber(formValue.companyCommission),
         };
 
         this.comservice.updateAccountInfo(this.selectedId, data).subscribe({
@@ -190,14 +176,31 @@ export class AccountinfoComponent {
         const formValue = this.accountForm.value;
         const taxPaymentDateValue = this.accountForm.get('taxPaymentDate')?.value;
 
+        // Helper function to parse numbers safely with Dari/Pashto numeral support
+        const parseNumber = (value: any): number | undefined => {
+            if (value === null || value === undefined || value === '') return undefined;
+            // Convert Eastern Arabic numerals to Western before parsing
+            const westernValue = this.numeralService.toWesternArabic(value);
+            const parsed = parseFloat(westernValue);
+            return isNaN(parsed) ? undefined : parsed;
+        };
+
+        const parseInteger = (value: any): number | undefined => {
+            if (value === null || value === undefined || value === '') return undefined;
+            // Convert Eastern Arabic numerals to Western before parsing
+            const westernValue = this.numeralService.toWesternArabic(value);
+            const parsed = parseInt(westernValue, 10);
+            return isNaN(parsed) ? undefined : parsed;
+        };
+
         const data: AccountInfoData = {
             companyId: this.comservice.mainTableId,
             settlementInfo: formValue.settlementInfo || undefined,
-            taxPaymentAmount: parseFloat(formValue.taxPaymentAmount) || 0,
-            settlementYear: formValue.settlementYear ? parseInt(formValue.settlementYear) : undefined,
+            taxPaymentAmount: parseNumber(formValue.taxPaymentAmount) || 0,
+            settlementYear: parseInteger(formValue.settlementYear),
             taxPaymentDate: taxPaymentDateValue ? this.formatDateForBackend(taxPaymentDateValue) : undefined,
-            transactionCount: formValue.transactionCount ? parseInt(formValue.transactionCount) : undefined,
-            companyCommission: formValue.companyCommission ? parseFloat(formValue.companyCommission) : undefined,
+            transactionCount: parseInteger(formValue.transactionCount),
+            companyCommission: parseNumber(formValue.companyCommission),
         };
 
         this.comservice.createAccountInfo(data).subscribe({

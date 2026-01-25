@@ -5,6 +5,7 @@ using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
 using WebAPIBackend.Models.PetitionWriterLicense;
 using WebAPIBackend.Models.RequestData.PetitionWriterLicense;
+using WebAPIBackend.Services;
 
 namespace WebAPIBackend.Controllers.PetitionWriterLicense
 {
@@ -17,10 +18,12 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
     public class PetitionWriterLicenseController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILicenseNumberGenerator _licenseNumberGenerator;
 
-        public PetitionWriterLicenseController(AppDbContext context)
+        public PetitionWriterLicenseController(AppDbContext context, ILicenseNumberGenerator licenseNumberGenerator)
         {
             _context = context;
+            _licenseNumberGenerator = licenseNumberGenerator;
         }
 
         #region Main License CRUD
@@ -56,6 +59,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     .OrderByDescending(x => x.CreatedAt)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
+                    .Include(x => x.Province)
                     .Include(x => x.PermanentProvince)
                     .Include(x => x.PermanentDistrict)
                     .Include(x => x.CurrentProvince)
@@ -64,6 +68,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     {
                         x.Id,
                         x.LicenseNumber,
+                        x.ProvinceId,
+                        ProvinceName = x.Province != null ? x.Province.Dari : "",
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
@@ -131,6 +137,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 var item = await _context.PetitionWriterLicenses
                     .Where(x => x.Id == id && x.Status == true)
+                    .Include(x => x.Province)
                     .Include(x => x.PermanentProvince)
                     .Include(x => x.PermanentDistrict)
                     .Include(x => x.CurrentProvince)
@@ -139,6 +146,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     {
                         x.Id,
                         x.LicenseNumber,
+                        x.ProvinceId,
+                        ProvinceName = x.Province != null ? x.Province.Dari : "",
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
@@ -208,9 +217,16 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     return BadRequest(ModelState);
                 }
 
+                // Auto-generate license number if provinceId is provided
+                string licenseNumber = data.LicenseNumber;
+                if (data.ProvinceId.HasValue && string.IsNullOrWhiteSpace(data.LicenseNumber))
+                {
+                    licenseNumber = await _licenseNumberGenerator.GenerateNextPetitionWriterLicenseNumber(data.ProvinceId.Value);
+                }
+
                 // Check for duplicate license number
                 var exists = await _context.PetitionWriterLicenses
-                    .AnyAsync(x => x.LicenseNumber == data.LicenseNumber && x.Status == true);
+                    .AnyAsync(x => x.LicenseNumber == licenseNumber && x.Status == true);
 
                 if (exists)
                 {
@@ -222,7 +238,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 var entity = new PetitionWriterLicenseEntity
                 {
-                    LicenseNumber = data.LicenseNumber,
+                    LicenseNumber = licenseNumber,
+                    ProvinceId = data.ProvinceId,
                     ApplicantName = data.ApplicantName,
                     ApplicantFatherName = data.ApplicantFatherName,
                     ApplicantGrandFatherName = data.ApplicantGrandFatherName,
@@ -250,7 +267,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 _context.PetitionWriterLicenses.Add(entity);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { id = entity.Id, message = "جواز با موفقیت ثبت شد" });
+                return Ok(new { id = entity.Id, licenseNumber = entity.LicenseNumber, message = "جواز با موفقیت ثبت شد" });
             }
             catch (Exception ex)
             {
@@ -292,6 +309,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 var username = User.Identity?.Name ?? "system";
 
                 entity.LicenseNumber = data.LicenseNumber;
+                entity.ProvinceId = data.ProvinceId;
                 entity.ApplicantName = data.ApplicantName;
                 entity.ApplicantFatherName = data.ApplicantFatherName;
                 entity.ApplicantGrandFatherName = data.ApplicantGrandFatherName;
@@ -387,6 +405,37 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "خطا در تغییر وضعیت", error = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Provinces
+
+        /// <summary>
+        /// Get all provinces for dropdown
+        /// </summary>
+        [HttpGet("provinces")]
+        public async Task<IActionResult> GetProvinces()
+        {
+            try
+            {
+                var provinces = await _context.Locations
+                    .Where(l => l.TypeId == 2 && l.IsActive == 1)
+                    .OrderBy(l => l.Dari)
+                    .Select(l => new
+                    {
+                        l.Id,
+                        l.Name,
+                        l.Dari
+                    })
+                    .ToListAsync();
+
+                return Ok(provinces);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در بارگذاری ولایات", error = ex.Message });
             }
         }
 

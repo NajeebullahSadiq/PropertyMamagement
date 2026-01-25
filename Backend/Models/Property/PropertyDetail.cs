@@ -9,9 +9,9 @@ public partial class PropertyDetail
     public int Id { get; set; }
 
     [Column("PNumber")]
-    public int Pnumber { get; set; }
+    public string? Pnumber { get; set; }
 
-    public int Parea { get; set; }
+    public string? Parea { get; set; }
 
     public int? PunitTypeId { get; set; }
 
@@ -23,11 +23,11 @@ public partial class PropertyDetail
 
     public string? CustomPropertyType { get; set; }
 
-    public double? Price { get; set; }
+    public string? Price { get; set; }
 
     public string? PriceText { get; set; }
 
-    public double? RoyaltyAmount { get; set; }
+    public string? RoyaltyAmount { get; set; }
 
     public int? TransactionTypeId { get; set; }
 

@@ -408,7 +408,7 @@ namespace WebAPIBackend.Controllers
 
             var property = new PropertyDetail
             {
-                Pnumber = request.Pnumber == 0 ? 0 : request.Pnumber,
+                Pnumber = string.IsNullOrWhiteSpace(request.Pnumber) || request.Pnumber == "0" ? null : request.Pnumber,
                 Parea = request.Parea,
                 PunitTypeId = request.PunitTypeId,
                 NumofFloor=request.NumofFloor,
@@ -417,7 +417,7 @@ namespace WebAPIBackend.Controllers
                 CustomPropertyType = normalizedCustomPropertyType,
                 Price=request.Price,
                 PriceText=request.PriceText,
-                RoyaltyAmount= (request.Price ?? 0) * 0.01,
+                RoyaltyAmount= (double.TryParse(request.Price, out var priceVal) ? priceVal * 0.01 : 0).ToString(),
                 TransactionTypeId=request.TransactionTypeId,
                 Des=request.Des,
                 CreatedAt=DateTime.Now,

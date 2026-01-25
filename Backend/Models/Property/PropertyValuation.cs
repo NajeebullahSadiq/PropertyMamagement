@@ -10,7 +10,7 @@ public partial class PropertyValuation
 
     public DateTime ValuationDate { get; set; }
 
-    public double ValuationAmount { get; set; }
+    public string? ValuationAmount { get; set; }
 
     public string? ValuatorName { get; set; }
 

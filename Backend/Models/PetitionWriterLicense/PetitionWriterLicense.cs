@@ -21,6 +21,9 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         [MaxLength(50)]
         public string LicenseNumber { get; set; } = string.Empty;
 
+        // Province for license numbering (Format: PROVINCE_CODE-SEQUENTIAL_NUMBER)
+        public int? ProvinceId { get; set; }
+
         [Required]
         [MaxLength(200)]
         public string ApplicantName { get; set; } = string.Empty;
@@ -93,6 +96,9 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         public string? UpdatedBy { get; set; }
 
         // Navigation Properties
+        [ForeignKey("ProvinceId")]
+        public virtual Location? Province { get; set; }
+
         [ForeignKey("PermanentProvinceId")]
         public virtual Location? PermanentProvince { get; set; }
 

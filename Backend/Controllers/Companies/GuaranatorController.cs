@@ -130,24 +130,17 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 var Pro = await _context.Guarantors.Where(x => x.CompanyId.Equals(id)).ToListAsync();
 
-                // Convert dates to the requested calendar type (defaults to HijriShamsi)
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
-                foreach (var item in Pro)
-                {
-                    item.PropertyDocumentDate = DateConversionHelper.ToCalendarDateOnly(item.PropertyDocumentDate, calendar);
-                    item.SenderMaktobDate = DateConversionHelper.ToCalendarDateOnly(item.SenderMaktobDate, calendar);
-                    item.AnswerdMaktobDate = DateConversionHelper.ToCalendarDateOnly(item.AnswerdMaktobDate, calendar);
-                    item.DateofGuarantee = DateConversionHelper.ToCalendarDateOnly(item.DateofGuarantee, calendar);
-                    item.GuaranteeDate = DateConversionHelper.ToCalendarDateOnly(item.GuaranteeDate, calendar);
-                    // Convert Cash deposit date
-                    item.DepositDate = DateConversionHelper.ToCalendarDateOnly(item.DepositDate, calendar);
-                }
+                // DO NOT convert dates - return them as Gregorian
+                // The frontend will handle calendar conversion
 
                 return Ok(Pro);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                // Log the full exception for debugging
+                Console.WriteLine($"Error in getGuaranatorById: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 

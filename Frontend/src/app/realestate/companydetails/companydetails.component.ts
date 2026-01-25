@@ -1,12 +1,5 @@
 import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@angular/core';
-import { NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import '@angular/localize/init';
-import {
-	NgbDateStruct,
-	NgbCalendar,
-	NgbDatepickerI18n,
-	NgbCalendarPersian,
-} from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { companydetails } from 'src/app/models/companydetails';
@@ -18,42 +11,14 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
 
-
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-	getWeekdayLabel(weekday: number) {
-		return WEEKDAYS_SHORT[weekday - 1];
-	}
-	getMonthShortName(month: number) {
-		return MONTHS[month - 1];
-	}
-	getMonthFullName(month: number) {
-		return MONTHS[month - 1];
-	}
-	getDayAriaLabel(date: NgbDateStruct): string {
-		return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-	}
-}
-
 @Component({
   selector: 'app-companydetails',
   templateUrl: './companydetails.component.html',
   styleUrls: ['./companydetails.component.scss'],
-  providers: [
-		{ provide: NgbCalendar, useClass: NgbCalendarPersian },
-		{ provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-	],
 })
 export class CompanydetailsComponent {
 
-	maxDate ={year:1410,month: 12, day: 31}
-	minDate ={year:1320,month: 12, day: 31}
-
   imageName:string=''
-  selectedDate: NgbDate;
   companyForm: FormGroup = new FormGroup({});
   selectedId:number=0;
   companyDetails!: companydetails[];
@@ -70,8 +35,8 @@ export class CompanydetailsComponent {
   onNextClick() {
     this.next.emit();
   }
-  constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,private ngbDateParserFormatter: NgbDateParserFormatter,
-	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent, private calendar: NgbCalendar,
+  constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,
+	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent,
 	private calendarConversionService: CalendarConversionService, private calendarService: CalendarService){
 	this.companyForm = this.fb.group({
 		id: [0],
@@ -81,7 +46,6 @@ export class CompanydetailsComponent {
 	  });
 	  this.comservice.mainTableId=0;
 	  this.comservice.ownerId=0;
-	  this.selectedDate = this.calendar.getToday();
 	}
 	
 	ngOnInit() {

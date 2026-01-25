@@ -19,7 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 //Get Connection String
 builder.Services.AddDbContext<AppDbContext>(opts =>
                opts.UseNpgsql(builder.Configuration["connection:connectionString"], 
-                   npgsqlOpts => npgsqlOpts.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+                   npgsqlOpts => npgsqlOpts.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+               .ConfigureWarnings(warnings => 
+                   warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 //Get data from appsettings.json and store to ApplicationSettings model than we use in our classes and Controller like Login Controller
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
 builder.Services.AddMvc();
@@ -106,6 +108,9 @@ builder.Services.Configure<FormOptions>(o =>
 builder.Services.AddScoped<IVerificationCodeGenerator, VerificationCodeGenerator>();
 builder.Services.AddScoped<ISignatureService, SignatureService>();
 builder.Services.AddScoped<IVerificationService, VerificationService>();
+
+// Register License Number Generator Service
+builder.Services.AddScoped<WebAPIBackend.Services.ILicenseNumberGenerator, WebAPIBackend.Services.LicenseNumberGenerator>();
 
 
 

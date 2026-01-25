@@ -19,6 +19,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
   result: DocumentVerificationDto | null = null;
   error: string | null = null;
   baseUrl = environment.apiURL + '/';
+  currentYear: number = new Date().getFullYear();
 
   // QR Scanner properties
   inputMode: 'manual' | 'scanner' = 'manual';

@@ -47,17 +47,17 @@ public partial class BuyerDetail
 
     public string? AdditionalDetails { get; set; }
 
-    public double? SharePercentage { get; set; }
+    public string? SharePercentage { get; set; }
 
-    public double? ShareAmount { get; set; }
+    public string? ShareAmount { get; set; }
 
-    public double? Price { get; set; }
+    public string? Price { get; set; }
 
     public string? PriceText { get; set; }
 
-    public double? RoyaltyAmount { get; set; }
+    public string? RoyaltyAmount { get; set; }
 
-    public double? HalfPrice { get; set; }
+    public string? HalfPrice { get; set; }
 
     public string? TransactionType { get; set; }
 

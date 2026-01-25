@@ -1,0 +1,131 @@
+.delete-dialog-container {
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dialog-header {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  padding: 24px;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+  margin: -24px -24px 0 -24px;
+}
+
+.icon-container {
+  margin-bottom: 12px;
+  
+  i {
+    font-size: 48px;
+    color: #fef2f2;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.dialog-title {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.dialog-content {
+  padding: 24px;
+  text-align: center;
+}
+
+.warning-message {
+  font-size: 16px;
+  color: #374151;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.item-name {
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 16px 0;
+  
+  strong {
+    color: #dc2626;
+    font-size: 18px;
+  }
+}
+
+.warning-note {
+  background: #fffbeb;
+  border-right: 4px solid #f59e0b;
+  padding: 12px 16px;
+  border-radius: 4px;
+  color: #92400e;
+  font-size: 14px;
+  text-align: right;
+  margin-top: 16px;
+  
+  i {
+    margin-left: 8px;
+    color: #f59e0b;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 0 24px 24px 24px;
+}
+
+.btn-cancel,
+.btn-delete {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  i {
+    font-size: 18px;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  }
+}

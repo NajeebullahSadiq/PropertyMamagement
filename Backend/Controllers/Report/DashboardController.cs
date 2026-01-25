@@ -102,26 +102,26 @@ namespace WebAPIBackend.Controllers.Report
         {
             
                 var query = _context.VehiclesPropertyDetails
-                .Where(b=>b.Price.HasValue);
+                .Where(b=>!string.IsNullOrWhiteSpace(b.Price));
             var results = new
             {
                 TotalRecord = new
                 {
-                    TotalAmount = query
-                .Sum(b => b.Price),
-                    TotalAmountNotCompleted = query.Where(b => b.iscomplete == false)
-                .Sum(b => b.Price),
-                    TotalAmountCompleted = query.Where(b => b.iscomplete == true)
-                .Sum(b => b.Price),
+                    TotalAmount = query.AsEnumerable()
+                .Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
+                    TotalAmountNotCompleted = query.Where(b => b.iscomplete == false).AsEnumerable()
+                .Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
+                    TotalAmountCompleted = query.Where(b => b.iscomplete == true).AsEnumerable()
+                .Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
                     TotalTransactionCompleted = query.Count(b => b.iscomplete == true),
                     TotalTransactionNotCompleted = query.Count(b => b.iscomplete == false),
                     TotalTransaction = query.Count(),
-                    TotalRoyaltyAmount = query
-                    .Sum(b => b.RoyaltyAmount),
-                    TotalRoyaltyAmountNotCompleted = query.Where(b => b.iscomplete == false)
-                    .Sum(b => b.RoyaltyAmount),
-                    TotalRoyaltyAmountCompleted = query.Where(b => b.iscomplete == true)
-                    .Sum(b => b.RoyaltyAmount),
+                    TotalRoyaltyAmount = query.AsEnumerable()
+                    .Sum(b => string.IsNullOrWhiteSpace(b.RoyaltyAmount) ? 0 : decimal.Parse(b.RoyaltyAmount)),
+                    TotalRoyaltyAmountNotCompleted = query.Where(b => b.iscomplete == false).AsEnumerable()
+                    .Sum(b => string.IsNullOrWhiteSpace(b.RoyaltyAmount) ? 0 : decimal.Parse(b.RoyaltyAmount)),
+                    TotalRoyaltyAmountCompleted = query.Where(b => b.iscomplete == true).AsEnumerable()
+                    .Sum(b => string.IsNullOrWhiteSpace(b.RoyaltyAmount) ? 0 : decimal.Parse(b.RoyaltyAmount)),
                 }
 
             };
@@ -139,13 +139,13 @@ namespace WebAPIBackend.Controllers.Report
             }
 
             var vquery = _context.VehiclesPropertyDetails
-               .Where(b => b.Price.HasValue &&
+               .Where(b => !string.IsNullOrWhiteSpace(b.Price) &&
                            b.CreatedAt.HasValue &&
                            b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date);
 
             var pquery = _context.PropertyDetails
-                .Where(b => b.Price.HasValue &&
+                .Where(b => !string.IsNullOrWhiteSpace(b.Price) &&
                             b.CreatedAt.HasValue &&
                             b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                             b.CreatedAt.Value.Date <= gregorianeDate.Date);
@@ -155,26 +155,26 @@ namespace WebAPIBackend.Controllers.Report
                 TotalRecord = new
                 {
                     // VehiclesPropertyDetails Data
-                    TotalAmount = vquery.Sum(b => b.Price),
-                    TotalAmountNotCompleted = vquery.Where(b => b.iscomplete==false).Sum(b => b.Price),
-                    TotalAmountCompleted = vquery.Where(b => b.iscomplete==true).Sum(b => b.Price),
+                    TotalAmount = vquery.AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
+                    TotalAmountNotCompleted = vquery.Where(b => b.iscomplete==false).AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
+                    TotalAmountCompleted = vquery.Where(b => b.iscomplete==true).AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
                     TotalTransactionCompleted = vquery.Count(b => b.iscomplete==true),
                     TotalTransactionNotCompleted = vquery.Count(b =>b.iscomplete==false),
                     TotalTransaction = vquery.Count(),
-                    TotalRoyaltyAmount = vquery.Sum(b => b.RoyaltyAmount),
-                    TotalRoyaltyAmountNotCompleted = vquery.Where(b => b.iscomplete==false).Sum(b => b.RoyaltyAmount),
-                    TotalRoyaltyAmountCompleted = vquery.Where(b => b.iscomplete==true).Sum(b => b.RoyaltyAmount),
+                    TotalRoyaltyAmount = vquery.AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.RoyaltyAmount) ? 0 : decimal.Parse(b.RoyaltyAmount)),
+                    TotalRoyaltyAmountNotCompleted = vquery.Where(b => b.iscomplete==false).AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.RoyaltyAmount) ? 0 : decimal.Parse(b.RoyaltyAmount)),
+                    TotalRoyaltyAmountCompleted = vquery.Where(b => b.iscomplete==true).AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.RoyaltyAmount) ? 0 : decimal.Parse(b.RoyaltyAmount)),
 
                     // PropertyDetails Data
-                    TotalAmountProperty = pquery.Sum(b => b.Price),
-                    TotalAmountPropertyNotCompleted = pquery.Where(b => b.iscomplete==false).Sum(b => b.Price),
-                    TotalAmountPropertyCompleted = pquery.Where(b => b.iscomplete==true).Sum(b => b.Price),
+                    TotalAmountProperty = pquery.AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
+                    TotalAmountPropertyNotCompleted = pquery.Where(b => b.iscomplete==false).AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
+                    TotalAmountPropertyCompleted = pquery.Where(b => b.iscomplete==true).AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price)),
                     TotalPropertyTransactionCompleted = pquery.Count(b => b.iscomplete==true),
                     TotalPropertyTransactionNotCompleted = pquery.Count(b => b.iscomplete==false),
                     TotalPropertyTransaction = pquery.Count(),
-                    TotalPropertyRoyaltyAmount = pquery.Sum(b => b.RoyaltyAmount),
-                    TotalPropertyRoyaltyAmountNotCompleted = pquery.Where(b => b.iscomplete==false).Sum(b => b.RoyaltyAmount),
-                    TotalPropertyRoyaltyAmountCompleted = pquery.Where(b => b.iscomplete==true).Sum(b => b.RoyaltyAmount)
+                    TotalPropertyRoyaltyAmount = pquery.AsEnumerable().Sum(b => string.IsNullOrWhiteSpace(b.RoyaltyAmount) ? 0 : decimal.Parse(b.RoyaltyAmount)),
+                    TotalPropertyRoyaltyAmountNotCompleted = pquery.Where(b => b.iscomplete==false).AsEnumerable().Sum(b => double.TryParse(b.RoyaltyAmount, out var r) ? r : 0),
+                    TotalPropertyRoyaltyAmountCompleted = pquery.Where(b => b.iscomplete==true).AsEnumerable().Sum(b => double.TryParse(b.RoyaltyAmount, out var r) ? r : 0)
                 }
             };
 
@@ -188,7 +188,7 @@ namespace WebAPIBackend.Controllers.Report
         {
 
             var query = _context.PropertyDetails
-                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue);
+                .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price));
 
             var results = new
             {
@@ -200,13 +200,14 @@ namespace WebAPIBackend.Controllers.Report
                         z => z.Id,
                         (b, z) => new {
                             Name = z.Name,
-                            Amount = b.Price ?? 0
+                            Price = b.Price
                         }
                     )
+                    .AsEnumerable()
                     .GroupBy(b => b.Name)
                     .Select(g => new {
                         Name = g.Key,
-                        Amount = g.Sum(b => b.Amount)
+                        Amount = g.Sum(b => double.TryParse(b.Price, out var p) ? p : 0)
                     })
                     .ToList(),
 
@@ -218,13 +219,14 @@ namespace WebAPIBackend.Controllers.Report
                         z => z.Id,
                         (b, z) => new {
                             Name = z.Name,
-                            Amount = b.Price ?? 0
+                            Price = b.Price
                         }
                     )
+                    .AsEnumerable()
                     .GroupBy(b => b.Name)
                     .Select(g => new {
                         Name = g.Key,
-                        Amount = g.Sum(b => b.Amount)
+                        Amount = g.Sum(b => double.TryParse(b.Price, out var p) ? p : 0)
                     })
                     .ToList(),
 
@@ -236,13 +238,14 @@ namespace WebAPIBackend.Controllers.Report
                         z => z.Id,
                         (b, z) => new {
                             Name = z.Name,
-                            Amount = b.Price ?? 0
+                            Price = b.Price
                         }
                     )
+                    .AsEnumerable()
                     .GroupBy(b => b.Name)
                     .Select(g => new {
                         Name = g.Key,
-                        Amount = g.Sum(b => b.Amount)
+                        Amount = g.Sum(b => double.TryParse(b.Price, out var p) ? p : 0)
                     })
                     .ToList(),
                 TransactionDataByTransactionTypeTotal = query
@@ -253,13 +256,14 @@ namespace WebAPIBackend.Controllers.Report
                         z => z.Id,
                         (b, z) => new {
                             Name = z.Name,
-                            Amount = b.Price ?? 0
+                            Price = b.Price
                         }
                     )
+                    .AsEnumerable()
                     .GroupBy(b => b.Name)
                     .Select(g => new {
                         Name = g.Key,
-                        Amount = g.Sum(b => b.Amount)
+                        Amount = g.Sum(b => double.TryParse(b.Price, out var p) ? p : 0)
                     })
                     .ToList(),
                 TransactionDataByTransactionTypeNotCompleted = query
@@ -270,13 +274,14 @@ namespace WebAPIBackend.Controllers.Report
                         z => z.Id,
                         (b, z) => new {
                             Name = z.Name,
-                            Amount = b.Price ?? 0
+                            Price = b.Price
                         }
                     )
+                    .AsEnumerable()
                     .GroupBy(b => b.Name)
                     .Select(g => new {
                         Name = g.Key,
-                        Amount = g.Sum(b => b.Amount)
+                        Amount = g.Sum(b => double.TryParse(b.Price, out var p) ? p : 0)
                     })
                     .ToList(),
                 TransactionDataByTransactionTypeCompleted = query
@@ -287,30 +292,31 @@ namespace WebAPIBackend.Controllers.Report
                         z => z.Id,
                         (b, z) => new {
                             Name = z.Name,
-                            Amount = b.Price ?? 0
+                            Price = b.Price
                         }
                     )
+                    .AsEnumerable()
                     .GroupBy(b => b.Name)
                     .Select(g => new {
                         Name = g.Key,
-                        Amount = g.Sum(b => b.Amount)
+                        Amount = g.Sum(b => double.TryParse(b.Price, out var p) ? p : 0)
                     })
                     .ToList(),
 
                 TotalRecord = new
                 {
-                    TotalAmount = query
-                    .Sum(b => b.Price),
-                    TotalAmountNotCompleted = query.Where(b => b.iscomplete == false)
-                    .Sum(b => b.Price),
-                    TotalAmountCompleted = query.Where(b => b.iscomplete == true)
-                    .Sum(b => b.Price),
-                    TotalRoyaltyAmount = query
-                    .Sum(b => b.RoyaltyAmount),
-                    TotalRoyaltyAmountNotCompleted = query.Where(b => b.iscomplete == false)
-                    .Sum(b => b.RoyaltyAmount),
-                    TotalRoyaltyAmountCompleted = query.Where(b => b.iscomplete == true)
-                    .Sum(b => b.RoyaltyAmount),
+                    TotalAmount = query.AsEnumerable()
+                    .Sum(b => double.TryParse(b.Price, out var p) ? p : 0),
+                    TotalAmountNotCompleted = query.Where(b => b.iscomplete == false).AsEnumerable()
+                    .Sum(b => double.TryParse(b.Price, out var p) ? p : 0),
+                    TotalAmountCompleted = query.Where(b => b.iscomplete == true).AsEnumerable()
+                    .Sum(b => double.TryParse(b.Price, out var p) ? p : 0),
+                    TotalRoyaltyAmount = query.AsEnumerable()
+                    .Sum(b => double.TryParse(b.RoyaltyAmount, out var r) ? r : 0),
+                    TotalRoyaltyAmountNotCompleted = query.Where(b => b.iscomplete == false).AsEnumerable()
+                    .Sum(b => double.TryParse(b.RoyaltyAmount, out var r) ? r : 0),
+                    TotalRoyaltyAmountCompleted = query.Where(b => b.iscomplete == true).AsEnumerable()
+                    .Sum(b => double.TryParse(b.RoyaltyAmount, out var r) ? r : 0),
                     TotalTransactionCompleted = query.Count(b => b.iscomplete == true),
                     TotalTransactionNotCompleted = query.Count(b => b.iscomplete == false),
                     TotalTransaction = query.Count(),
@@ -325,13 +331,15 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetTopUsersSummary()
         {
             var topUsersSummary = _context.PropertyDetails
-                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue)
+                .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price))
+                .Select(b => new { b.CreatedBy, b.Price })
+                .AsEnumerable()
                 .GroupBy(b => b.CreatedBy)
                 .Select(g => new
                 {
                     CreatedBy = g.Key,
                     TotalPropertiesCreated = g.Count(),
-                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    TotalPriceOfProperties = g.Sum(b => double.TryParse(b.Price, out var p) ? p : 0)
                 })
                 .OrderByDescending(u => u.TotalPriceOfProperties)
                // .Take(10)
@@ -378,13 +386,14 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetVehicleTopUsersSummary()
         {
             var topUsersSummary = _context.VehiclesPropertyDetails
-                .Where( b=> b.Price.HasValue)
+                .Where( b=> !string.IsNullOrWhiteSpace(b.Price))
+                .AsEnumerable()
                 .GroupBy(b => b.CreatedBy)
                 .Select(g => new
                 {
                     CreatedBy = g.Key,
                     TotalPropertiesCreated = g.Count(),
-                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    TotalPriceOfProperties = g.Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price))
                 })
                 .OrderByDescending(u => u.TotalPriceOfProperties)
                 // .Take(10)
@@ -432,19 +441,19 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetPropertyTypesByMonth()
         {
             var propertyTypesByMonth = _context.PropertyDetails
-                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue)
+                .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue)
                 .Select(b => new { b.PropertyTypeId, b.Price, b.CreatedAt })
                 .AsEnumerable()
                 .GroupBy(b => new
                 {
                     PropertyTypeId = b.PropertyTypeId!.Value,
-                    Month = new DateTime(b.CreatedAt!.Value.Year, b.CreatedAt.Value.Month, 1)
+                    Month = new DateTime(b.CreatedAt!.Value.Year, b.CreatedAt!.Value.Month, 1)
                 })
                 .Select(g => new
                 {
                     PropertyTypeId = g.Key.PropertyTypeId,
                     Month = g.Key.Month,
-                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    TotalPriceOfProperties = g.Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price))
                 })
                 .OrderBy(g => g.Month)
                 .ToList();
@@ -473,19 +482,19 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetTransactionTypesByMonth()
         {
             var propertyTypesByMonth = _context.PropertyDetails
-                .Where(b => b.TransactionTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue)
+                .Where(b => b.TransactionTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue)
                 .Select(b => new { b.TransactionTypeId, b.Price, b.CreatedAt })
                 .AsEnumerable()
                 .GroupBy(b => new
                 {
                     TransactionTypeId = b.TransactionTypeId!.Value,
-                    Month = new DateTime(b.CreatedAt!.Value.Year, b.CreatedAt.Value.Month, 1)
+                    Month = new DateTime(b.CreatedAt!.Value.Year, b.CreatedAt!.Value.Month, 1)
                 })
                 .Select(g => new
                 {
                     TransactionTypeId = g.Key.TransactionTypeId,
                     Month = g.Key.Month,
-                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    TotalPriceOfProperties = g.Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price))
                 })
                 .OrderBy(g => g.Month)
                 .ToList();
@@ -514,7 +523,7 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetVehicleReportByMonth()
         {
             var propertyTypesByMonth = _context.VehiclesPropertyDetails
-                .Where(b => b.Price.HasValue && b.CreatedAt.HasValue)
+                .Where(b => !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue)
                 .Select(b => new { b.Price, b.CreatedAt })
                 .AsEnumerable()
                 .GroupBy(b => new
@@ -524,7 +533,7 @@ namespace WebAPIBackend.Controllers.Report
                 .Select(g => new
                 {
                     Month = g.Key.Month.ToString("MMM yyyy"),
-                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    TotalPriceOfProperties = g.Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price))
                 })
                 .OrderBy(g => g.Month)
                 .ToList();
@@ -543,15 +552,16 @@ namespace WebAPIBackend.Controllers.Report
             }
 
             var topUsersSummary = _context.PropertyDetails
-                .Where(b => b.PropertyTypeId.HasValue && b.Price.HasValue && b.CreatedAt.HasValue && 
+                .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue && 
                            b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date)
+                .AsEnumerable()
                 .GroupBy(b => b.CreatedBy)
                 .Select(g => new
                 {
                     CreatedBy = g.Key,
                     TotalPropertiesCreated = g.Count(),
-                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    TotalPriceOfProperties = g.Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price))
                 })
                 .OrderByDescending(u => u.TotalPriceOfProperties)
                 // .Take(10)
@@ -605,15 +615,16 @@ namespace WebAPIBackend.Controllers.Report
             }
 
             var topUsersSummary = _context.VehiclesPropertyDetails
-                .Where(b => b.Price.HasValue && b.CreatedAt.HasValue && 
+                .Where(b => !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue && 
                            b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date)
+                .AsEnumerable()
                 .GroupBy(b => b.CreatedBy)
                 .Select(g => new
                 {
                     CreatedBy = g.Key,
                     TotalPropertiesCreated = g.Count(),
-                    TotalPriceOfProperties = g.Sum(b => b.Price ?? 0)
+                    TotalPriceOfProperties = g.Sum(b => string.IsNullOrWhiteSpace(b.Price) ? 0 : decimal.Parse(b.Price))
                 })
                 .OrderByDescending(u => u.TotalPriceOfProperties)
                 // .Take(10)

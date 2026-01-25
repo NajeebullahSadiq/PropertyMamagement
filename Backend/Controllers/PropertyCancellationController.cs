@@ -135,7 +135,7 @@ namespace WebAPIBackend.Controllers
                         c.Status,
                         c.CreatedAt,
                         TransactionTypeName = c.PropertyDetails != null && c.PropertyDetails.TransactionType != null ? c.PropertyDetails.TransactionType.Name : "",
-                        PropertyNumber = c.PropertyDetails != null ? c.PropertyDetails.Pnumber : 0,
+                        PropertyNumber = c.PropertyDetails != null ? c.PropertyDetails.Pnumber : null,
                         SellerName = c.PropertyDetails != null && c.PropertyDetails.SellerDetails.FirstOrDefault() != null ? 
                             $"{c.PropertyDetails.SellerDetails.First().FirstName} {c.PropertyDetails.SellerDetails.First().FatherName} {c.PropertyDetails.SellerDetails.First().GrandFather}" : "",
                         BuyerName = c.PropertyDetails != null && c.PropertyDetails.BuyerDetails.FirstOrDefault() != null ? 

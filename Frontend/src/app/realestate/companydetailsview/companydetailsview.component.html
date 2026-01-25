@@ -64,19 +64,11 @@
           </div>
           <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">شماره تماس</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.phoneNumber) }}</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.owner.phoneNumber) }}</p>
           </div>
           <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر TIN</p>
             <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.tin) }}</p>
-          </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر درخواست</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.petitionNumber) }}</p>
-          </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ درخواست</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ viewData.petitionDate | calendarDate }}</p>
           </div>
           <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">حالت</p>
@@ -104,6 +96,10 @@
           <div class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200">
             <p class="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2">نمبر جواز</p>
             <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.license.licenseNumber) }}</p>
+          </div>
+          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ولایت</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.license.provinceName) }}</p>
           </div>
           <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع جواز</p>
@@ -226,18 +222,10 @@
               <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">واتساپ</p>
               <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.owner.whatsAppNumber) }}</p>
             </div>
-            <!-- Identity Information -->
-            <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-              <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع تذکره</p>
-              <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.owner.identityCardTypeName) }}</p>
-            </div>
-            <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-              <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">شماره تذکره</p>
-              <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.owner.indentityCardNumber) }}</p>
-            </div>
-            <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-              <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">جلد / صفحه / ثبت</p>
-              <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.owner.jild) }} / {{ safeValue(viewData.owner.safha) }} / {{ safeValue(viewData.owner.sabtNumber) }}</p>
+            <!-- Electronic National ID -->
+            <div class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+              <p class="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2">شماره تذکره الکترونیکی</p>
+              <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.owner.electronicNationalIdNumber) }}</p>
             </div>
           </div>
 
@@ -263,17 +251,6 @@
                 <div><span class="text-xs text-gray-500">ولایت:</span> <span class="font-semibold">{{ safeValue(viewData.owner.permanentProvinceName) }}</span></div>
                 <div><span class="text-xs text-gray-500">ناحیه/ولسوالی:</span> <span class="font-semibold">{{ safeValue(viewData.owner.permanentDistrictName) }}</span></div>
                 <div><span class="text-xs text-gray-500">گذر/قریه:</span> <span class="font-semibold">{{ safeValue(viewData.owner.permanentVillage) }}</span></div>
-              </div>
-            </div>
-            <!-- Temporary Address -->
-            <div class="p-6 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200" *ngIf="viewData.owner.temporaryProvinceName || viewData.owner.temporaryDistrictName || viewData.owner.temporaryVillage">
-              <h3 class="text-sm font-bold text-amber-700 mb-4 flex items-center gap-2">
-                <i class="fas fa-location-dot"></i> آدرس موقت
-              </h3>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div><span class="text-xs text-gray-500">ولایت:</span> <span class="font-semibold">{{ safeValue(viewData.owner.temporaryProvinceName) }}</span></div>
-                <div><span class="text-xs text-gray-500">ناحیه/ولسوالی:</span> <span class="font-semibold">{{ safeValue(viewData.owner.temporaryDistrictName) }}</span></div>
-                <div><span class="text-xs text-gray-500">گذر/قریه:</span> <span class="font-semibold">{{ safeValue(viewData.owner.temporaryVillage) }}</span></div>
               </div>
             </div>
           </div>
@@ -311,12 +288,8 @@
                 <p class="font-semibold">{{ safeValue(g.phoneNumber) }}</p>
               </div>
               <div class="p-4 bg-white rounded-xl border border-gray-200">
-                <p class="text-xs text-gray-500 mb-1">شماره تذکره</p>
-                <p class="font-semibold">{{ safeValue(g.indentityCardNumber) }}</p>
-              </div>
-              <div class="p-4 bg-white rounded-xl border border-gray-200">
-                <p class="text-xs text-gray-500 mb-1">جلد / صفحه / ثبت</p>
-                <p class="font-semibold">{{ safeValue(g.jild) }} / {{ safeValue(g.safha) }} / {{ safeValue(g.sabtNumber) }}</p>
+                <p class="text-xs text-gray-500 mb-1">شماره تذکره الکترونیکی</p>
+                <p class="font-semibold">{{ safeValue(g.electronicNationalIdNumber) }}</p>
               </div>
               <div class="p-4 bg-white rounded-xl border border-gray-200">
                 <p class="text-xs text-gray-500 mb-1">تاریخ تضمین</p>

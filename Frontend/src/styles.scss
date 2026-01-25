@@ -1371,3 +1371,14 @@ mat-dialog-container,
   margin: 0 !important;
   max-height: none !important;
 }
+
+/* Delete Confirmation Dialog Styles */
+.delete-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.delete-dialog .mat-mdc-dialog-surface {
+  border-radius: 12px !important;
+}

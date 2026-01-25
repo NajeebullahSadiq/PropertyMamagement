@@ -10,10 +10,10 @@ namespace WebAPIBackend.Application.Vehicle.DTOs
         public string? EnginNo { get; set; }
         public string? ShasiNo { get; set; }
         public string? Color { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
         public string? Des { get; set; }
-        public double? RoyaltyAmount { get; set; }
+        public string? RoyaltyAmount { get; set; }
         public string? FilePath { get; set; }
         public string? VehicleHand { get; set; }
         public bool? Iscomplete { get; set; }
@@ -33,9 +33,9 @@ namespace WebAPIBackend.Application.Vehicle.DTOs
         public string? Color { get; set; }
         public string? VehicleHand { get; set; }
         public string? TransactionTypeName { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
-        public double? RoyaltyAmount { get; set; }
+        public string? RoyaltyAmount { get; set; }
         public string? Des { get; set; }
         public string? FilePath { get; set; }
         public bool? Iscomplete { get; set; }
@@ -114,9 +114,9 @@ namespace WebAPIBackend.Application.Vehicle.DTOs
         public string? EnginNo { get; set; }
         public string? ShasiNo { get; set; }
         public string? Color { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
-        public double? RoyaltyAmount { get; set; }
+        public string? RoyaltyAmount { get; set; }
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? CreatedAtFormatted { get; set; }

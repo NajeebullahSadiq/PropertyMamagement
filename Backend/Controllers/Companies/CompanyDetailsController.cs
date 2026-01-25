@@ -60,7 +60,7 @@ namespace WebAPIBackend.Controllers.Companies
                                 ownerFullName= (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
                                 ownerFatherName= (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
                                 ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                                licenseNumber= (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber:0,
+                                licenseNumber= (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
                                 granator= (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName+" "+"فرزند"+" "+ p.Guarantors.First().FatherName : null,
                             };
                 return Ok(query);
@@ -107,7 +107,7 @@ namespace WebAPIBackend.Controllers.Companies
                                 ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
                                 ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
                                 ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                                licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : 0,
+                                licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
                                 granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "فرزند" + " " + p.Guarantors.First().FatherName : null,
                             };
                 return Ok(query);
@@ -202,12 +202,15 @@ namespace WebAPIBackend.Controllers.Companies
                         {
                             l.Id,
                             l.LicenseNumber,
+                            l.ProvinceId,
+                            ProvinceName = l.Province != null ? l.Province.Dari : null,
                             l.LicenseType,
                             l.LicenseCategory,
                             l.RenewalRound,
                             l.IssueDate,
                             l.ExpireDate,
                             l.OfficeAddress,
+                            l.AreaId,
                             AreaName = l.Area != null ? l.Area.Name : null,
                             l.RoyaltyAmount,
                             l.RoyaltyDate,
@@ -430,6 +433,155 @@ namespace WebAPIBackend.Controllers.Companies
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> DeleteCompany(int id)
+        {
+            try
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
+                var company = await _context.CompanyDetails
+                    .Include(c => c.CompanyOwners)
+                    .Include(c => c.LicenseDetails)
+                    .Include(c => c.Guarantors)
+                    .Include(c => c.Gaurantees)
+                    .Include(c => c.CompanyAccountInfos)
+                    .Include(c => c.CompanyCancellationInfos)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (company == null)
+                {
+                    return NotFound(new { message = "شرکت یافت نشد" });
+                }
+
+                // Delete audit records first
+                var auditRecords = await _context.Companydetailsaudits
+                    .Where(a => a.CompanyId == id)
+                    .ToListAsync();
+                if (auditRecords.Any())
+                {
+                    _context.Companydetailsaudits.RemoveRange(auditRecords);
+                }
+
+                // Delete CompanyOwnerAddress records (must be deleted before CompanyOwner)
+                if (company.CompanyOwners != null && company.CompanyOwners.Any())
+                {
+                    var ownerIds = company.CompanyOwners.Select(o => o.Id).ToList();
+                    
+                    var ownerAddresses = await _context.CompanyOwnerAddresses
+                        .Where(a => a.CompanyOwnerId.HasValue && ownerIds.Contains(a.CompanyOwnerId.Value))
+                        .ToListAsync();
+                    if (ownerAddresses.Any())
+                    {
+                        _context.CompanyOwnerAddresses.RemoveRange(ownerAddresses);
+                    }
+
+                    // Delete CompanyOwner audit records (must be deleted before CompanyOwner)
+                    var ownerAuditRecords = await _context.Companyowneraudits
+                        .Where(a => ownerIds.Contains(a.OwnerId))
+                        .ToListAsync();
+                    if (ownerAuditRecords.Any())
+                    {
+                        _context.Companyowneraudits.RemoveRange(ownerAuditRecords);
+                    }
+                }
+
+                // Remove cancellation info
+                if (company.CompanyCancellationInfos != null && company.CompanyCancellationInfos.Any())
+                {
+                    _context.CompanyCancellationInfos.RemoveRange(company.CompanyCancellationInfos);
+                }
+
+                // Remove account info
+                if (company.CompanyAccountInfos != null && company.CompanyAccountInfos.Any())
+                {
+                    _context.CompanyAccountInfos.RemoveRange(company.CompanyAccountInfos);
+                }
+
+                // Remove guarantors
+                if (company.Guarantors != null && company.Guarantors.Any())
+                {
+                    var guarantorIds = company.Guarantors.Select(g => g.Id).ToList();
+                    
+                    // Delete guarantor audit records first
+                    var guarantorAuditRecords = await _context.Guarantorsaudits
+                        .Where(a => guarantorIds.Contains(a.GuarantorsId))
+                        .ToListAsync();
+                    if (guarantorAuditRecords.Any())
+                    {
+                        _context.Guarantorsaudits.RemoveRange(guarantorAuditRecords);
+                    }
+                    
+                    _context.Guarantors.RemoveRange(company.Guarantors);
+                }
+
+                // Remove gaurantees (note: different from Guarantors)
+                if (company.Gaurantees != null && company.Gaurantees.Any())
+                {
+                    var gauranteeIds = company.Gaurantees.Select(g => g.Id).ToList();
+                    
+                    // Delete gaurantee audit records first
+                    var gauranteeAuditRecords = await _context.Graunteeaudits
+                        .Where(a => gauranteeIds.Contains(a.GauranteeId))
+                        .ToListAsync();
+                    if (gauranteeAuditRecords.Any())
+                    {
+                        _context.Graunteeaudits.RemoveRange(gauranteeAuditRecords);
+                    }
+                    
+                    _context.Gaurantees.RemoveRange(company.Gaurantees);
+                }
+
+                // Remove license details
+                if (company.LicenseDetails != null && company.LicenseDetails.Any())
+                {
+                    var licenseIds = company.LicenseDetails.Select(l => l.Id).ToList();
+                    
+                    // Delete license audit records first
+                    var licenseAuditRecords = await _context.Licenseaudits
+                        .Where(a => licenseIds.Contains(a.LicenseId))
+                        .ToListAsync();
+                    if (licenseAuditRecords.Any())
+                    {
+                        _context.Licenseaudits.RemoveRange(licenseAuditRecords);
+                    }
+                    
+                    _context.LicenseDetails.RemoveRange(company.LicenseDetails);
+                }
+
+                // Remove company owners (after addresses are deleted)
+                if (company.CompanyOwners != null && company.CompanyOwners.Any())
+                {
+                    _context.CompanyOwners.RemoveRange(company.CompanyOwners);
+                }
+
+                // Remove the company itself
+                _context.CompanyDetails.Remove(company);
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "شرکت با موفقیت حذف شد" });
+            }
+            catch (Exception ex)
+            {
+                // Log the detailed error for debugging
+                Console.WriteLine($"Error deleting company: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new { 
+                    message = $"خطا در حذف شرکت: {ex.Message}",
+                    details = ex.InnerException?.Message 
+                });
+            }
+        }
+
         public class Companies
         {
             public int Id { get; set; }

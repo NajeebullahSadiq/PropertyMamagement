@@ -1,5 +1,6 @@
 export interface LicenseDetail{
     id: number;
+    provinceId?: number;        // Province for license numbering
     licenseNumber:number;
     issueDate:string;
     expireDate:string;

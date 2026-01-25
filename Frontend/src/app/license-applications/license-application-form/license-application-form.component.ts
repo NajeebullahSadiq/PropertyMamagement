@@ -2,14 +2,6 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-    NgbDate,
-    NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { MatTabGroup } from '@angular/material/tabs';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
@@ -26,31 +18,12 @@ import {
     LicenseGuaranteeTypes
 } from 'src/app/models/LicenseApplication';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) { return WEEKDAYS_SHORT[weekday - 1]; }
-    getMonthShortName(month: number) { return MONTHS[month - 1]; }
-    getMonthFullName(month: number) { return MONTHS[month - 1]; }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
-
 @Component({
     selector: 'app-license-application-form',
     templateUrl: './license-application-form.component.html',
     styleUrls: ['./license-application-form.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
 })
 export class LicenseApplicationFormComponent implements OnInit {
-    maxDate = { year: 1410, month: 12, day: 31 };
-    minDate = { year: 1320, month: 12, day: 31 };
 
     @ViewChild('tabGroup') tabGroup!: MatTabGroup;
 
@@ -96,8 +69,7 @@ export class LicenseApplicationFormComponent implements OnInit {
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService,
         private sellerService: SellerService,
-        private rbacService: RbacService,
-        private ngbDateParserFormatter: NgbDateParserFormatter
+        private rbacService: RbacService
     ) {
         this.initForms();
     }
@@ -212,13 +184,17 @@ export class LicenseApplicationFormComponent implements OnInit {
 
         // Parse date
         if (data.requestDateFormatted) {
-            const parsedDate = this.ngbDateParserFormatter.parse(data.requestDateFormatted);
-            if (parsedDate) {
-                this.applicationForm.patchValue({
-                    requestDate: new NgbDate(parsedDate.year, parsedDate.month, parsedDate.day)
-                });
+            const requestDate = this.parseDate(data.requestDateFormatted);
+            if (requestDate) {
+                this.applicationForm.patchValue({ requestDate });
             }
         }
+    }
+
+    parseDate(dateStr: string): Date | null {
+        if (!dateStr) return null;
+        const date = new Date(dateStr);
+        return isNaN(date.getTime()) ? null : date;
     }
 
     loadGuarantors(): void {
@@ -253,11 +229,9 @@ export class LicenseApplicationFormComponent implements OnInit {
         });
 
         if (data.withdrawalDateFormatted) {
-            const parsedDate = this.ngbDateParserFormatter.parse(data.withdrawalDateFormatted);
-            if (parsedDate) {
-                this.withdrawalForm.patchValue({
-                    withdrawalDate: new NgbDate(parsedDate.year, parsedDate.month, parsedDate.day)
-                });
+            const withdrawalDate = this.parseDate(data.withdrawalDateFormatted);
+            if (withdrawalDate) {
+                this.withdrawalForm.patchValue({ withdrawalDate });
             }
         }
     }
@@ -543,11 +517,9 @@ export class LicenseApplicationFormComponent implements OnInit {
 
         // Parse sharia deed date
         if (guarantor.shariaDeedDateFormatted) {
-            const parsedDate = this.ngbDateParserFormatter.parse(guarantor.shariaDeedDateFormatted);
-            if (parsedDate) {
-                this.guarantorForm.patchValue({
-                    shariaDeedDate: new NgbDate(parsedDate.year, parsedDate.month, parsedDate.day)
-                });
+            const shariaDeedDate = this.parseDate(guarantor.shariaDeedDateFormatted);
+            if (shariaDeedDate) {
+                this.guarantorForm.patchValue({ shariaDeedDate });
             }
         }
 

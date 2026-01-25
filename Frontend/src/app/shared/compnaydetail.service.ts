@@ -40,6 +40,9 @@ export class CompnaydetailService {
   getArea(){
     return this.http.get(this.baseUrldropbdownlist+'/getArea');
   }
+  getProvinces(){
+    return this.http.get(this.baseUrldropbdownlist+'/getProvinces');
+  }
   getGuaranteeType(){
     return this.http.get(this.baseUrldropbdownlist+'/getGuaranteeType');
   }
@@ -140,5 +143,9 @@ export class CompnaydetailService {
 
   updateCancellationInfo(id: number, data: CancellationInfoData): Observable<{ id: number }> {
     return this.http.put<{ id: number }>(`${this.baseUrlowner}CompanyCancellationInfo/${id}`, data);
+  }
+
+  deleteCompany(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${id}`);
   }
 }

@@ -4,16 +4,16 @@ namespace WebAPIBackend.Application.Property.DTOs
     {
         public int Id { get; set; }
         public int? Pnumber { get; set; }
-        public double? Parea { get; set; }
+        public string? Parea { get; set; }
         public int? PunitTypeId { get; set; }
         public int? NumofFloor { get; set; }
         public int? NumofRooms { get; set; }
         public int? PropertyTypeId { get; set; }
         public int? TransactionTypeId { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
         public string? Des { get; set; }
-        public double? RoyaltyAmount { get; set; }
+        public string? RoyaltyAmount { get; set; }
         public string? FilePath { get; set; }
         public string? PropertyTypeText { get; set; }
         public string? UnitTypeText { get; set; }
@@ -30,7 +30,7 @@ namespace WebAPIBackend.Application.Property.DTOs
     {
         public int Id { get; set; }
         public int? Pnumber { get; set; }
-        public double? Parea { get; set; }
+        public string? Parea { get; set; }
         public int? PunitTypeId { get; set; }
         public string? UnitTypeName { get; set; }
         public int? NumofFloor { get; set; }
@@ -41,9 +41,9 @@ namespace WebAPIBackend.Application.Property.DTOs
         public string? PropertyTypeText { get; set; }
         public int? TransactionTypeId { get; set; }
         public string? TransactionTypeName { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
-        public double? RoyaltyAmount { get; set; }
+        public string? RoyaltyAmount { get; set; }
         public string? Des { get; set; }
         public bool? Iscomplete { get; set; }
         public bool? Iseditable { get; set; }
@@ -124,10 +124,10 @@ namespace WebAPIBackend.Application.Property.DTOs
         public string? Photo { get; set; }
         public string? NationalIdCard { get; set; }
         public string? AuthorizationLetter { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
-        public double? RoyaltyAmount { get; set; }
-        public double? HalfPrice { get; set; }
+        public string? RoyaltyAmount { get; set; }
+        public string? HalfPrice { get; set; }
         public string? TransactionType { get; set; }
         public string? TransactionTypeDescription { get; set; }
         public DateOnly? RentStartDate { get; set; }
@@ -167,15 +167,15 @@ namespace WebAPIBackend.Application.Property.DTOs
         public string? SerialNumber { get; set; }
         public DateTime? TransactionDate { get; set; }
         public int? PNumber { get; set; }
-        public double? PArea { get; set; }
+        public string? PArea { get; set; }
         public int? NumofRooms { get; set; }
         public string? North { get; set; }
         public string? South { get; set; }
         public string? West { get; set; }
         public string? East { get; set; }
-        public double? Price { get; set; }
+        public string? Price { get; set; }
         public string? PriceText { get; set; }
-        public double? RoyaltyAmount { get; set; }
+        public string? RoyaltyAmount { get; set; }
         public string? PropertypeType { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string? CreatedAtFormatted { get; set; }

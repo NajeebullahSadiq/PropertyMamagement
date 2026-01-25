@@ -1,12 +1,4 @@
 import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@angular/core';
-import {
-	NgbDateStruct,
-	NgbCalendar,
-	NgbDatepickerI18n,
-	NgbCalendarPersian,
-	NgbDate,
-	NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
@@ -20,43 +12,17 @@ import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
 import { NumeralService } from 'src/app/shared/numeral.service';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-	getWeekdayLabel(weekday: number) {
-		return WEEKDAYS_SHORT[weekday - 1];
-	}
-	getMonthShortName(month: number) {
-		return MONTHS[month - 1];
-	}
-	getMonthFullName(month: number) {
-		return MONTHS[month - 1];
-	}
-	getDayAriaLabel(date: NgbDateStruct): string {
-		return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-	}
-}
-
 @Component({
 	selector: 'app-licensedetails',
 	templateUrl: './licensedetails.component.html',
 	styleUrls: ['./licensedetails.component.scss'],
-	providers: [
-		{ provide: NgbCalendar, useClass: NgbCalendarPersian },
-		{ provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-	],
 })
 export class LicensedetailsComponent {
-	maxDate = { year: 1410, month: 12, day: 31 }
-	minDate = { year: 1320, month: 12, day: 31 }
 
 	licenseForm: FormGroup = new FormGroup({});
 	selectedId: number = 0;
-	selectedDateIssue!: NgbDate;
-	selectedDateExpire!: NgbDate;
 	Areas: any;
+	provinces: any[] = [];  // Add provinces array
 	imageName: string = ''
 	licenseDetails!: LicenseDetail[];
 	licenseTypes = [
@@ -88,7 +54,6 @@ export class LicensedetailsComponent {
 		private toastr: ToastrService,
 		private comservice: CompnaydetailService,
 		private selerService: SellerService,
-		private ngbDateParserFormatter: NgbDateParserFormatter,
 		private propertyDetailsService: PropertyService,
 		private router: Router,
 		private calendarConversionService: CalendarConversionService,
@@ -97,7 +62,8 @@ export class LicensedetailsComponent {
 	) {
 		this.licenseForm = this.fb.group({
 			id: [0],
-			licenseNumber: ['', Validators.required],
+			provinceId: ['', Validators.required],  // Add provinceId field
+			licenseNumber: [''],  // Make it optional since it's auto-generated
 			issueDate: ['', Validators.required],
 			expireDate: ['', Validators.required],
 			areaId: ['', Validators.required],
@@ -193,6 +159,11 @@ export class LicensedetailsComponent {
 	}
 
 	ngOnInit() {
+		// Load provinces
+		this.comservice.getProvinces().subscribe((res: any) => {
+			this.provinces = res;
+		});
+		
 		this.comservice.getArea().subscribe(res => {
 			this.Areas = res;
 		});
@@ -204,6 +175,7 @@ export class LicensedetailsComponent {
 						this.licenseDetails = detail;
 						this.licenseForm.setValue({
 							id: detail[0].id,
+							provinceId: detail[0].provinceId || '',  // Add provinceId
 							licenseNumber: detail[0].licenseNumber,
 							issueDate: detail[0].issueDate,
 							expireDate: detail[0].expireDate,
@@ -228,20 +200,6 @@ export class LicensedetailsComponent {
 						this.selectedId = detail[0].id;
 						// Set imageName from existing docPath
 						this.imageName = detail[0].docPath || '';
-						const dateString = detail[0].issueDate;
-						const ExdateString = detail[0].expireDate;
-						const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-						const ExparsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(ExdateString);
-						let parsedDate: NgbDate | null = null;
-						let exparsedDate: NgbDate | null = null;
-						if (parsedDateStruct && ExparsedDateStruct) {
-							parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
-							exparsedDate = new NgbDate(ExparsedDateStruct.year, ExparsedDateStruct.month, ExparsedDateStruct.day);
-						}
-						if (parsedDate && exparsedDate) {
-							this.selectedDateIssue = parsedDate;
-							this.selectedDateExpire = exparsedDate;
-						}
 					}
 				},
 				error: (error) => {
@@ -442,6 +400,7 @@ export class LicensedetailsComponent {
 		this.router.navigate(['/printLicense', id]);
 	}
 
+	get provinceId() { return this.licenseForm.get('provinceId'); }
 	get licenseNumber() { return this.licenseForm.get('licenseNumber'); }
 	get officeAddress() { return this.licenseForm.get('officeAddress'); }
 	get issueDate() { return this.licenseForm.get('issueDate'); }

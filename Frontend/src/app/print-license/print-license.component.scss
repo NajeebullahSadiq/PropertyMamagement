@@ -377,9 +377,9 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   border-bottom: 2px solid var(--primary-100);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .header-right {
@@ -394,22 +394,28 @@
 }
 
 .national-emblem {
-  width: 65px;
+  width: 90px;
   height: auto;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .license-meta {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .meta-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 4px;
   
   .meta-label {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--neutral-600);
     font-weight: 600;
     font-family: var(--font-body);
@@ -417,7 +423,7 @@
   }
   
   .meta-value {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--primary-800);
     font-weight: 800;
     font-family: var(--font-heading);
@@ -468,11 +474,19 @@
 .header-center {
   flex: 1;
   text-align: center;
-  padding: 0 15px;
+  padding: 0 5px;
+}
+
+.islamic-logo {
+  height: 50px;
+  width: auto;
+  margin: 0 auto 4px auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .ministry-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 900;
   font-family: var(--font-display);
   color: var(--neutral-900);
@@ -502,7 +516,7 @@
 }
 
 .ministry-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   font-family: var(--font-heading);
   color: var(--primary-800);
@@ -512,7 +526,7 @@
 }
 
 .department-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   font-family: var(--font-heading);
   color: var(--primary-700);
@@ -522,7 +536,7 @@
 }
 
 .sub-department {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   font-family: var(--font-body);
   color: var(--primary-600);
@@ -532,26 +546,36 @@
 }
 
 .header-left {
-  width: 20%;
+  width: 18%;
   display: flex;
   justify-content: flex-start;
+  padding-left: 0;
+  align-items: flex-start;
+  position: relative;
+  left: -20px;
 }
 
 .logo-photo-stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
+  margin-left: -15px;
 }
 
 .ministry-logo {
-  height: 55px;
-  width: auto;
+  height: 75px;
+  width: 110px;
+  object-fit: contain;
+  object-position: left center;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  display: block;
+  margin-left: 0;
 }
 
 .photo-container {
-  text-align: center;
+  text-align: left;
+  margin-left: 0;
 }
 
 .photo-frame {
@@ -598,8 +622,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 0;
-  margin-bottom: 8px;
+  padding: 8px 0;
+  margin-bottom: 6px;
   position: relative;
   
   &::before {
@@ -624,7 +648,7 @@
 }
 
 .certificate-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 900;
   font-family: var(--font-display);
   color: var(--primary-900);
@@ -663,8 +687,8 @@
 }
 
 .info-card {
-  margin-bottom: 6px;
-  padding: 7px 12px;
+  margin-bottom: 5px;
+  padding: 6px 12px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
   border-radius: 4px;
   border-right: 3px solid var(--primary-500);
@@ -672,8 +696,8 @@
 }
 
 .info-paragraph {
-  font-size: 13px;
-  line-height: 2;
+  font-size: 15px;
+  line-height: 1.8;
   margin: 0;
   color: var(--neutral-800);
   font-weight: 600;
@@ -771,11 +795,11 @@
 }
 
 .inquiry-line {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--neutral-700);
-  margin: 10px 0;
-  text-align: center;
+  margin: 8px 0;
+  text-align: right;
   
   .inquiry-field {
     display: inline-block;
@@ -792,7 +816,8 @@
   display: flex;
   justify-content: flex-end;
   padding-left: 15%;
-  margin-top: 5px;
+  margin-top: 12px;
+  margin-bottom: 6px;
 }
 
 .signature-block {
@@ -801,11 +826,11 @@
 }
 
 .signature-greeting {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   font-family: var(--font-body);
   color: var(--neutral-800);
-  margin: 0 0 20px 0;
+  margin: 15px 0 8px 0;
   letter-spacing: 0.3px;
 }
 
@@ -813,11 +838,11 @@
   width: 120px;
   height: 1px;
   background: var(--neutral-400);
-  margin: 0 auto 5px;
+  margin: 0 auto 8px;
 }
 
 .signature-title {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 800;
   font-family: var(--font-heading);
   color: var(--primary-800);
@@ -830,8 +855,8 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .certificate-footer {
   border-top: 2px solid var(--primary-200);
-  padding-top: 6px;
-  padding-bottom: 4px;
+  padding-top: 5px;
+  padding-bottom: 3px;
   margin-top: auto;
   background: linear-gradient(180deg, rgba(227, 242, 253, 0.3) 0%, transparent 100%);
   position: relative;
@@ -839,14 +864,14 @@
 }
 
 .footer-row {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   font-family: var(--font-body);
   color: var(--neutral-700);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   padding: 0 10px;
   letter-spacing: 0.2px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .footer-label {
@@ -927,7 +952,7 @@
   border-radius: 4px;
   border-right: 3px solid var(--gold-500);
   margin: 4px 10px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   font-family: var(--font-body);
   letter-spacing: 0.2px;

@@ -7,10 +7,10 @@
           <span>آپلود عکس مالک</span>
         </h3>
       </div>
-      <div class="px-6 py-4">
+      <div class="px-6 py-4 flex justify-center">
         <app-profile-image-cropper #childComponent [initialImageUrl]="imagePath" documentType="company"
-          [roundCropper]="true" (imageChanged)="profilePreviewChanged($event)"
-          (imageUploaded)="profileImageUploaded($event)" style="text-align: left"></app-profile-image-cropper>
+          [roundCropper]="false" (imageChanged)="profilePreviewChanged($event)"
+          (imageUploaded)="profileImageUploaded($event)"></app-profile-image-cropper>
       </div>
     </div>
 
@@ -29,7 +29,9 @@
         <div class="px-6 py-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">اسم</label>
+              <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">
+                اسم <span class="text-red-600">*</span>
+              </label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-user"></i>
@@ -42,7 +44,9 @@
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ولد</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                ولد <span class="text-red-600">*</span>
+              </label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-user"></i>
@@ -55,7 +59,9 @@
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ولدیت</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                ولدیت <span class="text-red-600">*</span>
+              </label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-user"></i>
@@ -68,11 +74,13 @@
             </div>
 
             <div>
-              <app-multi-calendar-datepicker formControlName="dateofBirth" label="تاریخ تولد"></app-multi-calendar-datepicker>
+              <app-multi-calendar-datepicker formControlName="dateofBirth" label="تاریخ تولد *"></app-multi-calendar-datepicker>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">درجه تحصیل</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                درجه تحصیل <span class="text-red-600">*</span>
+              </label>
               <ng-select [items]="EducationLevel" [selectOnTab]="true" bindValue="id" formControlName="educationLevelId" class="custom-ng-select">
                 <ng-template ng-label-tmp let-item="item">
                   <span class="text-gray-800">{{ item.dari || item.name }}</span>
@@ -120,7 +128,9 @@
         <div class="px-6 py-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">الیکټرونیکی تذکره نمبر</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                الیکټرونیکی تذکره نمبر <span class="text-red-600">*</span>
+              </label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-id-card"></i>
@@ -147,7 +157,9 @@
           <div *ngIf="!isAddressChangeMode">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  ولایت <span class="text-red-600">*</span>
+                </label>
                 <ng-select formControlName="ownerProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterOwnerDistricts($event)" class="custom-ng-select"></ng-select>
                 <div *ngIf="ownerProvinceId?.invalid && (ownerProvinceId?.dirty || ownerProvinceId?.touched)">
                   <small class="text-red-600 text-xs mt-1 block" *ngIf="ownerProvinceId?.errors?.['required']">این فیلد الزامی است</small>
@@ -155,7 +167,9 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  ناحیه/ولسوالی <span class="text-red-600">*</span>
+                </label>
                 <ng-select formControlName="ownerDistrictId" [items]="ownerDistrict" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
                 <div *ngIf="ownerDistrictId?.invalid && (ownerDistrictId?.dirty || ownerDistrictId?.touched)">
                   <small class="text-red-600 text-xs mt-1 block" *ngIf="ownerDistrictId?.errors?.['required']">این فیلد الزامی است</small>
@@ -288,7 +302,9 @@
           <div *ngIf="!isAddressChangeMode">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  ولایت <span class="text-red-600">*</span>
+                </label>
                 <ng-select formControlName="permanentProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterPermanentDistricts($event)" class="custom-ng-select"></ng-select>
                 <div *ngIf="permanentProvinceId?.invalid && (permanentProvinceId?.dirty || permanentProvinceId?.touched)">
                   <small class="text-red-600 text-xs mt-1 block" *ngIf="permanentProvinceId?.errors?.['required']">این فیلد الزامی است</small>
@@ -296,7 +312,9 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  ناحیه/ولسوالی <span class="text-red-600">*</span>
+                </label>
                 <ng-select formControlName="permanentDistrictId" [items]="permanentDistrict" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
                 <div *ngIf="permanentDistrictId?.invalid && (permanentDistrictId?.dirty || permanentDistrictId?.touched)">
                   <small class="text-red-600 text-xs mt-1 block" *ngIf="permanentDistrictId?.errors?.['required']">این فیلد الزامی است</small>
@@ -304,7 +322,9 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  ګذر / قریه / ادرس بلاک <span class="text-red-600">*</span>
+                </label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                     <i class="fas fa-map-marker"></i>

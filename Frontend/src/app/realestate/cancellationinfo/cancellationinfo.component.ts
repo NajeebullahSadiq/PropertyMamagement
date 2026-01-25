@@ -1,12 +1,4 @@
 import { Component, EventEmitter, Injectable, Input, Output } from '@angular/core';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-    NgbDate,
-    NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
@@ -14,41 +6,15 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CancellationInfo, CancellationInfoData } from 'src/app/models/CancellationInfo';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) {
-        return WEEKDAYS_SHORT[weekday - 1];
-    }
-    getMonthShortName(month: number) {
-        return MONTHS[month - 1];
-    }
-    getMonthFullName(month: number) {
-        return MONTHS[month - 1];
-    }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
-
 @Component({
     selector: 'app-cancellationinfo',
     templateUrl: './cancellationinfo.component.html',
     styleUrls: ['./cancellationinfo.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
 })
 export class CancellationinfoComponent {
-    maxDate = { year: 1410, month: 12, day: 31 };
-    minDate = { year: 1320, month: 12, day: 31 };
 
     cancellationForm!: FormGroup;
     selectedId: number = 0;
-    selectedLicenseCancellationLetterDate!: NgbDate;
     cancellationInfo: CancellationInfo | null = null;
 
     @Input() id: number = 0;
@@ -62,7 +28,6 @@ export class CancellationinfoComponent {
         private fb: FormBuilder,
         private toastr: ToastrService,
         private comservice: CompnaydetailService,
-        private ngbDateParserFormatter: NgbDateParserFormatter,
         private calendarConversionService: CalendarConversionService,
         private calendarService: CalendarService
     ) {
@@ -90,27 +55,30 @@ export class CancellationinfoComponent {
                 next: (info) => {
                     if (info) {
                         this.cancellationInfo = info;
+                        
+                        // Parse licenseCancellationLetterDate properly for the multi-calendar datepicker
+                        let licenseCancellationLetterDateValue: Date | null = null;
+                        if (info.licenseCancellationLetterDate) {
+                            const dateString: any = info.licenseCancellationLetterDate;
+                            if (typeof dateString === 'string') {
+                                licenseCancellationLetterDateValue = new Date(dateString);
+                                if (isNaN(licenseCancellationLetterDateValue.getTime())) {
+                                    licenseCancellationLetterDateValue = null;
+                                }
+                            } else if (dateString instanceof Date) {
+                                licenseCancellationLetterDateValue = dateString;
+                            }
+                        }
+                        
                         this.cancellationForm.setValue({
                             id: info.id || 0,
                             companyId: info.companyId,
                             licenseCancellationLetterNumber: info.licenseCancellationLetterNumber || '',
                             revenueCancellationLetterNumber: info.revenueCancellationLetterNumber || '',
-                            licenseCancellationLetterDate: info.licenseCancellationLetterDate || '',
+                            licenseCancellationLetterDate: licenseCancellationLetterDateValue,
                             remarks: info.remarks || '',
                         });
                         this.selectedId = info.id || 0;
-
-                        if (info.licenseCancellationLetterDate) {
-                            const dateString = info.licenseCancellationLetterDate.toString();
-                            const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-                            if (parsedDateStruct) {
-                                this.selectedLicenseCancellationLetterDate = new NgbDate(
-                                    parsedDateStruct.year,
-                                    parsedDateStruct.month,
-                                    parsedDateStruct.day
-                                );
-                            }
-                        }
                     }
                 },
                 error: (error) => {

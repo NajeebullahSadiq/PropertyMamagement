@@ -150,7 +150,7 @@ namespace WebAPIBackend.Configuration
             {
                 entity
                     .HasNoKey()
-                    .ToView("LicenseView");
+                    .ToView("LicenseView", "public");
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(20);
                 entity.Property(e => e.WhatsAppNumber).HasMaxLength(20);
@@ -903,6 +903,10 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.PunitTypeId).HasColumnName("PUnitTypeId");
                 entity.Property(e => e.South).HasColumnName("south");
                 entity.Property(e => e.West).HasColumnName("west");
+                
+                // Configure Price and RoyaltyAmount to handle text columns
+                entity.Property(e => e.Price).HasColumnType("text");
+                entity.Property(e => e.RoyaltyAmount).HasColumnType("text");
 
                 entity.HasOne(d => d.PropertyType).WithMany(p => p.PropertyDetails)
                     .HasForeignKey(d => d.PropertyTypeId)
@@ -1185,6 +1189,9 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("propertyaudit", "log");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
                 entity.HasOne(d => d.Property).WithMany(p => p.Propertyaudits)
@@ -1198,6 +1205,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("propertybuyeraudit_pkey");
 
                 entity.ToTable("propertybuyeraudit", "log");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
@@ -1213,6 +1223,9 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("propertyselleraudit", "log");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
                 entity.HasOne(d => d.Seller).WithMany(p => p.Propertyselleraudits)
@@ -1225,6 +1238,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("vehicleaudit_pkey");
 
                 entity.ToTable("vehicleaudit", "log");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
@@ -1239,6 +1255,9 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("vehiclebuyeraudit", "log");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
                 entity.HasOne(d => d.VehicleBuyer).WithMany(p => p.Vehiclebuyeraudits)
@@ -1251,6 +1270,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("propertybuyeraudit_pkey");
 
                 entity.ToTable("propertybuyeraudit", "log");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
@@ -1266,6 +1288,9 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("vehicleselleraudit", "log");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
                 entity.HasOne(d => d.VehicleSeller).WithMany(p => p.Vehicleselleraudits)
@@ -1278,6 +1303,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("licenseaudit_pkey");
 
                 entity.ToTable("licenseaudit", "log");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
@@ -1293,6 +1321,9 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("guarantorsaudit", "log");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
                 entity.HasOne(d => d.Guarantors).WithMany(p => p.Guarantorsaudits)
@@ -1305,6 +1336,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("graunteeaudit_pkey");
 
                 entity.ToTable("graunteeaudit", "log");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
@@ -1320,6 +1354,9 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("companyowneraudit", "log");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 
                 entity.HasOne(d => d.Owner).WithMany(p => p.Companyowneraudits)
@@ -1332,6 +1369,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("companydetailsaudit_pkey");
 
                 entity.ToTable("companydetailsaudit", "log");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
 

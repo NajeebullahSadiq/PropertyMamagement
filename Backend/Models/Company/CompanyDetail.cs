@@ -17,7 +17,7 @@ public partial class CompanyDetail
     public bool? Status { get; set; }
 
     public string? DocPath { get; set; }
-    public double? Tin { get; set; }
+    public string? Tin { get; set; }
 
     public virtual ICollection<CompanyOwner> CompanyOwners { get; } = new List<CompanyOwner>();
 

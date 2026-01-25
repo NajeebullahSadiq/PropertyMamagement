@@ -8,7 +8,13 @@ public partial class LicenseDetail
 {
     public int Id { get; set; }
 
-    public double LicenseNumber { get; set; }
+    public string? LicenseNumber { get; set; }
+
+    /// <summary>
+    /// Province where the license is issued (for province-specific numbering)
+    /// Format: PROVINCE_CODE-SEQUENTIAL_NUMBER (e.g., KBL-0001, KHR-0234)
+    /// </summary>
+    public int? ProvinceId { get; set; }
 
     public DateOnly? IssueDate { get; set; }
 
@@ -75,6 +81,8 @@ public partial class LicenseDetail
     public virtual Area? Area { get; set; }
 
     public virtual CompanyDetail? Company { get; set; }
+
+    public virtual Location? Province { get; set; }
 
     public virtual ICollection<Licenseaudit> Licenseaudits { get; } = new List<Licenseaudit>();
 }

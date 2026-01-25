@@ -26,8 +26,8 @@ namespace WebAPIBackend.Configuration
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Ensure database exists and apply pending migrations
-            await context.Database.MigrateAsync();
+            // NOTE: Database migrations are handled by module-based migrations in Infrastructure/Migrations/
+            // We don't call context.Database.MigrateAsync() here to avoid conflicts
 
             // Seed RBAC roles using Identity API (safer than raw SQL)
             await SeedRolesAndPermissions(roleManager);
@@ -165,10 +165,17 @@ namespace WebAPIBackend.Configuration
                         co.""DateofBirth"",
                         co.""IndentityCardNumber"",
                         co.""PothoPath"" AS ""OwnerPhoto"",
-                        ld.""LicenseNumber""::text AS ""LicenseNumber"",
+                        ld.""LicenseNumber"",
                         ld.""OfficeAddress"",
                         ld.""IssueDate"",
                         ld.""ExpireDate"",
+                        ld.""RoyaltyAmount"",
+                        ld.""RoyaltyDate"",
+                        ld.""TariffNumber"",
+                        ld.""PenaltyAmount"",
+                        ld.""PenaltyDate"",
+                        ld.""HrLetter"",
+                        ld.""HrLetterDate"",
                         pp.""Dari"" AS ""PermanentProvinceName"",
                         pd.""Dari"" AS ""PermanentDistrictName"",
                         co.""PermanentVillage""
@@ -193,13 +200,13 @@ namespace WebAPIBackend.Configuration
                     SELECT 
                         pd.""Id"",
                         pd.""DocumentType"" as ""Doctype"",
-                        pd.""PNumber"" as ""Pnumber"",
-                        pd.""PArea"",
+                        COALESCE(pd.""PNumber"", '') as ""Pnumber"",
+                        COALESCE(pd.""PArea"", '') as ""PArea"",
                         pd.""NumofRooms"",
-                        pd.""north"",
-                        pd.""south"",
-                        pd.""west"",
-                        pd.""east"",
+                        pd.""north"" as ""north"",
+                        pd.""south"" as ""south"",
+                        pd.""west"" as ""west"",
+                        pd.""east"" as ""east"",
                         pd.""Price"",
                         pd.""PriceText"",
                         pd.""RoyaltyAmount"",
@@ -214,7 +221,7 @@ namespace WebAPIBackend.Configuration
                         pd.""IssuanceDate"",
                         pd.""SerialNumber"",
                         pd.""TransactionDate"",
-                        pd.""PNumber"",
+                        COALESCE(pd.""PNumber"", '') as ""PNumber"",
                         pa_prov.""Name"" as ""Province"",
                         pa_dist.""Name"" as ""District"",
                         pa_prov.""Dari"" as ""ProvinceDari"",
@@ -222,7 +229,7 @@ namespace WebAPIBackend.Configuration
                         pa.""Village"",
                         sd.""FirstName"" as ""SellerFirstName"",
                         sd.""FatherName"" as ""SellerFatherName"",
-                        sd.""IndentityCardNumber"" as ""SellerIndentityCardNumber"",
+                        sd.""ElectronicNationalIdNumber"" as ""SellerIndentityCardNumber"",
                         sd.""PaddressVillage"" as ""SellerVillage"",
                         sd.""TaddressVillage"" as ""TSellerVillage"",
                         sd.""photo"" as ""SellerPhoto"",
@@ -236,7 +243,7 @@ namespace WebAPIBackend.Configuration
                         s_temp_dist.""Dari"" as ""TSellerDistrictDari"",
                         bd.""FirstName"" as ""BuyerFirstName"",
                         bd.""FatherName"" as ""BuyerFatherName"",
-                        bd.""IndentityCardNumber"" as ""BuyerIndentityCardNumber"",
+                        bd.""ElectronicNationalIdNumber"" as ""BuyerIndentityCardNumber"",
                         bd.""PaddressVillage"" as ""BuyerVillage"",
                         bd.""TaddressVillage"" as ""TBuyerVillage"",
                         bd.""photo"" as ""BuyerPhoto"",
@@ -250,10 +257,10 @@ namespace WebAPIBackend.Configuration
                         b_temp_dist.""Dari"" as ""TBuyerDistrictDari"",
                         wd1.""FirstName"" as ""WitnessOneFirstName"",
                         wd1.""FatherName"" as ""WitnessOneFatherName"",
-                        wd1.""IndentityCardNumber"" as ""WitnessOneIndentityCardNumber"",
+                        wd1.""ElectronicNationalIdNumber"" as ""WitnessOneIndentityCardNumber"",
                         wd2.""FirstName"" as ""WitnessTwoFirstName"",
                         wd2.""FatherName"" as ""WitnessTwoFatherName"",
-                        wd2.""IndentityCardNumber"" as ""WitnessTwoIndentityCardNumber"",
+                        wd2.""ElectronicNationalIdNumber"" as ""WitnessTwoIndentityCardNumber"",
                         ut.""Name"" as ""UnitType"",
                         tt.""Name"" as ""TransactionType""
                     FROM tr.""PropertyDetails"" pd
@@ -274,13 +281,17 @@ namespace WebAPIBackend.Configuration
                     LEFT JOIN look.""Location"" b_temp_prov ON bd.""TaddressProvinceId"" = b_temp_prov.""ID""
                     LEFT JOIN look.""Location"" b_temp_dist ON bd.""TaddressDistrictId"" = b_temp_dist.""ID""
                     LEFT JOIN LATERAL (
-                        SELECT ""FirstName"", ""FatherName"", ""IndentityCardNumber""
+                        SELECT ""FirstName"", ""FatherName"", 
+                               ""ElectronicNationalIdNumber"" as ""IndentityCardNumber"",
+                               ""ElectronicNationalIdNumber""
                         FROM tr.""WitnessDetails""
                         WHERE ""PropertyDetailsId"" = pd.""Id""
                         ORDER BY ""Id"" ASC LIMIT 1
                     ) wd1 ON true
                     LEFT JOIN LATERAL (
-                        SELECT ""FirstName"", ""FatherName"", ""IndentityCardNumber""
+                        SELECT ""FirstName"", ""FatherName"", 
+                               ""ElectronicNationalIdNumber"" as ""IndentityCardNumber"",
+                               ""ElectronicNationalIdNumber""
                         FROM tr.""WitnessDetails""
                         WHERE ""PropertyDetailsId"" = pd.""Id""
                         ORDER BY ""Id"" ASC OFFSET 1 LIMIT 1
@@ -288,7 +299,11 @@ namespace WebAPIBackend.Configuration
                     WHERE pd.""iscomplete"" = true;
                 ");
             }
-            catch (Exception) { /* View may already exist */ }
+            catch (Exception ex) 
+            { 
+                // Log but don't fail - view creation is optional
+                Console.WriteLine($"Note: GetPrintType view creation skipped (may need schema update): {ex.Message}");
+            }
         }
 
         private static async Task SeedLookupTables(AppDbContext context)
@@ -420,21 +435,21 @@ namespace WebAPIBackend.Configuration
             {
                 var areas = new[]
                 {
-                    new Area { Name = "Construction", Des = "Construction and building services" },
-                    new Area { Name = "Real Estate", Des = "Real estate services and trading" },
-                    new Area { Name = "Import/Export", Des = "Import and export business" },
-                    new Area { Name = "Manufacturing", Des = "Manufacturing and production" },
-                    new Area { Name = "Retail Trade", Des = "Retail trading and sales" },
-                    new Area { Name = "Wholesale Trade", Des = "Wholesale trading" },
-                    new Area { Name = "Transportation", Des = "Transportation services" },
-                    new Area { Name = "Agriculture", Des = "Agricultural activities" },
-                    new Area { Name = "Mining", Des = "Mining and extraction" },
-                    new Area { Name = "Tourism", Des = "Tourism and hospitality" },
-                    new Area { Name = "Healthcare", Des = "Healthcare services" },
-                    new Area { Name = "Education", Des = "Educational services" },
-                    new Area { Name = "Financial Services", Des = "Banking and financial services" },
-                    new Area { Name = "Technology", Des = "IT and technology services" },
-                    new Area { Name = "Consulting", Des = "Professional consulting services" }
+                    new Area { Name = "ساختمان سازی", Des = "خدمات ساختمان سازی و تعمیرات" },
+                    new Area { Name = "املاک و مستغلات", Des = "خدمات املاک و معاملات ملکی" },
+                    new Area { Name = "واردات/صادرات", Des = "تجارت واردات و صادرات" },
+                    new Area { Name = "تولیدی", Des = "تولید و ساخت" },
+                    new Area { Name = "تجارت خرده فروشی", Des = "خرده فروشی و فروش" },
+                    new Area { Name = "تجارت عمده فروشی", Des = "عمده فروشی" },
+                    new Area { Name = "ترانسپورت", Des = "خدمات حمل و نقل" },
+                    new Area { Name = "زراعت", Des = "فعالیت های زراعتی" },
+                    new Area { Name = "معدن", Des = "استخراج معادن" },
+                    new Area { Name = "توریزم", Des = "توریزم و مهمان نوازی" },
+                    new Area { Name = "صحت", Des = "خدمات صحی" },
+                    new Area { Name = "تعلیم و تربیه", Des = "خدمات آموزشی" },
+                    new Area { Name = "خدمات مالی", Des = "بانکداری و خدمات مالی" },
+                    new Area { Name = "تکنالوژی", Des = "خدمات تکنالوژی معلوماتی" },
+                    new Area { Name = "مشاوره", Des = "خدمات مشاوره حرفوی" }
                 };
                 await context.Areas.AddRangeAsync(areas);
             }

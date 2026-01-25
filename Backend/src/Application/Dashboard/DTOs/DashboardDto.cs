@@ -2,15 +2,15 @@ namespace WebAPIBackend.Application.Dashboard.DTOs
 {
     public class DashboardSummaryDto
     {
-        public double? TotalAmount { get; set; }
-        public double? TotalAmountNotCompleted { get; set; }
-        public double? TotalAmountCompleted { get; set; }
+        public string? TotalAmount { get; set; }
+        public string? TotalAmountNotCompleted { get; set; }
+        public string? TotalAmountCompleted { get; set; }
         public int TotalTransactionCompleted { get; set; }
         public int TotalTransactionNotCompleted { get; set; }
         public int TotalTransaction { get; set; }
-        public double? TotalRoyaltyAmount { get; set; }
-        public double? TotalRoyaltyAmountNotCompleted { get; set; }
-        public double? TotalRoyaltyAmountCompleted { get; set; }
+        public string? TotalRoyaltyAmount { get; set; }
+        public string? TotalRoyaltyAmountNotCompleted { get; set; }
+        public string? TotalRoyaltyAmountCompleted { get; set; }
     }
 
     public class CompanyDashboardDto
@@ -32,7 +32,7 @@ namespace WebAPIBackend.Application.Dashboard.DTOs
     public class TransactionByTypeDto
     {
         public string? Name { get; set; }
-        public double Amount { get; set; }
+        public string? Amount { get; set; }
     }
 
     public class EstateDashboardDto
@@ -50,21 +50,21 @@ namespace WebAPIBackend.Application.Dashboard.DTOs
     {
         public string? CreatedBy { get; set; }
         public int TotalPropertiesCreated { get; set; }
-        public double TotalPriceOfProperties { get; set; }
+        public string? TotalPriceOfProperties { get; set; }
         public string? CompanyTitle { get; set; }
     }
 
     public class TopUsersSummaryResultDto
     {
         public int TotalProperties { get; set; }
-        public double TotalPrice { get; set; }
+        public string? TotalPrice { get; set; }
         public List<TopUserSummaryDto> TopUsers { get; set; } = new();
     }
 
     public class MonthlyDataDto
     {
         public string? Month { get; set; }
-        public double TotalPriceOfProperties { get; set; }
+        public string? TotalPriceOfProperties { get; set; }
     }
 
     public class PropertyTypeMonthlyDto

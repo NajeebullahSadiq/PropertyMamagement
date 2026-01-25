@@ -341,11 +341,11 @@ namespace WebAPIBackend.Services.Verification
 
             if (license == null) return null;
 
-            var owner = license.Company?.CompanyOwners.FirstOrDefault();
+            var owner = license.Company?.CompanyOwners?.FirstOrDefault();
 
             return new DocumentDataDto
             {
-                LicenseNumber = license.LicenseNumber.ToString(),
+                LicenseNumber = license.LicenseNumber?.ToString() ?? "",
                 HolderName = owner?.FirstName ?? license.Company?.Title ?? "",
                 HolderPhoto = owner?.PothoPath,
                 IssueDate = license.IssueDate?.ToDateTime(TimeOnly.MinValue),

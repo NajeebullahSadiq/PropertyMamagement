@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbCalendar, NgbDatepickerI18n, NgbCalendarPersian } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Guarantor, GuaranteeTypeEnum } from 'src/app/models/Guarantor';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
@@ -12,37 +11,12 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import '@angular/localize/init';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-  getWeekdayLabel(weekday: number) {
-    return WEEKDAYS_SHORT[weekday - 1];
-  }
-  getMonthShortName(month: number) {
-    return MONTHS[month - 1];
-  }
-  getMonthFullName(month: number) {
-    return MONTHS[month - 1];
-  }
-  getDayAriaLabel(date: NgbDateStruct): string {
-    return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-  }
-}
-
 @Component({
   selector: 'app-guaranators',
   templateUrl: './guaranators.component.html',
   styleUrls: ['./guaranators.component.scss'],
-  providers: [
-    { provide: NgbCalendar, useClass: NgbCalendarPersian },
-    { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-  ],
 })
 export class GuaranatorsComponent {
-  maxDate = { year: 1410, month: 12, day: 31 };
-  minDate = { year: 1320, month: 12, day: 31 };
 
   baseUrl: string = environment.apiURL + '/';
   guaranteeDocName: string = '';
@@ -76,7 +50,6 @@ export class GuaranatorsComponent {
     private toastr: ToastrService,
     private comservice: CompnaydetailService,
     private selerService: SellerService,
-    private ngbDateParserFormatter: NgbDateParserFormatter,
     private localizationService: LocalizationService,
     private calendarConversionService: CalendarConversionService,
     private calendarService: CalendarService
@@ -381,6 +354,18 @@ export class GuaranatorsComponent {
   BindValu(id: number) {
     const selectedOwnerAddress = this.guaranatorDetails.find(w => w.id === id);
     if (selectedOwnerAddress) {
+      // Parse all date fields properly for the multi-calendar datepicker
+      const parseDateField = (dateValue: any): Date | null => {
+        if (!dateValue) return null;
+        if (typeof dateValue === 'string') {
+          const date = new Date(dateValue);
+          return isNaN(date.getTime()) ? null : date;
+        } else if (dateValue instanceof Date) {
+          return dateValue;
+        }
+        return null;
+      };
+
       this.guaranatorForm.patchValue({
         id: selectedOwnerAddress.id,
         firstName: selectedOwnerAddress.firstName,
@@ -398,14 +383,14 @@ export class GuaranatorsComponent {
         // Guarantee fields
         guaranteeTypeId: selectedOwnerAddress.guaranteeTypeId,
         propertyDocumentNumber: selectedOwnerAddress.propertyDocumentNumber,
-        propertyDocumentDate: selectedOwnerAddress.propertyDocumentDate,
+        propertyDocumentDate: parseDateField(selectedOwnerAddress.propertyDocumentDate),
         senderMaktobNumber: selectedOwnerAddress.senderMaktobNumber,
-        senderMaktobDate: selectedOwnerAddress.senderMaktobDate,
+        senderMaktobDate: parseDateField(selectedOwnerAddress.senderMaktobDate),
         answerdMaktobNumber: selectedOwnerAddress.answerdMaktobNumber,
-        answerdMaktobDate: selectedOwnerAddress.answerdMaktobDate,
-        dateofGuarantee: selectedOwnerAddress.dateofGuarantee,
+        answerdMaktobDate: parseDateField(selectedOwnerAddress.answerdMaktobDate),
+        dateofGuarantee: parseDateField(selectedOwnerAddress.dateofGuarantee),
         guaranteeDocNumber: selectedOwnerAddress.guaranteeDocNumber,
-        guaranteeDate: selectedOwnerAddress.guaranteeDate,
+        guaranteeDate: parseDateField(selectedOwnerAddress.guaranteeDate),
         guaranteeDocPath: selectedOwnerAddress.guaranteeDocPath,
         // Conditional fields - Sharia Deed
         courtName: selectedOwnerAddress.courtName,
@@ -416,7 +401,7 @@ export class GuaranatorsComponent {
         // Conditional fields - Cash
         bankName: selectedOwnerAddress.bankName,
         depositNumber: selectedOwnerAddress.depositNumber,
-        depositDate: selectedOwnerAddress.depositDate,
+        depositDate: parseDateField(selectedOwnerAddress.depositDate),
       });
 
       this.selerService.getdistrict(selectedOwnerAddress.paddressProvinceId.valueOf()).subscribe(res => {
@@ -428,9 +413,6 @@ export class GuaranatorsComponent {
       this.selectedId = id;
       this.guaranteeDocName = selectedOwnerAddress.guaranteeDocPath || '';
 
-      // Parse guarantee dates
-      this.parseAndSetDates(selectedOwnerAddress);
-      
       // Set visibility flags based on loaded guarantee type (without clearing values)
       this.setGuaranteeTypeVisibility(selectedOwnerAddress.guaranteeTypeId);
     }
@@ -470,27 +452,6 @@ export class GuaranatorsComponent {
     }
     
     this.updateConditionalFieldsValidity();
-  }
-
-  private parseAndSetDates(data: Guarantor) {
-    const dateFields = [
-      { field: 'propertyDocumentDate', value: data.propertyDocumentDate },
-      { field: 'senderMaktobDate', value: data.senderMaktobDate },
-      { field: 'answerdMaktobDate', value: data.answerdMaktobDate },
-      { field: 'dateofGuarantee', value: data.dateofGuarantee },
-      { field: 'guaranteeDate', value: data.guaranteeDate },
-      { field: 'depositDate', value: data.depositDate }, // Cash conditional field
-    ];
-
-    dateFields.forEach(({ field, value }) => {
-      if (value) {
-        const parsedDateStruct = this.ngbDateParserFormatter.parse(value);
-        if (parsedDateStruct) {
-          const parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
-          this.guaranatorForm.patchValue({ [field]: parsedDate });
-        }
-      }
-    });
   }
 
   mapGuaranteeTypesToLocalized(backendTypes: any[]): any[] {

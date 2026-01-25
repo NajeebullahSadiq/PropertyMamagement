@@ -2,13 +2,6 @@ import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-    NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -23,31 +16,12 @@ import {
     LicenseTypes
 } from 'src/app/models/PetitionWriterLicense';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) { return WEEKDAYS_SHORT[weekday - 1]; }
-    getMonthShortName(month: number) { return MONTHS[month - 1]; }
-    getMonthFullName(month: number) { return MONTHS[month - 1]; }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
-
 @Component({
     selector: 'app-petition-writer-license-form',
     templateUrl: './petition-writer-license-form.component.html',
     styleUrls: ['./petition-writer-license-form.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
 })
 export class PetitionWriterLicenseFormComponent implements OnInit {
-    maxDate = { year: 1410, month: 12, day: 31 };
-    minDate = { year: 1320, month: 12, day: 31 };
 
     // Forms
     licenseForm!: FormGroup;
@@ -85,8 +59,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService,
         private sellerService: SellerService,
-        private rbacService: RbacService,
-        private ngbDateParserFormatter: NgbDateParserFormatter
+        private rbacService: RbacService
     ) { }
 
     ngOnInit(): void {
@@ -112,7 +85,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     initForms(): void {
         // Tab 1: مشخصات عریضه‌نویس
         this.licenseForm = this.fb.group({
-            licenseNumber: ['', Validators.required],
+            provinceId: [null, Validators.required],
+            licenseNumber: [''],
             applicantName: ['', Validators.required],
             applicantFatherName: [''],
             applicantGrandFatherName: [''],
@@ -150,7 +124,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     }
 
     loadProvinces(): void {
-        this.sellerService.getprovince().subscribe({
+        this.licenseService.getProvinces().subscribe({
             next: (data: any) => {
                 this.provinces = data;
             },
@@ -190,6 +164,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             next: (data) => {
                 // Patch license form
                 this.licenseForm.patchValue({
+                    provinceId: data.provinceId,
                     licenseNumber: data.licenseNumber,
                     applicantName: data.applicantName,
                     applicantFatherName: data.applicantFatherName,
@@ -246,29 +221,31 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         });
     }
 
-    parseDate(dateStr: string | undefined): NgbDateStruct | null {
+    parseDate(dateStr: string | undefined): Date | null {
         if (!dateStr) return null;
-        const parts = dateStr.split('/');
-        if (parts.length === 3) {
-            return {
-                year: parseInt(parts[0], 10),
-                month: parseInt(parts[1], 10),
-                day: parseInt(parts[2], 10)
-            };
-        }
-        return null;
+        const date = new Date(dateStr);
+        return isNaN(date.getTime()) ? null : date;
     }
 
-    formatDate(date: NgbDateStruct | Date | any | null | undefined): string {
-        if (!date) return '';
+    formatDate(dateValue: any): string {
+        if (!dateValue) return '';
+        const currentCalendar = this.calendarService.getSelectedCalendar();
 
-        const year = typeof date?.year === 'number' ? date.year : (typeof date?.getFullYear === 'function' ? date.getFullYear() : undefined);
-        const month = typeof date?.month === 'number' ? date.month : (typeof date?.getMonth === 'function' ? date.getMonth() + 1 : undefined);
-        const day = typeof date?.day === 'number' ? date.day : (typeof date?.getDate === 'function' ? date.getDate() : undefined);
-
-        if (!year || !month || !day) return '';
-
-        return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+        if (dateValue instanceof Date) {
+            const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+            const year = calendarDate.year;
+            const month = String(calendarDate.month).padStart(2, '0');
+            const day = String(calendarDate.day).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        } else if (typeof dateValue === 'object' && dateValue?.year) {
+            const year = dateValue.year;
+            const month = String(dateValue.month).padStart(2, '0');
+            const day = String(dateValue.day).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        } else if (typeof dateValue === 'string') {
+            return dateValue;
+        }
+        return '';
     }
 
     // Form getters
@@ -292,6 +269,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
 
         const data: PetitionWriterLicenseData = {
             ...formData,
+            provinceId: formData.provinceId,
+            licenseNumber: formData.licenseNumber || undefined,
             bankReceiptNumber: financialData.bankReceiptNumber,
             bankReceiptDate,
             licenseType: financialData.licenseType,
@@ -461,5 +440,15 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     onProfileImageUploaded(imagePath: string): void {
         this.imageName = imagePath;
         this.toastr.success('عکس پروفایل با موفقیت بارگذاری شد');
+    }
+
+    onProvinceChange(): void {
+        const provinceId = this.licenseForm.get('provinceId')?.value;
+        if (provinceId) {
+            this.licenseForm.get('licenseNumber')?.disable();
+            this.licenseForm.patchValue({ licenseNumber: '' });
+        } else {
+            this.licenseForm.get('licenseNumber')?.enable();
+        }
     }
 }

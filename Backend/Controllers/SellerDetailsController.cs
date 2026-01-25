@@ -459,7 +459,7 @@ namespace WebAPIBackend.Controllers
             }
             else if (request.TransactionType == "Purchase" || request.TransactionType == "Rent" || request.TransactionType == "Revocable Sale")
             {
-                if (!request.Price.HasValue || request.Price.Value <= 0)
+                if (string.IsNullOrWhiteSpace(request.Price) || decimal.Parse(request.Price) <= 0)
                 {
                     return StatusCode(400, "قیمت الزامی است");
                 }
@@ -472,10 +472,11 @@ namespace WebAPIBackend.Controllers
                 request.TransactionTypeDescription = null;
 
                 // Derived amounts (server authoritative)
-                request.HalfPrice = request.Price.Value / 2;
+                var priceValue = decimal.Parse(request.Price);
+                request.HalfPrice = (priceValue / 2).ToString();
                 if (request.TransactionType == "Purchase" || request.TransactionType == "Revocable Sale")
                 {
-                    request.RoyaltyAmount = request.Price.Value * 0.015;
+                    request.RoyaltyAmount = (priceValue * 0.015m).ToString();
                 }
                 else if (request.TransactionType == "Rent")
                 {
@@ -608,7 +609,7 @@ namespace WebAPIBackend.Controllers
             }
             else if (request.TransactionType == "Purchase" || request.TransactionType == "Rent" || request.TransactionType == "Revocable Sale")
             {
-                if (!request.Price.HasValue || request.Price.Value <= 0)
+                if (string.IsNullOrWhiteSpace(request.Price) || decimal.Parse(request.Price) <= 0)
                 {
                     return StatusCode(400, "قیمت الزامی است");
                 }
@@ -621,10 +622,11 @@ namespace WebAPIBackend.Controllers
                 request.TransactionTypeDescription = null;
 
                 // Derived amounts (server authoritative)
-                request.HalfPrice = request.Price.Value / 2;
+                var priceValue = decimal.Parse(request.Price);
+                request.HalfPrice = (priceValue / 2).ToString();
                 if (request.TransactionType == "Purchase" || request.TransactionType == "Revocable Sale")
                 {
-                    request.RoyaltyAmount = request.Price.Value * 0.015;
+                    request.RoyaltyAmount = (priceValue * 0.015m).ToString();
                 }
                 else if (request.TransactionType == "Rent")
                 {
@@ -938,6 +940,21 @@ namespace WebAPIBackend.Controllers
         }
         [HttpGet("getProvince")]
         public async Task<IActionResult> GetAlllocation()
+        {
+            try
+            {
+                var locations = await _context.Locations.Where(x=>x.TypeId.Equals(2)).ToListAsync();
+
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("getProvinces")]
+        public async Task<IActionResult> GetProvinces()
         {
             try
             {

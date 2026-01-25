@@ -21,11 +21,11 @@ public partial class VehiclesPropertyDetail
 
     public string? Color { get; set; }
 
-    public double? Price { get; set; }
+    public string? Price { get; set; }
 
     public string? PriceText { get; set; }
 
-    public double? RoyaltyAmount { get; set; }
+    public string? RoyaltyAmount { get; set; }
 
     public int? PropertyTypeId { get; set; }
 

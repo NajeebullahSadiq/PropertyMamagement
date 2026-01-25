@@ -1,11 +1,5 @@
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import {
-    NgbDateStruct,
-    NgbCalendar,
-    NgbDatepickerI18n,
-    NgbCalendarPersian,
-} from '@ng-bootstrap/ng-bootstrap';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import {
@@ -17,27 +11,10 @@ import {
     ReportConfig
 } from 'src/app/shared/securities-report.service';
 
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-    getWeekdayLabel(weekday: number) { return WEEKDAYS_SHORT[weekday - 1]; }
-    getMonthShortName(month: number) { return MONTHS[month - 1]; }
-    getMonthFullName(month: number) { return MONTHS[month - 1]; }
-    getDayAriaLabel(date: NgbDateStruct): string {
-        return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-    }
-}
-
 @Component({
     selector: 'app-securities-report',
     templateUrl: './securities-report.component.html',
     styleUrls: ['./securities-report.component.scss'],
-    providers: [
-        { provide: NgbCalendar, useClass: NgbCalendarPersian },
-        { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-    ],
 })
 export class SecuritiesReportComponent implements OnInit {
     // Filter form

@@ -13,7 +13,7 @@ public partial class LicenseView
 
     public string? Title { get; set; }
 
-    public double? Tin { get; set; }
+    public string? Tin { get; set; }
 
     public string? FirstName { get; set; }
 
@@ -23,22 +23,17 @@ public partial class LicenseView
 
     public DateOnly? DateofBirth { get; set; }
 
-    public double? IndentityCardNumber { get; set; }
+    public string? IndentityCardNumber { get; set; }
 
     public string? OwnerPhoto { get; set; }
 
-    public double? LicenseNumber { get; set; }
+    public string? LicenseNumber { get; set; }
 
     public string? OfficeAddress { get; set; }
 
     public DateOnly? IssueDate { get; set; }
 
     public DateOnly? ExpireDate { get; set; }
-
-    // Permanent Address Fields (آدرس دایمی)
-    public string? PermanentProvinceName { get; set; }
-    public string? PermanentDistrictName { get; set; }
-    public string? PermanentVillage { get; set; }
 
     // Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
     /// <summary>

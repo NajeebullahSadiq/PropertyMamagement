@@ -44,6 +44,7 @@
           <thead class="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200">
             <tr class="text-center">
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ولایت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عریضه‌نویس</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">محل فعالیت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت جواز</th>
@@ -56,6 +57,7 @@
           <tbody class="divide-y divide-gray-200">
             <tr *ngFor="let item of filteredItems | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-purple-50 transition-colors">
               <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ item.licenseNumber }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.provinceName || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.applicantName }} {{ item.applicantFatherName ? 'ولد ' + item.applicantFatherName : '' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.activityLocation || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseType === 'new' ? 'جدید' : item.licenseType === 'renewal' ? 'تمدید' : '-' }}</td>
@@ -81,7 +83,7 @@
               </td>
             </tr>
             <tr *ngIf="filteredItems.length === 0">
-              <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+              <td colspan="9" class="px-4 py-8 text-center text-gray-500">
                 <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
                 <p>هیچ جوازی یافت نشد</p>
               </td>

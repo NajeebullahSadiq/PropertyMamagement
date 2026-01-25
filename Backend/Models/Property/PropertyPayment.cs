@@ -10,13 +10,13 @@ public partial class PropertyPayment
 
     public DateTime PaymentDate { get; set; }
 
-    public double AmountPaid { get; set; }
+    public string? AmountPaid { get; set; }
 
     public string? PaymentMethod { get; set; }
 
     public string? ReceiptNumber { get; set; }
 
-    public double? BalanceRemaining { get; set; }
+    public string? BalanceRemaining { get; set; }
 
     public string? Notes { get; set; }
 

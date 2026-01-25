@@ -13,6 +13,8 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
         [MaxLength(50, ErrorMessage = "نمبر جواز نباید بیشتر از ۵۰ حرف باشد")]
         public string LicenseNumber { get; set; } = string.Empty;
 
+        public int? ProvinceId { get; set; }
+
         [Required(ErrorMessage = "نام متقاضی الزامی است")]
         [MaxLength(200, ErrorMessage = "نام متقاضی نباید بیشتر از ۲۰۰ حرف باشد")]
         public string ApplicantName { get; set; } = string.Empty;

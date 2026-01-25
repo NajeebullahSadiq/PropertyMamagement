@@ -154,7 +154,7 @@ export class CompanydetailsviewComponent {
       return imagePath;
     }
     // Otherwise, construct the full URL using the Upload controller's view endpoint
-    const baseUrl = environment.apiURL.replace('/api', ''); // Remove /api suffix if present
-    return `${baseUrl}/api/Upload/view/${imagePath}`;
+    // environment.apiURL already includes /api, so just append the Upload/view path
+    return `${environment.apiURL}/Upload/view/${imagePath}`;
   }
 }

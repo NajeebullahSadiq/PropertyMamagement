@@ -119,4 +119,10 @@ export class PetitionWriterLicenseService {
             tap(() => this.notifyDataChanged())
         );
     }
+
+    // ==================== Provinces ====================
+
+    getProvinces(): Observable<any> {
+        return this.http.get(`${this.baseUrl}/provinces`);
+    }
 }

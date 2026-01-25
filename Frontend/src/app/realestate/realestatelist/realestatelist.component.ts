@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { companydetailsList } from 'src/app/models/companydetails';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { RbacService } from 'src/app/shared/rbac.service';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
   selector: 'app-realestatelist',
@@ -20,15 +22,18 @@ export class RealestatelistComponent {
   tableSize: number = 10;
   tableSizes: any = [10,50,100];
   isViewOnly: boolean = false;
+  isAdmin: boolean = false;
 
   constructor(
     private http: HttpClient, 
     private comservice: CompnaydetailService, 
     private toastr: ToastrService, 
     private router: Router,
-    private rbacService: RbacService
+    private rbacService: RbacService,
+    private dialog: MatDialog
   ) {
     this.isViewOnly = this.rbacService.isViewOnly();
+    this.isAdmin = this.rbacService.isAdmin();
   }
 
   ngOnInit() {
@@ -79,5 +84,38 @@ export class RealestatelistComponent {
       property.licenseNumber.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
       property.ownerFullName.toString().toLowerCase().includes(searchTerm.toLowerCase().toString()) 
     );
+  }
+
+  onDelete(propertyId: number, title: string) {
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      data: {
+        title: 'تأیید حذف دفتر',
+        message: 'آیا مطمئن هستید که می‌خواهید این دفتر را حذف کنید؟',
+        itemName: title
+      },
+      disableClose: true,
+      panelClass: 'delete-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.comservice.deleteCompany(propertyId).subscribe({
+          next: (response) => {
+            this.toastr.success('دفتر با موفقیت حذف شد', 'موفق');
+            this.loadData();
+          },
+          error: (error) => {
+            console.error('Error deleting company:', error);
+            if (error.status === 403) {
+              this.toastr.error('شما اجازه حذف دفتر را ندارید', 'خطا');
+            } else {
+              this.toastr.error('خطا در حذف دفتر', 'خطا');
+            }
+          }
+        });
+      }
+    });
   }
 }

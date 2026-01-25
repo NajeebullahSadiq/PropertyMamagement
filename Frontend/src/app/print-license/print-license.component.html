@@ -104,14 +104,16 @@
 
           <!-- Center Column: Ministry Info -->
           <div class="header-center">
-            <h1 class="ministry-title">امارت اسلامی افغانستان</h1>
+            <img src="/assets/img/islamicLogo.png" alt="imerat" class="islamic-logo">
             <div class="ministry-divider">
               <span class="divider-line"></span>
               <span class="divider-diamond">◆</span>
               <span class="divider-line"></span>
             </div>
             <h2 class="ministry-name">وزارت عدلیه</h2>
+            <h3 class="department-name">معنیت مالی و اداری</h3>
             <h3 class="department-name">ریاست عمومی انسجام</h3>
+             
             <h4 class="sub-department">ریاست امور رهنمای معاملات و عریضه نویسان</h4>
           </div>
 
@@ -123,7 +125,7 @@
                 <div class="photo-frame">
                   <img [src]="filePath" alt="عکس" class="owner-photo" onerror="this.src='assets/img/avatar2.png'">
                 </div>
-                <div class="photo-label">عکس دارنده جواز</div>
+               
               </div>
             </div>
           </div>
@@ -158,22 +160,22 @@
           <div class="info-card address-info">
             <p class="info-paragraph">
               <span class="label-accent">مسکونه اصلی ولسوالی</span>
+              <span class="highlight-value">({{data.ownerDistrictName || '—'}})</span>
+              <span class="label-accent">ولایت</span>
+              <span class="highlight-value">({{data.ownerProvinceName || '—'}})</span>
+              <span class="label-accent">مسکونه فعلی ناحیه یا ولسوالی</span>
               <span class="highlight-value">({{data.permanentDistrictName || '—'}})</span>
               <span class="label-accent">ولایت</span>
               <span class="highlight-value">({{data.permanentProvinceName || '—'}})</span>
-              <span class="label-accent">مسکونه فعلی ناحیه یا ولسوالی</span>
-              <span class="highlight-value">({{data.temporaryDistrictName || '—'}})</span>
-              <span class="label-accent">ولایت</span>
-              <span class="highlight-value">({{data.temporaryProvinceName || '—'}})</span>
               <span class="label-accent">واقع ناحیه</span>
-              <span class="highlight-value">({{data.temporaryVillage || data.permanentVillage || '—'}})</span>
+              <span class="highlight-value">({{data.permanentVillage || data.ownerVillage || '—'}})</span>
             </p>
           </div>
 
           <!-- Authorization Statement -->
           <div class="info-card authorization-card">
             <p class="info-paragraph">
-              با در نظرداشت احکام مندرج فقره (4) ماده (13) قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف
+              با در نظرداشت  رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف
               میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
             </p>
           </div>

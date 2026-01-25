@@ -1,14 +1,6 @@
 import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import '@angular/localize/init';
-import {
-	NgbDateStruct,
-	NgbCalendar,
-	NgbDatepickerI18n,
-	NgbCalendarPersian,
-	NgbDate,
-	NgbDateParserFormatter,
-} from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { companyowner, companyOwnerAddressHistory } from 'src/app/models/companyowner';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
@@ -18,43 +10,16 @@ import { environment } from 'src/environments/environment';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 
-
-const WEEKDAYS_SHORT = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
-const MONTHS = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-@Injectable()
-export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
-	getWeekdayLabel(weekday: number) {
-		return WEEKDAYS_SHORT[weekday - 1];
-	}
-	getMonthShortName(month: number) {
-		return MONTHS[month - 1];
-	}
-	getMonthFullName(month: number) {
-		return MONTHS[month - 1];
-	}
-	getDayAriaLabel(date: NgbDateStruct): string {
-		return `${date.year}-${this.getMonthFullName(date.month)}-${date.day}`;
-	}
-}
 @Component({
 	selector: 'app-companyowner',
 	templateUrl: './companyowner.component.html',
-	styleUrls: ['./companyowner.component.scss'],
-	providers: [
-		{ provide: NgbCalendar, useClass: NgbCalendarPersian },
-		{ provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
-	],
+	styleUrls: ['./companyowner.component.scss']
 })
 export class CompanyownerComponent {
-	maxDate = { year: 1410, month: 12, day: 31 }
-	minDate = { year: 1320, month: 12, day: 31 }
-
 	baseUrl: string = environment.apiURL + '/';
 	imagePath: string = 'assets/img/avatar.png';
 	imageName: string = '';
 	selectedId: number = 0;
-	selectedDate!: NgbDate;
 	IdTypes: any;
 	EducationLevel: any;
 	ownerForm!: FormGroup;
@@ -104,7 +69,6 @@ export class CompanyownerComponent {
 		private toastr: ToastrService,
 		private comservice: CompnaydetailService,
 		private selerService: SellerService,
-		private ngbDateParserFormatter: NgbDateParserFormatter,
 		private calendarConversionService: CalendarConversionService,
 		private calendarService: CalendarService
 	) {
@@ -140,29 +104,17 @@ export class CompanyownerComponent {
 
 		// Add cross-field validation for phone numbers
 		this.ownerForm.get('whatsAppNumber')?.valueChanges.subscribe(() => {
-			this.validatePhoneNumbers();
+			// Removed duplicate phone validation - users can use same number for both
 		});
 		this.ownerForm.get('phoneNumber')?.valueChanges.subscribe(() => {
-			this.validatePhoneNumbers();
+			// Removed duplicate phone validation - users can use same number for both
 		});
 	}
 
 	// Validate that phone and WhatsApp numbers are not identical
 	validatePhoneNumbers(): void {
-		const phoneNumber = this.ownerForm.get('phoneNumber')?.value?.trim();
-		const whatsAppNumber = this.ownerForm.get('whatsAppNumber')?.value?.trim();
-		
-		if (phoneNumber && whatsAppNumber && phoneNumber === whatsAppNumber) {
-			this.ownerForm.get('whatsAppNumber')?.setErrors({ duplicatePhone: true });
-		} else {
-			const errors = this.ownerForm.get('whatsAppNumber')?.errors;
-			if (errors) {
-				delete errors['duplicatePhone'];
-				if (Object.keys(errors).length === 0) {
-					this.ownerForm.get('whatsAppNumber')?.setErrors(null);
-				}
-			}
-		}
+		// Validation removed - users can use the same number for both phone and WhatsApp
+		// This is a common use case and should not be restricted
 	}
 
 	// Property to track if WhatsApp should be same as phone
@@ -194,18 +146,35 @@ export class CompanyownerComponent {
 			this.province = res;
 		});
 
-		this.comservice.getOwnerById(this.id)
+					this.comservice.getOwnerById(this.id)
 			.subscribe({
 				next: (detail) => {
 					if (detail && detail.length > 0) {
 						this.ownerDetails = detail;
+						
+						// Parse the date properly for the multi-calendar datepicker
+						let dateOfBirthValue: Date | null = null;
+						if (detail[0].dateofBirth) {
+							const dateString: any = detail[0].dateofBirth;
+							// Try to parse as Date object
+							if (typeof dateString === 'string') {
+								dateOfBirthValue = new Date(dateString);
+								// Check if date is valid
+								if (isNaN(dateOfBirthValue.getTime())) {
+									dateOfBirthValue = null;
+								}
+							} else if (dateString instanceof Date) {
+								dateOfBirthValue = dateString;
+							}
+						}
+						
 						this.ownerForm.patchValue({
 							id: detail[0].id,
 							firstName: detail[0].firstName,
 							fatherName: detail[0].fatherName,
 							grandFatherName: detail[0].grandFatherName,
 							educationLevelId: detail[0].educationLevelId,
-							dateofBirth: detail[0].dateofBirth,
+							dateofBirth: dateOfBirthValue,
 							electronicNationalIdNumber: detail[0].electronicNationalIdNumber || '',
 							companyId: detail[0].companyId,
 							pothoPath: detail[0].pothoPath,
@@ -231,26 +200,16 @@ export class CompanyownerComponent {
 
 						this.comservice.ownerId = detail[0].id;
 						this.selectedId = detail[0].id;
-						const dateString = detail[0].dateofBirth;
 
 						if (detail[0].pothoPath) {
 							// Use the Upload controller's view endpoint for proper file serving
-							this.imagePath = `${this.baseUrl}api/Upload/view/${detail[0].pothoPath}`;
+							this.imagePath = `${this.baseUrl}Upload/view/${detail[0].pothoPath}`;
 							this.imageName = detail[0].pothoPath;
 							if (this.childComponent) {
 								this.childComponent.setExistingImage(this.imagePath);
 							} else {
 								this.pendingImagePath = this.imagePath;
 							}
-						}
-						const parsedDateStruct: NgbDateStruct | null = this.ngbDateParserFormatter.parse(dateString);
-						let parsedDate: NgbDate | null = null;
-
-						if (parsedDateStruct) {
-							parsedDate = new NgbDate(parsedDateStruct.year, parsedDateStruct.month, parsedDateStruct.day);
-						}
-						if (parsedDate) {
-							this.selectedDate = parsedDate;
 						}
 
 						if (detail[0].ownerProvinceId) {
@@ -372,7 +331,7 @@ export class CompanyownerComponent {
 
 	uploadFinished = (event: string) => {
 		this.imageName = event;
-		this.imagePath = event ? `${this.baseUrl}api/Upload/view/${event}` : 'assets/img/avatar.png';
+		this.imagePath = event ? `${this.baseUrl}Upload/view/${event}` : 'assets/img/avatar.png';
 	}
 
 	profilePreviewChanged = (localObjectUrl: string) => {
@@ -381,7 +340,7 @@ export class CompanyownerComponent {
 			return;
 		}
 		if (this.imageName) {
-			this.imagePath = `${this.baseUrl}api/Upload/view/${this.imageName}`;
+			this.imagePath = `${this.baseUrl}Upload/view/${this.imageName}`;
 			return;
 		}
 		this.imagePath = 'assets/img/avatar.png';
@@ -390,7 +349,7 @@ export class CompanyownerComponent {
 	profileImageUploaded = (dbPath: string) => {
 		this.imageName = dbPath || '';
 		this.ownerForm.patchValue({ pothoPath: this.imageName });
-		this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
+		this.imagePath = this.imageName ? `${this.baseUrl}Upload/view/${this.imageName}` : 'assets/img/avatar.png';
 	}
 
 	private formatDateForBackend(dateValue: any): string {
@@ -569,4 +528,16 @@ export class CompanyownerComponent {
 	get permanentProvinceId() { return this.ownerForm.get('permanentProvinceId'); }
 	get permanentDistrictId() { return this.ownerForm.get('permanentDistrictId'); }
 	get permanentVillage() { return this.ownerForm.get('permanentVillage'); }
+
+	// Debug helper to check form validity
+	checkFormValidity(): void {
+		console.log('Form Valid:', this.ownerForm.valid);
+		console.log('Form Errors:', this.ownerForm.errors);
+		Object.keys(this.ownerForm.controls).forEach(key => {
+			const control = this.ownerForm.get(key);
+			if (control && control.invalid) {
+				console.log(`Invalid field: ${key}`, control.errors, 'Value:', control.value);
+			}
+		});
+	}
 }

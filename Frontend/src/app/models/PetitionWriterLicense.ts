@@ -6,6 +6,8 @@ export interface PetitionWriterLicense {
     id?: number;
     
     // Tab 1: مشخصات عریضه‌نویس
+    provinceId?: number;
+    provinceName?: string;
     licenseNumber: string;
     applicantName: string;
     applicantFatherName?: string;
@@ -104,6 +106,7 @@ export const LicenseTypes = [
  */
 export interface PetitionWriterLicenseData {
     id?: number;
+    provinceId?: number;
     licenseNumber: string;
     applicantName: string;
     applicantFatherName?: string;

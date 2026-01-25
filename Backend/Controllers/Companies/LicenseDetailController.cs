@@ -17,9 +17,12 @@ namespace WebAPIBackend.Controllers.Companies
     public class LicenseDetailController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public LicenseDetailController(AppDbContext context)
+        private readonly WebAPIBackend.Services.ILicenseNumberGenerator _licenseNumberGenerator;
+        
+        public LicenseDetailController(AppDbContext context, WebAPIBackend.Services.ILicenseNumberGenerator licenseNumberGenerator)
         {
             _context = context;
+            _licenseNumberGenerator = licenseNumberGenerator;
         }
 
         [HttpGet("{id}")]
@@ -29,20 +32,9 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 var Pro = await _context.LicenseDetails.Where(x => x.CompanyId.Equals(id)).ToListAsync();
 
-                // Convert dates to the requested calendar type (defaults to HijriShamsi)
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
-                foreach (var item in Pro)
-                {
-                    var originalIssueDate = item.IssueDate;
-                    item.IssueDate = DateConversionHelper.ToCalendarDateOnly(originalIssueDate, calendar);
-                    item.ExpireDate = originalIssueDate.HasValue
-                        ? DateConversionHelper.ToCalendarDateOnly(originalIssueDate.Value.AddYears(3), calendar)
-                        : DateConversionHelper.ToCalendarDateOnly(item.ExpireDate, calendar);
-                    item.RoyaltyDate = DateConversionHelper.ToCalendarDateOnly(item.RoyaltyDate, calendar);
-                    item.PenaltyDate = DateConversionHelper.ToCalendarDateOnly(item.PenaltyDate, calendar);
-                    item.HrLetterDate = DateConversionHelper.ToCalendarDateOnly(item.HrLetterDate, calendar);
-                }
-
+                // DO NOT convert dates - return them as Gregorian
+                // The frontend will handle calendar conversion
+                
                 return Ok(Pro);
             }
             catch (Exception ex)
@@ -143,9 +135,24 @@ namespace WebAPIBackend.Controllers.Companies
                 return BadRequest("PenaltyAmount must be a non-negative number.");
             }
 
+            // Auto-generate license number if ProvinceId is provided and LicenseNumber is empty
+            string licenseNumber = request.LicenseNumber;
+            if (request.ProvinceId.HasValue && string.IsNullOrWhiteSpace(licenseNumber))
+            {
+                try
+                {
+                    licenseNumber = await _licenseNumberGenerator.GenerateNextLicenseNumber(request.ProvinceId.Value);
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest($"خطا در تولید شماره جواز: {ex.Message}");
+                }
+            }
+
             var property = new LicenseDetail
             {
-                LicenseNumber = request.LicenseNumber,
+                LicenseNumber = licenseNumber,
+                ProvinceId = request.ProvinceId,
                 IssueDate = issueDate,
                 ExpireDate = expireDate,
                 AreaId = request.AreaId,
@@ -270,8 +277,23 @@ namespace WebAPIBackend.Controllers.Companies
             var createdAt = existingProperty.CreatedAt;
             var companyId = existingProperty.CompanyId;
 
+            // Auto-generate license number if ProvinceId is provided and LicenseNumber is empty
+            string licenseNumber = request.LicenseNumber;
+            if (request.ProvinceId.HasValue && string.IsNullOrWhiteSpace(licenseNumber))
+            {
+                try
+                {
+                    licenseNumber = await _licenseNumberGenerator.GenerateNextLicenseNumber(request.ProvinceId.Value);
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest($"خطا در تولید شماره جواز: {ex.Message}");
+                }
+            }
+
             // Update the entity with the new values
-            existingProperty.LicenseNumber = request.LicenseNumber;
+            existingProperty.LicenseNumber = licenseNumber;
+            existingProperty.ProvinceId = request.ProvinceId;
             existingProperty.IssueDate = issueDate;
             existingProperty.ExpireDate = expireDate;
             existingProperty.AreaId = request.AreaId;
@@ -342,7 +364,65 @@ namespace WebAPIBackend.Controllers.Companies
                     return NotFound();
                 }
 
+                // Get address data from CompanyOwner and Location tables
+                var owner = await _context.CompanyOwners
+                    .Where(o => o.CompanyId == id)
+                    .FirstOrDefaultAsync();
+
+                string? ownerProvinceName = null;
+                string? ownerDistrictName = null;
+                string? ownerVillage = null;
+                string? permanentProvinceName = null;
+                string? permanentDistrictName = null;
+                string? permanentVillage = null;
+
+                if (owner != null)
+                {
+                    ownerVillage = owner.OwnerVillage;
+                    permanentVillage = owner.PermanentVillage;
+
+                    // Get owner address location names
+                    if (owner.OwnerProvinceId.HasValue)
+                    {
+                        var ownerProvince = await _context.Locations
+                            .Where(l => l.Id == owner.OwnerProvinceId.Value)
+                            .FirstOrDefaultAsync();
+                        ownerProvinceName = ownerProvince?.Dari;
+                    }
+
+                    if (owner.OwnerDistrictId.HasValue)
+                    {
+                        var ownerDistrict = await _context.Locations
+                            .Where(l => l.Id == owner.OwnerDistrictId.Value)
+                            .FirstOrDefaultAsync();
+                        ownerDistrictName = ownerDistrict?.Dari;
+                    }
+
+                    // Get permanent address location names
+                    if (owner.PermanentProvinceId.HasValue)
+                    {
+                        var permanentProvince = await _context.Locations
+                            .Where(l => l.Id == owner.PermanentProvinceId.Value)
+                            .FirstOrDefaultAsync();
+                        permanentProvinceName = permanentProvince?.Dari;
+                    }
+
+                    if (owner.PermanentDistrictId.HasValue)
+                    {
+                        var permanentDistrict = await _context.Locations
+                            .Where(l => l.Id == owner.PermanentDistrictId.Value)
+                            .FirstOrDefaultAsync();
+                        permanentDistrictName = permanentDistrict?.Dari;
+                    }
+                }
+
             var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+
+            // Get the actual LicenseDetail ID for verification purposes
+            var licenseDetail = await _context.LicenseDetails
+                .Where(l => l.CompanyId == id)
+                .OrderByDescending(l => l.IssueDate)
+                .FirstOrDefaultAsync();
 
             // Format dates for the requested calendar
             string issueDateFormatted = data.IssueDate.HasValue 
@@ -367,6 +447,7 @@ namespace WebAPIBackend.Controllers.Companies
             var result = new
             {
                 data.CompanyId,
+                LicenseDetailId = licenseDetail?.Id, // Actual LicenseDetail ID for verification
                 data.Title,
                 data.PhoneNumber,
                 data.Tin,
@@ -383,10 +464,14 @@ namespace WebAPIBackend.Controllers.Companies
                 issueDateFormatted,
                 expireDateFormatted,
                 dateOfBirthFormatted,
-                // Integrated Owner Address Fields
-                data.PermanentProvinceName,
-                data.PermanentDistrictName,
-                data.PermanentVillage,
+                // Owner Address Fields
+                ownerProvinceName,
+                ownerDistrictName,
+                ownerVillage,
+                // Permanent Address Fields
+                permanentProvinceName,
+                permanentDistrictName,
+                permanentVillage,
                 // Financial and Administrative Fields
                 data.RoyaltyAmount,
                 data.RoyaltyDate,
@@ -485,7 +570,7 @@ namespace WebAPIBackend.Controllers.Companies
                         co.""FatherName"",
                         co.""GrandFatherName"",
                         co.""DateofBirth"",
-                        co.""IndentityCardNumber"",
+                        co.""ElectronicNationalIdNumber"" AS ""IndentityCardNumber"",
                         co.""PothoPath"" AS ""OwnerPhoto"",
                         ld.""LicenseNumber"",
                         ld.""OfficeAddress"",

@@ -182,7 +182,7 @@ export class ProfileImageCropperComponent implements OnChanges {
       return path;
     }
     // Otherwise, construct the full URL using the environment API URL and Upload controller's view endpoint
-    const baseUrl = environment.apiURL.replace('/api', ''); // Remove /api suffix if present
-    return `${baseUrl}/api/Upload/view/${path}`;
+    // environment.apiURL already includes /api, so just append the Upload/view path
+    return `${environment.apiURL}/Upload/view/${path}`;
   }
 }

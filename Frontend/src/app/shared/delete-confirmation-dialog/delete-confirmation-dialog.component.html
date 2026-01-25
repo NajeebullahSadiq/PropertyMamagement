@@ -1,0 +1,30 @@
+<div class="delete-dialog-container" dir="rtl">
+  <div class="dialog-header">
+    <div class="icon-container">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h2 class="dialog-title">{{ data.title }}</h2>
+  </div>
+
+  <div class="dialog-content">
+    <p class="warning-message">{{ data.message }}</p>
+    <div *ngIf="data.itemName" class="item-name">
+      <strong>{{ data.itemName }}</strong>
+    </div>
+    <p class="warning-note">
+      <i class="fas fa-info-circle"></i>
+      توجه: این عملیات غیرقابل بازگشت است و تمام اطلاعات مرتبط حذف خواهد شد.
+    </p>
+  </div>
+
+  <div class="dialog-actions">
+    <button type="button" class="btn-cancel" (click)="onCancel()">
+      <i class="fas fa-times"></i>
+      انصراف
+    </button>
+    <button type="button" class="btn-delete" (click)="onConfirm()">
+      <i class="fas fa-trash"></i>
+      بله، حذف شود
+    </button>
+  </div>
+</div>
