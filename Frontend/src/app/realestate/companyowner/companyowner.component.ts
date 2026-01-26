@@ -202,8 +202,16 @@ export class CompanyownerComponent {
 						this.selectedId = detail[0].id;
 
 						if (detail[0].pothoPath) {
-							// Use the Upload controller's view endpoint for proper file serving
-							this.imagePath = `${this.baseUrl}Upload/view/${detail[0].pothoPath}`;
+							// Check if path already includes Resources/ prefix (full path from DB)
+							// If so, use static file serving; otherwise use Upload/view endpoint
+							const photoPath = detail[0].pothoPath;
+							if (photoPath.startsWith('Resources/') || photoPath.startsWith('/Resources/')) {
+								// Full path - use static file serving
+								this.imagePath = `${this.baseUrl}${photoPath.startsWith('/') ? photoPath.substring(1) : photoPath}`;
+							} else {
+								// Relative path - use Upload/view endpoint
+								this.imagePath = `${this.baseUrl}Upload/view/${photoPath}`;
+							}
 							this.imageName = detail[0].pothoPath;
 							if (this.childComponent) {
 								this.childComponent.setExistingImage(this.imagePath);

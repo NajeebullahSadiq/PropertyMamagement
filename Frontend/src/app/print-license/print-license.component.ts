@@ -63,7 +63,15 @@ export class PrintLicenseComponent implements OnInit {
           this.data = this.toCamelCaseDeep(payload || {});
 
           if (this.data && this.data.ownerPhoto) {
-            this.filePath = this.baseUrl + this.data.ownerPhoto;
+            // Check if path already includes Resources/ prefix (full path from DB)
+            const photoPath = this.data.ownerPhoto;
+            if (photoPath.startsWith('Resources/') || photoPath.startsWith('/Resources/')) {
+              // Full path - use static file serving
+              this.filePath = this.baseUrl + (photoPath.startsWith('/') ? photoPath.substring(1) : photoPath);
+            } else {
+              // Relative path - use Upload/view endpoint
+              this.filePath = this.baseUrl + 'Upload/view/' + photoPath;
+            }
           }
 
           // Fetch Account Info for the company
