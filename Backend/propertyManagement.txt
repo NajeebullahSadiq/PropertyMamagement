@@ -107,4 +107,6 @@ sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_Initi
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/10_Verification_Initial.sql
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_AddPicturePath.sql
 sudo -u postgres psql -d PRMIS -f Scripts/fix_owner_photo_issue.sql
-sudo -u postgres psql -d PRMIS -f Scripts/Modules/11_ActivityMonitoring_Initial.sql
+sudo -u postgres psql -d PRMIS -f Scripts/Modules/add_province_column.sql
+cd ~/PropertyMamagement/Backend
+sudo -u postgres psql -d PRMIS -f Scripts/fix_company_electronic_id_columns.sql
