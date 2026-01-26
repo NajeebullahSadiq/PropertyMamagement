@@ -181,8 +181,13 @@ export class ProfileImageCropperComponent implements OnChanges {
     if (path.startsWith('assets/')) {
       return path;
     }
-    // Otherwise, construct the full URL using the environment API URL and Upload controller's view endpoint
-    // environment.apiURL already includes /api, so just append the Upload/view path
+    // Check if path already includes Resources/ prefix (full path from DB)
+    // If so, use static file serving; otherwise use Upload/view endpoint
+    if (path.startsWith('Resources/') || path.startsWith('/Resources/')) {
+      // Full path - use static file serving
+      return `${environment.apiURL}/${path.startsWith('/') ? path.substring(1) : path}`;
+    }
+    // Relative path - use Upload/view endpoint
     return `${environment.apiURL}/Upload/view/${path}`;
   }
 }
