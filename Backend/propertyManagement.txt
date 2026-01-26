@@ -110,3 +110,6 @@ sudo -u postgres psql -d PRMIS -f Scripts/fix_owner_photo_issue.sql
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/add_province_column.sql
 cd ~/PropertyMamagement/Backend
 sudo -u postgres psql -d PRMIS -f Scripts/fix_company_electronic_id_columns.sql
+sudo -u postgres psql -d PRMIS -f Backend/Scripts/update_area_names_to_dari.sql
+sudo -u postgres psql -d PRMIS -f Backend/Scripts/QUICK_update_areas.sql
+sudo systemctl restart prmis-backend
