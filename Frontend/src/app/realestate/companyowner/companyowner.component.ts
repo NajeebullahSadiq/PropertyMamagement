@@ -202,8 +202,10 @@ export class CompanyownerComponent {
 						this.selectedId = detail[0].id;
 
 						if (detail[0].pothoPath) {
+							// Store the raw path from database
+							this.imageName = detail[0].pothoPath;
+							
 							// Check if path already includes Resources/ prefix (full path from DB)
-							// If so, use static file serving; otherwise use Upload/view endpoint
 							const photoPath = detail[0].pothoPath;
 							if (photoPath.startsWith('Resources/') || photoPath.startsWith('/Resources/')) {
 								// Full path - use static file serving
@@ -212,11 +214,13 @@ export class CompanyownerComponent {
 								// Relative path - use Upload/view endpoint
 								this.imagePath = `${this.baseUrl}Upload/view/${photoPath}`;
 							}
-							this.imageName = detail[0].pothoPath;
+							
+							// Pass the RAW database path to the child component, not the constructed URL
+							// The child component will construct the URL itself
 							if (this.childComponent) {
-								this.childComponent.setExistingImage(this.imagePath);
+								this.childComponent.setExistingImage(detail[0].pothoPath);
 							} else {
-								this.pendingImagePath = this.imagePath;
+								this.pendingImagePath = detail[0].pothoPath;
 							}
 						}
 
