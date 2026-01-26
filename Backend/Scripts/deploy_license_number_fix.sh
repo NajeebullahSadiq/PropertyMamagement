@@ -9,9 +9,9 @@ echo "Deploying LicenseNumber Type Fix"
 echo "=========================================="
 echo ""
 
-# Apply the fix
-echo "Step 1: Converting LicenseNumber from double precision to TEXT..."
-sudo -u postgres psql -d PRMIS -f Backend/Scripts/fix_license_number_type.sql
+# Apply the fix (with view recreation)
+echo "Step 1: Dropping LicenseView, converting LicenseNumber, and recreating view..."
+sudo -u postgres psql -d PRMIS -f Backend/Scripts/fix_license_number_with_view.sql
 
 echo ""
 echo "Step 2: Restarting backend service..."
