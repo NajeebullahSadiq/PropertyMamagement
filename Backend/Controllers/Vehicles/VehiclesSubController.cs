@@ -247,7 +247,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 TaddressProvinceId = request.TaddressProvinceId,
                 TaddressDistrictId = request.TaddressDistrictId,
                 TaddressVillage = request.TaddressVillage,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 Photo=request.Photo,
@@ -340,7 +340,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     {
                         VehicleBuyerId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         ColumnName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()
@@ -416,7 +416,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 TaddressProvinceId = request.TaddressProvinceId,
                 TaddressDistrictId = request.TaddressDistrictId,
                 TaddressVillage = request.TaddressVillage,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 Photo = request.Photo,
@@ -521,7 +521,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     {
                         VehicleSellerId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         ColumnName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()
@@ -563,7 +563,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 FatherName = request.FatherName,
                 ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 NationalIdCard = request.NationalIdCard,
@@ -607,6 +607,17 @@ namespace WebAPIBackend.Controllers.Vehicles
             try
             {
                 await _context.SaveChangesAsync();
+
+                // Ensure the IsComplete column of the PropertyDetails entity remains true
+                if (request.PropertyDetailsId.HasValue)
+                {
+                    var propertyDetails = await _context.VehiclesPropertyDetails.FindAsync(request.PropertyDetailsId.Value);
+                    if (propertyDetails != null)
+                    {
+                        propertyDetails.iscomplete = true;
+                        await _context.SaveChangesAsync();
+                    }
+                }
             }
             catch (DbUpdateConcurrencyException)
             {

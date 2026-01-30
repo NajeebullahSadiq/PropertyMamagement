@@ -260,7 +260,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     LicenseStatus = data.LicenseStatus ?? 1,
                     CancellationDate = DateConversionHelper.ParseDateOnly(data.CancellationDate, calendar),
                     Status = true,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = username
                 };
 
@@ -329,7 +329,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.LicenseExpiryDate = DateConversionHelper.ParseDateOnly(data.LicenseExpiryDate, calendar);
                 entity.LicenseStatus = data.LicenseStatus ?? entity.LicenseStatus;
                 entity.CancellationDate = DateConversionHelper.ParseDateOnly(data.CancellationDate, calendar);
-                entity.UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = username;
 
                 await _context.SaveChangesAsync();
@@ -361,7 +361,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 var username = User.Identity?.Name ?? "system";
 
                 entity.Status = false;
-                entity.UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = username;
 
                 await _context.SaveChangesAsync();
@@ -395,7 +395,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 entity.LicenseStatus = data.LicenseStatus;
                 entity.CancellationDate = DateConversionHelper.ParseDateOnly(data.CancellationDate, calendar);
-                entity.UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = username;
 
                 await _context.SaveChangesAsync();
@@ -509,7 +509,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     NewActivityLocation = data.NewActivityLocation,
                     RelocationDate = DateConversionHelper.ParseDateOnly(data.RelocationDate, calendar),
                     Remarks = data.Remarks,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = username
                 };
 

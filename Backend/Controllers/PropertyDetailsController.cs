@@ -69,39 +69,46 @@ namespace WebAPIBackend.Controllers
         {
             if (request?.PropertyAddresses == null)
             {
+                Console.WriteLine($"UpsertPropertyAddressAsync: PropertyAddresses is null for property {propertyDetailsId}");
                 return;
             }
 
             var incoming = request.PropertyAddresses.FirstOrDefault();
             if (incoming == null)
             {
+                Console.WriteLine($"UpsertPropertyAddressAsync: No address in collection for property {propertyDetailsId}");
                 return;
             }
+
+            Console.WriteLine($"UpsertPropertyAddressAsync: Processing address for property {propertyDetailsId}, ProvinceId={incoming.ProvinceId}, DistrictId={incoming.DistrictId}, Village={incoming.Village}");
 
             var existing = await _context.PropertyAddresses
                 .FirstOrDefaultAsync(x => x.PropertyDetailsId == propertyDetailsId);
 
             if (existing == null)
             {
+                Console.WriteLine($"UpsertPropertyAddressAsync: Creating new address for property {propertyDetailsId}");
                 var address = new PropertyAddress
                 {
                     ProvinceId = incoming.ProvinceId,
                     DistrictId = incoming.DistrictId,
                     Village = incoming.Village,
                     PropertyDetailsId = propertyDetailsId,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId
                 };
                 _context.PropertyAddresses.Add(address);
             }
             else
             {
+                Console.WriteLine($"UpsertPropertyAddressAsync: Updating existing address {existing.Id} for property {propertyDetailsId}");
                 existing.ProvinceId = incoming.ProvinceId;
                 existing.DistrictId = incoming.DistrictId;
                 existing.Village = incoming.Village;
             }
 
             await _context.SaveChangesAsync();
+            Console.WriteLine($"UpsertPropertyAddressAsync: Address saved successfully for property {propertyDetailsId}");
         }
         [Authorize]
         [HttpGet]
@@ -173,7 +180,10 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var Pro = await _context.PropertyDetails.Where(x => x.Id.Equals(id)).ToListAsync();
+                var Pro = await _context.PropertyDetails
+                    .Include(p => p.PropertyAddresses)
+                    .Where(x => x.Id.Equals(id))
+                    .ToListAsync();
 
                 return Ok(Pro);
             }
@@ -406,9 +416,21 @@ namespace WebAPIBackend.Controllers
                 transactionDate = request.TransactionDate;
             }
 
+            // Generate property number if not provided
+            string propertyNumber;
+            if (string.IsNullOrWhiteSpace(request.Pnumber) || request.Pnumber == "0")
+            {
+                // Generate a unique property number based on timestamp
+                propertyNumber = $"PROP-{DateTime.UtcNow:yyyyMMddHHmmss}";
+            }
+            else
+            {
+                propertyNumber = request.Pnumber;
+            }
+
             var property = new PropertyDetail
             {
-                Pnumber = string.IsNullOrWhiteSpace(request.Pnumber) || request.Pnumber == "0" ? null : request.Pnumber,
+                Pnumber = propertyNumber,
                 Parea = request.Parea,
                 PunitTypeId = request.PunitTypeId,
                 NumofFloor=request.NumofFloor,
@@ -420,7 +442,7 @@ namespace WebAPIBackend.Controllers
                 RoyaltyAmount= (double.TryParse(request.Price, out var priceVal) ? priceVal * 0.01 : 0).ToString(),
                 TransactionTypeId=request.TransactionTypeId,
                 Des=request.Des,
-                CreatedAt=DateTime.Now,
+                CreatedAt=DateTime.UtcNow,
                 CreatedBy= userId,
                 FilePath=request.FilePath,
                 PreviousDocumentsPath = request.PreviousDocumentsPath,
@@ -511,6 +533,15 @@ namespace WebAPIBackend.Controllers
                 return BadRequest();
             }
 
+            // DEBUG: Log incoming request
+            Console.WriteLine($"UpdatePropertyDetails: Property ID={id}");
+            Console.WriteLine($"UpdatePropertyDetails: PropertyAddresses count={request.PropertyAddresses?.Count ?? 0}");
+            if (request.PropertyAddresses != null && request.PropertyAddresses.Any())
+            {
+                var addr = request.PropertyAddresses.First();
+                Console.WriteLine($"UpdatePropertyDetails: Address - ProvinceId={addr.ProvinceId}, DistrictId={addr.DistrictId}, Village={addr.Village}, PropertyDetailsId={addr.PropertyDetailsId}");
+            }
+
             var existingProperty = await _context.PropertyDetails.FindAsync(id);
             if (existingProperty == null)
             {
@@ -541,6 +572,7 @@ namespace WebAPIBackend.Controllers
             // Store the original values of the CreatedBy and CreatedOn properties
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
+            var pNumber = existingProperty.Pnumber; // Preserve PNumber
 
             // Update the entity with the new values
             _context.Entry(existingProperty).CurrentValues.SetValues(request);
@@ -548,6 +580,7 @@ namespace WebAPIBackend.Controllers
             // Restore the original values of the CreatedBy and CreatedOn properties
             existingProperty.CreatedBy = createdBy;
             existingProperty.CreatedAt = createdAt;
+            existingProperty.Pnumber = pNumber; // Restore PNumber
 
             var entry = _context.Entry(existingProperty);
             entry.State = EntityState.Modified;
@@ -573,7 +606,7 @@ namespace WebAPIBackend.Controllers
                     {
                         PropertyId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         PropertyName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()
@@ -708,6 +741,112 @@ namespace WebAPIBackend.Controllers
                     message = "An error occurred while retrieving print record",
                     error = ex.Message,
                     hint
+                });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> DeleteProperty(int id)
+        {
+            try
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
+                var property = await _context.PropertyDetails
+                    .Include(p => p.SellerDetails)
+                    .Include(p => p.BuyerDetails)
+                    .Include(p => p.WitnessDetails)
+                    .Include(p => p.PropertyAddresses)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
+                if (property == null)
+                {
+                    return NotFound(new { message = "سند ملکیت یافت نشد" });
+                }
+
+                // Delete audit records first
+                var auditRecords = await _context.Propertyaudits
+                    .Where(a => a.PropertyId == id)
+                    .ToListAsync();
+                if (auditRecords.Any())
+                {
+                    _context.Propertyaudits.RemoveRange(auditRecords);
+                }
+
+                // Delete seller audit records
+                if (property.SellerDetails != null && property.SellerDetails.Any())
+                {
+                    var sellerIds = property.SellerDetails.Select(s => s.Id).ToList();
+                    var sellerAuditRecords = await _context.Propertyselleraudits
+                        .Where(a => sellerIds.Contains(a.SellerId))
+                        .ToListAsync();
+                    if (sellerAuditRecords.Any())
+                    {
+                        _context.Propertyselleraudits.RemoveRange(sellerAuditRecords);
+                    }
+                }
+
+                // Delete buyer audit records
+                if (property.BuyerDetails != null && property.BuyerDetails.Any())
+                {
+                    var buyerIds = property.BuyerDetails.Select(b => b.Id).ToList();
+                    var buyerAuditRecords = await _context.Propertybuyeraudits
+                        .Where(a => buyerIds.Contains(a.BuyerId))
+                        .ToListAsync();
+                    if (buyerAuditRecords.Any())
+                    {
+                        _context.Propertybuyeraudits.RemoveRange(buyerAuditRecords);
+                    }
+                }
+
+                // Note: Witness audit records are not tracked in a separate audit table
+
+                // Remove property addresses
+                if (property.PropertyAddresses != null && property.PropertyAddresses.Any())
+                {
+                    _context.PropertyAddresses.RemoveRange(property.PropertyAddresses);
+                }
+
+                // Remove witnesses
+                if (property.WitnessDetails != null && property.WitnessDetails.Any())
+                {
+                    _context.WitnessDetails.RemoveRange(property.WitnessDetails);
+                }
+
+                // Remove buyers
+                if (property.BuyerDetails != null && property.BuyerDetails.Any())
+                {
+                    _context.BuyerDetails.RemoveRange(property.BuyerDetails);
+                }
+
+                // Remove sellers
+                if (property.SellerDetails != null && property.SellerDetails.Any())
+                {
+                    _context.SellerDetails.RemoveRange(property.SellerDetails);
+                }
+
+                // Remove the property itself
+                _context.PropertyDetails.Remove(property);
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "سند ملکیت با موفقیت حذف شد" });
+            }
+            catch (Exception ex)
+            {
+                // Log the detailed error for debugging
+                Console.WriteLine($"Error deleting property: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                return StatusCode(500, new { 
+                    message = $"خطا در حذف سند: {ex.Message}",
+                    details = ex.InnerException?.Message 
                 });
             }
         }

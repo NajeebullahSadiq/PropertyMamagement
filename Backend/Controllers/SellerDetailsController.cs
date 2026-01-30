@@ -60,9 +60,49 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var Pro = await _context.BuyerDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+                var buyers = await _context.BuyerDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
 
-                return Ok(Pro);
+                // Map to response format with electronicNationalIdNumber
+                var mappedBuyers = buyers.Select(b => new
+                {
+                    b.Id,
+                    b.FirstName,
+                    b.FatherName,
+                    b.GrandFather,
+                    electronicNationalIdNumber = b.ElectronicNationalIdNumber,
+                    b.PhoneNumber,
+                    b.PaddressProvinceId,
+                    b.PaddressDistrictId,
+                    b.PaddressVillage,
+                    b.TaddressProvinceId,
+                    b.TaddressDistrictId,
+                    b.TaddressVillage,
+                    b.PropertyDetailsId,
+                    b.CreatedAt,
+                    b.CreatedBy,
+                    b.Photo,
+                    b.NationalIdCard,
+                    b.RoleType,
+                    b.AuthorizationLetter,
+                    b.TaxIdentificationNumber,
+                    b.AdditionalDetails,
+                    b.SharePercentage,
+                    b.ShareAmount,
+                    b.Price,
+                    b.PriceText,
+                    b.RoyaltyAmount,
+                    b.HalfPrice,
+                    b.TransactionType,
+                    b.TransactionTypeDescription,
+                    b.RentStartDate,
+                    b.RentEndDate,
+                    tazkiraType = "Electronic", // Default value for compatibility
+                    tazkiraVolume = (string?)null,
+                    tazkiraPage = (string?)null,
+                    tazkiraNumber = (string?)null
+                }).ToList();
+
+                return Ok(mappedBuyers);
             }
             catch (Exception ex)
             {
@@ -231,7 +271,7 @@ namespace WebAPIBackend.Controllers
                 TaddressProvinceId = request.TaddressProvinceId,
                 TaddressDistrictId = request.TaddressDistrictId,
                 TaddressVillage = request.TaddressVillage,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 Photo=request.Photo,
@@ -320,7 +360,7 @@ namespace WebAPIBackend.Controllers
                     {
                         SellerId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         ColumnName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()
@@ -520,10 +560,11 @@ namespace WebAPIBackend.Controllers
                 TaddressProvinceId = request.TaddressProvinceId,
                 TaddressDistrictId = request.TaddressDistrictId,
                 TaddressVillage = request.TaddressVillage,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 Photo=request.Photo,
+                NationalIdCard=request.NationalIdCard,
                 RoleType=roleType,
                 AuthorizationLetter=request.AuthorizationLetter,
                 TaxIdentificationNumber = request.TaxIdentificationNumber,
@@ -657,10 +698,35 @@ namespace WebAPIBackend.Controllers
                 request.RentEndDate = request.RentEndDate.Value.ToUniversalTime();
             }
 
-            request.RoleType = roleType;
+            // Map indentityCardNumber to ElectronicNationalIdNumber
+            var electronicId = request.ElectronicNationalIdNumber;
 
-            // Update the entity with the new values
-            _context.Entry(existingProperty).CurrentValues.SetValues(request);
+            // Update fields manually
+            existingProperty.FirstName = request.FirstName;
+            existingProperty.FatherName = request.FatherName;
+            existingProperty.GrandFather = request.GrandFather;
+            existingProperty.ElectronicNationalIdNumber = electronicId;
+            existingProperty.PhoneNumber = request.PhoneNumber;
+            existingProperty.PaddressProvinceId = request.PaddressProvinceId;
+            existingProperty.PaddressDistrictId = request.PaddressDistrictId;
+            existingProperty.PaddressVillage = request.PaddressVillage;
+            existingProperty.TaddressProvinceId = request.TaddressProvinceId;
+            existingProperty.TaddressDistrictId = request.TaddressDistrictId;
+            existingProperty.TaddressVillage = request.TaddressVillage;
+            existingProperty.Photo = request.Photo;
+            existingProperty.NationalIdCard = request.NationalIdCard;
+            existingProperty.RoleType = roleType;
+            existingProperty.AuthorizationLetter = request.AuthorizationLetter;
+            existingProperty.TaxIdentificationNumber = request.TaxIdentificationNumber;
+            existingProperty.AdditionalDetails = request.AdditionalDetails;
+            existingProperty.Price = request.Price;
+            existingProperty.PriceText = request.PriceText;
+            existingProperty.RoyaltyAmount = request.RoyaltyAmount;
+            existingProperty.HalfPrice = request.HalfPrice;
+            existingProperty.TransactionType = request.TransactionType;
+            existingProperty.TransactionTypeDescription = request.TransactionTypeDescription;
+            existingProperty.RentStartDate = request.RentStartDate;
+            existingProperty.RentEndDate = request.RentEndDate;
 
             // Restore the original values of the CreatedBy and CreatedOn properties
             existingProperty.CreatedBy = createdBy;
@@ -690,7 +756,7 @@ namespace WebAPIBackend.Controllers
                     {
                         BuyerId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         ColumnName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()
@@ -732,7 +798,7 @@ namespace WebAPIBackend.Controllers
                 FatherName = request.FatherName,
                 ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 NationalIdCard = request.NationalIdCard,
@@ -882,7 +948,7 @@ namespace WebAPIBackend.Controllers
                 ProvinceId = request.ProvinceId,
                 DistrictId = request.DistrictId,
                 Village = request.Village,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId.Value,
             };
@@ -922,6 +988,17 @@ namespace WebAPIBackend.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                // Ensure the IsComplete column of the PropertyDetails entity remains true
+                if (request.PropertyDetailsId.HasValue)
+                {
+                    var propertyDetails = await _context.PropertyDetails.FindAsync(request.PropertyDetailsId.Value);
+                    if (propertyDetails != null)
+                    {
+                        propertyDetails.iscomplete = true;
+                        await _context.SaveChangesAsync();
+                    }
+                }
             }
             catch (DbUpdateConcurrencyException)
             {

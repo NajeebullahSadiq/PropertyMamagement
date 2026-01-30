@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +49,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Check if user can access company module
                 if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "company"))
                 {
-                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول شرکت ها را ندارید" });
+                    return StatusCode(403, new { message = "??? ????? ?????? ?? ????? ???? ?? ?? ??????" });
                 }
 
                 var query = from p in _context.CompanyDetails
@@ -61,7 +61,7 @@ namespace WebAPIBackend.Controllers.Companies
                                 ownerFatherName= (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
                                 ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
                                 licenseNumber= (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                                granator= (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName+" "+"فرزند"+" "+ p.Guarantors.First().FatherName : null,
+                                granator= (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName+" "+"?????"+" "+ p.Guarantors.First().FatherName : null,
                             };
                 return Ok(query);
             }
@@ -93,10 +93,10 @@ namespace WebAPIBackend.Controllers.Companies
                 // Check if user can access company module
                 if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "company"))
                 {
-                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول شرکت ها را ندارید" });
+                    return StatusCode(403, new { message = "??? ????? ?????? ?? ????? ???? ?? ?? ??????" });
                 }
 
-                var currentDate = DateOnly.FromDateTime(DateTime.Now);
+                var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
                 var query = from p in _context.CompanyDetails
                             where p.LicenseDetails.Any(l => l.ExpireDate < currentDate)
@@ -108,7 +108,7 @@ namespace WebAPIBackend.Controllers.Companies
                                 ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
                                 ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
                                 licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                                granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "فرزند" + " " + p.Guarantors.First().FatherName : null,
+                                granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
                             };
                 return Ok(query);
             }
@@ -158,7 +158,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Check if user can access company module
                 if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "company"))
                 {
-                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول شرکت ها را ندارید" });
+                    return StatusCode(403, new { message = "??? ????? ?????? ?? ????? ???? ?? ?? ??????" });
                 }
 
                 var data = await _context.CompanyDetails
@@ -286,7 +286,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 if (data == null)
                 {
-                    return NotFound(new { message = "شرکت یافت نشد" });
+                    return NotFound(new { message = "???? ???? ???" });
                 }
 
                 return Ok(data);
@@ -325,7 +325,7 @@ namespace WebAPIBackend.Controllers.Companies
                     Title = request.Title,
                     Tin = request.Tin,
                     DocPath = request.DocPath,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId,
                 };
 
@@ -402,7 +402,7 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         CompanyId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         PropertyName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()
@@ -457,7 +457,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 if (company == null)
                 {
-                    return NotFound(new { message = "شرکت یافت نشد" });
+                    return NotFound(new { message = "???? ???? ???" });
                 }
 
                 // Delete audit records first
@@ -566,7 +566,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new { message = "شرکت با موفقیت حذف شد" });
+                return Ok(new { message = "???? ?? ?????? ??? ??" });
             }
             catch (Exception ex)
             {
@@ -576,7 +576,7 @@ namespace WebAPIBackend.Controllers.Companies
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 
                 return StatusCode(500, new { 
-                    message = $"خطا در حذف شرکت: {ex.Message}",
+                    message = $"??? ?? ??? ????: {ex.Message}",
                     details = ex.InnerException?.Message 
                 });
             }

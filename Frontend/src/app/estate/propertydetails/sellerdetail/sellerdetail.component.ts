@@ -94,29 +94,6 @@ export class SellerdetailComponent {
     }
   }
 
-  private normalizeTazkiraType(value: any, seller?: any): string {
-    const raw = (value ?? '').toString().trim();
-
-    if (!raw) {
-      const hasPaperFields = !!(seller?.tazkiraVolume || seller?.tazkiraPage || seller?.tazkiraNumber);
-      return hasPaperFields ? 'Paper' : 'Electronic';
-    }
-
-    const lower = raw.toLowerCase();
-    if (lower === 'paper' || lower.includes('paper') || raw.includes('کاغذ')) {
-      return 'Paper';
-    }
-    if (lower === 'electronic' || lower.includes('electronic') || raw.includes('الکترون')) {
-      return 'Electronic';
-    }
-
-    // Fallback: keep the backend expected values if they already match, otherwise default.
-    if (raw === 'Paper' || raw === 'Electronic') {
-      return raw;
-    }
-
-    return 'Electronic';
-  }
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
     private duplicateCheckService: DuplicateCheckService){
@@ -127,11 +104,7 @@ export class SellerdetailComponent {
       firstName: ['', Validators.required],
       fatherName: ['', Validators.required],
       grandFather: ['', Validators.required],
-      indentityCardNumber: ['', Validators.required],
-      tazkiraType: ['', Validators.required],
-      tazkiraVolume: [''],
-      tazkiraPage: [''],
-      tazkiraNumber: [''],
+      electronicNationalIdNumber: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       paddressProvinceId: ['', Validators.required],
       paddressDistrictId: ['', Validators.required],
@@ -178,29 +151,6 @@ export class SellerdetailComponent {
       authLetterControl?.updateValueAndValidity();
       heirsLetterControl?.updateValueAndValidity();
     });
-
-    this.sellerForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
-      const volumeControl = this.sellerForm.get('tazkiraVolume');
-      const pageControl = this.sellerForm.get('tazkiraPage');
-      const numberControl = this.sellerForm.get('tazkiraNumber');
-      
-      if (tazkiraType === 'Paper') {
-        volumeControl?.setValidators([Validators.required]);
-        pageControl?.setValidators([Validators.required]);
-        numberControl?.setValidators([Validators.required]);
-      } else {
-        volumeControl?.clearValidators();
-        pageControl?.clearValidators();
-        numberControl?.clearValidators();
-        volumeControl?.reset();
-        pageControl?.reset();
-        numberControl?.reset();
-      }
-      
-      volumeControl?.updateValueAndValidity();
-      pageControl?.updateValueAndValidity();
-      numberControl?.updateValueAndValidity();
-    });
   }
   ngOnInit() {
     // Initialize role types from localization service
@@ -236,17 +186,12 @@ export class SellerdetailComponent {
       if (sellers && sellers.length > 0) {
         // Load first seller for editing if exists
         const firstSeller = sellers[0];
-        const normalizedTazkiraType = this.normalizeTazkiraType(firstSeller.tazkiraType, firstSeller);
         this.sellerForm.setValue({
           id: firstSeller.id,
           firstName:firstSeller.firstName,
           fatherName: firstSeller.fatherName,
           grandFather: firstSeller.grandFather,
-          indentityCardNumber: firstSeller.indentityCardNumber,
-          tazkiraType: normalizedTazkiraType,
-          tazkiraVolume: firstSeller.tazkiraVolume || '',
-          tazkiraPage: firstSeller.tazkiraPage || '',
-          tazkiraNumber: firstSeller.tazkiraNumber || '',
+          electronicNationalIdNumber: firstSeller.electronicNationalIdNumber || '',
           phoneNumber: firstSeller.phoneNumber,
           propertyDetailsId: firstSeller.propertyDetailsId,
           paddressProvinceId: firstSeller.paddressProvinceId,
@@ -263,7 +208,7 @@ export class SellerdetailComponent {
           taxIdentificationNumber: firstSeller.taxIdentificationNumber || '',
           additionalDetails: firstSeller.additionalDetails || ''
         });
-        this.imagePath=this.baseUrl+firstSeller.photo;
+        this.imagePath=this.constructImageUrl(firstSeller.photo);
         this.imageName=firstSeller.photo || '';
         this.nationalIdCardName=firstSeller.nationalIdCard || '';
         this.authorizationLetterName=firstSeller.authorizationLetter || '';
@@ -272,9 +217,9 @@ export class SellerdetailComponent {
         
         if (firstSeller.photo) {
           if (this.childComponent) {
-            this.childComponent.setExistingImage(this.baseUrl + firstSeller.photo);
+            this.childComponent.setExistingImage(firstSeller.photo);
           } else {
-            this.pendingImagePath = this.baseUrl + firstSeller.photo;
+            this.pendingImagePath = firstSeller.photo;
           }
         }
         
@@ -404,17 +349,12 @@ export class SellerdetailComponent {
   BindValue(id: number) {
     const selectedSeller = this.sellerDetails.find(s => s.id === id);
     if (selectedSeller) {
-      const normalizedTazkiraType = this.normalizeTazkiraType(selectedSeller.tazkiraType, selectedSeller);
       this.sellerForm.patchValue({
         id: selectedSeller.id,
         firstName: selectedSeller.firstName,
         fatherName: selectedSeller.fatherName,
         grandFather: selectedSeller.grandFather,
-        indentityCardNumber: selectedSeller.indentityCardNumber,
-        tazkiraType: normalizedTazkiraType,
-        tazkiraVolume: selectedSeller.tazkiraVolume || '',
-        tazkiraPage: selectedSeller.tazkiraPage || '',
-        tazkiraNumber: selectedSeller.tazkiraNumber || '',
+        electronicNationalIdNumber: selectedSeller.electronicNationalIdNumber || '',
         phoneNumber: selectedSeller.phoneNumber,
         propertyDetailsId: selectedSeller.propertyDetailsId,
         paddressProvinceId: selectedSeller.paddressProvinceId,
@@ -431,7 +371,7 @@ export class SellerdetailComponent {
         taxIdentificationNumber: selectedSeller.taxIdentificationNumber || '',
         additionalDetails: selectedSeller.additionalDetails || ''
       });
-      this.imagePath = selectedSeller.photo ? `${this.baseUrl}api/Upload/view/${selectedSeller.photo}` : 'assets/img/avatar.png';
+      this.imagePath = this.constructImageUrl(selectedSeller.photo);
       this.imageName = selectedSeller.photo || '';
       this.nationalIdCardName = selectedSeller.nationalIdCard || '';
       this.authorizationLetterName = selectedSeller.authorizationLetter || '';
@@ -440,9 +380,9 @@ export class SellerdetailComponent {
       
       if (selectedSeller.photo) {
         if (this.childComponent) {
-          this.childComponent.setExistingImage(this.baseUrl + selectedSeller.photo);
+          this.childComponent.setExistingImage(selectedSeller.photo);
         } else {
-          this.pendingImagePath = this.baseUrl + selectedSeller.photo;
+          this.pendingImagePath = selectedSeller.photo;
         }
       }
       
@@ -471,6 +411,52 @@ export class SellerdetailComponent {
     this.selerService.getdistrict2(getId.id).subscribe(res => {
       this.district2 = res;
       
+    });
+  }
+
+  // Prepopulate seller's permanent address from property address
+  populateFromPropertyAddress(): void {
+    const effectiveId = this.id > 0 ? this.id : this.propertyDetailsService.mainTableId;
+    console.log('Populating from property address. Property ID:', effectiveId);
+    
+    if (effectiveId === 0) {
+      this.toastr.warning('لطفاً ابتدا آدرس ملکیت را ثبت کنید');
+      return;
+    }
+
+    this.selerService.getPaddressById(effectiveId).subscribe({
+      next: (addresses) => {
+        console.log('Property addresses received:', addresses);
+        
+        if (addresses && addresses.length > 0) {
+          const propertyAddress = addresses[0];
+          console.log('Property address to copy:', propertyAddress);
+          
+          // Set the permanent address fields with property address values
+          this.sellerForm.patchValue({
+            paddressProvinceId: propertyAddress.provinceId,
+            paddressDistrictId: propertyAddress.districtId,
+            paddressVillage: propertyAddress.village
+          });
+
+          // Load districts for the selected province
+          if (propertyAddress.provinceId) {
+            this.selerService.getdistrict(propertyAddress.provinceId.valueOf()).subscribe(res => {
+              this.district = res;
+              console.log('Districts loaded:', res);
+            });
+          }
+
+          this.toastr.success('آدرس ملکیت با موفقیت کاپی شد');
+        } else {
+          console.log('No property address found');
+          this.toastr.warning('آدرس ملکیت یافت نشد. لطفاً ابتدا آدرس ملکیت را ثبت کنید');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching property address:', error);
+        this.toastr.error('خطا در دریافت آدرس ملکیت');
+      }
     });
   }
   resetChild(){
@@ -525,7 +511,7 @@ export class SellerdetailComponent {
     }
 
     if (this.imageName) {
-      this.imagePath = this.baseUrl + this.imageName;
+      this.imagePath = this.constructImageUrl(this.imageName);
       return;
     }
 
@@ -535,7 +521,7 @@ export class SellerdetailComponent {
   profileImageUploaded = (dbPath: string) => {
     this.imageName = dbPath || '';
     this.sellerForm.patchValue({ photo: this.imageName });
-    this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
+    this.imagePath = this.constructImageUrl(this.imageName);
   }
 
   isAuthorizedAgent(): boolean {
@@ -547,11 +533,6 @@ export class SellerdetailComponent {
   isHeirs(): boolean {
     const roleType = this.sellerForm.get('roleType')?.value;
     return roleType === 'Heirs';
-  }
-
-  isPaperTazkira(): boolean {
-    const tazkiraType = this.sellerForm.get('tazkiraType')?.value;
-    return tazkiraType === 'Paper';
   }
 
   allowsMultipleSellers(): boolean {
@@ -572,11 +553,7 @@ export class SellerdetailComponent {
   get firstName() { return this.sellerForm.get('firstName'); }
   get fatherName() { return this.sellerForm.get('fatherName'); }
   get grandFather() { return this.sellerForm.get('grandFather'); }
-  get indentityCardNumber() { return this.sellerForm.get('indentityCardNumber'); }
-  get tazkiraType() { return this.sellerForm.get('tazkiraType'); }
-  get tazkiraVolume() { return this.sellerForm.get('tazkiraVolume'); }
-  get tazkiraPage() { return this.sellerForm.get('tazkiraPage'); }
-  get tazkiraNumber() { return this.sellerForm.get('tazkiraNumber'); }
+  get electronicNationalIdNumber() { return this.sellerForm.get('electronicNationalIdNumber'); }
   get phoneNumber() { return this.sellerForm.get('phoneNumber'); }
   get paddressProvinceId() { return this.sellerForm.get('paddressProvinceId'); }
   get paddressDistrictId() { return this.sellerForm.get('paddressDistrictId'); }
@@ -593,4 +570,27 @@ export class SellerdetailComponent {
   get heirsLetter() { return this.sellerForm.get('heirsLetter'); }
   get taxIdentificationNumber() { return this.sellerForm.get('taxIdentificationNumber'); }
   get additionalDetails() { return this.sellerForm.get('additionalDetails'); }
+
+  private constructImageUrl(path: string): string {
+    if (!path) return 'assets/img/avatar.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with Resources/, it's a full path from DB - use static file serving
+    if (path.startsWith('Resources/') || path.startsWith('/Resources/')) {
+      const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+      return `${this.baseUrl}${cleanPath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${path}`;
+  }
 }

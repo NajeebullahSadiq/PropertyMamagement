@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,11 +43,11 @@ namespace WebAPIBackend.Controllers.Companies
                         // Contact Information
                         o.PhoneNumber,
                         o.WhatsAppNumber,
-                        // Owner's Own Address Fields (آدرس اصلی مالک)
+                        // Owner's Own Address Fields (???? ???? ????)
                         o.OwnerProvinceId,
                         o.OwnerDistrictId,
                         o.OwnerVillage,
-                        // Permanent Address Fields (آدرس دایمی) - Current Residence
+                        // Permanent Address Fields (???? ?????) - Current Residence
                         o.PermanentProvinceId,
                         o.PermanentDistrictId,
                         o.PermanentVillage,
@@ -151,13 +151,13 @@ namespace WebAPIBackend.Controllers.Companies
                 // Contact Information
                 PhoneNumber = request.PhoneNumber?.Trim(),
                 WhatsAppNumber = request.WhatsAppNumber?.Trim(),
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
-                // Owner's Own Address Fields (آدرس اصلی مالک)
+                // Owner's Own Address Fields (???? ???? ????)
                 OwnerProvinceId = request.OwnerProvinceId,
                 OwnerDistrictId = request.OwnerDistrictId,
                 OwnerVillage = request.OwnerVillage,
-                // Permanent Address Fields (آدرس دایمی) - Current Residence
+                // Permanent Address Fields (???? ?????) - Current Residence
                 PermanentProvinceId = request.PermanentProvinceId,
                 PermanentDistrictId = request.PermanentDistrictId,
                 PermanentVillage = request.PermanentVillage,
@@ -218,11 +218,11 @@ namespace WebAPIBackend.Controllers.Companies
             // Contact Information
             existingProperty.PhoneNumber = request.PhoneNumber?.Trim();
             existingProperty.WhatsAppNumber = request.WhatsAppNumber?.Trim();
-            // Owner's Own Address Fields (آدرس اصلی مالک)
+            // Owner's Own Address Fields (???? ???? ????)
             existingProperty.OwnerProvinceId = request.OwnerProvinceId;
             existingProperty.OwnerDistrictId = request.OwnerDistrictId;
             existingProperty.OwnerVillage = request.OwnerVillage;
-            // Permanent Address Fields (آدرس دایمی) - Current Residence
+            // Permanent Address Fields (???? ?????) - Current Residence
             existingProperty.PermanentProvinceId = request.PermanentProvinceId;
             existingProperty.PermanentDistrictId = request.PermanentDistrictId;
             existingProperty.PermanentVillage = request.PermanentVillage;
@@ -252,7 +252,7 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         OwnerId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         PropertyName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()
@@ -271,7 +271,7 @@ namespace WebAPIBackend.Controllers.Companies
         /// </summary>
         private async Task ArchiveCurrentAddressToHistory(CompanyOwner owner, string userId)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             // Archive Owner's Own Address if exists
             if (owner.OwnerProvinceId.HasValue || owner.OwnerDistrictId.HasValue || !string.IsNullOrEmpty(owner.OwnerVillage))

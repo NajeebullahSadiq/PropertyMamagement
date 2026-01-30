@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -83,7 +83,7 @@ namespace WebAPIBackend.Controllers.Report
 
 
             var query = _context.LicenseDetails
-            .Where(b => b.ExpireDate < DateOnly.FromDateTime(DateTime.Now));
+            .Where(b => b.ExpireDate < DateOnly.FromDateTime(DateTime.UtcNow));
             var results = new
             {
                 TotalLicenseExpired = new

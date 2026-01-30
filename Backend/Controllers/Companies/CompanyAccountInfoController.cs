@@ -145,7 +145,7 @@ namespace WebAPIBackend.Controllers.Companies
                 TaxPaymentDate = request.TaxPaymentDate,
                 TransactionCount = request.TransactionCount,
                 CompanyCommission = request.CompanyCommission,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
                 Status = true
             };

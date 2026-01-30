@@ -195,7 +195,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     CurrentVillage = request.CurrentVillage,
                     Status = true,
                     IsWithdrawn = false,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId
                 };
 
@@ -245,7 +245,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 entity.CurrentProvinceId = request.CurrentProvinceId;
                 entity.CurrentDistrictId = request.CurrentDistrictId;
                 entity.CurrentVillage = request.CurrentVillage;
-                entity.UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = userId;
 
                 await _context.SaveChangesAsync();
@@ -390,7 +390,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     CurrentProvinceId = request.CurrentProvinceId,
                     CurrentDistrictId = request.CurrentDistrictId,
                     CurrentVillage = request.CurrentVillage,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId
                 };
 
@@ -556,7 +556,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         LicenseApplicationId = applicationId,
                         WithdrawalReason = request.WithdrawalReason,
                         WithdrawalDate = withdrawalDate,
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = DateTime.UtcNow,
                         CreatedBy = userId
                     };
                     _context.LicenseApplicationWithdrawals.Add(withdrawal);

@@ -57,23 +57,23 @@ export class PrintComponent implements OnInit {
         this.documentData = property || {};
 
         if (this.documentData.sellerPhoto) {
-          this.SellerfilePath = `${this.baseUrl}api/Upload/view/${this.documentData.sellerPhoto}`;
+          this.SellerfilePath = this.constructImageUrl(this.documentData.sellerPhoto);
         }
         
         if (this.documentData.buyerPhoto) {
-          this.BuyerfilePath = `${this.baseUrl}api/Upload/view/${this.documentData.buyerPhoto}`;
+          this.BuyerfilePath = this.constructImageUrl(this.documentData.buyerPhoto);
         }
 
         if (this.documentData.filePath) {
-          this.propertyImagePath = `${this.baseUrl}api/Upload/view/${this.documentData.filePath}`;
+          this.propertyImagePath = this.constructImageUrl(this.documentData.filePath);
         }
 
         if (this.documentData.previousDocumentsPath) {
-          this.previousDocsPath = `${this.baseUrl}api/Upload/view/${this.documentData.previousDocumentsPath}`;
+          this.previousDocsPath = this.constructImageUrl(this.documentData.previousDocumentsPath);
         }
 
         if (this.documentData.existingDocumentsPath) {
-          this.existingDocsPath = `${this.baseUrl}api/Upload/view/${this.documentData.existingDocumentsPath}`;
+          this.existingDocsPath = this.constructImageUrl(this.documentData.existingDocumentsPath);
         }
 
         if (this.documentData.propertypeType) {
@@ -187,6 +187,29 @@ export class PrintComponent implements OnInit {
     const value = (propertyTypeValue ?? '').toString();
     const match = this.localizationService.propertyTypes.find(pt => pt.value === value);
     return match?.label || 'سایر';
+  }
+
+  private constructImageUrl(path: string): string {
+    if (!path) return 'assets/img/avatar2.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with Resources/, it's a full path from DB - use static file serving
+    if (path.startsWith('Resources/') || path.startsWith('/Resources/')) {
+      const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+      return `${this.baseUrl}${cleanPath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${path}`;
   }
 
   private fetchVerificationCode(): void {

@@ -54,7 +54,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">فروشنده</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">خریدار</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">حالت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700" colspan="3">عملیات</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700" colspan="4">عملیات</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -103,6 +103,17 @@
                   <i class="fas fa-print"></i>
                   <span>چاپ</span>
                 </button>
+              </td>
+              <td class="px-4 py-3">
+                <!-- Delete button - only visible for admin users -->
+                <button *ngIf="isAdmin" 
+                        class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" 
+                        (click)="onDelete(property.id, property.pnumber)" 
+                        title="حذف">
+                  <i class="fas fa-trash"></i>
+                  <span>حذف</span>
+                </button>
+                <span *ngIf="!isAdmin" class="text-gray-400 text-sm">-</span>
               </td>
             </tr>
           </tbody>

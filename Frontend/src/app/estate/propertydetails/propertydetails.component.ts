@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, ViewChild, AfterViewInit, Input, Output, EventEmitter } from '@angular/core'
+import { Component, ViewChild, AfterViewInit, Input, Output, EventEmitter, OnChanges } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -21,7 +21,7 @@ import { NumeralService } from 'src/app/shared/numeral.service';
   templateUrl: './propertydetails.component.html',
   styleUrls: ['./propertydetails.component.scss']
 })
-export class PropertydetailsComponent  implements AfterViewInit {
+export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
   propertyForm: FormGroup = new FormGroup({});
   propertyDetails!: PropertyDetails[];
   unittypes!: PunitType[];
@@ -101,7 +101,7 @@ export class PropertydetailsComponent  implements AfterViewInit {
         issuanceDate: [''],
         serialNumber: [''],
         transactionDate: [''],
-        des: ['', Validators.required],
+        des: ['', [Validators.required, Validators.pattern(/.*\S.*/)]],
         filePath: [''],
         previousDocumentsPath: [''],
         existingDocumentsPath: [''],
@@ -119,6 +119,7 @@ export class PropertydetailsComponent  implements AfterViewInit {
   this.selerService.buyerId=0;
   this.selerService.withnessId=0;
   }
+  
   ngOnInit() {
     this.loadPropertyDetails();
       
@@ -137,6 +138,13 @@ export class PropertydetailsComponent  implements AfterViewInit {
 
   }
 
+  ngOnChanges() {
+    // Reload property details when the id input changes
+    if (this.id > 0) {
+      this.loadPropertyDetails();
+    }
+  }
+
   loadPropertyDetails() {
     this.selectedPropertyId = this.id;
 
@@ -150,6 +158,11 @@ export class PropertydetailsComponent  implements AfterViewInit {
       this.propertyDetailsService.getPropertyDetailsById(effectiveId)
           .subscribe(properties => {
             this.properties = properties;
+            
+            // Convert ISO date strings to Date objects for date pickers
+            const issuanceDate = properties[0].issuanceDate ? new Date(properties[0].issuanceDate) : '';
+            const transactionDate = properties[0].transactionDate ? new Date(properties[0].transactionDate) : '';
+            
             this.propertyForm.patchValue({
               id: properties[0].id,
               propertyTypeId: properties[0].propertyTypeId || '',
@@ -170,9 +183,9 @@ export class PropertydetailsComponent  implements AfterViewInit {
               south:properties[0].south,
               documentType:properties[0].documentType || '',
               issuanceNumber:properties[0].issuanceNumber || '',
-              issuanceDate:properties[0].issuanceDate || '',
+              issuanceDate: issuanceDate,
               serialNumber:properties[0].serialNumber || '',
-              transactionDate:properties[0].transactionDate || '',
+              transactionDate: transactionDate,
               status:properties[0].status || 'Draft',
             });
             this.imageName=properties.map(item => item.filePath).toString();
@@ -190,21 +203,20 @@ export class PropertydetailsComponent  implements AfterViewInit {
             const provinceId = addr[0].provinceId != null ? Number(addr[0].provinceId) : '';
             const districtId = addr[0].districtId != null ? Number(addr[0].districtId) : '';
 
+            // First set province and village
             this.propertyForm.patchValue({
               provinceId: provinceId,
               village: addr[0].village
             });
 
+            // Then load districts and set districtId after districts are loaded
             if (provinceId) {
               this.selerService.getdistrict(provinceId).subscribe(res => {
                 this.districts = res;
+                // Set districtId after districts are loaded
                 this.propertyForm.patchValue({
                   districtId: districtId
                 });
-              });
-            } else {
-              this.propertyForm.patchValue({
-                districtId: districtId
               });
             }
           }
@@ -309,7 +321,15 @@ export class PropertydetailsComponent  implements AfterViewInit {
       PropertyDetailsId: this.selectedPropertyId || 0,
       village: this.propertyForm.get('village')?.value
     };
+    
+    console.log('Frontend - Address object:', address);
+    console.log('Frontend - provinceId from form:', this.propertyForm.get('provinceId')?.value);
+    console.log('Frontend - districtId from form:', this.propertyForm.get('districtId')?.value);
+    console.log('Frontend - village from form:', this.propertyForm.get('village')?.value);
+    
     (propertyDetails as any).propertyAddresses = [address];
+    
+    console.log('Frontend - propertyDetails before send:', JSON.stringify(propertyDetails, null, 2));
 
     if(propertyDetails.id===0 && this.selectedPropertyId!==0 || this.selectedPropertyId!==null){
       propertyDetails.id=this.selectedPropertyId;

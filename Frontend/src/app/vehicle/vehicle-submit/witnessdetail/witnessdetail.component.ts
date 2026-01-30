@@ -38,7 +38,7 @@ export class WitnessdetailComponent {
         id: [0],
         firstName: ['', Validators.required],
         fatherName: ['', Validators.required],
-        indentityCardNumber: ['', Validators.required],
+        electronicNationalIdNumber: ['', Validators.required],
         phoneNumber: ['', Validators.required],
         nationalIdCardPath: ['', Validators.required]
       });
@@ -102,7 +102,7 @@ export class WitnessdetailComponent {
           id: witness[0].id,
           firstName:witness[0].firstName,
           fatherName: witness[0].fatherName,
-          indentityCardNumber: witness[0].indentityCardNumber,
+          electronicNationalIdNumber: witness[0].electronicNationalIdNumber || '',
           phoneNumber: witness[0].phoneNumber,
           nationalIdCardPath: existingNationalIdPath
         });
@@ -196,7 +196,7 @@ BindValu(id: number) {
       id: selectedWitness.id,
       firstName: selectedWitness.firstName,
       fatherName: selectedWitness.fatherName,
-      indentityCardNumber: selectedWitness.indentityCardNumber,
+      electronicNationalIdNumber: selectedWitness.electronicNationalIdNumber || '',
       phoneNumber: selectedWitness.phoneNumber,
       nationalIdCardPath: existingNationalIdPath
     });
@@ -221,7 +221,7 @@ BindValu(id: number) {
   get firstName() { return this.withnessForm.get('firstName'); }
   get fatherName() { return this.withnessForm.get('fatherName'); }
   get grandFather() { return this.withnessForm.get('grandFather'); }
-  get indentityCardNumber() { return this.withnessForm.get('indentityCardNumber'); }
+  get electronicNationalIdNumber() { return this.withnessForm.get('electronicNationalIdNumber'); }
   get phoneNumber() { return this.withnessForm.get('phoneNumber'); }
   get nationalIdCardPath() { return this.withnessForm.get('nationalIdCardPath'); }
 }

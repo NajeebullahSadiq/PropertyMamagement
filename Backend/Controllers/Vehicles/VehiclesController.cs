@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +47,7 @@ namespace WebAPIBackend.Controllers.Vehicles
             // Check if user can access vehicle module
             if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "vehicle"))
             {
-                return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول وسایط نقلیه را ندارید" });
+                return StatusCode(403, new { message = "??? ????? ?????? ?? ????? ????? ????? ?? ??????" });
             }
 
             IQueryable<VehiclesPropertyDetail> propertyQuery;
@@ -137,7 +137,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Check if user can access vehicle module
                 if (!RbacHelper.CanAccessModule(roles, user.LicenseType, "vehicle"))
                 {
-                    return StatusCode(403, new { message = "شما اجازه دسترسی به ماژول وسایط نقلیه را ندارید" });
+                    return StatusCode(403, new { message = "??? ????? ?????? ?? ????? ????? ????? ?? ??????" });
                 }
 
                 // Get vehicle details with all related data
@@ -148,13 +148,13 @@ namespace WebAPIBackend.Controllers.Vehicles
 
                 if (vehicle == null)
                 {
-                    return NotFound(new { message = "وسیله نقلیه یافت نشد" });
+                    return NotFound(new { message = "????? ????? ???? ???" });
                 }
 
                 // Check if user can view this record
                 if (!RbacHelper.CanViewAllRecords(roles, "vehicle") && vehicle.CreatedBy != userId)
                 {
-                    return StatusCode(403, new { message = "شما اجازه مشاهده این رکورد را ندارید" });
+                    return StatusCode(403, new { message = "??? ????? ?????? ??? ????? ?? ??????" });
                 }
 
                 // Get sellers with location names
@@ -290,7 +290,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 RoyaltyAmount = !string.IsNullOrWhiteSpace(request.Price) ? (decimal.Parse(request.Price) * 0.01m).ToString() : null,
                 TransactionTypeId = request.TransactionTypeId,
                 Des = request.Des,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
                 FilePath = request.FilePath,
                 VehicleHand = request.VehicleHand,
@@ -358,7 +358,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     {
                         VehicleId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         ColumnName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()

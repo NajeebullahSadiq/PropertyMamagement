@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +77,7 @@ namespace WebAPIBackend.Controllers.Companies
                 DistrictId = request.DistrictId,
                 CompanyOwnerId = request.CompanyOwnerId,
                 Village=request.Village,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
 
             };

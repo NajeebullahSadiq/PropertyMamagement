@@ -194,7 +194,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     InspectedPetitionWritersCount = request.InspectedPetitionWritersCount,
                     ViolatingPetitionWritersCount = request.ViolatingPetitionWritersCount,
                     Status = true,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId
                 };
 
@@ -254,7 +254,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 entity.SealedOfficesCount = request.SealedOfficesCount;
                 entity.InspectedPetitionWritersCount = request.InspectedPetitionWritersCount;
                 entity.ViolatingPetitionWritersCount = request.ViolatingPetitionWritersCount;
-                entity.UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = userId;
 
                 await _context.SaveChangesAsync();
@@ -371,7 +371,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     AccusedPartyName = request.AccusedPartyName,
                     ActionsTaken = request.ActionsTaken,
                     Remarks = request.Remarks,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId
                 };
 
@@ -526,7 +526,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     ViolationDate = violationDate,
                     ActionsTaken = request.ActionsTaken,
                     Remarks = request.Remarks,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId
                 };
 
@@ -680,7 +680,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     ViolationDate = violationDate,
                     ActionsTaken = request.ActionsTaken,
                     Remarks = request.Remarks,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId
                 };
 

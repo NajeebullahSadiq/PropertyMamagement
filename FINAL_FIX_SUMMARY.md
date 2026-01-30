@@ -172,13 +172,43 @@ getImageUrl(path: string): string {
 - ✅ Root cause identified
 - ✅ HTML template fixed
 - ✅ Code committed to repository
-- ⏳ Needs redeployment
-- ⏳ Needs browser cache clear
+- ✅ Frontend deployed (main.36459fc53d94a846.js - Jan 26 09:25)
+- ✅ Nginx configured correctly
+- ✅ UFW firewall open (port 80/443 allowed)
+- ✅ Nginx listening on 0.0.0.0:80
+- ✅ Local access works (curl http://localhost returns 200 OK)
+- ❌ **External access BLOCKED** - Cloud provider firewall issue
+- ❌ **Photos missing** - Resources folder is empty
+
+## Current Issues
+
+### Issue 1: External Access Blocked
+The server responds locally but browser from external network gets "ERR_CONNECTION_REFUSED". This is a **cloud provider security group/firewall** issue, NOT a server configuration issue.
+
+**Solution**: Configure your cloud provider's security group to allow inbound HTTP/HTTPS:
+- AWS: EC2 → Security Groups → Add Inbound Rules (port 80, 443)
+- Azure: VM → Networking → Add inbound port rules
+- GCP: VPC Network → Firewall → Create firewall rule
+
+### Issue 2: Photos Don't Exist
+The database has photo paths but `/var/www/prmis/backend/Resources/Documents/Company/` is empty.
+
+**Solution**: Upload photos through the application OR copy test photos to the Resources folder.
 
 ## Next Steps
 
-1. Run `./redeploy_frontend_fix.sh` on server
-2. Clear browser cache completely
-3. Test in Incognito window first
-4. If works in Incognito, clear normal browser cache
-5. Verify URL format is correct (single `/api/Resources/...`)
+1. **FIRST**: Fix cloud provider firewall (see FRONTEND_ACCESS_AND_PHOTO_FIX.md)
+2. **SECOND**: Test external access from browser
+3. **THIRD**: Clear browser cache (Ctrl+Shift+R)
+4. **FOURTH**: Upload photos through the application
+5. **FIFTH**: Verify photos load correctly
+
+## Diagnostic Tool
+
+Run this on the server to diagnose the issue:
+```bash
+chmod +x diagnose_access_issue.sh
+./diagnose_access_issue.sh
+```
+
+For complete solutions, see: **FRONTEND_ACCESS_AND_PHOTO_FIX.md**

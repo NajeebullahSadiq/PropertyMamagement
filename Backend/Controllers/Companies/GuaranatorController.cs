@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +19,9 @@ namespace WebAPIBackend.Controllers.Companies
         private readonly AppDbContext _context;
 
         // Guarantee Type Constants
-        private const int GuaranteeType_Cash = 1;          // پول نقد
-        private const int GuaranteeType_ShariaDeed = 2;    // قباله شرعی
-        private const int GuaranteeType_CustomaryDeed = 3; // قباله عرفی
+        private const int GuaranteeType_Cash = 1;          // ??? ???
+        private const int GuaranteeType_ShariaDeed = 2;    // ????? ????
+        private const int GuaranteeType_CustomaryDeed = 3; // ????? ????
 
         public GuaranatorController(AppDbContext context)
         {
@@ -36,38 +36,38 @@ namespace WebAPIBackend.Controllers.Companies
             // Guarantee type is required
             if (!request.GuaranteeTypeId.HasValue || request.GuaranteeTypeId == 0)
             {
-                return (false, "نوعیت تضمین الزامی است");
+                return (false, "????? ????? ?????? ???");
             }
 
             // Validate guarantee type is one of the 3 allowed values
             if (request.GuaranteeTypeId < 1 || request.GuaranteeTypeId > 3)
             {
-                return (false, "نوعیت تضمین نامعتبر است");
+                return (false, "????? ????? ??????? ???");
             }
 
             switch (request.GuaranteeTypeId)
             {
-                case GuaranteeType_Cash: // پول نقد
+                case GuaranteeType_Cash: // ??? ???
                     if (string.IsNullOrWhiteSpace(request.BankName))
-                        return (false, "بانک الزامی است");
+                        return (false, "???? ?????? ???");
                     if (string.IsNullOrWhiteSpace(request.DepositNumber))
-                        return (false, "نمبر اویز الزامی است");
+                        return (false, "???? ???? ?????? ???");
                     if (string.IsNullOrWhiteSpace(request.DepositDate))
-                        return (false, "تاریخ اویز الزامی است");
+                        return (false, "????? ???? ?????? ???");
                     break;
 
-                case GuaranteeType_ShariaDeed: // قباله شرعی
+                case GuaranteeType_ShariaDeed: // ????? ????
                     if (string.IsNullOrWhiteSpace(request.CourtName))
-                        return (false, "محکمه نوم الزامی است");
+                        return (false, "????? ??? ?????? ???");
                     if (string.IsNullOrWhiteSpace(request.CollateralNumber))
-                        return (false, "نمبر وثیقه الزامی است");
+                        return (false, "???? ????? ?????? ???");
                     break;
 
-                case GuaranteeType_CustomaryDeed: // قباله عرفی
+                case GuaranteeType_CustomaryDeed: // ????? ????
                     if (string.IsNullOrWhiteSpace(request.SetSerialNumber))
-                        return (false, "نمبر سریال سټه الزامی است");
+                        return (false, "???? ????? ??? ?????? ???");
                     if (!request.GuaranteeDistrictId.HasValue || request.GuaranteeDistrictId == 0)
-                        return (false, "ناحیه الزامی است");
+                        return (false, "????? ?????? ???");
                     break;
             }
 
@@ -216,7 +216,7 @@ namespace WebAPIBackend.Controllers.Companies
                 BankName = request.BankName,
                 DepositNumber = request.DepositNumber,
                 DepositDate = depositDate,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
             };
 
@@ -336,7 +336,7 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         GuarantorsId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         PropertyName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()

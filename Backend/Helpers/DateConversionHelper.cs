@@ -72,22 +72,29 @@ namespace WebAPIBackend.Helpers
         {
             try
             {
+                DateTime localDate;
                 switch (calendarType)
                 {
                     case CalendarType.Gregorian:
-                        return new DateTime(year, month, day);
+                        localDate = new DateTime(year, month, day);
+                        break;
 
                     case CalendarType.HijriShamsi:
                         var persianCalendar = new PersianCalendar();
-                        return persianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+                        localDate = persianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+                        break;
 
                     case CalendarType.HijriQamari:
                         var hijriCalendar = new HijriCalendar();
-                        return hijriCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+                        localDate = hijriCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+                        break;
 
                     default:
                         throw new ArgumentException("Unknown calendar type", nameof(calendarType));
                 }
+                
+                // Convert to UTC for PostgreSQL compatibility
+                return DateTime.SpecifyKind(localDate, DateTimeKind.Utc);
             }
             catch (Exception ex)
             {

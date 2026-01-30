@@ -61,8 +61,8 @@ export interface PropertyDetails {
     iscomplete:boolean;
     buyerName:string;
     sellerName:string;
-    buyerIndentityCardNumber?: number;
-    sellerIndentityCardNumber?: number;
+    buyerElectronicNationalIdNumber?: string;
+    sellerElectronicNationalIdNumber?: string;
     status?: string;
     createdBy?: string;
 

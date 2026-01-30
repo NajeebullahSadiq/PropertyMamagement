@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +66,7 @@ namespace WebAPIBackend.Controllers.Companies
             // Parse dates using multi-calendar helper
             if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
             {
-                return BadRequest("تاریخ صدور جواز معتبر نیست / د جواز د صدور نېټه سمه نه ده");
+                return BadRequest("????? ???? ???? ????? ???? / ? ???? ? ???? ???? ??? ?? ??");
             }
 
             var expectedExpireDate = issueDate.AddYears(3);
@@ -76,20 +76,20 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
                 {
-                    return BadRequest("تاریخ ختم جواز معتبر نیست / د جواز د ختم نېټه سمه نه ده");
+                    return BadRequest("????? ??? ???? ????? ???? / ? ???? ? ??? ???? ??? ?? ??");
                 }
 
                 if (submittedExpireDate != expectedExpireDate)
                 {
-                    return BadRequest("تاریخ ختم جواز باید دقیقاً سه سال بعد از تاریخ صدور جواز باشد / د جواز د ختم نېټه باید دقیقاً د صدور له نېټې درې کاله وروسته وي");
+                    return BadRequest("????? ??? ???? ???? ?????? ?? ??? ??? ?? ????? ???? ???? ???? / ? ???? ? ??? ???? ???? ?????? ? ???? ?? ???? ??? ???? ?????? ??");
                 }
             }
 
             // Validate LicenseCategory if provided
-            var allowedLicenseCategories = new[] { "جدید", "تجدید", "مثنی" };
+            var allowedLicenseCategories = new[] { "????", "?????", "????" };
             if (!string.IsNullOrEmpty(request.LicenseCategory) && !allowedLicenseCategories.Contains(request.LicenseCategory))
             {
-                return BadRequest("Invalid LicenseCategory. Allowed values: جدید, تجدید, مثنی");
+                return BadRequest("Invalid LicenseCategory. Allowed values: ????, ?????, ????");
             }
 
             // Parse HrLetterDate if provided
@@ -98,7 +98,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
                 {
-                    return BadRequest("تاریخ مکتوب قوای بشری معتبر نیست");
+                    return BadRequest("????? ????? ???? ???? ????? ????");
                 }
                 hrLetterDate = parsedHrLetterDate;
             }
@@ -109,7 +109,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
                 {
-                    return BadRequest("تاریخ پرداخت تعرفه معتبر نیست");
+                    return BadRequest("????? ?????? ????? ????? ????");
                 }
                 royaltyDate = parsedRoyaltyDate;
             }
@@ -120,7 +120,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
                 {
-                    return BadRequest("تاریخ جریمه معتبر نیست");
+                    return BadRequest("????? ????? ????? ????");
                 }
                 penaltyDate = parsedPenaltyDate;
             }
@@ -145,7 +145,7 @@ namespace WebAPIBackend.Controllers.Companies
                 }
                 catch (ArgumentException ex)
                 {
-                    return BadRequest($"خطا در تولید شماره جواز: {ex.Message}");
+                    return BadRequest($"??? ?? ????? ????? ????: {ex.Message}");
                 }
             }
 
@@ -169,7 +169,7 @@ namespace WebAPIBackend.Controllers.Companies
                 PenaltyDate = penaltyDate,
                 HrLetter = request.HrLetter,
                 HrLetterDate = hrLetterDate,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
             };
 
@@ -185,7 +185,7 @@ namespace WebAPIBackend.Controllers.Companies
             // Parse dates using multi-calendar helper
             if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
             {
-                return BadRequest("تاریخ صدور جواز معتبر نیست / د جواز د صدور نېټه سمه نه ده");
+                return BadRequest("????? ???? ???? ????? ???? / ? ???? ? ???? ???? ??? ?? ??");
             }
 
             var expectedExpireDate = issueDate.AddYears(3);
@@ -195,12 +195,12 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
                 {
-                    return BadRequest("تاریخ ختم جواز معتبر نیست / د جواز د ختم نېټه سمه نه ده");
+                    return BadRequest("????? ??? ???? ????? ???? / ? ???? ? ??? ???? ??? ?? ??");
                 }
 
                 if (submittedExpireDate != expectedExpireDate)
                 {
-                    return BadRequest("تاریخ ختم جواز باید دقیقاً سه سال بعد از تاریخ صدور جواز باشد / د جواز د ختم نېټه باید دقیقاً د صدور له نېټې درې کاله وروسته وي");
+                    return BadRequest("????? ??? ???? ???? ?????? ?? ??? ??? ?? ????? ???? ???? ???? / ? ???? ? ??? ???? ???? ?????? ? ???? ?? ???? ??? ???? ?????? ??");
                 }
             }
 
@@ -223,10 +223,10 @@ namespace WebAPIBackend.Controllers.Companies
             }
 
             // Validate LicenseCategory if provided
-            var allowedLicenseCategories = new[] { "جدید", "تجدید", "مثنی" };
+            var allowedLicenseCategories = new[] { "????", "?????", "????" };
             if (!string.IsNullOrEmpty(request.LicenseCategory) && !allowedLicenseCategories.Contains(request.LicenseCategory))
             {
-                return BadRequest("Invalid LicenseCategory. Allowed values: جدید, تجدید, مثنی");
+                return BadRequest("Invalid LicenseCategory. Allowed values: ????, ?????, ????");
             }
 
             // Parse HrLetterDate if provided
@@ -235,7 +235,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
                 {
-                    return BadRequest("تاریخ مکتوب قوای بشری معتبر نیست");
+                    return BadRequest("????? ????? ???? ???? ????? ????");
                 }
                 hrLetterDate = parsedHrLetterDate;
             }
@@ -246,7 +246,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
                 {
-                    return BadRequest("تاریخ پرداخت تعرفه معتبر نیست");
+                    return BadRequest("????? ?????? ????? ????? ????");
                 }
                 royaltyDate = parsedRoyaltyDate;
             }
@@ -257,7 +257,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
                 {
-                    return BadRequest("تاریخ جریمه معتبر نیست");
+                    return BadRequest("????? ????? ????? ????");
                 }
                 penaltyDate = parsedPenaltyDate;
             }
@@ -287,7 +287,7 @@ namespace WebAPIBackend.Controllers.Companies
                 }
                 catch (ArgumentException ex)
                 {
-                    return BadRequest($"خطا در تولید شماره جواز: {ex.Message}");
+                    return BadRequest($"??? ?? ????? ????? ????: {ex.Message}");
                 }
             }
 
@@ -335,7 +335,7 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         LicenseId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         PropertyName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()

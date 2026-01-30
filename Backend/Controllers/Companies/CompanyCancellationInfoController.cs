@@ -129,7 +129,7 @@ namespace WebAPIBackend.Controllers.Companies
                 RevenueCancellationLetterNumber = request.RevenueCancellationLetterNumber,
                 LicenseCancellationLetterDate = request.LicenseCancellationLetterDate,
                 Remarks = request.Remarks,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
                 Status = true
             };

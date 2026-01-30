@@ -194,11 +194,11 @@ namespace WebAPIBackend.Controllers
                 var cancellation = new PropertyCancellation
                 {
                     PropertyDetailsId = request.PropertyDetailsId,
-                    CancellationDate = DateTime.Now,
+                    CancellationDate = DateTime.UtcNow,
                     CancellationReason = request.CancellationReason,
                     CancelledBy = userId,
                     Status = "Cancelled",
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _context.PropertyCancellations.Add(cancellation);
@@ -217,7 +217,7 @@ namespace WebAPIBackend.Controllers
                         PropertyCancellationId = cancellation.Id,
                         FilePath = doc.FilePath,
                         OriginalFileName = doc.OriginalFileName,
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = DateTime.UtcNow,
                         CreatedBy = userId
                     });
                 }

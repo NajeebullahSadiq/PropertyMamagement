@@ -13,8 +13,8 @@ namespace WebAPIBackend.Models.ViewModels
         public DateTime? IssuanceDate { get; set; }
         public string? SerialNumber { get; set; }
         public DateTime? TransactionDate { get; set; }
-        public int PNumber { get; set; }
-        public int PArea { get; set; }
+        public string? PNumber { get; set; }
+        public string? PArea { get; set; }
         public int? NumofRooms { get; set; }
 
         [Column("north")]

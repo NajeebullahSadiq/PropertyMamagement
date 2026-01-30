@@ -14,6 +14,9 @@ using WebAPIBackend.Services.Verification;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Npgsql to use timestamp without time zone
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // Add services to the container.
 
 //Get Connection String
@@ -74,7 +77,12 @@ builder.Services.AddAuthentication(x =>
 //Should Use Authorization when we use JWT 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 //CorsPolicy Settings - Define allowed origins
 string[] allowedOrigins = new string[] 

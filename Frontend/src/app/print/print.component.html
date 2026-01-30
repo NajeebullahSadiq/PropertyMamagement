@@ -16,36 +16,34 @@
 </div>
 
 <div class="container" *ngIf="!isLoading && !loadError">
-    <br>
     <div class="dot-line"></div>
-    <br>
     <table>
         <tr >
           <td  colspan="4">
-            <img [src]="SellerfilePath" alt="Seller Photo" style="height: 100px; width:95px;">
-            <p><strong>عکس مالک</strong></p>
-            <p><strong>تاریخ معامله: &nbsp;{{documentData.createdAt | calendarDate}}</strong></p>
+            <img [src]="SellerfilePath" alt="Seller Photo" style="height: 85px; width:80px;">
+            <p style="margin: 2px 0; font-size: 11pt;"><strong>عکس مالک</strong></p>
+            <p style="margin: 2px 0; font-size: 11pt;"><strong>تاریخ معامله: {{documentData.createdAt | calendarDate}}</strong></p>
           </td>
           <td style="text-align: center;" colspan="4">
-            <p><u><b style="font-size: 20px;">ای کسانیکه ایمان آورده اید به قراردادها وفا کنید. </b></u><span ><b> (مایده آیه اول) </b></span></p>
+            <p style="margin: 2px 0; font-size: 16px;"><u><b>ای کسانیکه ایمان آورده اید به قراردادها وفا کنید. </b></u><span ><b> (مایده آیه اول) </b></span></p>
            
-            <h3  style="font-size: 24px;font-weight: bold;">دفتر رهنمایی معاملات <span>(</span><span>  {{userDetails.companyName}}</span><span>)</span></h3>
-            <h3 ><b style="font-size: 24px;">شماره تماس دفتر:</b> <span style="font-size: 22px; font-weight: bold;">  {{userDetails.phoneNumber}}  </span></h3>
-            <br>
-            <h3 *ngIf="documentData.transactionType === 'معامله فروش'" style="font-size: 22px;font-weight: bold;">سته/سند معامله بیع قطعی (خرید و فروش جایداد)</h3>
-            <h3 *ngIf="documentData.transactionType === 'معامله گرویی'" style="font-size: 22px;font-weight: bold;">سته/سند معامله بیع وفا ( گرویی)</h3>
-            <h3 *ngIf="documentData.transactionType === 'معامله کرایی'" style="font-size: 22px;font-weight: bold;">سته/سند معامله(کرایی)</h3>
+            <h3 style="font-size: 18px;font-weight: bold; margin: 2px 0;">دفتر رهنمایی معاملات <span>(</span><span>  {{userDetails.companyName}}</span><span>)</span></h3>
+            <h3 style="margin: 2px 0;"><b style="font-size: 18px;">شماره تماس دفتر:</b> <span style="font-size: 16px; font-weight: bold;">  {{userDetails.phoneNumber}}  </span></h3>
             
-            <!-- QR Code in Header -->
-            <div *ngIf="verificationCode" style="margin-top: 15px;">
-                <img [src]="qrCodeUrl" alt="QR Code" style="width: 80px; height: 80px; border: 1px solid #1976d2; padding: 3px; background: white;" *ngIf="qrCodeUrl">
-                <p style="margin-top: 5px; font-size: 11px; font-weight: bold; color: #1976d2;">{{ verificationCode }}</p>
-                <p style="margin-top: 2px; font-size: 10px; color: #555;">کود تصدیق سند</p>
+            <h3 *ngIf="documentData.transactionType === 'معامله فروش'" style="font-size: 17px;font-weight: bold; margin: 2px 0;">سته/سند معامله بیع قطعی (خرید و فروش جایداد)</h3>
+            <h3 *ngIf="documentData.transactionType === 'معامله گرویی'" style="font-size: 17px;font-weight: bold; margin: 2px 0;">سته/سند معامله بیع وفا ( گرویی)</h3>
+            <h3 *ngIf="documentData.transactionType === 'معامله کرایی'" style="font-size: 17px;font-weight: bold; margin: 2px 0;">سته/سند معامله(کرایی)</h3>
+            
+            <!-- QR Code in Header - Centered -->
+            <div *ngIf="verificationCode" style="margin: 5px auto; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <img [src]="qrCodeUrl" alt="QR Code" style="width: 85px; height: 85px; border: 2px solid #1976d2; padding: 2px; background: white; display: block;" *ngIf="qrCodeUrl">
+                <p style="margin: 2px 0; font-size: 10.5px; font-weight: bold; color: #1976d2; text-align: center;">{{ verificationCode }}</p>
+                <p style="margin: 1px 0; font-size: 9.5px; color: #555; text-align: center;">کود تصدیق سند</p>
             </div>
           </td>
           <td  colspan="4">
-            <img [src]="BuyerfilePath" style="height: 100px; width:95px;">
-            <p><strong>عکس مشتری</strong></p>
+            <img [src]="BuyerfilePath" style="height: 85px; width:80px;">
+            <p style="margin: 2px 0; font-size: 11pt;"><strong>عکس مشتری</strong></p>
           </td>
         </tr> 
         </table>
@@ -67,13 +65,13 @@
                         </tr>
                         <tr style="height:21pt;">
                             <td colspan="4" style="width:160.65pt; border-style:solid; border-width:1pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مالک ملکیت</span></strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مالک ملکیت</span></strong></p>
                             </td>
                             <td colspan="6" style="width:223.15pt; border-style:solid; border-width:1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">مشخصات، حدود اربعه و قیمت ملکیت</span></strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">مشخصات، حدود اربعه و قیمت ملکیت</span></strong></p>
                             </td>
                             <td colspan="3" style="width:149.75pt; border-style:solid; border-width:1pt 0.75pt 0.75pt 1pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مشتری</span></strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مشتری</span></strong></p>
                             </td>
                             <td style="vertical-align:top;"><br></td>
                             <td style="vertical-align:top;"><br></td>
@@ -435,18 +433,6 @@
                             <td style="vertical-align:top;"><br></td>
                             <td style="vertical-align:top;"><br></td>
                         </tr>
-                        <tr style="height:15.6pt;">
-                            <td colspan="13" style="width:555.15pt; border-style:solid; border-width:0.75pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>معامله هذا به شماره</strong><strong>&nbsp;(&nbsp;{{documentData.id}}&nbsp;)&nbsp;</strong><strong>ثبت سیستم مدیریت رهنمایی معاملات گردید.</strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        
-
                     </tbody>
                 </table>
 
@@ -455,28 +441,28 @@
                     <tbody>
                         <tr>
                             <td colspan="13" style="width:100%;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><strong><u><span style="font-family:'B Nazanin';">حقوق و مکلفیت های بایع و مشتری&nbsp;</span></u></strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:11pt;"><strong><u><span style="font-family:'B Nazanin';">حقوق و مکلفیت های بایع و مشتری&nbsp;</span></u></strong></p>
                                 <ol type="1" style="margin:0pt; padding-right:0pt;">
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-size:12pt;">&nbsp;</span><span style="font-family:'B Nazanin';">حق العمل رهنمای معاملات&nbsp;</span><span style="font-family:'B Nazanin';">یک فیصد بوده که با المناصفه توسط فروشنده و خریدار قابل پرداخت می باشد</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">اینجانب فروشنده که شهرتم در این سند درج می باشد ملکیت مندرج این سند از شخص بنده بوده و هیچ دعوای در رابطه به آن از طرف افراد و اشخاص موجود نمی باشد در صورت بروز، مسول و جوابگو می باشم</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">فروشنده و خریدار مكلف اند به رویت تذکره و اسناد یکدیگر را شناسایی و تضمين خط معتبر را اخذ نمایند تا آینده باعث سرگردانی و دچار مشکل نگردند و یک کاپی تضمین خط در دفتر رهنمای معاملات ثبت و قید می گردد</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">تکس و مالیه جایداد بر عهده فروشنده می باشد</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">فروشنده و خریدار می توانند این سند را جهت صحت آن در مرکز به وزارت عدلیه و در ولایات به ریاست عدلیه مربوط ارایه دارند</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:10pt;"><span style="font-size:11pt;">&nbsp;</span><span style="font-family:'B Nazanin';">حق العمل رهنمای معاملات&nbsp;</span><span style="font-family:'B Nazanin';">یک فیصد بوده که با المناصفه توسط فروشنده و خریدار قابل پرداخت می باشد</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:10pt;"><span style="font-family:'B Nazanin';">اینجانب فروشنده که شهرتم در این سند درج می باشد ملکیت مندرج این سند از شخص بنده بوده و هیچ دعوای در رابطه به آن از طرف افراد و اشخاص موجود نمی باشد در صورت بروز، مسول و جوابگو می باشم</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:10pt;"><span style="font-family:'B Nazanin';">فروشنده و خریدار مكلف اند به رویت تذکره و اسناد یکدیگر را شناسایی و تضمين خط معتبر را اخذ نمایند تا آینده باعث سرگردانی و دچار مشکل نگردند و یک کاپی تضمین خط در دفتر رهنمای معاملات ثبت و قید می گردد</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:10pt;"><span style="font-family:'B Nazanin';">تکس و مالیه جایداد بر عهده فروشنده می باشد</span>.</li>
+                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:10pt;"><span style="font-family:'B Nazanin';">فروشنده و خریدار می توانند این سند را جهت صحت آن در مرکز به وزارت عدلیه و در ولایات به ریاست عدلیه مربوط ارایه دارند</span>.</li>
                                 </ol>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-right:18pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><strong><u><span style="font-family:'B Nazanin';">مکلفیت های دارنده جواز رهنمای معاملات</span></u></strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong>&nbsp;</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-right:18pt; margin-bottom:0pt; text-align:right; font-size:11pt;"><strong><u><span style="font-family:'B Nazanin';">مکلفیت های دارنده جواز رهنمای معاملات</span></u></strong></p>
                                 <ol start="6" type="1" style="margin:0pt; padding-right:0pt;">
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">هرگاه معامله بر اثر عیب، غبن، فریب و سایر تخلفات مطابق احکام قانون فسخ گردد، دارنده جواز نامه مکلف اسن، حق العمل اخذ شده را به متضرر معامله مسترد نماید و هرگاه به توافق طرفین انجام ولی فسخ گردد مسترد نمی گردد</span>.</li>
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">متصدی رهنمای معاملات مسئول و مکلف است تا معاملات خویش را به ملاحظه اسناد مدار اعتبار به حضور داشت مالک جایداد یا وکیل قانونی آنها در حضور دو نفر شاهد انجام دهد</span>.</li>
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">اين سند به داخل چهار نقل مي باشدکه يك نقل نزد فروشنده، یک نقل نزد خریدار یک نقل به شعبات مالیاتی و نقل دیگر آن بعد از درج در کتاب ثبت معاملات به حیث کنده در دفتر رهنمای معاملات حفظ می گردد</span>.</li>
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام و ثبت معاملات درسته های کاپی،جعلی وخودساخته وسته های بدون مهرو نشانی شد اداره انسجام،</span></li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">ایجاد یک دفتر مشخص جهت فعالیت و اجتناب از حق العمل&nbsp;</span>(<span style="font-family:'B Nazanin';">کمیشن</span>) <span style="font-family:'B Nazanin';">اضافه خلاف اصول و مقررات</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">دارنده جواز نمی تواند بر اساس جواز تاریخ گذشته، معاملات را ثبت و یا فعالیت نماید و مکلف است یک ماه قبل از تاریخ ختم، جواز نامه رهنمای معاملات را تمدید نماید</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">تحریر سند بعد از حصول اطمینان از سند مدار اعتبار در حضور و بعد از موافقه طرفین معامله، نصب عکس، اخذ شصت و امضای آنها و درج مهر و امضای دفتر رهنمای معاملات در سته، و ثبت آن در کتاب ثبت معاملات</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;">&nbsp;<span style="font-family:'B Nazanin';">اجتناب از اخذ شصت و امضای اشخاص دیگر بجای فروشنده و خریدار</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:11pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق کتاب ثبت</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:11pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق سته و کتاب ثبت معاملات</span></li>
-                                    <li dir="rtl" style="margin-right:36pt; margin-bottom:10pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام معاملات و ثبت ملکیت های، دولتی، عامه، غصبی، تحت استملاک و یا جایداد های که تحت تضمین باشند</span></li>
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:10pt;"><span style="font-family:'B Nazanin';">هرگاه معامله بر اثر عیب، غبن، فریب و سایر تخلفات مطابق احکام قانون فسخ گردد، دارنده جواز نامه مکلف اسن، حق العمل اخذ شده را به متضرر معامله مسترد نماید و هرگاه به توافق طرفین انجام ولی فسخ گردد مسترد نمی گردد</span>.</li>
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:10pt;"><span style="font-family:'B Nazanin';">متصدی رهنمای معاملات مسئول و مکلف است تا معاملات خویش را به ملاحظه اسناد مدار اعتبار به حضور داشت مالک جایداد یا وکیل قانونی آنها در حضور دو نفر شاهد انجام دهد</span>.</li>
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:10pt;"><span style="font-family:'B Nazanin';">اين سند به داخل چهار نقل مي باشدکه يك نقل نزد فروشنده، یک نقل نزد خریدار یک نقل به شعبات مالیاتی و نقل دیگر آن بعد از درج در کتاب ثبت معاملات به حیث کنده در دفتر رهنمای معاملات حفظ می گردد</span>.</li>
+                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:10pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام و ثبت معاملات درسته های کاپی،جعلی وخودساخته وسته های بدون مهرو نشانی شد اداره انسجام،</span></li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:10pt;"><span style="font-family:'B Nazanin';">ایجاد یک دفتر مشخص جهت فعالیت و اجتناب از حق العمل&nbsp;</span>(<span style="font-family:'B Nazanin';">کمیشن</span>) <span style="font-family:'B Nazanin';">اضافه خلاف اصول و مقررات</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:10pt;"><span style="font-family:'B Nazanin';">دارنده جواز نمی تواند بر اساس جواز تاریخ گذشته، معاملات را ثبت و یا فعالیت نماید و مکلف است یک ماه قبل از تاریخ ختم، جواز نامه رهنمای معاملات را تمدید نماید</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:10pt;"><span style="font-family:'B Nazanin';">تحریر سند بعد از حصول اطمینان از سند مدار اعتبار در حضور و بعد از موافقه طرفین معامله، نصب عکس، اخذ شصت و امضای آنها و درج مهر و امضای دفتر رهنمای معاملات در سته، و ثبت آن در کتاب ثبت معاملات</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:10pt;">&nbsp;<span style="font-family:'B Nazanin';">اجتناب از اخذ شصت و امضای اشخاص دیگر بجای فروشنده و خریدار</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:10pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق کتاب ثبت</span>.</li>
+                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:10pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق سته و کتاب ثبت معاملات</span></li>
+                                    <li dir="rtl" style="margin-right:36pt; margin-bottom:8pt; text-align:right; font-size:10pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام معاملات و ثبت ملکیت های، دولتی، عامه، غصبی، تحت استملاک و یا جایداد های که تحت تضمین باشند</span></li>
                                 </ol>
                             </td>
                             <td colspan="2" style="width:100.65pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
@@ -489,13 +475,13 @@
                         </tr>
                         <tr style="height:14.65pt;">
                             <td colspan="13" rowspan="2" style="width:555.15pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">مایان فروشنده، خریدار در حالیکه دارای اهلیت کامل شرعی و حقوقی هستیم، با قبول حقوق و مکلفیت های خویش مندرج در این سند با هم به موافقه رسیده و در اقرار خویش صادق مي باشیم</span>.</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';"> شصت و امضای بایع  &nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای مشتری</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد&nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:11pt;"><span style="font-family:'B Nazanin';">مایان فروشنده، خریدار در حالیکه دارای اهلیت کامل شرعی و حقوقی هستیم، با قبول حقوق و مکلفیت های خویش مندرج در این سند با هم به موافقه رسیده و در اقرار خویش صادق مي باشیم</span>.</p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';"> شصت و امضای بایع  &nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای مشتری</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong>&nbsp;</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد&nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
                                 <br>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>مهر و امضای دارنده جواز رهنمایی معاملات</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><span dir="ltr">&nbsp;</span></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong>مهر و امضای دارنده جواز رهنمایی معاملات</strong></p>
+                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>
                             </td>
                             <td style="width:94.75pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
                                 <p dir="ltr" style="margin-top:0pt; margin-bottom:10pt; line-height:115%; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>

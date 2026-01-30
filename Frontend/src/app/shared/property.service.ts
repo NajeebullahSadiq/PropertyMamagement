@@ -66,5 +66,10 @@ export class PropertyService {
     return this.http.get(url);
   }
 
+  deleteProperty(id: number): Observable<any> {
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.delete(url);
+  }
+
   
 }

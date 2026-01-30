@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { PropertyDetails, PropertyDetailsList } from 'src/app/models/PropertyDetail';
 import { PropertyService } from 'src/app/shared/property.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { RbacService } from 'src/app/shared/rbac.service';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
   selector: 'app-propertydetailslist',
@@ -25,6 +27,7 @@ export class PropertydetailslistComponent {
   // RBAC flags
   isViewOnly = false;
   canCreate = false;
+  isAdmin = false;
   currentUserId = '';
 
   constructor(
@@ -33,13 +36,15 @@ export class PropertydetailslistComponent {
     private toastr: ToastrService,
     private router: Router,
     private localizationService: LocalizationService,
-    private rbacService: RbacService
+    private rbacService: RbacService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
     // Load RBAC permissions
     this.isViewOnly = this.rbacService.isViewOnly();
     this.canCreate = !this.isViewOnly && this.rbacService.hasPermission('property.create');
+    this.isAdmin = this.rbacService.isAdmin();
     this.currentUserId = this.rbacService.getCurrentUserId();
     
     this.loadData();
@@ -112,8 +117,8 @@ export class PropertydetailslistComponent {
       const transactionTypeMatch = toText(property.transactionTypeText).includes(term);
       const buyerNameMatch = toText(property.buyerName).includes(term);
       const sellerNameMatch = toText(property.sellerName).includes(term);
-      const buyerNationalIdMatch = toText(property.buyerIndentityCardNumber).includes(term);
-      const sellerNationalIdMatch = toText(property.sellerIndentityCardNumber).includes(term);
+      const buyerNationalIdMatch = toText(property.buyerElectronicNationalIdNumber).includes(term);
+      const sellerNationalIdMatch = toText(property.sellerElectronicNationalIdNumber).includes(term);
 
       return (
         idMatch ||
@@ -137,5 +142,38 @@ export class PropertydetailslistComponent {
     } else {
       this.router.navigateByUrl(tree);
     }
+  }
+
+  onDelete(propertyId: number, pnumber: string | number | undefined) {
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      data: {
+        title: 'تأیید حذف سند ملکیت',
+        message: 'آیا مطمئن هستید که می‌خواهید این سند ملکیت را حذف کنید؟',
+        itemName: pnumber?.toString() || 'سند ملکیت'
+      },
+      disableClose: true,
+      panelClass: 'delete-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.propertyService.deleteProperty(propertyId).subscribe({
+          next: (response) => {
+            this.toastr.success('سند ملکیت با موفقیت حذف شد', 'موفق');
+            this.loadData();
+          },
+          error: (error) => {
+            console.error('Error deleting property:', error);
+            if (error.status === 403) {
+              this.toastr.error('شما اجازه حذف سند ملکیت را ندارید', 'خطا');
+            } else {
+              this.toastr.error('خطا در حذف سند ملکیت', 'خطا');
+            }
+          }
+        });
+      }
+    });
   }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -95,7 +95,7 @@ namespace WebAPIBackend.Controllers.Companies
                 GuaranteeDate = guaranteeDate,
                 CompanyId = request.CompanyId,
                 DocPath = request.DocPath,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
             };
 
@@ -176,7 +176,7 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         GauranteeId = existingProperty.Id,
                         UpdatedBy = userId,
-                        UpdatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.UtcNow,
                         PropertyName = change.Key,
                         OldValue = change.Value.OldValue?.ToString(),
                         NewValue = change.Value.NewValue?.ToString()

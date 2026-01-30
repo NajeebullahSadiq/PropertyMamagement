@@ -77,28 +77,6 @@ export class BuyerdetailComponent {
     }
   }
 
-  private normalizeTazkiraType(value: any, buyer?: any): string {
-    const raw = (value ?? '').toString().trim();
-
-    if (!raw) {
-      const hasPaperFields = !!(buyer?.tazkiraVolume || buyer?.tazkiraPage || buyer?.tazkiraNumber);
-      return hasPaperFields ? 'Paper' : 'Electronic';
-    }
-
-    const lower = raw.toLowerCase();
-    if (lower === 'paper' || lower.includes('paper') || raw.includes('کاغذ')) {
-      return 'Paper';
-    }
-    if (lower === 'electronic' || lower.includes('electronic') || raw.includes('الکترون')) {
-      return 'Electronic';
-    }
-
-    if (raw === 'Paper' || raw === 'Electronic') {
-      return raw;
-    }
-
-    return 'Electronic';
-  }
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
     private duplicateCheckService: DuplicateCheckService, private numeralService: NumeralService){
@@ -109,11 +87,7 @@ export class BuyerdetailComponent {
       firstName: ['', Validators.required],
       fatherName: ['', Validators.required],
       grandFather: ['', Validators.required],
-      indentityCardNumber: ['', Validators.required],
-      tazkiraType: ['', Validators.required],
-      tazkiraVolume: [''],
-      tazkiraPage: [''],
-      tazkiraNumber: [''],
+      electronicNationalIdNumber: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       paddressProvinceId: ['', Validators.required],
       paddressDistrictId: ['', Validators.required],
@@ -220,29 +194,6 @@ export class BuyerdetailComponent {
 
       this.lastTransactionType = transactionType || null;
     });
-
-    this.sellerForm.get('tazkiraType')?.valueChanges.subscribe(tazkiraType => {
-      const volumeControl = this.sellerForm.get('tazkiraVolume');
-      const pageControl = this.sellerForm.get('tazkiraPage');
-      const numberControl = this.sellerForm.get('tazkiraNumber');
-      
-      if (tazkiraType === 'Paper') {
-        volumeControl?.setValidators([Validators.required]);
-        pageControl?.setValidators([Validators.required]);
-        numberControl?.setValidators([Validators.required]);
-      } else {
-        volumeControl?.clearValidators();
-        pageControl?.clearValidators();
-        numberControl?.clearValidators();
-        volumeControl?.reset();
-        pageControl?.reset();
-        numberControl?.reset();
-      }
-      
-      volumeControl?.updateValueAndValidity();
-      pageControl?.updateValueAndValidity();
-      numberControl?.updateValueAndValidity();
-    });
   }
   ngOnInit() {
     // Initialize role types from localization service
@@ -286,18 +237,13 @@ export class BuyerdetailComponent {
       if (sellers && sellers.length > 0) {
         // Load first buyer for editing if exists
         const firstBuyer = sellers[0];
-        const normalizedTazkiraType = this.normalizeTazkiraType((firstBuyer as any).tazkiraType, firstBuyer);
         this.suppressTransactionTypeHandling = true;
         this.sellerForm.setValue({
           id: firstBuyer.id,
           firstName:firstBuyer.firstName,
           fatherName: firstBuyer.fatherName,
           grandFather: firstBuyer.grandFather,
-          indentityCardNumber: firstBuyer.indentityCardNumber,
-          tazkiraType: normalizedTazkiraType,
-          tazkiraVolume: firstBuyer.tazkiraVolume || '',
-          tazkiraPage: firstBuyer.tazkiraPage || '',
-          tazkiraNumber: firstBuyer.tazkiraNumber || '',
+          electronicNationalIdNumber: firstBuyer.electronicNationalIdNumber || '',
           phoneNumber: firstBuyer.phoneNumber,
           propertyDetailsId: firstBuyer.propertyDetailsId,
           paddressProvinceId: firstBuyer.paddressProvinceId,
@@ -325,16 +271,16 @@ export class BuyerdetailComponent {
         this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
         this.calculateDerivedAmounts();
         this.selectedSellerId=firstBuyer.id;
-        this.imagePath=this.baseUrl+firstBuyer.photo;
+        this.imagePath=this.constructImageUrl(firstBuyer.photo);
         this.imageName=firstBuyer.photo || '';
         this.nationalIdCardName=firstBuyer.nationalIdCard || '';
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
         
         if (firstBuyer.photo) {
           if (this.childComponent) {
-            this.childComponent.setExistingImage(this.baseUrl + firstBuyer.photo);
+            this.childComponent.setExistingImage(firstBuyer.photo);
           } else {
-            this.pendingImagePath = this.baseUrl + firstBuyer.photo;
+            this.pendingImagePath = firstBuyer.photo;
           }
         }
         
@@ -462,18 +408,13 @@ updateBuyerDetails(): void {
  BindValue(id: number) {
   const selectedBuyer = this.sellerDetails.find(b => b.id === id);
   if (selectedBuyer) {
-    const normalizedTazkiraType = this.normalizeTazkiraType((selectedBuyer as any).tazkiraType, selectedBuyer);
     this.suppressTransactionTypeHandling = true;
     this.sellerForm.patchValue({
       id: selectedBuyer.id,
       firstName: selectedBuyer.firstName,
       fatherName: selectedBuyer.fatherName,
       grandFather: selectedBuyer.grandFather,
-      indentityCardNumber: selectedBuyer.indentityCardNumber,
-      tazkiraType: normalizedTazkiraType,
-      tazkiraVolume: selectedBuyer.tazkiraVolume || '',
-      tazkiraPage: selectedBuyer.tazkiraPage || '',
-      tazkiraNumber: selectedBuyer.tazkiraNumber || '',
+      electronicNationalIdNumber: selectedBuyer.electronicNationalIdNumber || '',
       phoneNumber: selectedBuyer.phoneNumber,
       propertyDetailsId: selectedBuyer.propertyDetailsId,
       paddressProvinceId: selectedBuyer.paddressProvinceId,
@@ -500,7 +441,7 @@ updateBuyerDetails(): void {
     this.suppressTransactionTypeHandling = false;
     this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
     this.calculateDerivedAmounts();
-    this.imagePath = selectedBuyer.photo ? `${this.baseUrl}api/Upload/view/${selectedBuyer.photo}` : 'assets/img/avatar.png';
+    this.imagePath = this.constructImageUrl(selectedBuyer.photo)
     this.imageName = selectedBuyer.photo || '';
     this.nationalIdCardName = selectedBuyer.nationalIdCard || '';
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
@@ -508,9 +449,9 @@ updateBuyerDetails(): void {
     
     if (selectedBuyer.photo) {
       if (this.childComponent) {
-        this.childComponent.setExistingImage(this.baseUrl + selectedBuyer.photo);
+        this.childComponent.setExistingImage(selectedBuyer.photo);
       } else {
-        this.pendingImagePath = this.baseUrl + selectedBuyer.photo;
+        this.pendingImagePath = selectedBuyer.photo;
       }
     }
     
@@ -621,17 +562,17 @@ deleteBuyer(id: number, event?: Event) {
    // Commission (مبلغ حق‌العمل رهنمای معاملات)
    // - Purchase / Revocable Sale: 1.5%
    // - Rent: 50% of monthly rent
-   let royaltyAmount: number | null = null;
+   let royaltyAmount: string | null = null;
    if (transactionType === 'Purchase' || transactionType === 'Revocable Sale') {
-     royaltyAmount = price * 0.015;
+     royaltyAmount = (price * 0.015).toString();
    } else if (transactionType === 'Rent') {
-     royaltyAmount = halfPrice;
+     royaltyAmount = halfPrice.toString();
    }
 
    this.sellerForm.patchValue(
      {
        royaltyAmount: royaltyAmount,
-       halfPrice: halfPrice
+       halfPrice: halfPrice.toString()
      },
      { emitEvent: false }
    );
@@ -700,7 +641,7 @@ profilePreviewChanged = (localObjectUrl: string) => {
   }
 
   if (this.imageName) {
-    this.imagePath = this.baseUrl + this.imageName;
+    this.imagePath = this.constructImageUrl(this.imageName);
     return;
   }
 
@@ -713,7 +654,7 @@ profileImageUploaded = (dbPath: string) => {
   this.sellerForm.get('photo')?.markAsTouched();
   this.sellerForm.get('photo')?.markAsDirty();
   this.sellerForm.get('photo')?.updateValueAndValidity();
-  this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
+  this.imagePath = this.constructImageUrl(this.imageName);
 }
 
 isAuthorizedAgent(): boolean {
@@ -730,11 +671,7 @@ isAuthorizedAgent(): boolean {
   get firstName() { return this.sellerForm.get('firstName'); }
   get fatherName() { return this.sellerForm.get('fatherName'); }
   get grandFather() { return this.sellerForm.get('grandFather'); }
-  get indentityCardNumber() { return this.sellerForm.get('indentityCardNumber'); }
-  get tazkiraType() { return this.sellerForm.get('tazkiraType'); }
-  get tazkiraVolume() { return this.sellerForm.get('tazkiraVolume'); }
-  get tazkiraPage() { return this.sellerForm.get('tazkiraPage'); }
-  get tazkiraNumber() { return this.sellerForm.get('tazkiraNumber'); }
+  get electronicNationalIdNumber() { return this.sellerForm.get('electronicNationalIdNumber'); }
   get phoneNumber() { return this.sellerForm.get('phoneNumber'); }
   get paddressProvinceId() { return this.sellerForm.get('paddressProvinceId'); }
   get paddressDistrictId() { return this.sellerForm.get('paddressDistrictId'); }
@@ -782,8 +719,26 @@ isAuthorizedAgent(): boolean {
     return role ? role.label : roleType;
   }
 
-  isPaperTazkira(): boolean {
-    const tazkiraType = this.sellerForm.get('tazkiraType')?.value;
-    return tazkiraType === 'Paper';
+  private constructImageUrl(path: string): string {
+    if (!path) return 'assets/img/avatar.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with Resources/, it's a full path from DB - use static file serving
+    if (path.startsWith('Resources/') || path.startsWith('/Resources/')) {
+      const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+      return `${this.baseUrl}${cleanPath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${path}`;
   }
 }

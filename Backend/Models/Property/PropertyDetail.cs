@@ -89,22 +89,22 @@ public partial class PropertyDetail
     [NotMapped]
     public string? TransactionDateStr { get; set; }
 
-    public virtual ICollection<BuyerDetail> BuyerDetails { get; } = new List<BuyerDetail>();
+    public virtual ICollection<BuyerDetail> BuyerDetails { get; set; } = new List<BuyerDetail>();
 
-    public virtual ICollection<PropertyAddress> PropertyAddresses { get; } = new List<PropertyAddress>();
+    public virtual ICollection<PropertyAddress> PropertyAddresses { get; set; } = new List<PropertyAddress>();
 
     public virtual PropertyType? PropertyType { get; set; }
 
     public virtual PunitType? PunitType { get; set; }
 
-    public virtual ICollection<SellerDetail> SellerDetails { get; } = new List<SellerDetail>();
+    public virtual ICollection<SellerDetail> SellerDetails { get; set; } = new List<SellerDetail>();
 
     public virtual TransactionType? TransactionType { get; set; }
 
-    public virtual ICollection<WitnessDetail> WitnessDetails { get; } = new List<WitnessDetail>();
-    public virtual ICollection<Propertyaudit> Propertyaudits { get; } = new List<Propertyaudit>();
-    public virtual ICollection<PropertyOwnershipHistory> PropertyOwnershipHistories { get; } = new List<PropertyOwnershipHistory>();
-    public virtual ICollection<PropertyPayment> PropertyPayments { get; } = new List<PropertyPayment>();
-    public virtual ICollection<PropertyValuation> PropertyValuations { get; } = new List<PropertyValuation>();
-    public virtual ICollection<PropertyDocument> PropertyDocuments { get; } = new List<PropertyDocument>();
+    public virtual ICollection<WitnessDetail> WitnessDetails { get; set; } = new List<WitnessDetail>();
+    public virtual ICollection<Propertyaudit> Propertyaudits { get; set; } = new List<Propertyaudit>();
+    public virtual ICollection<PropertyOwnershipHistory> PropertyOwnershipHistories { get; set; } = new List<PropertyOwnershipHistory>();
+    public virtual ICollection<PropertyPayment> PropertyPayments { get; set; } = new List<PropertyPayment>();
+    public virtual ICollection<PropertyValuation> PropertyValuations { get; set; } = new List<PropertyValuation>();
+    public virtual ICollection<PropertyDocument> PropertyDocuments { get; set; } = new List<PropertyDocument>();
 }
