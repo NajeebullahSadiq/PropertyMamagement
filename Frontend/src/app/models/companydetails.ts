@@ -3,6 +3,7 @@ export interface companydetails{
     title:string;
     tin:number,
     docPath:string;
+    provinceId?:number;
     calendarType?:string;
 }
 

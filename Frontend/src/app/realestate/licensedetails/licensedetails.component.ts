@@ -11,6 +11,8 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
 import { NumeralService } from 'src/app/shared/numeral.service';
+import { RbacService } from 'src/app/shared/rbac.service';
+import { AuthService } from 'src/app/shared/auth.service';
 
 @Component({
 	selector: 'app-licensedetails',
@@ -23,6 +25,8 @@ export class LicensedetailsComponent {
 	selectedId: number = 0;
 	Areas: any;
 	provinces: any[] = [];  // Add provinces array
+	isAdmin: boolean = false;  // Track if user is admin
+	userProvinceId: number | null = null;  // Store user's province
 	imageName: string = ''
 	licenseDetails!: LicenseDetail[];
 	licenseTypes = [
@@ -58,7 +62,9 @@ export class LicensedetailsComponent {
 		private router: Router,
 		private calendarConversionService: CalendarConversionService,
 		private calendarService: CalendarService,
-		private numeralService: NumeralService
+		private numeralService: NumeralService,
+		private rbacService: RbacService,
+		private authService: AuthService
 	) {
 		this.licenseForm = this.fb.group({
 			id: [0],
@@ -159,6 +165,27 @@ export class LicensedetailsComponent {
 	}
 
 	ngOnInit() {
+		// Check if user is admin
+		this.isAdmin = this.rbacService.isAdmin();
+		
+		// Get user's province if not admin
+		if (!this.isAdmin) {
+			this.authService.getUserProfile().subscribe({
+				next: (profile: any) => {
+					this.userProvinceId = profile.provinceId;
+					// Auto-populate province for non-admin users
+					if (this.userProvinceId) {
+						this.licenseForm.patchValue({ provinceId: this.userProvinceId });
+						// Disable the field for non-admin users
+						this.licenseForm.get('provinceId')?.disable();
+					}
+				},
+				error: (error: any) => {
+					console.error('Error loading user profile:', error);
+				}
+			});
+		}
+		
 		// Load provinces
 		this.comservice.getProvinces().subscribe((res: any) => {
 			this.provinces = res;
@@ -229,7 +256,8 @@ export class LicensedetailsComponent {
 	}
 
 	updateData(): void {
-		const details = this.licenseForm.value as LicenseDetail;
+		// Get form value including disabled fields
+		const details = this.licenseForm.getRawValue() as LicenseDetail;
 		const issueDateValue = this.licenseForm.get('issueDate')?.value;
 		const expireDateValue = this.licenseForm.get('expireDate')?.value;
 		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;
@@ -293,7 +321,8 @@ export class LicensedetailsComponent {
 	}
 
 	addData(): void {
-		const details = this.licenseForm.value as LicenseDetail;
+		// Get form value including disabled fields
+		const details = this.licenseForm.getRawValue() as LicenseDetail;
 		const issueDateValue = this.licenseForm.get('issueDate')?.value;
 		const expireDateValue = this.licenseForm.get('expireDate')?.value;
 		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;

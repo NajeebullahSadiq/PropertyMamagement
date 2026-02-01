@@ -363,25 +363,23 @@ namespace WebAPIBackend.Controllers.Companies
                 var userId = userIdClaim.Value;
 
                 // Auto-populate province for COMPANY_REGISTRAR, use provided for administrators
+                // Province can be null initially - it will be set when license is created
                 var provinceId = _provinceFilter.IsAdministrator() 
                     ? request.ProvinceId 
                     : _provinceFilter.GetUserProvinceId();
 
-                // Validate province is provided
-                if (!provinceId.HasValue)
+                // Validate province access only if province is provided
+                if (provinceId.HasValue)
                 {
-                    return BadRequest("Province is required.");
+                    _provinceFilter.ValidateProvinceAccess(provinceId.Value);
                 }
-
-                // Validate province access
-                _provinceFilter.ValidateProvinceAccess(provinceId.Value);
 
                 var property = new CompanyDetail
                 {
                     Title = request.Title,
                     Tin = request.Tin,
                     DocPath = request.DocPath,
-                    ProvinceId = provinceId.Value,
+                    ProvinceId = provinceId, // Can be null initially
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId,
                 };

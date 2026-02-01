@@ -10,7 +10,7 @@ import { RealestateComponent } from '../realestate.component';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
-
+import { RbacService } from 'src/app/shared/rbac.service';
 @Component({
   selector: 'app-companydetails',
   templateUrl: './companydetails.component.html',
@@ -22,6 +22,7 @@ export class CompanydetailsComponent {
   companyForm: FormGroup = new FormGroup({});
   selectedId:number=0;
   companyDetails!: companydetails[];
+  
   @ViewChild('childComponent') childComponent!: FileuploadComponent;
   ngAfterViewInit(): void {
     if (this.childComponent) {
@@ -37,7 +38,8 @@ export class CompanydetailsComponent {
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,
 	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent,
-	private calendarConversionService: CalendarConversionService, private calendarService: CalendarService){
+	private calendarConversionService: CalendarConversionService, private calendarService: CalendarService,
+	private rbacService: RbacService){
 	this.companyForm = this.fb.group({
 		id: [0],
 		title: ['', Validators.required],
@@ -52,15 +54,15 @@ export class CompanydetailsComponent {
 		if (this.id && this.id > 0) {
 			this.comservice.getCompanyById(this.id)
 			.subscribe({
-			  next: (detail) => {
+			  next: (detail: any) => {
 			    if (detail && detail.length > 0) {
 			      this.companyDetails = detail;
 			      
-			      this.companyForm.setValue({
+			      this.companyForm.patchValue({
 				    id: detail[0].id,
-				    title:detail[0].title,
-				    tin:detail[0].tin,
-				    docPath:detail[0].docPath
+				    title: detail[0].title,
+				    tin: detail[0].tin,
+				    docPath: detail[0].docPath
 			      });
 			      
 			      // Set imageName from existing docPath
@@ -70,7 +72,7 @@ export class CompanydetailsComponent {
 			      this.selectedId=detail[0].id;
 			    }
 			  },
-			  error: (error) => {
+			  error: (error: any) => {
 			    console.error('Error loading company details:', error);
 			  }
 			});

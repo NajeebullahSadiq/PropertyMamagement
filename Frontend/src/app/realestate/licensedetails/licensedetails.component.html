@@ -31,6 +31,10 @@
               <div *ngIf="provinceId?.invalid && (provinceId?.dirty || provinceId?.touched)">
                 <small class="text-red-600 text-xs mt-1 block" *ngIf="provinceId?.errors?.['required']">این فیلد الزامی است</small>
               </div>
+              <!-- Show message for non-admin users -->
+              <small *ngIf="!isAdmin && userProvinceId" class="text-blue-600 text-xs mt-1 block">
+                <i class="fas fa-info-circle"></i> ولایت از پروفایل شما خودکار انتخاب شده است
+              </small>
             </div>
 
             <!-- License Number - AUTO-GENERATED -->

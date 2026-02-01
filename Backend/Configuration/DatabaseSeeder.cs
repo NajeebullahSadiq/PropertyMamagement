@@ -140,9 +140,10 @@ namespace WebAPIBackend.Configuration
                         u.""LastName"",
                         u.""PhotoPath"",
                         c.""Title"" AS ""CompanyName"",
-                        COALESCE(c.""PhoneNumber"", u.""PhoneNumber"") AS ""PhoneNumber""
+                        COALESCE(co.""PhoneNumber"", u.""PhoneNumber"") AS ""PhoneNumber""
                     FROM public.""AspNetUsers"" u
-                    LEFT JOIN org.""CompanyDetails"" c ON u.""CompanyId"" = c.""Id"";
+                    LEFT JOIN org.""CompanyDetails"" c ON u.""CompanyId"" = c.""Id""
+                    LEFT JOIN org.""CompanyOwners"" co ON c.""Id"" = co.""CompanyId"";
                 ");
             }
             catch (Exception) { /* View may already exist */ }

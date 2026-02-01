@@ -210,6 +210,13 @@ namespace WebAPIBackend.Controllers.Companies
                 _context.Add(property);
                 await _context.SaveChangesAsync();
 
+                // Update the company's province to match the license province
+                if (company.ProvinceId != provinceId)
+                {
+                    company.ProvinceId = provinceId;
+                    await _context.SaveChangesAsync();
+                }
+
                 // Update the IsComplete status based on validation
                 await _companyService.UpdateLicenseCompletionStatusAsync(property.CompanyId.Value);
 
