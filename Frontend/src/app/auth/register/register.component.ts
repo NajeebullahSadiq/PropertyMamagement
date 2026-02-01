@@ -1,8 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/shared/auth.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
+import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -21,6 +23,15 @@ export class RegisterComponent implements OnInit {
   userRole: any;
   showCompanySelect = false;
   showLicenseTypeSelect = false;
+  showProvinceSelect = false; // Show province field for COMPANY_REGISTRAR
+
+  // License search
+  showLicenseSearch = false;
+  searchLicenseNumber: string = '';
+  searchProvinceId: number | null = null;
+  searchResults: any[] = [];
+  isSearching: boolean = false;
+  provinces: any = [];
 
   // UI State
   successMessage: string = '';
@@ -41,6 +52,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     public service: AuthService,
     private rbacService: RbacService,
+    private companyService: CompnaydetailService,
     private toastr: ToastrService
   ) {}
 
@@ -51,6 +63,11 @@ export class RegisterComponent implements OnInit {
     });
     this.service.getRoles().subscribe(res => {
       this.roles = res;
+    });
+    
+    // Load provinces for license search
+    this.companyService.getProvinces().subscribe(res => {
+      this.provinces = res;
     });
     
     // UserProfile
@@ -177,6 +194,7 @@ export class RegisterComponent implements OnInit {
       const roleControl = this.service.formModel.get('Role');
       const companyIdControl = this.service.formModel.get('CompanyId');
       const licenseTypeControl = this.service.formModel.get('LicenseType');
+      const provinceIdControl = this.service.formModel.get('ProvinceId');
 
       if (roleControl && companyIdControl) {
         const selectedRole = roleControl.value;
@@ -185,22 +203,32 @@ export class RegisterComponent implements OnInit {
         if (selectedRole === UserRoles.Admin || 
             selectedRole === UserRoles.Authority || 
             selectedRole === UserRoles.LicenseReviewer) {
-          // System-level roles don't need company
+          // System-level roles don't need company or province
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');
+          provinceIdControl?.setValue(null);
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
+          this.showProvinceSelect = false;
         } else if (selectedRole === UserRoles.CompanyRegistrar) {
-          // Company registrar doesn't need company association
+          // Company registrar needs province but not company association
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
+          this.showProvinceSelect = true;
+          // Make province required for COMPANY_REGISTRAR
+          provinceIdControl?.setValidators([Validators.required]);
+          provinceIdControl?.updateValueAndValidity();
         } else if (selectedRole === UserRoles.PropertyOperator || 
                    selectedRole === UserRoles.VehicleOperator) {
           // Company operators need company and license type
           this.showCompanySelect = true;
           this.showLicenseTypeSelect = true;
+          this.showProvinceSelect = false;
+          provinceIdControl?.setValue(null);
+          provinceIdControl?.clearValidators();
+          provinceIdControl?.updateValueAndValidity();
           // Auto-set license type based on role
           if (selectedRole === UserRoles.PropertyOperator) {
             licenseTypeControl?.setValue('realEstate');
@@ -210,6 +238,10 @@ export class RegisterComponent implements OnInit {
         } else {
           this.showCompanySelect = true;
           this.showLicenseTypeSelect = false;
+          this.showProvinceSelect = false;
+          provinceIdControl?.setValue(null);
+          provinceIdControl?.clearValidators();
+          provinceIdControl?.updateValueAndValidity();
         }
       }
     }
@@ -217,5 +249,78 @@ export class RegisterComponent implements OnInit {
 
   getRoleDari(role: string): string {
     return this.rbacService.getRoleDari(role);
+  }
+
+  searchCompanyByLicense() {
+    if (!this.searchLicenseNumber || this.searchLicenseNumber.trim() === '') {
+      this.toastr.warning('لطفاً شماره جواز را وارد کنید', 'هشدار');
+      return;
+    }
+
+    this.isSearching = true;
+    this.searchResults = [];
+
+    this.companyService.searchCompanyByLicense(
+      this.searchLicenseNumber.trim(),
+      this.searchProvinceId || undefined
+    ).subscribe(
+      (results: any[]) => {
+        this.isSearching = false;
+        this.searchResults = results;
+        
+        if (results.length === 0) {
+          this.toastr.info('هیچ شرکتی با این شماره جواز یافت نشد', 'نتیجه جستجو');
+        } else if (results.length === 1) {
+          // Auto-select if only one result
+          this.selectCompanyFromSearch(results[0]);
+          this.toastr.success('شرکت یافت شد و انتخاب گردید', 'موفق');
+        } else {
+          this.toastr.info(`${results.length} شرکت یافت شد`, 'نتیجه جستجو');
+        }
+      },
+      (error) => {
+        this.isSearching = false;
+        console.error('Search error:', error);
+        if (error.status === 404) {
+          this.toastr.info('هیچ شرکتی با این شماره جواز یافت نشد', 'نتیجه جستجو');
+        } else {
+          this.toastr.error('خطا در جستجوی شرکت', 'خطا');
+        }
+      }
+    );
+  }
+
+  selectCompanyFromSearch(result: any) {
+    const companyIdControl = this.service.formModel.get('CompanyId');
+    const licenseTypeControl = this.service.formModel.get('LicenseType');
+    
+    if (companyIdControl && result.companyId) {
+      companyIdControl.setValue(result.companyId);
+    }
+    
+    if (licenseTypeControl && result.licenseType) {
+      licenseTypeControl.setValue(result.licenseType);
+    }
+    
+    // Clear search
+    this.searchResults = [];
+    this.searchLicenseNumber = '';
+    this.searchProvinceId = null;
+    this.showLicenseSearch = false;
+  }
+
+  toggleLicenseSearch() {
+    this.showLicenseSearch = !this.showLicenseSearch;
+    if (!this.showLicenseSearch) {
+      this.searchResults = [];
+      this.searchLicenseNumber = '';
+      this.searchProvinceId = null;
+    }
+  }
+
+  clearSearch() {
+    this.searchResults = [];
+    this.searchLicenseNumber = '';
+    this.searchProvinceId = null;
   }
 }

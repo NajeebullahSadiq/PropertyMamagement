@@ -192,6 +192,9 @@ namespace WebAPIBackend.Configuration
                 Console.WriteLine($"Note: LicenseView creation skipped (may need schema update): {ex.Message}");
             }
 
+            // NOTE: GetPrintType view is deprecated - we now use direct queries in PropertyDetailsController
+            // The view creation is commented out to avoid schema mismatch warnings
+            /*
             // Create GetPrintType view for property printing
             try
             {
@@ -265,7 +268,7 @@ namespace WebAPIBackend.Configuration
                         tt.""Name"" as ""TransactionType""
                     FROM tr.""PropertyDetails"" pd
                     LEFT JOIN look.""PropertyType"" pt ON pd.""PropertyTypeId"" = pt.""Id""
-                    LEFT JOIN look.""PUnitType"" ut ON pd.""PUnitTypeId"" = ut.""Id""
+                    LEFT JOIN look.""PUnitType"" ut ON pd.""PunitTypeId"" = ut.""Id""
                     LEFT JOIN look.""TransactionType"" tt ON pd.""TransactionTypeId"" = tt.""Id""
                     LEFT JOIN tr.""PropertyAddress"" pa ON pd.""Id"" = pa.""PropertyDetailsId""
                     LEFT JOIN look.""Location"" pa_prov ON pa.""ProvinceId"" = pa_prov.""ID""
@@ -304,6 +307,7 @@ namespace WebAPIBackend.Configuration
                 // Log but don't fail - view creation is optional
                 Console.WriteLine($"Note: GetPrintType view creation skipped (may need schema update): {ex.Message}");
             }
+            */
         }
 
         private static async Task SeedLookupTables(AppDbContext context)

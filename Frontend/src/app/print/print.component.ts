@@ -189,6 +189,30 @@ export class PrintComponent implements OnInit {
     return match?.label || 'سایر';
   }
 
+  /**
+   * Get the appropriate label for issuance number based on document type
+   */
+  getIssuanceNumberLabel(): string {
+    const docType = this.documentData?.documentType;
+    if (docType === 'سند ملکیت') {
+      return 'نمبر سند ملکیت';
+    } else if (docType === 'قباله شرعی') {
+      return 'نمبر قباله';
+    }
+    return 'نمبر سند';
+  }
+
+  /**
+   * Get the document type display value (shows custom type if "سایر" is selected)
+   */
+  getDocumentTypeDisplay(): string {
+    const docType = this.documentData?.documentType;
+    if (docType === 'سایر' && this.documentData?.customDocumentType) {
+      return this.documentData.customDocumentType;
+    }
+    return docType || this.documentData?.doctype || '';
+  }
+
   private constructImageUrl(path: string): string {
     if (!path) return 'assets/img/avatar2.png';
     
@@ -210,6 +234,11 @@ export class PrintComponent implements OnInit {
     
     // Otherwise, use Upload/view endpoint
     return `${this.baseUrl}Upload/view/${path}`;
+  }
+
+  // Make constructImageUrl available in template
+  public constructImageUrlPublic(path: string): string {
+    return this.constructImageUrl(path);
   }
 
   private fetchVerificationCode(): void {

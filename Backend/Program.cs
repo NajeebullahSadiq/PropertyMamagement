@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Middleware;
 using WebAPIBackend.Services.Verification;
 
 
@@ -82,6 +83,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
 
 //CorsPolicy Settings - Define allowed origins
@@ -120,6 +122,21 @@ builder.Services.AddScoped<IVerificationService, VerificationService>();
 // Register License Number Generator Service
 builder.Services.AddScoped<WebAPIBackend.Services.ILicenseNumberGenerator, WebAPIBackend.Services.LicenseNumberGenerator>();
 
+// Register Province Filter Service
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<WebAPIBackend.Services.IProvinceFilterService, WebAPIBackend.Services.ProvinceFilterService>();
+
+// Register Company and License Services
+builder.Services.AddScoped<WebAPIBackend.Services.ICompanyService, WebAPIBackend.Services.CompanyService>();
+builder.Services.AddScoped<WebAPIBackend.Services.ILicenseService, WebAPIBackend.Services.LicenseService>();
+
+// Register Security Audit Logger
+builder.Services.AddScoped<WebAPIBackend.Services.ISecurityAuditLogger, WebAPIBackend.Services.SecurityAuditLogger>();
+
+// Register Exception Handler
+builder.Services.AddExceptionHandler<WebAPIBackend.Middleware.GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 
 
 
@@ -144,6 +161,55 @@ try
 
     await db.Database.ExecuteSqlRawAsync(
         "ALTER TABLE IF EXISTS org.\"PetitionWriterLicenses\" ADD COLUMN IF NOT EXISTS \"PicturePath\" VARCHAR(500) NULL;");
+
+    // Add ProvinceId columns for province-based access control
+    await db.Database.ExecuteSqlRawAsync(
+        "ALTER TABLE IF EXISTS public.\"AspNetUsers\" ADD COLUMN IF NOT EXISTS \"ProvinceId\" INTEGER NULL;");
+
+    await db.Database.ExecuteSqlRawAsync(
+        "ALTER TABLE IF EXISTS org.\"CompanyDetails\" ADD COLUMN IF NOT EXISTS \"ProvinceId\" INTEGER NULL;");
+
+    // Add foreign key constraints if they don't exist
+    await db.Database.ExecuteSqlRawAsync(@"
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.table_constraints 
+                WHERE constraint_name = 'FK_AspNetUsers_Location_ProvinceId'
+            ) THEN
+                ALTER TABLE public.""AspNetUsers""
+                ADD CONSTRAINT ""FK_AspNetUsers_Location_ProvinceId""
+                FOREIGN KEY (""ProvinceId"") REFERENCES look.""Location""(""ID"")
+                ON DELETE RESTRICT;
+            END IF;
+        END $$;
+    ");
+
+    await db.Database.ExecuteSqlRawAsync(@"
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.table_constraints 
+                WHERE constraint_name = 'FK_CompanyDetails_Location_ProvinceId'
+            ) THEN
+                ALTER TABLE org.""CompanyDetails""
+                ADD CONSTRAINT ""FK_CompanyDetails_Location_ProvinceId""
+                FOREIGN KEY (""ProvinceId"") REFERENCES look.""Location""(""ID"")
+                ON DELETE RESTRICT;
+            END IF;
+        END $$;
+    ");
+
+    // Add indexes for performance
+    await db.Database.ExecuteSqlRawAsync(@"
+        CREATE INDEX IF NOT EXISTS ""IX_AspNetUsers_ProvinceId"" 
+        ON public.""AspNetUsers""(""ProvinceId"");
+    ");
+
+    await db.Database.ExecuteSqlRawAsync(@"
+        CREATE INDEX IF NOT EXISTS ""IX_CompanyDetails_ProvinceId"" 
+        ON org.""CompanyDetails""(""ProvinceId"");
+    ");
 
     // Rename ElectronicIdNumber to ElectronicNationalIdNumber if the old column exists
     await db.Database.ExecuteSqlRawAsync(@"
@@ -207,6 +273,9 @@ catch (Exception ex)
 }
 
 // Configure the HTTP request pipeline.
+// Use exception handler
+app.UseExceptionHandler();
+
 // Use CORS (must be before UseAuthentication and UseAuthorization)
 app.UseCors();
 
@@ -238,6 +307,9 @@ app.UseStaticFiles(new StaticFileOptions()
 //allow Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Province-based access control middleware (must be after authentication)
+app.UseProvinceAuthorization();
 
 app.MapControllers();
 app.Run();

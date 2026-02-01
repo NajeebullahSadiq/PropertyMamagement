@@ -48,11 +48,61 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = $"Invalid role: {model.Role}" });
             }
 
+            // Validate province requirement for COMPANY_REGISTRAR
+            if (model.Role == UserRoles.CompanyRegistrar && !model.ProvinceId.HasValue)
+            {
+                return BadRequest(new { message = "Province is required for COMPANY_REGISTRAR role" });
+            }
+
+            // Validate province exists if provided
+            if (model.ProvinceId.HasValue)
+            {
+                var provinceExists = await _context.Locations.AnyAsync(l => l.Id == model.ProvinceId.Value);
+                if (!provinceExists)
+                {
+                    return BadRequest(new { message = "Invalid province" });
+                }
+            }
+
             // Validate company operators must have company and license type
             if ((model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator) 
                 && model.CompanyId == 0)
             {
                 return BadRequest(new { message = "Company operators must be associated with a company" });
+            }
+
+            // Validate company exists and license type matches
+            if (model.CompanyId > 0)
+            {
+                var company = await _context.CompanyDetails
+                    .Include(c => c.LicenseDetails)
+                    .FirstOrDefaultAsync(c => c.Id == model.CompanyId);
+
+                if (company == null)
+                {
+                    return BadRequest(new { message = "شرکت یافت نشد" });
+                }
+
+                // Check if company has licenses
+                if (!company.LicenseDetails.Any())
+                {
+                    return BadRequest(new { message = "این شرکت هیچ جوازی ندارد" });
+                }
+
+                // Validate license type matches for operators
+                if (model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator)
+                {
+                    var expectedLicenseType = model.Role == UserRoles.PropertyOperator ? "realEstate" : "carSale";
+                    var hasMatchingLicense = company.LicenseDetails.Any(l => l.LicenseType == expectedLicenseType);
+
+                    if (!hasMatchingLicense)
+                    {
+                        return BadRequest(new { message = $"این شرکت جواز {(expectedLicenseType == "realEstate" ? "املاک" : "موترفروشی")} ندارد" });
+                    }
+
+                    // Set license type from company
+                    model.LicenseType = expectedLicenseType;
+                }
             }
 
             // Get current user for CreatedBy
@@ -70,6 +120,7 @@ namespace WebAPI.Controllers
                 LicenseType = model.LicenseType,
                 UserRole = model.Role,
                 IsAdmin = model.Role == UserRoles.Admin,
+                ProvinceId = model.ProvinceId,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = createdBy
             };
@@ -160,6 +211,12 @@ namespace WebAPI.Controllers
                         new Claim("userRole", primaryRole),
                         new Claim("isViewOnly", (primaryRole == UserRoles.Authority || primaryRole == UserRoles.LicenseReviewer).ToString().ToLower())
                     };
+
+                    // Add province claim for COMPANY_REGISTRAR users
+                    if (primaryRole == UserRoles.CompanyRegistrar && user.ProvinceId.HasValue)
+                    {
+                        customClaims.Add(new Claim(CustomClaimTypes.ProvinceId, user.ProvinceId.Value.ToString()));
+                    }
 
                     // Add permissions as claims
                     foreach (var permission in permissions)
@@ -458,6 +515,22 @@ namespace WebAPI.Controllers
                 return NotFound(new { message = "کاربر یافت نشد" });
             }
 
+            // Validate province requirement for COMPANY_REGISTRAR
+            if (!string.IsNullOrEmpty(model.Role) && model.Role == UserRoles.CompanyRegistrar && !model.ProvinceId.HasValue)
+            {
+                return BadRequest(new { message = "Province is required for COMPANY_REGISTRAR role" });
+            }
+
+            // Validate province exists if provided
+            if (model.ProvinceId.HasValue)
+            {
+                var provinceExists = await _context.Locations.AnyAsync(l => l.Id == model.ProvinceId.Value);
+                if (!provinceExists)
+                {
+                    return BadRequest(new { message = "Invalid province" });
+                }
+            }
+
             // Update user properties
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
@@ -465,6 +538,7 @@ namespace WebAPI.Controllers
             user.PhoneNumber = model.PhoneNumber;
             user.CompanyId = model.CompanyId;
             user.LicenseType = model.LicenseType;
+            user.ProvinceId = model.ProvinceId;
 
             // Update role if changed
             if (!string.IsNullOrEmpty(model.Role))
@@ -529,7 +603,10 @@ namespace WebAPI.Controllers
         [Route("GetUser/{userId}")]
         public async Task<IActionResult> GetUser(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.Users
+                .Include(u => u.Province)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+                
             if (user == null)
             {
                 return NotFound(new { message = "کاربر یافت نشد" });
@@ -551,6 +628,8 @@ namespace WebAPI.Controllers
                 user.IsLocked,
                 user.PhotoPath,
                 user.CreatedAt,
+                user.ProvinceId,
+                Province = user.Province != null ? new { user.Province.Id, user.Province.Name, user.Province.Dari } : null,
                 Role = role,
                 RoleDari = UserRoles.GetDariName(role)
             });
@@ -566,6 +645,7 @@ namespace WebAPI.Controllers
             public int CompanyId { get; set; }
             public string? LicenseType { get; set; }
             public string? Role { get; set; }
+            public int? ProvinceId { get; set; }
         }
 
         public class ToggleUserStatusModel

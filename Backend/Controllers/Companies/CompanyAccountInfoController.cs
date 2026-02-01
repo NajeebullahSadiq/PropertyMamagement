@@ -11,7 +11,7 @@ namespace WebAPIBackend.Controllers.Companies
     /// <summary>
     /// Controller for Company Account/Financial Information (مالیه)
     /// </summary>
-    [Authorize(Roles = "ADMIN")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CompanyAccountInfoController : ControllerBase
@@ -25,12 +25,30 @@ namespace WebAPIBackend.Controllers.Companies
 
         /// <summary>
         /// Get account info by company ID
+        /// Accessible by: ADMIN, AUTHORITY, COMPANY_REGISTRAR, LICENSE_REVIEWER
         /// </summary>
         [HttpGet("{companyId}")]
         public async Task<IActionResult> GetByCompanyId(int companyId, [FromQuery] string? calendarType = null)
         {
             try
             {
+                // Get user info from claims
+                var userIdClaim = HttpContext.User.FindFirst("UserID");
+                if (userIdClaim == null)
+                {
+                    return Unauthorized();
+                }
+
+                var rolesClaim = HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+                var roles = rolesClaim.Split(',').Select(r => r.Trim()).ToList();
+                var licenseType = HttpContext.User.FindFirst("licenseType")?.Value ?? "";
+
+                // Check if user can access company module
+                if (!RbacHelper.CanAccessModule(roles, licenseType, "company"))
+                {
+                    return Forbid();
+                }
+
                 // Check if company exists
                 var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == companyId);
                 if (!companyExists)
@@ -89,7 +107,9 @@ namespace WebAPIBackend.Controllers.Companies
 
         /// <summary>
         /// Create new account info record
+        /// Accessible by: ADMIN, COMPANY_REGISTRAR
         /// </summary>
+        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR")]
         [HttpPost]
         public async Task<ActionResult<int>> Create([FromBody] CompanyAccountInfoData request)
         {
@@ -158,7 +178,9 @@ namespace WebAPIBackend.Controllers.Companies
 
         /// <summary>
         /// Update existing account info record
+        /// Accessible by: ADMIN, COMPANY_REGISTRAR
         /// </summary>
+        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CompanyAccountInfoData request)
         {

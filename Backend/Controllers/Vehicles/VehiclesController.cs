@@ -57,9 +57,18 @@ namespace WebAPIBackend.Controllers.Vehicles
             {
                 propertyQuery = _context.VehiclesPropertyDetails;
             }
+            else if (RbacHelper.ShouldFilterByCompany(roles, "vehicle"))
+            {
+                // Filter by company ID for VehicleOperator
+                if (user.CompanyId == 0)
+                {
+                    return StatusCode(403, new { message = "شما به هیچ شرکتی متصل نیستید" });
+                }
+                propertyQuery = _context.VehiclesPropertyDetails.Where(p => p.CompanyId == user.CompanyId);
+            }
             else
             {
-                // Filter the data based on the current user's ID
+                // Fallback: Filter by user ID
                 propertyQuery = _context.VehiclesPropertyDetails.Where(p => p.CreatedBy == userId);
             }
             try
@@ -148,13 +157,25 @@ namespace WebAPIBackend.Controllers.Vehicles
 
                 if (vehicle == null)
                 {
-                    return NotFound(new { message = "????? ????? ???? ???" });
+                    return NotFound(new { message = "موتر پیدا نشد" });
                 }
 
                 // Check if user can view this record
-                if (!RbacHelper.CanViewAllRecords(roles, "vehicle") && vehicle.CreatedBy != userId)
+                if (!RbacHelper.CanViewAllRecords(roles, "vehicle"))
                 {
-                    return StatusCode(403, new { message = "??? ????? ?????? ??? ????? ?? ??????" });
+                    if (RbacHelper.ShouldFilterByCompany(roles, "vehicle"))
+                    {
+                        // Check company ownership
+                        if (vehicle.CompanyId != user.CompanyId)
+                        {
+                            return StatusCode(403, new { message = "شما اجازه دسترسی این سند را ندارید" });
+                        }
+                    }
+                    else if (vehicle.CreatedBy != userId)
+                    {
+                        // Fallback: Check user ownership
+                        return StatusCode(403, new { message = "شما اجازه دسترسی این سند را ندارید" });
+                    }
                 }
 
                 // Get sellers with location names
@@ -274,6 +295,11 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
 
             var userId = userIdClaim.Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
 
             var property = new VehiclesPropertyDetail
             {
@@ -292,6 +318,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 Des = request.Des,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
+                CompanyId = user.CompanyId, // Set company ID for data isolation
                 FilePath = request.FilePath,
                 VehicleHand = request.VehicleHand,
                 iscomplete=false,

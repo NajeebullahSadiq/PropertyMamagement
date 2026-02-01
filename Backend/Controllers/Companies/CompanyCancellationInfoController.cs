@@ -11,7 +11,7 @@ namespace WebAPIBackend.Controllers.Companies
     /// <summary>
     /// Controller for Company License Cancellation/Revocation (فسخ / لغوه)
     /// </summary>
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR")]
     [Route("api/[controller]")]
     [ApiController]
     public class CompanyCancellationInfoController : ControllerBase

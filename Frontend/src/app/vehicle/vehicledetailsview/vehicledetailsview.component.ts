@@ -138,8 +138,8 @@ export class VehicledetailsviewComponent implements OnInit {
       case 'Lease Agent': return 'وکیل کرایه دهنده';
       case 'Agent for a revocable sale': return 'وکیل بیع جایزی';
       case 'Heirs': return 'ورثه';
-      case 'Buyer': return 'خریدار';
-      case 'Buyer Agent': return 'وکیل خریدار';
+      case 'Buyer': return 'مشتری';
+      case 'Buyer Agent': return 'وکیل مشتری';
       case 'Renter': return 'کرایه گیرنده';
       case 'Renter Agent': return 'وکیل کرایه گیرنده';
       default: return roleType;

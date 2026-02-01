@@ -47,6 +47,27 @@ export class DashboardComponent {
   totalexpiredLicense:any=[];
   constructor(private router: Router, private service: AuthService,private dashService:DashboardService,private http: HttpClient) { }
   ngOnInit(): void {
+    // Check if user has access to dashboard
+    const userRole = localStorage.getItem('token');
+    if (userRole) {
+      try {
+        const payload = JSON.parse(atob(userRole.split('.')[1]));
+        const role = payload.userRole || payload.role || '';
+        
+        // Only ADMIN and AUTHORITY can access dashboard
+        if (role !== 'ADMIN' && role !== 'AUTHORITY') {
+          this.router.navigate(['/forbidden']);
+          return;
+        }
+      } catch (e) {
+        this.router.navigate(['/forbidden']);
+        return;
+      }
+    } else {
+      this.router.navigate(['/Auth']);
+      return;
+    }
+
     this.dashboardData.totalRecord=[];
     this.vehicleDashboardData.totalRecord=[];
     this.totalCompany.totalCompanyRegisterd=0;

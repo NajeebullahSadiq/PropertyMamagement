@@ -11,6 +11,8 @@ public partial class VehiclesWitnessDetail
 
     public string FatherName { get; set; } = null!;
 
+    public string? GrandFatherName { get; set; }
+
     // Electronic National ID - الیکټرونیکی تذکره
     public string? ElectronicNationalIdNumber { get; set; }
 
@@ -23,6 +25,10 @@ public partial class VehiclesWitnessDetail
     public string? CreatedBy { get; set; }
 
     public string? NationalIdCard { get; set; }
+
+    public string? WitnessSide { get; set; }
+
+    public string? Des { get; set; }
 
     public virtual VehiclesPropertyDetail? PropertyDetails { get; set; }
 }

@@ -7,7 +7,7 @@ using WebAPIBackend.Models;
 
 namespace WebAPIBackend.Controllers.Companies
 {
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR")]
     [Route("api/[controller]")]
     [ApiController]
     public class CompanyOwnerAddressController : ControllerBase

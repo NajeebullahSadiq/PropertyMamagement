@@ -99,16 +99,27 @@
         </select>
       </div>
 
-      <!-- License Type (conditional) -->
+      <!-- License Type Info (Auto-determined by role) -->
       <div *ngIf="showLicenseTypeSelect">
         <label class="block text-sm font-semibold text-gray-700 mb-2">نوع جواز</label>
-        <select 
-          formControlName="licenseType"
-          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-        >
-          <option value="">انتخاب نوع جواز</option>
-          <option *ngFor="let type of licenseTypes" [value]="type.id">{{ type.dari }}</option>
-        </select>
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-info-circle text-blue-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold text-blue-800 mb-1">نوع جواز به صورت خودکار تعیین می‌شود</p>
+              <p class="text-xs text-blue-700">
+                <span *ngIf="editForm.get('role')?.value === 'PROPERTY_OPERATOR'">
+                  کاربران عملیاتی املاک فقط می‌توانند با شرکت‌های املاک کار کنند
+                </span>
+                <span *ngIf="editForm.get('role')?.value === 'VEHICLE_OPERATOR'">
+                  کاربران عملیاتی موتر فروشی فقط می‌توانند با شرکت‌های موتر فروشی کار کنند
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

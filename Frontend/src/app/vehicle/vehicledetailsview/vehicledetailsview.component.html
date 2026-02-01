@@ -233,7 +233,7 @@
             <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
               <i class="fas fa-user text-white text-lg"></i>
             </div>
-            <h2 class="text-xl font-bold text-white">معلومات خریدار</h2>
+            <h2 class="text-xl font-bold text-white">معلومات مشتری</h2>
           </div>
         </div>
         <div class="p-8 space-y-6">
@@ -244,12 +244,12 @@
               </div>
               <div>
                 <p class="font-bold text-gray-900 text-lg">{{ safeValue(b.firstName) }} فرزند {{ safeValue(b.fatherName) }}</p>
-                <p class="text-sm text-gray-600">خریدار</p>
+                <p class="text-sm text-gray-600">مشتری</p>
               </div>
               <!-- Buyer Photo -->
               <div class="mr-auto" *ngIf="b.photo">
                 <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-300 shadow-lg">
-                  <img [src]="b.photo" alt="عکس خریدار" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                  <img [src]="b.photo" alt="عکس مشتری" class="w-full h-full object-cover" onerror="this.style.display='none'">
                 </div>
               </div>
             </div>

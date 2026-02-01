@@ -112,13 +112,26 @@
                 <ng-option value="سند ملکیت">سند ملکیت</ng-option>
                 <ng-option value="سټه رهنمای معاملات">سټه رهنمای معاملات</ng-option>
                 <ng-option value="سند دست‌نویس">سند دست‌نویس</ng-option>
+                <ng-option value="سایر">سایر</ng-option>
               </ng-select>
               <div *ngIf="documentType?.invalid && (documentType?.dirty || documentType?.touched)">
                 <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>انتخاب نوع سند الزامی است</small>
               </div>
             </div>
+            <div *ngIf="isOtherDocumentType()" class="form-group">
+              <label for="customDocumentType" class="block text-sm font-semibold text-gray-700 mb-2">نوع سند (سایر)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                  <i class="fas fa-edit"></i>
+                </span>
+                <input type="text" id="customDocumentType" class="form-input w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" formControlName="customDocumentType" placeholder="نوع سند را وارد کنید">
+              </div>
+              <div *ngIf="customDocumentType?.invalid && (customDocumentType?.dirty || customDocumentType?.touched)">
+                <small class="text-red-500 text-xs mt-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>این فیلد الزامی است</small>
+              </div>
+            </div>
             <div *ngIf="requiresIssuanceFields()" class="form-group">
-              <label for="issuanceNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر قباله</label>
+              <label for="issuanceNumber" class="block text-sm font-semibold text-gray-700 mb-2">{{ getIssuanceNumberLabel() }}</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
                   <i class="fas fa-hashtag"></i>
@@ -153,23 +166,32 @@
               <i class="fas fa-cloud-upload-alt text-sm"></i>
             </div>
             <span>آپلود اسناد ملکیت</span>
+            <span *ngIf="!isOtherDocumentType()" class="text-red-300 text-sm">*</span>
           </h2>
         </div>
         <div class="p-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-dashed border-gray-200 hover:border-violet-300 transition-colors">
+            <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-dashed" [class.border-gray-200]="!documentsRequired() || previousDocumentsPath" [class.border-red-300]="documentsRequired() && !previousDocumentsPath && (previousDocumentsPath === '' || previousDocumentsPath === null)" [class.hover:border-violet-300]="!documentsRequired() || previousDocumentsPath">
               <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                 <i class="fas fa-file-archive text-violet-500"></i>
                 آپلود اسناد قبلی
+                <span *ngIf="!isOtherDocumentType()" class="text-red-500 text-xs">*</span>
               </h3>
               <app-upload #previousDocsComponent [existingFilePath]="previousDocumentsPath" (sendMessage)="previousDocumentsUploadFinished($event)"></app-upload>
+              <div *ngIf="documentsRequired() && !previousDocumentsPath && documentUploadAttempted">
+                <small class="text-red-500 text-xs mt-2 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>آپلود اسناد قبلی الزامی است</small>
+              </div>
             </div>
-            <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-dashed border-gray-200 hover:border-violet-300 transition-colors">
+            <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-dashed" [class.border-gray-200]="!documentsRequired() || existingDocumentsPath" [class.border-red-300]="documentsRequired() && !existingDocumentsPath && (existingDocumentsPath === '' || existingDocumentsPath === null)" [class.hover:border-violet-300]="!documentsRequired() || existingDocumentsPath">
               <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                 <i class="fas fa-file-alt text-violet-500"></i>
                 آپلود اسناد موجوده
+                <span *ngIf="!isOtherDocumentType()" class="text-red-500 text-xs">*</span>
               </h3>
               <app-upload #existingDocsComponent [existingFilePath]="existingDocumentsPath" (sendMessage)="existingDocumentsUploadFinished($event)"></app-upload>
+              <div *ngIf="documentsRequired() && !existingDocumentsPath && documentUploadAttempted">
+                <small class="text-red-500 text-xs mt-2 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i>آپلود اسناد موجوده الزامی است</small>
+              </div>
             </div>
           </div>
         </div>
@@ -258,10 +280,9 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">جزئیات دیگر <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">جزئیات دیگر</label>
             <textarea id="des" class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none" [class.border-red-500]="des?.invalid && des?.touched" formControlName="des" rows="4"></textarea>
             <div *ngIf="des?.invalid && des?.touched" class="text-red-500 text-sm mt-1">
-              <span *ngIf="des?.errors?.['required']">جزئیات دیگر الزامی است</span>
               <span *ngIf="des?.errors?.['pattern']">لطفاً متن معتبر وارد کنید (نه فقط فاصله)</span>
             </div>
           </div>
@@ -269,7 +290,7 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6" *ngIf="canEditProperty">
         <div class="p-6">
           <div class="flex flex-wrap gap-4 justify-center">
             <button type="submit" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 hover:-translate-y-0.5 active:translate-y-0">

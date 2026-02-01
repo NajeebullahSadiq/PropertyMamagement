@@ -34,7 +34,16 @@ export class MasterlayoutComponent implements AfterViewInit {
   canAccessVehicle = false;
   canAccessReports = false;
   canAccessUsers = false;
+  canAccessSecurities = false;
+  canAccessPetitionWriter = false;
+  canAccessActivityMonitoring = false;
+  canAccessVerification = false;
   isViewOnly = false;
+  
+  // Module create/edit flags
+  canCreateCompany = false;
+  canCreateProperty = false;
+  canCreateVehicle = false;
 
   // Dropdown menu states
   isUserMenuOpen = false;
@@ -95,7 +104,16 @@ export class MasterlayoutComponent implements AfterViewInit {
     this.canAccessVehicle = this.rbacService.canAccessModule('vehicle');
     this.canAccessReports = this.rbacService.canAccessModule('reports');
     this.canAccessUsers = this.rbacService.isAdmin();
+    this.canAccessSecurities = this.rbacService.canAccessModule('securities');
+    this.canAccessPetitionWriter = this.rbacService.canAccessModule('petitionWriter');
+    this.canAccessActivityMonitoring = this.rbacService.canAccessModule('activityMonitoring');
+    this.canAccessVerification = this.rbacService.canAccessModule('verification');
     this.isViewOnly = this.rbacService.isViewOnly();
+    
+    // Set module create/edit flags
+    this.canCreateCompany = this.rbacService.canCreateCompany();
+    this.canCreateProperty = this.rbacService.canCreateProperty();
+    this.canCreateVehicle = this.rbacService.canCreateVehicle();
   }
 
   onLogout() {

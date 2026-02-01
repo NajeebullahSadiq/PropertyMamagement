@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using WebAPIBackend.Models;
 
 namespace WebAPI.Models
 {
@@ -40,5 +41,17 @@ namespace WebAPI.Models
         /// User who created this account
         /// </summary>
         public string? CreatedBy { get; set; }
+
+        /// <summary>
+        /// Province assignment for COMPANY_REGISTRAR users (null for administrators)
+        /// Used for province-based access control and data isolation
+        /// </summary>
+        public int? ProvinceId { get; set; }
+
+        /// <summary>
+        /// Navigation property to the assigned province
+        /// </summary>
+        [ForeignKey("ProvinceId")]
+        public virtual Location? Province { get; set; }
     }
 }

@@ -3,6 +3,7 @@ export interface witnessDetail {
     firstName:string;
     fatherName:string;
     grandFather:string;
+    grandFatherName?:string;
     electronicNationalIdNumber?:string;
     phoneNumber:string;
     propertyDetailsId:number;
@@ -13,4 +14,6 @@ export interface witnessDetail {
     paddressVillage?:string;
     relationshipToParties?:string;
     witnessType?:string;
+    witnessSide?:string;
+    des?:string;
 }

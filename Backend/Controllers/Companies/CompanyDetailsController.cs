@@ -20,11 +20,16 @@ namespace WebAPIBackend.Controllers.Companies
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly WebAPIBackend.Services.IProvinceFilterService _provinceFilter;
 
-        public CompanyDetailsController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public CompanyDetailsController(
+            AppDbContext context, 
+            UserManager<ApplicationUser> userManager,
+            WebAPIBackend.Services.IProvinceFilterService provinceFilter)
         {
             _context = context;
             _userManager = userManager;
+            _provinceFilter = provinceFilter;
         }
 
         [HttpGet]
@@ -52,18 +57,22 @@ namespace WebAPIBackend.Controllers.Companies
                     return StatusCode(403, new { message = "??? ????? ?????? ?? ????? ???? ?? ?? ??????" });
                 }
 
-                var query = from p in _context.CompanyDetails
-                            select new
-                            {
-                                p.Id,
-                                p.Title,
-                                ownerFullName= (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
-                                ownerFatherName= (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                                ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                                licenseNumber= (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                                granator= (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName+" "+"?????"+" "+ p.Guarantors.First().FatherName : null,
-                            };
-                return Ok(query);
+                // Apply province filtering
+                var query = _context.CompanyDetails.AsQueryable();
+                query = _provinceFilter.ApplyProvinceFilter(query);
+
+                var result = await query.Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
+                    ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
+                    ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
+                    licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
+                    granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
+                }).ToListAsync();
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -98,19 +107,24 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
-                var query = from p in _context.CompanyDetails
-                            where p.LicenseDetails.Any(l => l.ExpireDate < currentDate)
-                            select new
-                            {
-                                p.Id,
-                                p.Title,
-                                ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
-                                ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                                ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                                licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                                granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
-                            };
-                return Ok(query);
+                // Apply province filtering
+                var query = _context.CompanyDetails
+                    .Where(p => p.LicenseDetails.Any(l => l.ExpireDate < currentDate))
+                    .AsQueryable();
+                query = _provinceFilter.ApplyProvinceFilter(query);
+
+                var result = await query.Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
+                    ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
+                    ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
+                    licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
+                    granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
+                }).ToListAsync();
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -123,9 +137,21 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var Pro = await _context.CompanyDetails.Where(x => x.Id.Equals(id)).ToListAsync();
+                var company = await _context.CompanyDetails.FindAsync(id);
+                if (company == null)
+                {
+                    return NotFound(new { message = "???? ???? ???" });
+                }
 
-                return Ok(Pro);
+                // Validate province access
+                _provinceFilter.ValidateProvinceAccess(company.ProvinceId);
+
+                var result = await _context.CompanyDetails.Where(x => x.Id.Equals(id)).ToListAsync();
+                return Ok(result);
+            }
+            catch (WebAPIBackend.Models.Common.ForbiddenException)
+            {
+                return NotFound(new { message = "???? ???? ???" }); // Return 404 to avoid information leakage
             }
             catch (Exception ex)
             {
@@ -160,6 +186,16 @@ namespace WebAPIBackend.Controllers.Companies
                 {
                     return StatusCode(403, new { message = "??? ????? ?????? ?? ????? ???? ?? ?? ??????" });
                 }
+
+                // First check if company exists and validate province access
+                var companyCheck = await _context.CompanyDetails.FindAsync(id);
+                if (companyCheck == null)
+                {
+                    return NotFound(new { message = "???? ???? ???" });
+                }
+
+                // Validate province access
+                _provinceFilter.ValidateProvinceAccess(companyCheck.ProvinceId);
 
                 var data = await _context.CompanyDetails
                     .AsNoTracking()
@@ -291,6 +327,10 @@ namespace WebAPIBackend.Controllers.Companies
 
                 return Ok(data);
             }
+            catch (WebAPIBackend.Models.Common.ForbiddenException)
+            {
+                return NotFound(new { message = "???? ???? ???" }); // Return 404 to avoid information leakage
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex}");
@@ -320,11 +360,26 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var userId = userIdClaim.Value;
 
+                // Auto-populate province for COMPANY_REGISTRAR, use provided for administrators
+                var provinceId = _provinceFilter.IsAdministrator() 
+                    ? request.ProvinceId 
+                    : _provinceFilter.GetUserProvinceId();
+
+                // Validate province is provided
+                if (!provinceId.HasValue)
+                {
+                    return BadRequest("Province is required.");
+                }
+
+                // Validate province access
+                _provinceFilter.ValidateProvinceAccess(provinceId.Value);
+
                 var property = new CompanyDetail
                 {
                     Title = request.Title,
                     Tin = request.Tin,
                     DocPath = request.DocPath,
+                    ProvinceId = provinceId.Value,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId,
                 };
@@ -334,6 +389,10 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var result = new { Id = property.Id };
                 return Ok(result);
+            }
+            catch (WebAPIBackend.Models.Common.ForbiddenException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -367,53 +426,69 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound();
             }
 
-            // Store the original values of the CreatedBy and CreatedAt properties
-            var createdBy = existingProperty.CreatedBy;
-            var createdAt = existingProperty.CreatedAt;
-
-            // Update the entity with the new values
-            existingProperty.Title = request.Title;
-            existingProperty.Tin = request.Tin;
-            existingProperty.DocPath = request.DocPath;
-
-            // Restore the original values of the CreatedBy and CreatedAt properties
-            existingProperty.CreatedBy = createdBy;
-            existingProperty.CreatedAt = createdAt;
-
-            var entry = _context.Entry(existingProperty);
-            entry.State = EntityState.Modified;
-
-            var changes = _context.ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Modified)
-                .SelectMany(e => e.Properties)
-                .Where(p => p.IsModified)
-                .ToDictionary(p => p.Metadata.Name, p => new
-                {
-                    OldValue = p.OriginalValue,
-                    NewValue = p.CurrentValue
-                });
-
-            foreach (var change in changes)
+            try
             {
-                // Only add an entry to the vehicleaudit table if the property has been modified
-                if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
-                {
-                    _context.Companydetailsaudits.Add(new Companydetailsaudit
+                // Validate province access
+                _provinceFilter.ValidateProvinceAccess(existingProperty.ProvinceId);
+
+                // Store the original values of the CreatedBy, CreatedAt, and ProvinceId properties
+                var createdBy = existingProperty.CreatedBy;
+                var createdAt = existingProperty.CreatedAt;
+                var originalProvinceId = existingProperty.ProvinceId; // Preserve province immutability
+
+                // Update the entity with the new values
+                existingProperty.Title = request.Title;
+                existingProperty.Tin = request.Tin;
+                existingProperty.DocPath = request.DocPath;
+
+                // Restore the original values of the CreatedBy, CreatedAt, and ProvinceId properties
+                existingProperty.CreatedBy = createdBy;
+                existingProperty.CreatedAt = createdAt;
+                existingProperty.ProvinceId = originalProvinceId; // Ensure province hasn't changed
+
+                var entry = _context.Entry(existingProperty);
+                entry.State = EntityState.Modified;
+
+                var changes = _context.ChangeTracker.Entries()
+                    .Where(e => e.State == EntityState.Modified)
+                    .SelectMany(e => e.Properties)
+                    .Where(p => p.IsModified)
+                    .ToDictionary(p => p.Metadata.Name, p => new
                     {
-                        CompanyId = existingProperty.Id,
-                        UpdatedBy = userId,
-                        UpdatedAt = DateTime.UtcNow,
-                        PropertyName = change.Key,
-                        OldValue = change.Value.OldValue?.ToString(),
-                        NewValue = change.Value.NewValue?.ToString()
+                        OldValue = p.OriginalValue,
+                        NewValue = p.CurrentValue
                     });
+
+                foreach (var change in changes)
+                {
+                    // Only add an entry to the audit table if the property has been modified
+                    if (change.Value.OldValue != null && !change.Value.OldValue.Equals(change.Value.NewValue))
+                    {
+                        _context.Companydetailsaudits.Add(new Companydetailsaudit
+                        {
+                            CompanyId = existingProperty.Id,
+                            UpdatedBy = userId,
+                            UpdatedAt = DateTime.UtcNow,
+                            PropertyName = change.Key,
+                            OldValue = change.Value.OldValue?.ToString(),
+                            NewValue = change.Value.NewValue?.ToString()
+                        });
+                    }
                 }
+
+                await _context.SaveChangesAsync();
+
+                var result = new { Id = request.Id };
+                return Ok(result);
             }
-
-            await _context.SaveChangesAsync();
-
-            var result = new { Id = request.Id };
-            return Ok(result);
+            catch (WebAPIBackend.Models.Common.ForbiddenException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
         }
 
         [HttpGet("getCompanies")]
@@ -421,10 +496,14 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var com = await _context.CompanyDetails
-                .OrderBy(u => u.Id)
-                .Select(u => new Companies { Id = u.Id, Title = u.Title })
-                .ToListAsync();
+                // Apply province filtering
+                var query = _context.CompanyDetails.AsQueryable();
+                query = _provinceFilter.ApplyProvinceFilter(query);
+
+                var com = await query
+                    .OrderBy(u => u.Id)
+                    .Select(u => new Companies { Id = u.Id, Title = u.Title })
+                    .ToListAsync();
 
                 return com;
             }
@@ -434,8 +513,60 @@ namespace WebAPIBackend.Controllers.Companies
             }
         }
 
-        [HttpDelete("{id}")]
+        /// <summary>
+        /// Search for company by license number and province
+        /// </summary>
+        [HttpGet("searchByLicense")]
         [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> SearchCompanyByLicense([FromQuery] string licenseNumber, [FromQuery] int? provinceId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(licenseNumber))
+                {
+                    return BadRequest(new { message = "شماره جواز الزامی است" });
+                }
+
+                var query = _context.LicenseDetails
+                    .Include(l => l.Company)
+                    .Include(l => l.Province)
+                    .Where(l => l.LicenseNumber == licenseNumber);
+
+                if (provinceId.HasValue && provinceId.Value > 0)
+                {
+                    query = query.Where(l => l.ProvinceId == provinceId.Value);
+                }
+
+                var licenses = await query
+                    .Select(l => new
+                    {
+                        CompanyId = l.CompanyId,
+                        CompanyTitle = l.Company != null ? l.Company.Title : null,
+                        LicenseNumber = l.LicenseNumber,
+                        LicenseType = l.LicenseType,
+                        ProvinceId = l.ProvinceId,
+                        ProvinceName = l.Province != null ? l.Province.Dari : null,
+                        IssueDate = l.IssueDate,
+                        ExpireDate = l.ExpireDate,
+                        Status = l.Status
+                    })
+                    .ToListAsync();
+
+                if (!licenses.Any())
+                {
+                    return NotFound(new { message = "هیچ شرکتی با این شماره جواز یافت نشد" });
+                }
+
+                return Ok(licenses);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در جستجوی شرکت", error = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
             try
@@ -459,6 +590,9 @@ namespace WebAPIBackend.Controllers.Companies
                 {
                     return NotFound(new { message = "???? ???? ???" });
                 }
+
+                // Validate province access
+                _provinceFilter.ValidateProvinceAccess(company.ProvinceId);
 
                 // Delete audit records first
                 var auditRecords = await _context.Companydetailsaudits
@@ -567,6 +701,10 @@ namespace WebAPIBackend.Controllers.Companies
                 await _context.SaveChangesAsync();
 
                 return Ok(new { message = "???? ?? ?????? ??? ??" });
+            }
+            catch (WebAPIBackend.Models.Common.ForbiddenException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (Exception ex)
             {

@@ -15,6 +15,7 @@ import { LocalizationService } from 'src/app/shared/localization.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { NumeralService } from 'src/app/shared/numeral.service';
+import { RbacService, Permissions } from 'src/app/shared/rbac.service';
 
 @Component({
   selector: 'app-propertydetails',
@@ -38,6 +39,8 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
   imageName:string='';
   previousDocumentsPath:string='';
   existingDocumentsPath:string='';
+  documentUploadAttempted:boolean=false;
+  canEditProperty = this.rbacService.hasPermission(Permissions.PropertyCreate) || this.rbacService.hasPermission(Permissions.PropertyEdit);
   @ViewChild('childComponent') childComponent!: UploadComponent;
   ngAfterViewInit(): void {
 
@@ -49,9 +52,18 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
 
   onSubmit(): void {
     this.updateDocumentFieldValidation();
+    this.documentUploadAttempted = true;
 
     const currentPropertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
     this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
+
+    // Validate document uploads for non-"سایر" document types
+    if (this.documentsRequired()) {
+      if (!this.previousDocumentsPath || !this.existingDocumentsPath) {
+        this.toastr.error('لطفاً اسناد ملکیت را آپلود کنید');
+        return;
+      }
+    }
 
     if (this.propertyForm.invalid) {
       this.propertyForm.markAllAsTouched();
@@ -80,15 +92,16 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     private localizationService: LocalizationService,
     private calendarConversionService: CalendarConversionService,
     private calendarService: CalendarService,
-    private numeralService: NumeralService) {
+    private numeralService: NumeralService,
+    public rbacService: RbacService) {
       this.propertyForm = this.fb.group({
         id: [0],
         propertyTypeId: ['', Validators.required],
         customPropertyType: [''],
         parea: ['', Validators.required],
         punitTypeId: ['', Validators.required],
-        numofFloor: ['', Validators.required],
-        numofRooms: ['', Validators.required],
+        numofFloor: [''],
+        numofRooms: [''],
         provinceId: ['', Validators.required],
         districtId: ['', Validators.required],
         village: ['', Validators.required],
@@ -97,11 +110,12 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
         east: ['', Validators.required],
         south: ['', Validators.required],
         documentType: ['', Validators.required],
+        customDocumentType: [''],
         issuanceNumber: [''],
         issuanceDate: [''],
         serialNumber: [''],
         transactionDate: [''],
-        des: ['', [Validators.required, Validators.pattern(/.*\S.*/)]],
+        des: ['', [Validators.pattern(/.*\S.*/)]],
         filePath: [''],
         previousDocumentsPath: [''],
         existingDocumentsPath: [''],
@@ -182,6 +196,7 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
               east:properties[0].east,
               south:properties[0].south,
               documentType:properties[0].documentType || '',
+              customDocumentType:(properties[0] as any).customDocumentType || '',
               issuanceNumber:properties[0].issuanceNumber || '',
               issuanceDate: issuanceDate,
               serialNumber:properties[0].serialNumber || '',
@@ -275,6 +290,12 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     if (!propertyDetails.serialNumber || (propertyDetails.serialNumber as any) === '') {
       propertyDetails.serialNumber = null as any;
     }
+    if (!propertyDetails.numofFloor || (propertyDetails.numofFloor as any) === '') {
+      propertyDetails.numofFloor = null as any;
+    }
+    if (!propertyDetails.numofRooms || (propertyDetails.numofRooms as any) === '') {
+      propertyDetails.numofRooms = null as any;
+    }
     
     // Format dates for backend using calendar service
     const currentCalendar = this.calendarService.getSelectedCalendar();
@@ -338,6 +359,12 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     if (!propertyDetails.serialNumber || (propertyDetails.serialNumber as any) === '') {
       propertyDetails.serialNumber = null as any;
     }
+    if (!propertyDetails.numofFloor || (propertyDetails.numofFloor as any) === '') {
+      propertyDetails.numofFloor = null as any;
+    }
+    if (!propertyDetails.numofRooms || (propertyDetails.numofRooms as any) === '') {
+      propertyDetails.numofRooms = null as any;
+    }
     
     // Format dates for backend using calendar service
     const currentCalendar = this.calendarService.getSelectedCalendar();
@@ -390,6 +417,7 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
       this.selectedPropertyId=0;
       this.selectedAddressId=0;
       this.id=0;
+      this.documentUploadAttempted=false;
       this.router.navigate(['/estate']);
     }
     this.propertyForm.reset({
@@ -412,6 +440,7 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
       east:'',
       south:'',
       documentType:'',
+      customDocumentType:'',
       issuanceNumber:'',
       issuanceDate:'',
       serialNumber:'',
@@ -427,18 +456,9 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     const propertyType = this.propertyForm.get('propertyTypeId')?.value;
     const numofFloorControl = this.propertyForm.get('numofFloor');
     const numofRoomControl = this.propertyForm.get('numofRooms');
-    if (propertyType === 2) {
-      // For Apartment (ID 2): disable numofFloor but enable numofRooms
-      numofFloorControl?.setValue(0);
-      numofFloorControl?.disable();
-      numofRoomControl?.enable();
-      numofRoomControl?.setValue(null);
-    } else {
-      numofFloorControl?.enable();
-      numofFloorControl?.setValue(null);
-      numofRoomControl?.enable();
-      numofRoomControl?.setValue(null);
-    }
+    // Both fields are now optional for all property types
+    numofFloorControl?.enable();
+    numofRoomControl?.enable();
   }
   resetForms(): void {
    this.parentComponent.resetChild();
@@ -510,8 +530,25 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     return selectedPropertyType && selectedPropertyType.name === 'سایر';
   }
 
+  /**
+   * Check if "سایر" (Other) is selected for document type
+   */
+  isOtherDocumentType(): boolean {
+    const docType = this.propertyForm.get('documentType')?.value;
+    return docType === 'سایر';
+  }
+
+  /**
+   * Check if document uploads are required (all document types except "سایر")
+   */
+  documentsRequired(): boolean {
+    return !this.isOtherDocumentType() && !!this.propertyForm.get('documentType')?.value;
+  }
+
   get propertyTypeId() { return this.propertyForm.get('propertyTypeId'); }
   get customPropertyType() { return this.propertyForm.get('customPropertyType'); }
+  get documentType() { return this.propertyForm.get('documentType'); }
+  get customDocumentType() { return this.propertyForm.get('customDocumentType'); }
 
   /**
    * Map backend unit types to localized versions with Dari labels
@@ -569,7 +606,6 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
   get north() { return this.propertyForm.get('north'); }
   get east() { return this.propertyForm.get('east'); }
   get south() { return this.propertyForm.get('south'); }
-  get documentType() { return this.propertyForm.get('documentType'); }
   get issuanceNumber() { return this.propertyForm.get('issuanceNumber'); }
   get issuanceDate() { return this.propertyForm.get('issuanceDate'); }
   get serialNumber() { return this.propertyForm.get('serialNumber'); }
@@ -585,6 +621,19 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
   requiresIssuanceFields(): boolean {
     const docType = this.propertyForm.get('documentType')?.value;
     return docType === 'قباله شرعی' || docType === 'سند ملکیت';
+  }
+
+  /**
+   * Get the appropriate label for issuance number based on document type
+   */
+  getIssuanceNumberLabel(): string {
+    const docType = this.propertyForm.get('documentType')?.value;
+    if (docType === 'سند ملکیت') {
+      return 'نمبر سند ملکیت';
+    } else if (docType === 'قباله شرعی') {
+      return 'نمبر قباله';
+    }
+    return 'نمبر سند';
   }
 
   /**
@@ -620,12 +669,14 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     const issuanceDateControl = this.propertyForm.get('issuanceDate');
     const serialNumberControl = this.propertyForm.get('serialNumber');
     const transactionDateControl = this.propertyForm.get('transactionDate');
+    const customDocumentTypeControl = this.propertyForm.get('customDocumentType');
 
     // Clear all validators first
     issuanceNumberControl?.clearValidators();
     issuanceDateControl?.clearValidators();
     serialNumberControl?.clearValidators();
     transactionDateControl?.clearValidators();
+    customDocumentTypeControl?.clearValidators();
 
     // Reset values for fields that are not visible
     if (!this.requiresIssuanceFields()) {
@@ -637,6 +688,9 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     }
     if (!this.requiresTransactionDate()) {
       transactionDateControl?.setValue('');
+    }
+    if (!this.isOtherDocumentType()) {
+      customDocumentTypeControl?.setValue('');
     }
 
     // Add validators based on document type
@@ -650,12 +704,16 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     if (this.requiresTransactionDate()) {
       transactionDateControl?.setValidators([Validators.required]);
     }
+    if (this.isOtherDocumentType()) {
+      customDocumentTypeControl?.setValidators([Validators.required]);
+    }
 
     // Update validity
     issuanceNumberControl?.updateValueAndValidity();
     issuanceDateControl?.updateValueAndValidity();
     serialNumberControl?.updateValueAndValidity();
     transactionDateControl?.updateValueAndValidity();
+    customDocumentTypeControl?.updateValueAndValidity();
   }
 
   filterResults(getId:any) {

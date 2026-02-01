@@ -14,7 +14,7 @@
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                 <i class="fas fa-search"></i>
               </span>
-              <input type="text" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="نمبر جواز سیر، نام فروشنده/خریدار، نمبر تذکره" aria-label="Search">
+              <input type="text" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="نمبر جواز سیر، نام فروشنده/مشتری، نمبر تذکره" aria-label="Search">
             </div>
             <button class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg" type="button" (click)="onSearch()">
               جستجو
@@ -47,7 +47,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نوع موتر</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">قیمت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">فروشنده</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">خریدار</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">مشتری</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">حالت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700" colspan="3">عملیات</th>
             </tr>
@@ -84,11 +84,11 @@
                 </button>
               </td>
               <td class="px-4 py-3">
-                <button *ngIf="!isViewOnly" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" (click)="onEdit(property.id)" title="ویرایش">
+                <button *ngIf="canEdit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" (click)="onEdit(property.id)" title="ویرایش">
                   <i class="fas fa-edit"></i>
                   <span>ویرایش</span>
                 </button>
-                <span *ngIf="isViewOnly" class="text-gray-400 text-sm">-</span>
+                <span *ngIf="!canEdit" class="text-gray-400 text-sm">-</span>
               </td>
               <td class="px-4 py-3">
                 <button [disabled]="!property.iscomplete" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 mx-auto" (click)="onPrint(property.id)" title="چاپ">

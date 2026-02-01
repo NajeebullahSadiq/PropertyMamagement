@@ -5,8 +5,8 @@ export interface PropertyDetails {
     id: number;
     parea: number;
     punitTypeId:number;
-    numofFloor:number;
-    numofRooms:number;
+    numofFloor?:number;
+    numofRooms?:number;
     propertyTypeId:number;
     customPropertyType?:string;
     price:number;
@@ -24,6 +24,7 @@ export interface PropertyDetails {
     east:string;
     north:string;
     documentType?:string;
+    customDocumentType?:string;
     issuanceNumber?:string;
     issuanceDate?:string;
     serialNumber?:string;
@@ -45,8 +46,8 @@ export interface PropertyDetails {
     pnumber?: number;
     parea: number;
     punitTypeId:number;
-    numofFloor:number;
-    numofRooms:number;
+    numofFloor?:number;
+    numofRooms?:number;
     propertyTypeId:number;
     customPropertyType?:string;
     price:number;

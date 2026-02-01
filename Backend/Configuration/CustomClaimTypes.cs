@@ -3,6 +3,7 @@
     public class CustomClaimTypes
     {
         public const string Permission = "Permission";
+        public const string ProvinceId = "province_id";
     }
 
     public static class UserPermissions

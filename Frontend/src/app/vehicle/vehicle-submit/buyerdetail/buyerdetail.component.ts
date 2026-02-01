@@ -115,7 +115,7 @@ export class BuyerdetailComponent {
       const agentRoles = ['Purchase Agent'];
       
       // Update canAddMoreBuyers based on role type
-      // Only 'Buyers' (خریداران) allows multiple buyers
+      // Only 'Buyers' (مشتریان) allows multiple buyers
       this.updateCanAddMoreBuyers(roleType);
       
       if (roleType && agentRoles.includes(roleType)) {
@@ -425,15 +425,15 @@ updateBuyerDetails(): void {
 }
 
 deleteBuyer(id: number) {
-  if (confirm('آیا مطمئن هستید که می‌خواهید این خریدار را حذف کنید؟')) {
+  if (confirm('آیا مطمئن هستید که می‌خواهید این مشتری را حذف کنید؟')) {
     this.vehiclesubservice.deleteBuyer(id).subscribe(
       () => {
-        this.toastr.success("خریدار با موفقیت حذف شد");
+        this.toastr.success("مشتری با موفقیت حذف شد");
         this.loadBuyerDetails();
         this.resetChild();
       },
       (error) => {
-        this.toastr.error("خطا در حذف خریدار");
+        this.toastr.error("خطا در حذف مشتری");
       }
     );
   }
@@ -506,8 +506,8 @@ isAuthorizedAgent(): boolean {
 
 /**
  * Update whether more buyers can be added based on role type
- * - خریدار (Buyer): Single buyer only
- * - خریداران (Buyers): Multiple buyers allowed
+ * - مشتری (Buyer): Single buyer only
+ * - مشتریان (Buyers): Multiple buyers allowed
  * - وکیل خرید (Purchase Agent): Single buyer only
  */
 updateCanAddMoreBuyers(roleType: string): void {

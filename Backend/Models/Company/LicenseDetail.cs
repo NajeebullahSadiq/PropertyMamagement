@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using WebAPIBackend.Models.Audit;
+using WebAPIBackend.Models.Common;
 
 namespace WebAPIBackend.Models;
 
-public partial class LicenseDetail
+public partial class LicenseDetail : IProvinceEntity
 {
     public int Id { get; set; }
 

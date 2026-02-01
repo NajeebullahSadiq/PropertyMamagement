@@ -80,6 +80,50 @@
   }
 }
 
+// Small variant for license search
+::ng-deep .custom-ng-select-sm {
+  .ng-select-container {
+    min-height: 36px !important;
+    border-radius: 0.5rem !important;
+    border: 1px solid #d1d5db !important;
+    background-color: white !important;
+    
+    .ng-value-container {
+      padding-right: 10px !important;
+      
+      .ng-placeholder {
+        color: #9ca3af !important;
+        font-size: 13px !important;
+      }
+      
+      .ng-value {
+        font-size: 13px !important;
+        color: #374151 !important;
+      }
+    }
+  }
+  
+  &.ng-select-focused {
+    .ng-select-container {
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+    }
+  }
+  
+  .ng-dropdown-panel {
+    border-radius: 0.5rem !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    
+    .ng-dropdown-panel-items {
+      .ng-option {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+      }
+    }
+  }
+}
+
 // Centered profile image cropper
 .centered-cropper {
   ::ng-deep .profile-image-cropper {

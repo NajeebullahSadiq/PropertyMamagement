@@ -11,7 +11,7 @@ using WebAPIBackend.Models.RequestData;
 
 namespace WebAPIBackend.Controllers.Companies
 {
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR")]
     [Route("api/[controller]")]
     [ApiController]
     public class GuaranatorController : ControllerBase

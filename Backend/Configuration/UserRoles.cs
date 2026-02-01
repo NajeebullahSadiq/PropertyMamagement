@@ -157,10 +157,11 @@ namespace WebAPIBackend.Configuration
 
                 UserRoles.CompanyRegistrar => new[]
                 {
-                    // Company module only
-                    Permissions.CompanyView, Permissions.CompanyCreate, Permissions.CompanyEdit,
+                    // Full access to company module + view all property and vehicle records
+                    Permissions.CompanyView, Permissions.CompanyCreate, Permissions.CompanyEdit, Permissions.CompanyDelete,
                     Permissions.LicenseView, Permissions.LicenseCreate, Permissions.LicenseEdit,
-                    Permissions.DashboardView,
+                    Permissions.PropertyView,  // Can view all property records
+                    Permissions.VehicleView,   // Can view all vehicle records
                     Permissions.ReportsView
                 },
 

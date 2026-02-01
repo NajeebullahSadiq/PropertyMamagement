@@ -57,8 +57,8 @@ namespace WebAPIBackend.Controllers.Vehicles
         {
             var roles = new[]
             {
-                new { value = "Buyer", label = "خریدار", allowMultiple = false },
-                new { value = "Buyers", label = "خریداران", allowMultiple = true },
+                new { value = "Buyer", label = "مشتری", allowMultiple = false },
+                new { value = "Buyers", label = "مشتریان", allowMultiple = true },
                 new { value = "Purchase Agent", label = "وکیل خرید", allowMultiple = false }
             };
             return Ok(roles);
@@ -169,7 +169,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     var existingTransaction = duplicates.First();
                     var transactionTypeName = existingTransaction.PropertyDetails?.TransactionType?.Name ?? "Unknown";
                     
-                    var message = $"این ملک قبلاً توسط همین خریدار برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
+                    var message = $"این ملک قبلاً توسط همین مشتری برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
                     
                     return Ok(new { isDuplicate = true, message = message, transactionType = transactionTypeName });
                 }
@@ -214,7 +214,7 @@ namespace WebAPIBackend.Controllers.Vehicles
             
             if (!AllowedBuyerRoles.Contains(roleType))
             {
-                return StatusCode(400, "Invalid buyer role type. Allowed values: Buyer, Buyers, Purchase Agent (خریدار، خریداران، وکیل خرید)");
+                return StatusCode(400, "Invalid buyer role type. Allowed values: Buyer, Buyers, Purchase Agent (مشتری، مشتریان، وکیل خرید)");
             }
 
             // Single buyer roles (Buyer, Purchase Agent) - check if already has a buyer
@@ -224,7 +224,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     .CountAsync(b => b.PropertyDetailsId == request.PropertyDetailsId);
                 if (existingBuyerCount > 0)
                 {
-                    return StatusCode(400, "برای نوعیت «خریدار» یا «وکیل خرید» فقط یک خریدار مجاز است. برای ثبت چندین خریدار، نوعیت «خریداران» را انتخاب کنید.");
+                    return StatusCode(400, "برای نوعیت «مشتری» یا «وکیل خرید» فقط یک مشتری مجاز است. برای ثبت چندین مشتری، نوعیت «مشتریان» را انتخاب کنید.");
                 }
             }
             
@@ -261,6 +261,12 @@ namespace WebAPIBackend.Controllers.Vehicles
             {
                 _context.Add(seller);
                 await _context.SaveChangesAsync();
+                
+                // Update completion status
+                if (request.PropertyDetailsId.HasValue && request.PropertyDetailsId.Value > 0)
+                {
+                    await UpdateVehicleCompletionStatus(request.PropertyDetailsId.Value);
+                }
             }
             catch (Exception ex)
             {
@@ -296,7 +302,7 @@ namespace WebAPIBackend.Controllers.Vehicles
             
             if (!AllowedBuyerRoles.Contains(roleType))
             {
-                return StatusCode(400, "Invalid buyer role type. Allowed values: Buyer, Buyers, Purchase Agent (خریدار، خریداران، وکیل خرید)");
+                return StatusCode(400, "Invalid buyer role type. Allowed values: Buyer, Buyers, Purchase Agent (مشتری، مشتریان، وکیل خرید)");
             }
             
             // If agent role (Purchase Agent), authorization letter is required
@@ -349,6 +355,12 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
 
             await _context.SaveChangesAsync();
+
+            // Update completion status
+            if (existingProperty.PropertyDetailsId.HasValue && existingProperty.PropertyDetailsId.Value > 0)
+            {
+                await UpdateVehicleCompletionStatus(existingProperty.PropertyDetailsId.Value);
+            }
 
             var result = new { Id = request.Id};
             return Ok(result);
@@ -429,6 +441,12 @@ namespace WebAPIBackend.Controllers.Vehicles
             {
                 _context.Add(seller);
                 await _context.SaveChangesAsync();
+                
+                // Update completion status
+                if (request.PropertyDetailsId.HasValue && request.PropertyDetailsId.Value > 0)
+                {
+                    await UpdateVehicleCompletionStatus(request.PropertyDetailsId.Value);
+                }
             }
             catch (Exception ex)
             {
@@ -531,6 +549,12 @@ namespace WebAPIBackend.Controllers.Vehicles
 
             await _context.SaveChangesAsync();
 
+            // Update completion status
+            if (existingProperty.PropertyDetailsId.HasValue && existingProperty.PropertyDetailsId.Value > 0)
+            {
+                await UpdateVehicleCompletionStatus(existingProperty.PropertyDetailsId.Value);
+            }
+
             var result = new { Id = request.Id };
             return Ok(result);
         }
@@ -573,16 +597,10 @@ namespace WebAPIBackend.Controllers.Vehicles
                 _context.Add(witness);
                 await _context.SaveChangesAsync();
 
-                // Update the IsComplete column of the PropertyDetails entity to true
+                // Update the IsComplete status based on validation
                 if (request.PropertyDetailsId.HasValue)
                 {
-                    var propertyDetails = await _context.VehiclesPropertyDetails.FindAsync(request.PropertyDetailsId.Value);
-                    if (propertyDetails == null)
-                    {
-                        return NotFound("PropertyDetails not found");
-                    }
-                    propertyDetails.iscomplete = true;
-                    await _context.SaveChangesAsync();
+                    await UpdateVehicleCompletionStatus(request.PropertyDetailsId.Value);
                 }
             }
             catch (Exception ex)
@@ -591,6 +609,65 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
             var result = new { Id = witness.Id };
             return Ok(result);
+        }
+
+        private async Task UpdateVehicleCompletionStatus(int vehicleDetailsId)
+        {
+            var vehicleDetails = await _context.VehiclesPropertyDetails
+                .Include(v => v.VehiclesSellerDetails)
+                .Include(v => v.VehiclesBuyerDetails)
+                .Include(v => v.VehiclesWitnessDetails)
+                .FirstOrDefaultAsync(v => v.Id == vehicleDetailsId);
+
+            if (vehicleDetails == null)
+            {
+                return;
+            }
+
+            // Check if all required fields are filled
+            bool isComplete = true;
+
+            // 1. Check if vehicle details has required fields (using correct field names)
+            if (string.IsNullOrWhiteSpace(vehicleDetails.TypeOfVehicle) ||
+                vehicleDetails.PilateNo == 0)
+            {
+                isComplete = false;
+            }
+
+            // 2. Check if at least one seller exists
+            if (vehicleDetails.VehiclesSellerDetails == null || !vehicleDetails.VehiclesSellerDetails.Any())
+            {
+                isComplete = false;
+            }
+
+            // 3. Check if at least one buyer exists
+            if (vehicleDetails.VehiclesBuyerDetails == null || !vehicleDetails.VehiclesBuyerDetails.Any())
+            {
+                isComplete = false;
+            }
+
+            // 4. Check if exactly two witnesses exist (one from each side)
+            if (vehicleDetails.VehiclesWitnessDetails == null || vehicleDetails.VehiclesWitnessDetails.Count != 2)
+            {
+                isComplete = false;
+            }
+            else
+            {
+                // Check if witnesses are from different sides
+                var witnessSides = vehicleDetails.VehiclesWitnessDetails
+                    .Select(w => w.WitnessSide)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Distinct()
+                    .ToList();
+                
+                if (witnessSides.Count != 2)
+                {
+                    isComplete = false;
+                }
+            }
+
+            vehicleDetails.iscomplete = isComplete;
+            await _context.SaveChangesAsync();
         }
 
         [HttpPut("Updatewitness/{id}")]
@@ -608,15 +685,10 @@ namespace WebAPIBackend.Controllers.Vehicles
             {
                 await _context.SaveChangesAsync();
 
-                // Ensure the IsComplete column of the PropertyDetails entity remains true
+                // Update the IsComplete status based on validation
                 if (request.PropertyDetailsId.HasValue)
                 {
-                    var propertyDetails = await _context.VehiclesPropertyDetails.FindAsync(request.PropertyDetailsId.Value);
-                    if (propertyDetails != null)
-                    {
-                        propertyDetails.iscomplete = true;
-                        await _context.SaveChangesAsync();
-                    }
+                    await UpdateVehicleCompletionStatus(request.PropertyDetailsId.Value);
                 }
             }
             catch (DbUpdateConcurrencyException)

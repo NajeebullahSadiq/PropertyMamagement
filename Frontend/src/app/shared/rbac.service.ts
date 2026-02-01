@@ -200,6 +200,21 @@ export class RbacService {
     return role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
   }
 
+  // Check if user can create/edit in Property module
+  canCreateProperty(): boolean {
+    return this.hasPermission(Permissions.PropertyCreate) || this.hasPermission(Permissions.PropertyEdit);
+  }
+
+  // Check if user can create/edit in Vehicle module
+  canCreateVehicle(): boolean {
+    return this.hasPermission(Permissions.VehicleCreate) || this.hasPermission(Permissions.VehicleEdit);
+  }
+
+  // Check if user can create/edit in Company module
+  canCreateCompany(): boolean {
+    return this.hasPermission(Permissions.CompanyCreate) || this.hasPermission(Permissions.CompanyEdit);
+  }
+
   // Check if user has specific permission
   hasPermission(permission: string): boolean {
     const permissions = this.permissions$.getValue();
@@ -245,13 +260,31 @@ export class RbacService {
       case 'company':
         return role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseReviewer;
       case 'property':
-        return role === UserRoles.PropertyOperator || licenseType === 'realEstate';
+        return role === UserRoles.PropertyOperator || 
+               role === UserRoles.CompanyRegistrar ||  // Company registrar can view property
+               licenseType === 'realEstate';
       case 'vehicle':
-        return role === UserRoles.VehicleOperator || licenseType === 'carSale';
+        return role === UserRoles.VehicleOperator || 
+               role === UserRoles.CompanyRegistrar ||  // Company registrar can view vehicle
+               licenseType === 'carSale';
+      case 'securities':
+        // Securities module is only for Admin and Authority
+        return role === UserRoles.Admin || role === UserRoles.Authority;
+      case 'petitionwriter':
+        // Petition Writer module is only for Admin and Authority
+        return role === UserRoles.Admin || role === UserRoles.Authority;
+      case 'activitymonitoring':
+        // Activity Monitoring is only for Admin and Authority
+        return role === UserRoles.Admin || role === UserRoles.Authority;
+      case 'verification':
+        // Verification is accessible to all roles
+        return true;
       case 'reports':
+        // Reports accessible to all except License Reviewer
         return role !== UserRoles.LicenseReviewer;
       case 'dashboard':
-        return role !== UserRoles.LicenseReviewer;
+        // Dashboard is ONLY for Admin and Authority
+        return role === UserRoles.Admin || role === UserRoles.Authority;
       case 'users':
         return role === UserRoles.Admin;
       default:
@@ -273,9 +306,9 @@ export class RbacService {
       return false;
     }
 
-    // Company registrar can edit company records
+    // Company registrar can edit company records but NOT property/vehicle records
     if (role === UserRoles.CompanyRegistrar) {
-      return true;
+      return true; // This will be further restricted by permission checks in components
     }
 
     // Property/Vehicle operators can only edit their own records

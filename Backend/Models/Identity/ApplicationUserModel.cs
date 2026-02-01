@@ -21,5 +21,10 @@ namespace WebAPI.Models
         /// License type (realEstate or carSale) - determines module access for company operators
         /// </summary>
         public string? LicenseType { get; set; }
+
+        /// <summary>
+        /// Province assignment (required for COMPANY_REGISTRAR role)
+        /// </summary>
+        public int? ProvinceId { get; set; }
     }
 }

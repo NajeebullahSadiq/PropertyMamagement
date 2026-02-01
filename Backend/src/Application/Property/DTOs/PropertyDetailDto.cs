@@ -52,6 +52,7 @@ namespace WebAPIBackend.Application.Property.DTOs
         public string? North { get; set; }
         public string? South { get; set; }
         public string? DocumentType { get; set; }
+        public string? CustomDocumentType { get; set; }
         public string? IssuanceNumber { get; set; }
         public DateTime? IssuanceDate { get; set; }
         public string? SerialNumber { get; set; }

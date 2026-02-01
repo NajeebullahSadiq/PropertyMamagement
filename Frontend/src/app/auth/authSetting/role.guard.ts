@@ -129,3 +129,87 @@ export class VehicleModuleGuard implements CanActivate {
     return true;
   }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DashboardGuard implements CanActivate {
+  constructor(private router: Router, private rbacService: RbacService) {}
+
+  canActivate(): boolean {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/Auth']);
+      return false;
+    }
+
+    if (!this.rbacService.canAccessModule('dashboard')) {
+      this.router.navigate(['/forbidden']);
+      return false;
+    }
+
+    return true;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SecuritiesModuleGuard implements CanActivate {
+  constructor(private router: Router, private rbacService: RbacService) {}
+
+  canActivate(): boolean {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/Auth']);
+      return false;
+    }
+
+    if (!this.rbacService.canAccessModule('securities')) {
+      this.router.navigate(['/forbidden']);
+      return false;
+    }
+
+    return true;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PetitionWriterModuleGuard implements CanActivate {
+  constructor(private router: Router, private rbacService: RbacService) {}
+
+  canActivate(): boolean {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/Auth']);
+      return false;
+    }
+
+    if (!this.rbacService.canAccessModule('petitionWriter')) {
+      this.router.navigate(['/forbidden']);
+      return false;
+    }
+
+    return true;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ActivityMonitoringGuard implements CanActivate {
+  constructor(private router: Router, private rbacService: RbacService) {}
+
+  canActivate(): boolean {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/Auth']);
+      return false;
+    }
+
+    if (!this.rbacService.canAccessModule('activityMonitoring')) {
+      this.router.navigate(['/forbidden']);
+      return false;
+    }
+
+    return true;
+  }
+}

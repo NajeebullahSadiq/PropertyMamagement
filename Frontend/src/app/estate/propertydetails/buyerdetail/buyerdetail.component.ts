@@ -472,15 +472,15 @@ deleteBuyer(id: number, event?: Event) {
   if (event) {
     event.stopPropagation();
   }
-  if (confirm('آیا مطمئن هستید که می‌خواهید این خریدار را حذف کنید؟')) {
+  if (confirm('آیا مطمئن هستید که می‌خواهید این مشتری را حذف کنید؟')) {
     this.selerService.deleteBuyer(id).subscribe(
       () => {
-        this.toastr.success("خریدار با موفقیت حذف شد");
+        this.toastr.success("مشتری با موفقیت حذف شد");
         this.loadBuyerDetails();
         this.resetChild();
       },
       (error) => {
-        this.toastr.error("خطا در حذف خریدار");
+        this.toastr.error("خطا در حذف مشتری");
       }
     );
   }

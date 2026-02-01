@@ -284,6 +284,13 @@ namespace WebAPIBackend.Controllers
             };
             _context.Add(seller);
             await _context.SaveChangesAsync();
+            
+            // Update completion status
+            if (request.PropertyDetailsId.HasValue && request.PropertyDetailsId.Value > 0)
+            {
+                await UpdatePropertyCompletionStatus(request.PropertyDetailsId.Value);
+            }
+            
             var result = new { Id = seller.Id};
             return Ok(result);
         }
@@ -370,10 +377,15 @@ namespace WebAPIBackend.Controllers
 
             await _context.SaveChangesAsync();
 
+            // Update completion status
+            if (existingProperty.PropertyDetailsId.HasValue && existingProperty.PropertyDetailsId.Value > 0)
+            {
+                await UpdatePropertyCompletionStatus(existingProperty.PropertyDetailsId.Value);
+            }
+
             var result = new { Id = request.Id };
             return Ok(result);
         }
-        
         
         [HttpPost("CheckDuplicateBuyer")]
         public async Task<IActionResult> CheckDuplicateBuyer([FromBody] DuplicateOwnerCheckRequest request)
@@ -420,7 +432,7 @@ namespace WebAPIBackend.Controllers
                     var existingTransaction = duplicates.First();
                     var transactionTypeName = existingTransaction.PropertyDetails?.TransactionType?.Name ?? "Unknown";
                     
-                    var message = $"این ملک قبلاً توسط همین خریدار برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
+                    var message = $"این ملک قبلاً توسط همین مشتری برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
                     
                     return Ok(new { isDuplicate = true, message = message, transactionType = transactionTypeName });
                 }
@@ -458,7 +470,7 @@ namespace WebAPIBackend.Controllers
 
                 if (existingBuyerCount > 0)
                 {
-                    return StatusCode(400, "فقط یک خریدار مجاز است");
+                    return StatusCode(400, "فقط یک مشتری مجاز است");
                 }
             }
 
@@ -582,6 +594,12 @@ namespace WebAPIBackend.Controllers
             {
                 _context.Add(buyer);
                 await _context.SaveChangesAsync();
+                
+                // Update completion status
+                if (request.PropertyDetailsId.HasValue && request.PropertyDetailsId.Value > 0)
+                {
+                    await UpdatePropertyCompletionStatus(request.PropertyDetailsId.Value);
+                }
             }
             catch (Exception ex)
             {
@@ -766,6 +784,12 @@ namespace WebAPIBackend.Controllers
 
             await _context.SaveChangesAsync();
 
+            // Update completion status
+            if (existingProperty.PropertyDetailsId.HasValue && existingProperty.PropertyDetailsId.Value > 0)
+            {
+                await UpdatePropertyCompletionStatus(existingProperty.PropertyDetailsId.Value);
+            }
+
             var result = new { Id = request.Id };
             return Ok(result);
         }
@@ -796,12 +820,20 @@ namespace WebAPIBackend.Controllers
             {
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
+                GrandFatherName = request.GrandFatherName,
                 ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 NationalIdCard = request.NationalIdCard,
+                PaddressProvinceId = request.PaddressProvinceId,
+                PaddressDistrictId = request.PaddressDistrictId,
+                PaddressVillage = request.PaddressVillage,
+                RelationshipToParties = request.RelationshipToParties,
+                WitnessType = request.WitnessType,
+                WitnessSide = request.WitnessSide,
+                Des = request.Des,
             };
             try
             {
@@ -814,6 +846,12 @@ namespace WebAPIBackend.Controllers
                     return StatusCode(500, "Failed to save witness details - ID not generated");
                 }
                 
+                // Update completion status
+                if (request.PropertyDetailsId.HasValue && request.PropertyDetailsId.Value > 0)
+                {
+                    await UpdatePropertyCompletionStatus(request.PropertyDetailsId.Value);
+                }
+                
                 var result = new { Id = witness.Id };
                 return Ok(result);
             }
@@ -824,7 +862,7 @@ namespace WebAPIBackend.Controllers
         }
 
         [HttpPut("Updatewitness/{id}")]
-        public async Task<IActionResult> UpdateWitness(int id, [FromBody] WitnessDetail request)
+        public async Task<IActionResult> UpdateWitness(int id, [FromBody] WitnessDetailRequest request)
         {
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null)
@@ -847,7 +885,23 @@ namespace WebAPIBackend.Controllers
             var createdBy = existingWitness.CreatedBy;
             var createdAt = existingWitness.CreatedAt;
 
-            _context.Entry(existingWitness).CurrentValues.SetValues(request);
+            // Update fields manually to ensure all fields are mapped correctly
+            existingWitness.FirstName = request.FirstName;
+            existingWitness.FatherName = request.FatherName;
+            existingWitness.GrandFatherName = request.GrandFatherName;
+            existingWitness.ElectronicNationalIdNumber = request.ElectronicNationalIdNumber;
+            existingWitness.PhoneNumber = request.PhoneNumber;
+            existingWitness.NationalIdCard = request.NationalIdCard;
+            existingWitness.PaddressProvinceId = request.PaddressProvinceId;
+            existingWitness.PaddressDistrictId = request.PaddressDistrictId;
+            existingWitness.PaddressVillage = request.PaddressVillage;
+            existingWitness.RelationshipToParties = request.RelationshipToParties;
+            existingWitness.WitnessType = request.WitnessType;
+            existingWitness.WitnessSide = request.WitnessSide;
+            existingWitness.Des = request.Des;
+            existingWitness.PropertyDetailsId = request.PropertyDetailsId;
+
+            // Restore the original values of the CreatedBy and CreatedAt properties
             existingWitness.CreatedBy = createdBy;
             existingWitness.CreatedAt = createdAt;
 
@@ -857,6 +911,12 @@ namespace WebAPIBackend.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                
+                // Update completion status
+                if (existingWitness.PropertyDetailsId.HasValue && existingWitness.PropertyDetailsId.Value > 0)
+                {
+                    await UpdatePropertyCompletionStatus(existingWitness.PropertyDetailsId.Value);
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -957,14 +1017,8 @@ namespace WebAPIBackend.Controllers
                 _context.Add(seller);
                 await _context.SaveChangesAsync();
 
-                // Update the IsComplete column of the PropertyDetails entity to true
-                var propertyDetails = await _context.PropertyDetails.FindAsync(request.PropertyDetailsId.Value);
-                if (propertyDetails == null)
-                {
-                    return NotFound("PropertyDetails not found");
-                }
-                propertyDetails.iscomplete = true;
-                await _context.SaveChangesAsync();
+                // Update the IsComplete status based on validation
+                await UpdatePropertyCompletionStatus(request.PropertyDetailsId.Value);
             }
             catch (Exception)
             {
@@ -972,6 +1026,78 @@ namespace WebAPIBackend.Controllers
             }
             var result = new { Id = seller.Id };
             return Ok(result);
+        }
+
+        private async Task UpdatePropertyCompletionStatus(int propertyDetailsId)
+        {
+            var propertyDetails = await _context.PropertyDetails
+                .Include(p => p.SellerDetails)
+                .Include(p => p.BuyerDetails)
+                .Include(p => p.WitnessDetails)
+                .Include(p => p.PropertyAddresses)
+                .FirstOrDefaultAsync(p => p.Id == propertyDetailsId);
+
+            if (propertyDetails == null)
+            {
+                return;
+            }
+
+            // Check if all required fields are filled
+            bool isComplete = true;
+
+            // 1. Check if property details has required fields
+            if (!propertyDetails.PropertyTypeId.HasValue)
+            {
+                isComplete = false;
+            }
+
+            // SerialNumber is only required for "سټه رهنمای معاملات" document type
+            if (propertyDetails.DocumentType == "سټه رهنمای معاملات" && 
+                string.IsNullOrWhiteSpace(propertyDetails.SerialNumber))
+            {
+                isComplete = false;
+            }
+
+            // 2. Check if at least one seller exists
+            if (propertyDetails.SellerDetails == null || !propertyDetails.SellerDetails.Any())
+            {
+                isComplete = false;
+            }
+
+            // 3. Check if at least one buyer exists
+            if (propertyDetails.BuyerDetails == null || !propertyDetails.BuyerDetails.Any())
+            {
+                isComplete = false;
+            }
+
+            // 4. Check if exactly two witnesses exist (one from each side)
+            if (propertyDetails.WitnessDetails == null || propertyDetails.WitnessDetails.Count != 2)
+            {
+                isComplete = false;
+            }
+            else
+            {
+                // Check if witnesses are from different sides
+                var witnessSides = propertyDetails.WitnessDetails
+                    .Select(w => w.WitnessSide)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Distinct()
+                    .ToList();
+                
+                if (witnessSides.Count != 2)
+                {
+                    isComplete = false;
+                }
+            }
+
+            // 5. Check if property address exists
+            if (propertyDetails.PropertyAddresses == null || !propertyDetails.PropertyAddresses.Any())
+            {
+                isComplete = false;
+            }
+
+            propertyDetails.iscomplete = isComplete;
+            await _context.SaveChangesAsync();
         }
 
         [HttpPut("updatePaddress/{id}")]
@@ -989,15 +1115,10 @@ namespace WebAPIBackend.Controllers
             {
                 await _context.SaveChangesAsync();
 
-                // Ensure the IsComplete column of the PropertyDetails entity remains true
+                // Update the IsComplete status based on validation
                 if (request.PropertyDetailsId.HasValue)
                 {
-                    var propertyDetails = await _context.PropertyDetails.FindAsync(request.PropertyDetailsId.Value);
-                    if (propertyDetails != null)
-                    {
-                        propertyDetails.iscomplete = true;
-                        await _context.SaveChangesAsync();
-                    }
+                    await UpdatePropertyCompletionStatus(request.PropertyDetailsId.Value);
                 }
             }
             catch (DbUpdateConcurrencyException)
@@ -1015,6 +1136,7 @@ namespace WebAPIBackend.Controllers
             var result = new { Id = request.Id };
             return Ok(result);
         }
+        
         [HttpGet("getProvince")]
         public async Task<IActionResult> GetAlllocation()
         {

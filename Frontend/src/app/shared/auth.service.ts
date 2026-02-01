@@ -25,6 +25,7 @@ export class AuthService {
     PhoneNumber:[''],
     PhotoPath:[],
     LicenseType: [''],
+    ProvinceId: [null], // Province assignment for COMPANY_REGISTRAR
     Passwords: this.fb.group({
       Password: ['', [Validators.required, Validators.minLength(4)]],
       ConfirmPassword: ['', Validators.required]
@@ -58,7 +59,8 @@ export class AuthService {
       phoneNumber: this.formModel.value.PhoneNumber,
       companyId: this.formModel.value.CompanyId,
       photoPath: this.photoPath,
-      licenseType: this.formModel.value.LicenseType
+      licenseType: this.formModel.value.LicenseType,
+      provinceId: this.formModel.value.ProvinceId
     };
     return this.http.post(this.BaseURI + '/ApplicationUser/Register', body);
   }
@@ -146,5 +148,51 @@ export class AuthService {
 
   getUser(userId: string) {
     return this.http.get(`${this.BaseURI}/ApplicationUser/GetUser/${userId}`);
+  }
+
+  // Province-based access control methods
+  getUserProvinceId(): number | null {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payLoad = JSON.parse(window.atob(token.split('.')[1]));
+        return payLoad.province_id ? parseInt(payLoad.province_id) : null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  isCompanyRegistrar(): boolean {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payLoad = JSON.parse(window.atob(token.split('.')[1]));
+        const userRole = payLoad.role || payLoad.userRole;
+        return userRole === UserRoles.CompanyRegistrar;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  isAdministrator(): boolean {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payLoad = JSON.parse(window.atob(token.split('.')[1]));
+        const userRole = payLoad.role || payLoad.userRole;
+        return userRole === UserRoles.Admin;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  getProvinces() {
+    return this.http.get(`${this.BaseURI}/Setup/GetProvinces`);
   }
 }

@@ -48,6 +48,9 @@ sudo systemctl enable nginx
 # DEPLOY FRONTEND ONLY
 # ============================================
 # Run this when you only changed Angular/Frontend code
+# Recent frontend changes:
+# - License type auto-determination (removed duplicate dropdown)
+# - RBAC button visibility (hide Save/Edit for view-only users)
 
 cd ~/PropertyMamagement
 git pull origin main
@@ -111,6 +114,21 @@ echo "Full deployment completed!"
 
 
 # ============================================
+# QUICK BACKEND REDEPLOY (for small fixes)
+# ============================================
+# Use this when you made small backend changes and already have the build
+# This skips the build step and just copies existing publish folder
+
+cd ~/PropertyMamagement/Backend
+sudo cp -r ./publish/* /var/www/prmis/backend/
+sudo chown -R www-data:www-data /var/www/prmis/backend
+sudo chmod -R 755 /var/www/prmis/backend
+sudo systemctl restart prmis-backend
+sudo systemctl status prmis-backend
+echo "Backend redeployed successfully!"
+
+
+# ============================================
 # CHECK BACKEND LOGS (if issues occur)
 # ============================================
 sudo journalctl -u prmis-backend -n 50 --no-pager
@@ -145,3 +163,15 @@ sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_AddPi
 sudo systemctl restart prmis-backend
 
 echo "Database migrations completed!"
+
+
+# ============================================
+# FIX VEHICLE ELECTRONIC ID COLUMNS
+# ============================================
+# Run this if you get error: column ElectronicNationalIdNumber does not exist
+# This renames IndentityCardNumber to ElectronicNationalIdNumber in vehicle tables
+
+cd ~/PropertyMamagement/Backend
+sudo -u postgres psql -d PRMIS -f Scripts/fix_vehicle_electronic_id.sql
+sudo systemctl restart prmis-backend
+echo "Vehicle electronic ID columns fixed!"

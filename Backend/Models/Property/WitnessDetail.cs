@@ -11,6 +11,8 @@ public partial class WitnessDetail
 
     public string FatherName { get; set; } = null!;
 
+    public string? GrandFatherName { get; set; }
+
     // Electronic National ID - الیکټرونیکی تذکره
     public string? ElectronicNationalIdNumber { get; set; }
 
@@ -33,6 +35,10 @@ public partial class WitnessDetail
     public string? RelationshipToParties { get; set; }
 
     public string? WitnessType { get; set; }
+
+    public string? WitnessSide { get; set; }
+
+    public string? Des { get; set; }
 
     public virtual PropertyDetail? PropertyDetails { get; set; }
 

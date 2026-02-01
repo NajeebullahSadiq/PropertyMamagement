@@ -40,6 +40,12 @@ public partial class VehiclesPropertyDetail
     public DateTime? CreatedAt { get; set; }
 
     public string? CreatedBy { get; set; }
+
+    /// <summary>
+    /// Company ID that created this vehicle record (for data isolation)
+    /// </summary>
+    public int? CompanyId { get; set; }
+
     public bool? iscomplete { get; set; }
     public bool? iseditable { get; set; }
 

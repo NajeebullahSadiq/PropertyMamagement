@@ -183,6 +183,27 @@
   overflow: hidden;
 }
 
+.watermark-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.watermark-logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.03;
+  filter: grayscale(100%) brightness(1.2);
+}
+
 .watermark-circle {
   position: absolute;
   top: 50%;
@@ -202,6 +223,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2;
   
   /* Multiple concentric circles for security effect */
   &::before {
@@ -548,34 +570,33 @@
 .header-left {
   width: 18%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   padding-left: 0;
-  align-items: flex-start;
+  align-items: center;
   position: relative;
-  left: -20px;
 }
 
 .logo-photo-stack {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
-  margin-left: -15px;
+  margin: 0;
 }
 
 .ministry-logo {
   height: 75px;
   width: 110px;
   object-fit: contain;
-  object-position: left center;
+  object-position: center center;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
   display: block;
-  margin-left: 0;
+  margin: 0 auto;
 }
 
 .photo-container {
-  text-align: left;
-  margin-left: 0;
+  text-align: center;
+  margin: 0 auto;
 }
 
 .photo-frame {
@@ -1137,6 +1158,10 @@
 
   .watermark-circle {
     opacity: 0.5 !important;
+  }
+  
+  .watermark-logo-image {
+    opacity: 0.04 !important;
   }
   
   .watermark-text {

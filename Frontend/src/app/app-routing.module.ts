@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/authSetting/auth.guard';
-import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard } from './auth/authSetting/role.guard';
+import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard, DashboardGuard, SecuritiesModuleGuard, PetitionWriterModuleGuard, ActivityMonitoringGuard } from './auth/authSetting/role.guard';
 import { ForbiddenComponent } from './auth/forbidden/forbidden.component';
 import { PrintComponent } from './print/print.component';
 import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
@@ -34,7 +34,7 @@ const routes: Routes = [
   { 
     path: 'dashboard', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, DashboardGuard],
     children: [
       { path: '', component: DashboardComponent }
     ]
@@ -90,7 +90,7 @@ const routes: Routes = [
   { 
     path: 'securities', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, SecuritiesModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./securities/securities.module').then(m => m.SecuritiesModule) }
     ]
@@ -98,7 +98,7 @@ const routes: Routes = [
   { 
     path: 'securities-control', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, SecuritiesModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./securities-control/securities-control.module').then(m => m.SecuritiesControlModule) }
     ]
@@ -106,7 +106,7 @@ const routes: Routes = [
   { 
     path: 'petition-writer-securities', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, PetitionWriterModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./petition-writer-securities/petition-writer-securities.module').then(m => m.PetitionWriterSecuritiesModule) }
     ]
@@ -114,7 +114,7 @@ const routes: Routes = [
   { 
     path: 'securities-report', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, SecuritiesModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./securities-report/securities-report.module').then(m => m.SecuritiesReportModule) }
     ]
@@ -122,7 +122,7 @@ const routes: Routes = [
   { 
     path: 'petition-writer-report', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, PetitionWriterModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./petition-writer-report/petition-writer-report.module').then(m => m.PetitionWriterReportModule) }
     ]
@@ -138,7 +138,7 @@ const routes: Routes = [
   { 
     path: 'petition-writer-license', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, PetitionWriterModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./petition-writer-license/petition-writer-license.module').then(m => m.PetitionWriterLicenseModule) }
     ]
@@ -146,7 +146,7 @@ const routes: Routes = [
   { 
     path: 'activity-monitoring', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, ActivityMonitoringGuard],
     children: [
       { path: '', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule) }
     ]

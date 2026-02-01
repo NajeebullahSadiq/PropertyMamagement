@@ -104,6 +104,30 @@ export class PropertydetailsviewComponent {
     return String(value);
   }
 
+  /**
+   * Get the appropriate label for issuance number based on document type
+   */
+  getIssuanceNumberLabel(): string {
+    const docType = this.viewData?.documentType;
+    if (docType === 'سند ملکیت') {
+      return 'نمبر سند ملکیت';
+    } else if (docType === 'قباله شرعی') {
+      return 'نمبر قباله';
+    }
+    return 'نمبر سند';
+  }
+
+  /**
+   * Get the document type display value (shows custom type if "سایر" is selected)
+   */
+  getDocumentTypeDisplay(): string {
+    const docType = this.viewData?.documentType;
+    if (docType === 'سایر' && this.viewData?.customDocumentType) {
+      return this.viewData.customDocumentType;
+    }
+    return this.safeValue(docType);
+  }
+
   formatDate(value: any): string {
     if (!value) {
       return '---';

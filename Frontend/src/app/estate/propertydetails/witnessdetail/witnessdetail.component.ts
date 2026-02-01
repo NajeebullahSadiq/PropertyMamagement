@@ -16,6 +16,7 @@ export class WitnessdetailComponent {
   selectedId: number=0;
   witnessDetails!: witnessDetail[];
   nationalIdCardName: string = '';
+  availableWitnessSides: string[] = ['Buyer', 'Seller'];
   @Input() id: number=0;
   @Output() next = new EventEmitter<void>();
   @ViewChild('nationalIdComponent') nationalIdComponent!: NationalidUploadComponent;
@@ -35,11 +36,35 @@ export class WitnessdetailComponent {
         id: [0],
         firstName: ['', Validators.required],
         fatherName: ['', Validators.required],
+        grandFatherName: [''],
         electronicNationalIdNumber: ['', Validators.required],
         phoneNumber: ['', Validators.required],
+        witnessSide: ['', Validators.required],
+        des: [''],
         nationalIdCard: ['', Validators.required]
       });
     }
+
+  getAvailableWitnessSides(): string[] {
+    if (!this.witnessDetails || this.witnessDetails.length === 0) {
+      return ['Buyer', 'Seller'];
+    }
+
+    const currentWitnessId = this.withnessForm.get('id')?.value;
+    const otherWitnesses = this.witnessDetails.filter(w => w.id !== currentWitnessId);
+    
+    if (otherWitnesses.length === 0) {
+      return ['Buyer', 'Seller'];
+    }
+
+    const usedSides = otherWitnesses.map(w => w.witnessSide).filter(side => side);
+    return ['Buyer', 'Seller'].filter(side => !usedSides.includes(side));
+  }
+
+  isWitnessSideDisabled(side: string): boolean {
+    const availableSides = this.getAvailableWitnessSides();
+    return !availableSides.includes(side);
+  }
     ngOnInit() {
       this.loadWitnessDetails();
     }
@@ -59,8 +84,11 @@ export class WitnessdetailComponent {
             id: witness[0].id,
             firstName:witness[0].firstName,
             fatherName: witness[0].fatherName,
+            grandFatherName: witness[0].grandFatherName || '',
             electronicNationalIdNumber: witness[0].electronicNationalIdNumber || '',
             phoneNumber: witness[0].phoneNumber,
+            witnessSide: witness[0].witnessSide || '',
+            des: witness[0].des || '',
             nationalIdCard: witness[0].nationalIdCard || ''
           });
           this.nationalIdCardName = witness[0].nationalIdCard || '';
@@ -71,6 +99,17 @@ export class WitnessdetailComponent {
     }
     addwithnessDetails(): void {
       const withnessDetails = this.withnessForm.value as witnessDetail;
+      
+      // Validate witness side is not already used
+      const selectedSide = withnessDetails.witnessSide;
+      const otherWitnesses = this.witnessDetails?.filter(w => w.id !== withnessDetails.id) || [];
+      const sideAlreadyUsed = otherWitnesses.some(w => w.witnessSide === selectedSide);
+      
+      if (sideAlreadyUsed) {
+        this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'فروشنده'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
+        return;
+      }
+
       withnessDetails.nationalIdCard = this.nationalIdCardName;
       withnessDetails.propertyDetailsId = this.propertyDetailsService.mainTableId;
       if (withnessDetails.id === null) {
@@ -102,6 +141,17 @@ export class WitnessdetailComponent {
     }
   updateWitnessDetails(): void {
     const wDetails = this.withnessForm.value as witnessDetail;
+    
+    // Validate witness side is not already used by another witness
+    const selectedSide = wDetails.witnessSide;
+    const otherWitnesses = this.witnessDetails?.filter(w => w.id !== wDetails.id) || [];
+    const sideAlreadyUsed = otherWitnesses.some(w => w.witnessSide === selectedSide);
+    
+    if (sideAlreadyUsed) {
+      this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'فروشنده'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
+      return;
+    }
+
     wDetails.nationalIdCard = this.nationalIdCardName;
     wDetails.propertyDetailsId=this.propertyDetailsService.mainTableId;
     this.selerService.updateWitnessDetails(wDetails).subscribe(result => {
@@ -135,8 +185,11 @@ BindValu(id: number) {
       id: selectedWitness.id,
       firstName: selectedWitness.firstName,
       fatherName: selectedWitness.fatherName,
+      grandFatherName: selectedWitness.grandFatherName || '',
       electronicNationalIdNumber: selectedWitness.electronicNationalIdNumber || '',
       phoneNumber: selectedWitness.phoneNumber,
+      witnessSide: selectedWitness.witnessSide || '',
+      des: selectedWitness.des || '',
       propertyDetailsId:selectedWitness.propertyDetailsId,
       nationalIdCard: selectedWitness.nationalIdCard || ''
     });
@@ -152,8 +205,11 @@ BindValu(id: number) {
 
   get firstName() { return this.withnessForm.get('firstName'); }
   get fatherName() { return this.withnessForm.get('fatherName'); }
+  get grandFatherName() { return this.withnessForm.get('grandFatherName'); }
   get electronicNationalIdNumber() { return this.withnessForm.get('electronicNationalIdNumber'); }
   get phoneNumber() { return this.withnessForm.get('phoneNumber'); }
+  get witnessSide() { return this.withnessForm.get('witnessSide'); }
+  get des() { return this.withnessForm.get('des'); }
   get nationalIdCard() { return this.withnessForm.get('nationalIdCard'); }
  
 }

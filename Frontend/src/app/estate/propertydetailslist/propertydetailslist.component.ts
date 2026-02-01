@@ -27,6 +27,7 @@ export class PropertydetailslistComponent {
   // RBAC flags
   isViewOnly = false;
   canCreate = false;
+  canEdit = false;
   isAdmin = false;
   currentUserId = '';
 
@@ -43,7 +44,8 @@ export class PropertydetailslistComponent {
   ngOnInit() {
     // Load RBAC permissions
     this.isViewOnly = this.rbacService.isViewOnly();
-    this.canCreate = !this.isViewOnly && this.rbacService.hasPermission('property.create');
+    this.canCreate = this.rbacService.canCreateProperty();
+    this.canEdit = this.rbacService.canCreateProperty(); // If can create, can also edit
     this.isAdmin = this.rbacService.isAdmin();
     this.currentUserId = this.rbacService.getCurrentUserId();
     

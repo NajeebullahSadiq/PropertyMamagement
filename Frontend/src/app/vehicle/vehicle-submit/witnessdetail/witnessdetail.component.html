@@ -26,7 +26,7 @@
                 <div class="px-6 py-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                         <div>
-                            <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">نام</label>
+                            <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">نام <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-user"></i>
@@ -39,7 +39,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="fatherName" class="block text-sm font-semibold text-gray-700 mb-2">نام پدر</label>
+                            <label for="fatherName" class="block text-sm font-semibold text-gray-700 mb-2">نام پدر <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-user"></i>
@@ -52,7 +52,17 @@
                             </div>
                         </div>
                         <div>
-                            <label for="electronicNationalIdNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره تذکره</label>
+                            <label for="grandFatherName" class="block text-sm font-semibold text-gray-700 mb-2">نام پدر کلان</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" id="grandFatherName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    formControlName="grandFatherName">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="electronicNationalIdNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره تذکره <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-hashtag"></i>
@@ -64,8 +74,11 @@
                                 <small class="text-red-600 text-xs mt-1 block" *ngIf="electronicNationalIdNumber?.errors?.['required']">این فیلد الزامی است</small>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label for="phoneNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره موبایل</label>
+                            <label for="phoneNumber" class="block text-sm font-semibold text-gray-700 mb-2">شماره موبایل <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-phone"></i>
@@ -76,6 +89,33 @@
                                 <small class="text-red-600 text-xs mt-1 block" *ngIf="phoneNumber?.errors?.['required']">این فیلد الزامی است</small>
                             </div>
                         </div>
+                        <div>
+                            <label for="witnessSide" class="block text-sm font-semibold text-gray-700 mb-2">شاهد از طرف <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-users"></i>
+                                </span>
+                                <select id="witnessSide" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="witnessSide">
+                                    <option value="">انتخاب کنید</option>
+                                    <option value="Buyer" [disabled]="isWitnessSideDisabled('Buyer')">مشتری</option>
+                                    <option value="Seller" [disabled]="isWitnessSideDisabled('Seller')">فروشنده</option>
+                                </select>
+                            </div>
+                            <div *ngIf="witnessSide?.invalid && (witnessSide?.dirty || witnessSide?.touched)">
+                                <small class="text-red-600 text-xs mt-1 block" *ngIf="witnessSide?.errors?.['required']">این فیلد الزامی است</small>
+                            </div>
+                            <div *ngIf="witnessDetails && witnessDetails.length > 0">
+                                <small class="text-blue-600 text-xs mt-1 block">
+                                    <i class="fas fa-info-circle"></i>
+                                    {{ getAvailableWitnessSides().length === 1 ? 'فقط یک طرف باقی مانده است' : 'هر دو طرف در دسترس است' }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="des" class="block text-sm font-semibold text-gray-700 mb-2">جزئیات دیگر</label>
+                        <textarea id="des" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" formControlName="des" rows="3"></textarea>
                     </div>
                 </div>
             </div>
@@ -135,6 +175,7 @@
                         <th class="px-4 py-3 text-sm font-semibold text-gray-700">نام پدر</th>
                         <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره تذکره</th>
                         <th class="px-4 py-3 text-sm font-semibold text-gray-700">شماره موبایل</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700">شاهد از طرف</th>
                         <th class="px-4 py-3 text-sm font-semibold text-gray-700">عملیات</th>
                       </tr>
                     </thead>
@@ -145,6 +186,12 @@
                         <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.fatherName }}</td>
                         <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.electronicNationalIdNumber }}</td>
                         <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm text-gray-700 cursor-pointer">{{ w.phoneNumber }}</td>
+                        <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm cursor-pointer">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
+                                  [ngClass]="w.witnessSide === 'Buyer' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'">
+                                {{ w.witnessSide === 'Buyer' ? 'مشتری' : w.witnessSide === 'Seller' ? 'فروشنده' : '-' }}
+                            </span>
+                        </td>
                         <td class="px-4 py-3">
                             <button type="button" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors mr-2" (click)="onEditWitness(w.id, $event)">
                                 <i class="fas fa-pen mr-1"></i>
@@ -153,7 +200,7 @@
                         </td>
                       </tr>
                       <tr *ngIf="!witnessDetails || witnessDetails.length === 0">
-                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">هیچ شاهدی ثبت نشده است</td>
+                        <td colspan="7" class="px-4 py-8 text-center text-gray-500">هیچ شاهدی ثبت نشده است</td>
                       </tr>
                     </tbody>
                   </table>

@@ -172,7 +172,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(14);
-                entity.Property(e => e.Photo).HasColumnName("photo");
+                entity.Property(e => e.Photo).HasColumnName("Photo");
                 entity.HasOne(d => d.PaddressDistrict).WithMany(p => p.BuyerDetailPaddressDistricts)
                     .HasForeignKey(d => d.PaddressDistrictId)
                     .HasConstraintName("BuyerDetails_PaddressDistrictId_fkey");
@@ -891,18 +891,18 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.IssuanceDate).HasColumnType("timestamp with time zone");
                 entity.Property(e => e.SerialNumber).HasColumnName("SerialNumber");
                 entity.Property(e => e.TransactionDate).HasColumnType("timestamp with time zone");
-                entity.Property(e => e.East).HasColumnName("east");
+                entity.Property(e => e.East).HasColumnName("East");
                 entity.Property(e => e.iscomplete)
                     .HasDefaultValueSql("false")
                     .HasColumnName("iscomplete");
                 entity.Property(e => e.iseditable)
                     .HasDefaultValueSql("false")
                     .HasColumnName("iseditable");
-                entity.Property(e => e.North).HasColumnName("north");
-                entity.Property(e => e.Parea).HasColumnName("PArea");
-                entity.Property(e => e.PunitTypeId).HasColumnName("PUnitTypeId");
-                entity.Property(e => e.South).HasColumnName("south");
-                entity.Property(e => e.West).HasColumnName("west");
+                entity.Property(e => e.North).HasColumnName("North");
+                entity.Property(e => e.Parea).HasColumnName("Parea");
+                entity.Property(e => e.PunitTypeId).HasColumnName("PunitTypeId");
+                entity.Property(e => e.South).HasColumnName("South");
+                entity.Property(e => e.West).HasColumnName("West");
                 
                 // Configure Price and RoyaltyAmount to handle text columns
                 entity.Property(e => e.Price).HasColumnType("text");
@@ -914,7 +914,7 @@ namespace WebAPIBackend.Configuration
 
                 entity.HasOne(d => d.PunitType).WithMany(p => p.PropertyDetails)
                     .HasForeignKey(d => d.PunitTypeId)
-                    .HasConstraintName("PropertyDetails_PUnitTypeId_fkey");
+                    .HasConstraintName("PropertyDetails_PunitTypeId_fkey");
 
                 entity.HasOne(d => d.TransactionType).WithMany(p => p.PropertyDetails)
                     .HasForeignKey(d => d.TransactionTypeId)
@@ -944,7 +944,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(14);
-                entity.Property(e => e.Photo).HasColumnName("photo");
+                entity.Property(e => e.Photo).HasColumnName("Photo");
                 entity.HasOne(d => d.PaddressDistrict).WithMany(p => p.SellerDetailPaddressDistricts)
                     .HasForeignKey(d => d.PaddressDistrictId)
                     .HasConstraintName("SellerDetails_PaddressDistrictId_fkey");
@@ -992,7 +992,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(14);
-                entity.Property(e => e.Photo).HasColumnName("photo");
+                entity.Property(e => e.Photo).HasColumnName("Photo");
                 entity.HasOne(d => d.PaddressDistrict).WithMany(p => p.VehiclesBuyerDetailPaddressDistricts)
                     .HasForeignKey(d => d.PaddressDistrictId)
                     .HasConstraintName("VehiclesBuyerDetails_PaddressDistrictId_fkey");
@@ -1041,7 +1041,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(14);
-                entity.Property(e => e.Photo).HasColumnName("photo");
+                entity.Property(e => e.Photo).HasColumnName("Photo");
                 entity.HasOne(d => d.PaddressDistrict).WithMany(p => p.VehiclesSellerDetailPaddressDistricts)
                     .HasForeignKey(d => d.PaddressDistrictId)
                     .HasConstraintName("VehiclesSellerDetails_PaddressDistrictId_fkey");

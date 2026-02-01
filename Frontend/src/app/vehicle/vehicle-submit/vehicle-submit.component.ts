@@ -9,6 +9,7 @@ import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
 import { VehicleComponent } from '../vehicle.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { NumeralService } from 'src/app/shared/numeral.service';
+import { RbacService, Permissions } from 'src/app/shared/rbac.service';
 
 @Component({
   selector: 'app-vehicle-submit',
@@ -22,6 +23,7 @@ export class VehicleSubmitComponent implements AfterViewInit{
   vehicleForm: FormGroup = new FormGroup({});
   properties!: VehicleDetails[];
   vehicleHandOptions: any;
+  canEditVehicle = this.rbacService.hasPermission(Permissions.VehicleCreate) || this.rbacService.hasPermission(Permissions.VehicleEdit);
   @ViewChild('childComponent') childComponent!: UploadComponent;
   ngAfterViewInit(): void {
     if (this.childComponent) {
@@ -36,7 +38,8 @@ export class VehicleSubmitComponent implements AfterViewInit{
   }
   constructor(private fb: FormBuilder,private toastr: ToastrService, private vehicleService: VehicleService,
     private parentComponent: VehicleComponent,private router: Router,private vehiclesubservice:VehiclesubService,
-    private localizationService: LocalizationService, private numeralService: NumeralService){
+    private localizationService: LocalizationService, private numeralService: NumeralService,
+    public rbacService: RbacService){
     this.vehicleForm = this.fb.group({
       id: [0],
       permitNo: ['', Validators.required],

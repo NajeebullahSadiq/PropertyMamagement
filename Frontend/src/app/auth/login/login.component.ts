@@ -63,8 +63,12 @@ export class LoginComponent {
         this.userRole = res.role || this.rbacService.getCurrentRole();
         
         // Navigate based on role and module access
-        if (this.userRole === UserRoles.Admin) {
+        if (this.userRole === UserRoles.Admin || this.userRole === UserRoles.Authority) {
+          // Admin and Authority go to dashboard
           this.router.navigateByUrl('/dashboard');
+        } else if (this.userRole === UserRoles.CompanyRegistrar) {
+          // Company registrar goes to company list
+          this.router.navigateByUrl('/realestate/list');
         } else if (this.userRole === UserRoles.LicenseReviewer) {
           // License reviewer goes to company list (view-only)
           this.router.navigateByUrl('/realestate/list');
