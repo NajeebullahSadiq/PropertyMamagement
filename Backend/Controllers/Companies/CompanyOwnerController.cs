@@ -17,9 +17,12 @@ namespace WebAPIBackend.Controllers.Companies
     public class CompanyOwnerController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public CompanyOwnerController(AppDbContext context)
+        private readonly WebAPIBackend.Services.ICompanyService _companyService;
+
+        public CompanyOwnerController(AppDbContext context, WebAPIBackend.Services.ICompanyService companyService)
         {
             _context = context;
+            _companyService = companyService;
         }
 
         [HttpGet("{id}")]
@@ -165,6 +168,13 @@ namespace WebAPIBackend.Controllers.Companies
 
             _context.Add(property);
             await _context.SaveChangesAsync();
+
+            // Update the IsComplete status based on validation
+            if (request.CompanyId.HasValue)
+            {
+                await _companyService.UpdateLicenseCompletionStatusAsync(request.CompanyId.Value);
+            }
+
             var result = new { Id = property.Id };
             return Ok(result);
         }
@@ -261,6 +271,12 @@ namespace WebAPIBackend.Controllers.Companies
             }
 
             await _context.SaveChangesAsync();
+
+            // Update the IsComplete status based on validation
+            if (existingProperty.CompanyId.HasValue)
+            {
+                await _companyService.UpdateLicenseCompletionStatusAsync(existingProperty.CompanyId.Value);
+            }
 
             var result = new { Id = request.Id };
             return Ok(result);

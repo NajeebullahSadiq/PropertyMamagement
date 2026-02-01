@@ -318,6 +318,7 @@ CREATE TABLE org."LicenseDetails" (
     "PenaltyDate" DATE,
     "HrLetter" VARCHAR(100),
     "HrLetterDate" DATE,
+    "IsComplete" BOOLEAN DEFAULT false,
     "Status" BOOLEAN DEFAULT true,
     "CreatedAt" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "CreatedBy" VARCHAR(50),
@@ -666,6 +667,8 @@ BEGIN
     RAISE NOTICE '  ✓ Royalty and penalty tracking';
     RAISE NOTICE '  ✓ HR letter tracking';
     RAISE NOTICE '  ✓ Tariff number support';
+    RAISE NOTICE '  ✓ License completion status tracking (IsComplete)';
+    RAISE NOTICE '  ✓ Print restriction based on completion status';
     RAISE NOTICE '  ✓ Company financial information (CompanyAccountInfo)';
     RAISE NOTICE '  ✓ License cancellation tracking (CompanyCancellationInfo)';
     RAISE NOTICE '  ✓ Address history tracking';

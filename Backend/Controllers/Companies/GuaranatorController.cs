@@ -17,15 +17,17 @@ namespace WebAPIBackend.Controllers.Companies
     public class GuaranatorController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly WebAPIBackend.Services.ICompanyService _companyService;
 
         // Guarantee Type Constants
         private const int GuaranteeType_Cash = 1;          // ??? ???
         private const int GuaranteeType_ShariaDeed = 2;    // ????? ????
         private const int GuaranteeType_CustomaryDeed = 3; // ????? ????
 
-        public GuaranatorController(AppDbContext context)
+        public GuaranatorController(AppDbContext context, WebAPIBackend.Services.ICompanyService companyService)
         {
             _context = context;
+            _companyService = companyService;
         }
 
         /// <summary>
@@ -225,6 +227,13 @@ namespace WebAPIBackend.Controllers.Companies
 
             _context.Add(property);
             await _context.SaveChangesAsync();
+
+            // Update the IsComplete status based on validation
+            if (request.CompanyId.HasValue)
+            {
+                await _companyService.UpdateLicenseCompletionStatusAsync(request.CompanyId.Value);
+            }
+
             var result = new { Id = property.Id };
             return Ok(result);
         }
@@ -345,6 +354,12 @@ namespace WebAPIBackend.Controllers.Companies
             }
 
             await _context.SaveChangesAsync();
+
+            // Update the IsComplete status based on validation
+            if (existingProperty.CompanyId.HasValue)
+            {
+                await _companyService.UpdateLicenseCompletionStatusAsync(existingProperty.CompanyId.Value);
+            }
 
             var result = new { Id = request.Id };
             return Ok(result);

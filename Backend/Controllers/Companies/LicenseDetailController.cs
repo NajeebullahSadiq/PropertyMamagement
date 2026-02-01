@@ -19,15 +19,18 @@ namespace WebAPIBackend.Controllers.Companies
         private readonly AppDbContext _context;
         private readonly WebAPIBackend.Services.ILicenseNumberGenerator _licenseNumberGenerator;
         private readonly WebAPIBackend.Services.IProvinceFilterService _provinceFilter;
+        private readonly WebAPIBackend.Services.ICompanyService _companyService;
         
         public LicenseDetailController(
             AppDbContext context, 
             WebAPIBackend.Services.ILicenseNumberGenerator licenseNumberGenerator,
-            WebAPIBackend.Services.IProvinceFilterService provinceFilter)
+            WebAPIBackend.Services.IProvinceFilterService provinceFilter,
+            WebAPIBackend.Services.ICompanyService companyService)
         {
             _context = context;
             _licenseNumberGenerator = licenseNumberGenerator;
             _provinceFilter = provinceFilter;
+            _companyService = companyService;
         }
 
         [HttpGet("{id}")]
@@ -206,6 +209,10 @@ namespace WebAPIBackend.Controllers.Companies
 
                 _context.Add(property);
                 await _context.SaveChangesAsync();
+
+                // Update the IsComplete status based on validation
+                await _companyService.UpdateLicenseCompletionStatusAsync(property.CompanyId.Value);
+
                 var result = new { Id = property.Id };
                 return Ok(result);
             }
@@ -390,6 +397,9 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 await _context.SaveChangesAsync();
+
+                // Update the IsComplete status based on validation
+                await _companyService.UpdateLicenseCompletionStatusAsync(existingProperty.CompanyId.Value);
 
                 var result = new { Id = request.Id };
                 return Ok(result);

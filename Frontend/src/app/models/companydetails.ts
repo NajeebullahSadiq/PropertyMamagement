@@ -15,6 +15,7 @@ export interface companydetailsList {
     ownerIdNumber:number;
     licenseNumber:string;
     granator:string;
+    isComplete:boolean;
 
 
   }

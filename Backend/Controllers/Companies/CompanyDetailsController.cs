@@ -70,6 +70,7 @@ namespace WebAPIBackend.Controllers.Companies
                     ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
                     licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
                     granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
+                    isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
                 }).ToListAsync();
 
                 return Ok(result);
@@ -122,6 +123,7 @@ namespace WebAPIBackend.Controllers.Companies
                     ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
                     licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
                     granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
+                    isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
                 }).ToListAsync();
 
                 return Ok(result);

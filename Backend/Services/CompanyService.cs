@@ -12,6 +12,7 @@ namespace WebAPIBackend.Services
         Task<CompanyDetail> CreateCompanyAsync(CompanyDetail company);
         Task<CompanyDetail> UpdateCompanyAsync(int id, CompanyDetail company);
         Task DeleteCompanyAsync(int id);
+        Task UpdateLicenseCompletionStatusAsync(int companyId);
     }
 
     public class CompanyService : ICompanyService
@@ -99,6 +100,91 @@ namespace WebAPIBackend.Services
 
             _context.CompanyDetails.Remove(company);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Updates the IsComplete status of all licenses for a company based on required field validation
+        /// </summary>
+        public async Task UpdateLicenseCompletionStatusAsync(int companyId)
+        {
+            var company = await _context.CompanyDetails
+                .Include(c => c.CompanyOwners)
+                .Include(c => c.LicenseDetails)
+                .Include(c => c.Guarantors)
+                .FirstOrDefaultAsync(c => c.Id == companyId);
+
+            if (company == null)
+            {
+                return;
+            }
+
+            // Check if all required fields are filled
+            bool isComplete = true;
+
+            // 1. Check if company has a title
+            if (string.IsNullOrWhiteSpace(company.Title))
+            {
+                isComplete = false;
+            }
+
+            // 2. Check if company has at least one owner with required fields
+            if (company.CompanyOwners == null || !company.CompanyOwners.Any())
+            {
+                isComplete = false;
+            }
+            else
+            {
+                var owner = company.CompanyOwners.First();
+                if (string.IsNullOrWhiteSpace(owner.FirstName) ||
+                    string.IsNullOrWhiteSpace(owner.FatherName) ||
+                    string.IsNullOrWhiteSpace(owner.ElectronicNationalIdNumber))
+                {
+                    isComplete = false;
+                }
+            }
+
+            // 3. Check if company has at least one license with required fields
+            if (company.LicenseDetails == null || !company.LicenseDetails.Any())
+            {
+                isComplete = false;
+            }
+            else
+            {
+                var license = company.LicenseDetails.First();
+                if (string.IsNullOrWhiteSpace(license.LicenseNumber) ||
+                    !license.IssueDate.HasValue ||
+                    !license.ExpireDate.HasValue ||
+                    string.IsNullOrWhiteSpace(license.OfficeAddress))
+                {
+                    isComplete = false;
+                }
+            }
+
+            // 4. Check if company has at least one guarantor with required fields
+            if (company.Guarantors == null || !company.Guarantors.Any())
+            {
+                isComplete = false;
+            }
+            else
+            {
+                var guarantor = company.Guarantors.First();
+                if (string.IsNullOrWhiteSpace(guarantor.FirstName) ||
+                    string.IsNullOrWhiteSpace(guarantor.FatherName) ||
+                    string.IsNullOrWhiteSpace(guarantor.ElectronicNationalIdNumber))
+                {
+                    isComplete = false;
+                }
+            }
+
+            // Update the IsComplete status for all licenses of this company
+            if (company.LicenseDetails != null && company.LicenseDetails.Any())
+            {
+                foreach (var license in company.LicenseDetails)
+                {
+                    license.IsComplete = isComplete;
+                }
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

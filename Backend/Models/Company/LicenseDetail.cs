@@ -79,6 +79,12 @@ public partial class LicenseDetail : IProvinceEntity
 
     public bool? Status { get; set; }
 
+    /// <summary>
+    /// Indicates whether all required fields for license completion are filled
+    /// Used to control print functionality
+    /// </summary>
+    public bool IsComplete { get; set; }
+
     public virtual Area? Area { get; set; }
 
     public virtual CompanyDetail? Company { get; set; }

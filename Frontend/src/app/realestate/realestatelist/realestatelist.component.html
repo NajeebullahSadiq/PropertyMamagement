@@ -48,6 +48,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره تذکره مالک دفتر</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز دفتر</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تضمین کننده دفتر</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">حالت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
           </thead>
@@ -55,11 +56,29 @@
             <tr *ngFor="let property of filteredProperties | paginate: { itemsPerPage: tableSize, currentPage: page, totalItems: count }; let i = index" class="text-center hover:bg-blue-50 transition-colors">
               <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ (page - 1) * tableSize + i + 1 }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.title }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ property.ownerFullName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ property.ownerFatherName }}</td>
+              <td class="px-4 py-3 text-sm" [ngClass]="property.ownerFullName ? 'text-gray-700' : 'text-red-600 font-semibold'">
+                {{ property.ownerFullName ? property.ownerFullName : 'تکیمل ناشده' }}
+              </td>
+              <td class="px-4 py-3 text-sm" [ngClass]="property.ownerFatherName ? 'text-gray-700' : 'text-red-600 font-semibold'">
+                {{ property.ownerFatherName ? property.ownerFatherName : 'تکیمل ناشده' }}
+              </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.ownerIdNumber }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.licenseNumber }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ property.granator }}</td>
+              <td class="px-4 py-3 text-sm" [ngClass]="property.granator ? 'text-gray-700' : 'text-red-600 font-semibold'">
+                {{ property.granator ? property.granator : 'تکیمل ناشده' }}
+              </td>
+              <td class="px-4 py-3">
+                <span *ngIf="property.isComplete; else notCompleted" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                  <i class="fas fa-check-circle mr-1"></i>
+                  تکمیل شده
+                </span>
+                <ng-template #notCompleted>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                    <i class="fas fa-times-circle mr-1"></i>
+                    ناقص
+                  </span>
+                </ng-template>
+              </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-2">
                   <button class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-1" (click)="onView(property.id)" title="مشاهده جزئیات">
@@ -70,7 +89,7 @@
                     <i class="fas fa-edit"></i>
                     <span>ویرایش</span>
                   </button>
-                  <button class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-1" (click)="onPrint(property.id)" title="چاپ جواز">
+                  <button [disabled]="!property.isComplete" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-1" (click)="onPrint(property.id)" title="چاپ جواز">
                     <i class="fas fa-print"></i>
                     <span>چاپ</span>
                   </button>
