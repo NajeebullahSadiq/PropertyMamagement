@@ -58,6 +58,44 @@ namespace WebAPIBackend.Services.Verification
         public DateTime VerifiedAt { get; set; }
         public string? CompanyTitle { get; set; }
         public string? OfficeAddress { get; set; }
+        
+        // Seller information (for Property and Vehicle documents)
+        public SellerInfoDto? SellerInfo { get; set; }
+        
+        // Buyer information (for Property and Vehicle documents)
+        public BuyerInfoDto? BuyerInfo { get; set; }
+    }
+
+    /// <summary>
+    /// Seller information DTO
+    /// </summary>
+    public class SellerInfoDto
+    {
+        public string? FirstName { get; set; }
+        public string? FatherName { get; set; }
+        public string? GrandFatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Photo { get; set; }
+        public string? Province { get; set; }
+        public string? District { get; set; }
+        public string? Village { get; set; }
+    }
+
+    /// <summary>
+    /// Buyer information DTO
+    /// </summary>
+    public class BuyerInfoDto
+    {
+        public string? FirstName { get; set; }
+        public string? FatherName { get; set; }
+        public string? GrandFatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Photo { get; set; }
+        public string? Province { get; set; }
+        public string? District { get; set; }
+        public string? Village { get; set; }
     }
 
     /// <summary>

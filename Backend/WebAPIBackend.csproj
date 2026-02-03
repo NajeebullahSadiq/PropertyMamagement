@@ -28,6 +28,18 @@
     <None Remove="bin\\**" />
     <None Remove="obj\\**" />
     <None Remove="publish\\**" />
+    
+    <!-- Exclude duplicate files from data/files directory -->
+    <Compile Remove="data\files\**" />
+    <Content Remove="data\files\**" />
+    <EmbeddedResource Remove="data\files\**" />
+    <None Remove="data\files\**" />
+    
+    <!-- Exclude DataMigration project files -->
+    <Compile Remove="DataMigration\**" />
+    <Content Remove="DataMigration\**" />
+    <EmbeddedResource Remove="DataMigration\**" />
+    <None Remove="DataMigration\**" />
   </ItemGroup>
 
 <ItemGroup>

@@ -38,13 +38,13 @@ export class RealestatelistComponent {
 
   ngOnInit() {
     this.loadData();
-   
   }
 
   loadData(){
-    this.comservice.getComapaniesList().subscribe(properties => {
+    this.comservice.getComapaniesList(this.searchTerm).subscribe(properties => {
       this.properties = properties;
       this.filteredProperties = properties;
+      this.count = properties.length;
     });
   }
 
@@ -63,27 +63,16 @@ export class RealestatelistComponent {
 
   onTableDataChange(event: any) {
     this.page = event;
-    this.loadData();
   }
 
   onTableSizeChange(event: any): void {
     this.tableSize = event.target.value;
     this.page = 1;
-    this.loadData();
   }
 
   onSearch() {
-    this.filteredProperties = this.filterProperties(this.properties, this.searchTerm);
-    this.count = this.filteredProperties.length;
     this.page = 1;
-  }
-
-  filterProperties(properties: companydetailsList[], searchTerm: string): companydetailsList[] {
-    return properties.filter(property =>
-      property.title.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.licenseNumber.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.ownerFullName.toString().toLowerCase().includes(searchTerm.toLowerCase().toString()) 
-    );
+    this.loadData();
   }
 
   onDelete(propertyId: number, title: string) {

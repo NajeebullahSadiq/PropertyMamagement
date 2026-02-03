@@ -31,6 +31,11 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 var Pro = await _context.CompanyOwners
+                    .Include(o => o.OwnerProvince)
+                    .Include(o => o.OwnerDistrict)
+                    .Include(o => o.PermanentProvince)
+                    .Include(o => o.PermanentDistrict)
+                    .Include(o => o.EducationLevel)
                     .Where(x => x.CompanyId.Equals(id))
                     .Select(o => new
                     {

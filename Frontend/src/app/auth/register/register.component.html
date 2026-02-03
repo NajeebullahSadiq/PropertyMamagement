@@ -182,11 +182,11 @@
                          class="custom-ng-select">
               </ng-select>
               <div *ngIf="service.formModel.get('ProvinceId')?.touched && service.formModel.get('ProvinceId')?.errors?.['required']">
-                <small class="text-red-600 text-xs mt-1 block">ولایت برای کاربر ثبت جواز شرکت الزامی است</small>
+                <small class="text-red-600 text-xs mt-1 block">ولایت برای کاربر ثبت جواز رهنما الزامی است</small>
               </div>
               <small class="text-gray-500 text-xs mt-1 block">
                 <i class="fas fa-info-circle"></i>
-                کاربر ثبت جواز شرکت فقط به شرکت ها و جوازهای ولایت خود دسترسی خواهد داشت
+                کاربر ثبت جواز رهنما فقط به رهنما ها و جوازهای ولایت خود دسترسی خواهد داشت
               </small>
             </div>
           </div>
@@ -255,7 +255,7 @@
         <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
             <i class="fas fa-building"></i>
-            <span>معلومات شرکت</span>
+            <span>معلومات رهنما</span>
           </h2>
         </div>
         <div class="px-6 py-6">
@@ -333,7 +333,7 @@
               
               <ng-select formControlName="CompanyId" [items]="companylist" [selectOnTab]="true" 
                          bindLabel="title" bindValue="id"
-                         placeholder="انتخاب شرکت..."
+                         placeholder="انتخاب رهنما..."
                          class="custom-ng-select">
               </ng-select>
             </div>
@@ -350,10 +350,10 @@
                     <p class="text-sm font-semibold text-blue-800 mb-1">نوع جواز به صورت خودکار تعیین می‌شود</p>
                     <p class="text-xs text-blue-700">
                       <span *ngIf="service.formModel.get('Role')?.value === 'PROPERTY_OPERATOR'">
-                        کاربران عملیاتی املاک فقط می‌توانند با شرکت‌های املاک کار کنند
+                        کاربران عملیاتی املاک فقط می‌توانند با رهنما‌های املاک کار کنند
                       </span>
                       <span *ngIf="service.formModel.get('Role')?.value === 'VEHICLE_OPERATOR'">
-                        کاربران عملیاتی موتر فروشی فقط می‌توانند با شرکت‌های موتر فروشی کار کنند
+                        کاربران عملیاتی موتر فروشی فقط می‌توانند با رهنما‌های موتر فروشی کار کنند
                       </span>
                     </p>
                   </div>

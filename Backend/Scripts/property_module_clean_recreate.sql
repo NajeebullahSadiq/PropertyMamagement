@@ -465,13 +465,84 @@ CREATE INDEX "IX_Propertyselleraudit_ChangedAt"
     ON log."Propertyselleraudit" ("ChangedAt");
 
 -- =====================================================
--- STEP 5: VERIFICATION QUERIES
+-- STEP 5: CREATE VERIFICATION SYSTEM TABLES
+-- =====================================================
+
+-- Ensure org schema exists
+CREATE SCHEMA IF NOT EXISTS org;
+
+-- Create DocumentVerifications table
+CREATE TABLE IF NOT EXISTS org."DocumentVerifications" (
+    "Id" SERIAL PRIMARY KEY,
+    "VerificationCode" VARCHAR(20) NOT NULL,
+    "DocumentId" INTEGER NOT NULL,
+    "DocumentType" VARCHAR(50) NOT NULL,
+    "DigitalSignature" VARCHAR(128) NOT NULL,
+    "DocumentSnapshot" JSONB,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "CreatedBy" VARCHAR(50),
+    "IsRevoked" BOOLEAN DEFAULT FALSE,
+    "RevokedAt" TIMESTAMP WITH TIME ZONE,
+    "RevokedBy" VARCHAR(50),
+    "RevokedReason" VARCHAR(500)
+);
+
+-- Create unique index on verification code
+CREATE UNIQUE INDEX IF NOT EXISTS "IX_DocumentVerifications_VerificationCode" 
+ON org."DocumentVerifications"("VerificationCode");
+
+-- Create composite index for document lookup
+CREATE INDEX IF NOT EXISTS "IX_DocumentVerifications_DocumentId_DocumentType" 
+ON org."DocumentVerifications"("DocumentId", "DocumentType");
+
+-- Create index for non-revoked verifications
+CREATE INDEX IF NOT EXISTS "IX_DocumentVerifications_IsRevoked" 
+ON org."DocumentVerifications"("IsRevoked") WHERE "IsRevoked" = FALSE;
+
+-- Create VerificationLogs table
+CREATE TABLE IF NOT EXISTS org."VerificationLogs" (
+    "Id" SERIAL PRIMARY KEY,
+    "VerificationCode" VARCHAR(20) NOT NULL,
+    "AttemptedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "IpAddress" VARCHAR(45),
+    "WasSuccessful" BOOLEAN NOT NULL,
+    "FailureReason" VARCHAR(50)
+);
+
+-- Create indexes for verification logs
+CREATE INDEX IF NOT EXISTS "IX_VerificationLogs_VerificationCode_AttemptedAt" 
+ON org."VerificationLogs"("VerificationCode", "AttemptedAt" DESC);
+
+CREATE INDEX IF NOT EXISTS "IX_VerificationLogs_WasSuccessful" 
+ON org."VerificationLogs"("WasSuccessful") WHERE "WasSuccessful" = FALSE;
+
+-- Add comments
+COMMENT ON TABLE org."DocumentVerifications" IS 'Stores verification codes and digital signatures for printed documents';
+COMMENT ON COLUMN org."DocumentVerifications"."VerificationCode" IS 'Unique code in format: PREFIX-YEAR-RANDOM (e.g., PRO-2026-A7X9K2)';
+COMMENT ON COLUMN org."DocumentVerifications"."DocumentId" IS 'ID of the source document (e.g., PropertyDetails.Id)';
+COMMENT ON COLUMN org."DocumentVerifications"."DocumentType" IS 'Type of document: PropertyDocument, VehicleDocument, RealEstateLicense, etc.';
+COMMENT ON COLUMN org."DocumentVerifications"."DigitalSignature" IS 'HMAC-SHA256 signature of key document fields';
+COMMENT ON COLUMN org."DocumentVerifications"."DocumentSnapshot" IS 'JSON snapshot of document data at verification code generation time';
+
+COMMENT ON TABLE org."VerificationLogs" IS 'Audit trail for all document verification attempts';
+COMMENT ON COLUMN org."VerificationLogs"."VerificationCode" IS 'The verification code that was attempted';
+COMMENT ON COLUMN org."VerificationLogs"."IpAddress" IS 'IP address of the requester (IPv4 or IPv6)';
+COMMENT ON COLUMN org."VerificationLogs"."FailureReason" IS 'Reason for failure: NotFound, Revoked, Expired, SignatureMismatch, Error';
+
+DO $$ 
+BEGIN
+    RAISE NOTICE '✓ Verification system tables created successfully';
+END $$;
+
+-- =====================================================
+-- STEP 6: VERIFICATION QUERIES
 -- =====================================================
 
 -- Verify all tables were created
 DO $$
 DECLARE
     table_count INTEGER;
+    verification_count INTEGER;
 BEGIN
     -- Count property module tables
     SELECT COUNT(*) INTO table_count
@@ -507,6 +578,21 @@ BEGIN
         RAISE NOTICE '✓ All 3 property audit tables created successfully';
     ELSE
         RAISE WARNING '⚠ Expected 3 audit tables, found %', table_count;
+    END IF;
+    
+    -- Count verification tables
+    SELECT COUNT(*) INTO verification_count
+    FROM information_schema.tables
+    WHERE table_schema = 'org'
+    AND table_name IN (
+        'DocumentVerifications',
+        'VerificationLogs'
+    );
+    
+    IF verification_count = 2 THEN
+        RAISE NOTICE '✓ All 2 verification system tables created successfully';
+    ELSE
+        RAISE WARNING '⚠ Expected 2 verification tables, found %', verification_count;
     END IF;
 END $$;
 
@@ -560,11 +646,19 @@ BEGIN
     RAISE NOTICE '  ✓ Electronic National ID fields';
     RAISE NOTICE '  ✓ Multiple buyers/sellers support';
     RAISE NOTICE '  ✓ Comprehensive audit logging';
+    RAISE NOTICE '  ✓ Document verification system (QR codes)';
+    RAISE NOTICE '  ✓ Verification logs for audit trail';
+    RAISE NOTICE '';
+    RAISE NOTICE 'Verification System:';
+    RAISE NOTICE '  - org.DocumentVerifications (verification codes)';
+    RAISE NOTICE '  - org.VerificationLogs (audit trail)';
     RAISE NOTICE '';
     RAISE NOTICE 'Next Steps:';
     RAISE NOTICE '  1. Verify table structure above';
     RAISE NOTICE '  2. Test property registration in frontend';
     RAISE NOTICE '  3. Verify all fields save correctly';
+    RAISE NOTICE '  4. Test verification code generation (Print page)';
+    RAISE NOTICE '  5. Test QR code scanning and verification';
     RAISE NOTICE '';
 END $$;
 

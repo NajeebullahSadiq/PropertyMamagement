@@ -61,7 +61,19 @@ FROM tr."VehiclesPropertyDetails" v
 
 -- Join Seller (first seller only)
 LEFT JOIN LATERAL (
-    SELECT * FROM tr."VehiclesSellerDetails" 
+    SELECT 
+        "Id",
+        "FirstName",
+        "FatherName",
+        "ElectronicNationalIdNumber",
+        "PaddressVillage",
+        "TaddressVillage",
+        "Photo",
+        "PaddressProvinceId",
+        "PaddressDistrictId",
+        "TaddressProvinceId",
+        "TaddressDistrictId"
+    FROM tr."VehiclesSellerDetails" 
     WHERE "PropertyDetailsId" = v."Id" 
     ORDER BY "Id" 
     LIMIT 1
@@ -73,7 +85,19 @@ LEFT JOIN look."Location" tsd ON s."TaddressDistrictId" = tsd."ID"
 
 -- Join Buyer (first buyer only)
 LEFT JOIN LATERAL (
-    SELECT * FROM tr."VehiclesBuyerDetails" 
+    SELECT 
+        "Id",
+        "FirstName",
+        "FatherName",
+        "ElectronicNationalIdNumber",
+        "PaddressVillage",
+        "TaddressVillage",
+        "Photo",
+        "PaddressProvinceId",
+        "PaddressDistrictId",
+        "TaddressProvinceId",
+        "TaddressDistrictId"
+    FROM tr."VehiclesBuyerDetails" 
     WHERE "PropertyDetailsId" = v."Id" 
     ORDER BY "Id" 
     LIMIT 1

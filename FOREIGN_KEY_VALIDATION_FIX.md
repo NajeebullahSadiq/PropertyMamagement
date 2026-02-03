@@ -36,7 +36,7 @@ if (roles.Contains(UserRoles.Admin) || roles.Contains(UserRoles.Authority))
         var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == companyId.Value);
         if (!companyExists)
         {
-            return BadRequest(new { message = $"شرکت با شناسه {companyId.Value} وجود ندارد" });
+            return BadRequest(new { message = $"رهنما با شناسه {companyId.Value} وجود ندارد" });
         }
     }
 }
@@ -48,7 +48,7 @@ else
     // Validate that the user has a company assigned
     if (!companyId.HasValue || companyId.Value == 0)
     {
-        return BadRequest(new { message = "شما به هیچ شرکتی متصل نیستید" });
+        return BadRequest(new { message = "شما به هیچ رهنمای متصل نیستید" });
     }
 }
 ```
@@ -70,10 +70,10 @@ From `UserRoles.cs`:
 ## Error Messages
 
 ### For Admin Users
-- **Invalid Company**: "شرکت با شناسه {id} وجود ندارد" (Company with ID {id} does not exist)
+- **Invalid Company**: "رهنما با شناسه {id} وجود ندارد" (Company with ID {id} does not exist)
 
 ### For Regular Users
-- **No Company Assigned**: "شما به هیچ شرکتی متصل نیستید" (You are not connected to any company)
+- **No Company Assigned**: "شما به هیچ رهنمای متصل نیستید" (You are not connected to any company)
 
 ## Testing Checklist
 

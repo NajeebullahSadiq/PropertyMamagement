@@ -135,7 +135,7 @@ namespace WebAPIBackend.Controllers
                 // Filter by company ID for PropertyOperator
                 if (user.CompanyId == 0)
                 {
-                    return StatusCode(403, new { message = "شما به هیچ شرکتی متصل نیستید" });
+                    return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
                 propertyQuery = _context.PropertyDetails.Where(p => p.CompanyId == user.CompanyId);
             }
@@ -225,7 +225,7 @@ namespace WebAPIBackend.Controllers
                 // Filter by company ID for PropertyOperator
                 if (user.CompanyId == 0)
                 {
-                    return StatusCode(403, new { message = "شما به هیچ شرکتی متصل نیستید" });
+                    return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
                 propertyQuery = _context.PropertyDetails.Where(p => p.CompanyId == user.CompanyId);
             }

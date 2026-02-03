@@ -269,22 +269,22 @@ export class RegisterComponent implements OnInit {
         this.searchResults = results;
         
         if (results.length === 0) {
-          this.toastr.info('هیچ شرکتی با این شماره جواز یافت نشد', 'نتیجه جستجو');
+          this.toastr.info('هیچ رهنمای با این شماره جواز یافت نشد', 'نتیجه جستجو');
         } else if (results.length === 1) {
           // Auto-select if only one result
           this.selectCompanyFromSearch(results[0]);
-          this.toastr.success('شرکت یافت شد و انتخاب گردید', 'موفق');
+          this.toastr.success('رهنما یافت شد و انتخاب گردید', 'موفق');
         } else {
-          this.toastr.info(`${results.length} شرکت یافت شد`, 'نتیجه جستجو');
+          this.toastr.info(`${results.length} رهنما یافت شد`, 'نتیجه جستجو');
         }
       },
       (error) => {
         this.isSearching = false;
         console.error('Search error:', error);
         if (error.status === 404) {
-          this.toastr.info('هیچ شرکتی با این شماره جواز یافت نشد', 'نتیجه جستجو');
+          this.toastr.info('هیچ رهنمای با این شماره جواز یافت نشد', 'نتیجه جستجو');
         } else {
-          this.toastr.error('خطا در جستجوی شرکت', 'خطا');
+          this.toastr.error('خطا در جستجوی رهنما', 'خطا');
         }
       }
     );

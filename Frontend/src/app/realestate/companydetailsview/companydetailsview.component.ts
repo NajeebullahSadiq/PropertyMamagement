@@ -31,7 +31,7 @@ export class CompanydetailsviewComponent {
       const id = idParam ? Number(idParam) : 0;
       if (!id) {
         this.isLoading = false;
-        this.error = 'شناسهٔ شرکت معتبر نیست';
+        this.error = 'شناسهٔ رهنما معتبر نیست';
         return;
       }
       this.companyId = id;
@@ -58,7 +58,7 @@ export class CompanydetailsviewComponent {
       },
       error: (err) => {
         console.error('Company details view load failed', err);
-        this.error = 'خطا در دریافت معلومات شرکت';
+        this.error = 'خطا در دریافت معلومات رهنما';
         this.isLoading = false;
       }
     });

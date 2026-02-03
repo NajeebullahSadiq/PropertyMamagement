@@ -210,7 +210,7 @@ else
 
 3. **Validation**
    - Admin must select company before submitting
-   - Clear error message in Dari/Pashto: "لطفا شرکت را انتخاب کنید"
+   - Clear error message in Dari/Pashto: "لطفا رهنما را انتخاب کنید"
 
 ### Files Modified
 1. `Backend/Controllers/Vehicles/VehiclesController.cs`

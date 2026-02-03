@@ -16,7 +16,7 @@ namespace WebAPIBackend.Configuration
         public const string Authority = "AUTHORITY";
 
         /// <summary>
-        /// کاربر ثبت جواز شرکت - Company registration user
+        /// کاربر ثبت جواز رهنما - Company registration user
         /// </summary>
         public const string CompanyRegistrar = "COMPANY_REGISTRAR";
 
@@ -26,12 +26,12 @@ namespace WebAPIBackend.Configuration
         public const string LicenseReviewer = "LICENSE_REVIEWER";
 
         /// <summary>
-        /// کاربر عملیاتی شرکت - املاک - Real estate company operational user
+        /// کاربر عملیاتی رهنما - املاک - Real estate company operational user
         /// </summary>
         public const string PropertyOperator = "PROPERTY_OPERATOR";
 
         /// <summary>
-        /// کاربر عملیاتی شرکت - موتر فروشی - Vehicle company operational user
+        /// کاربر عملیاتی رهنما - موتر فروشی - Vehicle company operational user
         /// </summary>
         public const string VehicleOperator = "VEHICLE_OPERATOR";
 
@@ -57,7 +57,7 @@ namespace WebAPIBackend.Configuration
             {
                 Admin => "مدیر سیستم",
                 Authority => "مقام / رهبری",
-                CompanyRegistrar => "کاربر ثبت جواز شرکت",
+                CompanyRegistrar => "کاربر ثبت جواز رهنما",
                 LicenseReviewer => "ریاست بررسی و ثبت جواز",
                 PropertyOperator => "کاربر عملیاتی املاک",
                 VehicleOperator => "کاربر عملیاتی موتر فروشی",

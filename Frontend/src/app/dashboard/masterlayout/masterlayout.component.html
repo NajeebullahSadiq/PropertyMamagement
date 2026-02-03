@@ -107,7 +107,7 @@
       <a *ngIf="canAccessDashboard" routerLink="/dashboard" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>dashboard</mat-icon><span>{{ "dashboard" | translate }}</span>
       </a>
-      <div *ngIf="canAccessCompany" class="section-label">شرکت ها</div>
+      <div *ngIf="canAccessCompany" class="section-label">رهنما ها</div>
       <a *ngIf="canAccessCompany && canCreateCompany" routerLink="/realestate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>business</mat-icon><span>{{ "company" | translate }}</span>
       </a>

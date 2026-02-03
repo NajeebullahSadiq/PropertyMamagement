@@ -159,7 +159,7 @@
             <span>{{ result.holderName }}</span>
           </div>
           <div class="info-item" *ngIf="result.companyTitle">
-            <label>نام شرکت:</label>
+            <label>نام رهنما:</label>
             <span>{{ result.companyTitle }}</span>
           </div>
           <div class="info-item" *ngIf="result.issueDate">
@@ -173,6 +173,104 @@
           <div class="info-item full-width" *ngIf="result.officeAddress">
             <label>آدرس دفتر:</label>
             <span>{{ result.officeAddress }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seller Information (for Property and Vehicle documents) -->
+      <div *ngIf="result.sellerInfo" class="party-details seller-details">
+        <div class="party-header">
+          <h4>معلومات فروشنده</h4>
+        </div>
+        <div class="party-content">
+          <!-- Seller Photo -->
+          <div class="party-photo-section" *ngIf="result.sellerInfo.photo">
+            <img [src]="baseUrl + result.sellerInfo.photo" alt="عکس فروشنده" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
+          </div>
+          
+          <!-- Seller Info Grid -->
+          <div class="party-info-grid">
+            <div class="info-item" *ngIf="result.sellerInfo.firstName">
+              <label>نام:</label>
+              <span>{{ result.sellerInfo.firstName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.sellerInfo.fatherName">
+              <label>نام پدر:</label>
+              <span>{{ result.sellerInfo.fatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.sellerInfo.grandFatherName">
+              <label>نام پدر کلان:</label>
+              <span>{{ result.sellerInfo.grandFatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.sellerInfo.electronicNationalIdNumber">
+              <label>شماره تذکره:</label>
+              <span dir="ltr">{{ result.sellerInfo.electronicNationalIdNumber }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.sellerInfo.phoneNumber">
+              <label>شماره تماس:</label>
+              <span dir="ltr">{{ result.sellerInfo.phoneNumber }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.sellerInfo.province">
+              <label>ولایت:</label>
+              <span>{{ result.sellerInfo.province }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.sellerInfo.district">
+              <label>ولسوالی:</label>
+              <span>{{ result.sellerInfo.district }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.sellerInfo.village">
+              <label>قریه/گذر:</label>
+              <span>{{ result.sellerInfo.village }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buyer Information (for Property and Vehicle documents) -->
+      <div *ngIf="result.buyerInfo" class="party-details buyer-details">
+        <div class="party-header">
+          <h4>معلومات خریدار</h4>
+        </div>
+        <div class="party-content">
+          <!-- Buyer Photo -->
+          <div class="party-photo-section" *ngIf="result.buyerInfo.photo">
+            <img [src]="baseUrl + result.buyerInfo.photo" alt="عکس خریدار" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
+          </div>
+          
+          <!-- Buyer Info Grid -->
+          <div class="party-info-grid">
+            <div class="info-item" *ngIf="result.buyerInfo.firstName">
+              <label>نام:</label>
+              <span>{{ result.buyerInfo.firstName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.buyerInfo.fatherName">
+              <label>نام پدر:</label>
+              <span>{{ result.buyerInfo.fatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.buyerInfo.grandFatherName">
+              <label>نام پدر کلان:</label>
+              <span>{{ result.buyerInfo.grandFatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.buyerInfo.electronicNationalIdNumber">
+              <label>شماره تذکره:</label>
+              <span dir="ltr">{{ result.buyerInfo.electronicNationalIdNumber }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.buyerInfo.phoneNumber">
+              <label>شماره تماس:</label>
+              <span dir="ltr">{{ result.buyerInfo.phoneNumber }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.buyerInfo.province">
+              <label>ولایت:</label>
+              <span>{{ result.buyerInfo.province }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.buyerInfo.district">
+              <label>ولسوالی:</label>
+              <span>{{ result.buyerInfo.district }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.buyerInfo.village">
+              <label>قریه/گذر:</label>
+              <span>{{ result.buyerInfo.village }}</span>
+            </div>
           </div>
         </div>
       </div>

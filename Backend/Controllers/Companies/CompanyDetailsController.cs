@@ -33,7 +33,7 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? search = null)
         {
             try
             {
@@ -60,6 +60,22 @@ namespace WebAPIBackend.Controllers.Companies
                 // Apply province filtering
                 var query = _context.CompanyDetails.AsQueryable();
                 query = _provinceFilter.ApplyProvinceFilter(query);
+
+                // Apply search filter if provided
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    var searchLower = search.ToLower().Trim();
+                    query = query.Where(p =>
+                        p.Title.ToLower().Contains(searchLower) ||
+                        (p.CompanyOwners != null && p.CompanyOwners.Any(o =>
+                            o.FirstName.ToLower().Contains(searchLower) ||
+                            (o.ElectronicNationalIdNumber != null && o.ElectronicNationalIdNumber.ToLower().Contains(searchLower))
+                        )) ||
+                        (p.LicenseDetails != null && p.LicenseDetails.Any(l =>
+                            l.LicenseNumber != null && l.LicenseNumber.ToLower().Contains(searchLower)
+                        ))
+                    );
+                }
 
                 var result = await query.Select(p => new
                 {
@@ -554,14 +570,14 @@ namespace WebAPIBackend.Controllers.Companies
 
                 if (!licenses.Any())
                 {
-                    return NotFound(new { message = "هیچ شرکتی با این شماره جواز یافت نشد" });
+                    return NotFound(new { message = "هیچ رهنمای با این شماره جواز یافت نشد" });
                 }
 
                 return Ok(licenses);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "خطا در جستجوی شرکت", error = ex.Message });
+                return StatusCode(500, new { message = "خطا در جستجوی رهنما", error = ex.Message });
             }
         }
 

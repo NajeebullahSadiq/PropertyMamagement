@@ -32,8 +32,8 @@ DROP TABLE IF EXISTS org."LicenseDetails" CASCADE;
 DROP TABLE IF EXISTS org."Gaurantees" CASCADE;
 DROP TABLE IF EXISTS org."Guarantors" CASCADE;
 DROP TABLE IF EXISTS org."CompanyOwnerAddressHistory" CASCADE;
-DROP TABLE IF EXISTS org."CompanyOwnerAddresses" CASCADE;
-DROP TABLE IF EXISTS org."CompanyOwners" CASCADE;
+DROP TABLE IF EXISTS org."CompanyOwnerAddress" CASCADE;
+DROP TABLE IF EXISTS org."CompanyOwner" CASCADE;
 DROP TABLE IF EXISTS org."CompanyDetails" CASCADE;
 
 DO $$ 
@@ -71,8 +71,8 @@ CREATE TABLE org."CompanyDetails" (
         ON DELETE SET NULL
 );
 
--- 2. CompanyOwners (Company owner/partner information)
-CREATE TABLE org."CompanyOwners" (
+-- 2. CompanyOwner (Company owner/partner information)
+CREATE TABLE org."CompanyOwner" (
     "Id" SERIAL PRIMARY KEY,
     "FirstName" VARCHAR(200) NOT NULL,
     "FatherName" VARCHAR(200) NOT NULL,
@@ -100,34 +100,34 @@ CREATE TABLE org."CompanyOwners" (
     "CreatedBy" VARCHAR(50),
     
     -- Foreign Keys
-    CONSTRAINT "FK_CompanyOwners_Company" 
+    CONSTRAINT "FK_CompanyOwner_Company" 
         FOREIGN KEY ("CompanyId") 
         REFERENCES org."CompanyDetails"("Id") 
         ON DELETE CASCADE,
-    CONSTRAINT "FK_CompanyOwners_EducationLevel" 
+    CONSTRAINT "FK_CompanyOwner_EducationLevel" 
         FOREIGN KEY ("EducationLevelId") 
         REFERENCES look."EducationLevel"("ID") 
         ON DELETE SET NULL,
-    CONSTRAINT "FK_CompanyOwners_OwnerProvince" 
+    CONSTRAINT "FK_CompanyOwner_OwnerProvince" 
         FOREIGN KEY ("OwnerProvinceId") 
         REFERENCES look."Location"("ID") 
         ON DELETE SET NULL,
-    CONSTRAINT "FK_CompanyOwners_OwnerDistrict" 
+    CONSTRAINT "FK_CompanyOwner_OwnerDistrict" 
         FOREIGN KEY ("OwnerDistrictId") 
         REFERENCES look."Location"("ID") 
         ON DELETE SET NULL,
-    CONSTRAINT "FK_CompanyOwners_PermanentProvince" 
+    CONSTRAINT "FK_CompanyOwner_PermanentProvince" 
         FOREIGN KEY ("PermanentProvinceId") 
         REFERENCES look."Location"("ID") 
         ON DELETE SET NULL,
-    CONSTRAINT "FK_CompanyOwners_PermanentDistrict" 
+    CONSTRAINT "FK_CompanyOwner_PermanentDistrict" 
         FOREIGN KEY ("PermanentDistrictId") 
         REFERENCES look."Location"("ID") 
         ON DELETE SET NULL
 );
 
--- 3. CompanyOwnerAddresses (Legacy address table - kept for compatibility)
-CREATE TABLE org."CompanyOwnerAddresses" (
+-- 3. CompanyOwnerAddress (Legacy address table - kept for compatibility)
+CREATE TABLE org."CompanyOwnerAddress" (
     "Id" SERIAL PRIMARY KEY,
     "AddressTypeId" INTEGER,
     "ProvinceId" INTEGER,
@@ -139,19 +139,19 @@ CREATE TABLE org."CompanyOwnerAddresses" (
     "CreatedBy" VARCHAR(50),
     
     -- Foreign Keys
-    CONSTRAINT "FK_CompanyOwnerAddresses_CompanyOwner" 
+    CONSTRAINT "FK_CompanyOwnerAddress_CompanyOwner" 
         FOREIGN KEY ("CompanyOwnerId") 
-        REFERENCES org."CompanyOwners"("Id") 
+        REFERENCES org."CompanyOwner"("Id") 
         ON DELETE CASCADE,
-    CONSTRAINT "FK_CompanyOwnerAddresses_AddressType" 
+    CONSTRAINT "FK_CompanyOwnerAddress_AddressType" 
         FOREIGN KEY ("AddressTypeId") 
         REFERENCES look."AddressType"("Id") 
         ON DELETE SET NULL,
-    CONSTRAINT "FK_CompanyOwnerAddresses_Province" 
+    CONSTRAINT "FK_CompanyOwnerAddress_Province" 
         FOREIGN KEY ("ProvinceId") 
         REFERENCES look."Location"("ID") 
         ON DELETE SET NULL,
-    CONSTRAINT "FK_CompanyOwnerAddresses_District" 
+    CONSTRAINT "FK_CompanyOwnerAddress_District" 
         FOREIGN KEY ("DistrictId") 
         REFERENCES look."Location"("ID") 
         ON DELETE SET NULL
@@ -174,7 +174,7 @@ CREATE TABLE org."CompanyOwnerAddressHistory" (
     -- Foreign Keys
     CONSTRAINT "FK_CompanyOwnerAddressHistory_CompanyOwner" 
         FOREIGN KEY ("CompanyOwnerId") 
-        REFERENCES org."CompanyOwners"("Id") 
+        REFERENCES org."CompanyOwner"("Id") 
         ON DELETE CASCADE,
     CONSTRAINT "FK_CompanyOwnerAddressHistory_Province" 
         FOREIGN KEY ("ProvinceId") 
@@ -465,7 +465,7 @@ CREATE TABLE log."Companyowneraudit" (
     -- Foreign Keys
     CONSTRAINT "FK_Companyowneraudit_Owner" 
         FOREIGN KEY ("OwnerId") 
-        REFERENCES org."CompanyOwners"("Id") 
+        REFERENCES org."CompanyOwner"("Id") 
         ON DELETE CASCADE
 );
 
@@ -535,14 +535,14 @@ CREATE INDEX "IX_CompanyDetails_Title" ON org."CompanyDetails"("Title");
 CREATE INDEX "IX_CompanyDetails_TIN" ON org."CompanyDetails"("TIN");
 CREATE INDEX "IX_CompanyDetails_Status" ON org."CompanyDetails"("Status");
 
--- CompanyOwners indexes
-CREATE INDEX "IX_CompanyOwners_CompanyId" ON org."CompanyOwners"("CompanyId");
-CREATE INDEX "IX_CompanyOwners_ElectronicNationalIdNumber" ON org."CompanyOwners"("ElectronicNationalIdNumber");
-CREATE INDEX "IX_CompanyOwners_FirstName" ON org."CompanyOwners"("FirstName");
+-- CompanyOwner indexes
+CREATE INDEX "IX_CompanyOwner_CompanyId" ON org."CompanyOwner"("CompanyId");
+CREATE INDEX "IX_CompanyOwner_ElectronicNationalIdNumber" ON org."CompanyOwner"("ElectronicNationalIdNumber");
+CREATE INDEX "IX_CompanyOwner_FirstName" ON org."CompanyOwner"("FirstName");
 
--- CompanyOwnerAddresses indexes
-CREATE INDEX "IX_CompanyOwnerAddresses_CompanyOwnerId" ON org."CompanyOwnerAddresses"("CompanyOwnerId");
-CREATE INDEX "IX_CompanyOwnerAddresses_ProvinceId" ON org."CompanyOwnerAddresses"("ProvinceId");
+-- CompanyOwnerAddress indexes
+CREATE INDEX "IX_CompanyOwnerAddress_CompanyOwnerId" ON org."CompanyOwnerAddress"("CompanyOwnerId");
+CREATE INDEX "IX_CompanyOwnerAddress_ProvinceId" ON org."CompanyOwnerAddress"("ProvinceId");
 
 -- CompanyOwnerAddressHistory indexes
 CREATE INDEX "IX_CompanyOwnerAddressHistory_CompanyOwnerId" ON org."CompanyOwnerAddressHistory"("CompanyOwnerId");
@@ -612,7 +612,7 @@ BEGIN
     FROM information_schema.tables 
     WHERE table_schema = 'org' 
     AND table_name IN (
-        'CompanyDetails', 'CompanyOwners', 'CompanyOwnerAddresses', 
+        'CompanyDetails', 'CompanyOwner', 'CompanyOwnerAddress', 
         'CompanyOwnerAddressHistory', 'Guarantors', 'Gaurantees', 
         'LicenseDetails', 'CompanyAccountInfo', 'CompanyCancellationInfo',
         'Haqulemtyaz', 'PeriodicForms'
@@ -642,8 +642,8 @@ BEGIN
     RAISE NOTICE '';
     RAISE NOTICE 'Tables Created:';
     RAISE NOTICE '  - org.CompanyDetails';
-    RAISE NOTICE '  - org.CompanyOwners';
-    RAISE NOTICE '  - org.CompanyOwnerAddresses';
+    RAISE NOTICE '  - org.CompanyOwner';
+    RAISE NOTICE '  - org.CompanyOwnerAddress';
     RAISE NOTICE '  - org.CompanyOwnerAddressHistory';
     RAISE NOTICE '  - org.Guarantors';
     RAISE NOTICE '  - org.Gaurantees';

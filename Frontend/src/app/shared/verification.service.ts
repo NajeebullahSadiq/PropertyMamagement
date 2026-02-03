@@ -28,6 +28,32 @@ export interface DocumentVerificationDto {
   officeAddress?: string;
   revokedReason?: string;
   verifiedAt: string;
+  sellerInfo?: SellerInfoDto;
+  buyerInfo?: BuyerInfoDto;
+}
+
+export interface SellerInfoDto {
+  firstName?: string;
+  fatherName?: string;
+  grandFatherName?: string;
+  electronicNationalIdNumber?: string;
+  phoneNumber?: string;
+  photo?: string;
+  province?: string;
+  district?: string;
+  village?: string;
+}
+
+export interface BuyerInfoDto {
+  firstName?: string;
+  fatherName?: string;
+  grandFatherName?: string;
+  electronicNationalIdNumber?: string;
+  phoneNumber?: string;
+  photo?: string;
+  province?: string;
+  district?: string;
+  village?: string;
 }
 
 export interface VerificationStatsDto {

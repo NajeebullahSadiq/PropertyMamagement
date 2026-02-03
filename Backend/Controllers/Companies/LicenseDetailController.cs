@@ -166,8 +166,29 @@ namespace WebAPIBackend.Controllers.Companies
                     return BadRequest("PenaltyAmount must be a non-negative number.");
                 }
 
-                // Inherit province from parent company
-                var provinceId = company.ProvinceId;
+                // Determine province: Admin can select, Company Registrar inherits from user
+                int? provinceId;
+                if (_provinceFilter.IsAdministrator())
+                {
+                    // Admin: use province from request (selected in UI)
+                    provinceId = request.ProvinceId;
+                    if (!provinceId.HasValue)
+                    {
+                        return BadRequest("Province is required for license creation.");
+                    }
+                }
+                else
+                {
+                    // Company Registrar: inherit from user's province
+                    provinceId = _provinceFilter.GetUserProvinceId();
+                    if (!provinceId.HasValue)
+                    {
+                        return BadRequest("User province not found. Please contact administrator.");
+                    }
+                }
+
+                // Validate province access
+                _provinceFilter.ValidateProvinceAccess(provinceId.Value);
 
                 // Auto-generate license number if ProvinceId is provided and LicenseNumber is empty
                 string licenseNumber = request.LicenseNumber;
@@ -179,14 +200,14 @@ namespace WebAPIBackend.Controllers.Companies
                     }
                     catch (ArgumentException ex)
                     {
-                        return BadRequest($"??? ?? ????? ????? ????: {ex.Message}");
+                        return BadRequest($"خطا در تولید شماره جواز: {ex.Message}");
                     }
                 }
 
                 var property = new LicenseDetail
                 {
                     LicenseNumber = licenseNumber,
-                    ProvinceId = provinceId, // Inherit from company
+                    ProvinceId = provinceId, // Set from admin selection or user province
                     IssueDate = issueDate,
                     ExpireDate = expireDate,
                     AreaId = request.AreaId,

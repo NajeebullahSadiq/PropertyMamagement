@@ -200,6 +200,10 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("CompanyDetails", "org");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityColumn();
+
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.Tin).HasColumnName("TIN");
@@ -210,6 +214,10 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("CompanyAccountInfo_pkey");
 
                 entity.ToTable("CompanyAccountInfo", "org");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityColumn();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
@@ -227,6 +235,10 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("CompanyCancellationInfo_pkey");
 
                 entity.ToTable("CompanyCancellationInfo", "org");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityColumn();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
@@ -580,6 +592,10 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("CompanyOwner", "org");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityColumn();
+
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
 
@@ -713,6 +729,10 @@ namespace WebAPIBackend.Configuration
 
                 entity.ToTable("Guarantors", "org");
 
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityColumn();
+
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(13);
@@ -773,6 +793,10 @@ namespace WebAPIBackend.Configuration
                 entity.HasKey(e => e.Id).HasName("LicenseDetails_pkey");
 
                 entity.ToTable("LicenseDetails", "org");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityColumn();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);

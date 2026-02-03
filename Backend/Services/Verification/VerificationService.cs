@@ -26,7 +26,8 @@ namespace WebAPIBackend.Services.Verification
             { "PetitionWriterLicense", "PWL" },
             { "Securities", "SEC" },
             { "PetitionWriterSecurities", "PWS" },
-            { "PropertyDocument", "PRO" }
+            { "PropertyDocument", "PRO" },
+            { "VehicleDocument", "VEH" }
         };
 
         public VerificationService(
@@ -236,6 +237,39 @@ namespace WebAPIBackend.Services.Verification
                 result.ExpiryDate = currentData.ExpiryDate;
                 result.CompanyTitle = currentData.CompanyTitle;
                 result.OfficeAddress = currentData.OfficeAddress;
+                
+                // Populate seller and buyer information (for Property and Vehicle documents)
+                if (currentData.Seller != null)
+                {
+                    result.SellerInfo = new SellerInfoDto
+                    {
+                        FirstName = currentData.Seller.FirstName,
+                        FatherName = currentData.Seller.FatherName,
+                        GrandFatherName = currentData.Seller.GrandFatherName,
+                        ElectronicNationalIdNumber = currentData.Seller.ElectronicNationalIdNumber,
+                        PhoneNumber = currentData.Seller.PhoneNumber,
+                        Photo = currentData.Seller.Photo,
+                        Province = currentData.Seller.Province,
+                        District = currentData.Seller.District,
+                        Village = currentData.Seller.Village
+                    };
+                }
+                
+                if (currentData.Buyer != null)
+                {
+                    result.BuyerInfo = new BuyerInfoDto
+                    {
+                        FirstName = currentData.Buyer.FirstName,
+                        FatherName = currentData.Buyer.FatherName,
+                        GrandFatherName = currentData.Buyer.GrandFatherName,
+                        ElectronicNationalIdNumber = currentData.Buyer.ElectronicNationalIdNumber,
+                        PhoneNumber = currentData.Buyer.PhoneNumber,
+                        Photo = currentData.Buyer.Photo,
+                        Province = currentData.Buyer.Province,
+                        District = currentData.Buyer.District,
+                        Village = currentData.Buyer.Village
+                    };
+                }
 
                 return result;
             }
@@ -327,6 +361,7 @@ namespace WebAPIBackend.Services.Verification
                 "RealEstateLicense" => await GetRealEstateLicenseDataAsync(documentId),
                 "PetitionWriterLicense" => await GetPetitionWriterLicenseDataAsync(documentId),
                 "PropertyDocument" => await GetPropertyDocumentDataAsync(documentId),
+                "VehicleDocument" => await GetVehicleDocumentDataAsync(documentId),
                 _ => null
             };
         }
@@ -408,6 +443,72 @@ namespace WebAPIBackend.Services.Verification
                 }
             }
 
+            // Prepare seller data
+            SellerData? sellerData = null;
+            if (seller != null)
+            {
+                string sellerProvince = "";
+                string sellerDistrict = "";
+                
+                if (seller.PaddressProvinceId.HasValue)
+                {
+                    var prov = await _context.Locations.FindAsync(seller.PaddressProvinceId.Value);
+                    sellerProvince = prov?.Dari ?? prov?.Name ?? "";
+                }
+                
+                if (seller.PaddressDistrictId.HasValue)
+                {
+                    var dist = await _context.Locations.FindAsync(seller.PaddressDistrictId.Value);
+                    sellerDistrict = dist?.Dari ?? dist?.Name ?? "";
+                }
+                
+                sellerData = new SellerData
+                {
+                    FirstName = seller.FirstName,
+                    FatherName = seller.FatherName,
+                    GrandFatherName = seller.GrandFather,
+                    ElectronicNationalIdNumber = seller.ElectronicNationalIdNumber,
+                    PhoneNumber = seller.PhoneNumber,
+                    Photo = seller.Photo,
+                    Province = sellerProvince,
+                    District = sellerDistrict,
+                    Village = seller.PaddressVillage
+                };
+            }
+
+            // Prepare buyer data
+            BuyerData? buyerData = null;
+            if (buyer != null)
+            {
+                string buyerProvince = "";
+                string buyerDistrict = "";
+                
+                if (buyer.PaddressProvinceId.HasValue)
+                {
+                    var prov = await _context.Locations.FindAsync(buyer.PaddressProvinceId.Value);
+                    buyerProvince = prov?.Dari ?? prov?.Name ?? "";
+                }
+                
+                if (buyer.PaddressDistrictId.HasValue)
+                {
+                    var dist = await _context.Locations.FindAsync(buyer.PaddressDistrictId.Value);
+                    buyerDistrict = dist?.Dari ?? dist?.Name ?? "";
+                }
+                
+                buyerData = new BuyerData
+                {
+                    FirstName = buyer.FirstName,
+                    FatherName = buyer.FatherName,
+                    GrandFatherName = buyer.GrandFather,
+                    ElectronicNationalIdNumber = buyer.ElectronicNationalIdNumber,
+                    PhoneNumber = buyer.PhoneNumber,
+                    Photo = buyer.Photo,
+                    Province = buyerProvince,
+                    District = buyerDistrict,
+                    Village = buyer.PaddressVillage
+                };
+            }
+
             return new DocumentDataDto
             {
                 LicenseNumber = property.IssuanceNumber ?? property.Pnumber ?? "",
@@ -416,7 +517,106 @@ namespace WebAPIBackend.Services.Verification
                 IssueDate = property.CreatedAt,
                 ExpiryDate = null, // Property documents don't expire
                 CompanyTitle = null,
-                OfficeAddress = $"{province}, {district}"
+                OfficeAddress = $"{province}, {district}",
+                Seller = sellerData,
+                Buyer = buyerData
+            };
+        }
+
+        private async Task<DocumentDataDto?> GetVehicleDocumentDataAsync(int vehicleId)
+        {
+            // Query vehicle details with seller and buyer information
+            var vehicle = await _context.VehiclesPropertyDetails
+                .Include(v => v.VehiclesSellerDetails)
+                .Include(v => v.VehiclesBuyerDetails)
+                .FirstOrDefaultAsync(v => v.Id == vehicleId);
+
+            if (vehicle == null) return null;
+
+            var seller = vehicle.VehiclesSellerDetails.FirstOrDefault();
+            var buyer = vehicle.VehiclesBuyerDetails.FirstOrDefault();
+
+            // Get province and district names from Location table for seller
+            string sellerProvince = "";
+            string sellerDistrict = "";
+            
+            if (seller != null)
+            {
+                if (seller.PaddressProvinceId.HasValue)
+                {
+                    var provinceLocation = await _context.Locations.FindAsync(seller.PaddressProvinceId.Value);
+                    sellerProvince = provinceLocation?.Dari ?? provinceLocation?.Name ?? "";
+                }
+                
+                if (seller.PaddressDistrictId.HasValue)
+                {
+                    var districtLocation = await _context.Locations.FindAsync(seller.PaddressDistrictId.Value);
+                    sellerDistrict = districtLocation?.Dari ?? districtLocation?.Name ?? "";
+                }
+            }
+
+            // Prepare seller data
+            SellerData? sellerData = null;
+            if (seller != null)
+            {
+                sellerData = new SellerData
+                {
+                    FirstName = seller.FirstName,
+                    FatherName = seller.FatherName,
+                    GrandFatherName = seller.GrandFather,
+                    ElectronicNationalIdNumber = seller.ElectronicNationalIdNumber,
+                    PhoneNumber = seller.PhoneNumber,
+                    Photo = seller.Photo,
+                    Province = sellerProvince,
+                    District = sellerDistrict,
+                    Village = seller.PaddressVillage
+                };
+            }
+
+            // Prepare buyer data
+            BuyerData? buyerData = null;
+            if (buyer != null)
+            {
+                string buyerProvince = "";
+                string buyerDistrict = "";
+                
+                if (buyer.PaddressProvinceId.HasValue)
+                {
+                    var prov = await _context.Locations.FindAsync(buyer.PaddressProvinceId.Value);
+                    buyerProvince = prov?.Dari ?? prov?.Name ?? "";
+                }
+                
+                if (buyer.PaddressDistrictId.HasValue)
+                {
+                    var dist = await _context.Locations.FindAsync(buyer.PaddressDistrictId.Value);
+                    buyerDistrict = dist?.Dari ?? dist?.Name ?? "";
+                }
+                
+                buyerData = new BuyerData
+                {
+                    FirstName = buyer.FirstName,
+                    FatherName = buyer.FatherName,
+                    GrandFatherName = buyer.GrandFather,
+                    ElectronicNationalIdNumber = buyer.ElectronicNationalIdNumber,
+                    PhoneNumber = buyer.PhoneNumber,
+                    Photo = buyer.Photo,
+                    Province = buyerProvince,
+                    District = buyerDistrict,
+                    Village = buyer.PaddressVillage
+                };
+            }
+
+            return new DocumentDataDto
+            {
+                LicenseNumber = vehicle.PermitNo ?? vehicle.PilateNo ?? "",
+                HolderName = $"{seller?.FirstName ?? ""} - {buyer?.FirstName ?? ""}",
+                HolderPhoto = seller?.Photo,
+                IssueDate = vehicle.CreatedAt,
+                ExpiryDate = null, // Vehicle documents don't expire
+                CompanyTitle = null,
+                OfficeAddress = $"{sellerProvince}, {sellerDistrict}",
+                Seller = sellerData,
+                Buyer = buyerData
             };
         }
     }
@@ -433,5 +633,43 @@ namespace WebAPIBackend.Services.Verification
         public DateTime? ExpiryDate { get; set; }
         public string? CompanyTitle { get; set; }
         public string? OfficeAddress { get; set; }
+        
+        // Seller information (for Property and Vehicle documents)
+        public SellerData? Seller { get; set; }
+        
+        // Buyer information (for Property and Vehicle documents)
+        public BuyerData? Buyer { get; set; }
+    }
+
+    /// <summary>
+    /// Internal seller data
+    /// </summary>
+    internal class SellerData
+    {
+        public string? FirstName { get; set; }
+        public string? FatherName { get; set; }
+        public string? GrandFatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Photo { get; set; }
+        public string? Province { get; set; }
+        public string? District { get; set; }
+        public string? Village { get; set; }
+    }
+
+    /// <summary>
+    /// Internal buyer data
+    /// </summary>
+    internal class BuyerData
+    {
+        public string? FirstName { get; set; }
+        public string? FatherName { get; set; }
+        public string? GrandFatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Photo { get; set; }
+        public string? Province { get; set; }
+        public string? District { get; set; }
+        public string? Village { get; set; }
     }
 }

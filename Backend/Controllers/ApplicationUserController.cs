@@ -80,13 +80,13 @@ namespace WebAPI.Controllers
 
                 if (company == null)
                 {
-                    return BadRequest(new { message = "شرکت یافت نشد" });
+                    return BadRequest(new { message = "رهنما یافت نشد" });
                 }
 
                 // Check if company has licenses
                 if (!company.LicenseDetails.Any())
                 {
-                    return BadRequest(new { message = "این شرکت هیچ جوازی ندارد" });
+                    return BadRequest(new { message = "این رهنما هیچ جوازی ندارد" });
                 }
 
                 // Validate license type matches for operators
@@ -97,7 +97,7 @@ namespace WebAPI.Controllers
 
                     if (!hasMatchingLicense)
                     {
-                        return BadRequest(new { message = $"این شرکت جواز {(expectedLicenseType == "realEstate" ? "املاک" : "موترفروشی")} ندارد" });
+                        return BadRequest(new { message = $"این رهنما جواز {(expectedLicenseType == "realEstate" ? "املاک" : "موترفروشی")} ندارد" });
                     }
 
                     // Set license type from company
@@ -463,7 +463,7 @@ namespace WebAPI.Controllers
                         succeeded = true, 
                         userId = applicationUser.Id,
                         role = role,
-                        message = "کاربر شرکت با موفقیت ایجاد شد"
+                        message = "کاربر رهنما با موفقیت ایجاد شد"
                     });
                 }
                 return BadRequest(new { succeeded = false, errors = result.Errors });

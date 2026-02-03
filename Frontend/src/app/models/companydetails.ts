@@ -13,7 +13,7 @@ export interface companydetailsList {
     title:string;
     ownerFullName:string;
     ownerFatherName:string;
-    ownerIdNumber:number;
+    ownerElectronicNationalIdNumber:string;
     licenseNumber:string;
     granator:string;
     isComplete:boolean;

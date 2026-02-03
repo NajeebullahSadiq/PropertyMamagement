@@ -62,7 +62,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Filter by company ID for VehicleOperator
                 if (user.CompanyId == 0)
                 {
-                    return StatusCode(403, new { message = "شما به هیچ شرکتی متصل نیستید" });
+                    return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
                 propertyQuery = _context.VehiclesPropertyDetails.Where(p => p.CompanyId == user.CompanyId);
             }
@@ -318,7 +318,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == companyId.Value);
                     if (!companyExists)
                     {
-                        return BadRequest(new { message = $"شرکت با شناسه {companyId.Value} وجود ندارد" });
+                        return BadRequest(new { message = $"رهنما با شناسه {companyId.Value} وجود ندارد" });
                     }
                 }
             }
@@ -330,7 +330,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Validate that the user has a company assigned
                 if (!companyId.HasValue || companyId.Value == 0)
                 {
-                    return BadRequest(new { message = "شما به هیچ شرکتی متصل نیستید" });
+                    return BadRequest(new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
             }
 

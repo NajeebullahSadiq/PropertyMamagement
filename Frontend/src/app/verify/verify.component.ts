@@ -39,7 +39,9 @@ export class VerifyComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       const code = params.get('code');
       if (code) {
-        this.verificationCode = code;
+        // Extract just the verification code if a full URL was somehow passed
+        const extractedCode = this.extractVerificationCode(code);
+        this.verificationCode = extractedCode || code;
         this.verifyDocument();
       }
     });
@@ -256,6 +258,10 @@ export class VerifyComponent implements OnInit, OnDestroy {
         return 'تضمین نامه';
       case 'PetitionWriterSecurities':
         return 'تضمین نامه عریضه نویس';
+      case 'PropertyDocument':
+        return 'سند معامله ملکیت';
+      case 'VehicleDocument':
+        return 'سند معامله واسطه';
       default:
         return this.result.documentType;
     }

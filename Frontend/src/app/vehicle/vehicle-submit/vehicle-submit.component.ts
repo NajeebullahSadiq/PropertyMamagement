@@ -126,7 +126,7 @@ export class VehicleSubmitComponent implements AfterViewInit{
   addVehicleDetails(): void {
     // Validate company selection for Admin
     if (this.isAdmin && !this.selectedCompanyId) {
-      this.toastr.error('لطفا شرکت را انتخاب کنید');
+      this.toastr.error('لطفا رهنما را انتخاب کنید');
       return;
     }
     
@@ -161,7 +161,7 @@ export class VehicleSubmitComponent implements AfterViewInit{
       },
       error: (err: any) => {
         console.error('Error loading companies:', err);
-        this.toastr.error('خطا در بارگذاری لیست شرکت ها');
+        this.toastr.error('خطا در بارگذاری لیست رهنما ها');
       }
     });
   }

@@ -87,7 +87,7 @@ Backend/
 |------|-----------|--------|
 | ADMIN | مدیر سیستم | Full access |
 | AUTHORITY | مقام / رهبری | View-only all modules |
-| COMPANY_REGISTRAR | کاربر ثبت جواز شرکت | Company module |
+| COMPANY_REGISTRAR | کاربر ثبت جواز رهنما | Company module |
 | LICENSE_REVIEWER | ریاست بررسی و ثبت جواز | View-only company list |
 | PROPERTY_OPERATOR | کاربر عملیاتی املاک | Property module |
 | VEHICLE_OPERATOR | کاربر عملیاتی موتر فروشی | Vehicle module |

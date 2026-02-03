@@ -329,7 +329,7 @@ export class RbacService {
     const roleNames: { [key: string]: string } = {
       [UserRoles.Admin]: 'مدیر سیستم',
       [UserRoles.Authority]: 'مقام / رهبری',
-      [UserRoles.CompanyRegistrar]: 'کاربر ثبت جواز شرکت',
+      [UserRoles.CompanyRegistrar]: 'کاربر ثبت جواز رهنما',
       [UserRoles.LicenseReviewer]: 'ریاست بررسی و ثبت جواز',
       [UserRoles.PropertyOperator]: 'کاربر عملیاتی املاک',
       [UserRoles.VehicleOperator]: 'کاربر عملیاتی موتر فروشی'
