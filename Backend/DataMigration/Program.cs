@@ -11,8 +11,9 @@ namespace DataMigration
     class Program
     {
         // Get connection string from environment variable or use default
+        // Use 127.0.0.1 instead of localhost to force TCP connection (avoids peer authentication)
         private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
-            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=postgres;Password=SecurePassword@2024";
+            ?? "Host=127.0.0.1;Port=5432;Database=PRMIS;Username=postgres;Password=SecurePassword@2024";
         
         private static MigrationStats stats = new MigrationStats();
         
