@@ -437,7 +437,7 @@ namespace DataMigration
             
             string query = @"
                 SELECT ""ID"" FROM look.""Location"" 
-                WHERE ""Name"" = @name AND ""Type"" = 'province'
+                WHERE ""Name"" = @name AND ""TypeId"" = 2
                 LIMIT 1";
             
             using (var cmd = new NpgsqlCommand(query, conn, transaction))
@@ -450,8 +450,8 @@ namespace DataMigration
                 
                 // If not found, create it
                 string insertQuery = @"
-                    INSERT INTO look.""Location"" (""Name"", ""Dari"", ""Type"", ""IsActive"")
-                    VALUES (@name, @dari, 'province', 1)
+                    INSERT INTO look.""Location"" (""Name"", ""Dari"", ""TypeId"", ""IsActive"")
+                    VALUES (@name, @dari, 2, 1)
                     RETURNING ""ID""";
                 
                 using (var insertCmd = new NpgsqlCommand(insertQuery, conn, transaction))
@@ -473,7 +473,7 @@ namespace DataMigration
             
             string query = @"
                 SELECT ""ID"" FROM look.""Location"" 
-                WHERE ""Name"" = @name AND ""Type"" = 'district'
+                WHERE ""Name"" = @name AND ""TypeId"" = 3
                 LIMIT 1";
             
             using (var cmd = new NpgsqlCommand(query, conn, transaction))
@@ -486,8 +486,8 @@ namespace DataMigration
                 
                 // If not found, create it
                 string insertQuery = @"
-                    INSERT INTO look.""Location"" (""Name"", ""Dari"", ""Type"", ""Parent_ID"", ""IsActive"")
-                    VALUES (@name, @dari, 'district', @parent_id, 1)
+                    INSERT INTO look.""Location"" (""Name"", ""Dari"", ""TypeId"", ""Parent_ID"", ""IsActive"")
+                    VALUES (@name, @dari, 3, @parent_id, 1)
                     RETURNING ""ID""";
                 
                 using (var insertCmd = new NpgsqlCommand(insertQuery, conn, transaction))
