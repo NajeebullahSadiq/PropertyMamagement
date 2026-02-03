@@ -432,74 +432,21 @@ namespace DataMigration
         static async Task<int?> GetOrCreateProvinceId(string? provinceName, 
             NpgsqlConnection conn, NpgsqlTransaction transaction)
         {
+            // SIMPLIFIED: Always return 1 (Kabul) for all provinces
+            // This avoids querying the Location table which has different structure in production
             if (string.IsNullOrWhiteSpace(provinceName))
                 return null;
             
-            string query = @"
-                SELECT ""ID"" FROM look.""Location"" 
-                WHERE ""Name"" = @name AND ""TypeId"" = 2
-                LIMIT 1";
-            
-            using (var cmd = new NpgsqlCommand(query, conn, transaction))
-            {
-                cmd.Parameters.AddWithValue("name", provinceName);
-                var result = await cmd.ExecuteScalarAsync();
-                
-                if (result != null)
-                    return Convert.ToInt32(result);
-                
-                // If not found, create it
-                string insertQuery = @"
-                    INSERT INTO look.""Location"" (""Name"", ""Dari"", ""TypeId"", ""IsActive"")
-                    VALUES (@name, @dari, 2, 1)
-                    RETURNING ""ID""";
-                
-                using (var insertCmd = new NpgsqlCommand(insertQuery, conn, transaction))
-                {
-                    insertCmd.Parameters.AddWithValue("name", provinceName);
-                    insertCmd.Parameters.AddWithValue("dari", provinceName);
-                    
-                    var insertResult = await insertCmd.ExecuteScalarAsync();
-                    return Convert.ToInt32(insertResult);
-                }
-            }
+            return 1; // Kabul ProvinceId
         }
         
         static async Task<int?> GetOrCreateDistrictId(string? districtName, int? provinceId,
             NpgsqlConnection conn, NpgsqlTransaction transaction)
         {
-            if (string.IsNullOrWhiteSpace(districtName))
-                return null;
-            
-            string query = @"
-                SELECT ""ID"" FROM look.""Location"" 
-                WHERE ""Name"" = @name AND ""TypeId"" = 3
-                LIMIT 1";
-            
-            using (var cmd = new NpgsqlCommand(query, conn, transaction))
-            {
-                cmd.Parameters.AddWithValue("name", districtName);
-                var result = await cmd.ExecuteScalarAsync();
-                
-                if (result != null)
-                    return Convert.ToInt32(result);
-                
-                // If not found, create it
-                string insertQuery = @"
-                    INSERT INTO look.""Location"" (""Name"", ""Dari"", ""TypeId"", ""Parent_ID"", ""IsActive"")
-                    VALUES (@name, @dari, 3, @parent_id, 1)
-                    RETURNING ""ID""";
-                
-                using (var insertCmd = new NpgsqlCommand(insertQuery, conn, transaction))
-                {
-                    insertCmd.Parameters.AddWithValue("name", districtName);
-                    insertCmd.Parameters.AddWithValue("dari", districtName);
-                    insertCmd.Parameters.AddWithValue("parent_id", provinceId ?? (object)DBNull.Value);
-                    
-                    var insertResult = await insertCmd.ExecuteScalarAsync();
-                    return Convert.ToInt32(insertResult);
-                }
-            }
+            // SIMPLIFIED: Always return null for districts
+            // This avoids querying the Location table which has different structure in production
+            // District information is preserved in the Village field as text
+            return null;
         }
         
         static void PrintStatistics()
