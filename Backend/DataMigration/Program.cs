@@ -10,7 +10,9 @@ namespace DataMigration
 {
     class Program
     {
-        private static string connectionString = "Host=localhost;Port=5432;Database=PRMIS;Username=postgres;Password=Khan@223344";
+        // Get connection string from environment variable or use default
+        private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
+            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=postgres;Password=SecurePassword@2024";
         
         private static MigrationStats stats = new MigrationStats();
         
