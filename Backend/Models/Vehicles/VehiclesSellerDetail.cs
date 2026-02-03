@@ -45,12 +45,6 @@ public partial class VehiclesSellerDetail
     public string? AuthorizationLetter { get; set; } // Path to authorization letter file
 
     public string? HeirsLetter { get; set; } // Path to heirs letter file
-
-    public string? Price { get; set; }
-
-    public string? RoyaltyAmount { get; set; }
-
-    public string? HalfPrice { get; set; }
     
     public virtual Location? PaddressDistrict { get; set; }
 

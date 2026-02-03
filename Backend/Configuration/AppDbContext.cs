@@ -139,7 +139,7 @@ namespace WebAPIBackend.Configuration
         
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
-        public DbSet<GetPrintType> GetPrintType { get; set; }
+        // GetPrintType view removed - use direct queries instead
         public DbSet<getVehiclePrintData> getVehiclePrintData { get; set; }
         public DbSet<LicenseView> LicenseView { get; set; }
 
@@ -992,7 +992,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(14);
-                entity.Property(e => e.Photo).HasColumnName("Photo");
+                // Photo column is uppercase in database, no mapping needed
                 entity.HasOne(d => d.PaddressDistrict).WithMany(p => p.VehiclesBuyerDetailPaddressDistricts)
                     .HasForeignKey(d => d.PaddressDistrictId)
                     .HasConstraintName("VehiclesBuyerDetails_PaddressDistrictId_fkey");
@@ -1041,7 +1041,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.PhoneNumber).HasMaxLength(14);
-                entity.Property(e => e.Photo).HasColumnName("Photo");
+                // Photo column is uppercase in database, no mapping needed
                 entity.HasOne(d => d.PaddressDistrict).WithMany(p => p.VehiclesSellerDetailPaddressDistricts)
                     .HasForeignKey(d => d.PaddressDistrictId)
                     .HasConstraintName("VehiclesSellerDetails_PaddressDistrictId_fkey");
@@ -1387,25 +1387,7 @@ namespace WebAPIBackend.Configuration
                 entity.ToTable("Area", "look");
             });
 
-            modelBuilder.Entity<GetPrintType>(entity =>
-            {
-                entity
-                    .HasNoKey()
-                    .ToView("GetPrintType");
-
-                entity.Property(e => e.North).HasColumnName("north");
-                entity.Property(e => e.South).HasColumnName("south");
-                entity.Property(e => e.West).HasColumnName("west");
-                entity.Property(e => e.East).HasColumnName("east");
-
-                entity.Property(e => e.tSellerVillage).HasColumnName("TSellerVillage");
-                entity.Property(e => e.tSellerProvince).HasColumnName("TSellerProvince");
-                entity.Property(e => e.tSellerDistrict).HasColumnName("TSellerDistrict");
-
-                entity.Property(e => e.tBuyerVillage).HasColumnName("TBuyerVillage");
-                entity.Property(e => e.tBuyerProvince).HasColumnName("TBuyerProvince");
-                entity.Property(e => e.tBuyerDistrict).HasColumnName("TBuyerDistrict");
-            });
+            // GetPrintType view configuration removed - use direct queries instead
 
             modelBuilder.Entity<getVehiclePrintData>(entity =>
             {

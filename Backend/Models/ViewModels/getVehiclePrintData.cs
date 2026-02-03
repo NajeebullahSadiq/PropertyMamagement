@@ -3,16 +3,17 @@
     public class getVehiclePrintData
     {
         public int Id { get; set; }
-        public int PermitNo { get; set; }
-        public int PilateNo { get; set; }
+        public string? PermitNo { get; set; }
+        public string? PilateNo { get; set; }
         public string? TypeOfVehicle { get; set; }
         public string? Model { get; set; }
-        public int EnginNo { get; set; }
-        public int ShasiNo { get; set; }
+        public string? EnginNo { get; set; }
+        public string? ShasiNo { get; set; }
         public string? Color { get; set; }
         public string? Description { get;set; }
         public string? Price { get; set; }
         public string? PriceText { get; set; }
+        public string? HalfPrice { get; set; }
         public string? RoyaltyAmount { get; set; }
         public string? SellerFirstName { get; set; }
         public string? SellerFatherName { get; set; }

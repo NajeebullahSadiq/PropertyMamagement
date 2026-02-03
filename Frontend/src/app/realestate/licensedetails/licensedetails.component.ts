@@ -170,7 +170,7 @@ export class LicensedetailsComponent {
 		
 		// Get user's province if not admin
 		if (!this.isAdmin) {
-			this.authService.getUserProfile().subscribe({
+			this.authService.getCurrentUserProfile().subscribe({
 				next: (profile: any) => {
 					this.userProvinceId = profile.provinceId;
 					// Auto-populate province for non-admin users

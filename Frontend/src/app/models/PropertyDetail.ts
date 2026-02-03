@@ -72,8 +72,8 @@ export interface PropertyDetails {
   export interface VehiclesDetailsList {
    
     id: number;
-    permitNo:number;
-    pilateNo: number;
+    permitNo:string;
+    pilateNo: string;
     typeOfVehicle:string;
     model:string;
     enginNo:string;
@@ -81,6 +81,7 @@ export interface PropertyDetails {
     color:string;
     price:number;
     priceText:string;
+    halfPrice:number;
     royaltyAmount:number;
     transactionTypeId:number;
     des:string;

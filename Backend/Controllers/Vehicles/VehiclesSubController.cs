@@ -585,12 +585,15 @@ namespace WebAPIBackend.Controllers.Vehicles
             {
                 FirstName = request.FirstName,
                 FatherName = request.FatherName,
+                GrandFatherName = request.GrandFatherName,
                 ElectronicNationalIdNumber = request.ElectronicNationalIdNumber,
                 PhoneNumber = request.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId.ToString(),
                 PropertyDetailsId = request.PropertyDetailsId,
                 NationalIdCard = request.NationalIdCard,
+                WitnessSide = request.WitnessSide,
+                Des = request.Des,
             };
             try
             {
@@ -629,7 +632,7 @@ namespace WebAPIBackend.Controllers.Vehicles
 
             // 1. Check if vehicle details has required fields (using correct field names)
             if (string.IsNullOrWhiteSpace(vehicleDetails.TypeOfVehicle) ||
-                vehicleDetails.PilateNo == 0)
+                string.IsNullOrWhiteSpace(vehicleDetails.PilateNo))
             {
                 isComplete = false;
             }

@@ -48,12 +48,6 @@ public partial class VehiclesBuyerDetail
 
     public DateTime? RentEndDate { get; set; }
 
-    public string? Price { get; set; }
-
-    public string? RoyaltyAmount { get; set; }
-
-    public string? HalfPrice { get; set; }
-
     public virtual ICollection<Vehiclebuyeraudit> Vehiclebuyeraudits { get; } = new List<Vehiclebuyeraudit>();
 
     public virtual Location? PaddressDistrict { get; set; }

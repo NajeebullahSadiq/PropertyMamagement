@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto px-4">
     <div class="mb-8">
       <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات وسایط نقلیه</h1>
-      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به وسیله نقلیه را با دقت تکمیل نمایید</p>
+      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به واسط نقلیه را با دقت تکمیل نمایید</p>
     </div>
 
     <form [formGroup]="vehicleForm" (ngSubmit)="vehicleForm.valid ? selectedVehicleId ? updateVehicleDetails() : addVehicleDetails() : null">
@@ -10,11 +10,41 @@
         <input type="hidden" formControlName="id">
       </div>
 
+      <!-- Company Selection for Admin -->
+      <div *ngIf="isAdmin" class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm mb-6 p-6">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <i class="fas fa-building text-yellow-600 text-2xl"></i>
+          </div>
+          <div class="ml-3 flex-1">
+            <h3 class="text-lg font-semibold text-yellow-800 mb-3">انتخاب شرکت</h3>
+            <p class="text-sm text-yellow-700 mb-4">به عنوان ادمین، لطفا شرکتی را که این واسط نقلیه برای آن ثبت می‌شود انتخاب کنید</p>
+            <div class="max-w-md">
+              <label for="companySelect" class="block text-sm font-semibold text-gray-700 mb-2">شرکت</label>
+              <select 
+                id="companySelect" 
+                [(ngModel)]="selectedCompanyId" 
+                [ngModelOptions]="{standalone: true}"
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all bg-white"
+                required>
+                <option [ngValue]="null">-- شرکت را انتخاب کنید --</option>
+                <option *ngFor="let company of companies" [ngValue]="company.id">
+                  {{ company.title }}
+                </option>
+              </select>
+              <small class="text-yellow-600 text-xs mt-1 block" *ngIf="!selectedCompanyId">
+                <i class="fas fa-exclamation-triangle"></i> انتخاب شرکت الزامی است
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
             <i class="fas fa-car"></i>
-            <span>مشخصات اساسی وسیله نقلیه</span>
+            <span>مشخصات اساسی واسط نقلیه</span>
           </h2>
         </div>
         <div class="px-6 py-6">
@@ -37,14 +67,14 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-hashtag"></i>
                 </span>
-                <input type="text" appNumericInput id="pilateNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="pilateNo">
+                <input type="text" id="pilateNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="pilateNo">
               </div>
               <div *ngIf="pilateNo?.invalid && (pilateNo?.dirty || pilateNo?.touched)">
                 <small class="text-red-600 text-xs mt-1 block" *ngIf="pilateNo?.errors?.['required']">این فیلد الزامی است</small>
               </div>
             </div>
             <div>
-              <label for="typeOfVehicle" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت موتر</label>
+              <label for="typeOfVehicle" class="block text-sm font-semibold text-gray-700 mb-2">نوعیت واسط واشترنګ</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-car"></i>
@@ -101,12 +131,12 @@
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <label for="enginNo" class="block text-sm font-semibold text-gray-700 mb-2">شماره انجین</label>
+              <label for="enginNo" class="block text-sm font-semibold text-gray-700 mb-2">شماره انجن و تعداد سلنډر</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-cog"></i>
                 </span>
-                <input type="text" appNumericInput id="enginNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="enginNo">
+                <input type="text" id="enginNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="enginNo">
               </div>
               <div *ngIf="enginNo?.invalid && (enginNo?.dirty || enginNo?.touched)">
                 <small class="text-red-600 text-xs mt-1 block" *ngIf="enginNo?.errors?.['required']">این فیلد الزامی است</small>
@@ -118,7 +148,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-barcode"></i>
                 </span>
-                <input type="text" appNumericInput id="shasiNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="shasiNo">
+                <input type="text" id="shasiNo" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="shasiNo">
               </div>
               <div *ngIf="shasiNo?.invalid && (shasiNo?.dirty || shasiNo?.touched)">
                 <small class="text-red-600 text-xs mt-1 block" *ngIf="shasiNo?.errors?.['required']">این فیلد الزامی است</small>
@@ -132,11 +162,11 @@
         <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
             <i class="fas fa-money-bill-wave"></i>
-            <span>معلومات قیمت و معامله</span>
+            <span>قیمت </span>
           </h2>
         </div>
         <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div>
               <label for="price" class="block text-sm font-semibold text-gray-700 mb-2">قیمت به عدد</label>
               <div class="relative">
@@ -162,7 +192,16 @@
               </div>
             </div>
             <div>
-              <label for="royaltyAmount" class="block text-sm font-semibold text-gray-700 mb-2">مبلغ حق‌العمل رهنمای معاملات</label>
+              <label for="halfPrice" class="block text-sm font-semibold text-gray-700 mb-2">مناصف قیمت</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-divide"></i>
+                </span>
+                <input type="number" id="halfPrice" [value]="halfPriceValue" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed" disabled>
+              </div>
+            </div>
+            <div>
+              <label for="royaltyAmount" class="block text-sm font-semibold text-gray-700 mb-2">    مبلغ حق‌العمل رهنمای معاملات طرافین</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-percentage"></i>
@@ -184,7 +223,7 @@
         <div class="px-6 py-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <h3 class="text-base font-semibold text-gray-800 mb-3">آپلود اسنادها در سیستم</h3>
+              <h3 class="text-base font-semibold text-gray-800 mb-3">اپلوډ جواز سیر و اخرین سند معامله</h3>
               <app-vehicle-fileupload #childComponent [existingFilePath]="imageName" (sendMessage)="uploadFinished($event)"></app-vehicle-fileupload>
             </div>
             <div *ngIf="vehicleForm.get('id')?.value && vehicleForm.get('filePath')?.value">

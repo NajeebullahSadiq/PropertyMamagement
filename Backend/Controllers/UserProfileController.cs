@@ -122,6 +122,7 @@ namespace WebAPI.Controllers
                     CompanyName = companyName,
                     PhoneNumber = user.PhoneNumber ?? string.Empty,
                     LicenseType = user.LicenseType ?? string.Empty,
+                    ProvinceId = user.ProvinceId,
                     Role = primaryRole,
                     RoleDari = UserRoles.GetDariName(primaryRole),
                     Permissions = permissions,

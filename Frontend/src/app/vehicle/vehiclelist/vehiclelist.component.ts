@@ -72,10 +72,11 @@ export class VehiclelistComponent {
 
   filterProperties(properties: VehiclesDetailsList[], searchTerm: string): VehiclesDetailsList[] {
     return properties.filter(property =>
-      property.permitNo.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.pilateNo.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.shasiNo.toString().toLowerCase().includes(searchTerm.toLowerCase().toString()) ||
-      (property.buyerName && property.buyerName.toString().toLowerCase().includes(searchTerm.toLowerCase())) || // add null check for buyerName
+      (property.permitNo && property.permitNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (property.pilateNo && property.pilateNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (property.shasiNo && property.shasiNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (property.enginNo && property.enginNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (property.buyerName && property.buyerName.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
       (property.sellerName && property.sellerName.toString().toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }

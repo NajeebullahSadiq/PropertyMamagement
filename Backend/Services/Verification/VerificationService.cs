@@ -376,20 +376,47 @@ namespace WebAPIBackend.Services.Verification
 
         private async Task<DocumentDataDto?> GetPropertyDocumentDataAsync(int propertyId)
         {
-            var property = await _context.GetPrintType
+            // Use direct query instead of GetPrintType view
+            var property = await _context.PropertyDetails
+                .Include(p => p.SellerDetails)
+                .Include(p => p.BuyerDetails)
+                .Include(p => p.PropertyAddresses)
                 .FirstOrDefaultAsync(p => p.Id == propertyId);
 
             if (property == null) return null;
 
+            var seller = property.SellerDetails.FirstOrDefault();
+            var buyer = property.BuyerDetails.FirstOrDefault();
+            var address = property.PropertyAddresses.FirstOrDefault();
+
+            // Get province and district names from Location table
+            string province = "";
+            string district = "";
+            
+            if (address != null)
+            {
+                if (address.ProvinceId.HasValue)
+                {
+                    var provinceLocation = await _context.Locations.FindAsync(address.ProvinceId.Value);
+                    province = provinceLocation?.Dari ?? provinceLocation?.Name ?? "";
+                }
+                
+                if (address.DistrictId.HasValue)
+                {
+                    var districtLocation = await _context.Locations.FindAsync(address.DistrictId.Value);
+                    district = districtLocation?.Dari ?? districtLocation?.Name ?? "";
+                }
+            }
+
             return new DocumentDataDto
             {
-                LicenseNumber = property.IssuanceNumber ?? property.PNumber.ToString(),
-                HolderName = $"{property.SellerFirstName} - {property.BuyerFirstName}",
-                HolderPhoto = property.SellerPhoto,
+                LicenseNumber = property.IssuanceNumber ?? property.Pnumber ?? "",
+                HolderName = $"{seller?.FirstName ?? ""} - {buyer?.FirstName ?? ""}",
+                HolderPhoto = seller?.Photo,
                 IssueDate = property.CreatedAt,
                 ExpiryDate = null, // Property documents don't expire
                 CompanyTitle = null,
-                OfficeAddress = $"{property.ProvinceDari ?? property.Province}, {property.DistrictDari ?? property.District}"
+                OfficeAddress = $"{province}, {district}"
             };
         }
     }

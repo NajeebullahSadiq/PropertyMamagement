@@ -123,7 +123,7 @@ export class WitnessdetailComponent {
           return;
         }
         const existingNationalIdPath = witness?.[0]?.nationalIdCardPath || witness?.[0]?.nationalIdCard || '';
-        this.withnessForm.setValue({
+        this.withnessForm.patchValue({
           id: witness[0].id,
           firstName:witness[0].firstName,
           fatherName: witness[0].fatherName,

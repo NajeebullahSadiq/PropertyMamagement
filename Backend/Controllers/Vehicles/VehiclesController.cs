@@ -87,6 +87,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                         p.Color,
                         p.Price,
                         p.PriceText,
+                        p.HalfPrice,
                         p.Des,
                         p.RoyaltyAmount,
                         p.FilePath,
@@ -259,6 +260,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                     TransactionTypeName = vehicle.TransactionType?.Name,
                     vehicle.Price,
                     vehicle.PriceText,
+                    vehicle.HalfPrice,
                     vehicle.RoyaltyAmount,
                     vehicle.Des,
                     
@@ -301,6 +303,37 @@ namespace WebAPIBackend.Controllers.Vehicles
                 return Unauthorized();
             }
 
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Determine CompanyId based on user role
+            int? companyId;
+            if (roles.Contains(UserRoles.Admin) || roles.Contains(UserRoles.Authority))
+            {
+                // Admin can specify CompanyId from request, or leave it null
+                companyId = request.CompanyId;
+                
+                // Validate that the company exists if CompanyId is provided
+                if (companyId.HasValue && companyId.Value > 0)
+                {
+                    var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == companyId.Value);
+                    if (!companyExists)
+                    {
+                        return BadRequest(new { message = $"شرکت با شناسه {companyId.Value} وجود ندارد" });
+                    }
+                }
+            }
+            else
+            {
+                // Regular users use their assigned CompanyId
+                companyId = user.CompanyId;
+                
+                // Validate that the user has a company assigned
+                if (!companyId.HasValue || companyId.Value == 0)
+                {
+                    return BadRequest(new { message = "شما به هیچ شرکتی متصل نیستید" });
+                }
+            }
+
             var property = new VehiclesPropertyDetail
             {
                 PermitNo = request.PermitNo,
@@ -313,12 +346,13 @@ namespace WebAPIBackend.Controllers.Vehicles
                 PropertyTypeId = request.PropertyTypeId,
                 Price = request.Price,
                 PriceText = request.PriceText,
+                HalfPrice = request.HalfPrice,
                 RoyaltyAmount = !string.IsNullOrWhiteSpace(request.Price) ? (decimal.Parse(request.Price) * 0.01m).ToString() : null,
                 TransactionTypeId = request.TransactionTypeId,
                 Des = request.Des,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
-                CompanyId = user.CompanyId, // Set company ID for data isolation
+                CompanyId = companyId, // Set company ID based on role
                 FilePath = request.FilePath,
                 VehicleHand = request.VehicleHand,
                 iscomplete=false,
@@ -427,6 +461,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 data.Color,
                 data.Price,
                 data.PriceText,
+                data.HalfPrice,
                 data.RoyaltyAmount,
                 data.Description,
                 data.SellerFirstName,

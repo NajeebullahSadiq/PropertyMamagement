@@ -1,18 +1,20 @@
 export interface VehicleDetails{
     id: number;
-    permitNo:number;
-    pilateNo: number;
+    permitNo:string;
+    pilateNo: string;
     typeOfVehicle:string;
     model:string;
-    enginNo:number;
-    shasiNo:number;
+    enginNo:string;
+    shasiNo:string;
     color:string;
     price:number;
     priceText:string;
-    royaltyAmount:number;
+    halfPrice:string;  // Changed to string to match backend
+    royaltyAmount:string;  // Changed to string to match backend
     des:string;
     filePath:string;
     vehicleHand:string;
+    companyId?:number;
     iscomplete?:boolean;
     iseditable?:boolean; 
 }
