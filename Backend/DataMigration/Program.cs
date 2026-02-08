@@ -10,14 +10,10 @@ namespace DataMigration
 {
     class Program
     {
-        // Get connection string from environment variable or use default
-        // Use 127.0.0.1 instead of localhost to force TCP connection (avoids peer authentication)
-         // Connection strings for different environments
-        private static readonly Dictionary<string, string> ConnectionStrings = new Dictionary<string, string>
-        {
-            ["development"] = "Host=127.0.0.1;Port=5432;Database=PRMIS;Username=postgres;Password=Khan@223344",
-            ["production"] = "Host=localhost;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024;Pooling=true;MaxPoolSize=20"
-        };        
+        // Connection string for database
+        private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
+            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024";
+        
         private static MigrationStats stats = new MigrationStats();
         
         static async Task Main(string[] args)
