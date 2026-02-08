@@ -1,0 +1,114 @@
+================================================================================
+SECURITIES MIGRATION - PRODUCTION DEPLOYMENT CHECKLIST
+================================================================================
+
+PRE-DEPLOYMENT CHECKLIST
+================================================================================
+
+[ ] Development migration completed successfully (7,022 records)
+[ ] All migration files are ready in Backend/DataMigration/
+[ ] WinSCP or SCP tool is available
+[ ] PuTTY or SSH client is available
+[ ] Production server credentials are available
+[ ] Production database credentials are confirmed
+[ ] Backup of production database is taken (recommended)
+
+REQUIRED FILES
+================================================================================
+
+[ ] Program.cs
+[ ] SecuritiesMigration.cs
+[ ] Models.cs
+[ ] SecuritiesModels.cs
+[ ] DataMigration.csproj
+[ ] securities_records_clean_fixed.json
+
+DEPLOYMENT STEPS
+================================================================================
+
+[ ] Step 1: Upload files to /var/www/prmis/migration/
+[ ] Step 2: Update connection string in SecuritiesMigration.cs
+        Change: Username=postgres;Password=Khan@223344
+        To: Username=prmis_user;Password=SecurePassword@2024
+[ ] Step 3: Build migration tool (dotnet build)
+[ ] Step 4: Run migration (dotnet run securities)
+[ ] Step 5: Monitor progress (should take 2-3 minutes)
+[ ] Step 6: Verify completion message
+
+VERIFICATION CHECKLIST
+================================================================================
+
+[ ] Migration completed without errors
+[ ] Total records processed: 7,022
+[ ] Distributions created: ~6,989
+[ ] Distribution items created: ~12,416
+[ ] Skipped records: 33 (expected)
+[ ] Database query: SELECT COUNT(*) FROM org."SecuritiesDistribution"
+    Expected result: ~6,989
+[ ] Database query: SELECT COUNT(*) FROM org."SecuritiesDistributionItem"
+    Expected result: ~12,416
+[ ] Sample data looks correct
+[ ] No null or invalid data
+
+POST-DEPLOYMENT CHECKLIST
+================================================================================
+
+[ ] Restart backend service (systemctl restart prmis-backend)
+[ ] Test securities module in application
+[ ] Verify users can view securities distributions
+[ ] Check securities reports are generating
+[ ] Verify print functionality works
+[ ] Check all document types are visible
+[ ] Remove migration files from server (optional)
+[ ] Update deployment documentation
+[ ] Notify team of successful migration
+
+SUCCESS CRITERIA
+================================================================================
+
+✓ All 7,022 records processed
+✓ ~6,989 distributions created
+✓ ~12,416 distribution items created
+✓ 0 errors encountered
+✓ Data visible in application
+✓ Reports generating correctly
+✓ Users can access securities module
+
+ROLLBACK PLAN (IF NEEDED)
+================================================================================
+
+If migration fails or data is incorrect:
+
+1. Connect to database:
+   psql -h localhost -U prmis_user -d PRMIS
+
+2. Run rollback commands:
+   DELETE FROM org."SecuritiesDistributionItem";
+   DELETE FROM org."SecuritiesDistribution";
+   ALTER SEQUENCE org."SecuritiesDistribution_Id_seq" RESTART WITH 1;
+   ALTER SEQUENCE org."SecuritiesDistributionItem_Id_seq" RESTART WITH 1;
+
+3. Fix issues and re-run migration
+
+CONTACT INFORMATION
+================================================================================
+
+Server: 185.125.231.135
+Database: PRMIS
+Migration Directory: /var/www/prmis/migration/
+
+NOTES
+================================================================================
+
+- Migration takes approximately 2-3 minutes
+- 33 duplicate records (registration number "فقط کتاب ثبت") will be skipped
+- This is expected and normal
+- No user intervention required during migration
+- Backend service should be restarted after migration
+
+================================================================================
+DEPLOYMENT DATE: _______________
+DEPLOYED BY: _______________
+VERIFIED BY: _______________
+STATUS: [ ] SUCCESS  [ ] FAILED  [ ] ROLLED BACK
+================================================================================
