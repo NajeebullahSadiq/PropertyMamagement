@@ -4,10 +4,7 @@ import { SecuritiesService } from '../shared/securities.service';
 import { CalendarService } from '../shared/calendar.service';
 import { 
     SecuritiesDistribution, 
-    DocumentTypes, 
-    PropertySubTypes, 
-    VehicleSubTypes,
-    RegistrationBookTypes 
+    DocumentTypes
 } from '../models/SecuritiesDistribution';
 
 @Component({
@@ -56,32 +53,19 @@ export class PrintSecuritiesComponent implements OnInit {
         return found ? found.name : '-';
     }
 
-    getPropertySubTypeName(subType: number | undefined): string {
-        if (!subType) return '-';
-        const found = PropertySubTypes.find(x => x.id === subType);
-        return found ? found.name : '-';
-    }
-
-    getVehicleSubTypeName(subType: number | undefined): string {
-        if (!subType) return '-';
-        const found = VehicleSubTypes.find(x => x.id === subType);
-        return found ? found.name : '-';
-    }
-
-    getRegistrationBookTypeName(type: number | undefined): string {
-        if (!type) return '-';
-        const found = RegistrationBookTypes.find(x => x.id === type);
-        return found ? found.name : '-';
+    getPricePerUnit(type: number | undefined): number {
+        if (!type) return 0;
+        const found = DocumentTypes.find(x => x.id === type);
+        return found ? found.pricePerUnit : 0;
     }
 
     getTotalDocumentCount(): number {
+        if (!this.item || !this.item.items) return 0;
+        return this.item.items.reduce((sum, item) => sum + item.count, 0);
+    }
+
+    getTotalPrice(): number {
         if (!this.item) return 0;
-        let total = 0;
-        if (this.item.propertySaleCount) total += this.item.propertySaleCount;
-        if (this.item.bayWafaCount) total += this.item.bayWafaCount;
-        if (this.item.rentCount) total += this.item.rentCount;
-        if (this.item.vehicleSaleCount) total += this.item.vehicleSaleCount;
-        if (this.item.vehicleExchangeCount) total += this.item.vehicleExchangeCount;
-        return total;
+        return this.item.totalSecuritiesPrice || 0;
     }
 }

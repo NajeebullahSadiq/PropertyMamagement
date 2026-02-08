@@ -37,7 +37,6 @@
           </div>
         </div>
       </div>
-
       <!-- Section 1: مشخصات رهنمای معاملات -->
       <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
         <div (click)="toggleSection('tab1')" class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 cursor-pointer flex justify-between items-center">
@@ -87,132 +86,45 @@
           <i class="fas text-white" [ngClass]="sections.tab2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
         </div>
         <div *ngIf="sections.tab2" class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-file text-emerald-500"></i>نوعیت سته</span>
-              <p class="font-bold text-gray-800 mt-1">{{ getDocumentTypeName(item.documentType) }}</p>
-            </div>
-            <div *ngIf="item.documentType === 1" class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-home text-emerald-500"></i>نوع سته جایداد</span>
-              <p class="font-bold text-gray-800 mt-1">{{ getPropertySubTypeName(item.propertySubType) }}</p>
-            </div>
-            <div *ngIf="item.documentType === 2" class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-car text-emerald-500"></i>نوع سته وسایط نقلیه</span>
-              <p class="font-bold text-gray-800 mt-1">{{ getVehicleSubTypeName(item.vehicleSubType) }}</p>
-            </div>
-          </div>
-
-          <!-- Property Sale Details -->
-          <div *ngIf="item.propertySaleCount || item.propertySaleSerialStart || item.propertySaleSerialEnd" class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 mb-4">
-            <h3 class="font-bold text-blue-800 mb-4 flex items-center gap-2"><i class="fas fa-home"></i> سته خرید و فروش جایداد</h3>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center">
-                <span class="text-sm text-gray-500">تعداد</span>
-                <p class="font-bold text-blue-700 text-lg">{{ item.propertySaleCount || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">آغاز سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.propertySaleSerialStart || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">ختم سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.propertySaleSerialEnd || '-' }}</p>
+          <!-- Items List -->
+          <div *ngIf="item.items && item.items.length > 0" class="space-y-4">
+            <div *ngFor="let docItem of item.items" class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+              <h3 class="font-bold text-blue-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-file-alt"></i> 
+                {{ getDocumentTypeName(docItem.documentType) }}
+              </h3>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center" *ngIf="docItem.serialStart">
+                  <span class="text-sm text-gray-500">آغاز سریال نمبر</span>
+                  <p class="font-bold text-gray-800">{{ docItem.serialStart }}</p>
+                </div>
+                <div class="text-center" *ngIf="docItem.serialEnd">
+                  <span class="text-sm text-gray-500">ختم سریال نمبر</span>
+                  <p class="font-bold text-gray-800">{{ docItem.serialEnd }}</p>
+                </div>
+                <div class="text-center">
+                  <span class="text-sm text-gray-500">تعداد</span>
+                  <p class="font-bold text-blue-700 text-lg">{{ docItem.count }}</p>
+                </div>
+                <div class="text-center">
+                  <span class="text-sm text-gray-500">قیمت</span>
+                  <p class="font-bold text-green-700 text-lg">{{ docItem.price | number }} افغانی</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Bay Wafa Details -->
-          <div *ngIf="item.bayWafaCount || item.bayWafaSerialStart || item.bayWafaSerialEnd" class="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
-            <h3 class="font-bold text-purple-800 mb-4 flex items-center gap-2"><i class="fas fa-handshake"></i> سته بیع وفا</h3>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center">
-                <span class="text-sm text-gray-500">تعداد</span>
-                <p class="font-bold text-purple-700 text-lg">{{ item.bayWafaCount || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">آغاز سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.bayWafaSerialStart || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">ختم سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.bayWafaSerialEnd || '-' }}</p>
-              </div>
-            </div>
+          <!-- Empty State -->
+          <div *ngIf="!item.items || item.items.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+            <i class="fas fa-inbox text-4xl mb-2"></i>
+            <p>هیچ سند ثبت نشده است</p>
           </div>
 
-          <!-- Rent Details -->
-          <div *ngIf="item.rentCount || item.rentSerialStart || item.rentSerialEnd" class="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200 mb-4">
-            <h3 class="font-bold text-orange-800 mb-4 flex items-center gap-2"><i class="fas fa-key"></i> سته کرایی</h3>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center">
-                <span class="text-sm text-gray-500">تعداد</span>
-                <p class="font-bold text-orange-700 text-lg">{{ item.rentCount || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">آغاز سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.rentSerialStart || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">ختم سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.rentSerialEnd || '-' }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vehicle Sale Details -->
-          <div *ngIf="item.vehicleSaleCount || item.vehicleSaleSerialStart || item.vehicleSaleSerialEnd" class="p-5 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-200 mb-4">
-            <h3 class="font-bold text-teal-800 mb-4 flex items-center gap-2"><i class="fas fa-car"></i> سته خرید و فروش وسایط نقلیه</h3>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center">
-                <span class="text-sm text-gray-500">تعداد</span>
-                <p class="font-bold text-teal-700 text-lg">{{ item.vehicleSaleCount || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">آغاز سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.vehicleSaleSerialStart || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">ختم سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.vehicleSaleSerialEnd || '-' }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vehicle Exchange Details -->
-          <div *ngIf="item.vehicleExchangeCount || item.vehicleExchangeSerialStart || item.vehicleExchangeSerialEnd" class="p-5 bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl border border-indigo-200 mb-4">
-            <h3 class="font-bold text-indigo-800 mb-4 flex items-center gap-2"><i class="fas fa-exchange-alt"></i> سته تبادله وسایط نقلیه</h3>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center">
-                <span class="text-sm text-gray-500">تعداد</span>
-                <p class="font-bold text-indigo-700 text-lg">{{ item.vehicleExchangeCount || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">آغاز سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.vehicleExchangeSerialStart || '-' }}</p>
-              </div>
-              <div class="text-center">
-                <span class="text-sm text-gray-500">ختم سریال نمبر</span>
-                <p class="font-bold text-gray-800">{{ item.vehicleExchangeSerialEnd || '-' }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Registration Book -->
-          <div *ngIf="item.registrationBookType" class="p-5 bg-gradient-to-br from-gray-50 to-slate-100 rounded-xl border border-gray-200">
-            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-book"></i> کتاب ثبت معاملات</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="text-center">
-                <span class="text-sm text-gray-500">نوع کتاب</span>
-                <p class="font-bold text-gray-800">{{ getRegistrationBookTypeName(item.registrationBookType) }}</p>
-              </div>
-              <div *ngIf="item.registrationBookCount" class="text-center">
-                <span class="text-sm text-gray-500">تعداد کتاب ثبت</span>
-                <p class="font-bold text-gray-800">{{ item.registrationBookCount }}</p>
-              </div>
-              <div *ngIf="item.duplicateBookCount" class="text-center">
-                <span class="text-sm text-gray-500">تعداد کتاب ثبت مثنی</span>
-                <p class="font-bold text-gray-800">{{ item.duplicateBookCount }}</p>
-              </div>
+          <!-- Total Documents -->
+          <div *ngIf="item.items && item.items.length > 0" class="mt-6 p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-700 font-medium">مجموع اسناد:</span>
+              <span class="text-2xl font-bold text-emerald-700">{{ getTotalDocumentCount() }} جلد</span>
             </div>
           </div>
         </div>

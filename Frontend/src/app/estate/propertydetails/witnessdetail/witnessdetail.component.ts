@@ -106,7 +106,7 @@ export class WitnessdetailComponent {
       const sideAlreadyUsed = otherWitnesses.some(w => w.witnessSide === selectedSide);
       
       if (sideAlreadyUsed) {
-        this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'فروشنده'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
+        this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'بایع'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
         return;
       }
 
@@ -148,7 +148,7 @@ export class WitnessdetailComponent {
     const sideAlreadyUsed = otherWitnesses.some(w => w.witnessSide === selectedSide);
     
     if (sideAlreadyUsed) {
-      this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'فروشنده'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
+      this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'بایع'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
       return;
     }
 

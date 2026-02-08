@@ -185,7 +185,7 @@
         <div class="party-content">
           <!-- Seller Photo -->
           <div class="party-photo-section" *ngIf="result.sellerInfo.photo">
-            <img [src]="baseUrl + result.sellerInfo.photo" alt="عکس فروشنده" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
+            <img [src]="getSellerPhotoUrl()" alt="عکس فروشنده" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
           </div>
           
           <!-- Seller Info Grid -->
@@ -234,7 +234,7 @@
         <div class="party-content">
           <!-- Buyer Photo -->
           <div class="party-photo-section" *ngIf="result.buyerInfo.photo">
-            <img [src]="baseUrl + result.buyerInfo.photo" alt="عکس خریدار" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
+            <img [src]="getBuyerPhotoUrl()" alt="عکس خریدار" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
           </div>
           
           <!-- Buyer Info Grid -->

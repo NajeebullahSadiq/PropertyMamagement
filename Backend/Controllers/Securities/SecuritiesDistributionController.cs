@@ -5,6 +5,7 @@ using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.RequestData;
+using WebAPIBackend.Models.RequestData.Securities;
 
 namespace WebAPIBackend.Controllers.Securities
 {
@@ -36,6 +37,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var query = _context.SecuritiesDistributions
+                    .Include(x => x.Items)
                     .Where(x => x.Status == true)
                     .AsQueryable();
 
@@ -64,30 +66,17 @@ namespace WebAPIBackend.Controllers.Securities
                         x.LicenseOwnerFatherName,
                         x.TransactionGuideName,
                         x.LicenseNumber,
-                        x.DocumentType,
-                        x.PropertySubType,
-                        x.VehicleSubType,
-                        x.PropertySaleCount,
-                        x.PropertySaleSerialStart,
-                        x.PropertySaleSerialEnd,
-                        x.BayWafaCount,
-                        x.BayWafaSerialStart,
-                        x.BayWafaSerialEnd,
-                        x.RentCount,
-                        x.RentSerialStart,
-                        x.RentSerialEnd,
-                        x.VehicleSaleCount,
-                        x.VehicleSaleSerialStart,
-                        x.VehicleSaleSerialEnd,
-                        x.VehicleExchangeCount,
-                        x.VehicleExchangeSerialStart,
-                        x.VehicleExchangeSerialEnd,
-                        x.RegistrationBookType,
-                        x.RegistrationBookCount,
-                        x.DuplicateBookCount,
+                        Items = x.Items.Select(i => new
+                        {
+                            i.Id,
+                            i.DocumentType,
+                            i.SerialStart,
+                            i.SerialEnd,
+                            i.Count,
+                            i.Price
+                        }).ToList(),
                         x.PricePerDocument,
                         x.TotalDocumentsPrice,
-                        x.RegistrationBookPrice,
                         x.TotalSecuritiesPrice,
                         x.BankReceiptNumber,
                         x.DeliveryDate,
@@ -127,6 +116,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var item = await _context.SecuritiesDistributions
+                    .Include(x => x.Items)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (item == null)
@@ -144,30 +134,17 @@ namespace WebAPIBackend.Controllers.Securities
                     item.LicenseOwnerFatherName,
                     item.TransactionGuideName,
                     item.LicenseNumber,
-                    item.DocumentType,
-                    item.PropertySubType,
-                    item.VehicleSubType,
-                    item.PropertySaleCount,
-                    item.PropertySaleSerialStart,
-                    item.PropertySaleSerialEnd,
-                    item.BayWafaCount,
-                    item.BayWafaSerialStart,
-                    item.BayWafaSerialEnd,
-                    item.RentCount,
-                    item.RentSerialStart,
-                    item.RentSerialEnd,
-                    item.VehicleSaleCount,
-                    item.VehicleSaleSerialStart,
-                    item.VehicleSaleSerialEnd,
-                    item.VehicleExchangeCount,
-                    item.VehicleExchangeSerialStart,
-                    item.VehicleExchangeSerialEnd,
-                    item.RegistrationBookType,
-                    item.RegistrationBookCount,
-                    item.DuplicateBookCount,
+                    Items = item.Items.Select(i => new
+                    {
+                        i.Id,
+                        i.DocumentType,
+                        i.SerialStart,
+                        i.SerialEnd,
+                        i.Count,
+                        i.Price
+                    }).ToList(),
                     item.PricePerDocument,
                     item.TotalDocumentsPrice,
-                    item.RegistrationBookPrice,
                     item.TotalSecuritiesPrice,
                     item.BankReceiptNumber,
                     item.DeliveryDate,
@@ -214,8 +191,8 @@ namespace WebAPIBackend.Controllers.Securities
                     return BadRequest(new { message = "نمبر ثبت قبلاً استفاده شده است" });
                 }
 
-                // Validate conditional fields
-                var validationResult = ValidateConditionalFields(data);
+                // Validate items
+                var validationResult = ValidateItems(data.Items);
                 if (!validationResult.IsValid)
                 {
                     return BadRequest(new { message = validationResult.ErrorMessage });
@@ -230,30 +207,8 @@ namespace WebAPIBackend.Controllers.Securities
                     LicenseOwnerFatherName = data.LicenseOwnerFatherName,
                     TransactionGuideName = data.TransactionGuideName,
                     LicenseNumber = data.LicenseNumber,
-                    DocumentType = data.DocumentType,
-                    PropertySubType = data.PropertySubType,
-                    VehicleSubType = data.VehicleSubType,
-                    PropertySaleCount = data.PropertySaleCount,
-                    PropertySaleSerialStart = data.PropertySaleSerialStart,
-                    PropertySaleSerialEnd = data.PropertySaleSerialEnd,
-                    BayWafaCount = data.BayWafaCount,
-                    BayWafaSerialStart = data.BayWafaSerialStart,
-                    BayWafaSerialEnd = data.BayWafaSerialEnd,
-                    RentCount = data.RentCount,
-                    RentSerialStart = data.RentSerialStart,
-                    RentSerialEnd = data.RentSerialEnd,
-                    VehicleSaleCount = data.VehicleSaleCount,
-                    VehicleSaleSerialStart = data.VehicleSaleSerialStart,
-                    VehicleSaleSerialEnd = data.VehicleSaleSerialEnd,
-                    VehicleExchangeCount = data.VehicleExchangeCount,
-                    VehicleExchangeSerialStart = data.VehicleExchangeSerialStart,
-                    VehicleExchangeSerialEnd = data.VehicleExchangeSerialEnd,
-                    RegistrationBookType = data.RegistrationBookType,
-                    RegistrationBookCount = data.RegistrationBookCount,
-                    DuplicateBookCount = data.DuplicateBookCount,
                     PricePerDocument = data.PricePerDocument,
                     TotalDocumentsPrice = data.TotalDocumentsPrice,
-                    RegistrationBookPrice = data.RegistrationBookPrice,
                     TotalSecuritiesPrice = data.TotalSecuritiesPrice,
                     BankReceiptNumber = data.BankReceiptNumber,
                     DeliveryDate = data.DeliveryDate,
@@ -263,6 +218,21 @@ namespace WebAPIBackend.Controllers.Securities
                     Status = true
                 };
 
+                // Add items
+                foreach (var itemData in data.Items)
+                {
+                    var item = new WebAPIBackend.Models.Securities.SecuritiesDistributionItem
+                    {
+                        DocumentType = itemData.DocumentType,
+                        SerialStart = itemData.SerialStart,
+                        SerialEnd = itemData.SerialEnd,
+                        Count = itemData.Count,
+                        Price = itemData.Price,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    entity.Items.Add(item);
+                }
+
                 _context.SecuritiesDistributions.Add(entity);
                 await _context.SaveChangesAsync();
 
@@ -270,7 +240,7 @@ namespace WebAPIBackend.Controllers.Securities
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "خطا در ثبت اطلاعات", error = ex.Message });
+                return StatusCode(500, new { message = "خطا در ثبت اطلاعات", error = ex.Message, innerError = ex.InnerException?.Message });
             }
         }
 
@@ -288,7 +258,10 @@ namespace WebAPIBackend.Controllers.Securities
                     return BadRequest(ModelState);
                 }
 
-                var entity = await _context.SecuritiesDistributions.FindAsync(id);
+                var entity = await _context.SecuritiesDistributions
+                    .Include(x => x.Items)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
                 if (entity == null)
                 {
                     return NotFound(new { message = "رکورد یافت نشد" });
@@ -303,8 +276,8 @@ namespace WebAPIBackend.Controllers.Securities
                     return BadRequest(new { message = "نمبر ثبت قبلاً استفاده شده است" });
                 }
 
-                // Validate conditional fields
-                var validationResult = ValidateConditionalFields(data);
+                // Validate items
+                var validationResult = ValidateItems(data.Items);
                 if (!validationResult.IsValid)
                 {
                     return BadRequest(new { message = validationResult.ErrorMessage });
@@ -317,30 +290,8 @@ namespace WebAPIBackend.Controllers.Securities
                 entity.LicenseOwnerFatherName = data.LicenseOwnerFatherName;
                 entity.TransactionGuideName = data.TransactionGuideName;
                 entity.LicenseNumber = data.LicenseNumber;
-                entity.DocumentType = data.DocumentType;
-                entity.PropertySubType = data.PropertySubType;
-                entity.VehicleSubType = data.VehicleSubType;
-                entity.PropertySaleCount = data.PropertySaleCount;
-                entity.PropertySaleSerialStart = data.PropertySaleSerialStart;
-                entity.PropertySaleSerialEnd = data.PropertySaleSerialEnd;
-                entity.BayWafaCount = data.BayWafaCount;
-                entity.BayWafaSerialStart = data.BayWafaSerialStart;
-                entity.BayWafaSerialEnd = data.BayWafaSerialEnd;
-                entity.RentCount = data.RentCount;
-                entity.RentSerialStart = data.RentSerialStart;
-                entity.RentSerialEnd = data.RentSerialEnd;
-                entity.VehicleSaleCount = data.VehicleSaleCount;
-                entity.VehicleSaleSerialStart = data.VehicleSaleSerialStart;
-                entity.VehicleSaleSerialEnd = data.VehicleSaleSerialEnd;
-                entity.VehicleExchangeCount = data.VehicleExchangeCount;
-                entity.VehicleExchangeSerialStart = data.VehicleExchangeSerialStart;
-                entity.VehicleExchangeSerialEnd = data.VehicleExchangeSerialEnd;
-                entity.RegistrationBookType = data.RegistrationBookType;
-                entity.RegistrationBookCount = data.RegistrationBookCount;
-                entity.DuplicateBookCount = data.DuplicateBookCount;
                 entity.PricePerDocument = data.PricePerDocument;
                 entity.TotalDocumentsPrice = data.TotalDocumentsPrice;
-                entity.RegistrationBookPrice = data.RegistrationBookPrice;
                 entity.TotalSecuritiesPrice = data.TotalSecuritiesPrice;
                 entity.BankReceiptNumber = data.BankReceiptNumber;
                 entity.DeliveryDate = data.DeliveryDate;
@@ -348,13 +299,31 @@ namespace WebAPIBackend.Controllers.Securities
                 entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = userName;
 
+                // Update items - remove old ones and add new ones
+                _context.SecuritiesDistributionItems.RemoveRange(entity.Items);
+                entity.Items.Clear();
+
+                foreach (var itemData in data.Items)
+                {
+                    var item = new WebAPIBackend.Models.Securities.SecuritiesDistributionItem
+                    {
+                        DocumentType = itemData.DocumentType,
+                        SerialStart = itemData.SerialStart,
+                        SerialEnd = itemData.SerialEnd,
+                        Count = itemData.Count,
+                        Price = itemData.Price,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    entity.Items.Add(item);
+                }
+
                 await _context.SaveChangesAsync();
 
                 return Ok(new { id = entity.Id, message = "رکورد با موفقیت بروزرسانی شد" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "خطا در بروزرسانی اطلاعات", error = ex.Message });
+                return StatusCode(500, new { message = "خطا در بروزرسانی اطلاعات", error = ex.Message, innerError = ex.InnerException?.Message });
             }
         }
 
@@ -388,56 +357,52 @@ namespace WebAPIBackend.Controllers.Securities
         }
 
         /// <summary>
-        /// Validate conditional fields based on document type selection
+        /// Validate items collection
         /// </summary>
-        private (bool IsValid, string? ErrorMessage) ValidateConditionalFields(SecuritiesDistributionData data)
+        private (bool IsValid, string? ErrorMessage) ValidateItems(List<SecuritiesDistributionItemData> items)
         {
-            // If document type is Property (1)
-            if (data.DocumentType == 1)
+            if (items == null || items.Count == 0)
             {
-                if (!data.PropertySubType.HasValue)
+                return (false, "لطفاً حداقل یک سند اضافه کنید");
+            }
+
+            foreach (var item in items)
+            {
+                // Validate document type
+                if (item.DocumentType < 1 || item.DocumentType > 6)
                 {
-                    return (false, "لطفاً نوع سته جایداد را انتخاب کنید");
+                    return (false, "نوعیت سند نامعتبر است");
                 }
 
-                // Clear vehicle fields
-                data.VehicleSubType = null;
-                data.VehicleSaleCount = null;
-                data.VehicleSaleSerialStart = null;
-                data.VehicleSaleSerialEnd = null;
-                data.VehicleExchangeCount = null;
-                data.VehicleExchangeSerialStart = null;
-                data.VehicleExchangeSerialEnd = null;
-            }
-            // If document type is Vehicle (2)
-            else if (data.DocumentType == 2)
-            {
-                if (!data.VehicleSubType.HasValue)
+                // For types 1-4, serial numbers are required
+                if (item.DocumentType >= 1 && item.DocumentType <= 4)
                 {
-                    return (false, "لطفاً نوع سته وسایط نقلیه را انتخاب کنید");
+                    if (string.IsNullOrWhiteSpace(item.SerialStart) || string.IsNullOrWhiteSpace(item.SerialEnd))
+                    {
+                        return (false, "سریال نمبر آغاز و ختم برای این نوع سند الزامی است");
+                    }
+
+                    // Validate count calculation
+                    if (item.Count <= 0)
+                    {
+                        return (false, "تعداد باید بیشتر از صفر باشد");
+                    }
                 }
 
-                // Clear property fields
-                data.PropertySubType = null;
-                data.PropertySaleCount = null;
-                data.PropertySaleSerialStart = null;
-                data.PropertySaleSerialEnd = null;
-                data.BayWafaCount = null;
-                data.BayWafaSerialStart = null;
-                data.BayWafaSerialEnd = null;
-                data.RentCount = null;
-                data.RentSerialStart = null;
-                data.RentSerialEnd = null;
-            }
+                // For types 5-6, count is required
+                if (item.DocumentType == 5 || item.DocumentType == 6)
+                {
+                    if (item.Count <= 0)
+                    {
+                        return (false, "تعداد برای کتاب ثبت الزامی است");
+                    }
+                }
 
-            // Validate registration book type
-            if (data.RegistrationBookType == 1 && !data.RegistrationBookCount.HasValue)
-            {
-                return (false, "لطفاً تعداد کتاب ثبت را وارد کنید");
-            }
-            if (data.RegistrationBookType == 2 && !data.DuplicateBookCount.HasValue)
-            {
-                return (false, "لطفاً تعداد کتاب ثبت مثنی را وارد کنید");
+                // Validate price
+                if (item.Price < 0)
+                {
+                    return (false, "قیمت نمی‌تواند منفی باشد");
+                }
             }
 
             return (true, null);

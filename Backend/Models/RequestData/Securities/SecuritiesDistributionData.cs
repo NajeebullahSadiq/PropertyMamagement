@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using WebAPIBackend.Models.RequestData.Securities;
 
 namespace WebAPIBackend.Models.RequestData;
 
@@ -31,66 +33,8 @@ public class SecuritiesDistributionData
     [MaxLength(50, ErrorMessage = "نمبر جواز نباید بیشتر از ۵۰ حرف باشد")]
     public string LicenseNumber { get; set; } = string.Empty;
 
-    // Tab 2: مشخصات اسناد توزیعی
-    public int? DocumentType { get; set; }
-    public int? PropertySubType { get; set; }
-    public int? VehicleSubType { get; set; }
-
-    // Property Document Counts
-    [Range(0, int.MaxValue, ErrorMessage = "تعداد باید مثبت باشد")]
-    public int? PropertySaleCount { get; set; }
-
-    [MaxLength(100)]
-    public string? PropertySaleSerialStart { get; set; }
-
-    [MaxLength(100)]
-    public string? PropertySaleSerialEnd { get; set; }
-
-    [Range(0, int.MaxValue, ErrorMessage = "تعداد باید مثبت باشد")]
-    public int? BayWafaCount { get; set; }
-
-    [MaxLength(100)]
-    public string? BayWafaSerialStart { get; set; }
-
-    [MaxLength(100)]
-    public string? BayWafaSerialEnd { get; set; }
-
-    [Range(0, int.MaxValue, ErrorMessage = "تعداد باید مثبت باشد")]
-    public int? RentCount { get; set; }
-
-    [MaxLength(100)]
-    public string? RentSerialStart { get; set; }
-
-    [MaxLength(100)]
-    public string? RentSerialEnd { get; set; }
-
-    // Vehicle Document Counts
-    [Range(0, int.MaxValue, ErrorMessage = "تعداد باید مثبت باشد")]
-    public int? VehicleSaleCount { get; set; }
-
-    [MaxLength(100)]
-    public string? VehicleSaleSerialStart { get; set; }
-
-    [MaxLength(100)]
-    public string? VehicleSaleSerialEnd { get; set; }
-
-    [Range(0, int.MaxValue, ErrorMessage = "تعداد باید مثبت باشد")]
-    public int? VehicleExchangeCount { get; set; }
-
-    [MaxLength(100)]
-    public string? VehicleExchangeSerialStart { get; set; }
-
-    [MaxLength(100)]
-    public string? VehicleExchangeSerialEnd { get; set; }
-
-    // Registration Book
-    public int? RegistrationBookType { get; set; }
-
-    [Range(0, int.MaxValue, ErrorMessage = "تعداد باید مثبت باشد")]
-    public int? RegistrationBookCount { get; set; }
-
-    [Range(0, int.MaxValue, ErrorMessage = "تعداد باید مثبت باشد")]
-    public int? DuplicateBookCount { get; set; }
+    // Tab 2: مشخصات اسناد توزیعی - Now using Items collection
+    public List<SecuritiesDistributionItemData> Items { get; set; } = new List<SecuritiesDistributionItemData>();
 
     // Tab 3: قیمت اسناد بهادار
     [Range(0, double.MaxValue, ErrorMessage = "قیمت باید مثبت باشد")]
@@ -98,9 +42,6 @@ public class SecuritiesDistributionData
 
     [Range(0, double.MaxValue, ErrorMessage = "قیمت باید مثبت باشد")]
     public decimal? TotalDocumentsPrice { get; set; }
-
-    [Range(0, double.MaxValue, ErrorMessage = "قیمت باید مثبت باشد")]
-    public decimal? RegistrationBookPrice { get; set; }
 
     [Range(0, double.MaxValue, ErrorMessage = "قیمت باید مثبت باشد")]
     public decimal? TotalSecuritiesPrice { get; set; }

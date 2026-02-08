@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using WebAPIBackend.Models.Securities;
 
 namespace WebAPIBackend.Models;
 
@@ -46,146 +48,23 @@ public partial class SecuritiesDistribution
     [MaxLength(50)]
     public string LicenseNumber { get; set; } = string.Empty;
 
-    // Tab 2: مشخصات اسناد توزیعی
-    /// <summary>
-    /// نوعیت سته - Document Type (1=Property, 2=Vehicle)
-    /// </summary>
-    public int? DocumentType { get; set; }
-
-    /// <summary>
-    /// نوع فرعی سته جایداد - Property Sub Type (1=Sale, 2=BayWafa, 3=Rent, 4=All)
-    /// </summary>
-    public int? PropertySubType { get; set; }
-
-    /// <summary>
-    /// نوع فرعی سته وسایط - Vehicle Sub Type (1=Sale, 2=Exchange)
-    /// </summary>
-    public int? VehicleSubType { get; set; }
-
-    // Property Document Counts
-    /// <summary>
-    /// تعداد سته خرید و فروش جایداد
-    /// </summary>
-    public int? PropertySaleCount { get; set; }
-
-    /// <summary>
-    /// آغاز سریال نمبر سته خرید و فروش
-    /// </summary>
-    [MaxLength(100)]
-    public string? PropertySaleSerialStart { get; set; }
-
-    /// <summary>
-    /// ختم سریال نمبر خرید و فروش
-    /// </summary>
-    [MaxLength(100)]
-    public string? PropertySaleSerialEnd { get; set; }
-
-    /// <summary>
-    /// تعداد سته بیع وفا
-    /// </summary>
-    public int? BayWafaCount { get; set; }
-
-    /// <summary>
-    /// آغاز سریال نمبر سته بیع وفا
-    /// </summary>
-    [MaxLength(100)]
-    public string? BayWafaSerialStart { get; set; }
-
-    /// <summary>
-    /// ختم سریال نمبر بیع وفا
-    /// </summary>
-    [MaxLength(100)]
-    public string? BayWafaSerialEnd { get; set; }
-
-    /// <summary>
-    /// تعداد سته کرایی
-    /// </summary>
-    public int? RentCount { get; set; }
-
-    /// <summary>
-    /// آغاز سریال نمبر سته کرایی
-    /// </summary>
-    [MaxLength(100)]
-    public string? RentSerialStart { get; set; }
-
-    /// <summary>
-    /// ختم سریال نمبر کرایی
-    /// </summary>
-    [MaxLength(100)]
-    public string? RentSerialEnd { get; set; }
-
-    // Vehicle Document Counts
-    /// <summary>
-    /// تعداد سته خرید و فروش وسایط نقلیه
-    /// </summary>
-    public int? VehicleSaleCount { get; set; }
-
-    /// <summary>
-    /// آغاز سریال نمبر سته خرید و فروش وسایط
-    /// </summary>
-    [MaxLength(100)]
-    public string? VehicleSaleSerialStart { get; set; }
-
-    /// <summary>
-    /// ختم سریال نمبر خرید و فروش وسایط
-    /// </summary>
-    [MaxLength(100)]
-    public string? VehicleSaleSerialEnd { get; set; }
-
-    /// <summary>
-    /// تعداد سته تبادله
-    /// </summary>
-    public int? VehicleExchangeCount { get; set; }
-
-    /// <summary>
-    /// آغاز سریال نمبر سته تبادله وسایط
-    /// </summary>
-    [MaxLength(100)]
-    public string? VehicleExchangeSerialStart { get; set; }
-
-    /// <summary>
-    /// ختم سریال نمبر تبادله وسایط
-    /// </summary>
-    [MaxLength(100)]
-    public string? VehicleExchangeSerialEnd { get; set; }
-
-    // Registration Book
-    /// <summary>
-    /// نوع کتاب ثبت (1=کتاب ثبت, 2=کتاب ثبت مثنی)
-    /// </summary>
-    public int? RegistrationBookType { get; set; }
-
-    /// <summary>
-    /// تعداد کتاب ثبت
-    /// </summary>
-    public int? RegistrationBookCount { get; set; }
-
-    /// <summary>
-    /// تعداد کتاب ثبت مثنی
-    /// </summary>
-    public int? DuplicateBookCount { get; set; }
+    // Tab 2: مشخصات اسناد توزیعی - Now handled by Items collection
 
     // Tab 3: قیمت اسناد بهادار
     /// <summary>
-    /// قیمت فی جلد سته
+    /// قیمت فی جلد سته (for reference - 4000 Afs)
     /// </summary>
     [Range(0, double.MaxValue)]
     public decimal? PricePerDocument { get; set; }
 
     /// <summary>
-    /// قیمت مجموعی سته‌ها
+    /// قیمت مجموعی سته‌ها (calculated from items)
     /// </summary>
     [Range(0, double.MaxValue)]
     public decimal? TotalDocumentsPrice { get; set; }
 
     /// <summary>
-    /// قیمت کتاب ثبت / کتاب ثبت مثنی
-    /// </summary>
-    [Range(0, double.MaxValue)]
-    public decimal? RegistrationBookPrice { get; set; }
-
-    /// <summary>
-    /// قیمت مجموعی اسناد بهادار
+    /// قیمت مجموعی اسناد بهادار (total of all items)
     /// </summary>
     [Range(0, double.MaxValue)]
     public decimal? TotalSecuritiesPrice { get; set; }
@@ -213,4 +92,10 @@ public partial class SecuritiesDistribution
     public DateTime? UpdatedAt { get; set; }
     public string? UpdatedBy { get; set; }
     public bool? Status { get; set; }
+
+    // Navigation Properties
+    /// <summary>
+    /// Collection of document items (سټه ها و کتاب های ثبت)
+    /// </summary>
+    public virtual ICollection<SecuritiesDistributionItem> Items { get; set; } = new List<SecuritiesDistributionItem>();
 }

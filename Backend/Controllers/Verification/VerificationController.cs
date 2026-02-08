@@ -43,6 +43,12 @@ namespace WebAPIBackend.Controllers.Verification
                 return StatusCode(500, new { error = result.ErrorMessage });
             }
 
+            // Log the result for debugging
+            Console.WriteLine($"[VerificationController] Generated verification:");
+            Console.WriteLine($"  Code: {result.VerificationCode}");
+            Console.WriteLine($"  URL: {result.VerificationUrl}");
+            Console.WriteLine($"  IsNew: {result.IsNew}");
+
             return Ok(new
             {
                 verificationCode = result.VerificationCode,
@@ -64,8 +70,12 @@ namespace WebAPIBackend.Controllers.Verification
                 return BadRequest(new { error = "Verification code is required" });
             }
 
+            Console.WriteLine($"[VerificationController] Verifying code: {code}");
+
             var ipAddress = GetClientIpAddress();
             var result = await _verificationService.VerifyDocumentAsync(code, ipAddress);
+
+            Console.WriteLine($"[VerificationController] Verification result: IsValid={result.IsValid}, Status={result.Status}");
 
             return Ok(result);
         }

@@ -98,7 +98,7 @@
                                 <select id="witnessSide" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" formControlName="witnessSide">
                                     <option value="">انتخاب کنید</option>
                                     <option value="Buyer" [disabled]="isWitnessSideDisabled('Buyer')">مشتری</option>
-                                    <option value="Seller" [disabled]="isWitnessSideDisabled('Seller')">فروشنده</option>
+                                    <option value="Seller" [disabled]="isWitnessSideDisabled('Seller')">بایع</option>
                                 </select>
                             </div>
                             <div *ngIf="witnessSide?.invalid && (witnessSide?.dirty || witnessSide?.touched)">
@@ -181,7 +181,7 @@
                         <td (click)="BindValu(w.id)" class="px-4 py-3 text-sm">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
                                   [ngClass]="w.witnessSide === 'Buyer' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'">
-                                {{ w.witnessSide === 'Buyer' ? 'مشتری' : w.witnessSide === 'Seller' ? 'فروشنده' : '-' }}
+                                {{ w.witnessSide === 'Buyer' ? 'مشتری' : w.witnessSide === 'Seller' ? 'بایع' : '-' }}
                             </span>
                         </td>
                         <td class="px-4 py-3">

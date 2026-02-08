@@ -77,17 +77,21 @@ namespace WebAPIBackend.Controllers.Companies
                     );
                 }
 
-                var result = await query.Select(p => new
-                {
-                    p.Id,
-                    p.Title,
-                    ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
-                    ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                    ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                    licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                    granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
-                    isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
-                }).ToListAsync();
+                // Order by CreatedAt descending - most recent first
+                var result = await query
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Title,
+                        ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
+                        ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
+                        ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
+                        licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
+                        granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
+                        isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
+                    })
+                    .ToListAsync();
 
                 return Ok(result);
             }
@@ -130,17 +134,21 @@ namespace WebAPIBackend.Controllers.Companies
                     .AsQueryable();
                 query = _provinceFilter.ApplyProvinceFilter(query);
 
-                var result = await query.Select(p => new
-                {
-                    p.Id,
-                    p.Title,
-                    ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
-                    ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                    ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                    licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                    granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
-                    isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
-                }).ToListAsync();
+                // Order by CreatedAt descending - most recent first
+                var result = await query
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Title,
+                        ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
+                        ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
+                        ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
+                        licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
+                        granator = (p.Guarantors != null && p.Guarantors.Any()) ? p.Guarantors.First().FirstName + " " + "?????" + " " + p.Guarantors.First().FatherName : null,
+                        isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
+                    })
+                    .ToListAsync();
 
                 return Ok(result);
             }
@@ -533,7 +541,7 @@ namespace WebAPIBackend.Controllers.Companies
         /// Search for company by license number and province
         /// </summary>
         [HttpGet("searchByLicense")]
-        [Authorize(Roles = UserRoles.Admin)]
+        [Authorize]
         public async Task<IActionResult> SearchCompanyByLicense([FromQuery] string licenseNumber, [FromQuery] int? provinceId)
         {
             try
@@ -545,6 +553,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var query = _context.LicenseDetails
                     .Include(l => l.Company)
+                        .ThenInclude(c => c.CompanyOwners)
                     .Include(l => l.Province)
                     .Where(l => l.LicenseNumber == licenseNumber);
 
@@ -558,6 +567,13 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         CompanyId = l.CompanyId,
                         CompanyTitle = l.Company != null ? l.Company.Title : null,
+                        CompanyName = l.Company != null ? l.Company.Title : null,
+                        OwnerName = l.Company != null && l.Company.CompanyOwners.Any() 
+                            ? l.Company.CompanyOwners.FirstOrDefault()!.FirstName 
+                            : null,
+                        OwnerFatherName = l.Company != null && l.Company.CompanyOwners.Any() 
+                            ? l.Company.CompanyOwners.FirstOrDefault()!.FatherName 
+                            : null,
                         LicenseNumber = l.LicenseNumber,
                         LicenseType = l.LicenseType,
                         ProvinceId = l.ProvinceId,

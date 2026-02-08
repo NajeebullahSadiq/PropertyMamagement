@@ -16,7 +16,6 @@ namespace WebAPIBackend.Models.LicenseApplication
         public int Id { get; set; }
 
         // Tab 1: مشخصات درخواست متقاضی
-        [Required]
         public DateOnly? RequestDate { get; set; }
 
         [Required]

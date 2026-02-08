@@ -12,9 +12,12 @@ namespace DataMigration
     {
         // Get connection string from environment variable or use default
         // Use 127.0.0.1 instead of localhost to force TCP connection (avoids peer authentication)
-        private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
-            ?? "Host=127.0.0.1;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024";
-        
+         // Connection strings for different environments
+        private static readonly Dictionary<string, string> ConnectionStrings = new Dictionary<string, string>
+        {
+            ["development"] = "Host=127.0.0.1;Port=5432;Database=PRMIS;Username=postgres;Password=Khan@223344",
+            ["production"] = "Host=localhost;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024;Pooling=true;MaxPoolSize=20"
+        };        
         private static MigrationStats stats = new MigrationStats();
         
         static async Task Main(string[] args)
@@ -23,6 +26,28 @@ namespace DataMigration
             Console.WriteLine("Data Migration Tool - Access to PostgreSQL");
             Console.WriteLine("=================================================================\n");
             
+            // Check which migration to run
+            if (args.Length > 0 && args[0].ToLower() == "securities")
+            {
+                // Run Securities Migration Only
+                await SecuritiesMigration.RunSecuritiesMigration();
+                return;
+            }
+            else if (args.Length > 0 && args[0].ToLower() == "all")
+            {
+                // Run Both Migrations
+                Console.WriteLine("Running BOTH Company and Securities migrations...\n");
+                await RunCompanyMigration();
+                await SecuritiesMigration.RunSecuritiesMigration();
+                return;
+            }
+            
+            // Default: Run Company Migration Only
+            await RunCompanyMigration();
+        }
+        
+        static async Task RunCompanyMigration()
+        {
             try
             {
                 // Read JSON file
@@ -118,6 +143,10 @@ namespace DataMigration
                         // Use ProvinceId = 1 for all records
                         int kabulProvinceId = 1;
                         
+                        // ============================================================
+                        // PART 1: COMPANY MODULE (Already Issued Licenses)
+                        // ============================================================
+                        
                         // 1. Insert CompanyDetails (registered in Kabul)
                         int companyId = await InsertCompanyDetails(record, kabulProvinceId, conn, transaction);
                         stats.CompaniesCreated++;
@@ -141,6 +170,17 @@ namespace DataMigration
                         {
                             await InsertCancellationInfo(record, companyId, conn, transaction);
                             stats.CancellationsCreated++;
+                        }
+                        
+                        // ============================================================
+                        // PART 2: LICENSE APPLICATIONS MODULE (Historical Applications)
+                        // ============================================================
+                        
+                        // 5. Insert LicenseApplication (as approved application)
+                        if (record.LicenseNo.HasValue)
+                        {
+                            await InsertLicenseApplication(record, conn, transaction);
+                            stats.ApplicationsCreated++;
                         }
                         
                         await transaction.CommitAsync();
@@ -318,6 +358,68 @@ namespace DataMigration
             }
         }
         
+        static async Task InsertLicenseApplication(OldRecord record,
+            NpgsqlConnection conn, NpgsqlTransaction transaction)
+        {
+            string query = @"
+                INSERT INTO org.""LicenseApplications"" 
+                (""RequestDate"", ""RequestSerialNumber"", ""ApplicantName"", ""ProposedGuideName"",
+                 ""PermanentProvinceId"", ""PermanentDistrictId"", ""PermanentVillage"",
+                 ""CurrentProvinceId"", ""CurrentDistrictId"", ""CurrentVillage"",
+                 ""Status"", ""IsWithdrawn"", ""CreatedAt"", ""CreatedBy"")
+                VALUES (@requestdate, @requestserialnumber, @applicantname, @proposedguidename,
+                        @permanentprovinceid, @permanentdistrictid, @permanentvillage,
+                        @currentprovinceid, @currentdistrictid, @currentvillage,
+                        @status, @iswithdrawn, @createdat, @createdby)";
+            
+            using (var cmd = new NpgsqlCommand(query, conn, transaction))
+            {
+                // Request date = License issue date
+                object requestDate = CreateDateObject(record.SYear, record.SMonth, record.SDay);
+                cmd.Parameters.AddWithValue("requestdate", requestDate);
+                
+                // Request serial number = License number (formatted)
+                string formattedSerialNumber = $"KBL-{record.LicenseNo.ToString().PadLeft(5, '0')}";
+                cmd.Parameters.AddWithValue("requestserialnumber", formattedSerialNumber);
+                
+                // Applicant name = Full name (FirstName FatherName GrandFatherName)
+                string applicantName = $"{record.FName} {record.FathName}";
+                if (!string.IsNullOrWhiteSpace(record.GFName))
+                    applicantName += $" {record.GFName}";
+                cmd.Parameters.AddWithValue("applicantname", applicantName.Trim());
+                
+                // Proposed guide name = Company/Office name
+                string proposedName = string.IsNullOrWhiteSpace(record.RealEstateName) 
+                    ? $"رهنما شماره {record.RID}" 
+                    : record.RealEstateName;
+                cmd.Parameters.AddWithValue("proposedguidename", proposedName);
+                
+                // Permanent address (owner's home address)
+                int? permProvinceId = await GetOrCreateProvinceId(record.PerProvince, conn, transaction);
+                int? permDistrictId = await GetOrCreateDistrictId(record.PerWoloswaly, permProvinceId, conn, transaction);
+                cmd.Parameters.AddWithValue("permanentprovinceid", permProvinceId ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("permanentdistrictid", permDistrictId ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("permanentvillage", record.ExactAddress ?? (object)DBNull.Value);
+                
+                // Current address (owner's current address)
+                int? currProvinceId = await GetOrCreateProvinceId(record.TempProvince, conn, transaction);
+                int? currDistrictId = await GetOrCreateDistrictId(record.TempWoloswaly, currProvinceId, conn, transaction);
+                cmd.Parameters.AddWithValue("currentprovinceid", currProvinceId ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("currentdistrictid", currDistrictId ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("currentvillage", record.ExactAddress ?? (object)DBNull.Value);
+                
+                // Status and withdrawal
+                cmd.Parameters.AddWithValue("status", true); // All historical applications were approved
+                cmd.Parameters.AddWithValue("iswithdrawn", !string.IsNullOrWhiteSpace(record.LicnsCancelNo));
+                
+                // Audit fields
+                cmd.Parameters.AddWithValue("createdat", DateTime.Now);
+                cmd.Parameters.AddWithValue("createdby", "MIGRATION_SCRIPT");
+                
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+        
         // Helper methods
         static object ParseDate(string? dateString)
         {
@@ -455,12 +557,16 @@ namespace DataMigration
             Console.WriteLine("MIGRATION COMPLETED");
             Console.WriteLine(new string('=', 80));
             Console.WriteLine($"Total records processed: {stats.TotalRecords}");
-            Console.WriteLine($"Companies created: {stats.CompaniesCreated}");
-            Console.WriteLine($"Owners created: {stats.OwnersCreated}");
-            Console.WriteLine($"Licenses created: {stats.LicensesCreated}");
-            Console.WriteLine($"Cancellations created: {stats.CancellationsCreated}");
-            Console.WriteLine($"Records skipped: {stats.Skipped.Count}");
-            Console.WriteLine($"Errors encountered: {stats.Errors.Count}");
+            Console.WriteLine($"\nCOMPANY MODULE:");
+            Console.WriteLine($"  Companies created: {stats.CompaniesCreated}");
+            Console.WriteLine($"  Owners created: {stats.OwnersCreated}");
+            Console.WriteLine($"  Licenses created: {stats.LicensesCreated}");
+            Console.WriteLine($"  Cancellations created: {stats.CancellationsCreated}");
+            Console.WriteLine($"\nLICENSE APPLICATIONS MODULE:");
+            Console.WriteLine($"  Applications created: {stats.ApplicationsCreated}");
+            Console.WriteLine($"\nOTHER:");
+            Console.WriteLine($"  Records skipped: {stats.Skipped.Count}");
+            Console.WriteLine($"  Errors encountered: {stats.Errors.Count}");
             
             if (stats.Errors.Count > 0)
             {

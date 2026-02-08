@@ -6,7 +6,7 @@
     </div>
     <div class="header-title">
       <h1>جمهوری اسلامی افغانستان</h1>
-      <h2>وزارت مخابرات و تکنالوژی معلوماتی</h2>
+      <h2>وزارت عدلیه</h2>
       <h3>اسناد بهادار رهنمای معاملات</h3>
     </div>
     <div class="header-info">
@@ -42,68 +42,21 @@
   <div class="print-section">
     <h4 class="section-title">مشخصات اسناد توزیعی</h4>
     <table class="info-table">
-      <tr>
-        <td class="label">نوعیت سته:</td>
-        <td class="value" colspan="3">{{ getDocumentTypeName(item.documentType) }}</td>
-      </tr>
-      
-      <!-- Property Documents -->
-      <tr *ngIf="item.documentType === 1">
-        <td class="label">نوع سته جایداد:</td>
-        <td class="value" colspan="3">{{ getPropertySubTypeName(item.propertySubType) }}</td>
-      </tr>
-      
-      <tr *ngIf="item.propertySaleCount || item.propertySaleSerialStart || item.propertySaleSerialEnd">
-        <td class="label">سته خرید و فروش جایداد:</td>
-        <td class="value">تعداد: {{ item.propertySaleCount || '-' }}</td>
-        <td class="label">سریال نمبر:</td>
-        <td class="value">{{ item.propertySaleSerialStart || '-' }} الی {{ item.propertySaleSerialEnd || '-' }}</td>
-      </tr>
-      
-      <tr *ngIf="item.bayWafaCount || item.bayWafaSerialStart || item.bayWafaSerialEnd">
-        <td class="label">سته بیع وفا:</td>
-        <td class="value">تعداد: {{ item.bayWafaCount || '-' }}</td>
-        <td class="label">سریال نمبر:</td>
-        <td class="value">{{ item.bayWafaSerialStart || '-' }} الی {{ item.bayWafaSerialEnd || '-' }}</td>
-      </tr>
-      
-      <tr *ngIf="item.rentCount || item.rentSerialStart || item.rentSerialEnd">
-        <td class="label">سته کرایی:</td>
-        <td class="value">تعداد: {{ item.rentCount || '-' }}</td>
-        <td class="label">سریال نمبر:</td>
-        <td class="value">{{ item.rentSerialStart || '-' }} الی {{ item.rentSerialEnd || '-' }}</td>
-      </tr>
-      
-      <!-- Vehicle Documents -->
-      <tr *ngIf="item.documentType === 2">
-        <td class="label">نوع سته وسایط:</td>
-        <td class="value" colspan="3">{{ getVehicleSubTypeName(item.vehicleSubType) }}</td>
-      </tr>
-      
-      <tr *ngIf="item.vehicleSaleCount || item.vehicleSaleSerialStart || item.vehicleSaleSerialEnd">
-        <td class="label">سته خرید و فروش وسایط:</td>
-        <td class="value">تعداد: {{ item.vehicleSaleCount || '-' }}</td>
-        <td class="label">سریال نمبر:</td>
-        <td class="value">{{ item.vehicleSaleSerialStart || '-' }} الی {{ item.vehicleSaleSerialEnd || '-' }}</td>
-      </tr>
-      
-      <tr *ngIf="item.vehicleExchangeCount || item.vehicleExchangeSerialStart || item.vehicleExchangeSerialEnd">
-        <td class="label">سته تبادله وسایط:</td>
-        <td class="value">تعداد: {{ item.vehicleExchangeCount || '-' }}</td>
-        <td class="label">سریال نمبر:</td>
-        <td class="value">{{ item.vehicleExchangeSerialStart || '-' }} الی {{ item.vehicleExchangeSerialEnd || '-' }}</td>
-      </tr>
-      
-      <!-- Registration Book -->
-      <tr *ngIf="item.registrationBookType">
-        <td class="label">کتاب ثبت:</td>
-        <td class="value">{{ getRegistrationBookTypeName(item.registrationBookType) }}</td>
-        <td class="label">تعداد:</td>
-        <td class="value">{{ item.registrationBookCount || item.duplicateBookCount || '-' }}</td>
-      </tr>
+      <ng-container *ngFor="let docItem of item.items">
+        <tr>
+          <td class="label">نوعیت اسناد:</td>
+          <td class="value">{{ getDocumentTypeName(docItem.documentType) }}</td>
+          <td class="label">تعداد:</td>
+          <td class="value">{{ docItem.count || '-' }}</td>
+        </tr>
+        <tr *ngIf="docItem.serialStart && docItem.serialEnd">
+          <td class="label">سریال نمبر:</td>
+          <td class="value" colspan="3">{{ docItem.serialStart }} الی {{ docItem.serialEnd }}</td>
+        </tr>
+      </ng-container>
       
       <tr>
-        <td class="label">مجموع سته‌ها:</td>
+        <td class="label">مجموع اسناد:</td>
         <td class="value total" colspan="3">{{ getTotalDocumentCount() }} جلد</td>
       </tr>
     </table>
@@ -113,17 +66,17 @@
   <div class="print-section">
     <h4 class="section-title">قیمت اسناد بهادار</h4>
     <table class="info-table">
+      <ng-container *ngFor="let docItem of item.items">
+        <tr>
+          <td class="label">{{ getDocumentTypeName(docItem.documentType) }}:</td>
+          <td class="value">{{ docItem.count }} × {{ getPricePerUnit(docItem.documentType) | number }} افغانی</td>
+          <td class="label">مجموع:</td>
+          <td class="value">{{ docItem.price | number }} افغانی</td>
+        </tr>
+      </ng-container>
       <tr>
-        <td class="label">قیمت فی جلد سته:</td>
-        <td class="value">{{ item.pricePerDocument | number }} افغانی</td>
-        <td class="label">قیمت مجموعی سته‌ها:</td>
-        <td class="value">{{ item.totalDocumentsPrice | number }} افغانی</td>
-      </tr>
-      <tr>
-        <td class="label">قیمت کتاب ثبت:</td>
-        <td class="value">{{ item.registrationBookPrice | number }} افغانی</td>
-        <td class="label">قیمت مجموعی اسناد:</td>
-        <td class="value total">{{ item.totalSecuritiesPrice | number }} افغانی</td>
+        <td class="label" colspan="2">قیمت مجموعی اسناد:</td>
+        <td class="value total" colspan="2">{{ getTotalPrice() | number }} افغانی</td>
       </tr>
     </table>
   </div>

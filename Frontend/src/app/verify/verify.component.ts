@@ -191,24 +191,40 @@ export class VerifyComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Extract verification code if a full URL was entered
+    const extractedCode = this.extractVerificationCode(this.verificationCode.trim());
+    const codeToVerify = extractedCode || this.verificationCode.trim();
+
+    console.log('[Verify] Original input:', this.verificationCode);
+    console.log('[Verify] Code to verify:', codeToVerify);
+
     this.isLoading = true;
     this.error = null;
     this.result = null;
     this.hasSearched = true;
 
-    this.verificationService.verifyDocument(this.verificationCode.trim()).subscribe({
+    this.verificationService.verifyDocument(codeToVerify).subscribe({
       next: (response) => {
+        console.log('[Verify] Verification response:', response);
         this.result = response;
         this.isLoading = false;
         
         // Update URL with the code for sharing
         if (!this.route.snapshot.paramMap.get('code')) {
-          this.router.navigate(['/verify', this.verificationCode], { replaceUrl: true });
+          this.router.navigate(['/verify', codeToVerify], { replaceUrl: true });
         }
       },
       error: (err) => {
         console.error('Verification error:', err);
-        this.error = 'خطا در تصدیق سند. لطفاً دوباره تلاش کنید.';
+        console.error('Error details:', err?.error);
+        
+        if (err.status === 404) {
+          this.error = 'کود تصدیق یافت نشد. لطفاً کود را بررسی کنید.';
+        } else if (err.status === 400) {
+          this.error = 'کود تصدیق نامعتبر است.';
+        } else {
+          this.error = 'خطا در تصدیق سند. لطفاً دوباره تلاش کنید.';
+        }
         this.isLoading = false;
       }
     });
@@ -269,7 +285,34 @@ export class VerifyComponent implements OnInit, OnDestroy {
 
   getPhotoUrl(): string {
     if (this.result?.holderPhoto) {
+      // Use the same logic as print components for photo URLs
+      if (this.result.holderPhoto.startsWith('Resources/') || this.result.holderPhoto.startsWith('/Resources/')) {
+        const cleanPath = this.result.holderPhoto.startsWith('/') ? this.result.holderPhoto.substring(1) : this.result.holderPhoto;
+        return `${this.baseUrl}${cleanPath}`;
+      }
       return this.baseUrl + this.result.holderPhoto;
+    }
+    return 'assets/img/avatar2.png';
+  }
+
+  getSellerPhotoUrl(): string {
+    if (this.result?.sellerInfo?.photo) {
+      if (this.result.sellerInfo.photo.startsWith('Resources/') || this.result.sellerInfo.photo.startsWith('/Resources/')) {
+        const cleanPath = this.result.sellerInfo.photo.startsWith('/') ? this.result.sellerInfo.photo.substring(1) : this.result.sellerInfo.photo;
+        return `${this.baseUrl}${cleanPath}`;
+      }
+      return this.baseUrl + this.result.sellerInfo.photo;
+    }
+    return 'assets/img/avatar2.png';
+  }
+
+  getBuyerPhotoUrl(): string {
+    if (this.result?.buyerInfo?.photo) {
+      if (this.result.buyerInfo.photo.startsWith('Resources/') || this.result.buyerInfo.photo.startsWith('/Resources/')) {
+        const cleanPath = this.result.buyerInfo.photo.startsWith('/') ? this.result.buyerInfo.photo.substring(1) : this.result.buyerInfo.photo;
+        return `${this.baseUrl}${cleanPath}`;
+      }
+      return this.baseUrl + this.result.buyerInfo.photo;
     }
     return 'assets/img/avatar2.png';
   }

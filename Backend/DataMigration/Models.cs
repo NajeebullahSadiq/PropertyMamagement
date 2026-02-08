@@ -11,55 +11,55 @@ namespace DataMigration
         public int RID { get; set; }
         
         [JsonPropertyName("Education")]
-        public string? Education { get; set; }
+        public string Education { get; set; }
         
         [JsonPropertyName("LicenseNo")]
         public int? LicenseNo { get; set; }
         
         [JsonPropertyName("FName")]
-        public string? FName { get; set; }
+        public string FName { get; set; }
         
         [JsonPropertyName("FathName")]
-        public string? FathName { get; set; }
+        public string FathName { get; set; }
         
         [JsonPropertyName("GFName")]
-        public string? GFName { get; set; }
+        public string GFName { get; set; }
         
         [JsonPropertyName("DOB")]
-        public string? DOB { get; set; }
+        public string DOB { get; set; }
         
         [JsonPropertyName("TazkeraNo")]
-        public string? TazkeraNo { get; set; }
+        public string TazkeraNo { get; set; }
         
         [JsonPropertyName("Page")]
-        public string? Page { get; set; }
+        public string Page { get; set; }
         
         [JsonPropertyName("Jold")]
-        public string? Jold { get; set; }
+        public string Jold { get; set; }
         
         [JsonPropertyName("ContactNo")]
-        public string? ContactNo { get; set; }
+        public string ContactNo { get; set; }
         
         [JsonPropertyName("EmailID")]
-        public string? EmailID { get; set; }
+        public string EmailID { get; set; }
         
         [JsonPropertyName("PerProvince")]
-        public string? PerProvince { get; set; }
+        public string PerProvince { get; set; }
         
         [JsonPropertyName("PerWoloswaly")]
-        public string? PerWoloswaly { get; set; }
+        public string PerWoloswaly { get; set; }
         
         [JsonPropertyName("TempProvince")]
-        public string? TempProvince { get; set; }
+        public string TempProvince { get; set; }
         
         [JsonPropertyName("TempWoloswaly")]
-        public string? TempWoloswaly { get; set; }
+        public string TempWoloswaly { get; set; }
         
         [JsonPropertyName("ExactAddress")]
-        public string? ExactAddress { get; set; }
+        public string ExactAddress { get; set; }
         
         [JsonPropertyName("DistLocation")]
-        public string? DistLocation { get; set; }
+        public string DistLocation { get; set; }
         
         [JsonPropertyName("SYear")]
         public double? SYear { get; set; }
@@ -80,13 +80,13 @@ namespace DataMigration
         public double? EDay { get; set; }
         
         [JsonPropertyName("RealEstateName")]
-        public string? RealEstateName { get; set; }
+        public string RealEstateName { get; set; }
         
         [JsonPropertyName("LicenseType")]
-        public string? LicenseType { get; set; }
+        public string LicenseType { get; set; }
         
         [JsonPropertyName("CreditRightNo")]
-        public string? CreditRightNo { get; set; }
+        public string CreditRightNo { get; set; }
         
         [JsonPropertyName("CreditRightAmount")]
         public double? CreditRightAmount { get; set; }
@@ -107,7 +107,7 @@ namespace DataMigration
         public double? CreditRightDay { get; set; }
         
         [JsonPropertyName("TIN")]
-        public string? TIN { get; set; }
+        public string TIN { get; set; }
         
         [JsonPropertyName("HRNo")]
         public double? HRNo { get; set; }
@@ -122,16 +122,16 @@ namespace DataMigration
         public double? HRDay { get; set; }
         
         [JsonPropertyName("Halat")]
-        public string? Halat { get; set; }
+        public string Halat { get; set; }
         
         [JsonPropertyName("FK")]
         public int FK { get; set; }
         
         [JsonPropertyName("LicnsCancelNo")]
-        public string? LicnsCancelNo { get; set; }
+        public string LicnsCancelNo { get; set; }
         
         [JsonPropertyName("CancelAmount")]
-        public string? CancelAmount { get; set; }
+        public string CancelAmount { get; set; }
         
         [JsonPropertyName("CancelYear")]
         public double? CancelYear { get; set; }
@@ -143,7 +143,7 @@ namespace DataMigration
         public double? CancelDay { get; set; }
         
         [JsonPropertyName("Remarks")]
-        public string? Remarks { get; set; }
+        public string Remarks { get; set; }
         
         [JsonPropertyName("SearchFor")]
         public double? SearchFor { get; set; }
@@ -162,6 +162,7 @@ namespace DataMigration
         public int OwnersCreated { get; set; }
         public int LicensesCreated { get; set; }
         public int CancellationsCreated { get; set; }
+        public int ApplicationsCreated { get; set; }
         public List<MigrationError> Errors { get; set; } = new List<MigrationError>();
         public List<SkippedRecord> Skipped { get; set; } = new List<SkippedRecord>();
     }

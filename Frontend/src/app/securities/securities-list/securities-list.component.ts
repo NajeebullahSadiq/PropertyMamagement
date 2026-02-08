@@ -139,12 +139,7 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
     }
 
     getTotalDocumentCount(item: SecuritiesDistribution): number {
-        let total = 0;
-        if (item.propertySaleCount) total += item.propertySaleCount;
-        if (item.bayWafaCount) total += item.bayWafaCount;
-        if (item.rentCount) total += item.rentCount;
-        if (item.vehicleSaleCount) total += item.vehicleSaleCount;
-        if (item.vehicleExchangeCount) total += item.vehicleExchangeCount;
-        return total;
+        if (!item || !item.items) return 0;
+        return item.items.reduce((sum, docItem) => sum + docItem.count, 0);
     }
 }

@@ -143,7 +143,7 @@ namespace WebAPIBackend.Configuration
                         COALESCE(co.""PhoneNumber"", u.""PhoneNumber"") AS ""PhoneNumber""
                     FROM public.""AspNetUsers"" u
                     LEFT JOIN org.""CompanyDetails"" c ON u.""CompanyId"" = c.""Id""
-                    LEFT JOIN org.""CompanyOwners"" co ON c.""Id"" = co.""CompanyId"";
+                    LEFT JOIN org.""CompanyOwner"" co ON c.""Id"" = co.""CompanyId"";
                 ");
             }
             catch (Exception) { /* View may already exist */ }
@@ -164,7 +164,7 @@ namespace WebAPIBackend.Configuration
                         co.""FatherName"",
                         co.""GrandFatherName"",
                         co.""DateofBirth"",
-                        co.""IndentityCardNumber"",
+                        co.""ElectronicNationalIdNumber"",
                         co.""PothoPath"" AS ""OwnerPhoto"",
                         ld.""LicenseNumber"",
                         ld.""OfficeAddress"",

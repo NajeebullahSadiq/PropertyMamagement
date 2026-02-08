@@ -65,36 +65,37 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     .Include(x => x.PermanentDistrict)
                     .Include(x => x.CurrentProvince)
                     .Include(x => x.CurrentDistrict)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.RequestDate,
-                        RequestDateFormatted = x.RequestDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.RequestDate, calendar)
-                            : "",
-                        x.RequestSerialNumber,
-                        x.ApplicantName,
-                        x.ProposedGuideName,
-                        x.PermanentProvinceId,
-                        PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
-                        x.PermanentDistrictId,
-                        PermanentDistrictName = x.PermanentDistrict != null ? x.PermanentDistrict.Dari : "",
-                        x.PermanentVillage,
-                        x.CurrentProvinceId,
-                        CurrentProvinceName = x.CurrentProvince != null ? x.CurrentProvince.Dari : "",
-                        x.CurrentDistrictId,
-                        CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
-                        x.CurrentVillage,
-                        x.IsWithdrawn,
-                        x.Status,
-                        x.CreatedAt,
-                        x.CreatedBy
-                    })
                     .ToListAsync();
+
+                var result = items.Select(x => new
+                {
+                    x.Id,
+                    x.RequestDate,
+                    RequestDateFormatted = x.RequestDate.HasValue
+                        ? DateConversionHelper.FormatDateOnly(x.RequestDate, calendar)
+                        : "",
+                    x.RequestSerialNumber,
+                    x.ApplicantName,
+                    x.ProposedGuideName,
+                    x.PermanentProvinceId,
+                    PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
+                    x.PermanentDistrictId,
+                    PermanentDistrictName = x.PermanentDistrict != null ? x.PermanentDistrict.Dari : "",
+                    x.PermanentVillage,
+                    x.CurrentProvinceId,
+                    CurrentProvinceName = x.CurrentProvince != null ? x.CurrentProvince.Dari : "",
+                    x.CurrentDistrictId,
+                    CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
+                    x.CurrentVillage,
+                    x.IsWithdrawn,
+                    x.Status,
+                    x.CreatedAt,
+                    x.CreatedBy
+                }).ToList();
 
                 return Ok(new
                 {
-                    items,
+                    items = result,
                     totalCount,
                     page,
                     pageSize
@@ -116,43 +117,44 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-                var item = await _context.LicenseApplications
+                var entity = await _context.LicenseApplications
                     .Include(x => x.PermanentProvince)
                     .Include(x => x.PermanentDistrict)
                     .Include(x => x.CurrentProvince)
                     .Include(x => x.CurrentDistrict)
                     .Where(x => x.Id == id && x.Status == true)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.RequestDate,
-                        RequestDateFormatted = x.RequestDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.RequestDate, calendar)
-                            : "",
-                        x.RequestSerialNumber,
-                        x.ApplicantName,
-                        x.ProposedGuideName,
-                        x.PermanentProvinceId,
-                        PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
-                        x.PermanentDistrictId,
-                        PermanentDistrictName = x.PermanentDistrict != null ? x.PermanentDistrict.Dari : "",
-                        x.PermanentVillage,
-                        x.CurrentProvinceId,
-                        CurrentProvinceName = x.CurrentProvince != null ? x.CurrentProvince.Dari : "",
-                        x.CurrentDistrictId,
-                        CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
-                        x.CurrentVillage,
-                        x.IsWithdrawn,
-                        x.Status,
-                        x.CreatedAt,
-                        x.CreatedBy
-                    })
                     .FirstOrDefaultAsync();
 
-                if (item == null)
+                if (entity == null)
                 {
                     return NotFound("درخواست یافت نشد");
                 }
+
+                var item = new
+                {
+                    entity.Id,
+                    entity.RequestDate,
+                    RequestDateFormatted = entity.RequestDate.HasValue
+                        ? DateConversionHelper.FormatDateOnly(entity.RequestDate, calendar)
+                        : "",
+                    entity.RequestSerialNumber,
+                    entity.ApplicantName,
+                    entity.ProposedGuideName,
+                    entity.PermanentProvinceId,
+                    PermanentProvinceName = entity.PermanentProvince != null ? entity.PermanentProvince.Dari : "",
+                    entity.PermanentDistrictId,
+                    PermanentDistrictName = entity.PermanentDistrict != null ? entity.PermanentDistrict.Dari : "",
+                    entity.PermanentVillage,
+                    entity.CurrentProvinceId,
+                    CurrentProvinceName = entity.CurrentProvince != null ? entity.CurrentProvince.Dari : "",
+                    entity.CurrentDistrictId,
+                    CurrentDistrictName = entity.CurrentDistrict != null ? entity.CurrentDistrict.Dari : "",
+                    entity.CurrentVillage,
+                    entity.IsWithdrawn,
+                    entity.Status,
+                    entity.CreatedAt,
+                    entity.CreatedBy
+                };
 
                 return Ok(item);
             }
@@ -298,39 +300,40 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-                var guarantors = await _context.LicenseApplicationGuarantors
+                var entities = await _context.LicenseApplicationGuarantors
                     .Where(x => x.LicenseApplicationId == applicationId)
                     .Include(x => x.PermanentProvince)
                     .Include(x => x.PermanentDistrict)
                     .Include(x => x.CurrentProvince)
                     .Include(x => x.CurrentDistrict)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.LicenseApplicationId,
-                        x.GuarantorName,
-                        x.GuarantorFatherName,
-                        x.GuaranteeTypeId,
-                        x.CashAmount,
-                        x.ShariaDeedNumber,
-                        x.ShariaDeedDate,
-                        ShariaDeedDateFormatted = x.ShariaDeedDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ShariaDeedDate, calendar)
-                            : "",
-                        x.CustomaryDeedSerialNumber,
-                        x.PermanentProvinceId,
-                        PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
-                        x.PermanentDistrictId,
-                        PermanentDistrictName = x.PermanentDistrict != null ? x.PermanentDistrict.Dari : "",
-                        x.PermanentVillage,
-                        x.CurrentProvinceId,
-                        CurrentProvinceName = x.CurrentProvince != null ? x.CurrentProvince.Dari : "",
-                        x.CurrentDistrictId,
-                        CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
-                        x.CurrentVillage,
-                        x.CreatedAt
-                    })
                     .ToListAsync();
+
+                var guarantors = entities.Select(x => new
+                {
+                    x.Id,
+                    x.LicenseApplicationId,
+                    x.GuarantorName,
+                    x.GuarantorFatherName,
+                    x.GuaranteeTypeId,
+                    x.CashAmount,
+                    x.ShariaDeedNumber,
+                    x.ShariaDeedDate,
+                    ShariaDeedDateFormatted = x.ShariaDeedDate.HasValue
+                        ? DateConversionHelper.FormatDateOnly(x.ShariaDeedDate, calendar)
+                        : "",
+                    x.CustomaryDeedSerialNumber,
+                    x.PermanentProvinceId,
+                    PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
+                    x.PermanentDistrictId,
+                    PermanentDistrictName = x.PermanentDistrict != null ? x.PermanentDistrict.Dari : "",
+                    x.PermanentVillage,
+                    x.CurrentProvinceId,
+                    CurrentProvinceName = x.CurrentProvince != null ? x.CurrentProvince.Dari : "",
+                    x.CurrentDistrictId,
+                    CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
+                    x.CurrentVillage,
+                    x.CreatedAt
+                }).ToList();
 
                 return Ok(guarantors);
             }
@@ -489,20 +492,26 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-                var withdrawal = await _context.LicenseApplicationWithdrawals
+                var entity = await _context.LicenseApplicationWithdrawals
                     .Where(x => x.LicenseApplicationId == applicationId)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.LicenseApplicationId,
-                        x.WithdrawalReason,
-                        x.WithdrawalDate,
-                        WithdrawalDateFormatted = x.WithdrawalDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.WithdrawalDate, calendar)
-                            : "",
-                        x.CreatedAt
-                    })
                     .FirstOrDefaultAsync();
+
+                if (entity == null)
+                {
+                    return Ok(null);
+                }
+
+                var withdrawal = new
+                {
+                    entity.Id,
+                    entity.LicenseApplicationId,
+                    entity.WithdrawalReason,
+                    entity.WithdrawalDate,
+                    WithdrawalDateFormatted = entity.WithdrawalDate.HasValue
+                        ? DateConversionHelper.FormatDateOnly(entity.WithdrawalDate, calendar)
+                        : "",
+                    entity.CreatedAt
+                };
 
                 return Ok(withdrawal);
             }

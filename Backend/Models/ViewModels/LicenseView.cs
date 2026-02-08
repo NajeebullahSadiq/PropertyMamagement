@@ -35,6 +35,12 @@ public partial class LicenseView
 
     public DateOnly? ExpireDate { get; set; }
 
+    public string? PermanentProvinceName { get; set; }
+
+    public string? PermanentDistrictName { get; set; }
+
+    public string? PermanentVillage { get; set; }
+
     // Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
     /// <summary>
     /// مبلغ حق‌الامتیاز - Royalty/License Fee Amount

@@ -4,13 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
-import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
+import { AuthService } from 'src/app/shared/auth.service';
 import { 
     SecuritiesDistributionData,
+    SecuritiesDistributionItem,
     DocumentTypes,
-    PropertySubTypes,
-    VehicleSubTypes,
-    RegistrationBookTypes
+    DocumentTypeInfo
 } from 'src/app/models/SecuritiesDistribution';
 
 @Component({
@@ -19,31 +19,20 @@ import {
     styleUrls: ['./securities-form.component.scss'],
 })
 export class SecuritiesFormComponent implements OnInit {
-    // Date range constraints (optional - can be removed if not needed)
-    minDate = { year: 1320, month: 1, day: 1 };
-    maxDate = { year: 1410, month: 12, day: 31 };
-
     securitiesForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
-    selectedTabIndex = 0;
+    
+    // Company search states
+    companySearching = false;
+    companyFound = false;
+    companyNotFound = false;
+    selectedCompanyId: number | null = null;
 
-    // Dropdown options
+    // Document types and items
     documentTypes = DocumentTypes;
-    propertySubTypes = PropertySubTypes;
-    vehicleSubTypes = VehicleSubTypes;
-    registrationBookTypes = RegistrationBookTypes;
-
-    // Conditional visibility flags
-    showPropertyFields = false;
-    showVehicleFields = false;
-    showPropertySaleFields = false;
-    showBayWafaFields = false;
-    showRentFields = false;
-    showVehicleSaleFields = false;
-    showVehicleExchangeFields = false;
-    showRegistrationBookCount = false;
-    showDuplicateBookCount = false;
+    items: SecuritiesDistributionItem[] = [];
+    selectedDocumentType: number | null = null;
 
     constructor(
         private fb: FormBuilder,
@@ -52,7 +41,8 @@ export class SecuritiesFormComponent implements OnInit {
         private toastr: ToastrService,
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService,
-        private calendarConversionService: CalendarConversionService
+        private companyService: CompnaydetailService,
+        private authService: AuthService
     ) {
         this.initForm();
     }
@@ -75,32 +65,9 @@ export class SecuritiesFormComponent implements OnInit {
             licenseOwnerFatherName: ['', [Validators.required, Validators.maxLength(200)]],
             transactionGuideName: ['', [Validators.required, Validators.maxLength(200)]],
             licenseNumber: ['', [Validators.required, Validators.maxLength(50)]],
-            // Tab 2
-            documentType: [null],
-            propertySubType: [null],
-            vehicleSubType: [null],
-            propertySaleCount: [null, [Validators.min(0)]],
-            propertySaleSerialStart: ['', [Validators.maxLength(100)]],
-            propertySaleSerialEnd: ['', [Validators.maxLength(100)]],
-            bayWafaCount: [null, [Validators.min(0)]],
-            bayWafaSerialStart: ['', [Validators.maxLength(100)]],
-            bayWafaSerialEnd: ['', [Validators.maxLength(100)]],
-            rentCount: [null, [Validators.min(0)]],
-            rentSerialStart: ['', [Validators.maxLength(100)]],
-            rentSerialEnd: ['', [Validators.maxLength(100)]],
-            vehicleSaleCount: [null, [Validators.min(0)]],
-            vehicleSaleSerialStart: ['', [Validators.maxLength(100)]],
-            vehicleSaleSerialEnd: ['', [Validators.maxLength(100)]],
-            vehicleExchangeCount: [null, [Validators.min(0)]],
-            vehicleExchangeSerialStart: ['', [Validators.maxLength(100)]],
-            vehicleExchangeSerialEnd: ['', [Validators.maxLength(100)]],
-            registrationBookType: [null],
-            registrationBookCount: [null, [Validators.min(0)]],
-            duplicateBookCount: [null, [Validators.min(0)]],
             // Tab 3
             pricePerDocument: [4000, [Validators.min(0)]],
             totalDocumentsPrice: [null, [Validators.min(0)]],
-            registrationBookPrice: [null, [Validators.min(0)]],
             totalSecuritiesPrice: [null, [Validators.min(0)]],
             // Tab 4
             bankReceiptNumber: ['', [Validators.maxLength(100)]],
@@ -112,7 +79,7 @@ export class SecuritiesFormComponent implements OnInit {
     loadData(id: number): void {
         const calendar = this.calendarService.getSelectedCalendar();
         this.securitiesService.getById(id, calendar).subscribe({
-            next: (data) => {
+            next: (data: any) => {
                 this.securitiesForm.patchValue({
                     id: data.id,
                     registrationNumber: data.registrationNumber,
@@ -120,53 +87,26 @@ export class SecuritiesFormComponent implements OnInit {
                     licenseOwnerFatherName: data.licenseOwnerFatherName,
                     transactionGuideName: data.transactionGuideName,
                     licenseNumber: data.licenseNumber,
-                    documentType: data.documentType,
-                    propertySubType: data.propertySubType,
-                    vehicleSubType: data.vehicleSubType,
-                    propertySaleCount: data.propertySaleCount,
-                    propertySaleSerialStart: data.propertySaleSerialStart,
-                    propertySaleSerialEnd: data.propertySaleSerialEnd,
-                    bayWafaCount: data.bayWafaCount,
-                    bayWafaSerialStart: data.bayWafaSerialStart,
-                    bayWafaSerialEnd: data.bayWafaSerialEnd,
-                    rentCount: data.rentCount,
-                    rentSerialStart: data.rentSerialStart,
-                    rentSerialEnd: data.rentSerialEnd,
-                    vehicleSaleCount: data.vehicleSaleCount,
-                    vehicleSaleSerialStart: data.vehicleSaleSerialStart,
-                    vehicleSaleSerialEnd: data.vehicleSaleSerialEnd,
-                    vehicleExchangeCount: data.vehicleExchangeCount,
-                    vehicleExchangeSerialStart: data.vehicleExchangeSerialStart,
-                    vehicleExchangeSerialEnd: data.vehicleExchangeSerialEnd,
-                    registrationBookType: data.registrationBookType,
-                    registrationBookCount: data.registrationBookCount,
-                    duplicateBookCount: data.duplicateBookCount,
                     pricePerDocument: data.pricePerDocument,
                     totalDocumentsPrice: data.totalDocumentsPrice,
-                    registrationBookPrice: data.registrationBookPrice,
                     totalSecuritiesPrice: data.totalSecuritiesPrice,
-                    bankReceiptNumber: data.bankReceiptNumber
+                    bankReceiptNumber: data.bankReceiptNumber,
+                    deliveryDate: data.deliveryDate,
+                    distributionDate: data.distributionDate
                 });
 
-                // Parse dates
-                if (data.deliveryDateFormatted) {
-                    const deliveryDate = this.parseDate(data.deliveryDateFormatted);
-                    if (deliveryDate) {
-                        this.securitiesForm.patchValue({ deliveryDate });
-                    }
+                // Load items
+                if (data.items && data.items.length > 0) {
+                    this.items = data.items.map((item: any) => ({
+                        id: item.id,
+                        documentType: item.documentType,
+                        serialStart: item.serialStart,
+                        serialEnd: item.serialEnd,
+                        count: item.count,
+                        price: item.price
+                    }));
+                    this.calculateTotals();
                 }
-                if (data.distributionDateFormatted) {
-                    const distributionDate = this.parseDate(data.distributionDateFormatted);
-                    if (distributionDate) {
-                        this.securitiesForm.patchValue({ distributionDate });
-                    }
-                }
-
-                // Set visibility based on loaded data
-                this.onDocumentTypeChange();
-                this.onPropertySubTypeChange();
-                this.onVehicleSubTypeChange();
-                this.onRegistrationBookTypeChange();
             },
             error: (err) => {
                 this.toastr.error('خطا در بارگذاری اطلاعات');
@@ -175,171 +115,74 @@ export class SecuritiesFormComponent implements OnInit {
         });
     }
 
-    onDocumentTypeChange(): void {
-        const docType = this.securitiesForm.get('documentType')?.value;
-        this.showPropertyFields = docType === 1;
-        this.showVehicleFields = docType === 2;
-
-        if (docType === 1) {
-            // Clear vehicle fields
-            this.securitiesForm.patchValue({
-                vehicleSubType: null,
-                vehicleSaleCount: null,
-                vehicleSaleSerialStart: '',
-                vehicleSaleSerialEnd: '',
-                vehicleExchangeCount: null,
-                vehicleExchangeSerialStart: '',
-                vehicleExchangeSerialEnd: ''
-            });
-            this.showVehicleSaleFields = false;
-            this.showVehicleExchangeFields = false;
-        } else if (docType === 2) {
-            // Clear property fields
-            this.securitiesForm.patchValue({
-                propertySubType: null,
-                propertySaleCount: null,
-                propertySaleSerialStart: '',
-                propertySaleSerialEnd: '',
-                bayWafaCount: null,
-                bayWafaSerialStart: '',
-                bayWafaSerialEnd: '',
-                rentCount: null,
-                rentSerialStart: '',
-                rentSerialEnd: ''
-            });
-            this.showPropertySaleFields = false;
-            this.showBayWafaFields = false;
-            this.showRentFields = false;
+    addItem(): void {
+        if (!this.selectedDocumentType) {
+            this.toastr.warning('لطفاً نوعیت اسناد بهادار را انتخاب کنید');
+            return;
         }
+
+        const docType = this.documentTypes.find(d => d.id === this.selectedDocumentType);
+        if (!docType) return;
+
+        const newItem: SecuritiesDistributionItem = {
+            documentType: this.selectedDocumentType,
+            serialStart: docType.hasSerial ? '' : undefined,
+            serialEnd: docType.hasSerial ? '' : undefined,
+            count: 0,
+            price: 0
+        };
+
+        this.items.push(newItem);
+        this.selectedDocumentType = null;
+        this.toastr.success('سند اضافه شد');
     }
 
-    onPropertySubTypeChange(): void {
-        const subType = this.securitiesForm.get('propertySubType')?.value;
-        this.showPropertySaleFields = subType === 1 || subType === 4;
-        this.showBayWafaFields = subType === 2 || subType === 4;
-        this.showRentFields = subType === 3 || subType === 4;
-
-        // Clear fields that are not visible
-        if (!this.showPropertySaleFields) {
-            this.securitiesForm.patchValue({ propertySaleCount: null, propertySaleSerialStart: '', propertySaleSerialEnd: '' });
-        }
-        if (!this.showBayWafaFields) {
-            this.securitiesForm.patchValue({ bayWafaCount: null, bayWafaSerialStart: '', bayWafaSerialEnd: '' });
-        }
-        if (!this.showRentFields) {
-            this.securitiesForm.patchValue({ rentCount: null, rentSerialStart: '', rentSerialEnd: '' });
-        }
+    removeItem(index: number): void {
+        this.items.splice(index, 1);
+        this.calculateTotals();
+        this.toastr.info('سند حذف شد');
     }
 
-    onVehicleSubTypeChange(): void {
-        const subType = this.securitiesForm.get('vehicleSubType')?.value;
-        this.showVehicleSaleFields = subType === 1;
-        this.showVehicleExchangeFields = subType === 2;
-
-        if (!this.showVehicleSaleFields) {
-            this.securitiesForm.patchValue({ vehicleSaleCount: null, vehicleSaleSerialStart: '', vehicleSaleSerialEnd: '' });
-        }
-        if (!this.showVehicleExchangeFields) {
-            this.securitiesForm.patchValue({ vehicleExchangeCount: null, vehicleExchangeSerialStart: '', vehicleExchangeSerialEnd: '' });
-        }
+    calculateItemCount(item: SecuritiesDistributionItem): void {
+        // Serial numbers are just reference numbers for tracking
+        // They should NOT affect the count or price
+        // Only the manually entered count should be used
+        this.calculateItemPrice(item);
     }
 
-    onRegistrationBookTypeChange(): void {
-        const bookType = this.securitiesForm.get('registrationBookType')?.value;
-        this.showRegistrationBookCount = bookType === 1;
-        this.showDuplicateBookCount = bookType === 2;
-
-        if (!this.showRegistrationBookCount) {
-            this.securitiesForm.patchValue({ registrationBookCount: null });
-        }
-        if (!this.showDuplicateBookCount) {
-            this.securitiesForm.patchValue({ duplicateBookCount: null });
-        }
-
-        // Recalculate registration book price when type changes
-        this.calculateRegistrationBookPrice();
+    onCountChange(item: SecuritiesDistributionItem): void {
+        // When count is manually changed, recalculate price
+        this.calculateItemPrice(item);
     }
 
-    calculateRegistrationBookPrice(): void {
-        const bookType = this.securitiesForm.get('registrationBookType')?.value;
-        let bookPrice = 0;
-
-        if (bookType === 1) {
-            // کتاب ثبت: تعداد × 1000
-            const count = this.securitiesForm.get('registrationBookCount')?.value || 0;
-            bookPrice = count * 1000;
-        } else if (bookType === 2) {
-            // کتاب ثبت مثنی: تعداد × 20000
-            const count = this.securitiesForm.get('duplicateBookCount')?.value || 0;
-            bookPrice = count * 20000;
+    calculateItemPrice(item: SecuritiesDistributionItem): void {
+        const docType = this.documentTypes.find(d => d.id === item.documentType);
+        if (docType && item.count > 0) {
+            item.price = item.count * docType.pricePerUnit;
+        } else {
+            item.price = 0;
         }
-
-        this.securitiesForm.patchValue({ registrationBookPrice: bookPrice });
-        this.calculateTotalPrice();
+        this.calculateTotals();
     }
 
-    calculateTotalPrice(): void {
-        // قیمت فی جلد سته is always 4000
-        const pricePerDoc = 4000;
-        this.securitiesForm.patchValue({ pricePerDocument: pricePerDoc }, { emitEvent: false });
-        
-        const bookPrice = this.securitiesForm.get('registrationBookPrice')?.value || 0;
-        
-        // Calculate total document count
-        let totalDocs = 0;
-        if (this.showPropertySaleFields) {
-            totalDocs += this.securitiesForm.get('propertySaleCount')?.value || 0;
-        }
-        if (this.showBayWafaFields) {
-            totalDocs += this.securitiesForm.get('bayWafaCount')?.value || 0;
-        }
-        if (this.showRentFields) {
-            totalDocs += this.securitiesForm.get('rentCount')?.value || 0;
-        }
-        if (this.showVehicleSaleFields) {
-            totalDocs += this.securitiesForm.get('vehicleSaleCount')?.value || 0;
-        }
-        if (this.showVehicleExchangeFields) {
-            totalDocs += this.securitiesForm.get('vehicleExchangeCount')?.value || 0;
-        }
-
-        // قیمت مجموعی سته‌ها = تعداد سته‌ها × قیمت فی جلد
-        const totalDocsPrice = totalDocs * pricePerDoc;
-        
-        // قیمت مجموعی اسناد بهادار = قیمت مجموعی سته‌ها + قیمت کتاب ثبت
-        const totalSecurities = totalDocsPrice + bookPrice;
+    calculateTotals(): void {
+        const totalDocs = this.items.reduce((sum, item) => sum + item.count, 0);
+        const totalPrice = this.items.reduce((sum, item) => sum + item.price, 0);
 
         this.securitiesForm.patchValue({
-            totalDocumentsPrice: totalDocsPrice,
-            totalSecuritiesPrice: totalSecurities
-        });
+            totalDocumentsPrice: totalPrice,
+            totalSecuritiesPrice: totalPrice
+        }, { emitEvent: false });
     }
 
-    parseDate(dateStr: string): Date | null {
-        if (!dateStr) return null;
-        const date = new Date(dateStr);
-        return isNaN(date.getTime()) ? null : date;
+    getDocumentTypeName(documentType: number): string {
+        const docType = this.documentTypes.find(d => d.id === documentType);
+        return docType ? docType.name : '';
     }
 
-    formatDateForBackend(dateValue: any): string | undefined {
-        if (!dateValue) return undefined;
-        const currentCalendar = this.calendarService.getSelectedCalendar();
-
-        if (dateValue instanceof Date) {
-            const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
-            const year = calendarDate.year;
-            const month = String(calendarDate.month).padStart(2, '0');
-            const day = String(calendarDate.day).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        } else if (typeof dateValue === 'object' && dateValue?.year) {
-            const year = dateValue.year;
-            const month = String(dateValue.month).padStart(2, '0');
-            const day = String(dateValue.day).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        } else if (typeof dateValue === 'string') {
-            return dateValue.replace(/\//g, '-');
-        }
-        return undefined;
+    hasSerialNumbers(documentType: number): boolean {
+        const docType = this.documentTypes.find(d => d.id === documentType);
+        return docType ? docType.hasSerial : false;
     }
 
     onSubmit(): void {
@@ -349,32 +192,63 @@ export class SecuritiesFormComponent implements OnInit {
             return;
         }
 
+        if (this.items.length === 0) {
+            this.toastr.error('لطفاً حداقل یک سند اضافه کنید');
+            return;
+        }
+
+        // Validate items
+        for (const item of this.items) {
+            const docType = this.documentTypes.find(d => d.id === item.documentType);
+            if (docType && docType.hasSerial) {
+                if (!item.serialStart || !item.serialEnd) {
+                    this.toastr.error('لطفاً سریال نمبر آغاز و ختم را برای تمام اسناد وارد کنید');
+                    return;
+                }
+            }
+            if (item.count <= 0) {
+                this.toastr.error('تعداد باید بیشتر از صفر باشد');
+                return;
+            }
+        }
+
         const formValue = this.securitiesForm.value;
+        
+        // Convert dates to DateOnly format (YYYY-MM-DD) if they exist
+        const deliveryDate = formValue.deliveryDate 
+            ? new Date(formValue.deliveryDate).toISOString().split('T')[0]
+            : null;
+        const distributionDate = formValue.distributionDate 
+            ? new Date(formValue.distributionDate).toISOString().split('T')[0]
+            : null;
+
         const data: SecuritiesDistributionData = {
             ...formValue,
-            deliveryDate: this.formatDateForBackend(formValue.deliveryDate),
-            distributionDate: this.formatDateForBackend(formValue.distributionDate)
+            deliveryDate,
+            distributionDate,
+            items: this.items
         };
 
         if (this.isEditMode && this.editId) {
             this.securitiesService.update(this.editId, data).subscribe({
-                next: (res) => {
+                next: (res: any) => {
                     this.toastr.success(res.message || 'رکورد با موفقیت بروزرسانی شد');
-                    // Stay on page for edit mode - just show success message
+                    this.router.navigate(['/securities/list']);
                 },
                 error: (err) => {
                     this.toastr.error(err.error?.message || 'خطا در بروزرسانی اطلاعات');
+                    console.error(err);
                 }
             });
         } else {
             this.securitiesService.create(data).subscribe({
-                next: (res) => {
+                next: (res: any) => {
                     this.toastr.success(res.message || 'رکورد با موفقیت ثبت شد');
-                    // Redirect to list for create mode
                     this.router.navigate(['/securities/list']);
                 },
                 error: (err) => {
                     this.toastr.error(err.error?.message || 'خطا در ثبت اطلاعات');
+                    console.error(err);
                 }
             });
         }
@@ -388,15 +262,11 @@ export class SecuritiesFormComponent implements OnInit {
 
     resetForm(): void {
         this.securitiesForm.reset();
-        this.showPropertyFields = false;
-        this.showVehicleFields = false;
-        this.showPropertySaleFields = false;
-        this.showBayWafaFields = false;
-        this.showRentFields = false;
-        this.showVehicleSaleFields = false;
-        this.showVehicleExchangeFields = false;
-        this.showRegistrationBookCount = false;
-        this.showDuplicateBookCount = false;
+        this.items = [];
+        this.selectedDocumentType = null;
+        this.companyFound = false;
+        this.companyNotFound = false;
+        this.selectedCompanyId = null;
         
         // If in edit mode, navigate to create page
         if (this.isEditMode) {
@@ -410,16 +280,55 @@ export class SecuritiesFormComponent implements OnInit {
         this.router.navigate(['/securities/list']);
     }
 
-    nextTab(): void {
-        if (this.selectedTabIndex < 3) {
-            this.selectedTabIndex++;
+    searchCompanyByLicense(): void {
+        const licenseNumber = this.securitiesForm.get('licenseNumber')?.value;
+        
+        if (!licenseNumber || !licenseNumber.trim()) {
+            return;
         }
-    }
 
-    prevTab(): void {
-        if (this.selectedTabIndex > 0) {
-            this.selectedTabIndex--;
-        }
+        // Reset states
+        this.companySearching = true;
+        this.companyFound = false;
+        this.companyNotFound = false;
+        this.selectedCompanyId = null;
+
+        // Get user's province if available
+        const provinceId = this.authService.getUserProvinceId();
+
+        this.companyService.searchCompanyByLicense(licenseNumber.trim(), provinceId || undefined).subscribe({
+            next: (companies) => {
+                this.companySearching = false;
+                
+                if (companies && companies.length > 0) {
+                    const company = companies[0]; // Take first match
+                    this.companyFound = true;
+                    this.companyNotFound = false;
+                    this.selectedCompanyId = company.companyId || company.id;
+
+                    // Auto-populate fields (handle both companyTitle and companyName)
+                    this.securitiesForm.patchValue({
+                        transactionGuideName: company.companyName || company.companyTitle || '',
+                        licenseOwnerName: company.ownerName || '',
+                        licenseOwnerFatherName: company.ownerFatherName || '',
+                        licenseNumber: company.licenseNumber || licenseNumber
+                    });
+
+                    this.toastr.success('معلومات شرکت با موفقیت بارگذاری شد');
+                } else {
+                    this.companyFound = false;
+                    this.companyNotFound = true;
+                    this.toastr.warning('شرکت با این نمبر جواز یافت نشد');
+                }
+            },
+            error: (err) => {
+                this.companySearching = false;
+                this.companyFound = false;
+                this.companyNotFound = true;
+                console.error('Error searching company:', err);
+                this.toastr.error('خطا در جستجوی شرکت');
+            }
+        });
     }
 
     // Form control getters

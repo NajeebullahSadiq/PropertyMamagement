@@ -259,10 +259,36 @@ export class PrintComponent implements OnInit {
     this.verificationService.generateVerificationCode(propertyId, 'PropertyDocument').subscribe({
       next: (result) => {
         console.log('[PrintProperty] Verification result:', result);
+        
+        // Validate the result
+        if (!result.verificationCode) {
+          console.error('[PrintProperty] No verification code in result');
+          this.verificationError = 'خطا در دریافت کود تصدیق';
+          this.waitForImagesToLoad();
+          return;
+        }
+        
+        if (!result.verificationUrl) {
+          console.error('[PrintProperty] No verification URL in result');
+          this.verificationError = 'خطا در دریافت لینک تصدیق';
+          this.waitForImagesToLoad();
+          return;
+        }
+        
+        // Ensure the verification URL contains the code
+        if (!result.verificationUrl.includes(result.verificationCode)) {
+          console.warn('[PrintProperty] Verification URL does not contain code, fixing...');
+          result.verificationUrl = `${result.verificationUrl}/${result.verificationCode}`;
+        }
+        
         this.verificationCode = result.verificationCode;
         this.verificationUrl = result.verificationUrl;
         this.qrCodeUrl = this.verificationService.generateQrCodeUrl(result.verificationUrl);
+        
+        console.log('[PrintProperty] Verification Code:', this.verificationCode);
+        console.log('[PrintProperty] Verification URL:', this.verificationUrl);
         console.log('[PrintProperty] QR Code URL:', this.qrCodeUrl);
+        
         this.waitForImagesToLoad();
       },
       error: (err) => {

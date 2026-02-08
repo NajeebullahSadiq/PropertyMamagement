@@ -115,6 +115,7 @@ namespace WebAPIBackend.Configuration
         public virtual DbSet<CompanyAccountInfo> CompanyAccountInfos { get; set; }
         public virtual DbSet<CompanyCancellationInfo> CompanyCancellationInfos { get; set; }
         public virtual DbSet<SecuritiesDistribution> SecuritiesDistributions { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.Securities.SecuritiesDistributionItem> SecuritiesDistributionItems { get; set; }
         public virtual DbSet<PetitionWriterSecurities> PetitionWriterSecurities { get; set; }
         public virtual DbSet<SecuritiesControl> SecuritiesControls { get; set; }
         
@@ -266,26 +267,37 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.LicenseOwnerFatherName).HasMaxLength(200);
                 entity.Property(e => e.TransactionGuideName).HasMaxLength(200);
                 entity.Property(e => e.LicenseNumber).HasMaxLength(50);
-                entity.Property(e => e.PropertySaleSerialStart).HasMaxLength(100);
-                entity.Property(e => e.PropertySaleSerialEnd).HasMaxLength(100);
-                entity.Property(e => e.BayWafaSerialStart).HasMaxLength(100);
-                entity.Property(e => e.BayWafaSerialEnd).HasMaxLength(100);
-                entity.Property(e => e.RentSerialStart).HasMaxLength(100);
-                entity.Property(e => e.RentSerialEnd).HasMaxLength(100);
-                entity.Property(e => e.VehicleSaleSerialStart).HasMaxLength(100);
-                entity.Property(e => e.VehicleSaleSerialEnd).HasMaxLength(100);
-                entity.Property(e => e.VehicleExchangeSerialStart).HasMaxLength(100);
-                entity.Property(e => e.VehicleExchangeSerialEnd).HasMaxLength(100);
                 entity.Property(e => e.BankReceiptNumber).HasMaxLength(100);
                 entity.Property(e => e.PricePerDocument).HasPrecision(18, 2);
                 entity.Property(e => e.TotalDocumentsPrice).HasPrecision(18, 2);
-                entity.Property(e => e.RegistrationBookPrice).HasPrecision(18, 2);
                 entity.Property(e => e.TotalSecuritiesPrice).HasPrecision(18, 2);
 
                 entity.HasIndex(e => e.RegistrationNumber).IsUnique();
                 entity.HasIndex(e => e.LicenseNumber);
                 entity.HasIndex(e => e.BankReceiptNumber);
                 entity.HasIndex(e => e.TransactionGuideName);
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.Securities.SecuritiesDistributionItem>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("SecuritiesDistributionItem_pkey");
+
+                entity.ToTable("SecuritiesDistributionItem", "org");
+
+                entity.Property(e => e.DocumentType).IsRequired();
+                entity.Property(e => e.Count).IsRequired();
+                entity.Property(e => e.Price).HasColumnType("decimal(18,2)").IsRequired();
+                entity.Property(e => e.SerialStart).HasMaxLength(100);
+                entity.Property(e => e.SerialEnd).HasMaxLength(100);
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+
+                entity.HasOne(d => d.SecuritiesDistribution)
+                    .WithMany(p => p.Items)
+                    .HasForeignKey(d => d.SecuritiesDistributionId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("SecuritiesDistributionItem_SecuritiesDistributionId_fkey");
+
+                entity.HasIndex(e => e.SecuritiesDistributionId);
             });
 
             modelBuilder.Entity<PetitionWriterSecurities>(entity =>

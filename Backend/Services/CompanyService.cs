@@ -19,11 +19,16 @@ namespace WebAPIBackend.Services
     {
         private readonly AppDbContext _context;
         private readonly IProvinceFilterService _provinceFilter;
+        private readonly ILicenseNumberGenerator _licenseNumberGenerator;
 
-        public CompanyService(AppDbContext context, IProvinceFilterService provinceFilter)
+        public CompanyService(
+            AppDbContext context, 
+            IProvinceFilterService provinceFilter,
+            ILicenseNumberGenerator licenseNumberGenerator)
         {
             _context = context;
             _provinceFilter = provinceFilter;
+            _licenseNumberGenerator = licenseNumberGenerator;
         }
 
         public async Task<List<CompanyDetail>> GetAllCompaniesAsync()
@@ -104,6 +109,7 @@ namespace WebAPIBackend.Services
 
         /// <summary>
         /// Updates the IsComplete status of all licenses for a company based on required field validation
+        /// Also generates license number when the license becomes complete for the first time
         /// </summary>
         public async Task UpdateLicenseCompletionStatusAsync(int companyId)
         {
@@ -128,7 +134,7 @@ namespace WebAPIBackend.Services
             }
 
             // 2. Check if company has at least one owner with required fields
-            if (company.CompanyOwners == null || !company.CompanyOwners.Any())
+            if (!company.CompanyOwners.Any())
             {
                 isComplete = false;
             }
@@ -143,16 +149,16 @@ namespace WebAPIBackend.Services
                 }
             }
 
-            // 3. Check if company has at least one license with required fields
-            if (company.LicenseDetails == null || !company.LicenseDetails.Any())
+            // 3. Check if company has at least one license with required fields (except LicenseNumber which will be auto-generated)
+            if (!company.LicenseDetails.Any())
             {
                 isComplete = false;
             }
             else
             {
                 var license = company.LicenseDetails.First();
-                if (string.IsNullOrWhiteSpace(license.LicenseNumber) ||
-                    !license.IssueDate.HasValue ||
+                // Don't check LicenseNumber here - it will be generated when complete
+                if (!license.IssueDate.HasValue ||
                     !license.ExpireDate.HasValue ||
                     string.IsNullOrWhiteSpace(license.OfficeAddress))
                 {
@@ -177,11 +183,31 @@ namespace WebAPIBackend.Services
             }
 
             // Update the IsComplete status for all licenses of this company
+            // AND generate license number if becoming complete for the first time
             if (company.LicenseDetails != null && company.LicenseDetails.Any())
             {
                 foreach (var license in company.LicenseDetails)
                 {
+                    var wasIncomplete = !license.IsComplete;
                     license.IsComplete = isComplete;
+
+                    // Generate license number when transitioning from incomplete to complete
+                    // This ensures license numbers are only assigned to completed licenses
+                    if (isComplete && wasIncomplete && string.IsNullOrWhiteSpace(license.LicenseNumber))
+                    {
+                        if (license.ProvinceId.HasValue)
+                        {
+                            try
+                            {
+                                license.LicenseNumber = await _licenseNumberGenerator.GenerateNextLicenseNumber(license.ProvinceId.Value);
+                            }
+                            catch (ArgumentException)
+                            {
+                                // If license number generation fails, keep the license incomplete
+                                license.IsComplete = false;
+                            }
+                        }
+                    }
                 }
                 await _context.SaveChangesAsync();
             }

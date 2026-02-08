@@ -6,10 +6,7 @@ import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { 
     SecuritiesDistribution, 
-    DocumentTypes, 
-    PropertySubTypes, 
-    VehicleSubTypes,
-    RegistrationBookTypes 
+    DocumentTypes
 } from 'src/app/models/SecuritiesDistribution';
 
 @Component({
@@ -77,22 +74,41 @@ export class SecuritiesViewComponent implements OnInit {
         return found ? found.name : '-';
     }
 
-    getPropertySubTypeName(subType: number | undefined): string {
-        if (!subType) return '-';
-        const found = PropertySubTypes.find(x => x.id === subType);
+    getPropertySubTypeName(type: number | undefined): string {
+        if (!type) return '-';
+        const types = [
+            { id: 1, name: 'سته خرید و فروش' },
+            { id: 2, name: 'سته بیع وفا' },
+            { id: 3, name: 'سته کرایی' },
+            { id: 4, name: 'همه' }
+        ];
+        const found = types.find(x => x.id === type);
         return found ? found.name : '-';
     }
 
-    getVehicleSubTypeName(subType: number | undefined): string {
-        if (!subType) return '-';
-        const found = VehicleSubTypes.find(x => x.id === subType);
+    getVehicleSubTypeName(type: number | undefined): string {
+        if (!type) return '-';
+        const types = [
+            { id: 1, name: 'سته خرید و فروش' },
+            { id: 2, name: 'سته تبادله' }
+        ];
+        const found = types.find(x => x.id === type);
         return found ? found.name : '-';
     }
 
     getRegistrationBookTypeName(type: number | undefined): string {
         if (!type) return '-';
-        const found = RegistrationBookTypes.find(x => x.id === type);
+        const types = [
+            { id: 1, name: 'کتاب ثبت' },
+            { id: 2, name: 'کتاب ثبت مثنی' }
+        ];
+        const found = types.find(x => x.id === type);
         return found ? found.name : '-';
+    }
+
+    getTotalDocumentCount(): number {
+        if (!this.item || !this.item.items) return 0;
+        return this.item.items.reduce((sum, docItem) => sum + docItem.count, 0);
     }
 
     editItem(): void {
