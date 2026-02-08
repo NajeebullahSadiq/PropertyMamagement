@@ -22,6 +22,16 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     searchTerm = '';
     isLoading = false;
 
+    // Advanced search fields
+    showAdvancedSearch = false;
+    searchSerialNumber = '';
+    searchRequestDate = '';
+    searchApplicantName = '';
+    searchProposedGuideName = '';
+    searchShariaDeedNumber = '';
+    searchCustomaryDeedSerial = '';
+    searchGuarantorName = '';
+
     // RBAC
     canEdit = false;
     canDelete = false;
@@ -61,11 +71,11 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         const calendar = this.calendarService.getSelectedCalendar();
 
-        this.licenseAppService.getAll(1, 1000, '', calendar).subscribe({
+        this.licenseAppService.getAll(this.page, this.pageSize, '', calendar).subscribe({
             next: (response) => {
                 this.items = response.items;
                 this.totalCount = response.totalCount;
-                this.applyFilter();
+                this.filteredItems = [...this.items];
                 this.isLoading = false;
             },
             error: (err) => {
@@ -93,6 +103,59 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     onSearch(): void {
         this.page = 1;
         this.applyFilter();
+    }
+
+    toggleAdvancedSearch(): void {
+        this.showAdvancedSearch = !this.showAdvancedSearch;
+        if (!this.showAdvancedSearch) {
+            this.clearAdvancedSearch();
+        }
+    }
+
+    performAdvancedSearch(): void {
+        this.isLoading = true;
+        this.page = 1;
+        const calendar = this.calendarService.getSelectedCalendar();
+
+        this.licenseAppService.search(
+            this.searchSerialNumber || undefined,
+            this.searchRequestDate || undefined,
+            this.searchApplicantName || undefined,
+            this.searchProposedGuideName || undefined,
+            this.searchShariaDeedNumber || undefined,
+            this.searchCustomaryDeedSerial || undefined,
+            this.searchGuarantorName || undefined,
+            this.page,
+            this.pageSize,
+            calendar
+        ).subscribe({
+            next: (response) => {
+                this.items = response.items;
+                this.filteredItems = [...this.items];
+                this.totalCount = response.totalCount;
+                this.isLoading = false;
+                
+                if (this.totalCount === 0) {
+                    this.toastr.info('هیچ نتیجه‌ای یافت نشد');
+                }
+            },
+            error: (err) => {
+                this.toastr.error('خطا در جستجو');
+                this.isLoading = false;
+                console.error(err);
+            }
+        });
+    }
+
+    clearAdvancedSearch(): void {
+        this.searchSerialNumber = '';
+        this.searchRequestDate = '';
+        this.searchApplicantName = '';
+        this.searchProposedGuideName = '';
+        this.searchShariaDeedNumber = '';
+        this.searchCustomaryDeedSerial = '';
+        this.searchGuarantorName = '';
+        this.loadData();
     }
 
     onPageChange(page: number): void {

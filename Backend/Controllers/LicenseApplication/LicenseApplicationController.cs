@@ -108,6 +108,182 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         }
 
         /// <summary>
+        /// Advanced search for license applications
+        /// Search fields: نمبر مسلسل، تاریخ درخواست، شهرت متقاضی، نام پیشنهادی رهنما، نمبر قباله شرعی، سریال نمبر سته قباله عرفی، شهرت تضمین‌کننده
+        /// </summary>
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(
+            [FromQuery] string? serialNumber = null,
+            [FromQuery] string? requestDate = null,
+            [FromQuery] string? applicantName = null,
+            [FromQuery] string? proposedGuideName = null,
+            [FromQuery] string? shariaDeedNumber = null,
+            [FromQuery] string? customaryDeedSerial = null,
+            [FromQuery] string? guarantorName = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+
+                // Start with base query
+                var query = _context.LicenseApplications
+                    .Where(x => x.Status == true)
+                    .AsQueryable();
+
+                // Filter by serial number (نمبر مسلسل)
+                if (!string.IsNullOrWhiteSpace(serialNumber))
+                {
+                    query = query.Where(x => x.RequestSerialNumber.Contains(serialNumber));
+                }
+
+                // Filter by request date (تاریخ درخواست)
+                if (!string.IsNullOrWhiteSpace(requestDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(requestDate, calendarType, out var parsedDate))
+                    {
+                        query = query.Where(x => x.RequestDate == parsedDate);
+                    }
+                }
+
+                // Filter by applicant name (شهرت متقاضی)
+                if (!string.IsNullOrWhiteSpace(applicantName))
+                {
+                    query = query.Where(x => x.ApplicantName.Contains(applicantName));
+                }
+
+                // Filter by proposed guide name (نام پیشنهادی رهنما)
+                if (!string.IsNullOrWhiteSpace(proposedGuideName))
+                {
+                    query = query.Where(x => x.ProposedGuideName.Contains(proposedGuideName));
+                }
+
+                // Filter by Sharia deed number or Customary deed serial or Guarantor name
+                // These require joining with guarantors table
+                if (!string.IsNullOrWhiteSpace(shariaDeedNumber) || 
+                    !string.IsNullOrWhiteSpace(customaryDeedSerial) || 
+                    !string.IsNullOrWhiteSpace(guarantorName))
+                {
+                    var guarantorQuery = _context.LicenseApplicationGuarantors.AsQueryable();
+
+                    // Filter by Sharia deed number (نمبر قباله شرعی)
+                    if (!string.IsNullOrWhiteSpace(shariaDeedNumber))
+                    {
+                        guarantorQuery = guarantorQuery.Where(g => 
+                            g.ShariaDeedNumber != null && g.ShariaDeedNumber.Contains(shariaDeedNumber));
+                    }
+
+                    // Filter by Customary deed serial (سریال نمبر سته قباله عرفی)
+                    if (!string.IsNullOrWhiteSpace(customaryDeedSerial))
+                    {
+                        guarantorQuery = guarantorQuery.Where(g => 
+                            g.CustomaryDeedSerialNumber != null && g.CustomaryDeedSerialNumber.Contains(customaryDeedSerial));
+                    }
+
+                    // Filter by Guarantor name (شهرت تضمین‌کننده)
+                    if (!string.IsNullOrWhiteSpace(guarantorName))
+                    {
+                        guarantorQuery = guarantorQuery.Where(g => 
+                            g.GuarantorName.Contains(guarantorName));
+                    }
+
+                    var applicationIdsWithGuarantors = await guarantorQuery
+                        .Select(g => g.LicenseApplicationId)
+                        .Distinct()
+                        .ToListAsync();
+
+                    query = query.Where(x => applicationIdsWithGuarantors.Contains(x.Id));
+                }
+
+                var totalCount = await query.CountAsync();
+
+                var items = await query
+                    .OrderByDescending(x => x.CreatedAt)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Include(x => x.PermanentProvince)
+                    .Include(x => x.PermanentDistrict)
+                    .Include(x => x.CurrentProvince)
+                    .Include(x => x.CurrentDistrict)
+                    .ToListAsync();
+
+                // Get guarantors for each application
+                var applicationIds = items.Select(x => x.Id).ToList();
+                var guarantors = await _context.LicenseApplicationGuarantors
+                    .Where(g => applicationIds.Contains(g.LicenseApplicationId))
+                    .ToListAsync();
+
+                var result = items.Select(x => new
+                {
+                    x.Id,
+                    x.RequestDate,
+                    RequestDateFormatted = x.RequestDate.HasValue
+                        ? DateConversionHelper.FormatDateOnly(x.RequestDate, calendar)
+                        : "",
+                    x.RequestSerialNumber,
+                    x.ApplicantName,
+                    x.ProposedGuideName,
+                    x.PermanentProvinceId,
+                    PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
+                    x.PermanentDistrictId,
+                    PermanentDistrictName = x.PermanentDistrict != null ? x.PermanentDistrict.Dari : "",
+                    x.PermanentVillage,
+                    x.CurrentProvinceId,
+                    CurrentProvinceName = x.CurrentProvince != null ? x.CurrentProvince.Dari : "",
+                    x.CurrentDistrictId,
+                    CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
+                    x.CurrentVillage,
+                    x.IsWithdrawn,
+                    x.Status,
+                    x.CreatedAt,
+                    x.CreatedBy,
+                    // Include guarantor information
+                    Guarantors = guarantors
+                        .Where(g => g.LicenseApplicationId == x.Id)
+                        .Select(g => new
+                        {
+                            g.Id,
+                            g.GuarantorName,
+                            g.GuarantorFatherName,
+                            g.GuaranteeTypeId,
+                            g.CashAmount,
+                            g.ShariaDeedNumber,
+                            g.ShariaDeedDate,
+                            ShariaDeedDateFormatted = g.ShariaDeedDate.HasValue
+                                ? DateConversionHelper.FormatDateOnly(g.ShariaDeedDate, calendar)
+                                : "",
+                            g.CustomaryDeedSerialNumber
+                        })
+                        .ToList()
+                }).ToList();
+
+                return Ok(new
+                {
+                    items = result,
+                    totalCount,
+                    page,
+                    pageSize,
+                    searchCriteria = new
+                    {
+                        serialNumber,
+                        requestDate,
+                        applicantName,
+                        proposedGuideName,
+                        shariaDeedNumber,
+                        customaryDeedSerial,
+                        guarantorName
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Get license application by ID
         /// </summary>
         [HttpGet("{id}")]

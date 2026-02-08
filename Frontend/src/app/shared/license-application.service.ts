@@ -53,6 +53,50 @@ export class LicenseApplicationService {
         return this.http.get<LicenseApplicationListResponse>(this.baseUrl, { params });
     }
 
+    search(
+        serialNumber?: string,
+        requestDate?: string,
+        applicantName?: string,
+        proposedGuideName?: string,
+        shariaDeedNumber?: string,
+        customaryDeedSerial?: string,
+        guarantorName?: string,
+        page: number = 1,
+        pageSize: number = 10,
+        calendarType?: string
+    ): Observable<LicenseApplicationListResponse> {
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('pageSize', pageSize.toString());
+
+        if (serialNumber) {
+            params = params.set('serialNumber', serialNumber);
+        }
+        if (requestDate) {
+            params = params.set('requestDate', requestDate);
+        }
+        if (applicantName) {
+            params = params.set('applicantName', applicantName);
+        }
+        if (proposedGuideName) {
+            params = params.set('proposedGuideName', proposedGuideName);
+        }
+        if (shariaDeedNumber) {
+            params = params.set('shariaDeedNumber', shariaDeedNumber);
+        }
+        if (customaryDeedSerial) {
+            params = params.set('customaryDeedSerial', customaryDeedSerial);
+        }
+        if (guarantorName) {
+            params = params.set('guarantorName', guarantorName);
+        }
+        if (calendarType) {
+            params = params.set('calendarType', calendarType);
+        }
+
+        return this.http.get<LicenseApplicationListResponse>(`${this.baseUrl}/search`, { params });
+    }
+
     getById(id: number, calendarType?: string): Observable<LicenseApplication> {
         let params = new HttpParams();
         if (calendarType) {
