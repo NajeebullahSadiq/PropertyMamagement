@@ -11,12 +11,10 @@ namespace DataMigration
 {
     class SecuritiesMigration
     {
-               // Connection string for database
+        // Connection string for database
         private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
             ?? "Host=localhost;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024";
         
-        private static MigrationStats stats = new MigrationStats();
-
         private static SecuritiesMigrationStats stats = new SecuritiesMigrationStats();
         
         public static async Task RunSecuritiesMigration()
