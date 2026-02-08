@@ -117,55 +117,58 @@ namespace DataMigration
                     try
                     {
                         // Check if company already exists
+                        bool companyExists = false;
                         using (var checkCmd = new NpgsqlCommand(
                             "SELECT \"Id\" FROM org.\"CompanyDetails\" WHERE \"Id\" = @id", conn, transaction))
                         {
                             checkCmd.Parameters.AddWithValue("id", record.RID);
                             var exists = await checkCmd.ExecuteScalarAsync();
-                            
-                            if (exists != null)
-                            {
-                                stats.Skipped.Add(new SkippedRecord
-                                {
-                                    RecordId = record.RID,
-                                    Reason = "Company already exists"
-                                });
-                                await transaction.RollbackAsync();
-                                return;
-                            }
+                            companyExists = (exists != null);
                         }
                         
                         // Get Kabul Province ID (all licenses are from Kabul)
                         // Use ProvinceId = 1 for all records
                         int kabulProvinceId = 1;
+                        int companyId = record.RID;
                         
                         // ============================================================
                         // PART 1: COMPANY MODULE (Already Issued Licenses)
                         // ============================================================
                         
-                        // 1. Insert CompanyDetails (registered in Kabul)
-                        int companyId = await InsertCompanyDetails(record, kabulProvinceId, conn, transaction);
-                        stats.CompaniesCreated++;
-                        
-                        // 2. Insert CompanyOwner (with their actual address)
-                        if (!string.IsNullOrWhiteSpace(record.FName) && !string.IsNullOrWhiteSpace(record.FathName))
+                        if (!companyExists)
                         {
-                            await InsertCompanyOwner(record, companyId, conn, transaction);
-                            stats.OwnersCreated++;
+                            // 1. Insert CompanyDetails (registered in Kabul)
+                            companyId = await InsertCompanyDetails(record, kabulProvinceId, conn, transaction);
+                            stats.CompaniesCreated++;
+                            
+                            // 2. Insert CompanyOwner (with their actual address)
+                            if (!string.IsNullOrWhiteSpace(record.FName) && !string.IsNullOrWhiteSpace(record.FathName))
+                            {
+                                await InsertCompanyOwner(record, companyId, conn, transaction);
+                                stats.OwnersCreated++;
+                            }
+                            
+                            // 3. Insert LicenseDetails (issued in Kabul)
+                            if (record.LicenseNo.HasValue)
+                            {
+                                await InsertLicenseDetails(record, companyId, kabulProvinceId, conn, transaction);
+                                stats.LicensesCreated++;
+                            }
+                            
+                            // 4. Insert CompanyCancellationInfo (if cancelled)
+                            if (!string.IsNullOrWhiteSpace(record.LicnsCancelNo))
+                            {
+                                await InsertCancellationInfo(record, companyId, conn, transaction);
+                                stats.CancellationsCreated++;
+                            }
                         }
-                        
-                        // 3. Insert LicenseDetails (issued in Kabul)
-                        if (record.LicenseNo.HasValue)
+                        else
                         {
-                            await InsertLicenseDetails(record, companyId, kabulProvinceId, conn, transaction);
-                            stats.LicensesCreated++;
-                        }
-                        
-                        // 4. Insert CompanyCancellationInfo (if cancelled)
-                        if (!string.IsNullOrWhiteSpace(record.LicnsCancelNo))
-                        {
-                            await InsertCancellationInfo(record, companyId, conn, transaction);
-                            stats.CancellationsCreated++;
+                            stats.Skipped.Add(new SkippedRecord
+                            {
+                                RecordId = record.RID,
+                                Reason = "Company already exists"
+                            });
                         }
                         
                         // ============================================================
@@ -173,10 +176,26 @@ namespace DataMigration
                         // ============================================================
                         
                         // 5. Insert LicenseApplication (as approved application)
+                        // Check if application already exists first
                         if (record.LicenseNo.HasValue)
                         {
-                            await InsertLicenseApplication(record, conn, transaction);
-                            stats.ApplicationsCreated++;
+                            string formattedSerialNumber = $"KBL-{record.LicenseNo.ToString().PadLeft(5, '0')}";
+                            
+                            bool applicationExists = false;
+                            using (var checkAppCmd = new NpgsqlCommand(
+                                "SELECT \"Id\" FROM org.\"LicenseApplications\" WHERE \"RequestSerialNumber\" = @serial", 
+                                conn, transaction))
+                            {
+                                checkAppCmd.Parameters.AddWithValue("serial", formattedSerialNumber);
+                                var appExists = await checkAppCmd.ExecuteScalarAsync();
+                                applicationExists = (appExists != null);
+                            }
+                            
+                            if (!applicationExists)
+                            {
+                                await InsertLicenseApplication(record, conn, transaction);
+                                stats.ApplicationsCreated++;
+                            }
                         }
                         
                         await transaction.CommitAsync();
