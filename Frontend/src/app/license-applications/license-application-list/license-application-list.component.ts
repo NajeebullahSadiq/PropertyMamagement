@@ -22,6 +22,9 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     searchTerm = '';
     isLoading = false;
 
+    // Math for template
+    Math = Math;
+
     // Advanced search fields
     showAdvancedSearch = false;
     searchSerialNumber = '';
@@ -71,7 +74,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         const calendar = this.calendarService.getSelectedCalendar();
 
-        this.licenseAppService.getAll(this.page, this.pageSize, '', calendar).subscribe({
+        this.licenseAppService.getAll(this.page, this.pageSize, this.searchTerm, calendar).subscribe({
             next: (response) => {
                 this.items = response.items;
                 this.totalCount = response.totalCount;
@@ -86,23 +89,9 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         });
     }
 
-    applyFilter(): void {
-        if (!this.searchTerm.trim()) {
-            this.filteredItems = [...this.items];
-        } else {
-            const term = this.searchTerm.toLowerCase().trim();
-            this.filteredItems = this.items.filter(item =>
-                item.requestSerialNumber?.toLowerCase().includes(term) ||
-                item.applicantName?.toLowerCase().includes(term) ||
-                item.proposedGuideName?.toLowerCase().includes(term)
-            );
-        }
-        this.totalCount = this.filteredItems.length;
-    }
-
     onSearch(): void {
         this.page = 1;
-        this.applyFilter();
+        this.loadData();
     }
 
     toggleAdvancedSearch(): void {
@@ -114,8 +103,13 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
 
     performAdvancedSearch(): void {
         this.isLoading = true;
-        this.page = 1;
         const calendar = this.calendarService.getSelectedCalendar();
+
+        // If no advanced search criteria, just load normal data
+        if (!this.hasAdvancedSearchCriteria()) {
+            this.loadData();
+            return;
+        }
 
         this.licenseAppService.search(
             this.searchSerialNumber || undefined,
@@ -155,15 +149,39 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         this.searchShariaDeedNumber = '';
         this.searchCustomaryDeedSerial = '';
         this.searchGuarantorName = '';
+        this.searchTerm = '';
+        this.page = 1;
         this.loadData();
     }
 
     onPageChange(page: number): void {
         this.page = page;
+        if (this.showAdvancedSearch && this.hasAdvancedSearchCriteria()) {
+            this.performAdvancedSearch();
+        } else {
+            this.loadData();
+        }
     }
 
     onPageSizeChange(): void {
         this.page = 1;
+        if (this.showAdvancedSearch && this.hasAdvancedSearchCriteria()) {
+            this.performAdvancedSearch();
+        } else {
+            this.loadData();
+        }
+    }
+
+    hasAdvancedSearchCriteria(): boolean {
+        return !!(
+            this.searchSerialNumber ||
+            this.searchRequestDate ||
+            this.searchApplicantName ||
+            this.searchProposedGuideName ||
+            this.searchShariaDeedNumber ||
+            this.searchCustomaryDeedSerial ||
+            this.searchGuarantorName
+        );
     }
 
     getStatusText(item: LicenseApplication): string {
