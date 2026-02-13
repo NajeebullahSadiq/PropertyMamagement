@@ -23,6 +23,15 @@ namespace DataMigration
             
             try
             {
+                // Ask if user wants to delete existing data
+                Console.Write("Delete existing company data before migration? (y/n): ");
+                string response = Console.ReadLine()?.ToLower() ?? "n";
+                
+                if (response == "y" || response == "yes")
+                {
+                    await DeleteExistingCompanyData();
+                }
+                
                 // Load JSON files
                 var mainFormRecords = await LoadMainFormRecords("mainform_full_records.json");
                 var guaranteeRecords = await LoadGuaranteeRecords("guarantee_records.json");
@@ -44,6 +53,46 @@ namespace DataMigration
             {
                 Console.WriteLine($"\nFatal Error: {ex.Message}");
                 Console.WriteLine(ex.StackTrace);
+            }
+        }
+        
+        private static async Task DeleteExistingCompanyData()
+        {
+            Console.WriteLine("Deleting existing company data...");
+            
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                using (var transaction = await conn.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        // Delete in correct order (respecting foreign keys)
+                        await ExecuteDelete(conn, transaction, "org.\"Guarantors\"");
+                        await ExecuteDelete(conn, transaction, "org.\"LicenseDetails\"");
+                        await ExecuteDelete(conn, transaction, "org.\"CompanyOwner\"");
+                        await ExecuteDelete(conn, transaction, "org.\"CompanyDetails\"");
+                        
+                        await transaction.CommitAsync();
+                        Console.WriteLine("Existing data deleted successfully.\n");
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        Console.WriteLine($"Error deleting data: {ex.Message}");
+                        throw;
+                    }
+                }
+            }
+        }
+        
+        private static async Task ExecuteDelete(NpgsqlConnection conn, NpgsqlTransaction transaction, string tableName)
+        {
+            string query = $"DELETE FROM {tableName}";
+            using (var cmd = new NpgsqlCommand(query, conn, transaction))
+            {
+                int deleted = await cmd.ExecuteNonQueryAsync();
+                Console.WriteLine($"  Deleted {deleted} records from {tableName}");
             }
         }
         
