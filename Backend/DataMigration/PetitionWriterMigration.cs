@@ -11,7 +11,7 @@ namespace DataMigration
     public class PetitionWriterMigration
     {
         private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
-            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=postgres;Password=Khan@223344";
+            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024";
         
         private static PetitionWriterStats stats = new PetitionWriterStats();
         
