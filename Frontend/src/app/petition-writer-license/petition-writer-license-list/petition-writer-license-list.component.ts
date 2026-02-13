@@ -84,7 +84,7 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
             this.filteredItems = this.items.filter(item =>
                 item.licenseNumber?.toLowerCase().includes(term) ||
                 item.applicantName?.toLowerCase().includes(term) ||
-                item.activityLocation?.toLowerCase().includes(term)
+                item.detailedAddress?.toLowerCase().includes(term)
             );
         }
         this.totalCount = this.filteredItems.length;

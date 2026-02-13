@@ -317,6 +317,34 @@ export class VerifyComponent implements OnInit, OnDestroy {
     return 'assets/img/avatar2.png';
   }
 
+  getCompetencyDisplay(competency: string | undefined): string {
+    if (!competency) return '-';
+    switch (competency.toLowerCase()) {
+      case 'high':
+        return 'اعلی';
+      case 'medium':
+        return 'اوسط';
+      case 'low':
+        return 'ادنی';
+      default:
+        return competency;
+    }
+  }
+
+  getLicenseTypeDisplay(licenseType: string | undefined): string {
+    if (!licenseType) return '-';
+    switch (licenseType.toLowerCase()) {
+      case 'new':
+        return 'جدید';
+      case 'renewal':
+        return 'تمدید';
+      case 'duplicate':
+        return 'مثنی';
+      default:
+        return licenseType;
+    }
+  }
+
   resetSearch(): void {
     this.verificationCode = '';
     this.result = null;

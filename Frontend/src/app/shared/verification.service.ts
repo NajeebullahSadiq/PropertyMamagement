@@ -30,6 +30,7 @@ export interface DocumentVerificationDto {
   verifiedAt: string;
   sellerInfo?: SellerInfoDto;
   buyerInfo?: BuyerInfoDto;
+  petitionWriterInfo?: PetitionWriterInfoDto;
 }
 
 export interface SellerInfoDto {
@@ -54,6 +55,25 @@ export interface BuyerInfoDto {
   province?: string;
   district?: string;
   village?: string;
+}
+
+export interface PetitionWriterInfoDto {
+  applicantFatherName?: string;
+  applicantGrandFatherName?: string;
+  electronicNationalIdNumber?: string;
+  mobileNumber?: string;
+  competency?: string;
+  district?: string;
+  licenseType?: string;
+  licensePrice?: number;
+  permanentProvinceName?: string;
+  permanentDistrictName?: string;
+  permanentVillage?: string;
+  currentProvinceName?: string;
+  currentDistrictName?: string;
+  currentVillage?: string;
+  detailedAddress?: string;
+  latestRelocation?: string;
 }
 
 export interface VerificationStatsDto {

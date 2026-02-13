@@ -12,7 +12,7 @@ namespace DataMigration
     {
         // Connection string for database
         private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
-            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024";
+            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=postgres;Password=Khan@223344";
         
         private static MigrationStats stats = new MigrationStats();
         
@@ -29,17 +29,35 @@ namespace DataMigration
                 await SecuritiesMigration.RunSecuritiesMigration();
                 return;
             }
+            else if (args.Length > 0 && args[0].ToLower() == "petitionwriter")
+            {
+                // Run Petition Writer Migration Only
+                await PetitionWriterMigration.RunPetitionWriterMigration();
+                return;
+            }
+            else if (args.Length > 0 && args[0].ToLower() == "company")
+            {
+                // Run Company Migration Only
+                await CompanyMigration.RunCompanyMigration();
+                return;
+            }
             else if (args.Length > 0 && args[0].ToLower() == "all")
             {
-                // Run Both Migrations
-                Console.WriteLine("Running BOTH Company and Securities migrations...\n");
-                await RunCompanyMigration();
+                // Run All Migrations
+                Console.WriteLine("Running ALL migrations (Company, Securities, and Petition Writer)...\n");
+                await CompanyMigration.RunCompanyMigration();
                 await SecuritiesMigration.RunSecuritiesMigration();
+                await PetitionWriterMigration.RunPetitionWriterMigration();
                 return;
             }
             
-            // Default: Run Company Migration Only
-            await RunCompanyMigration();
+            // Default: Show usage
+            Console.WriteLine("Usage: dotnet run [migration_type]");
+            Console.WriteLine("  company        - Migrate company/license data");
+            Console.WriteLine("  securities     - Migrate securities data");
+            Console.WriteLine("  petitionwriter - Migrate petition writer licenses");
+            Console.WriteLine("  all            - Run all migrations");
+            Console.WriteLine("\nExample: dotnet run company");
         }
         
         static async Task RunCompanyMigration()

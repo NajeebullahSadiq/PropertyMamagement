@@ -34,6 +34,14 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         [MaxLength(200)]
         public string? ApplicantGrandFatherName { get; set; }
 
+        // Mobile Number - شماره تماس
+        [MaxLength(20)]
+        public string? MobileNumber { get; set; }
+
+        // Competency - اهلیت عریضه نویس (اعلی, اوسط, ادنی)
+        [MaxLength(50)]
+        public string? Competency { get; set; }
+
         // Identity Card Information
         // Electronic National ID - الیکټرونیکی تذکره
         [Required]
@@ -54,9 +62,9 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         [MaxLength(500)]
         public string? CurrentVillage { get; set; }
 
-        // Activity Location (محل فعالیت)
-        [MaxLength(500)]
-        public string? ActivityLocation { get; set; }
+        // Detailed Address (ادرس دقیق محل فعالیت)
+        [MaxLength(1000)]
+        public string? DetailedAddress { get; set; }
 
         // Picture Path (عکس)
         [MaxLength(500)]
@@ -68,8 +76,15 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
 
         public DateOnly? BankReceiptDate { get; set; }
 
+        // District - ناحیه
+        [MaxLength(200)]
+        public string? District { get; set; }
+
         [MaxLength(50)]
         public string? LicenseType { get; set; }
+
+        // License Price - قیمت جواز
+        public decimal? LicensePrice { get; set; }
 
         public DateOnly? LicenseIssueDate { get; set; }
 

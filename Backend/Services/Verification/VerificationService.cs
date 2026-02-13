@@ -270,6 +270,30 @@ namespace WebAPIBackend.Services.Verification
                         Village = currentData.Buyer.Village
                     };
                 }
+                
+                // Populate petition writer information (for PetitionWriterLicense documents)
+                if (currentData.PetitionWriterData != null)
+                {
+                    result.PetitionWriterInfo = new PetitionWriterInfoDto
+                    {
+                        ApplicantFatherName = currentData.PetitionWriterData.ApplicantFatherName,
+                        ApplicantGrandFatherName = currentData.PetitionWriterData.ApplicantGrandFatherName,
+                        ElectronicNationalIdNumber = currentData.PetitionWriterData.ElectronicNationalIdNumber,
+                        MobileNumber = currentData.PetitionWriterData.MobileNumber,
+                        Competency = currentData.PetitionWriterData.Competency,
+                        District = currentData.PetitionWriterData.District,
+                        LicenseType = currentData.PetitionWriterData.LicenseType,
+                        LicensePrice = currentData.PetitionWriterData.LicensePrice,
+                        PermanentProvinceName = currentData.PetitionWriterData.PermanentProvinceName,
+                        PermanentDistrictName = currentData.PetitionWriterData.PermanentDistrictName,
+                        PermanentVillage = currentData.PetitionWriterData.PermanentVillage,
+                        CurrentProvinceName = currentData.PetitionWriterData.CurrentProvinceName,
+                        CurrentDistrictName = currentData.PetitionWriterData.CurrentDistrictName,
+                        CurrentVillage = currentData.PetitionWriterData.CurrentVillage,
+                        DetailedAddress = currentData.PetitionWriterData.DetailedAddress,
+                        LatestRelocation = currentData.PetitionWriterData.LatestRelocation
+                    };
+                }
 
                 return result;
             }
@@ -393,19 +417,56 @@ namespace WebAPIBackend.Services.Verification
         private async Task<DocumentDataDto?> GetPetitionWriterLicenseDataAsync(int licenseId)
         {
             var license = await _context.PetitionWriterLicenses
+                .Include(l => l.PermanentProvince)
+                .Include(l => l.PermanentDistrict)
+                .Include(l => l.CurrentProvince)
+                .Include(l => l.CurrentDistrict)
+                .Include(l => l.Relocations)
                 .FirstOrDefaultAsync(l => l.Id == licenseId);
 
             if (license == null) return null;
+
+            // Get province and district names
+            string permanentProvinceName = license.PermanentProvince?.Dari ?? license.PermanentProvince?.Name ?? "";
+            string permanentDistrictName = license.PermanentDistrict?.Dari ?? license.PermanentDistrict?.Name ?? "";
+            string currentProvinceName = license.CurrentProvince?.Dari ?? license.CurrentProvince?.Name ?? "";
+            string currentDistrictName = license.CurrentDistrict?.Dari ?? license.CurrentDistrict?.Name ?? "";
+
+            // Get latest relocation
+            var latestRelocation = license.Relocations
+                .OrderByDescending(r => r.RelocationDate)
+                .FirstOrDefault();
 
             return new DocumentDataDto
             {
                 LicenseNumber = license.LicenseNumber ?? "",
                 HolderName = license.ApplicantName,
-                HolderPhoto = null, // PetitionWriterLicense doesn't have a photo field
+                HolderPhoto = license.PicturePath,
                 IssueDate = license.LicenseIssueDate?.ToDateTime(TimeOnly.MinValue),
                 ExpiryDate = license.LicenseExpiryDate?.ToDateTime(TimeOnly.MinValue),
                 CompanyTitle = null,
-                OfficeAddress = license.ActivityLocation
+                OfficeAddress = license.DetailedAddress,
+                
+                // Petition Writer specific fields
+                PetitionWriterData = new PetitionWriterData
+                {
+                    ApplicantFatherName = license.ApplicantFatherName,
+                    ApplicantGrandFatherName = license.ApplicantGrandFatherName,
+                    ElectronicNationalIdNumber = license.ElectronicNationalIdNumber,
+                    MobileNumber = license.MobileNumber,
+                    Competency = license.Competency,
+                    District = license.District,
+                    LicenseType = license.LicenseType,
+                    LicensePrice = license.LicensePrice,
+                    PermanentProvinceName = permanentProvinceName,
+                    PermanentDistrictName = permanentDistrictName,
+                    PermanentVillage = license.PermanentVillage,
+                    CurrentProvinceName = currentProvinceName,
+                    CurrentDistrictName = currentDistrictName,
+                    CurrentVillage = license.CurrentVillage,
+                    DetailedAddress = license.DetailedAddress,
+                    LatestRelocation = latestRelocation?.NewActivityLocation
+                }
             };
         }
 
@@ -639,6 +700,9 @@ namespace WebAPIBackend.Services.Verification
         
         // Buyer information (for Property and Vehicle documents)
         public BuyerData? Buyer { get; set; }
+        
+        // Petition Writer specific information
+        public PetitionWriterData? PetitionWriterData { get; set; }
     }
 
     /// <summary>
@@ -671,5 +735,28 @@ namespace WebAPIBackend.Services.Verification
         public string? Province { get; set; }
         public string? District { get; set; }
         public string? Village { get; set; }
+    }
+
+    /// <summary>
+    /// Internal petition writer data
+    /// </summary>
+    internal class PetitionWriterData
+    {
+        public string? ApplicantFatherName { get; set; }
+        public string? ApplicantGrandFatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
+        public string? MobileNumber { get; set; }
+        public string? Competency { get; set; }
+        public string? District { get; set; }
+        public string? LicenseType { get; set; }
+        public decimal? LicensePrice { get; set; }
+        public string? PermanentProvinceName { get; set; }
+        public string? PermanentDistrictName { get; set; }
+        public string? PermanentVillage { get; set; }
+        public string? CurrentProvinceName { get; set; }
+        public string? CurrentDistrictName { get; set; }
+        public string? CurrentVillage { get; set; }
+        public string? DetailedAddress { get; set; }
+        public string? LatestRelocation { get; set; }
     }
 }

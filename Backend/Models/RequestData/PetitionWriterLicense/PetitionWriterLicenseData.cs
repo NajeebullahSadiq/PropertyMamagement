@@ -9,9 +9,9 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
     {
         public int? Id { get; set; }
 
-        [Required(ErrorMessage = "نمبر جواز الزامی است")]
+        // License number is optional - will be auto-generated if not provided
         [MaxLength(50, ErrorMessage = "نمبر جواز نباید بیشتر از ۵۰ حرف باشد")]
-        public string LicenseNumber { get; set; } = string.Empty;
+        public string? LicenseNumber { get; set; }
 
         public int? ProvinceId { get; set; }
 
@@ -24,6 +24,12 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
 
         [MaxLength(200)]
         public string? ApplicantGrandFatherName { get; set; }
+
+        [MaxLength(20)]
+        public string? MobileNumber { get; set; }
+
+        [MaxLength(50)]
+        public string? Competency { get; set; }
 
         [Required(ErrorMessage = "نمبر تذکره الکترونیکی الزامی است")]
         [MaxLength(50)]
@@ -43,8 +49,8 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
         [MaxLength(500)]
         public string? CurrentVillage { get; set; }
 
-        [MaxLength(500)]
-        public string? ActivityLocation { get; set; }
+        [MaxLength(1000)]
+        public string? DetailedAddress { get; set; }
 
         [MaxLength(500)]
         public string? PicturePath { get; set; }
@@ -55,8 +61,13 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
 
         public string? BankReceiptDate { get; set; }
 
+        [MaxLength(200)]
+        public string? District { get; set; }
+
         [MaxLength(50)]
         public string? LicenseType { get; set; }
+
+        public decimal? LicensePrice { get; set; }
 
         public string? LicenseIssueDate { get; set; }
 

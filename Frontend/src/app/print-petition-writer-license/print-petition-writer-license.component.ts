@@ -143,4 +143,31 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
     // environment.apiURL already includes /api, so just append the Upload/view path
     return `${environment.apiURL}/Upload/view/${path}`;
   }
+
+  getCompetencyName(): string {
+    const competency = this.data?.competency;
+    if (!competency) return '-';
+    
+    const competencyMap: { [key: string]: string } = {
+      'high': 'اعلی',
+      'medium': 'اوسط',
+      'low': 'ادنی'
+    };
+    
+    return competencyMap[competency] || competency;
+  }
+
+  getLatestRelocation(): string {
+    // If relocations array exists and has items, return the latest one
+    if (this.data?.relocations && this.data.relocations.length > 0) {
+      // Sort by date descending and get the first one
+      const sorted = [...this.data.relocations].sort((a, b) => {
+        const dateA = new Date(a.relocationDate || 0).getTime();
+        const dateB = new Date(b.relocationDate || 0).getTime();
+        return dateB - dateA;
+      });
+      return sorted[0]?.newActivityLocation || '-';
+    }
+    return '-';
+  }
 }

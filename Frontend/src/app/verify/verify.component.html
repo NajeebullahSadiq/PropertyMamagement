@@ -177,6 +177,112 @@
         </div>
       </div>
 
+      <!-- Petition Writer Information (for PetitionWriterLicense documents) -->
+      <div *ngIf="result.petitionWriterInfo" class="petition-writer-details">
+        <div class="detail-section-header">
+          <h4>معلومات تفصیلی عریضه نویس</h4>
+        </div>
+        
+        <!-- Personal Information -->
+        <div class="info-section">
+          <h5 class="section-title">معلومات شخصی</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.petitionWriterInfo.applicantFatherName">
+              <label>نام پدر:</label>
+              <span>{{ result.petitionWriterInfo.applicantFatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.petitionWriterInfo.applicantGrandFatherName">
+              <label>نام پدر کلان:</label>
+              <span>{{ result.petitionWriterInfo.applicantGrandFatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.petitionWriterInfo.electronicNationalIdNumber">
+              <label>شماره تذکره:</label>
+              <span dir="ltr">{{ result.petitionWriterInfo.electronicNationalIdNumber }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.petitionWriterInfo.mobileNumber">
+              <label>شماره تماس:</label>
+              <span dir="ltr">{{ result.petitionWriterInfo.mobileNumber }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Permanent Address -->
+        <div class="info-section" *ngIf="result.petitionWriterInfo.permanentProvinceName || result.petitionWriterInfo.permanentDistrictName || result.petitionWriterInfo.permanentVillage">
+          <h5 class="section-title">سکونت اصلی</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.petitionWriterInfo.permanentProvinceName">
+              <label>ولایت:</label>
+              <span>{{ result.petitionWriterInfo.permanentProvinceName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.petitionWriterInfo.permanentDistrictName">
+              <label>ولسوالی:</label>
+              <span>{{ result.petitionWriterInfo.permanentDistrictName }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.permanentVillage">
+              <label>ناحیه / قریه:</label>
+              <span>{{ result.petitionWriterInfo.permanentVillage }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Address -->
+        <div class="info-section" *ngIf="result.petitionWriterInfo.currentProvinceName || result.petitionWriterInfo.currentDistrictName || result.petitionWriterInfo.currentVillage">
+          <h5 class="section-title">سکونت فعلی</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.petitionWriterInfo.currentProvinceName">
+              <label>ولایت:</label>
+              <span>{{ result.petitionWriterInfo.currentProvinceName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.petitionWriterInfo.currentDistrictName">
+              <label>ولسوالی:</label>
+              <span>{{ result.petitionWriterInfo.currentDistrictName }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.currentVillage">
+              <label>قریه / گذر:</label>
+              <span>{{ result.petitionWriterInfo.currentVillage }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Location -->
+        <div class="info-section" *ngIf="result.petitionWriterInfo.district || result.petitionWriterInfo.detailedAddress || result.petitionWriterInfo.latestRelocation">
+          <h5 class="section-title">محل فعالیت</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.petitionWriterInfo.district">
+              <label>ناحیه:</label>
+              <span>{{ result.petitionWriterInfo.district }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.detailedAddress">
+              <label>آدرس دقیق:</label>
+              <span>{{ result.petitionWriterInfo.detailedAddress }}</span>
+            </div>
+            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.latestRelocation">
+              <label>نقل مکان:</label>
+              <span>{{ result.petitionWriterInfo.latestRelocation }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- License Details -->
+        <div class="info-section" *ngIf="result.petitionWriterInfo.competency || result.petitionWriterInfo.licenseType || result.petitionWriterInfo.licensePrice">
+          <h5 class="section-title">معلومات جواز</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.petitionWriterInfo.competency">
+              <label>اهلیت:</label>
+              <span>{{ getCompetencyDisplay(result.petitionWriterInfo.competency) }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.petitionWriterInfo.licenseType">
+              <label>نوع جواز:</label>
+              <span>{{ getLicenseTypeDisplay(result.petitionWriterInfo.licenseType) }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.petitionWriterInfo.licensePrice">
+              <label>قیمت جواز:</label>
+              <span>{{ result.petitionWriterInfo.licensePrice }} افغانی</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Seller Information (for Property and Vehicle documents) -->
       <div *ngIf="result.sellerInfo" class="party-details seller-details">
         <div class="party-header">

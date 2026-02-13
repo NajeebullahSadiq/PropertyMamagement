@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "e+As2mPh03w=",
+  "dgSpecHash": "nSNP4aS9lxM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Najib\\OneDrive\\Desktop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj",
+  "projectFilePath": "C:\\Users\\Najib\\OneDrive\\Desktop\\DeskTop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Najib\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
     "C:\\Users\\Najib\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.2\\microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",

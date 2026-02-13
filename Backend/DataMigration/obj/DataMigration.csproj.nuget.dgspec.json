@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Najib\\OneDrive\\Desktop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj": {}
+    "C:\\Users\\Najib\\OneDrive\\Desktop\\DeskTop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Najib\\OneDrive\\Desktop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj": {
+    "C:\\Users\\Najib\\OneDrive\\Desktop\\DeskTop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Najib\\OneDrive\\Desktop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj",
+        "projectUniqueName": "C:\\Users\\Najib\\OneDrive\\Desktop\\DeskTop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj",
         "projectName": "DataMigration",
-        "projectPath": "C:\\Users\\Najib\\OneDrive\\Desktop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj",
+        "projectPath": "C:\\Users\\Najib\\OneDrive\\Desktop\\DeskTop\\PropertyMamagement\\Backend\\DataMigration\\DataMigration.csproj",
         "packagesPath": "C:\\Users\\Najib\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Najib\\OneDrive\\Desktop\\PropertyMamagement\\Backend\\DataMigration\\obj\\",
+        "outputPath": "C:\\Users\\Najib\\OneDrive\\Desktop\\DeskTop\\PropertyMamagement\\Backend\\DataMigration\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Najib\\AppData\\Roaming\\NuGet\\NuGet.Config"

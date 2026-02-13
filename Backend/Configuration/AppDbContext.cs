@@ -434,7 +434,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.ElectronicNationalIdNumber).HasMaxLength(50).IsRequired();
                 entity.Property(e => e.PermanentVillage).HasMaxLength(500);
                 entity.Property(e => e.CurrentVillage).HasMaxLength(500);
-                entity.Property(e => e.ActivityLocation).HasMaxLength(500);
+                entity.Property(e => e.DetailedAddress).HasMaxLength(1000);
                 entity.Property(e => e.BankReceiptNumber).HasMaxLength(100);
                 entity.Property(e => e.LicenseType).HasMaxLength(50);
 

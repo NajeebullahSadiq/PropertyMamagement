@@ -48,8 +48,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 {
                     query = query.Where(x =>
                         x.LicenseNumber.Contains(search) ||
-                        x.ApplicantName.Contains(search) ||
-                        (x.ActivityLocation != null && x.ActivityLocation.Contains(search)));
+                        x.ApplicantName.Contains(search));
                 }
 
                 var totalCount = await query.CountAsync();
@@ -73,6 +72,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
+                        x.MobileNumber,
+                        x.Competency,
                         x.ElectronicNationalIdNumber,
                         x.PermanentProvinceId,
                         PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
@@ -84,14 +85,17 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.CurrentDistrictId,
                         CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
                         x.CurrentVillage,
-                        x.ActivityLocation,
+
+                        x.DetailedAddress,
                         x.PicturePath,
                         x.BankReceiptNumber,
                         x.BankReceiptDate,
                         BankReceiptDateFormatted = x.BankReceiptDate.HasValue
                             ? DateConversionHelper.FormatDateOnly(x.BankReceiptDate, calendar)
                             : "",
+                        x.District,
                         x.LicenseType,
+                        x.LicensePrice,
                         x.LicenseIssueDate,
                         LicenseIssueDateFormatted = x.LicenseIssueDate.HasValue
                             ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, calendar)
@@ -142,6 +146,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     .Include(x => x.PermanentDistrict)
                     .Include(x => x.CurrentProvince)
                     .Include(x => x.CurrentDistrict)
+                    .Include(x => x.Relocations)
                     .Select(x => new
                     {
                         x.Id,
@@ -151,6 +156,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.ApplicantName,
                         x.ApplicantFatherName,
                         x.ApplicantGrandFatherName,
+                        x.MobileNumber,
+                        x.Competency,
                         x.ElectronicNationalIdNumber,
                         x.PermanentProvinceId,
                         PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
@@ -162,14 +169,17 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.CurrentDistrictId,
                         CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
                         x.CurrentVillage,
-                        x.ActivityLocation,
+
+                        x.DetailedAddress,
                         x.PicturePath,
                         x.BankReceiptNumber,
                         x.BankReceiptDate,
                         BankReceiptDateFormatted = x.BankReceiptDate.HasValue
                             ? DateConversionHelper.FormatDateOnly(x.BankReceiptDate, calendar)
                             : "",
+                        x.District,
                         x.LicenseType,
+                        x.LicensePrice,
                         x.LicenseIssueDate,
                         LicenseIssueDateFormatted = x.LicenseIssueDate.HasValue
                             ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, calendar)
@@ -187,7 +197,17 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.CreatedAt,
                         x.CreatedBy,
                         x.UpdatedAt,
-                        x.UpdatedBy
+                        x.UpdatedBy,
+                        Relocations = x.Relocations.OrderByDescending(r => r.RelocationDate).Select(r => new
+                        {
+                            r.Id,
+                            r.NewActivityLocation,
+                            r.RelocationDate,
+                            RelocationDateFormatted = r.RelocationDate.HasValue
+                                ? DateConversionHelper.FormatDateOnly(r.RelocationDate, calendar)
+                                : "",
+                            r.Remarks
+                        }).ToList()
                     })
                     .FirstOrDefaultAsync();
 
@@ -243,6 +263,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     ApplicantName = data.ApplicantName,
                     ApplicantFatherName = data.ApplicantFatherName,
                     ApplicantGrandFatherName = data.ApplicantGrandFatherName,
+                    MobileNumber = data.MobileNumber,
+                    Competency = data.Competency,
                     ElectronicNationalIdNumber = data.ElectronicNationalIdNumber,
                     PermanentProvinceId = data.PermanentProvinceId,
                     PermanentDistrictId = data.PermanentDistrictId,
@@ -250,11 +272,13 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     CurrentProvinceId = data.CurrentProvinceId,
                     CurrentDistrictId = data.CurrentDistrictId,
                     CurrentVillage = data.CurrentVillage,
-                    ActivityLocation = data.ActivityLocation,
+                    DetailedAddress = data.DetailedAddress,
                     PicturePath = data.PicturePath,
                     BankReceiptNumber = data.BankReceiptNumber,
                     BankReceiptDate = DateConversionHelper.ParseDateOnly(data.BankReceiptDate, calendar),
+                    District = data.District,
                     LicenseType = data.LicenseType,
+                    LicensePrice = data.LicensePrice,
                     LicenseIssueDate = DateConversionHelper.ParseDateOnly(data.LicenseIssueDate, calendar),
                     LicenseExpiryDate = DateConversionHelper.ParseDateOnly(data.LicenseExpiryDate, calendar),
                     LicenseStatus = data.LicenseStatus ?? 1,
@@ -296,23 +320,33 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     return NotFound(new { message = "جواز یافت نشد" });
                 }
 
-                // Check for duplicate license number (excluding current)
-                var exists = await _context.PetitionWriterLicenses
-                    .AnyAsync(x => x.LicenseNumber == data.LicenseNumber && x.Id != id && x.Status == true);
+                // Use existing license number if not provided in request
+                string licenseNumber = !string.IsNullOrWhiteSpace(data.LicenseNumber) 
+                    ? data.LicenseNumber 
+                    : entity.LicenseNumber;
 
-                if (exists)
+                // Check for duplicate license number (excluding current) only if license number changed
+                if (licenseNumber != entity.LicenseNumber)
                 {
-                    return BadRequest(new { message = "نمبر جواز قبلاً ثبت شده است" });
+                    var exists = await _context.PetitionWriterLicenses
+                        .AnyAsync(x => x.LicenseNumber == licenseNumber && x.Id != id && x.Status == true);
+
+                    if (exists)
+                    {
+                        return BadRequest(new { message = "نمبر جواز قبلاً ثبت شده است" });
+                    }
                 }
 
                 var calendar = DateConversionHelper.ParseCalendarType(data.CalendarType);
                 var username = User.Identity?.Name ?? "system";
 
-                entity.LicenseNumber = data.LicenseNumber;
+                entity.LicenseNumber = licenseNumber;
                 entity.ProvinceId = data.ProvinceId;
                 entity.ApplicantName = data.ApplicantName;
                 entity.ApplicantFatherName = data.ApplicantFatherName;
                 entity.ApplicantGrandFatherName = data.ApplicantGrandFatherName;
+                entity.MobileNumber = data.MobileNumber;
+                entity.Competency = data.Competency;
                 entity.ElectronicNationalIdNumber = data.ElectronicNationalIdNumber;
                 entity.PermanentProvinceId = data.PermanentProvinceId;
                 entity.PermanentDistrictId = data.PermanentDistrictId;
@@ -320,11 +354,13 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.CurrentProvinceId = data.CurrentProvinceId;
                 entity.CurrentDistrictId = data.CurrentDistrictId;
                 entity.CurrentVillage = data.CurrentVillage;
-                entity.ActivityLocation = data.ActivityLocation;
+                entity.DetailedAddress = data.DetailedAddress;
                 entity.PicturePath = data.PicturePath;
                 entity.BankReceiptNumber = data.BankReceiptNumber;
                 entity.BankReceiptDate = DateConversionHelper.ParseDateOnly(data.BankReceiptDate, calendar);
+                entity.District = data.District;
                 entity.LicenseType = data.LicenseType;
+                entity.LicensePrice = data.LicensePrice;
                 entity.LicenseIssueDate = DateConversionHelper.ParseDateOnly(data.LicenseIssueDate, calendar);
                 entity.LicenseExpiryDate = DateConversionHelper.ParseDateOnly(data.LicenseExpiryDate, calendar);
                 entity.LicenseStatus = data.LicenseStatus ?? entity.LicenseStatus;

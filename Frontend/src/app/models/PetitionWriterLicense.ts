@@ -12,6 +12,8 @@ export interface PetitionWriterLicense {
     applicantName: string;
     applicantFatherName?: string;
     applicantGrandFatherName?: string;
+    mobileNumber?: string;
+    competency?: string;
     
     // Identity Card - تذکره
     electronicNationalIdNumber?: string;
@@ -29,8 +31,8 @@ export interface PetitionWriterLicense {
     currentProvinceName?: string;
     currentDistrictName?: string;
     
-    // Activity Location
-    activityLocation?: string;
+    // Detailed Address
+    detailedAddress?: string;
     
     // Picture Path
     picturePath?: string;
@@ -39,7 +41,9 @@ export interface PetitionWriterLicense {
     bankReceiptNumber?: string;
     bankReceiptDate?: Date | string;
     bankReceiptDateFormatted?: string;
+    district?: string;
     licenseType?: string;
+    licensePrice?: number;
     licenseIssueDate?: Date | string;
     licenseIssueDateFormatted?: string;
     licenseExpiryDate?: Date | string;
@@ -97,8 +101,18 @@ export const LicenseStatusTypes = [
  * License Types for dropdown
  */
 export const LicenseTypes = [
-    { id: 'new', name: 'جدید' },
-    { id: 'renewal', name: 'تمدید' }
+    { id: 'new', name: 'جدید', price: 168 },
+    { id: 'renewal', name: 'تجدید', price: 85 },
+    { id: 'duplicate', name: 'مثنی', price: 85 }
+];
+
+/**
+ * Competency Types for dropdown
+ */
+export const CompetencyTypes = [
+    { id: 'high', name: 'اعلی' },
+    { id: 'medium', name: 'اوسط' },
+    { id: 'low', name: 'ادنی' }
 ];
 
 /**
@@ -111,6 +125,8 @@ export interface PetitionWriterLicenseData {
     applicantName: string;
     applicantFatherName?: string;
     applicantGrandFatherName?: string;
+    mobileNumber?: string;
+    competency?: string;
     electronicNationalIdNumber: string;
     permanentProvinceId?: number;
     permanentDistrictId?: number;
@@ -119,10 +135,13 @@ export interface PetitionWriterLicenseData {
     currentDistrictId?: number;
     currentVillage?: string;
     activityLocation?: string;
+    detailedAddress?: string;
     picturePath?: string;
     bankReceiptNumber?: string;
     bankReceiptDate?: string;
+    district?: string;
     licenseType?: string;
+    licensePrice?: number;
     licenseIssueDate?: string;
     licenseExpiryDate?: string;
     licenseStatus?: number;

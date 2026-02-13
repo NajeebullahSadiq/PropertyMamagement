@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 import { SellerService } from 'src/app/shared/seller.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import {
@@ -13,7 +14,8 @@ import {
     PetitionWriterRelocation,
     LicenseStatusEnum,
     LicenseStatusTypes,
-    LicenseTypes
+    LicenseTypes,
+    CompetencyTypes
 } from 'src/app/models/PetitionWriterLicense';
 
 @Component({
@@ -38,6 +40,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     currentDistricts: any[] = [];
     licenseStatusTypes = LicenseStatusTypes;
     licenseTypes = LicenseTypes;
+    competencyTypes = CompetencyTypes;
 
     // Relocation list
     relocationsList: PetitionWriterRelocation[] = [];
@@ -90,6 +93,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             applicantName: ['', Validators.required],
             applicantFatherName: [''],
             applicantGrandFatherName: [''],
+            mobileNumber: [''],
+            competency: [null],
             electronicNationalIdNumber: ['', Validators.required],
             permanentProvinceId: [null],
             permanentDistrictId: [null],
@@ -97,14 +102,16 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             currentProvinceId: [null],
             currentDistrictId: [null],
             currentVillage: [''],
-            activityLocation: ['']
+            detailedAddress: ['']
         });
 
         // Tab 2: ثبت مالیه و مشخصات جواز
         this.financialForm = this.fb.group({
             bankReceiptNumber: [''],
             bankReceiptDate: [null],
+            district: [''],
             licenseType: [null],
+            licensePrice: [{ value: null, disabled: true }],
             licenseIssueDate: [null],
             licenseExpiryDate: [null]
         });
@@ -120,6 +127,16 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             newActivityLocation: ['', Validators.required],
             relocationDate: [null],
             remarks: ['']
+        });
+
+        // Subscribe to license type changes
+        this.financialForm.get('licenseType')?.valueChanges.subscribe(() => {
+            this.onLicenseTypeChange();
+        });
+
+        // Subscribe to license issue date changes
+        this.financialForm.get('licenseIssueDate')?.valueChanges.subscribe(() => {
+            this.onLicenseIssueDateChange();
         });
     }
 
@@ -169,6 +186,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     applicantName: data.applicantName,
                     applicantFatherName: data.applicantFatherName,
                     applicantGrandFatherName: data.applicantGrandFatherName,
+                    mobileNumber: data.mobileNumber,
+                    competency: data.competency,
                     electronicNationalIdNumber: data.electronicNationalIdNumber,
                     permanentProvinceId: data.permanentProvinceId,
                     permanentDistrictId: data.permanentDistrictId,
@@ -176,7 +195,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     currentProvinceId: data.currentProvinceId,
                     currentDistrictId: data.currentDistrictId,
                     currentVillage: data.currentVillage,
-                    activityLocation: data.activityLocation
+                    detailedAddress: data.detailedAddress
                 });
 
                 // Set imageName from existing picturePath
@@ -196,19 +215,21 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     });
                 }
 
-                // Patch financial form
+                // Patch financial form - use the same pattern as license details
                 this.financialForm.patchValue({
                     bankReceiptNumber: data.bankReceiptNumber,
-                    bankReceiptDate: this.parseDate(data.bankReceiptDateFormatted),
+                    bankReceiptDate: data.bankReceiptDate,
+                    district: data.district,
                     licenseType: data.licenseType,
-                    licenseIssueDate: this.parseDate(data.licenseIssueDateFormatted),
-                    licenseExpiryDate: this.parseDate(data.licenseExpiryDateFormatted)
+                    licensePrice: data.licensePrice,
+                    licenseIssueDate: data.licenseIssueDate,
+                    licenseExpiryDate: data.licenseExpiryDate
                 });
 
                 // Patch cancellation form
                 this.cancellationForm.patchValue({
                     licenseStatus: data.licenseStatus,
-                    cancellationDate: this.parseDate(data.cancellationDateFormatted)
+                    cancellationDate: data.cancellationDate
                 });
 
                 // Load relocations
@@ -221,14 +242,11 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         });
     }
 
-    parseDate(dateStr: string | undefined): Date | null {
-        if (!dateStr) return null;
-        const date = new Date(dateStr);
-        return isNaN(date.getTime()) ? null : date;
-    }
+    // Form getters
+    get licenseNumber() { return this.licenseForm.get('licenseNumber'); }
+    get applicantName() { return this.licenseForm.get('applicantName'); }
 
-    formatDate(dateValue: any): string {
-        if (!dateValue) return '';
+    private formatDateForBackend(dateValue: any): string {
         const currentCalendar = this.calendarService.getSelectedCalendar();
 
         if (dateValue instanceof Date) {
@@ -236,21 +254,17 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             const year = calendarDate.year;
             const month = String(calendarDate.month).padStart(2, '0');
             const day = String(calendarDate.day).padStart(2, '0');
-            return `${year}/${month}/${day}`;
-        } else if (typeof dateValue === 'object' && dateValue?.year) {
+            return `${year}-${month}-${day}`;
+        } else if (typeof dateValue === 'object' && dateValue.year) {
             const year = dateValue.year;
             const month = String(dateValue.month).padStart(2, '0');
             const day = String(dateValue.day).padStart(2, '0');
-            return `${year}/${month}/${day}`;
+            return `${year}-${month}-${day}`;
         } else if (typeof dateValue === 'string') {
-            return dateValue;
+            return dateValue.replace(/\//g, '-');
         }
         return '';
     }
-
-    // Form getters
-    get licenseNumber() { return this.licenseForm.get('licenseNumber'); }
-    get applicantName() { return this.licenseForm.get('applicantName'); }
 
     saveLicense(): void {
         if (this.licenseForm.invalid) {
@@ -262,18 +276,30 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         const formData = this.licenseForm.value;
         const financialData = this.financialForm.value;
 
-        const bankReceiptDate = this.formatDate(financialData.bankReceiptDate) || undefined;
-        const licenseIssueDate = this.formatDate(financialData.licenseIssueDate) || undefined;
-        const licenseExpiryDate = this.formatDate(financialData.licenseExpiryDate) || undefined;
-        const cancellationDate = this.formatDate(this.cancellationForm.value.cancellationDate) || undefined;
+        // Get date values
+        const bankReceiptDateValue = this.financialForm.get('bankReceiptDate')?.value;
+        const licenseIssueDateValue = this.financialForm.get('licenseIssueDate')?.value;
+        const licenseExpiryDateValue = this.financialForm.get('licenseExpiryDate')?.value;
+        const cancellationDateValue = this.cancellationForm.get('cancellationDate')?.value;
+
+        // Format dates for backend
+        const bankReceiptDate = bankReceiptDateValue ? this.formatDateForBackend(bankReceiptDateValue) : undefined;
+        const licenseIssueDate = licenseIssueDateValue ? this.formatDateForBackend(licenseIssueDateValue) : undefined;
+        const licenseExpiryDate = licenseExpiryDateValue ? this.formatDateForBackend(licenseExpiryDateValue) : undefined;
+        const cancellationDate = cancellationDateValue ? this.formatDateForBackend(cancellationDateValue) : undefined;
 
         const data: PetitionWriterLicenseData = {
             ...formData,
             provinceId: formData.provinceId,
             licenseNumber: formData.licenseNumber || undefined,
+            mobileNumber: formData.mobileNumber,
+            competency: formData.competency,
+            detailedAddress: formData.detailedAddress,
             bankReceiptNumber: financialData.bankReceiptNumber,
             bankReceiptDate,
+            district: financialData.district,
             licenseType: financialData.licenseType,
+            licensePrice: financialData.licensePrice,
             licenseIssueDate,
             licenseExpiryDate,
             licenseStatus: this.cancellationForm.value.licenseStatus,
@@ -329,10 +355,11 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
 
         const calendar = this.calendarService.getSelectedCalendar();
         const formData = this.relocationForm.value;
+        const relocationDateValue = this.relocationForm.get('relocationDate')?.value;
 
         const data: PetitionWriterRelocationData = {
             newActivityLocation: formData.newActivityLocation,
-            relocationDate: this.formatDate(formData.relocationDate) || undefined,
+            relocationDate: relocationDateValue ? this.formatDateForBackend(relocationDateValue) : undefined,
             remarks: formData.remarks,
             calendarType: calendar
         };
@@ -368,7 +395,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         this.selectedRelocationId = r.id!;
         this.relocationForm.patchValue({
             newActivityLocation: r.newActivityLocation,
-            relocationDate: this.parseDate(r.relocationDateFormatted),
+            relocationDate: r.relocationDate,
             remarks: r.remarks
         });
     }
@@ -399,7 +426,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
 
         const calendar = this.calendarService.getSelectedCalendar();
         const status = this.cancellationForm.value.licenseStatus;
-        const cancellationDate = this.formatDate(this.cancellationForm.value.cancellationDate) || undefined;
+        const cancellationDateValue = this.cancellationForm.get('cancellationDate')?.value;
+        const cancellationDate = cancellationDateValue ? this.formatDateForBackend(cancellationDateValue) : undefined;
 
         this.licenseService.updateStatus(this.licenseService.mainTableId, status, cancellationDate, calendar).subscribe({
             next: () => {
@@ -450,5 +478,101 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         } else {
             this.licenseForm.get('licenseNumber')?.enable();
         }
+    }
+
+    onLicenseTypeChange(): void {
+        const licenseType = this.financialForm.get('licenseType')?.value;
+        const licenseIssueDate = this.financialForm.get('licenseIssueDate')?.value;
+        
+        // Find the selected license type
+        const selectedType = this.licenseTypes.find(t => t.id === licenseType);
+        
+        // Set price based on license type
+        if (selectedType) {
+            this.financialForm.patchValue({ licensePrice: selectedType.price });
+        }
+        
+        // Handle expiry date
+        if (licenseType === 'new' || licenseType === 'renewal') {
+            // Auto-calculate expiry date (1 year)
+            if (licenseIssueDate) {
+                const expiryDate = this.addYearsToDate(licenseIssueDate, 1);
+                this.financialForm.patchValue({ licenseExpiryDate: expiryDate });
+            }
+            this.financialForm.get('licenseExpiryDate')?.disable();
+        } else if (licenseType === 'duplicate') {
+            // Allow manual entry for مثنی
+            this.financialForm.get('licenseExpiryDate')?.enable();
+        }
+    }
+
+    onLicenseIssueDateChange(): void {
+        const licenseType = this.financialForm.get('licenseType')?.value;
+        const licenseIssueDate = this.financialForm.get('licenseIssueDate')?.value;
+        
+        // Auto-calculate expiry date for جدید and تمدید (1 year)
+        if ((licenseType === 'new' || licenseType === 'renewal') && licenseIssueDate) {
+            const expiryDate = this.addYearsToDate(licenseIssueDate, 1);
+            this.financialForm.patchValue({ licenseExpiryDate: expiryDate });
+        }
+    }
+
+    addYearsToDate(dateValue: any, years: number): Date | null {
+        if (!dateValue) return null;
+        
+        const currentCalendar = this.calendarService.getSelectedCalendar();
+        
+        try {
+            // Use the same pattern as license details component
+            const issueDate = this.tryResolveGregorianDate(dateValue, currentCalendar);
+            if (!issueDate) return null;
+            
+            // Add years to the Gregorian date
+            const expiryDate = new Date(issueDate);
+            expiryDate.setFullYear(expiryDate.getFullYear() + years);
+            
+            return expiryDate;
+        } catch (error) {
+            console.error('Error adding years to date:', error, dateValue);
+        }
+        
+        return null;
+    }
+
+    private tryResolveGregorianDate(value: any, calendar: CalendarType): Date | null {
+        if (!value) return null;
+
+        // If it's already a valid Date object
+        if (value instanceof Date && !isNaN(value.getTime())) {
+            return value;
+        }
+
+        // If it's a calendar object with year, month, day
+        if (typeof value === 'object' && value.year && value.month && value.day) {
+            try {
+                return this.calendarConversionService.toGregorian({
+                    year: value.year,
+                    month: value.month,
+                    day: value.day,
+                    calendarType: calendar
+                });
+            } catch {
+                return null;
+            }
+        }
+
+        // If it's a string, parse it
+        if (typeof value === 'string') {
+            const normalized = value.trim();
+            if (!normalized) return null;
+
+            const normalizedForParser = calendar === CalendarType.GREGORIAN
+                ? normalized
+                : normalized.replace(/-/g, '/');
+
+            return this.calendarConversionService.parseInputDate(normalizedForParser, calendar);
+        }
+
+        return null;
     }
 }

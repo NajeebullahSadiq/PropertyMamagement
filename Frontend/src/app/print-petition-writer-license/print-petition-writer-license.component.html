@@ -121,10 +121,10 @@
               <img src="/assets/img/mcitlogo.png" alt="لوگو وزارت" class="ministry-logo">
               <div class="photo-container">
                 <div class="photo-frame">
-                  <img *ngIf="data.picturePath" [src]="getImageUrl(data.picturePath)" alt="عکس" class="owner-photo" onerror="this.src='assets/img/avatar.png'">
+                  <img *ngIf="data.picturePath" [src]="getImageUrl(data.picturePath)" alt="عکس" class="owner-photo"
+                    onerror="this.src='assets/img/avatar.png'">
                   <img *ngIf="!data.picturePath" src="assets/img/avatar.png" alt="عکس" class="owner-photo">
                 </div>
-                <div class="photo-label">فوتو</div>
               </div>
             </div>
           </div>
@@ -138,6 +138,7 @@
               <tr>
                 <th colspan="2" class="table-header">شهرت و سکونت اصلی</th>
                 <th colspan="2" class="table-header">سکونت فعلی</th>
+                <th colspan="2" class="table-header">محل فعالیت</th>
               </tr>
             </thead>
             <tbody>
@@ -146,34 +147,46 @@
                 <td class="table-value">{{ data.applicantName || '-' }}</td>
                 <td class="table-label">ولایت</td>
                 <td class="table-value">{{ data.currentProvinceName || '-' }}</td>
+                <td class="table-label">ناحیه</td>
+                <td class="table-value">{{ data.district || '-' }}</td>
               </tr>
               <tr>
                 <td class="table-label">ولد</td>
                 <td class="table-value">{{ data.applicantFatherName || '-' }}</td>
                 <td class="table-label">ولسوالی</td>
                 <td class="table-value">{{ data.currentDistrictName || '-' }}</td>
+                <td class="table-label">ادرس دقیق</td>
+                <td class="table-value">{{ data.detailedAddress || '-' }}</td>
               </tr>
               <tr>
                 <td class="table-label">نمبر تذکره</td>
                 <td class="table-value">{{ data.electronicNationalIdNumber || '-' }}</td>
                 <td class="table-label">ناحیه</td>
                 <td class="table-value">{{ data.currentVillage || '-' }}</td>
+                <td class="table-label">نقل مکان</td>
+                <td class="table-value">{{ getLatestRelocation() }}</td>
               </tr>
               <tr>
                 <td class="table-label">ولایت</td>
                 <td class="table-value">{{ data.permanentProvinceName || '-' }}</td>
-                <td class="table-label">محل فعالیت</td>
-                <td class="table-value">{{ data.activityLocation || '-' }}</td>
+                <td class="table-label">قریه / گذر</td>
+                <td class="table-value">{{ data.currentVillage || '-' }}</td>
+                <td class="table-label"></td>
+                <td class="table-value"></td>
               </tr>
               <tr>
                 <td class="table-label">ولسوالی</td>
                 <td class="table-value">{{ data.permanentDistrictName || '-' }}</td>
-                <td class="table-label">قریه / گذر</td>
-                <td class="table-value">{{ data.currentVillage || '-' }}</td>
+                <td class="table-label">شماره تماس</td>
+                <td class="table-value">{{ data.mobileNumber || '-' }}</td>
+                <td class="table-label"></td>
+                <td class="table-value"></td>
               </tr>
               <tr>
                 <td class="table-label">ناحیه / قریه</td>
                 <td class="table-value">{{ data.permanentVillage || '-' }}</td>
+                <td class="table-label"></td>
+                <td class="table-value"></td>
                 <td class="table-label"></td>
                 <td class="table-value"></td>
               </tr>
@@ -184,25 +197,15 @@
           <table class="bottom-table">
             <thead>
               <tr>
-                <th class="bottom-header">مرجع صلاحیت و امضاء</th>
-                <th class="bottom-header">نظر به درمورد</th>
                 <th class="bottom-header">معلومات جواز عریضه نویسی</th>
+                <th class="bottom-header">نظر به درمورد</th>
+                <th class="bottom-header">مرجع صلاحیت و امضاء</th>
+
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="bottom-cell">
-                  <div class="bottom-text-center">ریاست عمومی انسجام</div>
-                  <div class="signature-space"></div>
-                  <div class="bottom-text-center">امضاء رئیس</div>
-                </td>
-                <td class="bottom-cell">
-                  <div class="bottom-text-justify">
-                    در اهلیت عریضه نویسی بعد از اخذ امتحان نظر هیئت داده شد، که این عریضه نویس به درجه اعلی، اوسط، ادنی لیاقت و اهلیت دارد.
-                  </div>
-                  <div class="bottom-text-center">مهر</div>
-                </td>
-                <td class="bottom-cell">
+                 <td class="bottom-cell">
                   <div class="info-row">
                     <span>اعتبار از تاریخ:</span>
                     <span class="info-value">{{ data.licenseIssueDateFormatted || '-' }}</span>
@@ -211,10 +214,19 @@
                     <span>الی:</span>
                     <span class="info-value">{{ data.licenseExpiryDateFormatted || '-' }}</span>
                   </div>
-                  <div class="info-row">
-                    <span>نمبر ثبت:</span>
-                    <span class="info-value">( )</span>
+                </td>
+                <td class="bottom-cell">
+                  <div class="bottom-text-justify">
+                    در اهلیت عریضه نویسی بعد از اخذ امتحان نظر هیئت داده شد، که این عریضه نویس به درجه {{
+                    getCompetencyName() }} لیاقت و اهلیت دارد.
                   </div>
+                  <div class="bottom-text-center">مهر</div>
+                </td>
+               
+                <td class="bottom-cell">
+                  <div class="bottom-text-center">ریاست عمومی انسجام</div>
+                  <div class="signature-space"></div>
+                  <div class="bottom-text-center">امضاء رئیس</div>
                 </td>
               </tr>
             </tbody>

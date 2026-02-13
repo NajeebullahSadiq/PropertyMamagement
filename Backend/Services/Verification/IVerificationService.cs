@@ -64,6 +64,9 @@ namespace WebAPIBackend.Services.Verification
         
         // Buyer information (for Property and Vehicle documents)
         public BuyerInfoDto? BuyerInfo { get; set; }
+        
+        // Petition Writer information (for PetitionWriterLicense documents)
+        public PetitionWriterInfoDto? PetitionWriterInfo { get; set; }
     }
 
     /// <summary>
@@ -96,6 +99,29 @@ namespace WebAPIBackend.Services.Verification
         public string? Province { get; set; }
         public string? District { get; set; }
         public string? Village { get; set; }
+    }
+
+    /// <summary>
+    /// Petition Writer information DTO
+    /// </summary>
+    public class PetitionWriterInfoDto
+    {
+        public string? ApplicantFatherName { get; set; }
+        public string? ApplicantGrandFatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
+        public string? MobileNumber { get; set; }
+        public string? Competency { get; set; }
+        public string? District { get; set; }
+        public string? LicenseType { get; set; }
+        public decimal? LicensePrice { get; set; }
+        public string? PermanentProvinceName { get; set; }
+        public string? PermanentDistrictName { get; set; }
+        public string? PermanentVillage { get; set; }
+        public string? CurrentProvinceName { get; set; }
+        public string? CurrentDistrictName { get; set; }
+        public string? CurrentVillage { get; set; }
+        public string? DetailedAddress { get; set; }
+        public string? LatestRelocation { get; set; }
     }
 
     /// <summary>
