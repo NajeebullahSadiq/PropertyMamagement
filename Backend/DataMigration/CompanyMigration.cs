@@ -211,7 +211,9 @@ namespace DataMigration
             
             using (var cmd = new NpgsqlCommand(query, conn, transaction))
             {
-                cmd.Parameters.AddWithValue("licensenumber", licenseNo.ToString());
+                // Format license number with KBL prefix for checking
+                string formattedLicenseNumber = $"KBL-{licenseNo.ToString().PadLeft(5, '0')}";
+                cmd.Parameters.AddWithValue("licensenumber", formattedLicenseNumber);
                 var result = await cmd.ExecuteScalarAsync();
                 return result != null ? Convert.ToInt32(result) : null;
             }
@@ -301,7 +303,9 @@ namespace DataMigration
             
             using (var cmd = new NpgsqlCommand(query, conn, transaction))
             {
-                cmd.Parameters.AddWithValue("licensenumber", record.LicenseNo.ToString());
+                // Format license number as KBL-00001 (Kabul prefix with 5-digit number)
+                string formattedLicenseNumber = $"KBL-{record.LicenseNo.ToString().PadLeft(5, '0')}";
+                cmd.Parameters.AddWithValue("licensenumber", formattedLicenseNumber);
                 cmd.Parameters.AddWithValue("provinceid", 1); // Default to Kabul
                 
                 // Parse dates
