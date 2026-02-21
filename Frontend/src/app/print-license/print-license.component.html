@@ -92,7 +92,7 @@
             <div class="license-meta">
               <div class="meta-item">
                 <span class="meta-label">شماره جوازنامه</span>
-                <span class="meta-value">({{data.licenseNumber || '—'}})</span>
+                <span class="meta-value">{{data.licenseNumber || '—'}}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">تاریخ صدور:</span>
@@ -150,12 +150,12 @@
           <!-- Personal Information Card -->
           <div class="info-card personal-info">
             <p class="info-paragraph">
-              محترم <span class="highlight-value">({{data.firstName || '—'}})</span>
-              ولد <span class="highlight-value">({{data.fatherName || '—'}})</span>
-              ولدیت <span class="highlight-value">({{data.grandFatherName || '—'}})</span>
-              متولد سال <span class="highlight-value">({{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
-                || '—'}})</span>
-              دارنده تذکره الکترونیکی <span class="highlight-value">({{data.indentityCardNumber || '—'}})</span>
+              محترم <span class="highlight-value">{{data.firstName || '—'}}</span>
+              ولد <span class="highlight-value">{{data.fatherName || '—'}}</span>
+              ولدیت <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
+              متولد سال <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
+                || '—'}}</span>
+              دارنده تذکره الکترونیکی <span class="highlight-value">{{data.indentityCardNumber || '—'}}</span>
             </p>
           </div>
 
@@ -163,22 +163,22 @@
           <div class="info-card address-info">
             <p class="info-paragraph">
               <span class="label-accent">مسکونه اصلی ولسوالی</span>
-              <span class="highlight-value">({{data.ownerDistrictName || '—'}})</span>
+              <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span>
               <span class="label-accent">ولایت</span>
-              <span class="highlight-value">({{data.ownerProvinceName || '—'}})</span>
+              <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span>
               <span class="label-accent">مسکونه فعلی ناحیه یا ولسوالی</span>
-              <span class="highlight-value">({{data.permanentDistrictName || '—'}})</span>
+              <span class="highlight-value">{{data.permanentDistrictName || '—'}}</span>
               <span class="label-accent">ولایت</span>
-              <span class="highlight-value">({{data.permanentProvinceName || '—'}})</span>
+              <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span>
               <span class="label-accent">واقع ناحیه</span>
-              <span class="highlight-value">({{data.permanentVillage || data.ownerVillage || '—'}})</span>
+              <span class="highlight-value">{{data.permanentVillage || data.ownerVillage || '—'}}</span>
             </p>
           </div>
 
           <!-- Authorization Statement -->
           <div class="info-card authorization-card">
             <p class="info-paragraph">
-               با در نظرداشت اصول رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف
+               با در نظرداشت قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف
               میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
             </p>
           </div>
@@ -206,7 +206,7 @@
           <!-- Office Address -->
           <div class="footer-row address-row">
             <span class="footer-label">آدرس دفتر رهنمای معاملات:</span>
-            <span class="footer-value">({{data.officeAddress || '—'}})</span>
+            <span class="footer-value">{{data.officeAddress || '—'}}</span>
           </div>
 
           <!-- Important Note -->
@@ -218,9 +218,9 @@
 
           <!-- License Details Row -->
           <div class="footer-row details-row">
-            <span>شماره تماس دارنده جوازنامه: <strong class="footer-value">({{data.phoneNumber || '—'}})</strong></span>
-            <span>نمبر تشخیصیه <strong class="footer-value">({{data.tin || '—'}})</strong></span>
-            <span>قیمت جواز نامه: <strong class="footer-value">(پانزده هزار افغانی)</strong></span>
+            <span>شماره تماس دارنده جوازنامه: <strong class="footer-value">{{data.phoneNumber || '—'}}</strong></span>
+            <span>نمبر تشخیصیه <strong class="footer-value">{{data.tin || '—'}}</strong></span>
+            <span>قیمت جواز نامه: <strong class="footer-value">پانزده هزار افغانی</strong></span>
           </div>
 
           <!-- QR Code Verification Row -->
