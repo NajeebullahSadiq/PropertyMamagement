@@ -159,6 +159,7 @@ sudo -u postgres psql -d PRMIS -f Scripts/Modules/11_ActivityMonitoring_Initial.
 # Additional migration (if exists)
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/09_PetitionWriterLicense_AddPicturePath.sql
 sudo -u postgres psql -d PRMIS -f Scripts/Modules/company_module_clean_recreate.sql
+sudo -u postgres psql -d PRMIS -f Scripts/add_witness_history_fields.sql
 
 # Restart backend after migrations
 sudo systemctl restart prmis-backend
