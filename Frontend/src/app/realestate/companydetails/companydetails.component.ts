@@ -98,7 +98,9 @@ export class CompanydetailsComponent {
 		  },
 		  error => {
 		    console.error('Error adding company:', error);
-		    this.toastr.error("خرابی در ثبت معلومات: " + (error.message || 'نامعلوم'));
+		    // Check if error has a specific message from backend
+		    const errorMessage = error.error?.message || error.message || 'نامعلوم';
+		    this.toastr.error(errorMessage);
 		  }
 		);
 	}
@@ -121,7 +123,9 @@ export class CompanydetailsComponent {
 		  },
 		  error => {
 		    console.error('Error updating company:', error);
-		    this.toastr.error("خرابی در تغیر معلومات: " + (error.message || 'نامعلوم'));
+		    // Check if error has a specific message from backend
+		    const errorMessage = error.error?.message || error.message || 'نامعلوم';
+		    this.toastr.error(errorMessage);
 		  }
 		);
 	  

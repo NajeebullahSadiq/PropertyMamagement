@@ -130,18 +130,85 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var Pro = await _context.Guarantors.Where(x => x.CompanyId.Equals(id)).ToListAsync();
+                var guarantors = await _context.Guarantors
+                    .Where(x => x.CompanyId.Equals(id))
+                    .OrderByDescending(x => x.IsActive)
+                    .ThenByDescending(x => x.CreatedAt)
+                    .ToListAsync();
 
                 // DO NOT convert dates - return them as Gregorian
                 // The frontend will handle calendar conversion
 
-                return Ok(Pro);
+                return Ok(guarantors);
             }
             catch (Exception ex)
             {
                 // Log the full exception for debugging
                 Console.WriteLine($"Error in getGuaranatorById: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get only the active witness for a company
+        /// </summary>
+        [HttpGet("active/{companyId}")]
+        public async Task<IActionResult> GetActiveGuarantor(int companyId)
+        {
+            try
+            {
+                var activeGuarantor = await _context.Guarantors
+                    .Where(x => x.CompanyId == companyId && x.IsActive)
+                    .FirstOrDefaultAsync();
+
+                if (activeGuarantor == null)
+                {
+                    return NotFound(new { message = "هیچ شاهد فعالی یافت نشد" });
+                }
+
+                return Ok(activeGuarantor);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetActiveGuarantor: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get witness history for a company
+        /// </summary>
+        [HttpGet("history/{companyId}")]
+        public async Task<IActionResult> GetGuarantorHistory(int companyId)
+        {
+            try
+            {
+                var history = await _context.Guarantors
+                    .Where(x => x.CompanyId == companyId)
+                    .OrderByDescending(x => x.IsActive)
+                    .ThenByDescending(x => x.CreatedAt)
+                    .Select(g => new
+                    {
+                        g.Id,
+                        g.FirstName,
+                        g.FatherName,
+                        g.GrandFatherName,
+                        g.ElectronicNationalIdNumber,
+                        g.PhoneNumber,
+                        g.IsActive,
+                        g.CreatedAt,
+                        g.ExpiredAt,
+                        g.ExpiredBy,
+                        g.ReplacedByGuarantorId
+                    })
+                    .ToListAsync();
+
+                return Ok(history);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetGuarantorHistory: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -156,14 +223,24 @@ namespace WebAPIBackend.Controllers.Companies
             }
 
             var userId = userIdClaim.Value;
-            int propertyCount = _context.Guarantors.Count(wd => wd.CompanyId == request.CompanyId && wd.CompanyId != null);
-            if (propertyCount >= 2)
-            {
-                return StatusCode(400, "You cannot add more than Two");
-            }
+
+            // Check if company exists
             if (request.CompanyId.Equals(0))
             {
                 return StatusCode(312, "Main Table is Empty");
+            }
+
+            // Check if there's already an active witness
+            var existingActiveWitness = await _context.Guarantors
+                .FirstOrDefaultAsync(g => g.CompanyId == request.CompanyId && g.IsActive);
+
+            // If there's an active witness, expire it
+            if (existingActiveWitness != null)
+            {
+                existingActiveWitness.IsActive = false;
+                existingActiveWitness.ExpiredAt = DateTime.UtcNow;
+                existingActiveWitness.ExpiredBy = userId;
+                // We'll set ReplacedByGuarantorId after creating the new witness
             }
 
             // Parse all guarantee dates using multi-calendar helper
@@ -218,6 +295,8 @@ namespace WebAPIBackend.Controllers.Companies
                 BankName = request.BankName,
                 DepositNumber = request.DepositNumber,
                 DepositDate = depositDate,
+                // Witness history fields
+                IsActive = true, // New witness is always active
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
             };
@@ -228,13 +307,26 @@ namespace WebAPIBackend.Controllers.Companies
             _context.Add(property);
             await _context.SaveChangesAsync();
 
+            // Now update the old witness with the new witness ID
+            if (existingActiveWitness != null)
+            {
+                existingActiveWitness.ReplacedByGuarantorId = property.Id;
+                await _context.SaveChangesAsync();
+            }
+
             // Update the IsComplete status based on validation
             if (request.CompanyId.HasValue)
             {
                 await _companyService.UpdateLicenseCompletionStatusAsync(request.CompanyId.Value);
             }
 
-            var result = new { Id = property.Id };
+            var result = new { 
+                Id = property.Id,
+                Message = existingActiveWitness != null 
+                    ? "شاهد جدید اضافه شد و شاهد قبلی منقضی شد" 
+                    : "شاهد با موفقیت اضافه شد",
+                ReplacedWitnessId = existingActiveWitness?.Id
+            };
             return Ok(result);
         }
 
@@ -259,6 +351,16 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound();
             }
 
+            // CRITICAL: Only allow editing of active witnesses
+            if (!existingProperty.IsActive)
+            {
+                return StatusCode(403, new { 
+                    message = "شاهد منقضی شده قابل ویرایش نیست. فقط شاهد فعال قابل ویرایش است.",
+                    isActive = false,
+                    expiredAt = existingProperty.ExpiredAt
+                });
+            }
+
             // Validate guarantee type and conditional fields
             var validation = ValidateGuaranteeFields(request);
             if (!validation.IsValid)
@@ -275,10 +377,14 @@ namespace WebAPIBackend.Controllers.Companies
             // Parse Cash deposit date
             DateConversionHelper.TryParseToDateOnly(request.DepositDate, request.CalendarType, out var depositDate);
 
-            // Store the original values of the CreatedBy and CreatedAt properties
+            // Store the original values that should not be changed
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
             var companyId = existingProperty.CompanyId;
+            var isActive = existingProperty.IsActive;
+            var expiredAt = existingProperty.ExpiredAt;
+            var expiredBy = existingProperty.ExpiredBy;
+            var replacedByGuarantorId = existingProperty.ReplacedByGuarantorId;
 
             // Update the entity with the new values
             existingProperty.FirstName = request.FirstName;
@@ -319,9 +425,13 @@ namespace WebAPIBackend.Controllers.Companies
             // Clear fields that don't belong to the selected guarantee type
             ClearIrrelevantFields(existingProperty, request.GuaranteeTypeId);
 
-            // Restore the original values of the CreatedBy and CreatedAt properties
+            // Restore the original values that should not be changed
             existingProperty.CreatedBy = createdBy;
             existingProperty.CreatedAt = createdAt;
+            existingProperty.IsActive = isActive;
+            existingProperty.ExpiredAt = expiredAt;
+            existingProperty.ExpiredBy = expiredBy;
+            existingProperty.ReplacedByGuarantorId = replacedByGuarantorId;
 
             var entry = _context.Entry(existingProperty);
             entry.State = EntityState.Modified;
@@ -363,6 +473,69 @@ namespace WebAPIBackend.Controllers.Companies
 
             var result = new { Id = request.Id };
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteGuarantor(int id)
+        {
+            try
+            {
+                var guarantor = await _context.Guarantors.FindAsync(id);
+                if (guarantor == null)
+                {
+                    return NotFound(new { message = "شاهد یافت نشد" });
+                }
+
+                // Only allow deletion of active witnesses
+                if (!guarantor.IsActive)
+                {
+                    return StatusCode(403, new { 
+                        message = "شاهد منقضی شده قابل حذف نیست. فقط شاهد فعال قابل حذف است.",
+                        isActive = false
+                    });
+                }
+
+                var companyId = guarantor.CompanyId;
+
+                // Delete audit records first
+                var auditRecords = await _context.Guarantorsaudits
+                    .Where(a => a.GuarantorsId == id)
+                    .ToListAsync();
+                
+                if (auditRecords.Any())
+                {
+                    _context.Guarantorsaudits.RemoveRange(auditRecords);
+                }
+
+                // If this witness replaced another, clear the ReplacedByGuarantorId reference
+                var previousWitness = await _context.Guarantors
+                    .FirstOrDefaultAsync(g => g.ReplacedByGuarantorId == id);
+                
+                if (previousWitness != null)
+                {
+                    previousWitness.ReplacedByGuarantorId = null;
+                }
+
+                // Delete the guarantor
+                _context.Guarantors.Remove(guarantor);
+                await _context.SaveChangesAsync();
+
+                // Update the IsComplete status
+                if (companyId.HasValue)
+                {
+                    await _companyService.UpdateLicenseCompletionStatusAsync(companyId.Value);
+                }
+
+                return Ok(new { message = "شاهد با موفقیت حذف شد" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting guarantor: {ex.Message}");
+                return StatusCode(500, new { 
+                    message = "خطا در حذف شاهد",
+                    error = ex.Message 
+                });
+            }
         }
     }
 }

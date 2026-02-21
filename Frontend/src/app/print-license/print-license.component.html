@@ -5,7 +5,7 @@
     <div class="spinner-ring"></div>
     <div class="spinner-ring"></div>
   </div>
-  <p>در حال بارگذاری معلومات جواز...</p>
+  <p>په حال کې د جواز معلومات بارېږي...</p>
 </div>
 
 <div *ngIf="!isLoading && error" class="error-container">
@@ -91,15 +91,15 @@
             </div>
             <div class="license-meta">
               <div class="meta-item">
-                <span class="meta-label">شماره جوازنامه</span>
+                <span class="meta-label">د جوازنامې شمېره</span>
                 <span class="meta-value">{{data.licenseNumber || '—'}}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">تاریخ صدور:</span>
+                <span class="meta-label">د صدور نېټه:</span>
                 <span class="meta-value">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">تاریخ ختم:</span>
+                <span class="meta-label">د ختم نېټه:</span>
                 <span class="meta-value">{{data.expireDateFormatted || (data.expireDate | calendarDate) || '—'}}</span>
               </div>
             </div>
@@ -113,11 +113,11 @@
               <span class="divider-diamond">◆</span>
               <span class="divider-line"></span>
             </div>
-            <h2 class="ministry-name">وزارت عدلیه</h2>
-            <h3 class="department-name">معنیت مالی و اداری</h3>
-            <h3 class="department-name">ریاست عمومی انسجام</h3>
+            <h2 class="ministry-name">د عدلیې وزارت</h2>
+            <h3 class="department-name">مالي او اداري معینیت</h3>
+            <h3 class="department-name">د انسجام لوی ریاست</h3>
              
-            <h4 class="sub-department">ریاست امور رهنمای معاملات و عریضه نویسان</h4>
+            <h4 class="sub-department">د معاملاتو لارښوانو او عریضه لیکونکو چارو ریاست</h4>
           </div>
 
           <!-- Left Column: Logo & Photo -->
@@ -137,11 +137,20 @@
         <!-- Title Banner -->
         <div class="title-banner">
           <div class="banner-decoration left"></div>
-          <h2 class="certificate-title">
-            <span class="title-icon">📜</span>
-            جوازنامه فعالیت رهنمای معاملات
-            <span class="title-highlight">({{data.title || '—'}})</span>
-          </h2>
+          <div class="title-content-wrapper">
+            <!-- License Type Badge -->
+            <div class="license-type-badge">
+              <span class="license-type-icon">
+                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'املاک'">🏢</ng-container>
+                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'موټر فروشی'">🚗</ng-container>
+              </span>
+              <span class="license-type-label">د جواز ډول:</span>
+              <span class="license-type-value">{{getLicenseTypeInPashto(data.licenseType)}}</span>
+            </div>
+            <h2 class="certificate-title">
+              د معاملاتو لارښود د فعالیت جوازنامه
+            </h2>
+          </div>
           <div class="banner-decoration right"></div>
         </div>
 
@@ -151,22 +160,22 @@
           <div class="info-card personal-info">
             <p class="info-paragraph">
               محترم <span class="highlight-value">{{data.firstName || '—'}}</span>
-              ولد <span class="highlight-value">{{data.fatherName || '—'}}</span>
-              ولدیت <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
-              متولد سال <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
+              د <span class="highlight-value">{{data.fatherName || '—'}}</span>
+              زوی د <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
+              لمسی د <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
                 || '—'}}</span>
-              دارنده تذکره الکترونیکی <span class="highlight-value">{{data.indentityCardNumber || '—'}}</span>
+              کال زېږېدلی د الکترونیکي تذکرې لرونکی <span class="highlight-value">{{data.indentityCardNumber || '—'}}</span>
             </p>
           </div>
 
           <!-- Address Information -->
           <div class="info-card address-info">
             <p class="info-paragraph">
-              <span class="label-accent">مسکونه اصلی ولسوالی</span>
+              <span class="label-accent">اصلي استوګنځای ناحیه یا ولسوالۍ</span>
               <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span>
               <span class="label-accent">ولایت</span>
               <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span>
-              <span class="label-accent">مسکونه فعلی ناحیه یا ولسوالی</span>
+              <span class="label-accent">اوسنی استوګنځای ناحیه یا ولسوالۍ</span>
               <span class="highlight-value">{{data.permanentDistrictName || '—'}}</span>
               <span class="label-accent">ولایت</span>
               <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span>
@@ -178,25 +187,24 @@
           <!-- Authorization Statement -->
           <div class="info-card authorization-card">
             <p class="info-paragraph">
-               با در نظرداشت قانون رهنمای معاملات این جوازنامه اعطاء و به اساس آن موصوف
-              میتواند در حدود احکام قانون در عقود و معاملات بین اشخاص وساطت نماید.
+              د معاملاتو لارښود قانون په پام کې نیولو سره دا جوازنامه ورکول کېږي او پر اساس یې موصوف کولای شي د قانون د حکمونو په حدودو کې د اشخاصو تر منځ په عقودو او معاملاتو کې منځګړیتوب وکړي.
             </p>
           </div>
 
           <!-- Inquiry Reference -->
           <div class="inquiry-line">
-            <span>ذریعه استعلام نمبر</span>
+            <span>د استعلام په شمېره</span>
             <span
               class="inquiry-field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span>به مطبعه معرفی شد.</span>
+            <span>مطبعې ته معرفي شو.</span>
           </div>
 
           <!-- Signature Section -->
           <div class="signature-section">
             <div class="signature-block">
-              <p class="signature-greeting">بااحترام</p>
+              <p class="signature-greeting">په درناوي</p>
               <div class="signature-line"></div>
-              <p class="signature-title">رئیس عمومی انسجام</p>
+              <p class="signature-title">د انسجام لوی رئیس</p>
             </div>
           </div>
         </main>
@@ -205,22 +213,22 @@
         <footer class="certificate-footer">
           <!-- Office Address -->
           <div class="footer-row address-row">
-            <span class="footer-label">آدرس دفتر رهنمای معاملات:</span>
+            <span class="footer-label">د معاملاتو لارښود دفتر پته:</span>
             <span class="footer-value">{{data.officeAddress || '—'}}</span>
           </div>
 
           <!-- Important Note -->
           <div class="validity-notice">
             <span class="notice-icon">📌</span>
-            <span class="notice-label">نوت:</span>
-            <span class="notice-text">مدت اعتبار این جوازنامه از تاریخ صدور برای مدت سه سال می باشد.</span>
+            <span class="notice-label">یادښت:</span>
+            <span class="notice-text">د دې جوازنامې د اعتبار موده د صدور له نېټې څخه د درېو کلونو لپاره ده.</span>
           </div>
 
           <!-- License Details Row -->
           <div class="footer-row details-row">
-            <span>شماره تماس دارنده جوازنامه: <strong class="footer-value">{{data.phoneNumber || '—'}}</strong></span>
-            <span>نمبر تشخیصیه <strong class="footer-value">{{data.tin || '—'}}</strong></span>
-            <span>قیمت جواز نامه: <strong class="footer-value">پانزده هزار افغانی</strong></span>
+            <span>د جوازنامې لرونکي د تماس شمېره: <strong class="footer-value">{{data.phoneNumber || '—'}}</strong></span>
+            <span>د پېژندنې شمېره <strong class="footer-value">{{data.tin || '—'}}</strong></span>
+            <span>د جوازنامې بیه: <strong class="footer-value">پنځلس زره افغانۍ</strong></span>
           </div>
 
           <!-- QR Code Verification Row -->
@@ -230,11 +238,11 @@
             </div>
             <div class="verification-details">
               <div class="verification-item">
-                <span class="verification-label">کود تصدیق سند:</span>
+                <span class="verification-label">د سند د تصدیق کوډ:</span>
                 <span class="verification-code">{{ verificationCode }}</span>
               </div>
               <div class="verification-item">
-                <span class="verification-label"> شهرت :</span>
+                <span class="verification-label">شهرت:</span>
                 <span class="verification-value">{{ data.firstName || '—' }} {{ data.fatherName || '—' }}</span>
               </div>
             </div>
@@ -244,7 +252,7 @@
           <div class="verification-row error" *ngIf="verificationError && !verificationCode">
             <div class="error-content">
               <span class="error-text">{{ verificationError }}</span>
-              <span class="verification-label">برای تصدیق با اداره تماس بگیرید</span>
+              <span class="verification-label">د تصدیق لپاره له ادارې سره اړیکه ونیسئ</span>
             </div>
           </div>
         </footer>

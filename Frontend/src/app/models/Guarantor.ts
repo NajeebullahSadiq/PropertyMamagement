@@ -35,6 +35,12 @@ export interface Guarantor{
     bankName?:string;            // بانک
     depositNumber?:string;       // نمبر اویز
     depositDate?:string;         // تاریخ اویز
+    // Witness History Fields
+    isActive?: boolean;
+    createdAt?: string;
+    expiredAt?: string;
+    expiredBy?: string;
+    replacedByGuarantorId?: number;
 }
 
 // Guarantee Type Constants

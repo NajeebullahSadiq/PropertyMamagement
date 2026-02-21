@@ -75,6 +75,38 @@ public partial class Guarantor
     public string? DepositNumber { get; set; }       // نمبر اویز
     public DateOnly? DepositDate { get; set; }       // تاریخ اویز
 
+    // Witness History Tracking
+    /// <summary>
+    /// Indicates if this is the currently active witness for the company
+    /// Only one witness can be active per company at a time
+    /// </summary>
+    public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Date and time when this witness was replaced/expired
+    /// </summary>
+    public DateTime? ExpiredAt { get; set; }
+
+    /// <summary>
+    /// User ID who replaced/expired this witness
+    /// </summary>
+    public string? ExpiredBy { get; set; }
+
+    /// <summary>
+    /// Reference to the new witness that replaced this one
+    /// </summary>
+    public int? ReplacedByGuarantorId { get; set; }
+
+    /// <summary>
+    /// Navigation property to the witness that replaced this one
+    /// </summary>
+    public virtual Guarantor? ReplacedByGuarantor { get; set; }
+
+    /// <summary>
+    /// Navigation property to witnesses that this one replaced
+    /// </summary>
+    public virtual ICollection<Guarantor> ReplacedGuarantors { get; } = new List<Guarantor>();
+
     public virtual CompanyDetail? Company { get; set; }
 
     public virtual ICollection<Guarantorsaudit> Guarantorsaudits { get; } = new List<Guarantorsaudit>();

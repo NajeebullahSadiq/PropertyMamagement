@@ -29,6 +29,8 @@ export class GuaranatorsComponent {
   localizedGuaranteeTypes: any;
   guaranatorForm: FormGroup = new FormGroup({});
   guaranatorDetails!: Guarantor[];
+  activeWitness: Guarantor | null = null;
+  witnessHistory: Guarantor[] = [];
   
   // Districts for guarantee (Customary Deed)
   guaranteeDistricts: any;
@@ -105,7 +107,53 @@ export class GuaranatorsComponent {
     this.comservice.getGuaranatorById(this.id)
       .subscribe(detail => {
         this.guaranatorDetails = detail;
+        this.separateActiveAndHistory();
       });
+  }
+
+  separateActiveAndHistory(): void {
+    if (this.guaranatorDetails && this.guaranatorDetails.length > 0) {
+      this.activeWitness = this.guaranatorDetails.find(w => w.isActive === true) || null;
+      this.witnessHistory = this.guaranatorDetails.filter(w => w.isActive === false);
+    } else {
+      this.activeWitness = null;
+      this.witnessHistory = [];
+    }
+  }
+
+  canEditWitness(witness: Guarantor): boolean {
+    return witness.isActive === true;
+  }
+
+  deleteWitness(id: number): void {
+    const witness = this.guaranatorDetails.find(w => w.id === id);
+    
+    if (witness && !this.canEditWitness(witness)) {
+      this.toastr.warning("شاهد منقضی شده قابل حذف نیست. فقط شاهد فعال قابل حذف است.");
+      return;
+    }
+
+    if (confirm('آیا مطمئن هستید که می‌خواهید این شاهد را حذف کنید؟')) {
+      this.comservice.deleteGuarantor(this.id, id).subscribe({
+        next: () => {
+          this.toastr.success('شاهد با موفقیت حذف شد');
+          this.comservice.getGuaranatorById(this.id).subscribe(detail => {
+            this.guaranatorDetails = detail;
+            this.separateActiveAndHistory();
+          });
+          this.resetForms();
+        },
+        error: (error) => {
+          if (error.status === 403) {
+            this.toastr.error(error.error.message || "شاهد منقضی شده قابل حذف نیست");
+          } else if (error.status === 404) {
+            this.toastr.error("شاهد یافت نشد");
+          } else {
+            this.toastr.error("خطا در حذف شاهد");
+          }
+        }
+      });
+    }
   }
 
   private formatDateForBackend(dateValue: any): string {
@@ -165,21 +213,23 @@ export class GuaranatorsComponent {
     this.comservice.addcompanyGuaranator(details).subscribe(
       result => {
         if (result.id !== 0) {
-          this.toastr.success("معلومات موفقانه ثبت شد");
+          const message = (result as any).message || "معلومات موفقانه ثبت شد";
+          this.toastr.success(message);
           this.selectedId = result.id;
           this.comservice.getGuaranatorById(this.id)
             .subscribe(detail => {
               this.guaranatorDetails = detail;
+              this.separateActiveAndHistory();
             });
         }
       },
       error => {
         if (error.status === 400) {
-          this.toastr.error("شما نمی توانید بشتر از دو ضامن ثبت سیستم کنید");
+          this.toastr.error(error.error || "خطا در ثبت معلومات");
         } else if (error.status === 312) {
           this.toastr.error("لطفا ابتدا معلومات جدول اصلی را ثبت کنید");
         } else {
-          this.toastr.error("An error occurred");
+          this.toastr.error("خطا در ثبت معلومات");
         }
       }
     );
@@ -213,11 +263,21 @@ export class GuaranatorsComponent {
     if (details.id === 0 && this.selectedId !== 0 || this.selectedId !== null) {
       details.id = this.selectedId;
     }
-    this.comservice.updateGuaranator(details).subscribe(result => {
-      if (result.id !== 0)
-        this.selectedId = result.id;
-      this.toastr.info("معلومات موفقانه تغیر یافت ");
-    });
+    this.comservice.updateGuaranator(details).subscribe(
+      result => {
+        if (result.id !== 0) {
+          this.selectedId = result.id;
+          this.toastr.info("معلومات موفقانه تغیر یافت");
+        }
+      },
+      error => {
+        if (error.status === 403) {
+          this.toastr.error(error.error.message || "شاهد منقضی شده قابل ویرایش نیست");
+        } else {
+          this.toastr.error("خطا در ویرایش معلومات");
+        }
+      }
+    );
   }
 
   resetForms(): void {
@@ -354,6 +414,12 @@ export class GuaranatorsComponent {
   BindValu(id: number) {
     const selectedOwnerAddress = this.guaranatorDetails.find(w => w.id === id);
     if (selectedOwnerAddress) {
+      // Check if witness is active before allowing edit
+      if (!this.canEditWitness(selectedOwnerAddress)) {
+        this.toastr.warning("شاهد منقضی شده قابل ویرایش نیست. فقط شاهد فعال قابل ویرایش است.");
+        return;
+      }
+
       // Parse all date fields properly for the multi-calendar datepicker
       const parseDateField = (dateValue: any): Date | null => {
         if (!dateValue) return null;

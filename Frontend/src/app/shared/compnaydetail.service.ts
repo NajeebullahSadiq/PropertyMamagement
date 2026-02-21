@@ -74,6 +74,11 @@ export class CompnaydetailService {
     return this.http.put<Guarantor>(url, propertyDetails);
   }
 
+  deleteGuarantor(companyId: number, guarantorId: number): Observable<any> {
+    const url = `${this.baseUrlowner}Guaranator/${guarantorId}`;
+    return this.http.delete(url);
+  }
+
   addLicenseDetails(details: LicenseDetail): Observable<LicenseDetail> {
     return this.http.post<LicenseDetail>(this.baseUrlowner+'LicenseDetail', details);
   }

@@ -406,35 +406,103 @@
       </div>
     </form>
 
-    <!-- Guarantors List Table -->
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-8">
-      <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
-        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-          <i class="fas fa-table"></i>
-          <span>لیست تضمین کننده‌ها</span>
-        </h2>
+    <!-- Active Witness and History -->
+    <div class="space-y-6 mt-8">
+      <!-- Active Witness Section -->
+      <div *ngIf="activeWitness" class="bg-white rounded-xl shadow-md border-2 border-green-500 overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-check-circle"></i>
+            <span>شاهد فعال</span>
+          </h2>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <span class="text-sm text-gray-600">نام:</span>
+                  <p class="font-semibold text-gray-800">{{ activeWitness.firstName }} {{ activeWitness.fatherName }}</p>
+                </div>
+                <div>
+                  <span class="text-sm text-gray-600">تذکره:</span>
+                  <p class="font-semibold text-gray-800">{{ activeWitness.electronicNationalIdNumber || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-sm text-gray-600">تلفن:</span>
+                  <p class="font-semibold text-gray-800">{{ activeWitness.phoneNumber }}</p>
+                </div>
+                <div>
+                  <span class="text-sm text-gray-600">نوعیت تضمین:</span>
+                  <p class="font-semibold text-gray-800">{{ getGuaranteeTypeName(activeWitness.guaranteeTypeId) }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="mr-4 flex gap-2">
+              <button (click)="BindValu(activeWitness.id)" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-edit"></i>
+                <span>ویرایش</span>
+              </button>
+              <button (click)="deleteWitness(activeWitness.id)" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-trash"></i>
+                <span>حذف</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b-2 border-gray-200">
-            <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">اسم</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ولد</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ولدیت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره تماس</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت تضمین</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr *ngFor="let w of guaranatorDetails" class="text-center hover:bg-orange-50 transition-colors cursor-pointer" (click)="BindValu(w.id)">
-              <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ w.fatherName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ w.grandFatherName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ w.phoneNumber }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ getGuaranteeTypeName(w.guaranteeTypeId) }}</td>
-            </tr>
-          </tbody>
-        </table>
+
+      <!-- Add New Witness Button -->
+      <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 text-center">
+        <p class="text-gray-700 mb-3">
+          <i class="fas fa-info-circle text-blue-600"></i>
+          برای اضافه کردن شاهد جدید، فورم بالا را پر کنید و ثبت کنید
+        </p>
+        <p class="text-sm text-gray-600">
+          <i class="fas fa-exclamation-triangle text-amber-600"></i>
+          توجه: اضافه کردن شاهد جدید، شاهد فعلی را منقضی می‌کند
+        </p>
+      </div>
+
+      <!-- Witness History Section -->
+      <div *ngIf="witnessHistory.length > 0" class="bg-white rounded-xl shadow-md border border-gray-300 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-600 to-gray-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-history"></i>
+            <span>تاریخچه شاهدان</span>
+          </h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b-2 border-gray-200">
+              <tr class="text-center">
+                <th class="px-4 py-4 text-sm font-bold text-gray-700">اسم</th>
+                <th class="px-4 py-4 text-sm font-bold text-gray-700">ولد</th>
+                <th class="px-4 py-4 text-sm font-bold text-gray-700">تذکره</th>
+                <th class="px-4 py-4 text-sm font-bold text-gray-700">تلفن</th>
+                <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت تضمین</th>
+                <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ انقضا</th>
+                <th class="px-4 py-4 text-sm font-bold text-gray-700">وضعیت</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let w of witnessHistory" class="text-center hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ w.fatherName }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ w.electronicNationalIdNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ w.phoneNumber }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ getGuaranteeTypeName(w.guaranteeTypeId) }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ w.expiredAt ? (w.expiredAt | date:'yyyy-MM-dd') : '-' }}</td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">
+                    <i class="fas fa-lock mr-1"></i>
+                    منقضی شده
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

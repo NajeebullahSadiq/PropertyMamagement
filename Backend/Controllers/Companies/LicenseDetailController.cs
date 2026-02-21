@@ -530,6 +530,7 @@ namespace WebAPIBackend.Controllers.Companies
                     data.CompanyId,
                     LicenseDetailId = licenseDetail?.Id, // Actual LicenseDetail ID for verification
                     data.Title,
+                    LicenseType = licenseDetail?.LicenseType, // Get LicenseType from LicenseDetail table
                     data.PhoneNumber,
                     data.Tin,
                     data.FirstName,

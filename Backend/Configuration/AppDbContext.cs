@@ -778,12 +778,28 @@ namespace WebAPIBackend.Configuration
                     .HasForeignKey(d => d.GuaranteeDistrictId)
                     .HasConstraintName("Guarantors_GuaranteeDistrictId_fkey");
 
+                // Self-referencing relationship for witness history
+                entity.HasOne(d => d.ReplacedByGuarantor)
+                    .WithMany(p => p.ReplacedGuarantors)
+                    .HasForeignKey(d => d.ReplacedByGuarantorId)
+                    .HasConstraintName("FK_Guarantor_ReplacedBy")
+                    .OnDelete(DeleteBehavior.SetNull);
+
                 // Configure conditional field max lengths
                 entity.Property(e => e.CourtName).HasMaxLength(255);
                 entity.Property(e => e.CollateralNumber).HasMaxLength(100);
                 entity.Property(e => e.SetSerialNumber).HasMaxLength(100);
                 entity.Property(e => e.BankName).HasMaxLength(255);
                 entity.Property(e => e.DepositNumber).HasMaxLength(100);
+
+                // Configure witness history fields
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.ExpiredAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.ExpiredBy).HasMaxLength(50);
+
+                // Create index for better query performance
+                entity.HasIndex(e => new { e.CompanyId, e.IsActive })
+                    .HasDatabaseName("IX_Guarantor_CompanyId_IsActive");
             });
 
             modelBuilder.Entity<Haqulemtyaz>(entity =>

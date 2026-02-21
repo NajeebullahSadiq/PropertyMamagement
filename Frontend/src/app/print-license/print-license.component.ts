@@ -184,4 +184,35 @@ export class PrintLicenseComponent implements OnInit {
   printPage(): void {
     window.print();
   }
+
+  // Translate license type from English to Pashto
+  getLicenseTypeInPashto(licenseType: string): string {
+    if (!licenseType) return '—';
+    
+    console.log('[PrintLicense] Original licenseType:', licenseType);
+    
+    // Convert to lowercase for case-insensitive matching
+    const lowerType = licenseType.toLowerCase().trim();
+    
+    const translations: { [key: string]: string } = {
+      'realestate': 'املاک',
+      'real estate': 'املاک',
+      'property': 'املاک',
+      'vehicle': 'موټر فروشی',
+      'carsale': 'موټر فروشی',
+      'car sale': 'موټر فروشی',
+      'car': 'موټر فروشی',
+      'motor': 'موټر فروشی',
+      'املاک': 'املاک',
+      'موټر فروشی': 'موټر فروشی',
+      'عقار': 'املاک',
+      'موتر': 'موټر فروشی',
+      'گاډی': 'موټر فروشی'
+    };
+    
+    const translated = translations[lowerType] || licenseType;
+    console.log('[PrintLicense] Translated to:', translated);
+    
+    return translated;
+  }
 }

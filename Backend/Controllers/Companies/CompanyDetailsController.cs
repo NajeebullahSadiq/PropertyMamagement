@@ -386,6 +386,15 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var userId = userIdClaim.Value;
 
+                // Check for duplicate company name
+                var existingCompany = await _context.CompanyDetails
+                    .FirstOrDefaultAsync(c => c.Title.ToLower() == request.Title.ToLower());
+                
+                if (existingCompany != null)
+                {
+                    return BadRequest(new { message = "این عنوان رهنمایی معاملات قبلاً ثبت شده است" });
+                }
+
                 // Auto-populate province for COMPANY_REGISTRAR, use provided for administrators
                 // Province can be null initially - it will be set when license is created
                 var provinceId = _provinceFilter.IsAdministrator() 
@@ -454,6 +463,15 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 // Validate province access
                 _provinceFilter.ValidateProvinceAccess(existingProperty.ProvinceId);
+
+                // Check for duplicate company name (excluding current company)
+                var duplicateCompany = await _context.CompanyDetails
+                    .FirstOrDefaultAsync(c => c.Title.ToLower() == request.Title.ToLower() && c.Id != id);
+                
+                if (duplicateCompany != null)
+                {
+                    return BadRequest(new { message = "این عنوان رهنمایی معاملات قبلاً ثبت شده است" });
+                }
 
                 // Store the original values of the CreatedBy, CreatedAt, and ProvinceId properties
                 var createdBy = existingProperty.CreatedBy;
