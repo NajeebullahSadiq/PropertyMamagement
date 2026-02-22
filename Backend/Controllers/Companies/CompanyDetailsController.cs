@@ -387,8 +387,10 @@ namespace WebAPIBackend.Controllers.Companies
                 var userId = userIdClaim.Value;
 
                 // Check for duplicate company name
+                // Trim and normalize the title for comparison
+                var normalizedTitle = request.Title.Trim().ToLower();
                 var existingCompany = await _context.CompanyDetails
-                    .FirstOrDefaultAsync(c => c.Title.ToLower() == request.Title.ToLower());
+                    .FirstOrDefaultAsync(c => c.Title.Trim().ToLower() == normalizedTitle);
                 
                 if (existingCompany != null)
                 {
@@ -465,8 +467,11 @@ namespace WebAPIBackend.Controllers.Companies
                 _provinceFilter.ValidateProvinceAccess(existingProperty.ProvinceId);
 
                 // Check for duplicate company name (excluding current company)
+                // Trim and normalize the title for comparison
+                var normalizedTitle = request.Title.Trim().ToLower();
                 var duplicateCompany = await _context.CompanyDetails
-                    .FirstOrDefaultAsync(c => c.Title.ToLower() == request.Title.ToLower() && c.Id != id);
+                    .Where(c => c.Id != id)
+                    .FirstOrDefaultAsync(c => c.Title.Trim().ToLower() == normalizedTitle);
                 
                 if (duplicateCompany != null)
                 {
