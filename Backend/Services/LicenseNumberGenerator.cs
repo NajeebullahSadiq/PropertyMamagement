@@ -97,8 +97,8 @@ namespace WebAPIBackend.Services
                 }
             }
 
-            // Format: PROVINCE_CODE-0001 (4 digits with leading zeros)
-            return $"{provinceCode}-{nextNumber:D4}";
+            // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
+            return $"{provinceCode}-{nextNumber:D8}";
         }
 
         /// <summary>
@@ -136,8 +136,8 @@ namespace WebAPIBackend.Services
                 }
             }
 
-            // Format: PROVINCE_CODE-0001 (4 digits with leading zeros)
-            return $"{provinceCode}-{nextNumber:D4}";
+            // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
+            return $"{provinceCode}-{nextNumber:D8}";
         }
 
         /// <summary>

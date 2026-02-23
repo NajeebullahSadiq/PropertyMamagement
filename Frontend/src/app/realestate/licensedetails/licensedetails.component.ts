@@ -124,8 +124,35 @@ export class LicensedetailsComponent {
 			return;
 		}
 
-		const expireDate = new Date(issueDate);
-		expireDate.setFullYear(expireDate.getFullYear() + 3);
+		// Validate the issue date is valid
+		if (isNaN(issueDate.getTime())) {
+			expireCtrl.setValue('');
+			expireCtrl.updateValueAndValidity();
+			return;
+		}
+
+		// Add 3 years to the Gregorian date using a safer method
+		const expireDate = new Date(issueDate.getTime());
+		const currentYear = expireDate.getFullYear();
+		const currentMonth = expireDate.getMonth();
+		const currentDay = expireDate.getDate();
+		
+		// Set the new year first
+		expireDate.setFullYear(currentYear + 3);
+		
+		// If the day changed (e.g., Feb 29 -> Feb 28), adjust it
+		if (expireDate.getMonth() !== currentMonth) {
+			expireDate.setDate(0); // Go to last day of previous month
+		}
+		
+		// Validate the expire date is valid
+		if (isNaN(expireDate.getTime())) {
+			expireCtrl.setValue('');
+			expireCtrl.updateValueAndValidity();
+			return;
+		}
+		
+		// Set the Date object - the datepicker will handle the conversion
 		expireCtrl.setValue(expireDate);
 		expireCtrl.updateValueAndValidity();
 	}
@@ -153,6 +180,12 @@ export class LicensedetailsComponent {
 		if (typeof value === 'string') {
 			const normalized = value.trim();
 			if (!normalized) return null;
+
+			// Check if it's an ISO date format (YYYY-MM-DD) - these are always Gregorian
+			if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+				const date = new Date(normalized + 'T00:00:00');
+				return isNaN(date.getTime()) ? null : date;
+			}
 
 			const normalizedForParser = calendar === CalendarType.GREGORIAN
 				? normalized

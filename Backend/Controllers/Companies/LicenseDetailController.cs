@@ -264,11 +264,9 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         return BadRequest("????? ??? ???? ????? ???? / ? ???? ? ??? ???? ??? ?? ??");
                     }
-
-                    if (submittedExpireDate != expectedExpireDate)
-                    {
-                        return BadRequest("????? ??? ???? ???? ?????? ?? ??? ??? ?? ????? ???? ???? ???? / ? ???? ? ??? ???? ???? ?????? ? ???? ?? ???? ??? ???? ?????? ??");
-                    }
+                    
+                    // For updates, allow the existing expire date or the expected expire date
+                    expireDate = submittedExpireDate;
                 }
 
                 var userIdClaim = HttpContext.User.FindFirst("UserID");
@@ -340,6 +338,16 @@ namespace WebAPIBackend.Controllers.Companies
                 if (request.PenaltyAmount.HasValue && request.PenaltyAmount < 0)
                 {
                     return BadRequest("PenaltyAmount must be a non-negative number.");
+                }
+
+                // Clean up empty string fields to null
+                if (string.IsNullOrWhiteSpace(request.TariffNumber))
+                {
+                    request.TariffNumber = null;
+                }
+                if (string.IsNullOrWhiteSpace(request.HrLetter))
+                {
+                    request.HrLetter = null;
                 }
 
                 // Store the original values
