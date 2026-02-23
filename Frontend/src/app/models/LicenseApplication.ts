@@ -10,6 +10,9 @@ export interface LicenseApplication {
     requestDateFormatted?: string;
     requestSerialNumber: string;
     applicantName: string;
+    applicantFatherName?: string;
+    applicantGrandfatherName?: string;
+    applicantElectronicNumber?: string;
     proposedGuideName: string;
     
     // Permanent Address (سکونت اصلی)
@@ -109,6 +112,9 @@ export interface LicenseApplicationData {
     requestDate?: string;
     requestSerialNumber: string;
     applicantName: string;
+    applicantFatherName?: string;
+    applicantGrandfatherName?: string;
+    applicantElectronicNumber?: string;
     proposedGuideName: string;
     permanentProvinceId?: number;
     permanentDistrictId?: number;

@@ -125,7 +125,7 @@ COMMENT ON TABLE org."LicenseApplications" IS 'ثبت درخواست متقاض�
 COMMENT ON TABLE org."LicenseApplicationGuarantors" IS 'تضمین‌کنندگان - Guarantors for License Applications';
 COMMENT ON TABLE org."LicenseApplicationWithdrawals" IS 'انصراف - Withdrawal Information for License Applications';
 
-COMMENT ON COLUMN org."LicenseApplications"."RequestSerialNumber" IS 'نمبر مسلسل درخواست';
+COMMENT ON COLUMN org."LicenseApplications"."RequestSerialNumber" IS 'نمبر عریضه';
 COMMENT ON COLUMN org."LicenseApplications"."ApplicantName" IS 'شهرت متقاضی';
 COMMENT ON COLUMN org."LicenseApplications"."ProposedGuideName" IS 'نام پیشنهادی رهنما';
 COMMENT ON COLUMN org."LicenseApplications"."IsWithdrawn" IS 'وضعیت انصراف';

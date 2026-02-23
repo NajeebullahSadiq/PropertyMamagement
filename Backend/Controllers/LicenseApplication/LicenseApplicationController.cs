@@ -51,6 +51,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     query = query.Where(x =>
                         x.RequestSerialNumber.Contains(search) ||
                         x.ApplicantName.Contains(search) ||
+                        (x.ApplicantFatherName != null && x.ApplicantFatherName.Contains(search)) ||
+                        (x.ApplicantGrandfatherName != null && x.ApplicantGrandfatherName.Contains(search)) ||
+                        (x.ApplicantElectronicNumber != null && x.ApplicantElectronicNumber.Contains(search)) ||
                         x.ProposedGuideName.Contains(search));
                 }
 
@@ -76,6 +79,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         : "",
                     x.RequestSerialNumber,
                     x.ApplicantName,
+                    x.ApplicantFatherName,
+                    x.ApplicantGrandfatherName,
+                    x.ApplicantElectronicNumber,
                     x.ProposedGuideName,
                     x.PermanentProvinceId,
                     PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
@@ -224,6 +230,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         : "",
                     x.RequestSerialNumber,
                     x.ApplicantName,
+                    x.ApplicantFatherName,
+                    x.ApplicantGrandfatherName,
+                    x.ApplicantElectronicNumber,
                     x.ProposedGuideName,
                     x.PermanentProvinceId,
                     PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
@@ -315,6 +324,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         : "",
                     entity.RequestSerialNumber,
                     entity.ApplicantName,
+                    entity.ApplicantFatherName,
+                    entity.ApplicantGrandfatherName,
+                    entity.ApplicantElectronicNumber,
                     entity.ProposedGuideName,
                     entity.PermanentProvinceId,
                     PermanentProvinceName = entity.PermanentProvince != null ? entity.PermanentProvince.Dari : "",
@@ -364,6 +376,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     RequestDate = requestDate,
                     RequestSerialNumber = request.RequestSerialNumber,
                     ApplicantName = request.ApplicantName,
+                    ApplicantFatherName = request.ApplicantFatherName,
+                    ApplicantGrandfatherName = request.ApplicantGrandfatherName,
+                    ApplicantElectronicNumber = request.ApplicantElectronicNumber,
                     ProposedGuideName = request.ProposedGuideName,
                     PermanentProvinceId = request.PermanentProvinceId,
                     PermanentDistrictId = request.PermanentDistrictId,
@@ -416,6 +431,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 entity.RequestDate = requestDate;
                 entity.RequestSerialNumber = request.RequestSerialNumber;
                 entity.ApplicantName = request.ApplicantName;
+                entity.ApplicantFatherName = request.ApplicantFatherName;
+                entity.ApplicantGrandfatherName = request.ApplicantGrandfatherName;
+                entity.ApplicantElectronicNumber = request.ApplicantElectronicNumber;
                 entity.ProposedGuideName = request.ProposedGuideName;
                 entity.PermanentProvinceId = request.PermanentProvinceId;
                 entity.PermanentDistrictId = request.PermanentDistrictId;

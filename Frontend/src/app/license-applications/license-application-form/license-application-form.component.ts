@@ -100,6 +100,9 @@ export class LicenseApplicationFormComponent implements OnInit {
             requestDate: ['', Validators.required],
             requestSerialNumber: ['', [Validators.required, Validators.maxLength(50)]],
             applicantName: ['', [Validators.required, Validators.maxLength(200)]],
+            applicantFatherName: ['', Validators.maxLength(200)],
+            applicantGrandfatherName: ['', Validators.maxLength(200)],
+            applicantElectronicNumber: ['', Validators.maxLength(50)],
             proposedGuideName: ['', [Validators.required, Validators.maxLength(200)]],
             permanentProvinceId: ['', Validators.required],
             permanentDistrictId: ['', Validators.required],
@@ -173,6 +176,9 @@ export class LicenseApplicationFormComponent implements OnInit {
             id: data.id,
             requestSerialNumber: data.requestSerialNumber,
             applicantName: data.applicantName,
+            applicantFatherName: data.applicantFatherName,
+            applicantGrandfatherName: data.applicantGrandfatherName,
+            applicantElectronicNumber: data.applicantElectronicNumber,
             proposedGuideName: data.proposedGuideName,
             permanentProvinceId: data.permanentProvinceId,
             permanentDistrictId: data.permanentDistrictId,
@@ -380,6 +386,9 @@ export class LicenseApplicationFormComponent implements OnInit {
             requestDate: this.formatDateForBackend(formValue.requestDate),
             requestSerialNumber: formValue.requestSerialNumber,
             applicantName: formValue.applicantName,
+            applicantFatherName: formValue.applicantFatherName,
+            applicantGrandfatherName: formValue.applicantGrandfatherName,
+            applicantElectronicNumber: formValue.applicantElectronicNumber,
             proposedGuideName: formValue.proposedGuideName,
             permanentProvinceId: formValue.permanentProvinceId,
             permanentDistrictId: formValue.permanentDistrictId,
@@ -628,5 +637,8 @@ export class LicenseApplicationFormComponent implements OnInit {
     get requestDate() { return this.applicationForm.get('requestDate'); }
     get requestSerialNumber() { return this.applicationForm.get('requestSerialNumber'); }
     get applicantName() { return this.applicationForm.get('applicantName'); }
+    get applicantFatherName() { return this.applicationForm.get('applicantFatherName'); }
+    get applicantGrandfatherName() { return this.applicationForm.get('applicantGrandfatherName'); }
+    get applicantElectronicNumber() { return this.applicationForm.get('applicantElectronicNumber'); }
     get proposedGuideName() { return this.applicationForm.get('proposedGuideName'); }
 }

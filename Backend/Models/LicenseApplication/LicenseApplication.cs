@@ -26,6 +26,15 @@ namespace WebAPIBackend.Models.LicenseApplication
         [MaxLength(200)]
         public string ApplicantName { get; set; } = string.Empty;
 
+        [MaxLength(200)]
+        public string? ApplicantFatherName { get; set; }
+
+        [MaxLength(200)]
+        public string? ApplicantGrandfatherName { get; set; }
+
+        [MaxLength(50)]
+        public string? ApplicantElectronicNumber { get; set; }
+
         [Required]
         [MaxLength(200)]
         public string ProposedGuideName { get; set; } = string.Empty;

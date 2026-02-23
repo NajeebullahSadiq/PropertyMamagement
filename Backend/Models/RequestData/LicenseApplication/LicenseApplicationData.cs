@@ -12,13 +12,22 @@ namespace WebAPIBackend.Models.RequestData.LicenseApplication
         [Required(ErrorMessage = "تاریخ درخواست الزامی است")]
         public string? RequestDate { get; set; }
 
-        [Required(ErrorMessage = "نمبر مسلسل درخواست الزامی است")]
+        [Required(ErrorMessage = "نمبر عریضه الزامی است")]
         [MaxLength(50, ErrorMessage = "نمبر مسلسل نباید بیشتر از ۵۰ حرف باشد")]
         public string RequestSerialNumber { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "شهرت متقاضی الزامی است")]
-        [MaxLength(200, ErrorMessage = "شهرت متقاضی نباید بیشتر از ۲۰۰ حرف باشد")]
+        [Required(ErrorMessage = "نام متقاضی الزامی است")]
+        [MaxLength(200, ErrorMessage = "نام متقاضی نباید بیشتر از ۲۰۰ حرف باشد")]
         public string ApplicantName { get; set; } = string.Empty;
+
+        [MaxLength(200, ErrorMessage = "نام پدر متقاضی نباید بیشتر از ۲۰۰ حرف باشد")]
+        public string? ApplicantFatherName { get; set; }
+
+        [MaxLength(200, ErrorMessage = "نام پدرکلان متقاضی نباید بیشتر از ۲۰۰ حرف باشد")]
+        public string? ApplicantGrandfatherName { get; set; }
+
+        [MaxLength(50, ErrorMessage = "نمبر الکترونیکی نباید بیشتر از ۵۰ حرف باشد")]
+        public string? ApplicantElectronicNumber { get; set; }
 
         [Required(ErrorMessage = "نام پیشنهادی رهنما الزامی است")]
         [MaxLength(200, ErrorMessage = "نام پیشنهادی رهنما نباید بیشتر از ۲۰۰ حرف باشد")]

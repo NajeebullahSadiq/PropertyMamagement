@@ -59,7 +59,7 @@
         <div *ngIf="sections.applicant" class="p-6">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-hashtag text-blue-500"></i>نمبر مسلسل درخواست</span>
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-hashtag text-blue-500"></i>نمبر عریضه</span>
               <p class="font-bold text-gray-800 mt-1">{{ item.requestSerialNumber }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
@@ -67,8 +67,20 @@
               <p class="font-bold text-gray-800 mt-1">{{ item.requestDateFormatted || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>شهرت متقاضی</span>
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>نام متقاضی</span>
               <p class="font-bold text-gray-800 mt-1">{{ item.applicantName }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>نام پدر متقاضی</span>
+              <p class="font-bold text-gray-800 mt-1">{{ item.applicantFatherName || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>نام پدرکلان متقاضی</span>
+              <p class="font-bold text-gray-800 mt-1">{{ item.applicantGrandfatherName || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-id-card text-blue-500"></i>نمبر الکترونیکی متقاضی</span>
+              <p class="font-bold text-gray-800 mt-1">{{ item.applicantElectronicNumber || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-building text-blue-500"></i>نام پیشنهادی رهنما</span>
