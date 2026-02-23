@@ -172,8 +172,12 @@ export class LicenseApplicationFormComponent implements OnInit {
             });
         }
 
+        // Convert ISO date string to Date object (same as property module)
+        const requestDate = data.requestDate ? new Date(data.requestDate) : '';
+
         this.applicationForm.patchValue({
             id: data.id,
+            requestDate: requestDate,
             requestSerialNumber: data.requestSerialNumber,
             applicantName: data.applicantName,
             applicantFatherName: data.applicantFatherName,
@@ -187,20 +191,6 @@ export class LicenseApplicationFormComponent implements OnInit {
             currentDistrictId: data.currentDistrictId,
             currentVillage: data.currentVillage,
         });
-
-        // Parse date
-        if (data.requestDateFormatted) {
-            const requestDate = this.parseDate(data.requestDateFormatted);
-            if (requestDate) {
-                this.applicationForm.patchValue({ requestDate });
-            }
-        }
-    }
-
-    parseDate(dateStr: string): Date | null {
-        if (!dateStr) return null;
-        const date = new Date(dateStr);
-        return isNaN(date.getTime()) ? null : date;
     }
 
     loadGuarantors(): void {
@@ -229,17 +219,14 @@ export class LicenseApplicationFormComponent implements OnInit {
     }
 
     patchWithdrawalForm(data: LicenseApplicationWithdrawal): void {
+        // Convert ISO date string to Date object (same as property module)
+        const withdrawalDate = data.withdrawalDate ? new Date(data.withdrawalDate) : '';
+
         this.withdrawalForm.patchValue({
             id: data.id,
             withdrawalReason: data.withdrawalReason,
+            withdrawalDate: withdrawalDate,
         });
-
-        if (data.withdrawalDateFormatted) {
-            const withdrawalDate = this.parseDate(data.withdrawalDateFormatted);
-            if (withdrawalDate) {
-                this.withdrawalForm.patchValue({ withdrawalDate });
-            }
-        }
     }
 
     // ==================== Province/District Handlers ====================
@@ -508,6 +495,9 @@ export class LicenseApplicationFormComponent implements OnInit {
             });
         }
 
+        // Convert ISO date string to Date object (same as property module)
+        const shariaDeedDate = guarantor.shariaDeedDate ? new Date(guarantor.shariaDeedDate) : '';
+
         this.guarantorForm.patchValue({
             id: guarantor.id,
             guarantorName: guarantor.guarantorName,
@@ -515,6 +505,7 @@ export class LicenseApplicationFormComponent implements OnInit {
             guaranteeTypeId: guarantor.guaranteeTypeId,
             cashAmount: guarantor.cashAmount,
             shariaDeedNumber: guarantor.shariaDeedNumber,
+            shariaDeedDate: shariaDeedDate,
             customaryDeedSerialNumber: guarantor.customaryDeedSerialNumber,
             permanentProvinceId: guarantor.permanentProvinceId,
             permanentDistrictId: guarantor.permanentDistrictId,
@@ -523,14 +514,6 @@ export class LicenseApplicationFormComponent implements OnInit {
             currentDistrictId: guarantor.currentDistrictId,
             currentVillage: guarantor.currentVillage,
         });
-
-        // Parse sharia deed date
-        if (guarantor.shariaDeedDateFormatted) {
-            const shariaDeedDate = this.parseDate(guarantor.shariaDeedDateFormatted);
-            if (shariaDeedDate) {
-                this.guarantorForm.patchValue({ shariaDeedDate });
-            }
-        }
 
         this.setGuaranteeTypeVisibility(guarantor.guaranteeTypeId);
     }
