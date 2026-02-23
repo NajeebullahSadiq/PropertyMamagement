@@ -200,8 +200,8 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  opacity: 0.10;
-  filter: grayscale(0%) brightness(1.1);
+  opacity: 0.18;
+  filter: brightness(1.3);
 }
 
 .watermark-circle {
@@ -1114,8 +1114,8 @@
   }
   
   .watermark-logo-image {
-    opacity: 0.10 !important;
-    filter: grayscale(0%) brightness(1.1) !important;
+    opacity: 0.18 !important;
+    filter: brightness(1.3) !important;
   }
   
   .watermark-text {
