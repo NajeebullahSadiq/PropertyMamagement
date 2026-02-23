@@ -175,5 +175,8 @@ echo "Database migrations completed!"
 
 cd ~/PropertyMamagement/Backend
 sudo -u postgres psql -d PRMIS -f Scripts/company_module_clean_recreate.sql
+sudo -u postgres psql -d PRMIS -f Scripts/add_applicant_name_fields.sql
+
+
 sudo systemctl restart prmis-backend
 echo "Vehicle electronic ID columns fixed!"

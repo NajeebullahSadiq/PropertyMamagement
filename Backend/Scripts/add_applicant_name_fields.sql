@@ -13,6 +13,11 @@ ADD COLUMN IF NOT EXISTS "ApplicantGrandfatherName" VARCHAR(200);
 ALTER TABLE org."LicenseApplications"
 ADD COLUMN IF NOT EXISTS "ApplicantElectronicNumber" VARCHAR(50);
 
+-- Add unique constraint for ApplicantElectronicNumber (when not null)
+CREATE UNIQUE INDEX IF NOT EXISTS "IX_LicenseApplications_ApplicantElectronicNumber" 
+ON org."LicenseApplications" ("ApplicantElectronicNumber") 
+WHERE "ApplicantElectronicNumber" IS NOT NULL AND "ApplicantElectronicNumber" != '';
+
 -- Add comments for clarity
 COMMENT ON COLUMN org."LicenseApplications"."ApplicantName" IS 'نام متقاضی';
 COMMENT ON COLUMN org."LicenseApplications"."ApplicantFatherName" IS 'نام پدر متقاضی';

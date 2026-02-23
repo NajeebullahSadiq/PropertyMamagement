@@ -58,6 +58,7 @@ export class LicenseApplicationService {
         requestDate?: string,
         applicantName?: string,
         proposedGuideName?: string,
+        electronicNumber?: string,
         shariaDeedNumber?: string,
         customaryDeedSerial?: string,
         guarantorName?: string,
@@ -80,6 +81,9 @@ export class LicenseApplicationService {
         }
         if (proposedGuideName) {
             params = params.set('proposedGuideName', proposedGuideName);
+        }
+        if (electronicNumber) {
+            params = params.set('electronicNumber', electronicNumber);
         }
         if (shariaDeedNumber) {
             params = params.set('shariaDeedNumber', shariaDeedNumber);

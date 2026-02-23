@@ -14,11 +14,10 @@ import { LicenseApplication } from 'src/app/models/LicenseApplication';
 })
 export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     items: LicenseApplication[] = [];
-    filteredItems: LicenseApplication[] = [];
     totalCount = 0;
     page = 1;
-    pageSize = 10;
-    pageSizes = [5, 10, 25, 50];
+    pageSize = 100;
+    pageSizes = [10, 25, 50, 100, 200];
     searchTerm = '';
     isLoading = false;
 
@@ -31,6 +30,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     searchRequestDate = '';
     searchApplicantName = '';
     searchProposedGuideName = '';
+    searchElectronicNumber = '';
     searchShariaDeedNumber = '';
     searchCustomaryDeedSerial = '';
     searchGuarantorName = '';
@@ -78,7 +78,6 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
             next: (response) => {
                 this.items = response.items;
                 this.totalCount = response.totalCount;
-                this.filteredItems = [...this.items];
                 this.isLoading = false;
             },
             error: (err) => {
@@ -116,6 +115,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
             this.searchRequestDate || undefined,
             this.searchApplicantName || undefined,
             this.searchProposedGuideName || undefined,
+            this.searchElectronicNumber || undefined,
             this.searchShariaDeedNumber || undefined,
             this.searchCustomaryDeedSerial || undefined,
             this.searchGuarantorName || undefined,
@@ -125,7 +125,6 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         ).subscribe({
             next: (response) => {
                 this.items = response.items;
-                this.filteredItems = [...this.items];
                 this.totalCount = response.totalCount;
                 this.isLoading = false;
                 
@@ -146,6 +145,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         this.searchRequestDate = '';
         this.searchApplicantName = '';
         this.searchProposedGuideName = '';
+        this.searchElectronicNumber = '';
         this.searchShariaDeedNumber = '';
         this.searchCustomaryDeedSerial = '';
         this.searchGuarantorName = '';
@@ -178,6 +178,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
             this.searchRequestDate ||
             this.searchApplicantName ||
             this.searchProposedGuideName ||
+            this.searchElectronicNumber ||
             this.searchShariaDeedNumber ||
             this.searchCustomaryDeedSerial ||
             this.searchGuarantorName

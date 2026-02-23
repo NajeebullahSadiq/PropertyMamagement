@@ -115,7 +115,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
 
         /// <summary>
         /// Advanced search for license applications
-        /// Search fields: نمبر مسلسل، تاریخ درخواست، شهرت متقاضی، نام پیشنهادی رهنما، نمبر قباله شرعی، سریال نمبر سته قباله عرفی، شهرت تضمین‌کننده
+        /// Search fields: نمبر مسلسل، تاریخ درخواست، نام متقاضی، نام پیشنهادی رهنما، نمبر الکترونیکی، نمبر قباله شرعی، سریال نمبر سته قباله عرفی، شهرت تضمین‌کننده
         /// </summary>
         [HttpGet("search")]
         public async Task<IActionResult> Search(
@@ -123,6 +123,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             [FromQuery] string? requestDate = null,
             [FromQuery] string? applicantName = null,
             [FromQuery] string? proposedGuideName = null,
+            [FromQuery] string? electronicNumber = null,
             [FromQuery] string? shariaDeedNumber = null,
             [FromQuery] string? customaryDeedSerial = null,
             [FromQuery] string? guarantorName = null,
@@ -164,6 +165,12 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 if (!string.IsNullOrWhiteSpace(proposedGuideName))
                 {
                     query = query.Where(x => x.ProposedGuideName.Contains(proposedGuideName));
+                }
+
+                // Filter by electronic number (نمبر الکترونیکی)
+                if (!string.IsNullOrWhiteSpace(electronicNumber))
+                {
+                    query = query.Where(x => x.ApplicantElectronicNumber != null && x.ApplicantElectronicNumber.Contains(electronicNumber));
                 }
 
                 // Filter by Sharia deed number or Customary deed serial or Guarantor name
@@ -280,6 +287,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         requestDate,
                         applicantName,
                         proposedGuideName,
+                        electronicNumber,
                         shariaDeedNumber,
                         customaryDeedSerial,
                         guarantorName
@@ -368,6 +376,18 @@ namespace WebAPIBackend.Controllers.LicenseApplication
 
                 var userId = userIdClaim.Value;
 
+                // Check for duplicate electronic number
+                if (!string.IsNullOrWhiteSpace(request.ApplicantElectronicNumber))
+                {
+                    var existingWithSameElectronicNumber = await _context.LicenseApplications
+                        .AnyAsync(x => x.ApplicantElectronicNumber == request.ApplicantElectronicNumber && x.Status == true);
+                    
+                    if (existingWithSameElectronicNumber)
+                    {
+                        return BadRequest($"نمبر الکترونیکی {request.ApplicantElectronicNumber} قبلاً ثبت شده است. لطفاً نمبر دیگری را وارد کنید.");
+                    }
+                }
+
                 // Parse date
                 DateConversionHelper.TryParseToDateOnly(request.RequestDate, request.CalendarType, out var requestDate);
 
@@ -423,6 +443,20 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 if (entity == null || entity.Status == false)
                 {
                     return NotFound("درخواست یافت نشد");
+                }
+
+                // Check for duplicate electronic number (excluding current record)
+                if (!string.IsNullOrWhiteSpace(request.ApplicantElectronicNumber))
+                {
+                    var existingWithSameElectronicNumber = await _context.LicenseApplications
+                        .AnyAsync(x => x.ApplicantElectronicNumber == request.ApplicantElectronicNumber 
+                                    && x.Id != id 
+                                    && x.Status == true);
+                    
+                    if (existingWithSameElectronicNumber)
+                    {
+                        return BadRequest($"نمبر الکترونیکی {request.ApplicantElectronicNumber} قبلاً ثبت شده است. لطفاً نمبر دیگری را وارد کنید.");
+                    }
                 }
 
                 // Parse date

@@ -37,6 +37,13 @@ namespace WebAPIBackend.Infrastructure.Migrations.LicenseApplication
                 maxLength: 50,
                 nullable: true);
 
+            // Create unique index for ApplicantElectronicNumber (partial index - only for non-null values)
+            migrationBuilder.Sql(@"
+                CREATE UNIQUE INDEX ""IX_LicenseApplications_ApplicantElectronicNumber"" 
+                ON org.""LicenseApplications"" (""ApplicantElectronicNumber"") 
+                WHERE ""ApplicantElectronicNumber"" IS NOT NULL AND ""ApplicantElectronicNumber"" != '';
+            ");
+
             // Rename ApplicantName column comment to reflect it's now just the name
             migrationBuilder.AlterColumn<string>(
                 name: "ApplicantName",
@@ -53,6 +60,9 @@ namespace WebAPIBackend.Infrastructure.Migrations.LicenseApplication
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            // Drop unique index
+            migrationBuilder.Sql(@"DROP INDEX IF EXISTS org.""IX_LicenseApplications_ApplicantElectronicNumber"";");
+
             migrationBuilder.DropColumn(
                 name: "ApplicantFatherName",
                 schema: "org",
