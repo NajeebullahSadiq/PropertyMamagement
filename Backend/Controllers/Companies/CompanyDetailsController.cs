@@ -78,8 +78,15 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 // Order by CreatedAt descending - most recent first
-                var result = await query
-                    .OrderByDescending(p => p.CreatedAt)
+                var orderedQuery = query.OrderByDescending(p => p.CreatedAt);
+                
+                // Limit to 100 records if no search is provided
+                if (string.IsNullOrWhiteSpace(search))
+                {
+                    orderedQuery = (IOrderedQueryable<CompanyDetail>)orderedQuery.Take(100);
+                }
+
+                var result = await orderedQuery
                     .Select(p => new
                     {
                         p.Id,
