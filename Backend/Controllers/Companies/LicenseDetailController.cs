@@ -38,8 +38,15 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                // Get licenses for the company
-                var licenses = await _context.LicenseDetails.Where(x => x.CompanyId.Equals(id)).ToListAsync();
+                // Get licenses for the company using FromSqlRaw to avoid AreaId
+                var licenses = await _context.LicenseDetails
+                    .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
+                                  ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                                  ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                                  ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
+                                  ""CreatedBy"", ""Status"", ""IsComplete""
+                                  FROM org.""LicenseDetails"" WHERE ""CompanyId"" = {0}", id)
+                    .ToListAsync();
                 
                 // Validate province access for each license
                 foreach (var license in licenses)
@@ -200,7 +207,7 @@ namespace WebAPIBackend.Controllers.Companies
                     ProvinceId = provinceId, // Set from admin selection or user province
                     IssueDate = issueDate,
                     ExpireDate = expireDate,
-                    AreaId = request.AreaId,
+                    TransferLocation = request.TransferLocation,
                     OfficeAddress = request.OfficeAddress,
                     CompanyId = request.CompanyId,
                     DocPath = request.DocPath,
@@ -281,7 +288,16 @@ namespace WebAPIBackend.Controllers.Companies
                     return BadRequest();
                 }
 
-                var existingProperty = await _context.LicenseDetails.FindAsync(id);
+                // Load entity using FromSqlRaw to avoid AreaId column
+                var existingProperty = await _context.LicenseDetails
+                    .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
+                                  ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                                  ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                                  ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
+                                  ""CreatedBy"", ""Status"", ""IsComplete""
+                                  FROM org.""LicenseDetails"" WHERE ""Id"" = {0}", id)
+                    .FirstOrDefaultAsync();
+                    
                 if (existingProperty == null)
                 {
                     return NotFound();
@@ -364,7 +380,7 @@ namespace WebAPIBackend.Controllers.Companies
                 existingProperty.LicenseNumber = originalLicenseNumber; // Keep existing license number
                 existingProperty.IssueDate = issueDate;
                 existingProperty.ExpireDate = expireDate;
-                existingProperty.AreaId = request.AreaId;
+                existingProperty.TransferLocation = request.TransferLocation;
                 existingProperty.OfficeAddress = request.OfficeAddress;
                 existingProperty.DocPath = request.DocPath;
                 existingProperty.LicenseType = request.LicenseType;

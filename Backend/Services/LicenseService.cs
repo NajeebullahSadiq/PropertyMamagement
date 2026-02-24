@@ -27,14 +27,29 @@ namespace WebAPIBackend.Services
 
         public async Task<List<LicenseDetail>> GetAllLicensesAsync()
         {
-            var query = _context.LicenseDetails.AsQueryable();
+            var query = _context.LicenseDetails
+                .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
+                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                              ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
+                              ""CreatedBy"", ""Status"", ""IsComplete""
+                              FROM org.""LicenseDetails""")
+                .AsQueryable();
             query = _provinceFilter.ApplyProvinceFilter(query);
             return await query.ToListAsync();
         }
 
         public async Task<LicenseDetail> GetLicenseByIdAsync(int id)
         {
-            var license = await _context.LicenseDetails.FindAsync(id);
+            var license = await _context.LicenseDetails
+                .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
+                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                              ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
+                              ""CreatedBy"", ""Status"", ""IsComplete""
+                              FROM org.""LicenseDetails"" WHERE ""Id"" = {0}", id)
+                .FirstOrDefaultAsync();
+                
             if (license == null)
             {
                 throw new NotFoundException("License not found");
@@ -66,7 +81,15 @@ namespace WebAPIBackend.Services
 
         public async Task<LicenseDetail> UpdateLicenseAsync(int id, LicenseDetail updatedLicense)
         {
-            var license = await _context.LicenseDetails.FindAsync(id);
+            var license = await _context.LicenseDetails
+                .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
+                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                              ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
+                              ""CreatedBy"", ""Status"", ""IsComplete""
+                              FROM org.""LicenseDetails"" WHERE ""Id"" = {0}", id)
+                .FirstOrDefaultAsync();
+                
             if (license == null)
             {
                 throw new NotFoundException("License not found");
@@ -82,7 +105,7 @@ namespace WebAPIBackend.Services
             license.LicenseNumber = updatedLicense.LicenseNumber;
             license.IssueDate = updatedLicense.IssueDate;
             license.ExpireDate = updatedLicense.ExpireDate;
-            license.AreaId = updatedLicense.AreaId;
+            license.TransferLocation = updatedLicense.TransferLocation;
             license.OfficeAddress = updatedLicense.OfficeAddress;
             license.DocPath = updatedLicense.DocPath;
             license.LicenseType = updatedLicense.LicenseType;
@@ -106,7 +129,15 @@ namespace WebAPIBackend.Services
 
         public async Task DeleteLicenseAsync(int id)
         {
-            var license = await _context.LicenseDetails.FindAsync(id);
+            var license = await _context.LicenseDetails
+                .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
+                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                              ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
+                              ""CreatedBy"", ""Status"", ""IsComplete""
+                              FROM org.""LicenseDetails"" WHERE ""Id"" = {0}", id)
+                .FirstOrDefaultAsync();
+                
             if (license == null)
             {
                 throw new NotFoundException("License not found");

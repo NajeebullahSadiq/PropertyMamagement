@@ -75,7 +75,6 @@ namespace WebAPI.Controllers
             if (model.CompanyId > 0)
             {
                 var company = await _context.CompanyDetails
-                    .Include(c => c.LicenseDetails)
                     .FirstOrDefaultAsync(c => c.Id == model.CompanyId);
 
                 if (company == null)
@@ -84,7 +83,10 @@ namespace WebAPI.Controllers
                 }
 
                 // Check if company has licenses
-                if (!company.LicenseDetails.Any())
+                var hasLicenses = await _context.LicenseDetails
+                    .AnyAsync(l => l.CompanyId == model.CompanyId);
+                
+                if (!hasLicenses)
                 {
                     return BadRequest(new { message = "این رهنما هیچ جوازی ندارد" });
                 }

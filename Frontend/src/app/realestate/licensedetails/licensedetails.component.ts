@@ -72,7 +72,7 @@ export class LicensedetailsComponent {
 			licenseNumber: [''],  // Make it optional since it's auto-generated
 			issueDate: ['', Validators.required],
 			expireDate: ['', Validators.required],
-			areaId: ['', Validators.required],
+			transferLocation: [''],
 			officeAddress: ['', Validators.required],
 			licenseType: ['', Validators.required],
 			licenseCategory: [''],
@@ -224,9 +224,7 @@ export class LicensedetailsComponent {
 			this.provinces = res;
 		});
 		
-		this.comservice.getArea().subscribe(res => {
-			this.Areas = res;
-		});
+		// Remove Areas loading since we don't need it anymore
 
 		this.comservice.getLicenseById(this.id)
 			.subscribe({
@@ -239,7 +237,7 @@ export class LicensedetailsComponent {
 							licenseNumber: detail[0].licenseNumber,
 							issueDate: detail[0].issueDate,
 							expireDate: detail[0].expireDate,
-							areaId: detail[0].areaId,
+							transferLocation: detail[0].transferLocation || '',
 							officeAddress: detail[0].officeAddress,
 							licenseType: detail[0].licenseType,
 							licenseCategory: detail[0].licenseCategory || '',
@@ -470,7 +468,7 @@ export class LicensedetailsComponent {
 	get licenseType() { return this.licenseForm.get('licenseType'); }
 	get licenseCategory() { return this.licenseForm.get('licenseCategory'); }
 	get renewalRound() { return this.licenseForm.get('renewalRound'); }
-	get licenareaIdseNumber() { return this.licenseForm.get('areaId'); }
+	get transferLocation() { return this.licenseForm.get('transferLocation'); }
 	get companyId() { return this.licenseForm.get('companyId'); }
 	get docPath() { return this.licenseForm.get('docPath'); }
 	// Financial and Administrative Fields getters

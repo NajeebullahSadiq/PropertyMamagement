@@ -115,7 +115,6 @@ namespace WebAPIBackend.Services
         {
             var company = await _context.CompanyDetails
                 .Include(c => c.CompanyOwners)
-                .Include(c => c.LicenseDetails)
                 .Include(c => c.Guarantors)
                 .FirstOrDefaultAsync(c => c.Id == companyId);
 
@@ -123,6 +122,11 @@ namespace WebAPIBackend.Services
             {
                 return;
             }
+
+            // Get license details separately to avoid AreaId column issue
+            var licenseDetails = await _context.LicenseDetails
+                .Where(l => l.CompanyId == companyId)
+                .ToListAsync();
 
             // Check if all required fields are filled
             bool isComplete = true;
@@ -150,13 +154,13 @@ namespace WebAPIBackend.Services
             }
 
             // 3. Check if company has at least one license with required fields (except LicenseNumber which will be auto-generated)
-            if (!company.LicenseDetails.Any())
+            if (!licenseDetails.Any())
             {
                 isComplete = false;
             }
             else
             {
-                var license = company.LicenseDetails.First();
+                var license = licenseDetails.First();
                 // Don't check LicenseNumber here - it will be generated when complete
                 if (!license.IssueDate.HasValue ||
                     !license.ExpireDate.HasValue ||
@@ -184,9 +188,9 @@ namespace WebAPIBackend.Services
 
             // Update the IsComplete status for all licenses of this company
             // AND generate license number if becoming complete for the first time
-            if (company.LicenseDetails != null && company.LicenseDetails.Any())
+            if (licenseDetails.Any())
             {
-                foreach (var license in company.LicenseDetails)
+                foreach (var license in licenseDetails)
                 {
                     var wasIncomplete = !license.IsComplete;
                     license.IsComplete = isComplete;

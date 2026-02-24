@@ -829,14 +829,15 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.TariffNumber).HasMaxLength(100);
-
-                entity.HasOne(d => d.Area).WithMany(p => p.LicenseDetails)
-                    .HasForeignKey(d => d.AreaId)
-                    .HasConstraintName("LicenseDetails_AreaId_fkey");
+                entity.Property(e => e.TransferLocation).HasMaxLength(500);
 
                 entity.HasOne(d => d.Company).WithMany(p => p.LicenseDetails)
                     .HasForeignKey(d => d.CompanyId)
                     .HasConstraintName("LicenseDetails_CompanyId_fkey");
+                    
+                entity.HasOne(d => d.Province).WithMany()
+                    .HasForeignKey(d => d.ProvinceId)
+                    .HasConstraintName("LicenseDetails_ProvinceId_fkey");
             });
 
             modelBuilder.Entity<Location>(entity =>

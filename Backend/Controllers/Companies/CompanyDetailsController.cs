@@ -84,12 +84,16 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         p.Id,
                         p.Title,
-                        ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
-                        ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                        ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                        licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                        granator = (p.Guarantors != null && p.Guarantors.Any()) ? (p.Guarantors.First().FirstName ?? "") + (string.IsNullOrWhiteSpace(p.Guarantors.First().GrandFatherName) ? "" : " " + p.Guarantors.First().GrandFatherName) + " " + (p.Guarantors.First().FatherName ?? "") : null,
-                        isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
+                        ownerFullName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
+                        ownerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
+                        ownerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
+                        licenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 
+                            (g.FirstName ?? "") + 
+                            (string.IsNullOrWhiteSpace(g.GrandFatherName) ? "" : " " + g.GrandFatherName) + 
+                            " " + (g.FatherName ?? "")
+                        ).FirstOrDefault(),
+                        isComplete = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IsComplete).FirstOrDefault(),
                     })
                     .ToListAsync();
 
@@ -141,12 +145,16 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         p.Id,
                         p.Title,
-                        ownerFullName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FirstName : null,
-                        ownerFatherName = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().FatherName : null,
-                        ownerElectronicNationalIdNumber = (p.CompanyOwners != null && p.CompanyOwners.Any()) ? p.CompanyOwners.First().ElectronicNationalIdNumber : null,
-                        licenseNumber = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().LicenseNumber : null,
-                        granator = (p.Guarantors != null && p.Guarantors.Any()) ? (p.Guarantors.First().FirstName ?? "") + (string.IsNullOrWhiteSpace(p.Guarantors.First().GrandFatherName) ? "" : " " + p.Guarantors.First().GrandFatherName) + " " + (p.Guarantors.First().FatherName ?? "") : null,
-                        isComplete = (p.LicenseDetails != null && p.LicenseDetails.Any()) ? p.LicenseDetails.First().IsComplete : false,
+                        ownerFullName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
+                        ownerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
+                        ownerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
+                        licenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 
+                            (g.FirstName ?? "") + 
+                            (string.IsNullOrWhiteSpace(g.GrandFatherName) ? "" : " " + g.GrandFatherName) + 
+                            " " + (g.FatherName ?? "")
+                        ).FirstOrDefault(),
+                        isComplete = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IsComplete).FirstOrDefault(),
                     })
                     .ToListAsync();
 
@@ -272,8 +280,7 @@ namespace WebAPIBackend.Controllers.Companies
                             l.IssueDate,
                             l.ExpireDate,
                             l.OfficeAddress,
-                            l.AreaId,
-                            AreaName = l.Area != null ? l.Area.Name : null,
+                            l.TransferLocation,
                             l.RoyaltyAmount,
                             l.RoyaltyDate,
                             l.TariffNumber,
@@ -634,7 +641,6 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var company = await _context.CompanyDetails
                     .Include(c => c.CompanyOwners)
-                    .Include(c => c.LicenseDetails)
                     .Include(c => c.Guarantors)
                     .Include(c => c.Gaurantees)
                     .Include(c => c.CompanyAccountInfos)
@@ -648,6 +654,23 @@ namespace WebAPIBackend.Controllers.Companies
 
                 // Validate province access
                 _provinceFilter.ValidateProvinceAccess(company.ProvinceId);
+
+                // Delete LicenseDetails and their audit records first
+                var licenseDetails = await _context.LicenseDetails
+                    .Where(l => l.CompanyId == id)
+                    .ToListAsync();
+                if (licenseDetails.Any())
+                {
+                    var licenseIds = licenseDetails.Select(l => l.Id).ToList();
+                    var licenseAuditRecords = await _context.Licenseaudits
+                        .Where(a => licenseIds.Contains(a.LicenseId))
+                        .ToListAsync();
+                    if (licenseAuditRecords.Any())
+                    {
+                        _context.Licenseaudits.RemoveRange(licenseAuditRecords);
+                    }
+                    _context.LicenseDetails.RemoveRange(licenseDetails);
+                }
 
                 // Delete audit records first
                 var auditRecords = await _context.Companydetailsaudits

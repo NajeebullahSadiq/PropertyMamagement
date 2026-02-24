@@ -16,7 +16,7 @@
 
         public string? ExpireDate { get; set; }
 
-        public int? AreaId { get; set; }
+        public string? TransferLocation { get; set; }
 
         public string? OfficeAddress { get; set; }
 

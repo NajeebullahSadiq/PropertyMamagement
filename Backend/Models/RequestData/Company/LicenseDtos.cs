@@ -14,7 +14,7 @@ namespace WebAPIBackend.Models.RequestData.Company
         public string? LicenseNumber { get; set; }
         public DateOnly? IssueDate { get; set; }
         public DateOnly? ExpireDate { get; set; }
-        public int? AreaId { get; set; }
+        public string? TransferLocation { get; set; }
         public string? OfficeAddress { get; set; }
         public string? DocPath { get; set; }
         public string? LicenseType { get; set; }
@@ -39,7 +39,7 @@ namespace WebAPIBackend.Models.RequestData.Company
         public string? LicenseNumber { get; set; }
         public DateOnly? IssueDate { get; set; }
         public DateOnly? ExpireDate { get; set; }
-        public int? AreaId { get; set; }
+        public string? TransferLocation { get; set; }
         public string? OfficeAddress { get; set; }
         public string? DocPath { get; set; }
         public string? LicenseType { get; set; }

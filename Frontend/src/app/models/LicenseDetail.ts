@@ -4,7 +4,7 @@ export interface LicenseDetail{
     licenseNumber:number;
     issueDate:string;
     expireDate:string;
-    areaId:number;
+    transferLocation?:string;   // محل انتقال (Transfer Location) - replaces areaId
     officeAddress:string;
     companyId:number;
     docPath:string;

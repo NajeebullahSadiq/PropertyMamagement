@@ -21,7 +21,7 @@ public partial class LicenseDetail : IProvinceEntity
 
     public DateOnly? ExpireDate { get; set; }
 
-    public int? AreaId { get; set; }
+    public string? TransferLocation { get; set; }
 
     public string? OfficeAddress { get; set; }
 
@@ -84,8 +84,6 @@ public partial class LicenseDetail : IProvinceEntity
     /// Used to control print functionality
     /// </summary>
     public bool IsComplete { get; set; }
-
-    public virtual Area? Area { get; set; }
 
     public virtual CompanyDetail? Company { get; set; }
 

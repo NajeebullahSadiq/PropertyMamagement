@@ -395,7 +395,6 @@ namespace WebAPIBackend.Services.Verification
             var license = await _context.LicenseDetails
                 .Include(l => l.Company)
                     .ThenInclude(c => c!.CompanyOwners)
-                .Include(l => l.Area)
                 .FirstOrDefaultAsync(l => l.Id == licenseId);
 
             if (license == null) return null;

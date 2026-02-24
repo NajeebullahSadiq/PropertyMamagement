@@ -11,5 +11,5 @@ public partial class Area
 
     public string? Des { get; set; }
 
-    public virtual ICollection<LicenseDetail> LicenseDetails { get; } = new List<LicenseDetail>();
+    // Removed LicenseDetails navigation property - no longer used after migration to TransferLocation
 }
