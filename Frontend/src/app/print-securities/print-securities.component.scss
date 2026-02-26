@@ -3,8 +3,10 @@
   font-family: 'Vazir', 'B Nazanin', Arial, sans-serif;
   max-width: 210mm;
   margin: 0 auto;
-  padding: 15mm;
+  padding: 10mm;
   background: white;
+  min-height: 297mm;
+  box-sizing: border-box;
 }
 
 .print-header {
@@ -12,58 +14,68 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid #333;
-  padding-bottom: 15px;
-  margin-bottom: 20px;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
 
   .header-logo {
+    flex-shrink: 0;
+    
     .logo {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
     }
   }
 
   .header-title {
     text-align: center;
     flex: 1;
+    padding: 0 15px;
 
     h1 {
-      font-size: 16px;
+      font-size: 14px;
       margin: 0;
       font-weight: bold;
+      line-height: 1.4;
     }
 
     h2 {
-      font-size: 14px;
-      margin: 5px 0;
-    }
-
-    h3 {
-      font-size: 18px;
-      margin: 10px 0 0;
-      font-weight: bold;
-      color: #1a365d;
-    }
-  }
-
-  .header-info {
-    text-align: left;
-    font-size: 12px;
-
-    p {
+      font-size: 13px;
       margin: 3px 0;
+      line-height: 1.4;
+    }
+
+    h3, h4, h5, h6 {
+      font-size: 11px;
+      margin: 3px 0;
+      font-weight: normal;
+      line-height: 1.4;
     }
   }
 }
 
+.header-info {
+  text-align: center;
+  font-size: 11px;
+  margin-bottom: 10px;
+  
+  p {
+    margin: 2px 0;
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
 .print-section {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 
   .section-title {
     background: #1a365d;
     color: white;
-    padding: 8px 15px;
-    margin: 0 0 10px;
-    font-size: 14px;
+    padding: 5px 12px;
+    margin: 0 0 8px;
+    font-size: 12px;
     font-weight: bold;
   }
 }
@@ -74,8 +86,8 @@
 
   td {
     border: 1px solid #ddd;
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 5px 10px;
+    font-size: 11px;
   }
 
   .label {
@@ -90,7 +102,7 @@
     &.total {
       font-weight: bold;
       color: #1a365d;
-      font-size: 14px;
+      font-size: 12px;
     }
   }
 }
@@ -98,17 +110,17 @@
 .signatures {
   display: flex;
   justify-content: space-between;
-  margin-top: 40px;
-  padding-top: 20px;
+  margin-top: 25px;
+  padding-top: 15px;
 
   .signature-box {
     text-align: center;
     width: 30%;
 
     p {
-      margin-bottom: 40px;
+      margin-bottom: 30px;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .signature-line {
@@ -119,12 +131,12 @@
 }
 
 .print-footer {
-  margin-top: 30px;
+  margin-top: 20px;
   text-align: center;
-  font-size: 11px;
+  font-size: 10px;
   color: #666;
   border-top: 1px solid #ddd;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 
 .loading {
@@ -140,11 +152,16 @@
   }
 
   .print-container {
-    padding: 10mm;
+    padding: 8mm;
+    page-break-after: avoid;
   }
 
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 8mm;
+  }
+  
+  .print-section {
+    page-break-inside: avoid;
   }
 }
