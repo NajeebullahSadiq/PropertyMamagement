@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -41,6 +42,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     isViewOnly = false;
 
     private dataChangedSub?: Subscription;
+    private searchSubject = new Subject<string>();
 
     constructor(
         private licenseAppService: LicenseApplicationService,
@@ -48,7 +50,17 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         private rbacService: RbacService,
         private router: Router,
         private toastr: ToastrService
-    ) { }
+    ) {
+        // Setup debounced search
+        this.searchSubject.pipe(
+            debounceTime(500), // Wait 500ms after user stops typing
+            distinctUntilChanged() // Only emit if value is different from previous
+        ).subscribe(searchTerm => {
+            this.searchTerm = searchTerm;
+            this.page = 1; // Reset page when search changes
+            this.loadData();
+        });
+    }
 
     ngOnInit(): void {
         this.checkPermissions();
@@ -61,6 +73,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.dataChangedSub?.unsubscribe();
+        this.searchSubject.complete();
     }
 
     checkPermissions(): void {
@@ -89,8 +102,7 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     }
 
     onSearch(): void {
-        this.page = 1;
-        this.loadData();
+        this.searchSubject.next(this.searchTerm);
     }
 
     toggleAdvancedSearch(): void {

@@ -13,6 +13,63 @@
       integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" 
       crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="preconnect" href="https://fonts.gstatic.com">
+  
+  <!-- CRITICAL FIX: Remove Material Tab Dark Shadow while preserving accessibility -->
+  <style>
+    /* Suppress only the ripple elements that create dark shadows */
+    .mdc-tab__ripple,
+    span.mdc-tab__ripple {
+      display: none !important;
+    }
+    
+    .mat-mdc-tab-ripple,
+    div.mat-ripple.mat-mdc-tab-ripple {
+      display: none !important;
+    }
+    
+    .mat-mdc-tab-disabled {
+      opacity: 0.5 !important;
+    }
+    
+    /* Zero out the default (idle) state-layer opacity so no dark overlay shows at rest,
+       but MDC's hover/pressed opacity transitions remain functional. */
+    .mat-mdc-tab::before,
+    .mdc-tab::before {
+      opacity: 0 !important;
+    }
+    
+    /* Allow hover state to show visual feedback */
+    .mat-mdc-tab:hover::before,
+    .mdc-tab:hover::before {
+      opacity: 0.04 !important;
+    }
+    
+    /* Restore visible focus indicator when tab receives focus */
+    .mat-mdc-tab:focus::before,
+    .mdc-tab:focus::before {
+      background: rgba(59, 130, 246, 0.12) !important;
+      opacity: 1 !important;
+    }
+    
+    /* Ensure keyboard focus is ALWAYS visible for accessibility (WCAG 2.4.7) */
+    .mat-mdc-tab:focus {
+      outline: 2px solid #3b82f6 !important;
+      outline-offset: -2px !important;
+    }
+    
+    .mat-mdc-tab:focus-visible {
+      outline: 2px solid #3b82f6 !important;
+      outline-offset: -2px !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+    }
+    
+    .mat-mdc-tab:focus .mdc-tab__text-label,
+    .mat-mdc-tab:focus-visible .mdc-tab__text-label {
+      text-decoration: underline !important;
+      /* Avoid font-weight change — it causes horizontal layout shift on
+         neighbouring tabs as the label widens on focus/blur transitions. */
+    }
+  </style>
 
 </head>
 <body class="mat-typography">

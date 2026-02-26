@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Guarantor, GuaranteeTypeEnum } from 'src/app/models/Guarantor';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { environment } from 'src/environments/environment';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
@@ -54,7 +56,8 @@ export class GuaranatorsComponent {
     private selerService: SellerService,
     private localizationService: LocalizationService,
     private calendarConversionService: CalendarConversionService,
-    private calendarService: CalendarService
+    private calendarService: CalendarService,
+    private dialog: MatDialog
   ) {
     this.guaranatorForm = this.fb.group({
       id: [0],
@@ -133,27 +136,39 @@ export class GuaranatorsComponent {
       return;
     }
 
-    if (confirm('آیا مطمئن هستید که می‌خواهید این شاهد را حذف کنید؟')) {
-      this.comservice.deleteGuarantor(this.id, id).subscribe({
-        next: () => {
-          this.toastr.success('شاهد با موفقیت حذف شد');
-          this.comservice.getGuaranatorById(this.id).subscribe(detail => {
-            this.guaranatorDetails = detail;
-            this.separateActiveAndHistory();
-          });
-          this.resetForms();
-        },
-        error: (error) => {
-          if (error.status === 403) {
-            this.toastr.error(error.error.message || "شاهد منقضی شده قابل حذف نیست");
-          } else if (error.status === 404) {
-            this.toastr.error("شاهد یافت نشد");
-          } else {
-            this.toastr.error("خطا در حذف شاهد");
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'حذف تضمین کننده',
+        message: 'آیا از حذف این تضمین کننده اطمینان دارید؟',
+        confirmText: 'حذف',
+        cancelText: 'لغو'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.comservice.deleteGuarantor(this.id, id).subscribe({
+          next: () => {
+            this.toastr.success('تضمین کننده با موفقیت حذف شد');
+            this.comservice.getGuaranatorById(this.id).subscribe(detail => {
+              this.guaranatorDetails = detail;
+              this.separateActiveAndHistory();
+            });
+            this.resetForms();
+          },
+          error: (error) => {
+            if (error.status === 403) {
+              this.toastr.error(error.error.message || "تضمین کننده منقضی شده قابل حذف نیست");
+            } else if (error.status === 404) {
+              this.toastr.error("تضمین کننده یافت نشد");
+            } else {
+              this.toastr.error("خطا در حذف تضمین کننده");
+            }
           }
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   private formatDateForBackend(dateValue: any): string {

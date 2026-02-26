@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
@@ -7,13 +7,15 @@ import { companydetailsList } from 'src/app/models/companydetails';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { RbacService } from 'src/app/shared/rbac.service';
 import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-realestatelist',
   templateUrl: './realestatelist.component.html',
   styleUrls: ['./realestatelist.component.scss']
 })
-export class RealestatelistComponent {
+export class RealestatelistComponent implements OnInit, OnDestroy {
   properties!: companydetailsList[];
   filteredProperties!: companydetailsList[];
   searchTerm: string = '';
@@ -23,6 +25,7 @@ export class RealestatelistComponent {
   tableSizes: any = [10,50,100];
   isViewOnly: boolean = false;
   isAdmin: boolean = false;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private http: HttpClient, 
@@ -34,10 +37,24 @@ export class RealestatelistComponent {
   ) {
     this.isViewOnly = this.rbacService.isViewOnly();
     this.isAdmin = this.rbacService.isAdmin();
+    
+    // Setup debounced search
+    this.searchSubject.pipe(
+      debounceTime(500), // Wait 500ms after user stops typing
+      distinctUntilChanged() // Only emit if value is different from previous
+    ).subscribe(searchTerm => {
+      this.searchTerm = searchTerm;
+      this.page = 1; // Reset page when search changes
+      this.loadData();
+    });
   }
 
   ngOnInit() {
     this.loadData();
+  }
+
+  ngOnDestroy() {
+    this.searchSubject.complete();
   }
 
   loadData(){
@@ -71,8 +88,7 @@ export class RealestatelistComponent {
   }
 
   onSearch() {
-    this.page = 1;
-    this.loadData();
+    this.searchSubject.next(this.searchTerm);
   }
 
   onDelete(propertyId: number, title: string) {

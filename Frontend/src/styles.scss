@@ -1014,6 +1014,87 @@ mat-select,
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
 
+/* ============================================
+   FIX: Material Design Tab Dark Shadow/Overlay
+   Preserves accessibility focus indicators (WCAG 2.4.7)
+   ============================================ */
+
+/* Target the actual dark overlay with maximum specificity */
+.mat-mdc-tab.mat-mdc-tab-disabled.mat-mdc-focus-indicator.mdc-tab,
+.mat-mdc-tab.mat-mdc-tab-disabled.mdc-tab,
+.mat-mdc-tab-disabled.mdc-tab,
+div[role="tab"].mat-mdc-tab-disabled {
+  opacity: 0.5 !important;
+  filter: none !important;
+}
+
+/* Zero out the default (idle) state-layer opacity so no dark overlay shows at rest,
+   but MDC's hover/pressed opacity transitions remain functional. */
+.mat-mdc-tab::before,
+.mdc-tab::before {
+  opacity: 0 !important;
+}
+
+/* Allow hover state to show visual feedback */
+.mat-mdc-tab:hover::before,
+.mdc-tab:hover::before {
+  opacity: 0.04 !important;
+}
+
+/* Restore visible focus indicator when tab receives focus */
+.mat-mdc-tab:focus::before,
+.mdc-tab:focus::before {
+  /* Show a subtle focus background */
+  background: rgba(59, 130, 246, 0.12) !important;
+  opacity: 1 !important;
+}
+
+/* Remove ALL ripple overlays - display: none makes other properties redundant */
+.mat-mdc-tab.mdc-tab .mdc-tab__ripple,
+.mat-mdc-tab-disabled.mdc-tab .mdc-tab__ripple,
+div[role="tab"] .mdc-tab__ripple,
+span.mdc-tab__ripple {
+  display: none !important;
+}
+
+/* Remove mat-ripple overlays */
+.mat-mdc-tab .mat-mdc-tab-ripple,
+.mat-mdc-tab-disabled .mat-mdc-tab-ripple,
+div.mat-ripple.mat-mdc-tab-ripple {
+  display: none !important;
+}
+
+/* Remove ripple elements */
+.mat-mdc-tab .mat-ripple-element,
+.mat-mdc-tab-disabled .mat-ripple-element {
+  display: none !important;
+}
+
+/* Ensure keyboard focus is ALWAYS visible for accessibility (WCAG 2.4.7) */
+.mat-mdc-tab:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: -2px !important;
+}
+
+/* Enhanced focus indicator for keyboard navigation */
+.mat-mdc-tab:focus-visible {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: -2px !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+.mat-mdc-tab:focus .mdc-tab__text-label,
+.mat-mdc-tab:focus-visible .mdc-tab__text-label {
+  text-decoration: underline !important;
+  /* Avoid font-weight change — it causes horizontal layout shift on
+     neighbouring tabs as the label widens on focus/blur transitions. */
+}
+
+/* Ensure tab indicator underline is visible */
+.mdc-tab-indicator__content--underline {
+  border-color: #3b82f6 !important;
+}
+
 
 /* ============================================
    MODERN SIDEBAR & MENU GLOBAL STYLES
