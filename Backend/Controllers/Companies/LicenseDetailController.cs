@@ -41,7 +41,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Get licenses for the company using FromSqlRaw to avoid AreaId
                 var licenses = await _context.LicenseDetails
                     .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                                  ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                                  ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                                   ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                                   ""CreatedBy"", ""Status"", ""IsComplete""
@@ -208,6 +208,7 @@ namespace WebAPIBackend.Controllers.Companies
                     IssueDate = issueDate,
                     ExpireDate = expireDate,
                     TransferLocation = request.TransferLocation,
+                    ActivityLocation = request.ActivityLocation,
                     OfficeAddress = request.OfficeAddress,
                     CompanyId = request.CompanyId,
                     DocPath = request.DocPath,
@@ -291,7 +292,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Load entity using FromSqlRaw to avoid AreaId column
                 var existingProperty = await _context.LicenseDetails
                     .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                                  ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                                  ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                                   ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                                   ""CreatedBy"", ""Status"", ""IsComplete""
@@ -381,6 +382,7 @@ namespace WebAPIBackend.Controllers.Companies
                 existingProperty.IssueDate = issueDate;
                 existingProperty.ExpireDate = expireDate;
                 existingProperty.TransferLocation = request.TransferLocation;
+                existingProperty.ActivityLocation = request.ActivityLocation;
                 existingProperty.OfficeAddress = request.OfficeAddress;
                 existingProperty.DocPath = request.DocPath;
                 existingProperty.LicenseType = request.LicenseType;
@@ -573,7 +575,7 @@ namespace WebAPIBackend.Controllers.Companies
                     // Owner Address Fields
                     ownerProvinceName,
                     ownerDistrictName,
-                    ownerVillage,
+                    ownerVillage = licenseDetail?.ActivityLocation ?? owner?.OwnerVillage, // Use ActivityLocation if available, fallback to OwnerVillage
                     // Permanent Address Fields
                     permanentProvinceName,
                     permanentDistrictName,

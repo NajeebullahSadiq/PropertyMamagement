@@ -288,6 +288,7 @@ namespace WebAPIBackend.Controllers.Companies
                             l.ExpireDate,
                             l.OfficeAddress,
                             l.TransferLocation,
+                            l.ActivityLocation,
                             l.RoyaltyAmount,
                             l.RoyaltyDate,
                             l.TariffNumber,

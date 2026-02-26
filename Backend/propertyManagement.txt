@@ -176,7 +176,7 @@ echo "Database migrations completed!"
 cd ~/PropertyMamagement/Backend
 sudo -u postgres psql -d PRMIS -f Scripts/company_module_clean_recreate.sql
 sudo -u postgres psql -d PRMIS -f Scripts/add_applicant_name_fields.sql
-sudo -u postgres psql -d PRMIS -f Scripts/URGENT_drop_areaid_column.sql
+sudo -u postgres psql -d PRMIS -f Scripts/add_activity_location_to_license.sql
 
 
 sudo systemctl restart prmis-backend

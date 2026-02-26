@@ -23,6 +23,8 @@ public partial class LicenseDetail : IProvinceEntity
 
     public string? TransferLocation { get; set; }
 
+    public string? ActivityLocation { get; set; }
+
     public string? OfficeAddress { get; set; }
 
     public int? CompanyId { get; set; }
