@@ -65,11 +65,10 @@ namespace WebAPIBackend.Controllers.Companies
                         return (false, "???? ????? ?????? ???");
                     break;
 
-                case GuaranteeType_CustomaryDeed: // ????? ????
+                case GuaranteeType_CustomaryDeed: // قباله عرفی
                     if (string.IsNullOrWhiteSpace(request.SetSerialNumber))
-                        return (false, "???? ????? ??? ?????? ???");
-                    if (!request.GuaranteeDistrictId.HasValue || request.GuaranteeDistrictId == 0)
-                        return (false, "????? ?????? ???");
+                        return (false, "نمبر سریال سټه الزامی است");
+                    // GuaranteeDistrictName is now optional (no validation required)
                     break;
             }
 
@@ -87,12 +86,16 @@ namespace WebAPIBackend.Controllers.Companies
                     // Clear Sharia Deed fields
                     guarantor.CourtName = null;
                     guarantor.CollateralNumber = null;
+                    guarantor.PropertyDocumentNumber = null;
+                    // PropertyDocumentDate is kept - it's always visible
                     // Clear Customary Deed fields
                     guarantor.SetSerialNumber = null;
                     guarantor.GuaranteeDistrictId = null;
+                    guarantor.GuaranteeDistrictName = null;
                     break;
 
                 case GuaranteeType_ShariaDeed:
+                    // Keep PropertyDocumentNumber and PropertyDocumentDate for Sharia Deed
                     // Clear Cash fields
                     guarantor.BankName = null;
                     guarantor.DepositNumber = null;
@@ -100,6 +103,7 @@ namespace WebAPIBackend.Controllers.Companies
                     // Clear Customary Deed fields
                     guarantor.SetSerialNumber = null;
                     guarantor.GuaranteeDistrictId = null;
+                    guarantor.GuaranteeDistrictName = null;
                     break;
 
                 case GuaranteeType_CustomaryDeed:
@@ -110,6 +114,10 @@ namespace WebAPIBackend.Controllers.Companies
                     // Clear Sharia Deed fields
                     guarantor.CourtName = null;
                     guarantor.CollateralNumber = null;
+                    guarantor.PropertyDocumentNumber = null;
+                    // PropertyDocumentDate is kept - it's always visible
+                    // Keep GuaranteeDistrictName and clear legacy GuaranteeDistrictId
+                    guarantor.GuaranteeDistrictId = null;
                     break;
 
                 default:
@@ -118,9 +126,12 @@ namespace WebAPIBackend.Controllers.Companies
                     guarantor.CollateralNumber = null;
                     guarantor.SetSerialNumber = null;
                     guarantor.GuaranteeDistrictId = null;
+                    guarantor.GuaranteeDistrictName = null;
                     guarantor.BankName = null;
                     guarantor.DepositNumber = null;
                     guarantor.DepositDate = null;
+                    guarantor.PropertyDocumentNumber = null;
+                    // PropertyDocumentDate is kept - it's always visible
                     break;
             }
         }
@@ -291,6 +302,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Conditional fields - Customary Deed
                 SetSerialNumber = request.SetSerialNumber,
                 GuaranteeDistrictId = request.GuaranteeDistrictId,
+                GuaranteeDistrictName = request.GuaranteeDistrictName,
                 // Conditional fields - Cash
                 BankName = request.BankName,
                 DepositNumber = request.DepositNumber,
@@ -417,6 +429,7 @@ namespace WebAPIBackend.Controllers.Companies
             // Conditional fields - Customary Deed
             existingProperty.SetSerialNumber = request.SetSerialNumber;
             existingProperty.GuaranteeDistrictId = request.GuaranteeDistrictId;
+            existingProperty.GuaranteeDistrictName = request.GuaranteeDistrictName;
             // Conditional fields - Cash
             existingProperty.BankName = request.BankName;
             existingProperty.DepositNumber = request.DepositNumber;

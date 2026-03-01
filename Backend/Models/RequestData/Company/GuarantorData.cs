@@ -58,7 +58,8 @@ namespace WebAPIBackend.Models.RequestData
 
         // Conditional fields for Customary Deed (قباله عرفی)
         public string? SetSerialNumber { get; set; }     // نمبر سریال سټه
-        public int? GuaranteeDistrictId { get; set; }    // ناحیه
+        public int? GuaranteeDistrictId { get; set; }    // ناحیه (ID) - Legacy
+        public string? GuaranteeDistrictName { get; set; } // ناحیه (نام) - New text field
 
         // Conditional fields for Cash (پول نقد)
         public string? BankName { get; set; }            // بانک

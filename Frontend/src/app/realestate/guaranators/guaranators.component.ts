@@ -91,6 +91,7 @@ export class GuaranatorsComponent {
       // Conditional fields - Customary Deed (قباله عرفی)
       setSerialNumber: [''],
       guaranteeDistrictId: [''],
+      guaranteeDistrictName: [''],
       // Conditional fields - Cash (پول نقد)
       bankName: [''],
       depositNumber: [''],
@@ -360,7 +361,7 @@ export class GuaranatorsComponent {
       case GuaranteeTypeEnum.CustomaryDeed: // قباله عرفی
         this.showCustomaryDeedFields = true;
         this.guaranatorForm.get('setSerialNumber')?.setValidators([Validators.required]);
-        this.guaranatorForm.get('guaranteeDistrictId')?.setValidators([Validators.required]);
+        // guaranteeDistrictName is optional - no validators
         break;
     }
     
@@ -372,12 +373,15 @@ export class GuaranatorsComponent {
    * Clear validators from all conditional fields
    */
   private clearConditionalValidators() {
+    // Document number field (only for Sharia Deed) - Date field is always visible
+    this.guaranatorForm.get('propertyDocumentNumber')?.clearValidators();
     // Sharia Deed fields
     this.guaranatorForm.get('courtName')?.clearValidators();
     this.guaranatorForm.get('collateralNumber')?.clearValidators();
     // Customary Deed fields
     this.guaranatorForm.get('setSerialNumber')?.clearValidators();
     this.guaranatorForm.get('guaranteeDistrictId')?.clearValidators();
+    this.guaranatorForm.get('guaranteeDistrictName')?.clearValidators();
     // Cash fields
     this.guaranatorForm.get('bankName')?.clearValidators();
     this.guaranatorForm.get('depositNumber')?.clearValidators();
@@ -392,9 +396,12 @@ export class GuaranatorsComponent {
     this.guaranatorForm.patchValue({
       courtName: '',
       collateralNumber: '',
+      propertyDocumentNumber: '',
+      // propertyDocumentDate is NOT cleared - it's always visible
       // Customary Deed fields
       setSerialNumber: '',
       guaranteeDistrictId: '',
+      guaranteeDistrictName: '',
       // Cash fields
       bankName: '',
       depositNumber: '',
@@ -406,10 +413,16 @@ export class GuaranatorsComponent {
    * Update validity status for all conditional fields
    */
   private updateConditionalFieldsValidity() {
+    // Document number field (only for Sharia Deed) - Date field is always visible
+    this.guaranatorForm.get('propertyDocumentNumber')?.updateValueAndValidity();
+    // Sharia Deed fields
     this.guaranatorForm.get('courtName')?.updateValueAndValidity();
     this.guaranatorForm.get('collateralNumber')?.updateValueAndValidity();
+    // Customary Deed fields
     this.guaranatorForm.get('setSerialNumber')?.updateValueAndValidity();
     this.guaranatorForm.get('guaranteeDistrictId')?.updateValueAndValidity();
+    this.guaranatorForm.get('guaranteeDistrictName')?.updateValueAndValidity();
+    // Cash fields
     this.guaranatorForm.get('bankName')?.updateValueAndValidity();
     this.guaranatorForm.get('depositNumber')?.updateValueAndValidity();
     this.guaranatorForm.get('depositDate')?.updateValueAndValidity();
@@ -473,12 +486,13 @@ export class GuaranatorsComponent {
         guaranteeDocNumber: selectedOwnerAddress.guaranteeDocNumber,
         guaranteeDate: parseDateField(selectedOwnerAddress.guaranteeDate),
         guaranteeDocPath: selectedOwnerAddress.guaranteeDocPath,
-        // Conditional fields - Sharia Deed
+        // Conditional fields - Customary Deed
         courtName: selectedOwnerAddress.courtName,
         collateralNumber: selectedOwnerAddress.collateralNumber,
         // Conditional fields - Customary Deed
         setSerialNumber: selectedOwnerAddress.setSerialNumber,
         guaranteeDistrictId: selectedOwnerAddress.guaranteeDistrictId,
+        guaranteeDistrictName: selectedOwnerAddress.guaranteeDistrictName,
         // Conditional fields - Cash
         bankName: selectedOwnerAddress.bankName,
         depositNumber: selectedOwnerAddress.depositNumber,
@@ -528,7 +542,7 @@ export class GuaranatorsComponent {
       case GuaranteeTypeEnum.CustomaryDeed:
         this.showCustomaryDeedFields = true;
         this.guaranatorForm.get('setSerialNumber')?.setValidators([Validators.required]);
-        this.guaranatorForm.get('guaranteeDistrictId')?.setValidators([Validators.required]);
+        // guaranteeDistrictName is optional - no validators
         break;
     }
     
@@ -602,6 +616,7 @@ export class GuaranatorsComponent {
   // Conditional field getters - Customary Deed
   get setSerialNumber() { return this.guaranatorForm.get('setSerialNumber'); }
   get guaranteeDistrictId() { return this.guaranatorForm.get('guaranteeDistrictId'); }
+  get guaranteeDistrictName() { return this.guaranatorForm.get('guaranteeDistrictName'); }
   // Conditional field getters - Cash
   get bankName() { return this.guaranatorForm.get('bankName'); }
   get depositNumber() { return this.guaranatorForm.get('depositNumber'); }

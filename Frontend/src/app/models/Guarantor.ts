@@ -30,7 +30,8 @@ export interface Guarantor{
     collateralNumber?:string;    // نمبر وثیقه
     // Conditional fields - Customary Deed (قباله عرفی)
     setSerialNumber?:string;     // نمبر سریال سټه
-    guaranteeDistrictId?:number; // ناحیه
+    guaranteeDistrictId?:number; // ناحیه (ID) - Legacy field
+    guaranteeDistrictName?:string; // ناحیه (نام) - New text field
     // Conditional fields - Cash (پول نقد)
     bankName?:string;            // بانک
     depositNumber?:string;       // نمبر اویز

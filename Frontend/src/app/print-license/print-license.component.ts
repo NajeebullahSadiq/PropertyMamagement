@@ -195,19 +195,21 @@ export class PrintLicenseComponent implements OnInit {
     const lowerType = licenseType.toLowerCase().trim();
     
     const translations: { [key: string]: string } = {
-      'realestate': 'املاک',
-      'real estate': 'املاک',
-      'property': 'املاک',
-      'vehicle': 'موټر فروشی',
-      'carsale': 'موټر فروشی',
-      'car sale': 'موټر فروشی',
-      'car': 'موټر فروشی',
-      'motor': 'موټر فروشی',
-      'املاک': 'املاک',
-      'موټر فروشی': 'موټر فروشی',
-      'عقار': 'املاک',
-      'موتر': 'موټر فروشی',
-      'گاډی': 'موټر فروشی'
+      'realestate': 'ملکیت',
+      'real estate': 'ملکیت',
+      'property': 'ملکیت',
+      'vehicle': 'موټر پلورنه',
+      'carsale': 'موټر پلورنه',
+      'car sale': 'موټر پلورنه',
+      'car': 'موټر پلورنه',
+      'motor': 'موټر پلورنه',
+      'املاک': 'ملکیت',
+      'موټر فروشی': 'موټر پلورنه',
+      'عقار': 'ملکیت',
+      'موتر': 'موټر پلورنه',
+      'گاډی': 'موټر پلورنه',
+      'ملکیت': 'ملکیت',
+      'موټر پلورنه': 'موټر پلورنه'
     };
     
     const translated = translations[lowerType] || licenseType;

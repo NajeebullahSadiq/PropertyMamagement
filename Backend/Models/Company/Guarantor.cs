@@ -42,8 +42,17 @@ public partial class Guarantor
     // Guarantee Information (merged from Gaurantee entity)
     public int? GuaranteeTypeId { get; set; }
 
+    /// <summary>
+    /// Property Document Number - نمبر سند(تضمین)
+    /// Only applicable for Sharia Deed (قباله شرعی) guarantee type (GuaranteeTypeId = 2)
+    /// Should be NULL for Cash (پول نقد) and Customary Deed (قباله عرفی)
+    /// </summary>
     public long? PropertyDocumentNumber { get; set; }
 
+    /// <summary>
+    /// Property Document Date - تاریخ سند(تضمین)
+    /// This field is visible for all guarantee types
+    /// </summary>
     public DateOnly? PropertyDocumentDate { get; set; }
 
     public string? SenderMaktobNumber { get; set; }
@@ -68,7 +77,19 @@ public partial class Guarantor
 
     // Conditional fields for Customary Deed (قباله عرفی)
     public string? SetSerialNumber { get; set; }     // نمبر سریال سټه
-    public int? GuaranteeDistrictId { get; set; }    // ناحیه
+    
+    /// <summary>
+    /// District ID - Legacy field, kept for backward compatibility
+    /// Use GuaranteeDistrictName instead for new records
+    /// </summary>
+    [Obsolete("Use GuaranteeDistrictName instead")]
+    public int? GuaranteeDistrictId { get; set; }    // ناحیه (ID)
+    
+    /// <summary>
+    /// District Name - Free text field for district name
+    /// Replaces GuaranteeDistrictId for flexibility
+    /// </summary>
+    public string? GuaranteeDistrictName { get; set; } // ناحیه (نام)
 
     // Conditional fields for Cash (پول نقد)
     public string? BankName { get; set; }            // بانک

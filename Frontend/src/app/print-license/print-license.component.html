@@ -91,7 +91,7 @@
             </div>
             <div class="license-meta">
               <div class="meta-item">
-                <span class="meta-label">د جوازنامې شمېره</span>
+                <span class="meta-label">د جوازلیک شمېره</span>
                 <span class="meta-value">{{data.licenseNumber || '—'}}</span>
               </div>
               <div class="meta-item">
@@ -99,7 +99,7 @@
                 <span class="meta-value">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">د ختم نېټه:</span>
+                <span class="meta-label">د پای نېټه:</span>
                 <span class="meta-value">{{data.expireDateFormatted || (data.expireDate | calendarDate) || '—'}}</span>
               </div>
             </div>
@@ -115,9 +115,8 @@
             </div>
             <h2 class="ministry-name">د عدلیې وزارت</h2>
             <h3 class="department-name">مالي او اداري معینیت</h3>
-            <h3 class="department-name">د انسجام لوی ریاست</h3>
-             
-            <h4 class="sub-department">د معاملاتو لارښوانو او عریضه لیکونکو چارو ریاست</h4>
+            <h3 class="department-name">د انسجام عمومی ریاست</h3>
+            <h4 class="sub-department">د معاملو د لارښوانې او عریضه لیکونکو چارو ریاست</h4>
           </div>
 
           <!-- Left Column: Logo & Photo -->
@@ -128,7 +127,7 @@
                 <div class="photo-frame">
                   <img [src]="filePath" alt="عکس" class="owner-photo" onerror="this.src='assets/img/avatar2.png'">
                 </div>
-               
+
               </div>
             </div>
           </div>
@@ -141,15 +140,15 @@
             <!-- License Type Badge -->
             <div class="license-type-badge">
               <span class="license-type-icon">
-                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'املاک'">🏢</ng-container>
-                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'موټر فروشی'">🚗</ng-container>
+                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'ملکیت'">🏢</ng-container>
+                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'موټر پلورنه'">🚗</ng-container>
               </span>
-              <span class="license-type-label">د جواز ډول:</span>
+              <span class="license-type-label">د جوازلیک ډول:</span>
               <span class="license-type-value">{{getLicenseTypeInPashto(data.licenseType)}}</span>
             </div>
             <h2 class="certificate-title">
-              د معاملاتو لارښود د فعالیت جوازنامه
-              <span class="title-highlight">({{data.title || '—'}})</span>
+              د <span class="title-highlight">({{data.title || '—'}})</span> معاملو د لارښوانې د فعالیت جوازلیک
+
             </h2>
           </div>
           <div class="banner-decoration right"></div>
@@ -160,27 +159,31 @@
           <!-- Personal Information Card -->
           <div class="info-card personal-info">
             <p class="info-paragraph">
-              محترم <span class="highlight-value">{{data.firstName || '—'}}</span>
+              ښاغلی <span class="highlight-value">{{data.firstName || '—'}}</span>
               د <span class="highlight-value">{{data.fatherName || '—'}}</span>
               زوی د <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
               لمسی د <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
                 || '—'}}</span>
-              کال زېږېدلی د الکترونیکي تذکرې لرونکی <span class="highlight-value">{{data.indentityCardNumber || '—'}}</span>
+              کال کی زېږېدلی د الکترونیکي تذکرې شمېره <span class="highlight-value">{{data.indentityCardNumber ||
+                '—'}}</span>
             </p>
           </div>
 
           <!-- Address Information -->
           <div class="info-card address-info">
             <p class="info-paragraph">
-              <span class="label-accent">اصلي استوګنځای ناحیه یا ولسوالۍ</span>
-              <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span>
-              <span class="label-accent">ولایت</span>
-              <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span>
-              <span class="label-accent">اوسنی استوګنځای ناحیه یا ولسوالۍ</span>
-              <span class="highlight-value">{{data.permanentDistrictName || '—'}}</span>
-              <span class="label-accent">ولایت</span>
+              د <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span><span
+                class="label-accent">ولایت</span> د <span class="highlight-value">{{data.ownerDistrictName ||
+                '—'}}</span>
+              <span class="label-accent"> ناحې/ ولسوالۍ اصلي اوسیدونکې او د</span>
               <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span>
-              
+              <span class="label-accent">ولایت</span> د <span class="highlight-value">{{data.permanentDistrictName ||
+                '—'}}</span>
+
+              <span class="label-accent"> ناحې/ ولسوالۍ اوسنی اوسیدونکې دی</span>
+
+
+
             </p>
           </div>
 
@@ -189,26 +192,27 @@
             <p class="info-paragraph authorization-text">
               <span class="label-accent">واقع ناحیه</span>
               <span class="highlight-value">({{data.ownerVillage || data.ownerVillage || '—'}})</span>
-              د معاملاتو لارښود قانون په پام کې نیولو سره دا جوازنامه ورکول کېږي
+              د معاملو لارښوونې قانون په پام کې نیولو سره، دا جوازلیک ورکړل شو
               <br>
-              او پر اساس یې موصوف کولای شي د قانون د حکمونو په حدودو کې د اشخاصو تر منځ په عقودو او معاملاتو کې منځګړیتوب وکړي.
+              او نوموړی د دې پر اساس یې کولای شي د قانون په حدودو کې د اشخاصو تر منځ په عقودونو او معاملاتو کې
+              منځګړیتوب وکړي.
             </p>
           </div>
 
           <!-- Inquiry Reference -->
           <div class="inquiry-line">
-            <span>د استعلام په شمېره</span>
+            <span>  د </span>
             <span
               class="inquiry-field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span>مطبعې ته معرفي شو.</span>
+            <span> شمیرې استعلام په ذریعه، مطبعي ته وروپیژندل شو </span>
           </div>
 
           <!-- Signature Section -->
           <div class="signature-section">
             <div class="signature-block">
-              <p class="signature-greeting">په درناوي</p>
+              <p class="signature-greeting">په درنښت</p>
               <div class="signature-line"></div>
-              <p class="signature-title">د انسجام لوی رئیس</p>
+              <p class="signature-title">د انسجام عمومی رئیس</p>
             </div>
           </div>
         </main>
@@ -217,7 +221,7 @@
         <footer class="certificate-footer">
           <!-- Office Address -->
           <div class="footer-row address-row">
-            <span class="footer-label">د معاملاتو لارښود دفتر پته:</span>
+            <span class="footer-label">د معاملو د لارښوانې د دفتر پته:</span>
             <span class="footer-value">{{data.officeAddress || '—'}}</span>
           </div>
 
@@ -225,14 +229,16 @@
           <div class="validity-notice">
             <span class="notice-icon">📌</span>
             <span class="notice-label">یادښت:</span>
-            <span class="notice-text">د دې جوازنامې د اعتبار موده د صدور له نېټې څخه د درېو کلونو لپاره ده.</span>
+            <span class="notice-text">د دې جوازلیک د اعتبار موده د صدور له نېټې څخه د درېو کلونو پورې ده.</span>
           </div>
 
           <!-- License Details Row -->
           <div class="footer-row details-row">
-            <span>د جوازنامې لرونکي د تماس شمېره: <strong class="footer-value">{{data.phoneNumber || '—'}}</strong></span>
-            <span>د پېژندنې شمېره <strong class="footer-value">{{data.tin || '—'}}</strong></span>
-            <span>د جوازنامې بیه: <strong class="footer-value">پنځلس زره افغانۍ</strong></span>
+            <span>د جوازلیک لرونکي د اړیکې شمېره: <strong class="footer-value">{{data.phoneNumber ||
+                '—'}}</strong></span>
+            <span>د تشخیصی شمېره <strong class="footer-value">{{data.tin || '—'}}</strong></span>
+            <span>د جوازلیک بیه: <strong class="footer-value">{{ getLicenseTypeInPashto(data.licenseType) === 'ملکیت' ?
+                'شل زره افغانۍ' : 'پنځویشت زره افغانۍ' }}</strong></span>
           </div>
 
           <!-- QR Code Verification Row -->
