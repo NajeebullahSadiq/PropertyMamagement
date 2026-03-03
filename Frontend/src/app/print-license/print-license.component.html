@@ -13,7 +13,28 @@
   <p>{{ error }}</p>
 </div>
 
-<div class="certificate-page" *ngIf="!isLoading && !error">
+<!-- Language Selector Modal -->
+<div class="language-selector-overlay" *ngIf="!isLoading && !error && showLanguageSelector">
+  <div class="language-selector-modal">
+    <h2>د چاپ ژبه انتخاب کړئ / زبان چاپ را انتخاب کنید</h2>
+    <p>Select Print Language</p>
+    <div class="language-buttons">
+      <button class="language-btn pashto-btn" (click)="selectLanguage('pashto')">
+        <span class="lang-icon">🇦🇫</span>
+        <span class="lang-name">پښتو</span>
+        <span class="lang-name-en">Pashto</span>
+      </button>
+      <button class="language-btn dari-btn" (click)="selectLanguage('dari')">
+        <span class="lang-icon">🇦🇫</span>
+        <span class="lang-name">دری</span>
+        <span class="lang-name-en">Dari</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Pashto Version -->
+<div class="certificate-page" *ngIf="!isLoading && !error && selectedLanguage === 'pashto'">
   <div class="certificate-wrapper">
     <!-- Watermark Background -->
     <div class="watermark-layer">
@@ -91,7 +112,7 @@
             </div>
             <div class="license-meta">
               <div class="meta-item">
-                <span class="meta-label">د جوازلیک شمېره</span>
+                <span class="meta-label">د جوازلیک شمېره:</span>
                 <span class="meta-value">{{data.licenseNumber || '—'}}</span>
               </div>
               <div class="meta-item">
@@ -115,8 +136,8 @@
             </div>
             <h2 class="ministry-name">د عدلیې وزارت</h2>
             <h3 class="department-name">مالي او اداري معینیت</h3>
-            <h3 class="department-name">د انسجام عمومی ریاست</h3>
-            <h4 class="sub-department">د معاملو د لارښوانې او عریضه لیکونکو چارو ریاست</h4>
+            <h3 class="department-name">د انسجام عمومي ریاست</h3>
+            <h4 class="sub-department">د معاملو د لارښوونې او عریضه لیکونکو چارو ریاست</h4>
           </div>
 
           <!-- Left Column: Logo & Photo -->
@@ -147,7 +168,7 @@
               <span class="license-type-value">{{getLicenseTypeInPashto(data.licenseType)}}</span>
             </div>
             <h2 class="certificate-title">
-              د <span class="title-highlight">({{data.title || '—'}})</span> معاملو د لارښوانې د فعالیت جوازلیک
+              د <span class="title-highlight">({{data.title || '—'}})</span> معاملو د لارښوونې د فعالیت جوازلیک
 
             </h2>
           </div>
@@ -164,7 +185,7 @@
               زوی د <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
               لمسی د <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
                 || '—'}}</span>
-              کال کی زېږېدلی د الکترونیکي تذکرې شمېره <span class="highlight-value">{{data.indentityCardNumber ||
+              کال کی زېږېدلی د برښنایې تذکرې شمېره <span class="highlight-value">{{data.indentityCardNumber ||
                 '—'}}</span>
             </p>
           </div>
@@ -172,39 +193,34 @@
           <!-- Address Information -->
           <div class="info-card address-info">
             <p class="info-paragraph">
-              د <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span><span
-                class="label-accent">ولایت</span> د <span class="highlight-value">{{data.ownerDistrictName ||
-                '—'}}</span>
-              <span class="label-accent"> ناحې/ ولسوالۍ اصلي اوسیدونکې او د</span>
-              <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span>
-              <span class="label-accent">ولایت</span> د <span class="highlight-value">{{data.permanentDistrictName ||
-                '—'}}</span>
-
-              <span class="label-accent"> ناحې/ ولسوالۍ اوسنی اوسیدونکې دی</span>
-
-
-
+              د <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span> ولایت
+              د <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span> ناحیې/ ولسوالۍ اصلي اوسیدونکی
+              او د <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span> ولایت
+              د <span class="highlight-value">{{data.permanentDistrictName || '—'}}</span> ناحیې/ ولسوالۍ اوسنی
+              اوسیدونکی دی
+              واقع ناحیه <span class="highlight-value">({{data.ownerVillage || '—'}})</span>
             </p>
           </div>
 
           <!-- Authorization Statement -->
           <div class="info-card authorization-card">
             <p class="info-paragraph authorization-text">
-              <span class="label-accent">واقع ناحیه</span>
               <span class="highlight-value">({{data.ownerVillage || data.ownerVillage || '—'}})</span>
+              <span class="label-accent">د ناحیې اړوند</span>
+
               د معاملو لارښوونې قانون په پام کې نیولو سره، دا جوازلیک ورکړل شو
               <br>
-              او نوموړی د دې پر اساس یې کولای شي د قانون په حدودو کې د اشخاصو تر منځ په عقودونو او معاملاتو کې
+              او نوموړی د دې پر اساس کولای شي د قانون په حدودو کې د اشخاصو تر منځ په عقدونو او معاملو کې
               منځګړیتوب وکړي.
             </p>
           </div>
 
           <!-- Inquiry Reference -->
           <div class="inquiry-line">
-            <span>  د </span>
+            <span> د </span>
             <span
               class="inquiry-field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span> شمیرې استعلام په ذریعه، مطبعي ته وروپیژندل شو </span>
+            <span> شمېرې استعلام په ذریعه، مطبعې ته وروپېژندل شو.</span>
           </div>
 
           <!-- Signature Section -->
@@ -212,7 +228,7 @@
             <div class="signature-block">
               <p class="signature-greeting">په درنښت</p>
               <div class="signature-line"></div>
-              <p class="signature-title">د انسجام عمومی رئیس</p>
+              <p class="signature-title">د انسجام عمومي رئیس</p>
             </div>
           </div>
         </main>
@@ -221,7 +237,7 @@
         <footer class="certificate-footer">
           <!-- Office Address -->
           <div class="footer-row address-row">
-            <span class="footer-label">د معاملو د لارښوانې د دفتر پته:</span>
+            <span class="footer-label">د معاملو د لارښوونې د دفتر پته:</span>
             <span class="footer-value">{{data.officeAddress || '—'}}</span>
           </div>
 
@@ -229,14 +245,14 @@
           <div class="validity-notice">
             <span class="notice-icon">📌</span>
             <span class="notice-label">یادښت:</span>
-            <span class="notice-text">د دې جوازلیک د اعتبار موده د صدور له نېټې څخه د درېو کلونو پورې ده.</span>
+            <span class="notice-text">د دغه جوازلیک د اعتبار موده، د صدور له نېټې څخه د دريو کلونو پورې ده.</span>
           </div>
 
           <!-- License Details Row -->
           <div class="footer-row details-row">
             <span>د جوازلیک لرونکي د اړیکې شمېره: <strong class="footer-value">{{data.phoneNumber ||
                 '—'}}</strong></span>
-            <span>د تشخیصی شمېره <strong class="footer-value">{{data.tin || '—'}}</strong></span>
+            <span>د تشخیصیې شمېره <strong class="footer-value">{{data.tin || '—'}}</strong></span>
             <span>د جوازلیک بیه: <strong class="footer-value">{{ getLicenseTypeInPashto(data.licenseType) === 'ملکیت' ?
                 'شل زره افغانۍ' : 'پنځویشت زره افغانۍ' }}</strong></span>
           </div>
@@ -263,6 +279,258 @@
             <div class="error-content">
               <span class="error-text">{{ verificationError }}</span>
               <span class="verification-label">د تصدیق لپاره له ادارې سره اړیکه ونیسئ</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Dari Version -->
+<div class="certificate-page" *ngIf="!isLoading && !error && selectedLanguage === 'dari'">
+  <div class="certificate-wrapper">
+    <!-- Watermark Background -->
+    <div class="watermark-layer">
+      <div class="watermark-logo">
+        <img src="/assets/img/mcitlogo.png" alt="Watermark Logo" class="watermark-logo-image">
+      </div>
+      <div class="watermark-circle">
+        <div class="watermark-text">
+          <div class="watermark-line">{{data.licenseNumber || '—'}}</div>
+          <div class="watermark-line">{{data.firstName || '—'}}</div>
+          <div class="watermark-line">{{data.fatherName || '—'}}</div>
+          <div class="watermark-line">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</div>
+          <div class="watermark-line">{{data.indentityCardNumber || '—'}}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guilloche Pattern Border -->
+    <div class="guilloche-border">
+      <svg class="guilloche-pattern" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="guillochePatternDari" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(25, 118, 210, 0.15)" stroke-width="0.5" />
+            <circle cx="10" cy="10" r="5" fill="none" stroke="rgba(25, 118, 210, 0.1)" stroke-width="0.3" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#guillochePatternDari)" />
+      </svg>
+    </div>
+
+    <!-- Main Certificate Frame -->
+    <div class="certificate-frame">
+      <!-- Ornate Corner Decorations -->
+      <div class="corner-ornament top-right">
+        <svg viewBox="0 0 60 60">
+          <path d="M0,60 Q0,0 60,0" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M5,60 Q5,5 60,5" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="15" cy="45" r="3" fill="#1976d2" />
+          <circle cx="45" cy="15" r="3" fill="#1976d2" />
+        </svg>
+      </div>
+      <div class="corner-ornament top-left">
+        <svg viewBox="0 0 60 60">
+          <path d="M60,60 Q60,0 0,0" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M55,60 Q55,5 0,5" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="45" cy="45" r="3" fill="#1976d2" />
+          <circle cx="15" cy="15" r="3" fill="#1976d2" />
+        </svg>
+      </div>
+      <div class="corner-ornament bottom-right">
+        <svg viewBox="0 0 60 60">
+          <path d="M0,0 Q0,60 60,60" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M5,0 Q5,55 60,55" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="15" cy="15" r="3" fill="#1976d2" />
+          <circle cx="45" cy="45" r="3" fill="#1976d2" />
+        </svg>
+      </div>
+      <div class="corner-ornament bottom-left">
+        <svg viewBox="0 0 60 60">
+          <path d="M60,0 Q60,60 0,60" fill="none" stroke="#1565c0" stroke-width="2" />
+          <path d="M55,0 Q55,55 0,55" fill="none" stroke="#42a5f5" stroke-width="1" />
+          <circle cx="45" cy="15" r="3" fill="#1976d2" />
+          <circle cx="15" cy="45" r="3" fill="#1976d2" />
+        </svg>
+      </div>
+
+      <!-- Certificate Content -->
+      <div class="certificate-content">
+        <!-- Header Section -->
+        <header class="certificate-header">
+          <!-- Right Column: National Emblem & License Info -->
+          <div class="header-right">
+            <div class="emblem-container">
+              <img src="/assets/img/afg.png" alt="نشان ملی افغانستان" class="national-emblem">
+            </div>
+            <div class="license-meta">
+              <div class="meta-item">
+                <span class="meta-label">شماره جوازنامه</span>
+                <span class="meta-value">{{data.licenseNumber || '—'}}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">تاریخ صدور:</span>
+                <span class="meta-value">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">تاریخ ختم:</span>
+                <span class="meta-value">{{data.expireDateFormatted || (data.expireDate | calendarDate) || '—'}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center Column: Ministry Info -->
+          <div class="header-center">
+            <img src="/assets/img/islamicLogo.png" alt="imerat" class="islamic-logo">
+            <div class="ministry-divider">
+              <span class="divider-line"></span>
+              <span class="divider-diamond">◆</span>
+              <span class="divider-line"></span>
+            </div>
+            <h2 class="ministry-name">وزارت عدلیه</h2>
+            <h3 class="department-name">معینیت مالی و اداری</h3>
+            <h3 class="department-name">ریاست عمومی انسجام</h3>
+            <h4 class="sub-department">ریاست امور رهنمای معاملات و عریضه نویسان</h4>
+          </div>
+
+          <!-- Left Column: Logo & Photo -->
+          <div class="header-left">
+            <div class="logo-photo-stack">
+              <img src="/assets/img/mcitlogo.png" alt="لوگو وزارت" class="ministry-logo">
+              <div class="photo-container">
+                <div class="photo-frame">
+                  <img [src]="filePath" alt="عکس" class="owner-photo" onerror="this.src='assets/img/avatar2.png'">
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Title Banner -->
+        <div class="title-banner">
+          <div class="banner-decoration left"></div>
+          <div class="title-content-wrapper">
+            <!-- License Type Badge -->
+            <div class="license-type-badge">
+              <span class="license-type-icon">
+                <ng-container *ngIf="getLicenseTypeInDari(data.licenseType) === 'املاک'">🏢</ng-container>
+                <ng-container *ngIf="getLicenseTypeInDari(data.licenseType) === 'فروش موتر'">🚗</ng-container>
+              </span>
+              <span class="license-type-label">نوع جواز:</span>
+              <span class="license-type-value">{{getLicenseTypeInDari(data.licenseType)}}</span>
+            </div>
+            <h2 class="certificate-title">
+              جوازنامه فعالیت رهنمای معاملات <span class="title-highlight">({{data.title || '—'}})</span>
+            </h2>
+          </div>
+          <div class="banner-decoration right"></div>
+        </div>
+
+        <!-- Main Body -->
+        <main class="certificate-body">
+          <!-- Personal Information Card -->
+          <div class="info-card personal-info">
+            <p class="info-paragraph">
+              محترم <span class="highlight-value">{{data.firstName || '—'}}</span>
+              ولد <span class="highlight-value">{{data.fatherName || '—'}}</span>
+              ولدیت <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
+
+              که به تاریخ <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
+                || '—'}}</span>
+              تولد شده؛ شماره تذکره الکترونیکی وی؛ <span class="highlight-value">{{data.indentityCardNumber ||
+                '—'}}</span>
+            </p>
+          </div>
+
+          <!-- Address Information -->
+          <div class="info-card address-info">
+            <p class="info-paragraph">
+              باشنده اصلی ناحیه / ولسوالی <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span>
+
+              ولایت <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span>
+              و باشنده فعلی ناحیه / ولسوالی <span class="highlight-value">{{data.permanentDistrictName || '—'}}</span>
+
+
+              ولایت <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span> می باشد
+            </p>
+          </div>
+
+          <!-- Authorization Statement -->
+          <div class="info-card authorization-card">
+            <p class="info-paragraph authorization-text">
+              <span class="label-accent">واقع ناحیه</span>
+              <span class="highlight-value">({{data.ownerVillage || data.ownerVillage || '—'}})</span>
+              با در نظرداشت قانون رهنمای معاملات، این جوازنامه برایش اعطا گردید و موصوف
+              <br>
+              بر این اساس میتواند در حدود احکام قانون در عقود و معاملات میان اشخاص وساطت نماید.
+            </p>
+          </div>
+
+          <!-- Inquiry Reference -->
+          <div class="inquiry-line">
+            <span> ذریعه استعلام شماره </span>
+            <span
+              class="inquiry-field">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span>به مطبعه معرفی گردید. </span>
+          </div>
+
+          <!-- Signature Section -->
+          <div class="signature-section">
+            <div class="signature-block">
+              <p class="signature-greeting">با احترام</p>
+              <div class="signature-line"></div>
+              <p class="signature-title">رئیس عمومی انسجام</p>
+            </div>
+          </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="certificate-footer">
+          <!-- Office Address -->
+          <div class="footer-row address-row">
+            <span class="footer-label">آدرس دفتر رهنمای معاملات:</span>
+            <span class="footer-value">({{data.officeAddress || '—'}})</span>
+          </div>
+
+          <!-- Important Note -->
+          <div class="validity-notice">
+            <span class="notice-icon">📌</span>
+            <span class="notice-label">یادداشت:</span>
+            <span class="notice-text">مدت اعتبار این جوازنامه از تاریخ صدور الی سه سال می باشد.</span>
+          </div>
+
+          <!-- License Details Row -->
+          <div class="footer-row details-row">
+            <span>شماره تماس دارنده جوازنامه: <strong class="footer-value">{{data.phoneNumber || '—'}}</strong></span>
+            <span> نمبر تشخیصیه <strong class="footer-value">{{data.tin || '—'}}</strong></span>
+            <span>قیمت جوازنامه: <strong class="footer-value">{{ getLicenseTypeInDari(data.licenseType) === 'املاک' ?
+                'بیست هزار افغانی' : 'بیست و پنج هزار افغانی' }}</strong></span>
+          </div>
+
+          <!-- QR Code Verification Row -->
+          <div class="verification-row" *ngIf="verificationCode">
+            <div class="qr-code-container">
+              <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" *ngIf="qrCodeUrl">
+            </div>
+            <div class="verification-details">
+              <div class="verification-item">
+                <span class="verification-label">کود تصدیق سند:</span>
+                <span class="verification-code">{{ verificationCode }}</span>
+              </div>
+              <div class="verification-item">
+                <span class="verification-label">شهرت:</span>
+                <span class="verification-value">{{ data.firstName || '—' }} {{ data.fatherName || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verification Error -->
+          <div class="verification-row error" *ngIf="verificationError && !verificationCode">
+            <div class="error-content">
+              <span class="error-text">{{ verificationError }}</span>
+              <span class="verification-label">برای تصدیق با اداره تماس بگیرید</span>
             </div>
           </div>
         </footer>

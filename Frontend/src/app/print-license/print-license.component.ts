@@ -26,6 +26,10 @@ export class PrintLicenseComponent implements OnInit {
   verificationUrl: string = '';
   qrCodeUrl: string = '';
   verificationError: string | null = null;
+  
+  // Language selection
+  selectedLanguage: 'pashto' | 'dari' = 'pashto';
+  showLanguageSelector: boolean = true;
 
   constructor(
     public service: AuthService,
@@ -166,6 +170,14 @@ export class PrintLicenseComponent implements OnInit {
       return;
     }
 
+    // Don't auto-print, let user select language first
+    // Auto-print is now triggered by the print button after language selection
+  }
+  
+  selectLanguage(language: 'pashto' | 'dari'): void {
+    this.selectedLanguage = language;
+    this.showLanguageSelector = false;
+    
     // Wait for images to load before printing
     setTimeout(() => {
       // Store original title and set empty to hide from print header
@@ -216,5 +228,32 @@ export class PrintLicenseComponent implements OnInit {
     console.log('[PrintLicense] Translated to:', translated);
     
     return translated;
+  }
+  
+  // Translate license type from English to Dari
+  getLicenseTypeInDari(licenseType: string): string {
+    if (!licenseType) return '—';
+    
+    const lowerType = licenseType.toLowerCase().trim();
+    
+    const translations: { [key: string]: string } = {
+      'realestate': 'املاک',
+      'real estate': 'املاک',
+      'property': 'املاک',
+      'vehicle': 'فروش موتر',
+      'carsale': 'فروش موتر',
+      'car sale': 'فروش موتر',
+      'car': 'فروش موتر',
+      'motor': 'فروش موتر',
+      'املاک': 'املاک',
+      'موټر فروشی': 'فروش موتر',
+      'عقار': 'املاک',
+      'موتر': 'فروش موتر',
+      'گاډی': 'فروش موتر',
+      'ملکیت': 'املاک',
+      'موټر پلورنه': 'فروش موتر'
+    };
+    
+    return translations[lowerType] || licenseType;
   }
 }

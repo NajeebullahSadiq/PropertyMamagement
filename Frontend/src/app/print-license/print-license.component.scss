@@ -422,19 +422,23 @@
 }
 
 .license-meta {
-  text-align: center;
+  text-align: right;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  direction: rtl;
+  width: 100%;
 }
 
 .meta-item {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 6px;
   margin-bottom: 4px;
+  direction: rtl;
+  width: 100%;
   
   .meta-label {
     font-size: 13px;
@@ -442,6 +446,8 @@
     font-weight: 600;
     font-family: var(--font-body);
     letter-spacing: 0.2px;
+    text-align: right;
+    white-space: nowrap;
   }
   
   .meta-value {
@@ -451,6 +457,9 @@
     font-family: var(--font-heading);
     letter-spacing: 0.3px;
     display: inline-block;
+    direction: ltr;
+    text-align: right;
+    white-space: nowrap;
     
     /* Enhanced security watermark effect for license number */
     position: relative;
@@ -538,8 +547,8 @@
 }
 
 .ministry-name {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 26px;
+  font-weight: 900;
   font-family: var(--font-heading);
   color: var(--neutral-900);
   margin: 0 0 2px 0;
@@ -548,8 +557,8 @@
 }
 
 .department-name {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 900;
   font-family: var(--font-heading);
   color: var(--neutral-900);
   margin: 0 0 2px 0;
@@ -558,8 +567,8 @@
 }
 
 .sub-department {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 900;
   font-family: var(--font-body);
   color: var(--neutral-900);
   margin: 0;
@@ -767,7 +776,7 @@
   line-height: 1.9;
   margin: 0;
   color: var(--neutral-800);
-  font-weight: 600;
+  font-weight: 800;
   font-family: var(--font-body);
   letter-spacing: 0.3px;
   text-align: center;
@@ -849,7 +858,7 @@
   width: 120px;
   height: 1px;
   background: var(--neutral-400);
-  margin: 0 auto 10px;
+  margin: 0 auto 6px;
 }
 
 .signature-title {
@@ -857,7 +866,7 @@
   font-weight: 800;
   font-family: var(--font-heading);
   color: var(--primary-800);
-  margin: 0;
+  margin: 0 0 6px 0;
   letter-spacing: 0.4px;
 }
 
@@ -1322,5 +1331,130 @@
   .certificate-wrapper * {
     page-break-before: avoid !important;
     page-break-after: avoid !important;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Language Selector Modal
+   ───────────────────────────────────────────────────────────────────────────── */
+.language-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+}
+
+.language-selector-modal {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 16px;
+  padding: 40px 50px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  border: 3px solid var(--primary-600);
+  
+  h2 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--neutral-900);
+    margin: 0 0 10px 0;
+    letter-spacing: 0.5px;
+    direction: rtl;
+  }
+  
+  p {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    color: var(--neutral-600);
+    margin: 0 0 30px 0;
+    font-weight: 600;
+  }
+}
+
+.language-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.language-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 25px 40px;
+  border: 3px solid var(--primary-500);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, var(--primary-50) 100%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 180px;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
+    border-color: var(--primary-700);
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+  }
+  
+  &:active {
+    transform: translateY(-2px);
+  }
+  
+  .lang-icon {
+    font-size: 48px;
+    line-height: 1;
+  }
+  
+  .lang-name {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary-800);
+    letter-spacing: 0.5px;
+    direction: rtl;
+  }
+  
+  .lang-name-en {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--neutral-600);
+    letter-spacing: 0.3px;
+  }
+}
+
+.pashto-btn {
+  border-color: var(--primary-600);
+  
+  &:hover {
+    border-color: var(--primary-800);
+  }
+}
+
+.dari-btn {
+  border-color: var(--accent-red-light);
+  
+  &:hover {
+    border-color: var(--accent-red);
+  }
+}
+
+/* Hide language selector when printing */
+@media print {
+  .language-selector-overlay {
+    display: none !important;
   }
 }
