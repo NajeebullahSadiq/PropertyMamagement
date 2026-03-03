@@ -187,28 +187,32 @@
                 || '—'}}</span>
               کال کی زېږېدلی د برښنایې تذکرې شمېره <span class="highlight-value">{{data.indentityCardNumber ||
                 '—'}}</span>
+
+
+              د <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span> ولایت
+
             </p>
           </div>
 
           <!-- Address Information -->
           <div class="info-card address-info">
             <p class="info-paragraph">
-              د <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span> ولایت
               د <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span> ناحیې/ ولسوالۍ اصلي اوسیدونکی
               او د <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span> ولایت
               د <span class="highlight-value">{{data.permanentDistrictName || '—'}}</span> ناحیې/ ولسوالۍ اوسنی
               اوسیدونکی دی
+
+              د<span class="highlight-value">({{data.ownerVillage || data.ownerVillage || '—'}})</span>
+              <span class="label-accent"> ناحیې اړوند.</span>
             </p>
           </div>
 
           <!-- Authorization Statement -->
           <div class="info-card authorization-card">
             <p class="info-paragraph authorization-text">
-              <span class="highlight-value">({{data.ownerVillage || data.ownerVillage || '—'}})</span>
-              <span class="label-accent">د ناحیې اړوند</span>
+
 
               د معاملو لارښوونې قانون په پام کې نیولو سره، دا جوازلیک ورکړل شو
-              <br>
               او نوموړی د دې پر اساس کولای شي د قانون په حدودو کې د اشخاصو تر منځ په عقدونو او معاملو کې
               منځګړیتوب وکړي.
             </p>
@@ -440,29 +444,32 @@
                 || '—'}}</span>
               تولد شده؛ شماره تذکره الکترونیکی وی؛ <span class="highlight-value">{{data.indentityCardNumber ||
                 '—'}}</span>
+
+              باشنده اصلی
             </p>
           </div>
 
           <!-- Address Information -->
           <div class="info-card address-info">
             <p class="info-paragraph">
-              باشنده اصلی ناحیه / ولسوالی <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span>
+              ناحیه / ولسوالی <span class="highlight-value">{{data.ownerDistrictName || '—'}}</span>
 
               ولایت <span class="highlight-value">{{data.ownerProvinceName || '—'}}</span>
               و باشنده فعلی ناحیه / ولسوالی <span class="highlight-value">{{data.permanentDistrictName || '—'}}</span>
 
 
               ولایت <span class="highlight-value">{{data.permanentProvinceName || '—'}}</span> می باشد
+
+
+              <span class="label-accent">واقع ناحیه</span>
+              <span class="highlight-value">({{data.ownerVillage || data.ownerVillage || '—'}})</span>
             </p>
           </div>
 
           <!-- Authorization Statement -->
           <div class="info-card authorization-card">
             <p class="info-paragraph authorization-text">
-              <span class="label-accent">واقع ناحیه</span>
-              <span class="highlight-value">({{data.ownerVillage || data.ownerVillage || '—'}})</span>
               با در نظرداشت قانون رهنمای معاملات، این جوازنامه برایش اعطا گردید و موصوف
-              <br>
               بر این اساس میتواند در حدود احکام قانون در عقود و معاملات میان اشخاص وساطت نماید.
             </p>
           </div>

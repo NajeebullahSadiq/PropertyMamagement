@@ -772,11 +772,11 @@
 }
 
 .info-paragraph {
-  font-size: 17px;
+  font-size: 19px;
   line-height: 1.9;
   margin: 0;
   color: var(--neutral-800);
-  font-weight: 800;
+  font-weight: 900;
   font-family: var(--font-body);
   letter-spacing: 0.3px;
   text-align: center;
@@ -787,6 +787,9 @@
   text-align: justify;
   text-align-last: center;
   max-width: 100%;
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: 0.1px;
 }
 
 .highlight-value {
@@ -807,6 +810,14 @@
 
 .address-info {
   border-right-color: var(--accent-red-light);
+  padding: 8px 16px;
+}
+
+.address-line {
+  margin: 3px 0;
+  line-height: 1.6;
+  font-size: 19px;
+  font-weight: 900;
 }
 
 .authorization-card {
@@ -852,6 +863,7 @@
   color: var(--neutral-800);
   margin: 8px 0 10px 0;
   letter-spacing: 0.3px;
+  padding-top: 14px;
 }
 
 .signature-line {
@@ -868,6 +880,7 @@
   color: var(--primary-800);
   margin: 0 0 6px 0;
   letter-spacing: 0.4px;
+  padding-top: 6px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
