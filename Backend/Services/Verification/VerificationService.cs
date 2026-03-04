@@ -383,10 +383,34 @@ namespace WebAPIBackend.Services.Verification
             return documentType switch
             {
                 "RealEstateLicense" => await GetRealEstateLicenseDataAsync(documentId),
+                "CompanyLicense" => await GetCompanyLicenseDataAsync(documentId),
                 "PetitionWriterLicense" => await GetPetitionWriterLicenseDataAsync(documentId),
                 "PropertyDocument" => await GetPropertyDocumentDataAsync(documentId),
                 "VehicleDocument" => await GetVehicleDocumentDataAsync(documentId),
                 _ => null
+            };
+        }
+
+        private async Task<DocumentDataDto?> GetCompanyLicenseDataAsync(int licenseId)
+        {
+            var license = await _context.LicenseDetails
+                .Include(l => l.Company)
+                    .ThenInclude(c => c!.CompanyOwners)
+                .FirstOrDefaultAsync(l => l.Id == licenseId);
+
+            if (license == null) return null;
+
+            var owner = license.Company?.CompanyOwners?.FirstOrDefault();
+
+            return new DocumentDataDto
+            {
+                LicenseNumber = license.LicenseNumber?.ToString() ?? "",
+                HolderName = owner?.FirstName ?? license.Company?.Title ?? "",
+                HolderPhoto = owner?.PothoPath,
+                IssueDate = license.IssueDate?.ToDateTime(TimeOnly.MinValue),
+                ExpiryDate = license.ExpireDate?.ToDateTime(TimeOnly.MinValue),
+                CompanyTitle = license.Company?.Title,
+                OfficeAddress = license.OfficeAddress
             };
         }
 

@@ -64,6 +64,7 @@ namespace WebAPIBackend.Services
 
         /// <summary>
         /// Generate the next sequential license number for a specific province
+        /// Uses database transaction with row-level locking to prevent race conditions
         /// </summary>
         public async Task<string> GenerateNextLicenseNumber(int provinceId)
         {
@@ -78,31 +79,49 @@ namespace WebAPIBackend.Services
 
             var provinceCode = GetProvinceCode(provinceId);
 
-            // Get the last license number for this province
-            var lastLicense = await _context.LicenseDetails
-                .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
-                .OrderByDescending(l => l.Id)
-                .Select(l => l.LicenseNumber)
-                .FirstOrDefaultAsync();
-
-            int nextNumber = 1;
-
-            if (lastLicense != null)
+            // Use a transaction with serializable isolation to prevent race conditions
+            using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            
+            try
             {
-                // Extract the number part after the dash
-                var parts = lastLicense.Split('-');
-                if (parts.Length == 2 && int.TryParse(parts[1], out int currentNumber))
-                {
-                    nextNumber = currentNumber + 1;
-                }
-            }
+                // Get all license numbers for this province and find the max numeric value
+                var licenses = await _context.LicenseDetails
+                    .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
+                    .Select(l => l.LicenseNumber)
+                    .ToListAsync();
 
-            // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
-            return $"{provinceCode}-{nextNumber:D8}";
+                int nextNumber = 1;
+
+                if (licenses.Any())
+                {
+                    // Parse all license numbers and find the maximum
+                    var maxNumber = licenses
+                        .Select(ln => {
+                            var parts = ln.Split('-');
+                            if (parts.Length == 2 && int.TryParse(parts[1], out int num))
+                                return num;
+                            return 0;
+                        })
+                        .Max();
+                    
+                    nextNumber = maxNumber + 1;
+                }
+
+                await transaction.CommitAsync();
+
+                // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
+                return $"{provinceCode}-{nextNumber:D8}";
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         /// <summary>
         /// Generate the next sequential license number for petition writer license
+        /// Uses database transaction with row-level locking to prevent race conditions
         /// </summary>
         public async Task<string> GenerateNextPetitionWriterLicenseNumber(int provinceId)
         {
@@ -117,27 +136,44 @@ namespace WebAPIBackend.Services
 
             var provinceCode = GetProvinceCode(provinceId);
 
-            // Get the last license number for this province
-            var lastLicense = await _context.PetitionWriterLicenses
-                .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
-                .OrderByDescending(l => l.Id)
-                .Select(l => l.LicenseNumber)
-                .FirstOrDefaultAsync();
-
-            int nextNumber = 1;
-
-            if (lastLicense != null)
+            // Use a transaction with serializable isolation to prevent race conditions
+            using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            
+            try
             {
-                // Extract the number part after the dash
-                var parts = lastLicense.Split('-');
-                if (parts.Length == 2 && int.TryParse(parts[1], out int currentNumber))
-                {
-                    nextNumber = currentNumber + 1;
-                }
-            }
+                // Get all license numbers for this province and find the max numeric value
+                var licenses = await _context.PetitionWriterLicenses
+                    .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
+                    .Select(l => l.LicenseNumber)
+                    .ToListAsync();
 
-            // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
-            return $"{provinceCode}-{nextNumber:D8}";
+                int nextNumber = 1;
+
+                if (licenses.Any())
+                {
+                    // Parse all license numbers and find the maximum
+                    var maxNumber = licenses
+                        .Select(ln => {
+                            var parts = ln.Split('-');
+                            if (parts.Length == 2 && int.TryParse(parts[1], out int num))
+                                return num;
+                            return 0;
+                        })
+                        .Max();
+                    
+                    nextNumber = maxNumber + 1;
+                }
+
+                await transaction.CommitAsync();
+
+                // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
+                return $"{provinceCode}-{nextNumber:D8}";
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         /// <summary>

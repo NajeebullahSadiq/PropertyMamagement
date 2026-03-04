@@ -128,7 +128,7 @@ export class PrintLicenseComponent implements OnInit {
 
     console.log('[PrintLicense] Calling generateVerificationCode with ID:', licenseId);
 
-    this.verificationService.generateVerificationCode(licenseId, 'RealEstateLicense').subscribe({
+    this.verificationService.generateVerificationCode(licenseId, 'CompanyLicense').subscribe({
       next: (result) => {
         console.log('[PrintLicense] Verification result:', result);
         this.verificationCode = result.verificationCode;

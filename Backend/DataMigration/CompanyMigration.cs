@@ -352,8 +352,8 @@ namespace DataMigration
             
             using (var cmd = new NpgsqlCommand(query, conn, transaction))
             {
-                // Format license number as KBL-00001 (Kabul prefix with 5-digit number)
-                string formattedLicenseNumber = $"KBL-{record.LicenseNo.ToString().PadLeft(5, '0')}";
+                // Format license number as KBL-00000001 (Kabul prefix with 8-digit number to match current system)
+                string formattedLicenseNumber = $"KBL-{record.LicenseNo.ToString().PadLeft(8, '0')}";
                 cmd.Parameters.AddWithValue("licensenumber", formattedLicenseNumber);
                 cmd.Parameters.AddWithValue("provinceid", 1); // Default to Kabul
                 

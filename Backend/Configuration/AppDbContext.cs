@@ -838,6 +838,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasOne(d => d.Province).WithMany()
                     .HasForeignKey(d => d.ProvinceId)
                     .HasConstraintName("LicenseDetails_ProvinceId_fkey");
+
+                // Add unique constraint on LicenseNumber to prevent duplicates
+                entity.HasIndex(e => e.LicenseNumber).IsUnique();
             });
 
             modelBuilder.Entity<Location>(entity =>
