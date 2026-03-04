@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DistrictManagementService } from '../shared/district-management.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DistrictManagementService } from 'src/app/shared/district-management.service';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -21,7 +23,8 @@ export class DistrictManagementComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private districtService: DistrictManagementService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private dialog: MatDialog
   ) {
     this.districtForm = this.fb.group({
       dari: ['', Validators.required],
@@ -40,7 +43,7 @@ export class DistrictManagementComponent implements OnInit {
         this.provinces = data;
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.toastr.error('خطا در بارگذاری ولایات');
         this.isLoading = false;
       }
@@ -64,7 +67,7 @@ export class DistrictManagementComponent implements OnInit {
         this.districts = data;
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.toastr.error('خطا در بارگذاری ولسوالی ها');
         this.isLoading = false;
       }
@@ -124,7 +127,7 @@ export class DistrictManagementComponent implements OnInit {
         this.showForm = false;
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.toastr.error(error.error?.message || 'خطا در ثبت ولسوالی');
         this.isLoading = false;
       }
@@ -141,7 +144,7 @@ export class DistrictManagementComponent implements OnInit {
         this.showForm = false;
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.toastr.error(error.error?.message || 'خطا در ویرایش ولسوالی');
         this.isLoading = false;
       }
@@ -149,20 +152,61 @@ export class DistrictManagementComponent implements OnInit {
   }
 
   deleteDistrict(district: any): void {
-    if (!confirm(`آیا مطمئن هستید که می خواهید "${district.dari}" را حذف کنید؟`)) {
-      return;
-    }
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      data: {
+        title: 'تأیید حذف ولسوالی',
+        message: `آیا مطمئن هستید که می‌خواهید "${district.dari}" را حذف کنید؟`,
+        itemName: district.dari
+      }
+    });
 
-    this.isLoading = true;
-    this.districtService.deleteDistrict(district.id).subscribe({
-      next: (response: any) => {
-        this.toastr.success(response.message || 'ولسوالی با موفقیت حذف شد');
-        this.loadDistricts(this.selectedProvinceId!);
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.toastr.error(error.error?.message || 'خطا در حذف ولسوالی');
-        this.isLoading = false;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.isLoading = true;
+        this.districtService.deleteDistrict(district.id).subscribe({
+          next: (response: any) => {
+            this.toastr.success(response.message || 'ولسوالی با موفقیت حذف شد');
+            this.loadDistricts(this.selectedProvinceId!);
+            this.isLoading = false;
+          },
+          error: (error: any) => {
+            this.toastr.error(error.error?.message || 'خطا در حذف ولسوالی');
+            this.isLoading = false;
+          }
+        });
+      }
+    });
+  }
+
+  activateDistrict(district: any): void {
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      data: {
+        title: 'تأیید فعال سازی ولسوالی',
+        message: `آیا مطمئن هستید که می‌خواهید "${district.dari}" را فعال کنید؟`,
+        itemName: district.dari,
+        confirmButtonText: 'فعال سازی',
+        confirmButtonColor: 'primary'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.isLoading = true;
+        this.districtService.activateDistrict(district.id).subscribe({
+          next: (response: any) => {
+            this.toastr.success(response.message || 'ولسوالی با موفقیت فعال شد');
+            this.loadDistricts(this.selectedProvinceId!);
+            this.isLoading = false;
+          },
+          error: (error: any) => {
+            this.toastr.error(error.error?.message || 'خطا در فعال سازی ولسوالی');
+            this.isLoading = false;
+          }
+        });
       }
     });
   }

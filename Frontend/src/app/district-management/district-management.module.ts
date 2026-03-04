@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { DistrictManagementComponent } from './district-management.component';
+import { SharedModule } from '../shared/shared.module';
 import { TranslateModule } from '@ngx-translate/core';
 
 const routes: Routes = [
@@ -17,6 +18,7 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    SharedModule,
     TranslateModule,
     RouterModule.forChild(routes)
   ]

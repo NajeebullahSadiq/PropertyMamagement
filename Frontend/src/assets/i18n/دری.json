@@ -29,6 +29,7 @@
         "INACTIVE": "غیرفعال",
         "ACTIONS": "عملیات",
         "EDIT": "ویرایش",
-        "DELETE": "حذف"
+        "DELETE": "حذف",
+        "ACTIVATE": "فعال سازی"
     }
 }

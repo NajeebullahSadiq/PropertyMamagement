@@ -34,4 +34,8 @@ export class DistrictManagementService {
   deleteDistrict(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
+
+  activateDistrict(id: number): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/${id}/activate`, {});
+  }
 }

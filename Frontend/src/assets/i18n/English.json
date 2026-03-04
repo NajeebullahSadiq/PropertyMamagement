@@ -30,6 +30,7 @@
         "INACTIVE": "غیر فعال",
         "ACTIONS": "عملیات",
         "EDIT": "تعدیل",
-        "DELETE": "حذف"
+        "DELETE": "حذف",
+        "ACTIVATE": "فعال کول"
     }
 }

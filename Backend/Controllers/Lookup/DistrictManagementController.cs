@@ -19,7 +19,7 @@ namespace WebAPIBackend.Controllers.Lookup
         }
 
         /// <summary>
-        /// Get all districts for a specific province
+        /// Get all districts for a specific province (including inactive ones)
         /// </summary>
         [HttpGet("province/{provinceId}")]
         public async Task<IActionResult> GetDistrictsByProvince(int provinceId)
@@ -28,7 +28,8 @@ namespace WebAPIBackend.Controllers.Lookup
             {
                 var districts = await _context.Locations
                     .Where(x => x.ParentId == provinceId && x.TypeId == 3)
-                    .OrderBy(x => x.Dari)
+                    .OrderByDescending(x => x.IsActive)
+                    .ThenBy(x => x.Dari)
                     .Select(x => new
                     {
                         x.Id,
@@ -265,6 +266,34 @@ namespace WebAPIBackend.Controllers.Lookup
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "خطا در حذف ولسوالی", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Activate a district (set IsActive = 1)
+        /// </summary>
+        [HttpPatch("{id}/activate")]
+        public async Task<IActionResult> ActivateDistrict(int id)
+        {
+            try
+            {
+                var district = await _context.Locations
+                    .FirstOrDefaultAsync(x => x.Id == id && x.TypeId == 3);
+
+                if (district == null)
+                {
+                    return NotFound(new { message = "ولسوالی یافت نشد" });
+                }
+
+                // Activate the district
+                district.IsActive = 1;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "ولسوالی با موفقیت فعال شد" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در فعال سازی ولسوالی", error = ex.Message });
             }
         }
 

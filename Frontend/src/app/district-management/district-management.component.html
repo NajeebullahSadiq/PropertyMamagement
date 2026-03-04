@@ -117,16 +117,25 @@
                   </td>
                   <td>
                     <button 
+                      *ngIf="district.isActive === 1"
                       class="btn btn-sm btn-warning me-2" 
                       (click)="editDistrict(district)"
                       [disabled]="isLoading">
                       <i class="bi bi-pencil"></i> {{ 'DISTRICT_MANAGEMENT.EDIT' | translate }}
                     </button>
                     <button 
+                      *ngIf="district.isActive === 1"
                       class="btn btn-sm btn-danger" 
                       (click)="deleteDistrict(district)"
                       [disabled]="isLoading">
                       <i class="bi bi-trash"></i> {{ 'DISTRICT_MANAGEMENT.DELETE' | translate }}
+                    </button>
+                    <button 
+                      *ngIf="district.isActive === 0"
+                      class="btn btn-sm btn-success" 
+                      (click)="activateDistrict(district)"
+                      [disabled]="isLoading">
+                      <i class="bi bi-check-circle"></i> {{ 'DISTRICT_MANAGEMENT.ACTIVATE' | translate }}
                     </button>
                   </td>
                 </tr>
