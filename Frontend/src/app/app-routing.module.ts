@@ -151,6 +151,14 @@ const routes: Routes = [
       { path: '', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule) }
     ]
   },
+  { 
+    path: 'district-management', 
+    component: MasterlayoutComponent,
+    canActivate: [AuthGuard, AdminGuard],
+    children: [
+      { path: '', loadChildren: () => import('./district-management/district-management.module').then(m => m.DistrictManagementModule) }
+    ]
+  },
   { path: 'forbidden', component: ForbiddenComponent },
   { path: 'print/:id', component: PrintComponent },
   { path: 'print', component: PrintComponent },

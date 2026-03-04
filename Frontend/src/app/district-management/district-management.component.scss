@@ -1,0 +1,30 @@
+.card {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.card-header {
+  border-radius: 8px 8px 0 0;
+}
+
+.table-responsive {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}

@@ -9,7 +9,26 @@
      "company":"ثبت رهنما معاملات",
      "companylist":"جدول رهنما معاملات",
      "report":"راپور",
-     "reportbycompany":"راپور دفتر ها "
-
-
+     "reportbycompany":"راپور دفتر ها ",
+     "DISTRICT_MANAGEMENT": {
+        "TITLE": "مدیریت ولسوالی ها",
+        "SELECT_PROVINCE": "انتخاب ولایت",
+        "CHOOSE_PROVINCE": "ولایت را انتخاب کنید",
+        "ADD_DISTRICT": "افزودن ولسوالی",
+        "EDIT_DISTRICT": "ویرایش ولسوالی",
+        "ADD_NEW_DISTRICT": "افزودن ولسوالی جدید",
+        "DISTRICT_NAME_DARI": "نام ولسوالی (دری)",
+        "DISTRICT_NAME_ENGLISH": "نام ولسوالی (انگلیسی)",
+        "DARI_REQUIRED": "نام دری الزامی است",
+        "SAVE": "ذخیره",
+        "CANCEL": "لغو",
+        "DISTRICTS_LIST": "لیست ولسوالی ها",
+        "NO_DISTRICTS": "هیچ ولسوالی یافت نشد",
+        "STATUS": "وضعیت",
+        "ACTIVE": "فعال",
+        "INACTIVE": "غیرفعال",
+        "ACTIONS": "عملیات",
+        "EDIT": "ویرایش",
+        "DELETE": "حذف"
+    }
 }

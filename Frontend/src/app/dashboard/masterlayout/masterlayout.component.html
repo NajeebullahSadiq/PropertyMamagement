@@ -192,6 +192,9 @@
       <a *ngIf="canAccessUsers" routerLink="/Auth/Register" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>person_add</mat-icon><span>ایجاد کاربر جدید</span>
       </a>
+      <a *ngIf="canAccessUsers" routerLink="/district-management" routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>location_city</mat-icon><span>مدیریت ولسوالی ها</span>
+      </a>
       <div *ngIf="canAccessVerification" class="section-label">تصدیق اسناد</div>
       <a *ngIf="canAccessVerification" routerLink="/verify" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>verified</mat-icon><span>تصدیق اسناد</span>

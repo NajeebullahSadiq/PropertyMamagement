@@ -1,0 +1,140 @@
+<div class="container-fluid mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">{{ 'DISTRICT_MANAGEMENT.TITLE' | translate }}</h4>
+    </div>
+    <div class="card-body">
+      <!-- Province Selection -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="form-label">{{ 'DISTRICT_MANAGEMENT.SELECT_PROVINCE' | translate }}</label>
+          <select class="form-select" (change)="onProvinceChange($event)" [disabled]="isLoading">
+            <option value="">{{ 'DISTRICT_MANAGEMENT.CHOOSE_PROVINCE' | translate }}</option>
+            <option *ngFor="let province of provinces" [value]="province.id">
+              {{ province.dari }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+          <button 
+            class="btn btn-success" 
+            (click)="showAddForm()" 
+            [disabled]="!selectedProvinceId || isLoading">
+            <i class="bi bi-plus-circle"></i> {{ 'DISTRICT_MANAGEMENT.ADD_DISTRICT' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Add/Edit Form -->
+      <div class="card mb-4" *ngIf="showForm">
+        <div class="card-header">
+          <h5 class="mb-0">
+            {{ isEditMode ? ('DISTRICT_MANAGEMENT.EDIT_DISTRICT' | translate) : ('DISTRICT_MANAGEMENT.ADD_NEW_DISTRICT' | translate) }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="districtForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">{{ 'DISTRICT_MANAGEMENT.DISTRICT_NAME_DARI' | translate }} <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="dari"
+                    [class.is-invalid]="districtForm.get('dari')?.invalid && districtForm.get('dari')?.touched">
+                  <div class="invalid-feedback" *ngIf="districtForm.get('dari')?.invalid && districtForm.get('dari')?.touched">
+                    {{ 'DISTRICT_MANAGEMENT.DARI_REQUIRED' | translate }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">{{ 'DISTRICT_MANAGEMENT.DISTRICT_NAME_ENGLISH' | translate }}</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="name">
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button 
+                type="button" 
+                class="btn btn-primary" 
+                (click)="saveDistrict()"
+                [disabled]="isLoading">
+                <i class="bi bi-save"></i> {{ 'DISTRICT_MANAGEMENT.SAVE' | translate }}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                (click)="cancelForm()"
+                [disabled]="isLoading">
+                <i class="bi bi-x-circle"></i> {{ 'DISTRICT_MANAGEMENT.CANCEL' | translate }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Districts List -->
+      <div class="card" *ngIf="selectedProvinceId">
+        <div class="card-header">
+          <h5 class="mb-0">{{ 'DISTRICT_MANAGEMENT.DISTRICTS_LIST' | translate }}</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="isLoading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!isLoading && districts.length === 0" class="alert alert-info">
+            {{ 'DISTRICT_MANAGEMENT.NO_DISTRICTS' | translate }}
+          </div>
+
+          <div class="table-responsive" *ngIf="!isLoading && districts.length > 0">
+            <table class="table table-striped table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>{{ 'DISTRICT_MANAGEMENT.DISTRICT_NAME_DARI' | translate }}</th>
+                  <th>{{ 'DISTRICT_MANAGEMENT.DISTRICT_NAME_ENGLISH' | translate }}</th>
+                  <th>{{ 'DISTRICT_MANAGEMENT.STATUS' | translate }}</th>
+                  <th>{{ 'DISTRICT_MANAGEMENT.ACTIONS' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let district of districts; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ district.dari }}</td>
+                  <td>{{ district.name || '-' }}</td>
+                  <td>
+                    <span class="badge" [class.bg-success]="district.isActive === 1" [class.bg-danger]="district.isActive === 0">
+                      {{ district.isActive === 1 ? ('DISTRICT_MANAGEMENT.ACTIVE' | translate) : ('DISTRICT_MANAGEMENT.INACTIVE' | translate) }}
+                    </span>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-warning me-2" 
+                      (click)="editDistrict(district)"
+                      [disabled]="isLoading">
+                      <i class="bi bi-pencil"></i> {{ 'DISTRICT_MANAGEMENT.EDIT' | translate }}
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-danger" 
+                      (click)="deleteDistrict(district)"
+                      [disabled]="isLoading">
+                      <i class="bi bi-trash"></i> {{ 'DISTRICT_MANAGEMENT.DELETE' | translate }}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

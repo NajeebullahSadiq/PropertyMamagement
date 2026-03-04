@@ -10,6 +10,26 @@
      "company":"د دفترونو ثبت",
      "companylist":"د دفترونو جدول",
      "report":"گزارش",
-     "reportbycompany":"د دفترونو راپور"
-
+     "reportbycompany":"د دفترونو راپور",
+     "DISTRICT_MANAGEMENT": {
+        "TITLE": "د ولسوالیو مدیریت",
+        "SELECT_PROVINCE": "ولایت انتخاب کړئ",
+        "CHOOSE_PROVINCE": "ولایت انتخاب کړئ",
+        "ADD_DISTRICT": "ولسوالۍ اضافه کړئ",
+        "EDIT_DISTRICT": "ولسوالۍ تعدیل کړئ",
+        "ADD_NEW_DISTRICT": "نوې ولسوالۍ اضافه کړئ",
+        "DISTRICT_NAME_DARI": "د ولسوالۍ نوم (دری)",
+        "DISTRICT_NAME_ENGLISH": "د ولسوالۍ نوم (انګلیسي)",
+        "DARI_REQUIRED": "دری نوم اړین دی",
+        "SAVE": "خوندي کړئ",
+        "CANCEL": "لغوه کړئ",
+        "DISTRICTS_LIST": "د ولسوالیو لیست",
+        "NO_DISTRICTS": "هیڅ ولسوالۍ ونه موندل شوه",
+        "STATUS": "حالت",
+        "ACTIVE": "فعال",
+        "INACTIVE": "غیر فعال",
+        "ACTIONS": "عملیات",
+        "EDIT": "تعدیل",
+        "DELETE": "حذف"
+    }
 }
