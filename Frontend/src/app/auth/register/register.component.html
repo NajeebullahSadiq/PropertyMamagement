@@ -333,6 +333,7 @@
               
               <ng-select formControlName="CompanyId" [items]="companylist" [selectOnTab]="true" 
                          bindLabel="title" bindValue="id"
+                         (change)="onCompanyChange($event)"
                          placeholder="انتخاب رهنما..."
                          class="custom-ng-select">
               </ng-select>

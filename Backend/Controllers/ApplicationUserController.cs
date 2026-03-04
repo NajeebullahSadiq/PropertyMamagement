@@ -75,6 +75,7 @@ namespace WebAPI.Controllers
             if (model.CompanyId > 0)
             {
                 var company = await _context.CompanyDetails
+                    .Include(c => c.LicenseDetails)
                     .FirstOrDefaultAsync(c => c.Id == model.CompanyId);
 
                 if (company == null)
@@ -83,10 +84,7 @@ namespace WebAPI.Controllers
                 }
 
                 // Check if company has licenses
-                var hasLicenses = await _context.LicenseDetails
-                    .AnyAsync(l => l.CompanyId == model.CompanyId);
-                
-                if (!hasLicenses)
+                if (company.LicenseDetails == null || !company.LicenseDetails.Any())
                 {
                     return BadRequest(new { message = "این رهنما هیچ جوازی ندارد" });
                 }
@@ -104,6 +102,12 @@ namespace WebAPI.Controllers
 
                     // Set license type from company
                     model.LicenseType = expectedLicenseType;
+                }
+
+                // Automatically set provinceId from company if not already set
+                if (!model.ProvinceId.HasValue && company.ProvinceId.HasValue)
+                {
+                    model.ProvinceId = company.ProvinceId;
                 }
             }
 

@@ -564,7 +564,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var com = await query
                     .OrderBy(u => u.Id)
-                    .Select(u => new Companies { Id = u.Id, Title = u.Title })
+                    .Select(u => new Companies { Id = u.Id, Title = u.Title, ProvinceId = u.ProvinceId })
                     .ToListAsync();
 
                 return com;
@@ -810,6 +810,7 @@ namespace WebAPIBackend.Controllers.Companies
         {
             public int Id { get; set; }
             public string? Title { get; set; }
+            public int? ProvinceId { get; set; }
         }
     }
 }

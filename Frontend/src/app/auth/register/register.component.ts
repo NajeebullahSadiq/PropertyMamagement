@@ -247,6 +247,16 @@ export class RegisterComponent implements OnInit {
     }
   }
 
+  onCompanyChange(selectedCompany: any) {
+    // When company is selected, automatically populate provinceId
+    if (selectedCompany && selectedCompany.provinceId) {
+      const provinceIdControl = this.service.formModel.get('ProvinceId');
+      if (provinceIdControl) {
+        provinceIdControl.setValue(selectedCompany.provinceId);
+      }
+    }
+  }
+
   getRoleDari(role: string): string {
     return this.rbacService.getRoleDari(role);
   }
@@ -293,6 +303,7 @@ export class RegisterComponent implements OnInit {
   selectCompanyFromSearch(result: any) {
     const companyIdControl = this.service.formModel.get('CompanyId');
     const licenseTypeControl = this.service.formModel.get('LicenseType');
+    const provinceIdControl = this.service.formModel.get('ProvinceId');
     
     if (companyIdControl && result.companyId) {
       companyIdControl.setValue(result.companyId);
@@ -300,6 +311,11 @@ export class RegisterComponent implements OnInit {
     
     if (licenseTypeControl && result.licenseType) {
       licenseTypeControl.setValue(result.licenseType);
+    }
+    
+    // Auto-populate provinceId from search result
+    if (provinceIdControl && result.provinceId) {
+      provinceIdControl.setValue(result.provinceId);
     }
     
     // Clear search
