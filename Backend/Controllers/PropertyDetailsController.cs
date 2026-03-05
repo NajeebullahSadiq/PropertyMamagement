@@ -790,25 +790,35 @@ namespace WebAPIBackend.Controllers
                     Witnesses = witnesses,
                     
                     // Backward compatibility - first seller/buyer
-                    SellerFirstName = sellers.FirstOrDefault()?.GetType().GetProperty("FirstName")?.GetValue(sellers.FirstOrDefault()),
-                    SellerFatherName = sellers.FirstOrDefault()?.GetType().GetProperty("FatherName")?.GetValue(sellers.FirstOrDefault()),
-                    SellerIndentityCardNumber = sellers.FirstOrDefault()?.GetType().GetProperty("ElectronicNationalIdNumber")?.GetValue(sellers.FirstOrDefault()),
-                    SellerPhoto = sellers.FirstOrDefault()?.GetType().GetProperty("Photo")?.GetValue(sellers.FirstOrDefault()),
-                    SellerProvince = sellers.FirstOrDefault()?.GetType().GetProperty("PaddressProvince")?.GetValue(sellers.FirstOrDefault()),
-                    SellerProvinceDari = sellers.FirstOrDefault()?.GetType().GetProperty("PaddressProvinceDari")?.GetValue(sellers.FirstOrDefault()),
-                    SellerDistrict = sellers.FirstOrDefault()?.GetType().GetProperty("PaddressDistrict")?.GetValue(sellers.FirstOrDefault()),
-                    SellerDistrictDari = sellers.FirstOrDefault()?.GetType().GetProperty("PaddressDistrictDari")?.GetValue(sellers.FirstOrDefault()),
-                    SellerVillage = sellers.FirstOrDefault()?.GetType().GetProperty("PaddressVillage")?.GetValue(sellers.FirstOrDefault()),
+                    SellerFirstName = property.SellerDetails.FirstOrDefault()?.FirstName,
+                    SellerFatherName = property.SellerDetails.FirstOrDefault()?.FatherName,
+                    SellerIndentityCardNumber = property.SellerDetails.FirstOrDefault()?.ElectronicNationalIdNumber,
+                    SellerPhoto = property.SellerDetails.FirstOrDefault()?.Photo,
+                    SellerProvince = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.PaddressProvinceId),
+                    SellerProvinceDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.PaddressProvinceId),
+                    SellerDistrict = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.PaddressDistrictId),
+                    SellerDistrictDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.PaddressDistrictId),
+                    SellerVillage = property.SellerDetails.FirstOrDefault()?.PaddressVillage,
+                    TSellerProvince = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.TaddressProvinceId),
+                    TSellerProvinceDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.TaddressProvinceId),
+                    TSellerDistrict = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.TaddressDistrictId),
+                    TSellerDistrictDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.TaddressDistrictId),
+                    TSellerVillage = property.SellerDetails.FirstOrDefault()?.TaddressVillage,
                     
-                    BuyerFirstName = buyers.FirstOrDefault()?.GetType().GetProperty("FirstName")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerFatherName = buyers.FirstOrDefault()?.GetType().GetProperty("FatherName")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerIndentityCardNumber = buyers.FirstOrDefault()?.GetType().GetProperty("ElectronicNationalIdNumber")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerPhoto = buyers.FirstOrDefault()?.GetType().GetProperty("Photo")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerProvince = buyers.FirstOrDefault()?.GetType().GetProperty("PaddressProvince")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerProvinceDari = buyers.FirstOrDefault()?.GetType().GetProperty("PaddressProvinceDari")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerDistrict = buyers.FirstOrDefault()?.GetType().GetProperty("PaddressDistrict")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerDistrictDari = buyers.FirstOrDefault()?.GetType().GetProperty("PaddressDistrictDari")?.GetValue(buyers.FirstOrDefault()),
-                    BuyerVillage = buyers.FirstOrDefault()?.GetType().GetProperty("PaddressVillage")?.GetValue(buyers.FirstOrDefault()),
+                    BuyerFirstName = property.BuyerDetails.FirstOrDefault()?.FirstName,
+                    BuyerFatherName = property.BuyerDetails.FirstOrDefault()?.FatherName,
+                    BuyerIndentityCardNumber = property.BuyerDetails.FirstOrDefault()?.ElectronicNationalIdNumber,
+                    BuyerPhoto = property.BuyerDetails.FirstOrDefault()?.Photo,
+                    BuyerProvince = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.PaddressProvinceId),
+                    BuyerProvinceDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.PaddressProvinceId),
+                    BuyerDistrict = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.PaddressDistrictId),
+                    BuyerDistrictDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.PaddressDistrictId),
+                    BuyerVillage = property.BuyerDetails.FirstOrDefault()?.PaddressVillage,
+                    TBuyerProvince = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.TaddressProvinceId),
+                    TBuyerProvinceDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.TaddressProvinceId),
+                    TBuyerDistrict = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.TaddressDistrictId),
+                    TBuyerDistrictDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.TaddressDistrictId),
+                    TBuyerVillage = property.BuyerDetails.FirstOrDefault()?.TaddressVillage,
                     
                     WitnessOneFirstName = witnesses.ElementAtOrDefault(0)?.FirstName,
                     WitnessOneFatherName = witnesses.ElementAtOrDefault(0)?.FatherName,
@@ -837,6 +847,20 @@ namespace WebAPIBackend.Controllers
                     error = ex.Message
                 });
             }
+        }
+
+        private async Task<string?> GetLocationNameAsync(int? locationId)
+        {
+            if (!locationId.HasValue) return null;
+            var location = await _context.Locations.FindAsync(locationId.Value);
+            return location?.Name;
+        }
+
+        private async Task<string?> GetLocationDariAsync(int? locationId)
+        {
+            if (!locationId.HasValue) return null;
+            var location = await _context.Locations.FindAsync(locationId.Value);
+            return location?.Dari;
         }
 
         [HttpDelete("{id}")]
