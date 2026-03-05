@@ -21,6 +21,11 @@ public partial class LicenseDetail : IProvinceEntity
 
     public DateOnly? ExpireDate { get; set; }
 
+    /// <summary>
+    /// Calendar type used for date entry: "gregorian", "hijriShamsi", or "hijriQamari"
+    /// </summary>
+    public string? DateType { get; set; }
+
     public string? TransferLocation { get; set; }
 
     public string? ActivityLocation { get; set; }

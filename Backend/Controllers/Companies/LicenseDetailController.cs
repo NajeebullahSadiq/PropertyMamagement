@@ -44,7 +44,7 @@ namespace WebAPIBackend.Controllers.Companies
                                   ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                                   ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
-                                  ""CreatedBy"", ""Status"", ""IsComplete""
+                                  ""CreatedBy"", ""Status"", ""IsComplete"", ""DateType""
                                   FROM org.""LicenseDetails"" WHERE ""CompanyId"" = {0}", id)
                     .ToListAsync();
                 
@@ -207,6 +207,7 @@ namespace WebAPIBackend.Controllers.Companies
                     ProvinceId = provinceId, // Set from admin selection or user province
                     IssueDate = issueDate,
                     ExpireDate = expireDate,
+                    DateType = request.CalendarType, // Store the calendar type used for date entry
                     TransferLocation = request.TransferLocation,
                     ActivityLocation = request.ActivityLocation,
                     OfficeAddress = request.OfficeAddress,
@@ -292,7 +293,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Load entity using FromSqlRaw to avoid AreaId column
                 var existingProperty = await _context.LicenseDetails
                     .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                                  ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                                  ""DateType"", ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                                   ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                                   ""CreatedBy"", ""Status"", ""IsComplete""
@@ -381,6 +382,7 @@ namespace WebAPIBackend.Controllers.Companies
                 existingProperty.LicenseNumber = originalLicenseNumber; // Keep existing license number
                 existingProperty.IssueDate = issueDate;
                 existingProperty.ExpireDate = expireDate;
+                existingProperty.DateType = request.CalendarType; // Update the calendar type
                 existingProperty.TransferLocation = request.TransferLocation;
                 existingProperty.ActivityLocation = request.ActivityLocation;
                 existingProperty.OfficeAddress = request.OfficeAddress;
@@ -531,12 +533,18 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
+                // Use the stored DateType if available, otherwise fall back to the query parameter
+                var storedDateType = licenseDetail?.DateType;
+                var dateCalendar = !string.IsNullOrEmpty(storedDateType) 
+                    ? DateConversionHelper.ParseCalendarType(storedDateType) 
+                    : calendar;
+
                 // Format dates for the requested calendar
                 string issueDateFormatted = data.IssueDate.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.IssueDate, calendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.IssueDate, dateCalendar) 
                     : "";
                 string expireDateFormatted = data.ExpireDate.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.ExpireDate, calendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.ExpireDate, dateCalendar) 
                     : "";
                 string dateOfBirthFormatted = data.DateofBirth.HasValue 
                     ? DateConversionHelper.FormatDateOnly(data.DateofBirth, calendar) 
@@ -557,6 +565,7 @@ namespace WebAPIBackend.Controllers.Companies
                     LicenseDetailId = licenseDetail?.Id, // Actual LicenseDetail ID for verification
                     data.Title,
                     LicenseType = licenseDetail?.LicenseType, // Get LicenseType from LicenseDetail table
+                    DateType = licenseDetail?.DateType, // Calendar type used for date entry
                     data.PhoneNumber,
                     data.Tin,
                     data.FirstName,
