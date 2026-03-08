@@ -203,7 +203,8 @@ export class RegisterComponent implements OnInit {
         if (selectedRole === UserRoles.Admin || 
             selectedRole === UserRoles.Authority || 
             selectedRole === UserRoles.LicenseReviewer ||
-            selectedRole === UserRoles.LicenseApplicationManager) {
+            selectedRole === UserRoles.LicenseApplicationManager ||
+            selectedRole === UserRoles.ActivityMonitoringManager) {
           // System-level roles don't need company or province
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');

@@ -11,7 +11,8 @@ export const UserRoles = {
   LicenseReviewer: 'LICENSE_REVIEWER',
   PropertyOperator: 'PROPERTY_OPERATOR',
   VehicleOperator: 'VEHICLE_OPERATOR',
-  LicenseApplicationManager: 'LICENSE_APPLICATION_MANAGER'
+  LicenseApplicationManager: 'LICENSE_APPLICATION_MANAGER',
+  ActivityMonitoringManager: 'ACTIVITY_MONITORING_MANAGER'
 } as const;
 
 // Permission constants matching backend
@@ -225,14 +226,28 @@ export class RbacService {
   // Check if user can create securities
   canCreateSecurities(): boolean {
     const role = this.getCurrentRole();
-    // Only Admin and Authority can create securities (not LICENSE_APPLICATION_MANAGER)
+    // Only Admin and Authority can create securities (not LICENSE_APPLICATION_MANAGER or ACTIVITY_MONITORING_MANAGER)
     return role === UserRoles.Admin || role === UserRoles.Authority;
   }
 
   // Check if user can create activity monitoring entries
   canCreateActivityMonitoring(): boolean {
     const role = this.getCurrentRole();
-    // Only Admin and Authority can create activity monitoring (not LICENSE_APPLICATION_MANAGER)
+    // Only Admin, Authority, and ACTIVITY_MONITORING_MANAGER can create activity monitoring
+    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.ActivityMonitoringManager;
+  }
+
+  // Check if user can create petition writer securities
+  canCreatePetitionWriterSecurities(): boolean {
+    const role = this.getCurrentRole();
+    // Only Admin and Authority can create petition writer securities (not ACTIVITY_MONITORING_MANAGER)
+    return role === UserRoles.Admin || role === UserRoles.Authority;
+  }
+
+  // Check if user can create petition writer license
+  canCreatePetitionWriterLicense(): boolean {
+    const role = this.getCurrentRole();
+    // Only Admin and Authority can create petition writer license (not ACTIVITY_MONITORING_MANAGER)
     return role === UserRoles.Admin || role === UserRoles.Authority;
   }
 
@@ -279,26 +294,25 @@ export class RbacService {
 
     switch (module.toLowerCase()) {
       case 'company':
-        return role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager;
+        return role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager;
       case 'property':
         return role === UserRoles.PropertyOperator || 
-               role === UserRoles.CompanyRegistrar ||  // Company registrar can view property
-               role === UserRoles.LicenseApplicationManager ||  // License app manager can view property
+               role === UserRoles.CompanyRegistrar ||
+               role === UserRoles.LicenseApplicationManager ||
+               role === UserRoles.ActivityMonitoringManager ||
                licenseType === 'realEstate';
       case 'vehicle':
         return role === UserRoles.VehicleOperator || 
-               role === UserRoles.CompanyRegistrar ||  // Company registrar can view vehicle
-               role === UserRoles.LicenseApplicationManager ||  // License app manager can view vehicle
+               role === UserRoles.CompanyRegistrar ||
+               role === UserRoles.LicenseApplicationManager ||
+               role === UserRoles.ActivityMonitoringManager ||
                licenseType === 'carSale';
       case 'securities':
-        // Securities module is only for Admin and Authority
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager;
       case 'petitionwriter':
-        // Petition Writer module is only for Admin and Authority
-        return role === UserRoles.Admin || role === UserRoles.Authority;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.ActivityMonitoringManager;
       case 'activitymonitoring':
-        // Activity Monitoring is only for Admin and Authority
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager;
       case 'verification':
         // Verification is accessible to all roles
         return true;
@@ -358,7 +372,9 @@ export class RbacService {
       [UserRoles.CompanyRegistrar]: 'کاربر ثبت جواز رهنما',
       [UserRoles.LicenseReviewer]: 'ریاست بررسی و ثبت جواز',
       [UserRoles.PropertyOperator]: 'کاربر عملیاتی املاک',
-      [UserRoles.VehicleOperator]: 'کاربر عملیاتی موتر فروشی'
+      [UserRoles.VehicleOperator]: 'کاربر عملیاتی موتر فروشی',
+      [UserRoles.LicenseApplicationManager]: 'کاربر مدیریت درخواست جواز',
+      [UserRoles.ActivityMonitoringManager]: 'کاربر مدیریت نظارت بر فعالیت‌ها'
     };
     return roleNames[role] || role;
   }

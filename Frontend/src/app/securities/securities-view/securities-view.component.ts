@@ -18,6 +18,7 @@ export class SecuritiesViewComponent implements OnInit {
     item: SecuritiesDistribution | null = null;
     isLoading = true;
     canEdit = false;
+    canPrint = false;
 
     // Collapsible sections
     sections = {
@@ -47,6 +48,8 @@ export class SecuritiesViewComponent implements OnInit {
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
         this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator;
+        // Only Admin and Authority can print securities (not LICENSE_APPLICATION_MANAGER or ACTIVITY_MONITORING_MANAGER)
+        this.canPrint = role === UserRoles.Admin || role === UserRoles.Authority;
     }
 
     loadData(id: number): void {

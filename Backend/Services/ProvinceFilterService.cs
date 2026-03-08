@@ -50,7 +50,8 @@ namespace WebAPIBackend.Services
             return role == UserRoles.Admin || 
                    role == UserRoles.Authority || 
                    role == UserRoles.LicenseReviewer ||
-                   role == UserRoles.LicenseApplicationManager;
+                   role == UserRoles.LicenseApplicationManager ||
+                   role == UserRoles.ActivityMonitoringManager;
         }
 
         /// <summary>

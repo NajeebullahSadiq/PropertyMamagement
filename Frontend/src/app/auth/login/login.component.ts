@@ -75,6 +75,9 @@ export class LoginComponent {
         } else if (this.userRole === UserRoles.LicenseApplicationManager) {
           // License application manager goes to license applications list
           this.router.navigateByUrl('/license-applications/list');
+        } else if (this.userRole === UserRoles.ActivityMonitoringManager) {
+          // Activity monitoring manager goes to activity monitoring list
+          this.router.navigateByUrl('/activity-monitoring/list');
         } else if (this.userRole === UserRoles.PropertyOperator) {
           // Property operator goes to property list
           this.router.navigateByUrl('/estate/list');

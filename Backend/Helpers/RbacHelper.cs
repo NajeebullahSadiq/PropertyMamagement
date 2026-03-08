@@ -26,9 +26,9 @@ namespace WebAPIBackend.Helpers
 
             return module.ToLower() switch
             {
-                "property" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager), // Company registrar and license app manager can view all property records
-                "vehicle" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager),  // Company registrar and license app manager can view all vehicle records
-                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer, UserRoles.LicenseApplicationManager),
+                "property" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager, UserRoles.ActivityMonitoringManager),
+                "vehicle" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager, UserRoles.ActivityMonitoringManager),
+                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer, UserRoles.LicenseApplicationManager, UserRoles.ActivityMonitoringManager),
                 _ => false
             };
         }
@@ -119,9 +119,9 @@ namespace WebAPIBackend.Helpers
 
             return module.ToLower() switch
             {
-                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer, UserRoles.LicenseApplicationManager),
-                "property" => HasAnyRole(userRoles, UserRoles.PropertyOperator, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager) || licenseType == "realEstate",
-                "vehicle" => HasAnyRole(userRoles, UserRoles.VehicleOperator, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager) || licenseType == "carSale",
+                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer, UserRoles.LicenseApplicationManager, UserRoles.ActivityMonitoringManager),
+                "property" => HasAnyRole(userRoles, UserRoles.PropertyOperator, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager, UserRoles.ActivityMonitoringManager) || licenseType == "realEstate",
+                "vehicle" => HasAnyRole(userRoles, UserRoles.VehicleOperator, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager, UserRoles.ActivityMonitoringManager) || licenseType == "carSale",
                 "reports" => !HasAnyRole(userRoles, UserRoles.LicenseReviewer),
                 "dashboard" => !HasAnyRole(userRoles, UserRoles.LicenseReviewer),
                 "users" => HasAnyRole(userRoles, UserRoles.Admin),

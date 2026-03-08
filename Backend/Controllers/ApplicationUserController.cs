@@ -54,12 +54,13 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = "Province is required for COMPANY_REGISTRAR role" });
             }
 
-            // System-level roles (ADMIN, AUTHORITY, LICENSE_REVIEWER, LICENSE_APPLICATION_MANAGER) don't need company
+            // System-level roles (ADMIN, AUTHORITY, LICENSE_REVIEWER, LICENSE_APPLICATION_MANAGER, ACTIVITY_MONITORING_MANAGER) don't need company
             var systemLevelRoles = new[] { 
                 UserRoles.Admin, 
                 UserRoles.Authority, 
                 UserRoles.LicenseReviewer,
-                UserRoles.LicenseApplicationManager 
+                UserRoles.LicenseApplicationManager,
+                UserRoles.ActivityMonitoringManager
             };
             
             if (systemLevelRoles.Contains(model.Role))

@@ -49,6 +49,8 @@ export class MasterlayoutComponent implements AfterViewInit {
   canCreateVehicle = false;
   canCreateSecurities = false;
   canCreateActivityMonitoring = false;
+  canCreatePetitionWriterSecurities = false;
+  canCreatePetitionWriterLicense = false;
 
   // Dropdown menu states
   isUserMenuOpen = false;
@@ -126,6 +128,8 @@ export class MasterlayoutComponent implements AfterViewInit {
     this.canCreateVehicle = this.rbacService.canCreateVehicle();
     this.canCreateSecurities = this.rbacService.canCreateSecurities();
     this.canCreateActivityMonitoring = this.rbacService.canCreateActivityMonitoring();
+    this.canCreatePetitionWriterSecurities = this.rbacService.canCreatePetitionWriterSecurities();
+    this.canCreatePetitionWriterLicense = this.rbacService.canCreatePetitionWriterLicense();
   }
 
   onLogout() {

@@ -41,6 +41,11 @@ namespace WebAPIBackend.Configuration
         public const string LicenseApplicationManager = "LICENSE_APPLICATION_MANAGER";
 
         /// <summary>
+        /// کاربر مدیریت نظارت بر فعالیت‌ها - Activity monitoring manager with full access to activity monitoring and read-only to other modules
+        /// </summary>
+        public const string ActivityMonitoringManager = "ACTIVITY_MONITORING_MANAGER";
+
+        /// <summary>
         /// Get all roles as array
         /// </summary>
         public static string[] AllRoles => new[]
@@ -51,7 +56,8 @@ namespace WebAPIBackend.Configuration
             LicenseReviewer,
             PropertyOperator,
             VehicleOperator,
-            LicenseApplicationManager
+            LicenseApplicationManager,
+            ActivityMonitoringManager
         };
 
         /// <summary>
@@ -68,6 +74,7 @@ namespace WebAPIBackend.Configuration
                 PropertyOperator => "کاربر عملیاتی املاک",
                 VehicleOperator => "کاربر عملیاتی موتر فروشی",
                 LicenseApplicationManager => "کاربر مدیریت درخواست جواز",
+                ActivityMonitoringManager => "کاربر مدیریت نظارت بر فعالیت‌ها",
                 _ => role
             };
         }
@@ -211,6 +218,17 @@ namespace WebAPIBackend.Configuration
                     // Full access to license applications
                     Permissions.LicenseApplicationView, Permissions.LicenseApplicationCreate, 
                     Permissions.LicenseApplicationEdit, Permissions.LicenseApplicationDelete,
+                    // Read-only access to other modules
+                    Permissions.CompanyView,
+                    Permissions.PropertyView,
+                    Permissions.VehicleView,
+                    Permissions.ReportsView,
+                    Permissions.DashboardView
+                },
+
+                UserRoles.ActivityMonitoringManager => new[]
+                {
+                    // Full access to activity monitoring (handled by controller authorization)
                     // Read-only access to other modules
                     Permissions.CompanyView,
                     Permissions.PropertyView,

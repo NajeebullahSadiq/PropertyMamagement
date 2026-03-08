@@ -54,7 +54,7 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager;
+        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager;
         this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator;
         this.canPrint = this.canEdit; // Only users who can edit can also print
         this.canDelete = role === UserRoles.Admin;

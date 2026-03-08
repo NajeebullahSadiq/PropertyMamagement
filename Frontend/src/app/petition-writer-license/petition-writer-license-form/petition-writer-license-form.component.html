@@ -290,11 +290,11 @@
 
         <!-- Action Buttons -->
         <div class="flex gap-4 justify-center pb-6">
-          <button type="submit" [disabled]="licenseForm.invalid || isViewOnly" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <button *ngIf="!isViewOnly" type="submit" [disabled]="licenseForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
             <i class="fas" [ngClass]="isEditMode ? 'fa-edit' : 'fa-save'"></i>
             <span>{{isEditMode ? 'تغییر معلومات' : 'ثبت معلومات'}}</span>
           </button>
-          <button type="button" (click)="resetAll()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <button *ngIf="!isViewOnly" type="button" (click)="resetAll()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
             <i class="fas fa-plus-circle"></i>
             <span>جدید</span>
           </button>
