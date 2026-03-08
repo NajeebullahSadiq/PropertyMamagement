@@ -64,7 +64,7 @@ namespace WebAPIBackend.Services
 
         /// <summary>
         /// Generate the next sequential license number for a specific province
-        /// Uses database transaction with row-level locking to prevent race conditions
+        /// Uses PostgreSQL advisory lock to prevent race conditions
         /// </summary>
         public async Task<string> GenerateNextLicenseNumber(int provinceId)
         {
@@ -79,11 +79,15 @@ namespace WebAPIBackend.Services
 
             var provinceCode = GetProvinceCode(provinceId);
 
-            // Use a transaction with serializable isolation to prevent race conditions
-            using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            // Use PostgreSQL advisory lock to prevent concurrent generation for same province
+            // Lock key is based on province ID to allow concurrent generation for different provinces
+            var lockKey = 1000000 + provinceId; // Offset to avoid conflicts with other locks
             
             try
             {
+                // Acquire advisory lock (will wait if another transaction holds it)
+                await _context.Database.ExecuteSqlRawAsync($"SELECT pg_advisory_xact_lock({lockKey})");
+                
                 // Get all license numbers for this province and find the max numeric value
                 var licenses = await _context.LicenseDetails
                     .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
@@ -107,21 +111,19 @@ namespace WebAPIBackend.Services
                     nextNumber = maxNumber + 1;
                 }
 
-                await transaction.CommitAsync();
-
                 // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
                 return $"{provinceCode}-{nextNumber:D8}";
             }
-            catch
+            catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                throw;
+                throw new Exception($"Error generating license number for province {provinceId}: {ex.Message}", ex);
             }
+            // Advisory lock is automatically released when transaction commits or rolls back
         }
 
         /// <summary>
         /// Generate the next sequential license number for petition writer license
-        /// Uses database transaction with row-level locking to prevent race conditions
+        /// Uses PostgreSQL advisory lock to prevent race conditions
         /// </summary>
         public async Task<string> GenerateNextPetitionWriterLicenseNumber(int provinceId)
         {
@@ -136,11 +138,15 @@ namespace WebAPIBackend.Services
 
             var provinceCode = GetProvinceCode(provinceId);
 
-            // Use a transaction with serializable isolation to prevent race conditions
-            using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            // Use PostgreSQL advisory lock to prevent concurrent generation for same province
+            // Lock key is based on province ID + offset to separate from company licenses
+            var lockKey = 2000000 + provinceId; // Different offset for petition writer licenses
             
             try
             {
+                // Acquire advisory lock (will wait if another transaction holds it)
+                await _context.Database.ExecuteSqlRawAsync($"SELECT pg_advisory_xact_lock({lockKey})");
+                
                 // Get all license numbers for this province and find the max numeric value
                 var licenses = await _context.PetitionWriterLicenses
                     .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
@@ -164,16 +170,14 @@ namespace WebAPIBackend.Services
                     nextNumber = maxNumber + 1;
                 }
 
-                await transaction.CommitAsync();
-
                 // Format: PROVINCE_CODE-00000001 (8 digits with leading zeros)
                 return $"{provinceCode}-{nextNumber:D8}";
             }
-            catch
+            catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                throw;
+                throw new Exception($"Error generating petition writer license number for province {provinceId}: {ex.Message}", ex);
             }
+            // Advisory lock is automatically released when transaction commits or rolls back
         }
 
         /// <summary>

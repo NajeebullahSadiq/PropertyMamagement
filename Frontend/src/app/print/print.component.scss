@@ -26,6 +26,28 @@ hr {
   100% { transform: rotate(360deg); }
 }
 
+/* Data-Only Mode Styles */
+.data-only-mode {
+  /* Hide all borders and design elements */
+  table {
+    border: none !important;
+    
+    td, th {
+      border: none !important;
+      background: transparent !important;
+    }
+  }
+  
+  /* Hide decorative elements */
+  .dot-line {
+    display: none !important;
+  }
+  
+  hr {
+    display: none !important;
+  }
+}
+
 /* Screen view - ensure proper A4 sizing */
 .container {
   width: 210mm;
@@ -69,6 +91,11 @@ hr {
 }
 
 @media print {
+  /* Hide no-print elements */
+  .no-print {
+    display: none !important;
+  }
+  
   @page {
     size: A4 portrait;
     margin: 8mm 6mm;
@@ -92,10 +119,6 @@ hr {
     font-size: 9.5pt;
     transform: scale(0.98);
     transform-origin: top left;
-  }
-
-  .no-print {
-    display: none !important;
   }
   
   img {
@@ -160,5 +183,70 @@ hr {
   /* Reduce spacing in the dot line */
   .dot-line {
     margin: 1px 0 !important;
+  }
+
+  /* Data-Only Mode Print Styles */
+  .data-only-mode {
+    /* Remove all borders and backgrounds */
+    table, td, th, tr {
+      border: none !important;
+      background: none !important;
+      box-shadow: none !important;
+    }
+    
+    /* Hide ALL images, QR codes, photos */
+    img {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    /* Hide decorative elements */
+    .dot-line, hr, br {
+      display: none !important;
+    }
+    
+    /* Hide all list items (rights and obligations section) */
+    ol, ul, li {
+      display: none !important;
+    }
+    
+    /* Hide all headers */
+    h1, h2, h3, h4, h5, h6 {
+      display: none !important;
+    }
+    
+    /* Hide underlined text (section headers) */
+    u {
+      display: none !important;
+    }
+    
+    /* Hide the second table (rights and obligations + signatures) */
+    table:nth-of-type(2) {
+      display: none !important;
+    }
+    
+    /* Remove padding/margins to match pre-printed form positions */
+    td {
+      padding: 2px !important;
+    }
+    
+    /* Ensure data text is visible and properly sized */
+    p, strong, span, b {
+      font-size: 12pt !important;
+      color: black !important;
+      font-weight: normal !important;
+    }
+    
+    /* Ensure single page - no page breaks */
+    .container {
+      page-break-after: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    
+    table {
+      page-break-before: avoid !important;
+      page-break-after: avoid !important;
+      page-break-inside: avoid !important;
+    }
   }
 }

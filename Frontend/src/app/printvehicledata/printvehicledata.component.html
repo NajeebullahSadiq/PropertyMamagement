@@ -1,4 +1,34 @@
 
+<!-- Print Mode Selection Dialog -->
+<div *ngIf="showPrintOptions && !isLoading && !loadError" class="print-options-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 99999;">
+    <div class="print-options-dialog" style="background: white; border-radius: 12px; padding: 40px; max-width: 600px; width: 90%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);">
+        <h2 style="text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 24px;">
+            <i class="fas fa-print"></i> انتخاب نوع چاپ
+        </h2>
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 16px;">
+            لطفاً نوع چاپ مورد نظر خود را انتخاب کنید
+        </p>
+        
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <button (click)="setPrintMode('full')" style="flex: 1; padding: 30px 20px; border: 2px solid #3498db; border-radius: 8px; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <i class="fas fa-file-alt" style="font-size: 48px; color: #3498db;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #2c3e50;">چاپ با دیزاین کامل</span>
+                <span style="font-size: 14px; color: #7f8c8d;">برای کاغذ سفید A4</span>
+            </button>
+            
+            <button (click)="setPrintMode('data-only')" style="flex: 1; padding: 30px 20px; border: 2px solid #27ae60; border-radius: 8px; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <i class="fas fa-align-left" style="font-size: 48px; color: #27ae60;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #2c3e50;">چاپ فقط معلومات</span>
+                <span style="font-size: 14px; color: #7f8c8d;">برای فورم چاپ شده</span>
+            </button>
+        </div>
+        
+        <button (click)="cancelPrint()" style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; color: #7f8c8d; cursor: pointer; font-size: 16px;">
+            <i class="fas fa-times"></i> لغو
+        </button>
+    </div>
+</div>
+
 <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column;">
     <div style="text-align: center;">
         <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
@@ -15,10 +45,10 @@
     </div>
 </div>
 
-<div class="container" *ngIf="!isLoading && !loadError">
-    <br>
-    <div class="dot-line"></div>
-    <br>
+<div class="container" *ngIf="!isLoading && !loadError" [class.data-only-mode]="printMode === 'data-only'">
+    <br *ngIf="printMode === 'full'">
+    <div class="dot-line" *ngIf="printMode === 'full'"></div>
+    <br *ngIf="printMode === 'full'">
     <table>
         <tr >
           <td  colspan="4">

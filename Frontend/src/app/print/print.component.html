@@ -1,4 +1,21 @@
 
+<!-- Print Mode Selection Buttons - Always visible on screen, hidden when printing -->
+<div class="no-print" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); display: flex; gap: 15px; align-items: center;">
+  <span style="font-weight: bold; color: #2c3e50;">انتخاب نوع چاپ:</span>
+  <button (click)="setPrintMode('full')" [style.background]="printMode === 'full' ? '#3498db' : 'white'" [style.color]="printMode === 'full' ? 'white' : '#3498db'" style="padding: 10px 20px; border: 2px solid #3498db; border-radius: 6px; cursor: pointer; font-weight: bold;">
+    <i class="fas fa-file-alt"></i> چاپ کامل
+  </button>
+  <button (click)="setPrintMode('data-only')" [style.background]="printMode === 'data-only' ? '#27ae60' : 'white'" [style.color]="printMode === 'data-only' ? 'white' : '#27ae60'" style="padding: 10px 20px; border: 2px solid #27ae60; border-radius: 6px; cursor: pointer; font-weight: bold;">
+    <i class="fas fa-align-left"></i> فقط معلومات
+  </button>
+  <button (click)="window.print()" style="padding: 10px 20px; border: 2px solid #e67e22; background: #e67e22; color: white; border-radius: 6px; cursor: pointer; font-weight: bold;">
+    <i class="fas fa-print"></i> چاپ
+  </button>
+  <button (click)="window.close()" style="padding: 10px 20px; border: 2px solid #95a5a6; background: white; color: #95a5a6; border-radius: 6px; cursor: pointer;">
+    <i class="fas fa-times"></i> بستن
+  </button>
+</div>
+
 <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column;">
     <div style="text-align: center;">
         <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
@@ -15,8 +32,8 @@
     </div>
 </div>
 
-<div class="container" *ngIf="!isLoading && !loadError">
-    <div class="dot-line"></div>
+<div class="container" *ngIf="!isLoading && !loadError" [class.data-only-mode]="printMode === 'data-only'">
+    <div class="dot-line" *ngIf="printMode === 'full'"></div>
     <table>
         <tr >
           <td  colspan="4">

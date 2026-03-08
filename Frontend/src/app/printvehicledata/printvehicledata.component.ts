@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
@@ -28,17 +28,123 @@ export class PrintvehicledataComponent implements OnInit {
   qrCodeUrl: string = '';
   verificationError: string | null = null;
 
+  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms
+  printMode: 'full' | 'data-only' = 'full';
+  showPrintOptions: boolean = true;
+
   constructor(
     public service: AuthService,
     private route: ActivatedRoute,
     private pservice: VehicleService,
-    private verificationService: VerificationService
+    private verificationService: VerificationService,
+    private elementRef: ElementRef,
+    private renderer: Renderer2
   ) { 
   
   }
 
   ngOnInit(): void {
+    // Check if print mode is specified in URL
+    const mode = this.route.snapshot.queryParamMap.get('mode');
+    if (mode === 'data-only' || mode === 'full') {
+      this.printMode = mode as 'full' | 'data-only';
+      this.showPrintOptions = false;
+    }
+    console.log('Vehicle print component initialized. showPrintOptions:', this.showPrintOptions, 'mode:', mode);
     this.loadPrintData();
+  }
+
+  setPrintMode(mode: 'full' | 'data-only'): void {
+    this.printMode = mode;
+    this.showPrintOptions = false;
+    
+    // If switching to data-only mode, process the DOM to remove labels
+    if (mode === 'data-only') {
+      setTimeout(() => {
+        this.processDataOnlyMode();
+        window.print();
+      }, 100);
+    } else {
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    }
+  }
+
+  /**
+   * Process the DOM to remove all label text and keep only dynamic data values
+   */
+  private processDataOnlyMode(): void {
+    const container = this.elementRef.nativeElement.querySelector('.container');
+    if (!container) return;
+
+    // Remove the second table (rights and obligations + signatures) completely
+    const tables = container.querySelectorAll('table');
+    if (tables.length > 1) {
+      // Remove all tables after the first one
+      for (let i = 1; i < tables.length; i++) {
+        tables[i].remove();
+      }
+    }
+
+    // List of Dari label keywords to remove
+    const labelKeywords = [
+      'اسم', 'ولد', 'شماره تذکره', 'نمبر جواز سیر', 'نمبر پلیت', 'نوعیت',
+      'مودل', 'نمبر انجن', 'نمبر شاسی', 'رنگ', 'قیمت به عدد', 'قیمت به حروف',
+      'مناصفه قیمت', 'مبلغ حق الامتیاز', 'ولایت', 'ناحیه', 'ولسوالی', 'قریه', 'گذر',
+      'سکونت اصلی', 'سکونت فعلی', 'شهرت شهود', 'شماره', 'جزئیات',
+      'شهرت مکمل مالک ملکیت', 'شهرت مکمل مشتری', 'مشخصات و قیمت واسطه',
+      'شصت و امضای بایع', 'شصت و امضای مشتری', 'شصت و امضای شاهد',
+      'مهر و امضای دارنده جواز', 'حقوق و مکلفیت های بایع و مشتری',
+      'مکلفیت های دارنده جواز رهنمای معاملات'
+    ];
+
+    // Process all text nodes
+    const walker = document.createTreeWalker(
+      container,
+      NodeFilter.SHOW_TEXT,
+      null
+    );
+
+    const nodesToProcess: { node: Node; parent: Node }[] = [];
+    let node: Node | null;
+    
+    while (node = walker.nextNode()) {
+      if (node.parentNode) {
+        nodesToProcess.push({ node, parent: node.parentNode });
+      }
+    }
+
+    nodesToProcess.forEach(({ node, parent }) => {
+      const text = node.textContent || '';
+      let processedText = text;
+
+      // Remove label keywords
+      labelKeywords.forEach(keyword => {
+        const regex = new RegExp(keyword + '\\s*:?\\s*', 'g');
+        processedText = processedText.replace(regex, '');
+      });
+
+      // Remove common patterns like ":" followed by spaces
+      processedText = processedText.replace(/:\s*/g, '');
+      
+      // Remove parentheses if they're empty or contain only spaces
+      processedText = processedText.replace(/\(\s*\)/g, '');
+
+      // Update the text node if it changed
+      if (processedText !== text && processedText.trim()) {
+        node.textContent = processedText.trim();
+      } else if (!processedText.trim()) {
+        // If the text is now empty, remove the parent element
+        if (parent instanceof HTMLElement && parent.parentNode) {
+          parent.parentNode.removeChild(parent);
+        }
+      }
+    });
+  }
+
+  cancelPrint(): void {
+    window.close();
   }
 
   private loadPrintData(): void {
@@ -120,9 +226,13 @@ export class PrintvehicledataComponent implements OnInit {
       loadedCount++;
       if (loadedCount >= totalImages) {
         this.isLoading = false;
-        setTimeout(() => {
-          window.print();
-        }, 500);
+        console.log('Vehicle images loaded. showPrintOptions:', this.showPrintOptions, 'isLoading:', this.isLoading);
+        // Don't auto-print if showing options
+        if (!this.showPrintOptions) {
+          setTimeout(() => {
+            window.print();
+          }, 500);
+        }
       }
     };
 
