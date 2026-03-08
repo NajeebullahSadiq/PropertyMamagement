@@ -533,30 +533,27 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-                // Use the stored DateType if available, otherwise fall back to the query parameter
-                var storedDateType = licenseDetail?.DateType;
-                var dateCalendar = !string.IsNullOrEmpty(storedDateType) 
-                    ? DateConversionHelper.ParseCalendarType(storedDateType) 
-                    : calendar;
+                // ALWAYS use Hijri Shamsi (Solar Hijri) calendar for print license dates
+                var printCalendar = CalendarType.HijriShamsi;
 
-                // Format dates for the requested calendar
+                // Format dates for print - always in Hijri Shamsi
                 string issueDateFormatted = data.IssueDate.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.IssueDate, dateCalendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.IssueDate, printCalendar) 
                     : "";
                 string expireDateFormatted = data.ExpireDate.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.ExpireDate, dateCalendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.ExpireDate, printCalendar) 
                     : "";
                 string dateOfBirthFormatted = data.DateofBirth.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.DateofBirth, calendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.DateofBirth, printCalendar) 
                     : "";
                 string hrLetterDateFormatted = data.HrLetterDate.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.HrLetterDate, calendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.HrLetterDate, printCalendar) 
                     : "";
                 string royaltyDateFormatted = data.RoyaltyDate.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.RoyaltyDate, calendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.RoyaltyDate, printCalendar) 
                     : "";
                 string penaltyDateFormatted = data.PenaltyDate.HasValue 
-                    ? DateConversionHelper.FormatDateOnly(data.PenaltyDate, calendar) 
+                    ? DateConversionHelper.FormatDateOnly(data.PenaltyDate, printCalendar) 
                     : "";
 
                 var result = new
