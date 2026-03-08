@@ -48,21 +48,20 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = $"Invalid role: {model.Role}" });
             }
 
-            // Validate province requirement for COMPANY_REGISTRAR
-            if (model.Role == UserRoles.CompanyRegistrar && !model.ProvinceId.HasValue)
+            // Validate province requirement for COMPANY_REGISTRAR and PETITION_WRITER_LICENSE_MANAGER
+            if ((model.Role == UserRoles.CompanyRegistrar || model.Role == UserRoles.PetitionWriterLicenseManager) && !model.ProvinceId.HasValue)
             {
-                return BadRequest(new { message = "Province is required for COMPANY_REGISTRAR role" });
+                return BadRequest(new { message = "Province is required for this role" });
             }
 
-            // System-level roles (ADMIN, AUTHORITY, LICENSE_REVIEWER, LICENSE_APPLICATION_MANAGER, ACTIVITY_MONITORING_MANAGER, SECURITIES_MANAGER, PETITION_WRITER_LICENSE_MANAGER) don't need company
+            // System-level roles (ADMIN, AUTHORITY, LICENSE_REVIEWER, LICENSE_APPLICATION_MANAGER, ACTIVITY_MONITORING_MANAGER, SECURITIES_MANAGER) don't need company
             var systemLevelRoles = new[] { 
                 UserRoles.Admin, 
                 UserRoles.Authority, 
                 UserRoles.LicenseReviewer,
                 UserRoles.LicenseApplicationManager,
                 UserRoles.ActivityMonitoringManager,
-                UserRoles.SecuritiesManager,
-                UserRoles.PetitionWriterLicenseManager
+                UserRoles.SecuritiesManager
             };
             
             if (systemLevelRoles.Contains(model.Role))

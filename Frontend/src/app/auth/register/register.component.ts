@@ -205,8 +205,7 @@ export class RegisterComponent implements OnInit {
             selectedRole === UserRoles.LicenseReviewer ||
             selectedRole === UserRoles.LicenseApplicationManager ||
             selectedRole === UserRoles.ActivityMonitoringManager ||
-            selectedRole === UserRoles.SecuritiesManager ||
-            selectedRole === UserRoles.PetitionWriterLicenseManager) {
+            selectedRole === UserRoles.SecuritiesManager) {
           // System-level roles don't need company or province
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');
@@ -214,14 +213,14 @@ export class RegisterComponent implements OnInit {
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
           this.showProvinceSelect = false;
-        } else if (selectedRole === UserRoles.CompanyRegistrar) {
-          // Company registrar needs province but not company association
+        } else if (selectedRole === UserRoles.CompanyRegistrar || selectedRole === UserRoles.PetitionWriterLicenseManager) {
+          // Company registrar and petition writer license manager need province but not company association
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
           this.showProvinceSelect = true;
-          // Make province required for COMPANY_REGISTRAR
+          // Make province required
           provinceIdControl?.setValidators([Validators.required]);
           provinceIdControl?.updateValueAndValidity();
         } else if (selectedRole === UserRoles.PropertyOperator || 
