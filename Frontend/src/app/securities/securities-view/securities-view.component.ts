@@ -47,9 +47,9 @@ export class SecuritiesViewComponent implements OnInit {
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator;
-        // Only Admin and Authority can print securities (not LICENSE_APPLICATION_MANAGER or ACTIVITY_MONITORING_MANAGER)
-        this.canPrint = role === UserRoles.Admin || role === UserRoles.Authority;
+        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator || role === UserRoles.SecuritiesManager;
+        // Only Admin, Authority, and SECURITIES_MANAGER can print securities
+        this.canPrint = role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
     }
 
     loadData(id: number): void {

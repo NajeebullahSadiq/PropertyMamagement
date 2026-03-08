@@ -81,8 +81,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.ActivityMonitoringManager;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar;
+        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager;
+        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PetitionWriterLicenseManager;
     }
 
     initForms(): void {

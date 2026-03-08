@@ -158,7 +158,7 @@ namespace WebAPIBackend.Controllers.Securities
         /// Create new petition writer securities
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR")]
+        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER")]
         public async Task<IActionResult> Create([FromBody] PetitionWriterSecuritiesData data)
         {
             try
@@ -217,7 +217,7 @@ namespace WebAPIBackend.Controllers.Securities
         /// Update petition writer securities
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR")]
+        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER")]
         public async Task<IActionResult> Update(int id, [FromBody] PetitionWriterSecuritiesData data)
         {
             try

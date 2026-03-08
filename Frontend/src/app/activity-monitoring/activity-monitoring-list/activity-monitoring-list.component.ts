@@ -40,8 +40,8 @@ export class ActivityMonitoringListComponent implements OnInit {
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.canCreate = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar;
+        this.canCreate = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.ActivityMonitoringManager;
+        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.ActivityMonitoringManager;
         this.canDelete = role === UserRoles.Admin;
     }
 

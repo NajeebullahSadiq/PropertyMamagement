@@ -228,6 +228,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
         /// Create a new petition writer license
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "ADMIN,AUTHORITY,PETITION_WRITER_LICENSE_MANAGER")]
         public async Task<IActionResult> Create([FromBody] PetitionWriterLicenseData data)
         {
             try
@@ -303,6 +304,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
         /// Update an existing petition writer license
         /// </summary>
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN,AUTHORITY,PETITION_WRITER_LICENSE_MANAGER")]
         public async Task<IActionResult> Update(int id, [FromBody] PetitionWriterLicenseData data)
         {
             try

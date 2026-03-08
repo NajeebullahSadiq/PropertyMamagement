@@ -28,6 +28,7 @@ export class PetitionWriterSecuritiesListComponent implements OnInit, OnDestroy 
     isViewOnly = false;
     canEdit = false;
     canDelete = false;
+    canPrint = false;
     currentUserId = '';
 
     private dataChangedSubscription?: Subscription;
@@ -56,8 +57,9 @@ export class PetitionWriterSecuritiesListComponent implements OnInit, OnDestroy 
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator;
+        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager;
+        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator || role === UserRoles.SecuritiesManager;
+        this.canPrint = role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
         this.canDelete = role === UserRoles.Admin;
         this.currentUserId = this.rbacService.getCurrentUserId();
     }

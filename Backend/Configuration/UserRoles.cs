@@ -46,6 +46,16 @@ namespace WebAPIBackend.Configuration
         public const string ActivityMonitoringManager = "ACTIVITY_MONITORING_MANAGER";
 
         /// <summary>
+        /// کاربر مدیریت اسناد بهادار - Securities manager with full access to securities and petition writer securities modules
+        /// </summary>
+        public const string SecuritiesManager = "SECURITIES_MANAGER";
+
+        /// <summary>
+        /// کاربر مدیریت جواز عریضه‌نویسان - Petition writer license manager with full access to petition writer license module
+        /// </summary>
+        public const string PetitionWriterLicenseManager = "PETITION_WRITER_LICENSE_MANAGER";
+
+        /// <summary>
         /// Get all roles as array
         /// </summary>
         public static string[] AllRoles => new[]
@@ -57,7 +67,9 @@ namespace WebAPIBackend.Configuration
             PropertyOperator,
             VehicleOperator,
             LicenseApplicationManager,
-            ActivityMonitoringManager
+            ActivityMonitoringManager,
+            SecuritiesManager,
+            PetitionWriterLicenseManager
         };
 
         /// <summary>
@@ -75,6 +87,8 @@ namespace WebAPIBackend.Configuration
                 VehicleOperator => "کاربر عملیاتی موتر فروشی",
                 LicenseApplicationManager => "کاربر مدیریت درخواست جواز",
                 ActivityMonitoringManager => "کاربر مدیریت نظارت بر فعالیت‌ها",
+                SecuritiesManager => "کاربر مدیریت اسناد بهادار",
+                PetitionWriterLicenseManager => "کاربر مدیریت جواز عریضه‌نویسان",
                 _ => role
             };
         }
@@ -229,6 +243,28 @@ namespace WebAPIBackend.Configuration
                 UserRoles.ActivityMonitoringManager => new[]
                 {
                     // Full access to activity monitoring (handled by controller authorization)
+                    // Read-only access to other modules
+                    Permissions.CompanyView,
+                    Permissions.PropertyView,
+                    Permissions.VehicleView,
+                    Permissions.ReportsView,
+                    Permissions.DashboardView
+                },
+
+                UserRoles.SecuritiesManager => new[]
+                {
+                    // Full access to securities and petition writer securities (handled by controller authorization)
+                    // Read-only access to other modules
+                    Permissions.CompanyView,
+                    Permissions.PropertyView,
+                    Permissions.VehicleView,
+                    Permissions.ReportsView,
+                    Permissions.DashboardView
+                },
+
+                UserRoles.PetitionWriterLicenseManager => new[]
+                {
+                    // Full access to petition writer license (handled by controller authorization)
                     // Read-only access to other modules
                     Permissions.CompanyView,
                     Permissions.PropertyView,

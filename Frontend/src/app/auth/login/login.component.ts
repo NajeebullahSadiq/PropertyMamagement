@@ -78,6 +78,12 @@ export class LoginComponent {
         } else if (this.userRole === UserRoles.ActivityMonitoringManager) {
           // Activity monitoring manager goes to activity monitoring list
           this.router.navigateByUrl('/activity-monitoring/list');
+        } else if (this.userRole === UserRoles.SecuritiesManager) {
+          // Securities manager goes to securities list
+          this.router.navigateByUrl('/securities/list');
+        } else if (this.userRole === UserRoles.PetitionWriterLicenseManager) {
+          // Petition writer license manager goes to petition writer license list
+          this.router.navigateByUrl('/petition-writer-license/list');
         } else if (this.userRole === UserRoles.PropertyOperator) {
           // Property operator goes to property list
           this.router.navigateByUrl('/estate/list');
