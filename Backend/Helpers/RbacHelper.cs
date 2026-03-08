@@ -26,9 +26,9 @@ namespace WebAPIBackend.Helpers
 
             return module.ToLower() switch
             {
-                "property" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar), // Company registrar can view all property records
-                "vehicle" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar),  // Company registrar can view all vehicle records
-                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer),
+                "property" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager), // Company registrar and license app manager can view all property records
+                "vehicle" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager),  // Company registrar and license app manager can view all vehicle records
+                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer, UserRoles.LicenseApplicationManager),
                 _ => false
             };
         }
@@ -119,9 +119,9 @@ namespace WebAPIBackend.Helpers
 
             return module.ToLower() switch
             {
-                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer),
-                "property" => HasAnyRole(userRoles, UserRoles.PropertyOperator, UserRoles.CompanyRegistrar) || licenseType == "realEstate",
-                "vehicle" => HasAnyRole(userRoles, UserRoles.VehicleOperator, UserRoles.CompanyRegistrar) || licenseType == "carSale",
+                "company" => HasAnyRole(userRoles, UserRoles.CompanyRegistrar, UserRoles.LicenseReviewer, UserRoles.LicenseApplicationManager),
+                "property" => HasAnyRole(userRoles, UserRoles.PropertyOperator, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager) || licenseType == "realEstate",
+                "vehicle" => HasAnyRole(userRoles, UserRoles.VehicleOperator, UserRoles.CompanyRegistrar, UserRoles.LicenseApplicationManager) || licenseType == "carSale",
                 "reports" => !HasAnyRole(userRoles, UserRoles.LicenseReviewer),
                 "dashboard" => !HasAnyRole(userRoles, UserRoles.LicenseReviewer),
                 "users" => HasAnyRole(userRoles, UserRoles.Admin),

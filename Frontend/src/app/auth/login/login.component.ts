@@ -72,6 +72,9 @@ export class LoginComponent {
         } else if (this.userRole === UserRoles.LicenseReviewer) {
           // License reviewer goes to company list (view-only)
           this.router.navigateByUrl('/realestate/list');
+        } else if (this.userRole === UserRoles.LicenseApplicationManager) {
+          // License application manager goes to license applications list
+          this.router.navigateByUrl('/license-applications/list');
         } else if (this.userRole === UserRoles.PropertyOperator) {
           // Property operator goes to property list
           this.router.navigateByUrl('/estate/list');

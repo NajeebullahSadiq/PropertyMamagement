@@ -25,6 +25,7 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
     // RBAC
     canEdit = false;
     canDelete = false;
+    canPrint = false;
     isViewOnly = false;
 
     private dataChangedSub?: Subscription;
@@ -53,8 +54,9 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
+        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager;
         this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator;
+        this.canPrint = this.canEdit; // Only users who can edit can also print
         this.canDelete = role === UserRoles.Admin;
     }
 

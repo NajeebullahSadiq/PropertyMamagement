@@ -25,6 +25,8 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
   tableSizes: any = [10,50,100];
   isViewOnly: boolean = false;
   isAdmin: boolean = false;
+  canEdit: boolean = false;
+  canPrint: boolean = false;
   private searchSubject = new Subject<string>();
 
   constructor(
@@ -37,6 +39,10 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
   ) {
     this.isViewOnly = this.rbacService.isViewOnly();
     this.isAdmin = this.rbacService.isAdmin();
+    
+    // Check if user can edit and print companies
+    this.canEdit = this.rbacService.canCreateCompany();
+    this.canPrint = this.rbacService.canCreateCompany();
     
     // Setup debounced search
     this.searchSubject.pipe(

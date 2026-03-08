@@ -364,6 +364,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         /// Create new license application
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "ADMIN,LICENSE_APPLICATION_MANAGER")]
         public async Task<IActionResult> Create([FromBody] LicenseApplicationData request)
         {
             try
@@ -427,6 +428,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         /// Update license application
         /// </summary>
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN,LICENSE_APPLICATION_MANAGER")]
         public async Task<IActionResult> Update(int id, [FromBody] LicenseApplicationData request)
         {
             try
@@ -575,6 +577,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         /// Add guarantor to license application
         /// </summary>
         [HttpPost("{applicationId}/guarantors")]
+        [Authorize(Roles = "ADMIN,LICENSE_APPLICATION_MANAGER")]
         public async Task<IActionResult> AddGuarantor(int applicationId, [FromBody] LicenseApplicationGuarantorData request)
         {
             try
@@ -640,6 +643,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         /// Update guarantor
         /// </summary>
         [HttpPut("{applicationId}/guarantors/{guarantorId}")]
+        [Authorize(Roles = "ADMIN,LICENSE_APPLICATION_MANAGER")]
         public async Task<IActionResult> UpdateGuarantor(int applicationId, int guarantorId, [FromBody] LicenseApplicationGuarantorData request)
         {
             try
@@ -683,6 +687,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         /// Delete guarantor
         /// </summary>
         [HttpDelete("{applicationId}/guarantors/{guarantorId}")]
+        [Authorize(Roles = "ADMIN,LICENSE_APPLICATION_MANAGER")]
         public async Task<IActionResult> DeleteGuarantor(int applicationId, int guarantorId)
         {
             try
@@ -753,6 +758,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         /// Save withdrawal info (create or update)
         /// </summary>
         [HttpPost("{applicationId}/withdrawal")]
+        [Authorize(Roles = "ADMIN,LICENSE_APPLICATION_MANAGER")]
         public async Task<IActionResult> SaveWithdrawal(int applicationId, [FromBody] LicenseApplicationWithdrawalData request)
         {
             try
@@ -816,6 +822,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         /// Delete withdrawal info
         /// </summary>
         [HttpDelete("{applicationId}/withdrawal")]
+        [Authorize(Roles = "ADMIN,LICENSE_APPLICATION_MANAGER")]
         public async Task<IActionResult> DeleteWithdrawal(int applicationId)
         {
             try

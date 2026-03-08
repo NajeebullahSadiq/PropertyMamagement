@@ -28,6 +28,7 @@ export class PropertydetailslistComponent {
   isViewOnly = false;
   canCreate = false;
   canEdit = false;
+  canPrint = false;
   isAdmin = false;
   currentUserId = '';
 
@@ -46,6 +47,7 @@ export class PropertydetailslistComponent {
     this.isViewOnly = this.rbacService.isViewOnly();
     this.canCreate = this.rbacService.canCreateProperty();
     this.canEdit = this.rbacService.canCreateProperty(); // If can create, can also edit
+    this.canPrint = this.rbacService.canCreateProperty(); // If can create, can also print
     this.isAdmin = this.rbacService.isAdmin();
     this.currentUserId = this.rbacService.getCurrentUserId();
     

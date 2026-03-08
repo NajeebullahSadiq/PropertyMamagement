@@ -85,11 +85,11 @@
                     <i class="fas fa-eye"></i>
                     <span>مشاهده</span>
                   </button>
-                  <button *ngIf="!isViewOnly" class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-1" (click)="onEdit(property.id)" title="ویرایش">
+                  <button *ngIf="canEdit" class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-1" (click)="onEdit(property.id)" title="ویرایش">
                     <i class="fas fa-edit"></i>
                     <span>ویرایش</span>
                   </button>
-                  <button [disabled]="!property.isComplete" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-1" (click)="onPrint(property.id)" title="چاپ جواز">
+                  <button *ngIf="canPrint" [disabled]="!property.isComplete" class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-1" (click)="onPrint(property.id)" title="چاپ جواز">
                     <i class="fas fa-print"></i>
                     <span>چاپ</span>
                   </button>

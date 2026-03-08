@@ -117,12 +117,13 @@
                 <span *ngIf="!canEdit" class="text-gray-400 text-sm">-</span>
               </td>
               <td class="px-4 py-3">
-                <button (click)="printItem(item.id!)" 
+                <button *ngIf="canPrint" (click)="printItem(item.id!)" 
                   class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" 
                   title="چاپ">
                   <i class="fas fa-print"></i>
                   <span>چاپ</span>
                 </button>
+                <span *ngIf="!canPrint" class="text-gray-400 text-sm">-</span>
               </td>
             </tr>
             <tr *ngIf="items.length === 0">

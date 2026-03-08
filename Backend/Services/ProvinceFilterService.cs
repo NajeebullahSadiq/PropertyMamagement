@@ -42,13 +42,25 @@ namespace WebAPIBackend.Services
         }
 
         /// <summary>
+        /// Check if the current user is a system-level role that doesn't require province filtering
+        /// </summary>
+        private bool IsSystemLevelRole()
+        {
+            var role = _httpContextAccessor.HttpContext?.Items["UserRole"]?.ToString();
+            return role == UserRoles.Admin || 
+                   role == UserRoles.Authority || 
+                   role == UserRoles.LicenseReviewer ||
+                   role == UserRoles.LicenseApplicationManager;
+        }
+
+        /// <summary>
         /// Apply province filtering to a queryable collection
-        /// Filters by user's province for COMPANY_REGISTRAR, no filter for administrators
+        /// Filters by user's province for COMPANY_REGISTRAR, no filter for administrators and system-level roles
         /// </summary>
         public IQueryable<T> ApplyProvinceFilter<T>(IQueryable<T> query) where T : IProvinceEntity
         {
-            // Administrators see all data
-            if (IsAdministrator())
+            // System-level roles (Admin, Authority, LicenseReviewer, LicenseApplicationManager) see all data
+            if (IsSystemLevelRole())
             {
                 return query;
             }
@@ -70,8 +82,8 @@ namespace WebAPIBackend.Services
         /// </summary>
         public void ValidateProvinceAccess(int? entityProvinceId)
         {
-            // Administrators have access to all provinces
-            if (IsAdministrator())
+            // System-level roles have access to all provinces
+            if (IsSystemLevelRole())
             {
                 return;
             }

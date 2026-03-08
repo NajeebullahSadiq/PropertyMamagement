@@ -107,11 +107,11 @@
       <a *ngIf="canAccessDashboard" routerLink="/dashboard" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>dashboard</mat-icon><span>{{ "dashboard" | translate }}</span>
       </a>
-       <div *ngIf="canAccessCompany" class="section-label">درخواست جواز رهنمای معاملات</div>
-      <a *ngIf="canAccessCompany && !isViewOnly" routerLink="/license-applications" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+       <div *ngIf="canAccessLicenseApplications" class="section-label">درخواست جواز رهنمای معاملات</div>
+      <a *ngIf="canAccessLicenseApplications && canManageLicenseApplications" routerLink="/license-applications" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>assignment</mat-icon><span>ثبت درخواست متقاضیان</span>
       </a>
-      <a *ngIf="canAccessCompany" routerLink="/license-applications/list" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessLicenseApplications" routerLink="/license-applications/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>list_alt</mat-icon><span>جدول ثبت درخواست متقاضیان</span>
       </a>
       <div *ngIf="canAccessCompany" class="section-label">رهنما ها</div>
@@ -136,7 +136,7 @@
         <mat-icon>format_list_bulleted</mat-icon><span>{{ "vehiclelist" | translate }}</span>
       </a>
       <div *ngIf="canAccessSecurities" class="section-label">اسناد بهادار </div>
-      <a *ngIf="canAccessSecurities && !isViewOnly" routerLink="/securities" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessSecurities && canCreateSecurities" routerLink="/securities" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>receipt_long</mat-icon><span>اسناد بهادار رهنمای معاملات</span>
       </a>
       <a *ngIf="canAccessSecurities" routerLink="/securities/list" routerLinkActive="active-nav" class="nav-link">
@@ -172,7 +172,7 @@
         <mat-icon>table_view</mat-icon><span>جدول ثبت جواز عریضه‌نویسان</span>
       </a>
       <div *ngIf="canAccessActivityMonitoring" class="section-label">نظارت بر فعالیت‌ها</div>
-      <a *ngIf="canAccessActivityMonitoring && !isViewOnly" routerLink="/activity-monitoring/form" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessActivityMonitoring && canCreateActivityMonitoring" routerLink="/activity-monitoring/form" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>fact_check</mat-icon><span>ثبت نظارت بر فعالیت‌ها</span>
       </a>
       <a *ngIf="canAccessActivityMonitoring" routerLink="/activity-monitoring/list" routerLinkActive="active-nav" class="nav-link">

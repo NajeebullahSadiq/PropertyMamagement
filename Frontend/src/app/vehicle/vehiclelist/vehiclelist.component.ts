@@ -21,6 +21,7 @@ export class VehiclelistComponent {
   tableSizes: any = [10,50,100];
   isViewOnly: boolean = false;
   canEdit: boolean = false;
+  canPrint: boolean = false;
 
   constructor(
     private http: HttpClient, 
@@ -31,6 +32,7 @@ export class VehiclelistComponent {
   ) {
     this.isViewOnly = this.rbacService.isViewOnly();
     this.canEdit = this.rbacService.canCreateVehicle();
+    this.canPrint = this.rbacService.canCreateVehicle();
   }
 
   ngOnInit() {

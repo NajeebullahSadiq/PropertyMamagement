@@ -10,7 +10,8 @@ export const UserRoles = {
   CompanyRegistrar: 'COMPANY_REGISTRAR',
   LicenseReviewer: 'LICENSE_REVIEWER',
   PropertyOperator: 'PROPERTY_OPERATOR',
-  VehicleOperator: 'VEHICLE_OPERATOR'
+  VehicleOperator: 'VEHICLE_OPERATOR',
+  LicenseApplicationManager: 'LICENSE_APPLICATION_MANAGER'
 } as const;
 
 // Permission constants matching backend
@@ -21,6 +22,12 @@ export const Permissions = {
   UsersEdit: 'users.edit',
   UsersDelete: 'users.delete',
   UsersLock: 'users.lock',
+
+  // License Application Management
+  LicenseApplicationView: 'licenseapplication.view',
+  LicenseApplicationCreate: 'licenseapplication.create',
+  LicenseApplicationEdit: 'licenseapplication.edit',
+  LicenseApplicationDelete: 'licenseapplication.delete',
 
   // Company Management
   CompanyView: 'company.view',
@@ -215,6 +222,20 @@ export class RbacService {
     return this.hasPermission(Permissions.CompanyCreate) || this.hasPermission(Permissions.CompanyEdit);
   }
 
+  // Check if user can create securities
+  canCreateSecurities(): boolean {
+    const role = this.getCurrentRole();
+    // Only Admin and Authority can create securities (not LICENSE_APPLICATION_MANAGER)
+    return role === UserRoles.Admin || role === UserRoles.Authority;
+  }
+
+  // Check if user can create activity monitoring entries
+  canCreateActivityMonitoring(): boolean {
+    const role = this.getCurrentRole();
+    // Only Admin and Authority can create activity monitoring (not LICENSE_APPLICATION_MANAGER)
+    return role === UserRoles.Admin || role === UserRoles.Authority;
+  }
+
   // Check if user has specific permission
   hasPermission(permission: string): boolean {
     const permissions = this.permissions$.getValue();
@@ -258,27 +279,32 @@ export class RbacService {
 
     switch (module.toLowerCase()) {
       case 'company':
-        return role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseReviewer;
+        return role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager;
       case 'property':
         return role === UserRoles.PropertyOperator || 
                role === UserRoles.CompanyRegistrar ||  // Company registrar can view property
+               role === UserRoles.LicenseApplicationManager ||  // License app manager can view property
                licenseType === 'realEstate';
       case 'vehicle':
         return role === UserRoles.VehicleOperator || 
                role === UserRoles.CompanyRegistrar ||  // Company registrar can view vehicle
+               role === UserRoles.LicenseApplicationManager ||  // License app manager can view vehicle
                licenseType === 'carSale';
       case 'securities':
         // Securities module is only for Admin and Authority
-        return role === UserRoles.Admin || role === UserRoles.Authority;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager;
       case 'petitionwriter':
         // Petition Writer module is only for Admin and Authority
         return role === UserRoles.Admin || role === UserRoles.Authority;
       case 'activitymonitoring':
         // Activity Monitoring is only for Admin and Authority
-        return role === UserRoles.Admin || role === UserRoles.Authority;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager;
       case 'verification':
         // Verification is accessible to all roles
         return true;
+      case 'licenseapplications':
+        // License applications accessible to Admin, CompanyRegistrar (view-only), and LicenseApplicationManager (full access)
+        return role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseApplicationManager;
       case 'reports':
         // Reports accessible to all except License Reviewer
         return role !== UserRoles.LicenseReviewer;

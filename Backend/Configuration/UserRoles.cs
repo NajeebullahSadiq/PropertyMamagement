@@ -36,6 +36,11 @@ namespace WebAPIBackend.Configuration
         public const string VehicleOperator = "VEHICLE_OPERATOR";
 
         /// <summary>
+        /// کاربر مدیریت درخواست جواز - License application manager with full access to license applications and read-only to other modules
+        /// </summary>
+        public const string LicenseApplicationManager = "LICENSE_APPLICATION_MANAGER";
+
+        /// <summary>
         /// Get all roles as array
         /// </summary>
         public static string[] AllRoles => new[]
@@ -45,7 +50,8 @@ namespace WebAPIBackend.Configuration
             CompanyRegistrar,
             LicenseReviewer,
             PropertyOperator,
-            VehicleOperator
+            VehicleOperator,
+            LicenseApplicationManager
         };
 
         /// <summary>
@@ -61,6 +67,7 @@ namespace WebAPIBackend.Configuration
                 LicenseReviewer => "ریاست بررسی و ثبت جواز",
                 PropertyOperator => "کاربر عملیاتی املاک",
                 VehicleOperator => "کاربر عملیاتی موتر فروشی",
+                LicenseApplicationManager => "کاربر مدیریت درخواست جواز",
                 _ => role
             };
         }
@@ -77,6 +84,12 @@ namespace WebAPIBackend.Configuration
         public const string UsersEdit = "users.edit";
         public const string UsersDelete = "users.delete";
         public const string UsersLock = "users.lock";
+
+        // License Application Management
+        public const string LicenseApplicationView = "licenseapplication.view";
+        public const string LicenseApplicationCreate = "licenseapplication.create";
+        public const string LicenseApplicationEdit = "licenseapplication.edit";
+        public const string LicenseApplicationDelete = "licenseapplication.delete";
 
         // Company Management
         public const string CompanyView = "company.view";
@@ -138,6 +151,8 @@ namespace WebAPIBackend.Configuration
                     Permissions.VehicleDelete,
                     Permissions.LicenseView, Permissions.LicenseCreate, Permissions.LicenseEdit, 
                     Permissions.LicenseApprove,
+                    Permissions.LicenseApplicationView, Permissions.LicenseApplicationCreate, 
+                    Permissions.LicenseApplicationEdit, Permissions.LicenseApplicationDelete,
                     Permissions.ReportsView, Permissions.ReportsExport,
                     Permissions.DashboardView,
                     Permissions.SystemConfigure
@@ -151,6 +166,7 @@ namespace WebAPIBackend.Configuration
                     Permissions.PropertyView,
                     Permissions.VehicleView,
                     Permissions.LicenseView,
+                    Permissions.LicenseApplicationView,
                     Permissions.ReportsView,
                     Permissions.DashboardView
                 },
@@ -162,14 +178,16 @@ namespace WebAPIBackend.Configuration
                     Permissions.LicenseView, Permissions.LicenseCreate, Permissions.LicenseEdit,
                     Permissions.PropertyView,  // Can view all property records
                     Permissions.VehicleView,   // Can view all vehicle records
-                    Permissions.ReportsView
+                    Permissions.ReportsView,
+                    Permissions.LicenseApplicationView  // Can only view license applications, no edit/delete
                 },
 
                 UserRoles.LicenseReviewer => new[]
                 {
                     // View-only company list
                     Permissions.CompanyView,
-                    Permissions.LicenseView
+                    Permissions.LicenseView,
+                    Permissions.LicenseApplicationView
                 },
 
                 UserRoles.PropertyOperator => new[]
@@ -186,6 +204,19 @@ namespace WebAPIBackend.Configuration
                     Permissions.VehicleView, Permissions.VehicleCreate, Permissions.VehicleEditOwn,
                     Permissions.DashboardView,
                     Permissions.ReportsView
+                },
+
+                UserRoles.LicenseApplicationManager => new[]
+                {
+                    // Full access to license applications
+                    Permissions.LicenseApplicationView, Permissions.LicenseApplicationCreate, 
+                    Permissions.LicenseApplicationEdit, Permissions.LicenseApplicationDelete,
+                    // Read-only access to other modules
+                    Permissions.CompanyView,
+                    Permissions.PropertyView,
+                    Permissions.VehicleView,
+                    Permissions.ReportsView,
+                    Permissions.DashboardView
                 },
 
                 _ => Array.Empty<string>()

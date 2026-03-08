@@ -91,10 +91,11 @@
                 <span *ngIf="!canEdit" class="text-gray-400 text-sm">-</span>
               </td>
               <td class="px-4 py-3">
-                <button [disabled]="!property.iscomplete" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 mx-auto" (click)="onPrint(property.id)" title="چاپ">
+                <button *ngIf="canPrint" [disabled]="!property.iscomplete" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 mx-auto" (click)="onPrint(property.id)" title="چاپ">
                   <i class="fas fa-print"></i>
                   <span>چاپ</span>
                 </button>
+                <span *ngIf="!canPrint" class="text-gray-400 text-sm">-</span>
               </td>
             </tr>
           </tbody>

@@ -202,7 +202,8 @@ export class RegisterComponent implements OnInit {
         // Determine which fields to show based on role
         if (selectedRole === UserRoles.Admin || 
             selectedRole === UserRoles.Authority || 
-            selectedRole === UserRoles.LicenseReviewer) {
+            selectedRole === UserRoles.LicenseReviewer ||
+            selectedRole === UserRoles.LicenseApplicationManager) {
           // System-level roles don't need company or province
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');

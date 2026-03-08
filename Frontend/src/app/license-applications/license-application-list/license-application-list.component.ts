@@ -78,9 +78,11 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar;
-        this.canDelete = role === UserRoles.Admin;
+        this.isViewOnly = role === UserRoles.Authority || 
+                          role === UserRoles.LicenseReviewer || 
+                          role === UserRoles.CompanyRegistrar;
+        this.canEdit = role === UserRoles.Admin || role === UserRoles.LicenseApplicationManager;
+        this.canDelete = role === UserRoles.Admin || role === UserRoles.LicenseApplicationManager;
     }
 
     loadData(): void {

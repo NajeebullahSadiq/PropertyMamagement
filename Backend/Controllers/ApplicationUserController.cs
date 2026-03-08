@@ -54,6 +54,20 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = "Province is required for COMPANY_REGISTRAR role" });
             }
 
+            // System-level roles (ADMIN, AUTHORITY, LICENSE_REVIEWER, LICENSE_APPLICATION_MANAGER) don't need company
+            var systemLevelRoles = new[] { 
+                UserRoles.Admin, 
+                UserRoles.Authority, 
+                UserRoles.LicenseReviewer,
+                UserRoles.LicenseApplicationManager 
+            };
+            
+            if (systemLevelRoles.Contains(model.Role))
+            {
+                model.CompanyId = 0; // Ensure no company association
+                model.LicenseType = null; // No license type needed
+            }
+
             // Validate province exists if provided
             if (model.ProvinceId.HasValue)
             {

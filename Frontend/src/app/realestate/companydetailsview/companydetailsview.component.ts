@@ -5,6 +5,7 @@ import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { FileService } from 'src/app/shared/file.service';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
 import { environment } from 'src/environments/environment';
+import { RbacService } from 'src/app/shared/rbac.service';
 
 @Component({
   selector: 'app-companydetailsview',
@@ -16,14 +17,18 @@ export class CompanydetailsviewComponent {
   error: string | null = null;
   viewData: any = null;
   private companyId: number = 0;
+  canPrint: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private companyService: CompnaydetailService,
     private dialog: MatDialog,
-    private fileService: FileService
-  ) {}
+    private fileService: FileService,
+    private rbacService: RbacService
+  ) {
+    this.canPrint = this.rbacService.canCreateCompany();
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {

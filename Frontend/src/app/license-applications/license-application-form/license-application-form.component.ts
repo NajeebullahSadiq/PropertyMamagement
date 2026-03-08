@@ -89,8 +89,10 @@ export class LicenseApplicationFormComponent implements OnInit {
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar;
+        this.isViewOnly = role === UserRoles.Authority || 
+                          role === UserRoles.LicenseReviewer || 
+                          role === UserRoles.CompanyRegistrar;
+        this.canEdit = role === UserRoles.Admin || role === UserRoles.LicenseApplicationManager;
     }
 
     initForms(): void {
