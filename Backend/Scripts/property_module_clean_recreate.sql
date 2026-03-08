@@ -67,11 +67,6 @@ CREATE TABLE tr."PropertyDetails" (
     
     -- Transaction Information
     "TransactionTypeId" INTEGER,
-    "Status" VARCHAR(50) DEFAULT 'Draft',
-    "VerifiedBy" VARCHAR(50),
-    "VerifiedAt" TIMESTAMP WITHOUT TIME ZONE,
-    "ApprovedBy" VARCHAR(50),
-    "ApprovedAt" TIMESTAMP WITHOUT TIME ZONE,
     
     -- Property Description
     "Des" TEXT,
@@ -439,8 +434,6 @@ CREATE INDEX "IX_PropertyCancellationDocuments_PropertyCancellationId"
 -- PropertyDetails indexes
 CREATE INDEX "IX_PropertyDetails_CompanyId" 
     ON tr."PropertyDetails" ("CompanyId");
-CREATE INDEX "IX_PropertyDetails_Status" 
-    ON tr."PropertyDetails" ("Status");
 CREATE INDEX "IX_PropertyDetails_TransactionTypeId" 
     ON tr."PropertyDetails" ("TransactionTypeId");
 CREATE INDEX "IX_PropertyDetails_PropertyTypeId" 

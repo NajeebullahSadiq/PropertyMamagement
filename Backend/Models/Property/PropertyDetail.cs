@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,16 +30,6 @@ public partial class PropertyDetail
     public string? RoyaltyAmount { get; set; }
 
     public int? TransactionTypeId { get; set; }
-
-    public string Status { get; set; } = "Draft";
-
-    public string? VerifiedBy { get; set; }
-
-    public DateTime? VerifiedAt { get; set; }
-
-    public string? ApprovedBy { get; set; }
-
-    public DateTime? ApprovedAt { get; set; }
 
     public string? Des { get; set; }
 
