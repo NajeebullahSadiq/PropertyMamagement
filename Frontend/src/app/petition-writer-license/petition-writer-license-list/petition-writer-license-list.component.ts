@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -17,8 +18,8 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
     filteredItems: PetitionWriterLicense[] = [];
     totalCount = 0;
     page = 1;
-    pageSize = 10;
-    pageSizes = [5, 10, 25, 50];
+    pageSize = 100;
+    pageSizes = [10, 25, 50, 100];
     searchTerm = '';
     isLoading = false;
 
@@ -28,6 +29,7 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
     isViewOnly = false;
 
     private dataChangedSub?: Subscription;
+    private searchSubject = new Subject<string>();
 
     constructor(
         private licenseService: PetitionWriterLicenseService,
@@ -35,7 +37,17 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
         private rbacService: RbacService,
         private router: Router,
         private toastr: ToastrService
-    ) { }
+    ) {
+        // Setup debounced search
+        this.searchSubject.pipe(
+            debounceTime(500), // Wait 500ms after user stops typing
+            distinctUntilChanged() // Only emit if value is different from previous
+        ).subscribe(searchTerm => {
+            this.searchTerm = searchTerm;
+            this.page = 1;
+            this.loadData();
+        });
+    }
 
     ngOnInit(): void {
         this.checkPermissions();
@@ -48,6 +60,7 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.dataChangedSub?.unsubscribe();
+        this.searchSubject.complete();
     }
 
     checkPermissions(): void {
@@ -61,11 +74,12 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         const calendar = this.calendarService.getSelectedCalendar();
 
-        this.licenseService.getAll(1, 1000, '', calendar).subscribe({
+        // Use server-side search via API
+        this.licenseService.getAll(this.page, this.pageSize, this.searchTerm.trim(), calendar).subscribe({
             next: (response) => {
                 this.items = response.items;
+                this.filteredItems = response.items;
                 this.totalCount = response.totalCount;
-                this.applyFilter();
                 this.isLoading = false;
             },
             error: (err) => {
@@ -77,30 +91,22 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
     }
 
     applyFilter(): void {
-        if (!this.searchTerm.trim()) {
-            this.filteredItems = [...this.items];
-        } else {
-            const term = this.searchTerm.toLowerCase().trim();
-            this.filteredItems = this.items.filter(item =>
-                item.licenseNumber?.toLowerCase().includes(term) ||
-                item.applicantName?.toLowerCase().includes(term) ||
-                item.detailedAddress?.toLowerCase().includes(term)
-            );
-        }
-        this.totalCount = this.filteredItems.length;
+        // No longer needed - using server-side search
+        this.loadData();
     }
 
     onSearch(): void {
-        this.page = 1;
-        this.applyFilter();
+        this.searchSubject.next(this.searchTerm);
     }
 
     onPageChange(page: number): void {
         this.page = page;
+        this.loadData();
     }
 
     onPageSizeChange(): void {
         this.page = 1;
+        this.loadData();
     }
 
     createNew(): void {
