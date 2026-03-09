@@ -157,6 +157,23 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Print Button - Only shown when both witnesses are complete -->
+            <div *ngIf="areWitnessesComplete()" class="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-xl shadow-lg overflow-hidden mb-6 animate-pulse">
+                <div class="px-6 py-6">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="flex items-center gap-3 text-purple-700">
+                            <i class="fas fa-check-circle text-3xl"></i>
+                            <h3 class="text-xl font-bold">شاهدین کامل شدند!</h3>
+                        </div>
+                        <p class="text-purple-600 text-center">اکنون می‌توانید اسناد واسط نقلیه را چاپ کنید</p>
+                        <button type="button" (click)="printVehicle()" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-lg rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center gap-3 transform hover:scale-105">
+                            <i class="fas fa-print text-2xl"></i>
+                            <span>چاپ اسناد واسط نقلیه</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </form>
         
         <div class="mt-8 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">

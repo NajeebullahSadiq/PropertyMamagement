@@ -252,6 +252,11 @@ export class SellerdetailComponent {
               // Reload the list immediately
               this.loadSellerDetails();
               this.resetChild(); // Reset form for next entry
+              
+              // Auto-redirect to next tab if single seller role
+              if (this.isSingleSellerRole()) {
+                this.onNextClick();
+              }
             }
           },
           (error) => {
@@ -286,6 +291,11 @@ updateSellerDetails(): void {
       this.vehiclesubservice.udateSellerId(result.id);
       this.loadSellerDetails(); // Reload the list
       this.resetChild(); // Reset form
+      
+      // Auto-redirect to next tab if single seller role
+      if (this.isSingleSellerRole()) {
+        this.onNextClick();
+      }
     }
  });
 }

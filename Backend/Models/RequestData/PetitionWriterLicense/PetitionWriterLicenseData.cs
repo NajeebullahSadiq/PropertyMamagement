@@ -53,6 +53,12 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
         public string? DetailedAddress { get; set; }
 
         [MaxLength(500)]
+        public string? ActivityLocation { get; set; }
+
+        [MaxLength(200)]
+        public string? ActivityNahia { get; set; }
+
+        [MaxLength(500)]
         public string? PicturePath { get; set; }
 
         // Financial Info
@@ -68,6 +74,8 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterLicense
         public string? LicenseType { get; set; }
 
         public decimal? LicensePrice { get; set; }
+
+        public decimal? LicenseCost { get; set; }
 
         public string? LicenseIssueDate { get; set; }
 

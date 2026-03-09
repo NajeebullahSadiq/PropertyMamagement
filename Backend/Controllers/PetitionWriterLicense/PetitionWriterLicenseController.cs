@@ -85,7 +85,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.CurrentDistrictId,
                         CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
                         x.CurrentVillage,
-
+                        x.ActivityLocation,
+                        x.ActivityNahia,
                         x.DetailedAddress,
                         x.PicturePath,
                         x.BankReceiptNumber,
@@ -96,6 +97,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.District,
                         x.LicenseType,
                         x.LicensePrice,
+                        x.LicenseCost,
                         x.LicenseIssueDate,
                         LicenseIssueDateFormatted = x.LicenseIssueDate.HasValue
                             ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, calendar)
@@ -169,7 +171,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.CurrentDistrictId,
                         CurrentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
                         x.CurrentVillage,
-
+                        x.ActivityLocation,
+                        x.ActivityNahia,
                         x.DetailedAddress,
                         x.PicturePath,
                         x.BankReceiptNumber,
@@ -180,6 +183,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.District,
                         x.LicenseType,
                         x.LicensePrice,
+                        x.LicenseCost,
                         x.LicenseIssueDate,
                         LicenseIssueDateFormatted = x.LicenseIssueDate.HasValue
                             ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, calendar)
@@ -280,10 +284,13 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     District = data.District,
                     LicenseType = data.LicenseType,
                     LicensePrice = data.LicensePrice,
+                    LicenseCost = data.LicenseCost,
                     LicenseIssueDate = DateConversionHelper.ParseDateOnly(data.LicenseIssueDate, calendar),
                     LicenseExpiryDate = DateConversionHelper.ParseDateOnly(data.LicenseExpiryDate, calendar),
                     LicenseStatus = data.LicenseStatus ?? 1,
                     CancellationDate = DateConversionHelper.ParseDateOnly(data.CancellationDate, calendar),
+                    ActivityLocation = data.ActivityLocation,
+                    ActivityNahia = data.ActivityNahia,
                     Status = true,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = username
@@ -363,10 +370,13 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.District = data.District;
                 entity.LicenseType = data.LicenseType;
                 entity.LicensePrice = data.LicensePrice;
+                entity.LicenseCost = data.LicenseCost;
                 entity.LicenseIssueDate = DateConversionHelper.ParseDateOnly(data.LicenseIssueDate, calendar);
                 entity.LicenseExpiryDate = DateConversionHelper.ParseDateOnly(data.LicenseExpiryDate, calendar);
                 entity.LicenseStatus = data.LicenseStatus ?? entity.LicenseStatus;
                 entity.CancellationDate = DateConversionHelper.ParseDateOnly(data.CancellationDate, calendar);
+                entity.ActivityLocation = data.ActivityLocation;
+                entity.ActivityNahia = data.ActivityNahia;
                 entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = username;
 

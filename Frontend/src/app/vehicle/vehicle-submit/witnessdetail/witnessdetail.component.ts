@@ -26,6 +26,27 @@ export class WitnessdetailComponent {
     this.next.emit();
   }
 
+  // Check if both witnesses are registered (one from buyer side, one from seller side)
+  areWitnessesComplete(): boolean {
+    if (!this.witnessDetails || this.witnessDetails.length < 2) {
+      return false;
+    }
+    
+    const hasBuyerWitness = this.witnessDetails.some(w => w.witnessSide === 'Buyer');
+    const hasSellerWitness = this.witnessDetails.some(w => w.witnessSide === 'Seller');
+    
+    return hasBuyerWitness && hasSellerWitness;
+  }
+
+  // Navigate to print page
+  printVehicle(): void {
+    if (this.vehicleService.mainTableId && this.vehicleService.mainTableId !== 0) {
+      window.open(`/dashboard/vehicle/view/${this.vehicleService.mainTableId}`, '_blank');
+    } else {
+      this.toastr.error('خطا: شناسه واسط نقلیه یافت نشد');
+    }
+  }
+
   onEditWitness(id: number, event?: Event) {
     if (event) {
       event.stopPropagation();
@@ -176,6 +197,11 @@ export class WitnessdetailComponent {
             this.vehiclesub.getWitnessById(this.vehicleService.mainTableId)
             .subscribe(witness => {
               this.witnessDetails = witness;
+              
+              // Check if witnesses are complete after adding
+              if (this.areWitnessesComplete()) {
+                this.toastr.info('شاهدین کامل شدند. می‌توانید چاپ کنید', '', { timeOut: 5000 });
+              }
             });
           
           }
@@ -215,6 +241,11 @@ export class WitnessdetailComponent {
       this.vehiclesub.getWitnessById(this.vehicleService.mainTableId)
             .subscribe(witness => {
               this.witnessDetails = witness;
+              
+              // Check if witnesses are complete after updating
+              if (this.areWitnessesComplete()) {
+                this.toastr.info('شاهدین کامل شدند. می‌توانید چاپ کنید', '', { timeOut: 5000 });
+              }
             });
      // this.onNextClick();
    });

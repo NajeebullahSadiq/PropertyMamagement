@@ -185,6 +185,7 @@ updateVehicleDetails():void{
        this.vehicleService.updateMainTableId(result.id);
        this.selectedVehicleId=result.id;
        this.toastr.info("معلومات موفقانه تغیر یافت ");
+       this.onNextClick();
     
     });
   

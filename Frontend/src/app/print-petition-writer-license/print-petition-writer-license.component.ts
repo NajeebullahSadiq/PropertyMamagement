@@ -148,13 +148,8 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
     const competency = this.data?.competency;
     if (!competency) return '-';
     
-    const competencyMap: { [key: string]: string } = {
-      'high': 'اعلی',
-      'medium': 'اوسط',
-      'low': 'ادنی'
-    };
-    
-    return competencyMap[competency] || competency;
+    // Return the competency value directly since we're storing Dari values
+    return competency;
   }
 
   getLatestRelocation(): string {

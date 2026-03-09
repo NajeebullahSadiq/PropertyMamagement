@@ -33,6 +33,8 @@ export interface PetitionWriterLicense {
     
     // Detailed Address
     detailedAddress?: string;
+    activityLocation?: string;
+    activityNahia?: string;
     
     // Picture Path
     picturePath?: string;
@@ -44,6 +46,7 @@ export interface PetitionWriterLicense {
     district?: string;
     licenseType?: string;
     licensePrice?: number;
+    licenseCost?: number;
     licenseIssueDate?: Date | string;
     licenseIssueDateFormatted?: string;
     licenseExpiryDate?: Date | string;
@@ -135,6 +138,7 @@ export interface PetitionWriterLicenseData {
     currentDistrictId?: number;
     currentVillage?: string;
     activityLocation?: string;
+    activityNahia?: string;
     detailedAddress?: string;
     picturePath?: string;
     bankReceiptNumber?: string;
@@ -142,6 +146,7 @@ export interface PetitionWriterLicenseData {
     district?: string;
     licenseType?: string;
     licensePrice?: number;
+    licenseCost?: number;
     licenseIssueDate?: string;
     licenseExpiryDate?: string;
     licenseStatus?: number;

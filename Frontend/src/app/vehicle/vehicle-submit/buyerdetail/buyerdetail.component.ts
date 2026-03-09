@@ -334,6 +334,12 @@ export class BuyerdetailComponent {
               // Reload the list immediately
               this.loadBuyerDetails();
               this.resetChild(); // Reset form for next entry
+              
+              // Auto-redirect to next tab if single buyer role
+              const roleType = this.buyerForm.get('roleType')?.value;
+              if (roleType === 'Buyer' || roleType === 'Purchase Agent') {
+                this.onNextClick();
+              }
             }
           },
           (error) => {
@@ -368,6 +374,12 @@ updateBuyerDetails(): void {
       this.vehiclesubservice.udateBuyerId(result.id);
       this.loadBuyerDetails(); // Reload the list
       this.resetChild(); // Reset form
+      
+      // Auto-redirect to next tab if single buyer role
+      const roleType = this.buyerForm.get('roleType')?.value;
+      if (roleType === 'Buyer' || roleType === 'Purchase Agent') {
+        this.onNextClick();
+      }
     }
  });
 }

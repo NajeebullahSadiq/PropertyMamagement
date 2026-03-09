@@ -8,6 +8,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarType } from 'src/app/models/calendar-type';
 import { SellerService } from 'src/app/shared/seller.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
+import { AuthService } from 'src/app/shared/auth.service';
 import {
     PetitionWriterLicenseData,
     PetitionWriterRelocationData,
@@ -41,6 +42,11 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     licenseStatusTypes = LicenseStatusTypes;
     licenseTypes = LicenseTypes;
     competencyTypes = CompetencyTypes;
+    competencyLevels = [
+        { id: 'اعلی', name: 'اعلی' },
+        { id: 'اوسط', name: 'اوسط' },
+        { id: 'ادنی', name: 'ادنی' }
+    ];
 
     // Relocation list
     relocationsList: PetitionWriterRelocation[] = [];
@@ -52,6 +58,9 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     // RBAC
     canEdit = false;
     isViewOnly = false;
+    isAdmin = false;
+    hasProvinceAccess = false;
+    userProvinceId: number | null = null;
 
     constructor(
         private fb: FormBuilder,
@@ -62,13 +71,14 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService,
         private sellerService: SellerService,
-        private rbacService: RbacService
+        private rbacService: RbacService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
         this.checkPermissions();
         this.initForms();
-        this.loadProvinces();
+        this.loadProvinces(); // This will call loadUserProvince after provinces are loaded
 
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
@@ -83,6 +93,28 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         const role = this.rbacService.getCurrentRole();
         this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager;
         this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PetitionWriterLicenseManager;
+        this.isAdmin = this.rbacService.isAdmin();
+        // Check if user has province-based access (not system-level)
+        this.hasProvinceAccess = role === UserRoles.CompanyRegistrar || role === UserRoles.PetitionWriterLicenseManager;
+    }
+
+    loadUserProvince(): void {
+        // Auto-populate province for users with province-based access (COMPANY_REGISTRAR, PETITION_WRITER_LICENSE_MANAGER)
+        if (this.hasProvinceAccess) {
+            this.authService.getCurrentUserProfile().subscribe({
+                next: (profile: any) => {
+                    this.userProvinceId = profile.provinceId;
+                    if (this.userProvinceId) {
+                        this.licenseForm.patchValue({ provinceId: this.userProvinceId });
+                        // Disable the province field for province-based users
+                        this.licenseForm.get('provinceId')?.disable();
+                    }
+                },
+                error: (error: any) => {
+                    console.error('Error loading user profile:', error);
+                }
+            });
+        }
     }
 
     initForms(): void {
@@ -102,7 +134,9 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             currentProvinceId: [null],
             currentDistrictId: [null],
             currentVillage: [''],
-            detailedAddress: ['']
+            detailedAddress: [''],
+            activityLocation: [''],
+            activityNahia: ['']
         });
 
         // Tab 2: ثبت مالیه و مشخصات جواز
@@ -112,6 +146,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             district: [''],
             licenseType: [null],
             licensePrice: [{ value: null, disabled: true }],
+            licenseCost: [{ value: null, disabled: true }],
             licenseIssueDate: [null],
             licenseExpiryDate: [null]
         });
@@ -144,6 +179,10 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         this.licenseService.getProvinces().subscribe({
             next: (data: any) => {
                 this.provinces = data;
+                // After provinces are loaded, set user province if user has province-based access and not in edit mode
+                if (this.hasProvinceAccess && !this.isEditMode) {
+                    this.loadUserProvince();
+                }
             },
             error: (err: any) => console.error('Error loading provinces', err)
         });
@@ -195,7 +234,9 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     currentProvinceId: data.currentProvinceId,
                     currentDistrictId: data.currentDistrictId,
                     currentVillage: data.currentVillage,
-                    detailedAddress: data.detailedAddress
+                    detailedAddress: data.detailedAddress,
+                    activityLocation: data.activityLocation,
+                    activityNahia: data.activityNahia
                 });
 
                 // Set imageName from existing picturePath
@@ -222,6 +263,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                     district: data.district,
                     licenseType: data.licenseType,
                     licensePrice: data.licensePrice,
+                    licenseCost: data.licenseCost,
                     licenseIssueDate: data.licenseIssueDate,
                     licenseExpiryDate: data.licenseExpiryDate
                 });
@@ -273,7 +315,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         }
 
         const calendar = this.calendarService.getSelectedCalendar();
-        const formData = this.licenseForm.value;
+        // Use getRawValue() to include disabled fields (like provinceId for province-based users)
+        const formData = this.licenseForm.getRawValue();
         const financialData = this.financialForm.value;
 
         // Get date values
@@ -300,6 +343,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             district: financialData.district,
             licenseType: financialData.licenseType,
             licensePrice: financialData.licensePrice,
+            licenseCost: financialData.licenseCost,
             licenseIssueDate,
             licenseExpiryDate,
             licenseStatus: this.cancellationForm.value.licenseStatus,
@@ -473,10 +517,9 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     onProvinceChange(): void {
         const provinceId = this.licenseForm.get('provinceId')?.value;
         if (provinceId) {
-            this.licenseForm.get('licenseNumber')?.disable();
+            // Clear license number so backend can auto-generate it
+            // Keep it enabled so it's included in form submission
             this.licenseForm.patchValue({ licenseNumber: '' });
-        } else {
-            this.licenseForm.get('licenseNumber')?.enable();
         }
     }
 
@@ -489,7 +532,10 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         
         // Set price based on license type
         if (selectedType) {
-            this.financialForm.patchValue({ licensePrice: selectedType.price });
+            this.financialForm.patchValue({ 
+                licensePrice: selectedType.price,
+                licenseCost: selectedType.price 
+            });
         }
         
         // Handle expiry date

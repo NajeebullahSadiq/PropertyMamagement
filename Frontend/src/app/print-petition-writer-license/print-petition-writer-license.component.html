@@ -14,6 +14,50 @@
   <p>{{ error }}</p>
 </div>
 
+<!-- Force table column widths -->
+<style>
+  .data-table {
+    table-layout: auto !important;
+  }
+  .table-header {
+    font-size: 17px !important;
+  }
+  .table-label {
+    width: 10% !important;
+    min-width: 80px !important;
+    max-width: 120px !important;
+    white-space: nowrap !important;
+    font-size: 15px !important;
+  }
+  .table-value {
+    width: 23.33% !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    font-size: 15px !important;
+  }
+  .bottom-header {
+    font-size: 15px !important;
+  }
+  .bottom-text-center {
+    font-size: 14px !important;
+  }
+  .bottom-text-justify {
+    font-size: 13px !important;
+  }
+  .info-row {
+    font-size: 13px !important;
+  }
+  .info-value {
+    font-size: 13px !important;
+  }
+  .meta-label {
+    font-size: 15px !important;
+  }
+  .meta-value {
+    font-size: 16px !important;
+  }
+</style>
+
 <!-- Main License Page -->
 <div class="certificate-page" *ngIf="!isLoading && !error">
   <div class="certificate-wrapper">
@@ -102,17 +146,12 @@
 
           <!-- Center Column: Ministry Info -->
           <div class="header-center">
-            <h1 class="ministry-title">امارت اسلامی افغانستان</h1>
-            <div class="ministry-divider">
-              <span class="divider-line"></span>
-              <span class="divider-diamond">◆</span>
-              <span class="divider-line"></span>
-            </div>
+            <img src="/assets/img/islamicLogo.png" alt="imerat" class="islamic-logo">
             <h2 class="ministry-name">وزارت عدلیه</h2>
+            <h3 class="department-name"> معینیت مالی و اداری</h3>
             <h3 class="department-name">ریاست عمومی انسجام</h3>
             <h4 class="sub-department">ریاست امور رهنمای معاملات و عریضه نویسان</h4>
-            <h4 class="sub-department">آمریت رهنمای معاملات و عریضه نویسان</h4>
-            <h4 class="sub-department">مدیریت بررسی و ثبت جواز عریضه نویسان</h4>
+            <h1 class="sub-department">جواز فعالیت عریضه نویسی</h1>
           </div>
 
           <!-- Left Column: Logo & Photo -->
@@ -138,7 +177,7 @@
               <tr>
                 <th colspan="2" class="table-header">شهرت و سکونت اصلی</th>
                 <th colspan="2" class="table-header">سکونت فعلی</th>
-                <th colspan="2" class="table-header">محل فعالیت</th>
+                <th colspan="2" class="table-header"> ساحه فعالیت</th>
               </tr>
             </thead>
             <tbody>
@@ -148,15 +187,15 @@
                 <td class="table-label">ولایت</td>
                 <td class="table-value">{{ data.currentProvinceName || '-' }}</td>
                 <td class="table-label">ناحیه</td>
-                <td class="table-value">{{ data.district || '-' }}</td>
+                <td class="table-value">{{ data.activityNahia || '-' }}</td>
               </tr>
               <tr>
                 <td class="table-label">ولد</td>
                 <td class="table-value">{{ data.applicantFatherName || '-' }}</td>
                 <td class="table-label">ولسوالی</td>
                 <td class="table-value">{{ data.currentDistrictName || '-' }}</td>
-                <td class="table-label">ادرس دقیق</td>
-                <td class="table-value">{{ data.detailedAddress || '-' }}</td>
+                <td class="table-label">محل فعالیت</td>
+                <td class="table-value">{{ data.activityLocation || '-' }}</td>
               </tr>
               <tr>
                 <td class="table-label">نمبر تذکره</td>
@@ -171,7 +210,7 @@
                 <td class="table-value">{{ data.permanentProvinceName || '-' }}</td>
                 <td class="table-label">قریه / گذر</td>
                 <td class="table-value">{{ data.currentVillage || '-' }}</td>
-                <td class="table-label"></td>
+                <td class="table-label"> </td>
                 <td class="table-value"></td>
               </tr>
               <tr>
@@ -205,7 +244,7 @@
             </thead>
             <tbody>
               <tr>
-                 <td class="bottom-cell">
+                <td class="bottom-cell">
                   <div class="info-row">
                     <span>اعتبار از تاریخ:</span>
                     <span class="info-value">{{ data.licenseIssueDateFormatted || '-' }}</span>
@@ -222,7 +261,7 @@
                   </div>
                   <div class="bottom-text-center">مهر</div>
                 </td>
-               
+
                 <td class="bottom-cell">
                   <div class="bottom-text-center">ریاست عمومی انسجام</div>
                   <div class="signature-space"></div>

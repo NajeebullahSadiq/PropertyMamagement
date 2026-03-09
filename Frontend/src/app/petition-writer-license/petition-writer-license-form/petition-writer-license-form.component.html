@@ -20,10 +20,14 @@
               <!-- Province Selection -->
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت <span class="text-red-500">*</span></label>
-                <ng-select formControlName="provinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onProvinceChange()" class="custom-ng-select"></ng-select>
+                <ng-select formControlName="provinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onProvinceChange()" [disabled]="hasProvinceAccess" class="custom-ng-select" placeholder="ولایت را انتخاب کنید"></ng-select>
                 <div *ngIf="licenseForm.get('provinceId')?.invalid && licenseForm.get('provinceId')?.touched">
                   <small class="text-red-600 text-xs mt-1 block">ولایت الزامی است</small>
                 </div>
+                <!-- Show message for province-based users -->
+                <small *ngIf="hasProvinceAccess && userProvinceId" class="text-blue-600 text-xs mt-1 block">
+                  <i class="fas fa-info-circle"></i> ولایت از پروفایل شما خودکار انتخاب شده است
+                </small>
               </div>
               <!-- License Number -->
               <div>
@@ -51,6 +55,14 @@
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">نام پدر کلان</label>
                 <input type="text" formControlName="applicantGrandFatherName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">شماره تماس</label>
+                <input type="text" formControlName="mobileNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="07XX XXX XXX">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">درجه اهلیت</label>
+                <ng-select formControlName="competency" [items]="competencyLevels" [selectOnTab]="true" bindLabel="name" bindValue="id" class="custom-ng-select" placeholder="درجه اهلیت را انتخاب کنید"></ng-select>
               </div>
             </div>
           </div>
@@ -131,14 +143,18 @@
           <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <i class="fas fa-building"></i>
-              <span>محل فعالیت</span>
+              <span>ساحه فعالیت</span>
             </h2>
           </div>
           <div class="px-6 py-6">
-            <div class="grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">محل فعالیت عریضه‌نویس</label>
                 <input type="text" formControlName="activityLocation" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه</label>
+                <input type="text" formControlName="activityNahia" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="مثال: ناحیه اول">
               </div>
             </div>
           </div>
@@ -188,6 +204,10 @@
                 <ng-select [items]="licenseTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="licenseType" class="custom-ng-select"></ng-select>
               </div>
               <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">قیمت</label>
+                <input type="number" formControlName="licenseCost" readonly class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
+              </div>
+              <div>
                 <app-multi-calendar-datepicker formControlName="licenseIssueDate" label="تاریخ صدور جواز"></app-multi-calendar-datepicker>
               </div>
               <div>
@@ -223,7 +243,7 @@
           <div class="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <i class="fas fa-exchange-alt"></i>
-              <span>نقل مکان / محل فعالیت</span>
+              <span>نقل مکان / ساحه فعالیت</span>
             </h2>
           </div>
           <div class="px-6 py-6">

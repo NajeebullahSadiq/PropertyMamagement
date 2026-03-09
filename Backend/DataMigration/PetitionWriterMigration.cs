@@ -95,12 +95,21 @@ namespace DataMigration
         private static async Task MigrateAllPetitionWriterRecords(List<PetitionWriterRecord> records)
         {
             int processedCount = 0;
+            int sequenceNumber = 1; // Start sequence for KBL licenses
             
-            foreach (var record in records)
+            // Sort records by source year and original order to maintain chronological sequence
+            // Use null-safe sorting: nulls go to the end
+            var sortedRecords = records
+                .OrderBy(r => r.SourceYear ?? int.MaxValue)
+                .ThenBy(r => GetLicenseNumberString(r.LicenseNumber) ?? string.Empty)
+                .ToList();
+            
+            foreach (var record in sortedRecords)
             {
                 try
                 {
-                    await MigratePetitionWriterRecord(record);
+                    await MigratePetitionWriterRecord(record, sequenceNumber);
+                    sequenceNumber++; // Increment for next record
                     processedCount++;
                     
                     if (processedCount % 50 == 0)
@@ -122,7 +131,7 @@ namespace DataMigration
             }
         }
         
-        private static async Task MigratePetitionWriterRecord(PetitionWriterRecord record)
+        private static async Task MigratePetitionWriterRecord(PetitionWriterRecord record, int sequenceNumber)
         {
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -131,39 +140,44 @@ namespace DataMigration
                 {
                     try
                     {
-                        // Get license number as string
-                        string licenseNumber = GetLicenseNumberString(record.LicenseNumber);
+                        // Generate new license number in format: KBL-00000001
+                        string newLicenseNumber = $"KBL-{sequenceNumber:D8}";
                         
-                        if (string.IsNullOrWhiteSpace(licenseNumber))
+                        // Get original license number for reference
+                        string originalLicenseNumber = GetLicenseNumberString(record.LicenseNumber);
+                        
+                        if (string.IsNullOrWhiteSpace(originalLicenseNumber))
                         {
                             stats.Skipped.Add(new PetitionWriterSkipped
                             {
                                 ApplicantName = record.ApplicantName ?? "Unknown",
-                                Reason = "Missing license number",
+                                Reason = "Missing original license number",
                                 SourceYear = record.SourceYear ?? 0
                             });
                             await transaction.CommitAsync();
                             return;
                         }
                         
-                        // Check if license already exists
-                        bool licenseExists = await CheckLicenseExists(licenseNumber, conn, transaction);
+                        // Check if new license number already exists (shouldn't happen with sequential generation)
+                        bool licenseExists = await CheckLicenseExists(newLicenseNumber, conn, transaction);
                         
                         if (licenseExists)
                         {
                             stats.Skipped.Add(new PetitionWriterSkipped
                             {
                                 ApplicantName = record.ApplicantName ?? "Unknown",
-                                Reason = $"License {licenseNumber} already exists",
+                                Reason = $"License {newLicenseNumber} already exists",
                                 SourceYear = record.SourceYear ?? 0
                             });
                             await transaction.CommitAsync();
                             return;
                         }
                         
-                        // Insert PetitionWriterLicense
-                        await InsertPetitionWriterLicense(record, licenseNumber, conn, transaction);
+                        // Insert PetitionWriterLicense with new license number
+                        await InsertPetitionWriterLicense(record, newLicenseNumber, conn, transaction);
                         stats.LicensesCreated++;
+                        
+                        Console.WriteLine($"Migrated: {originalLicenseNumber} -> {newLicenseNumber} ({record.ApplicantName})");
                         
                         await transaction.CommitAsync();
                     }

@@ -2,7 +2,7 @@
    PETITION WRITER LICENSE - A4 Landscape
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Scheherazade+New:wght@400;700&display=swap');
 
 :host {
   --primary-900: #0d47a1;
@@ -16,22 +16,35 @@
   --primary-100: #bbdefb;
   --primary-50: #e3f2fd;
   
+  --gold-600: #d4a017;
   --gold-500: #f4c430;
   --gold-400: #ffd54f;
+  --gold-300: #ffe082;
+  --gold-100: #fff8e1;
   
   --accent-red: #c62828;
+  --accent-red-light: #ef5350;
   
   --neutral-900: #1a1a2e;
   --neutral-800: #2d2d44;
   --neutral-700: #404060;
   --neutral-600: #555577;
   --neutral-500: #6b6b8a;
+  --neutral-400: #8888a4;
+  --neutral-300: #a5a5bd;
+  --neutral-200: #c4c4d6;
+  --neutral-100: #e8e8f0;
+  --neutral-50: #f5f5fa;
   
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
   --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
   
-  --font-display: 'Amiri', 'B Nazanin', serif;
-  --font-heading: 'Cairo', 'Tajawal', 'B Nazanin', sans-serif;
-  --font-body: 'Noto Naskh Arabic', 'Cairo', 'B Nazanin', 'Tahoma', sans-serif;
+  /* Premium Typography Stack - Unified Font matching company license */
+  --font-display: 'Amiri', 'Scheherazade New', 'B Nazanin', serif;
+  --font-heading: 'Amiri', 'Scheherazade New', 'B Nazanin', serif;
+  --font-body: 'Amiri', 'Scheherazade New', 'B Nazanin', serif;
   --font-mono: 'Courier New', 'Consolas', monospace;
 }
 
@@ -327,9 +340,9 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding-bottom: 3px;
+  padding-bottom: 6px;
   border-bottom: 2px solid var(--primary-100);
-  margin-bottom: 3px;
+  margin-bottom: 6px;
   flex-shrink: 0;
 }
 
@@ -337,135 +350,229 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 18%;
+  width: 22%;
 }
 
 .emblem-container {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .national-emblem {
-  width: 75px;
+  width: 90px;
   height: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .license-meta {
-  text-align: center;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  direction: rtl;
+  width: 100%;
 }
 
 .meta-item {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 2px;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  direction: rtl;
+  width: 100%;
   
   .meta-label {
-    font-size: 9px;
+    font-size: 13px;
     color: var(--neutral-600);
     font-weight: 600;
+    font-family: var(--font-body);
+    letter-spacing: 0.2px;
+    text-align: right;
+    white-space: nowrap;
   }
   
   .meta-value {
-    font-size: 10px;
+    font-size: 15px;
     color: var(--primary-800);
     font-weight: 800;
     font-family: var(--font-heading);
-    padding: 1px 4px;
-    background: var(--primary-50);
+    letter-spacing: 0.3px;
+    display: inline-block;
+    direction: ltr;
+    text-align: right;
+    white-space: nowrap;
+    
+    /* Enhanced security watermark effect for license number */
+    position: relative;
+    text-shadow: 
+      0 0 1px rgba(255, 255, 255, 0.8),
+      0 1px 2px rgba(25, 118, 210, 0.12),
+      0 2px 4px rgba(25, 118, 210, 0.08);
+    
+    /* More visible microprint background */
+    background: 
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        rgba(25, 118, 210, 0.05) 2px,
+        rgba(25, 118, 210, 0.05) 3px
+      ),
+      linear-gradient(135deg, rgba(227, 242, 253, 0.3) 0%, rgba(255, 255, 255, 0.5) 100%);
+    padding: 2px 6px;
     border-radius: 2px;
+    
+    /* Microprint pattern */
+    &::before {
+      content: '━━━━━━━━━━━━━━━━━━━━';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      font-size: 4px;
+      line-height: 1;
+      color: var(--primary-400);
+      opacity: 0.15;
+      z-index: -1;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+      overflow: hidden;
+      white-space: nowrap;
+    }
   }
 }
 
 .header-center {
   flex: 1;
   text-align: center;
-  padding: 0 10px;
+  padding: 0 5px;
+}
+
+.islamic-logo {
+  height: 50px;
+  width: auto;
+  margin: 0 auto 4px auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .ministry-title {
-  font-size: 18px;
-  font-weight: 900;
-  font-family: var(--font-display);
-  color: var(--neutral-900);
-  margin: 0 0 2px 0;
-  line-height: 1.2;
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  font-family: var(--font-display) !important;
+  color: var(--neutral-900) !important;
+  margin: 0 0 4px 0 !important;
+  letter-spacing: 1.5px !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  line-height: 1.3 !important;
 }
 
 .ministry-divider {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 2px 0;
+  margin: 6px 0;
   
   .divider-line {
-    width: 50px;
+    width: 60px;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--primary-400), transparent);
   }
   
   .divider-diamond {
-    margin: 0 8px;
+    margin: 0 10px;
     color: var(--gold-500);
-    font-size: 8px;
+    font-size: 10px;
   }
 }
 
 .ministry-name {
-  font-size: 15px;
-  font-weight: 800;
-  font-family: var(--font-heading);
-  color: var(--primary-800);
-  margin: 0 0 1px 0;
-  line-height: 1.3;
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  font-family: var(--font-heading) !important;
+  color: var(--neutral-900) !important;
+  margin: 0 0 2px 0 !important;
+  letter-spacing: 0.8px !important;
+  line-height: 1.4 !important;
 }
 
 .department-name {
-  font-size: 12px;
-  font-weight: 700;
-  font-family: var(--font-heading);
-  color: var(--primary-700);
-  margin: 0 0 1px 0;
-  line-height: 1.3;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  font-family: var(--font-heading) !important;
+  color: var(--neutral-900) !important;
+  margin: 0 0 2px 0 !important;
+  letter-spacing: 0.5px !important;
+  line-height: 1.4 !important;
 }
 
 .sub-department {
-  font-size: 10px;
-  font-weight: 600;
-  font-family: var(--font-body);
-  color: var(--primary-600);
-  margin: 0;
-  line-height: 1.4;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  font-family: var(--font-body) !important;
+  color: var(--neutral-900) !important;
+  margin: 0 !important;
+  letter-spacing: 0.3px !important;
+  line-height: 1.5 !important;
 }
 
 .header-left {
   width: 18%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  padding-left: 0;
+  align-items: center;
+  position: relative;
 }
 
 .logo-photo-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  margin: 0;
 }
 
 .ministry-logo {
-  height: 70px;
-  width: auto;
+  height: 75px;
+  width: 110px;
+  object-fit: contain;
+  object-position: center center;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  display: block;
+  margin: 0 auto;
 }
 
 .photo-container {
   text-align: center;
+  margin: 0 auto;
 }
 
 .photo-frame {
-  width: 100px;
-  height: 120px;
-  border: 4px solid var(--primary-700);
-  border-radius: 3px;
+  width: 110px;
+  height: 130px;
+  border: 3px solid var(--primary-600);
+  border-radius: 4px;
   overflow: hidden;
-  background: var(--primary-50);
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+  background: linear-gradient(135deg, var(--primary-50) 0%, #fff 100%);
+  box-shadow: 
+    0 4px 12px rgba(25, 118, 210, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    pointer-events: none;
+  }
 }
 
 .owner-photo {
@@ -478,7 +585,6 @@
   font-size: 8px;
   color: var(--neutral-500);
   margin-top: 2px;
-  font-weight: 600;
 }
 
 /* Title Banner */
@@ -535,17 +641,17 @@
   border: 3px solid #1976d2;
   margin-bottom: 0;
   box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .table-header {
   background: linear-gradient(180deg, #1976d2 0%, #1565c0 100%);
   color: #fff;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
   font-family: var(--font-heading);
   text-align: center;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border: 2px solid #1976d2;
   letter-spacing: 0.5px;
   width: 33.33%;
@@ -554,29 +660,35 @@
 .table-label {
   background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   color: #0d47a1;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   font-family: var(--font-heading);
-  padding: 5px 8px;
+  padding: 6px 8px;
   border: 2px solid #1976d2;
   text-align: right;
-  width: 16.66%;
+  width: 10% !important;
+  min-width: 80px;
+  max-width: 120px;
   vertical-align: middle;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .table-value {
   background: #fff;
   color: #1a1a2e;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   font-family: var(--font-body);
-  padding: 5px 8px;
+  padding: 6px 10px;
   border: 2px solid #1976d2;
   text-align: right;
-  width: 16.67%;
+  width: 23.33% !important;
   vertical-align: middle;
   letter-spacing: 0.2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 /* Bottom Three Columns Table */
@@ -593,21 +705,21 @@
 .bottom-header {
   background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   color: #0d47a1;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   font-family: var(--font-heading);
   text-align: center;
-  padding: 5px 6px;
+  padding: 6px 8px;
   border: 2px solid #1976d2;
   letter-spacing: 0.4px;
 }
 
 .bottom-cell {
   background: #fff;
-  padding: 4px 6px;
+  padding: 6px 8px;
   border: 2px solid #1976d2;
   vertical-align: top;
-  height: 50px;
+  height: 60px;
 }
 
 .bottom-text-center {
@@ -615,31 +727,31 @@
   font-weight: 700;
   font-family: var(--font-heading);
   color: #0d47a1;
-  margin: 2px 0;
-  font-size: 10px;
+  margin: 3px 0;
+  font-size: 13px;
   letter-spacing: 0.3px;
 }
 
 .bottom-text-justify {
-  font-size: 9px;
-  line-height: 1.4;
+  font-size: 12px;
+  line-height: 1.5;
   text-align: justify;
   color: #2d2d44;
   font-weight: 600;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   letter-spacing: 0.1px;
 }
 
 .signature-space {
-  height: 15px;
+  height: 20px;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2px 0;
-  font-size: 9px;
+  padding: 3px 0;
+  font-size: 12px;
   font-weight: 600;
   border-bottom: 1px dashed #90caf9;
   color: #2d2d44;
@@ -654,12 +766,12 @@
   color: #0d47a1;
   font-weight: 800;
   font-family: var(--font-heading);
-  padding: 2px 5px;
+  padding: 3px 6px;
   background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   border-radius: 2px;
   border: 1px solid #90caf9;
   letter-spacing: 0.2px;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 /* Footer Section */

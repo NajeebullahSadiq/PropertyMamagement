@@ -148,4 +148,8 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
         const found = LicenseStatusTypes.find(s => s.id === item.licenseStatus);
         return found ? found.name : 'نامشخص';
     }
+
+    printLicense(id: number): void {
+        window.open(`/printPetitionWriterLicense/${id}`, '_blank');
+    }
 }

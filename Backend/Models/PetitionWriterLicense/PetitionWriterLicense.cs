@@ -66,6 +66,14 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
         [MaxLength(1000)]
         public string? DetailedAddress { get; set; }
 
+        // Activity Location (محل فعالیت)
+        [MaxLength(500)]
+        public string? ActivityLocation { get; set; }
+
+        // Activity Nahia (ناحیه محل فعالیت)
+        [MaxLength(200)]
+        public string? ActivityNahia { get; set; }
+
         // Picture Path (عکس)
         [MaxLength(500)]
         public string? PicturePath { get; set; }
@@ -85,6 +93,9 @@ namespace WebAPIBackend.Models.PetitionWriterLicense
 
         // License Price - قیمت جواز
         public decimal? LicensePrice { get; set; }
+
+        // License Cost - قیمت (based on license type)
+        public decimal? LicenseCost { get; set; }
 
         public DateOnly? LicenseIssueDate { get; set; }
 
