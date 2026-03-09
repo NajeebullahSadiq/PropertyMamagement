@@ -55,7 +55,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
                 var items = await query
-                    .OrderByDescending(x => x.CreatedAt)
+                    .OrderByDescending(x => x.Id)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Include(x => x.Province)
