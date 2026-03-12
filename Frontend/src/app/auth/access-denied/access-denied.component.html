@@ -1,0 +1,51 @@
+<div class="access-denied-container">
+  <div class="access-denied-card">
+    <!-- Header with Logo -->
+    <div class="header-section">
+      <img src="/assets/img/mcitlogo.png" alt="Ministry Logo" class="ministry-logo">
+      <h1 class="ministry-title">د عدلیې وزارت</h1>
+      <p class="ministry-subtitle">وزارت عدلیه</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-section">
+      <div class="error-icon">🚫</div>
+      <h2 class="error-title">د رسائي اجازت نشته</h2>
+      <h2 class="error-title-dari">دسترسی مجاز نیست</h2>
+      
+      <p class="error-message">
+        معاف کړئ، دا پروګرام یوازې د افغانستان کې کارول کیدی شي.
+      </p>
+      <p class="error-message-dari">
+        متاسفانه، این برنامه تنها در افغانستان قابل استفاده است.
+      </p>
+
+      <!-- Country Info -->
+      <div class="country-info" *ngIf="!isLoading">
+        <p class="country-label">تاسو د دې ځای څخه رسائي کوئ:</p>
+        <p class="country-label-dari">شما از این مکان دسترسی دارید:</p>
+        <p class="country-value">{{ userCountry }} ({{ userCountryCode }})</p>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>د معلومات د لوډ کولو په انتظار...</p>
+      </div>
+
+      <!-- Instructions -->
+      <div class="instructions">
+        <h3>د مزید معلومات لپاره:</h3>
+        <h3>برای اطلاعات بیشتر:</h3>
+        <p>د عدلیې وزارت سره اړیکه ونیسئ</p>
+        <p>با وزارت عدلیه تماس بگیرید</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-section">
+      <p class="footer-text">© 2026 د عدلیې وزارت - وزارت عدلیه</p>
+      <p class="footer-text">Ministry of Justice - Afghanistan</p>
+    </div>
+  </div>
+</div>

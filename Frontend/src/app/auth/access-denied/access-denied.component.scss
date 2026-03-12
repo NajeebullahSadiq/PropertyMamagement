@@ -1,0 +1,211 @@
+.access-denied-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.access-denied-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header-section {
+  background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+
+  .ministry-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+    filter: brightness(0) invert(1);
+  }
+
+  .ministry-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 10px 0 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .ministry-subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    opacity: 0.9;
+    margin: 0;
+  }
+}
+
+.content-section {
+  padding: 40px 30px;
+  text-align: center;
+
+  .error-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+
+  .error-title {
+    color: #d32f2f;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 15px 0 5px;
+  }
+
+  .error-title-dari {
+    color: #d32f2f;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 20px;
+  }
+
+  .error-message {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 15px 0;
+  }
+
+  .error-message-dari {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 25px;
+  }
+
+  .country-info {
+    background: #f5f5f5;
+    border-left: 4px solid #1976d2;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 25px 0;
+
+    .country-label {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .country-label-dari {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .country-value {
+      color: #1976d2;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 10px 0 0;
+    }
+  }
+
+  .loading-state {
+    padding: 20px;
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #1976d2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    p {
+      color: #666;
+      font-size: 14px;
+    }
+  }
+
+  .instructions {
+    background: #e3f2fd;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 25px 0;
+
+    h3 {
+      color: #1565c0;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 10px;
+    }
+
+    p {
+      color: #555;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+  }
+}
+
+.footer-section {
+  background: #f5f5f5;
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+
+  .footer-text {
+    color: #999;
+    font-size: 12px;
+    margin: 5px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .access-denied-card {
+    margin: 20px;
+  }
+
+  .content-section {
+    padding: 30px 20px;
+  }
+
+  .error-icon {
+    font-size: 48px;
+  }
+
+  .error-title,
+  .error-title-dari {
+    font-size: 20px;
+  }
+
+  .error-message,
+  .error-message-dari {
+    font-size: 14px;
+  }
+}

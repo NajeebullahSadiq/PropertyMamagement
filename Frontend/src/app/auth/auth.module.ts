@@ -6,6 +6,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { AuthRoutingModule } from './auth-routing.module';
 import { AuthComponent } from './auth.component';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
+import { AccessDeniedComponent } from './access-denied/access-denied.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { UploadComponent } from './register/upload/upload.component';
@@ -20,7 +21,8 @@ import { SharedModule } from '../shared/shared.module';
     LoginComponent,
     RegisterComponent,
     UploadComponent,
-    ForbiddenComponent
+    ForbiddenComponent,
+    AccessDeniedComponent
   ],
   imports: [
     CommonModule,

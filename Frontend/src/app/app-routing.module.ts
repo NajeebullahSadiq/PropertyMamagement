@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/authSetting/auth.guard';
+import { GeolocationGuard } from './auth/authSetting/geolocation.guard';
 import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard, DashboardGuard, SecuritiesModuleGuard, PetitionWriterModuleGuard, ActivityMonitoringGuard } from './auth/authSetting/role.guard';
 import { ForbiddenComponent } from './auth/forbidden/forbidden.component';
+import { AccessDeniedComponent } from './auth/access-denied/access-denied.component';
 import { PrintComponent } from './print/print.component';
 import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
 import { PrintLicenseComponent } from './print-license/print-license.component';
@@ -16,17 +18,22 @@ import { UserReportComponent } from './dashboard/user-report/user-report.compone
 import { RegisterComponent } from './auth/register/register.component';
 
 const routes: Routes = [
-  // Auth routes - standalone without masterlayout
-  { path: '', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) }, 
+  // Access Denied Route (no geolocation check needed)
+  { path: 'access-denied', component: AccessDeniedComponent },
+  
+  // Auth routes - standalone without masterlayout (with geolocation check)
+  { path: '', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule), canActivate: [GeolocationGuard] }, 
   { path: 'Auth', redirectTo: '', pathMatch: 'full' },
   { path: 'Auth/Login', redirectTo: '', pathMatch: 'full' },
-  // Public verification portal (no auth required)
-  { path: 'verify', loadChildren: () => import('./verify/verify.module').then(m => m.VerifyModule) },
-  // Register page with master layout (authenticated)
+  
+  // Public verification portal (with geolocation check)
+  { path: 'verify', loadChildren: () => import('./verify/verify.module').then(m => m.VerifyModule), canActivate: [GeolocationGuard] },
+  
+  // Register page with master layout (authenticated + geolocation)
   { 
     path: 'Auth/Register', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [GeolocationGuard, AuthGuard],
     children: [
       { path: '', component: RegisterComponent }
     ]
@@ -34,7 +41,7 @@ const routes: Routes = [
   { 
     path: 'dashboard', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, DashboardGuard],
+    canActivate: [GeolocationGuard, AuthGuard, DashboardGuard],
     children: [
       { path: '', component: DashboardComponent }
     ]
@@ -42,7 +49,7 @@ const routes: Routes = [
   { 
     path: 'estate', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, PropertyModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, PropertyModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./estate/estate.module').then(m => m.EstateModule) }
     ]
@@ -50,7 +57,7 @@ const routes: Routes = [
   { 
     path: 'realestate', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, CompanyModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, CompanyModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./realestate/realestate.module').then(m => m.RealestateModule) }
     ]
@@ -58,7 +65,7 @@ const routes: Routes = [
   { 
     path: 'vehicle', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, VehicleModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, VehicleModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./vehicle/vehicle.module').then(m => m.VehicleModule) }
     ]
@@ -66,7 +73,7 @@ const routes: Routes = [
   { 
     path: 'report', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [GeolocationGuard, AuthGuard],
     children: [
       { path: '', component: ReportComponent }
     ]
@@ -74,7 +81,7 @@ const routes: Routes = [
   { 
     path: 'userreport', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [GeolocationGuard, AuthGuard],
     children: [
       { path: '', component: UserReportComponent }
     ]
@@ -82,7 +89,7 @@ const routes: Routes = [
   { 
     path: 'users', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, AdminGuard],
+    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
     children: [
       { path: '', loadChildren: () => import('./users/users.module').then(m => m.UsersModule) }
     ]
@@ -90,7 +97,7 @@ const routes: Routes = [
   { 
     path: 'securities', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, SecuritiesModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, SecuritiesModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./securities/securities.module').then(m => m.SecuritiesModule) }
     ]
@@ -98,7 +105,7 @@ const routes: Routes = [
   { 
     path: 'securities-control', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, SecuritiesModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, SecuritiesModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./securities-control/securities-control.module').then(m => m.SecuritiesControlModule) }
     ]
@@ -106,7 +113,7 @@ const routes: Routes = [
   { 
     path: 'petition-writer-securities', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, PetitionWriterModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./petition-writer-securities/petition-writer-securities.module').then(m => m.PetitionWriterSecuritiesModule) }
     ]
@@ -114,7 +121,7 @@ const routes: Routes = [
   { 
     path: 'securities-report', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, SecuritiesModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, SecuritiesModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./securities-report/securities-report.module').then(m => m.SecuritiesReportModule) }
     ]
@@ -122,7 +129,7 @@ const routes: Routes = [
   { 
     path: 'petition-writer-report', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, PetitionWriterModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./petition-writer-report/petition-writer-report.module').then(m => m.PetitionWriterReportModule) }
     ]
@@ -130,7 +137,7 @@ const routes: Routes = [
   { 
     path: 'license-applications', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, CompanyModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, CompanyModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./license-applications/license-applications.module').then(m => m.LicenseApplicationsModule) }
     ]
@@ -138,7 +145,7 @@ const routes: Routes = [
   { 
     path: 'petition-writer-license', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, PetitionWriterModuleGuard],
+    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterModuleGuard],
     children: [
       { path: '', loadChildren: () => import('./petition-writer-license/petition-writer-license.module').then(m => m.PetitionWriterLicenseModule) }
     ]
@@ -146,7 +153,7 @@ const routes: Routes = [
   { 
     path: 'activity-monitoring', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, ActivityMonitoringGuard],
+    canActivate: [GeolocationGuard, AuthGuard, ActivityMonitoringGuard],
     children: [
       { path: '', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule) }
     ]
@@ -154,24 +161,24 @@ const routes: Routes = [
   { 
     path: 'district-management', 
     component: MasterlayoutComponent,
-    canActivate: [AuthGuard, AdminGuard],
+    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
     children: [
       { path: '', loadChildren: () => import('./district-management/district-management.module').then(m => m.DistrictManagementModule) }
     ]
   },
   { path: 'forbidden', component: ForbiddenComponent },
-  { path: 'print/:id', component: PrintComponent },
-  { path: 'print', component: PrintComponent },
-  { path: 'printvehicledata/:id', component: PrintvehicledataComponent },
-  { path: 'printvehicledata', component: PrintvehicledataComponent },
-  { path: 'printLicense/:id', component: PrintLicenseComponent },
-  { path: 'printLicense', component: PrintLicenseComponent },
-  { path: 'printSecurities/:id', component: PrintSecuritiesComponent },
-  { path: 'printSecurities', component: PrintSecuritiesComponent },
-  { path: 'printPetitionWriterSecurities/:id', component: PrintPetitionWriterSecuritiesComponent },
-  { path: 'printPetitionWriterSecurities', component: PrintPetitionWriterSecuritiesComponent },
-  { path: 'printPetitionWriterLicense/:id', component: PrintPetitionWriterLicenseComponent },
-  { path: 'printPetitionWriterLicense', component: PrintPetitionWriterLicenseComponent },
+  { path: 'print/:id', component: PrintComponent, canActivate: [GeolocationGuard] },
+  { path: 'print', component: PrintComponent, canActivate: [GeolocationGuard] },
+  { path: 'printvehicledata/:id', component: PrintvehicledataComponent, canActivate: [GeolocationGuard] },
+  { path: 'printvehicledata', component: PrintvehicledataComponent, canActivate: [GeolocationGuard] },
+  { path: 'printLicense/:id', component: PrintLicenseComponent, canActivate: [GeolocationGuard] },
+  { path: 'printLicense', component: PrintLicenseComponent, canActivate: [GeolocationGuard] },
+  { path: 'printSecurities/:id', component: PrintSecuritiesComponent, canActivate: [GeolocationGuard] },
+  { path: 'printSecurities', component: PrintSecuritiesComponent, canActivate: [GeolocationGuard] },
+  { path: 'printPetitionWriterSecurities/:id', component: PrintPetitionWriterSecuritiesComponent, canActivate: [GeolocationGuard] },
+  { path: 'printPetitionWriterSecurities', component: PrintPetitionWriterSecuritiesComponent, canActivate: [GeolocationGuard] },
+  { path: 'printPetitionWriterLicense/:id', component: PrintPetitionWriterLicenseComponent, canActivate: [GeolocationGuard] },
+  { path: 'printPetitionWriterLicense', component: PrintPetitionWriterLicenseComponent, canActivate: [GeolocationGuard] },
 ];
 
 @NgModule({
