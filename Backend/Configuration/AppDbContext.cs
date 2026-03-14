@@ -304,7 +304,7 @@ namespace WebAPIBackend.Configuration
             {
                 entity.HasKey(e => e.Id).HasName("PetitionWriterSecurities_pkey");
 
-                entity.ToTable("PetitionWriterSecurities", "org");
+                entity.ToTable("PetitionWriterSecurities", "sec");
 
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
