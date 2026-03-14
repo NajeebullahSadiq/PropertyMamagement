@@ -144,4 +144,31 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
         if (!item || !item.items) return 0;
         return item.items.reduce((sum, docItem) => sum + docItem.count, 0);
     }
+
+    getDocumentTypesList(item: SecuritiesDistribution): string {
+        if (!item || !item.items || item.items.length === 0) return '-';
+        
+        // Import DocumentTypes from the model
+        const DocumentTypes = [
+            { id: 1, name: 'سټه یی خرید و فروش' },
+            { id: 2, name: 'سټه یی بیع وفا' },
+            { id: 3, name: 'سټه یی کرایی' },
+            { id: 4, name: 'سټه وسایط نقلیه' },
+            { id: 5, name: 'کتاب ثبت' },
+            { id: 6, name: 'کتاب ثبت مثنی' }
+        ];
+        
+        // Get unique document types
+        const uniqueTypes = [...new Set(item.items.map(i => i.documentType))];
+        
+        // Map to names
+        const typeNames = uniqueTypes
+            .map(typeId => {
+                const docType = DocumentTypes.find(dt => dt.id === typeId);
+                return docType ? docType.name : `نوع ${typeId}`;
+            })
+            .filter(name => name);
+        
+        return typeNames.join('، ') || '-';
+    }
 }
