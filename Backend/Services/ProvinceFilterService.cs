@@ -52,7 +52,10 @@ namespace WebAPIBackend.Services
                    role == UserRoles.LicenseReviewer ||
                    role == UserRoles.LicenseApplicationManager ||
                    role == UserRoles.ActivityMonitoringManager ||
-                   role == UserRoles.SecuritiesManager;
+                   role == UserRoles.SecuritiesManager ||
+                   role == UserRoles.SecuritiesEntryManager ||
+                   role == UserRoles.PetitionWriterSecuritiesEntryManager ||
+                   role == UserRoles.PetitionWriterLicenseManager;
         }
 
         /// <summary>

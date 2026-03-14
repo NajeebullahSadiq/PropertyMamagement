@@ -205,7 +205,9 @@ export class RegisterComponent implements OnInit {
             selectedRole === UserRoles.LicenseReviewer ||
             selectedRole === UserRoles.LicenseApplicationManager ||
             selectedRole === UserRoles.ActivityMonitoringManager ||
-            selectedRole === UserRoles.SecuritiesManager) {
+            selectedRole === UserRoles.SecuritiesManager ||
+            selectedRole === UserRoles.SecuritiesEntryManager ||
+            selectedRole === UserRoles.PetitionWriterSecuritiesEntryManager) {
           // System-level roles don't need company or province
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');

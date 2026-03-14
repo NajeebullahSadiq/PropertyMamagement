@@ -18,6 +18,8 @@ export interface PetitionWriterSecurities {
     serialNumberEnd: string;
     distributionDate?: Date | string;
     distributionDateFormatted?: string;
+    deliveryDate?: Date | string;
+    deliveryDateFormatted?: string;
 
     // Audit Fields
     createdAt?: Date;
@@ -42,6 +44,7 @@ export interface PetitionWriterSecuritiesData {
     serialNumberStart: string;
     serialNumberEnd: string;
     distributionDate?: string;
+    deliveryDate?: string;
 }
 
 /**

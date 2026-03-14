@@ -50,4 +50,7 @@ public class PetitionWriterSecuritiesData
 
     [Required(ErrorMessage = "تاریخ توزیع عریضه الزامی است")]
     public DateOnly? DistributionDate { get; set; }
+
+    [Required(ErrorMessage = "تاریخ تحویلی اویز الزامی است")]
+    public DateOnly? DeliveryDate { get; set; }
 }

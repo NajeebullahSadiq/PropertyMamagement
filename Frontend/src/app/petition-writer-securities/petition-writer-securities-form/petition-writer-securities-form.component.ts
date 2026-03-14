@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PetitionWriterSecuritiesService } from 'src/app/shared/petition-writer-securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { RbacService } from 'src/app/shared/rbac.service';
 import { PetitionWriterSecuritiesData } from 'src/app/models/PetitionWriterSecurities';
 
 @Component({
@@ -16,6 +17,7 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
     petitionForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
+    canEdit = true;
 
     constructor(
         private fb: FormBuilder,
@@ -24,16 +26,27 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
         private toastr: ToastrService,
         private petitionService: PetitionWriterSecuritiesService,
         private calendarService: CalendarService,
-        private calendarConversionService: CalendarConversionService
+        private calendarConversionService: CalendarConversionService,
+        private rbacService: RbacService
     ) {
         this.initForm();
     }
 
     ngOnInit(): void {
+        this.canEdit = this.rbacService.canEditPetitionWriterSecurities();
+        
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             this.isEditMode = true;
             this.editId = parseInt(id, 10);
+            
+            // SECURITIES_ENTRY_MANAGER cannot edit, redirect to list
+            if (!this.canEdit) {
+                this.toastr.warning('شما مجاز به ویرایش نیستید');
+                this.router.navigate(['/petition-writer-securities/list']);
+                return;
+            }
+            
             this.loadData(this.editId);
         }
         
@@ -41,6 +54,14 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
             if (params['id']) {
                 this.isEditMode = true;
                 this.editId = parseInt(params['id'], 10);
+                
+                // SECURITIES_ENTRY_MANAGER cannot edit, redirect to list
+                if (!this.canEdit) {
+                    this.toastr.warning('شما مجاز به ویرایش نیستید');
+                    this.router.navigate(['/petition-writer-securities/list']);
+                    return;
+                }
+                
                 this.loadData(this.editId);
             }
         });
@@ -54,11 +75,22 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
             petitionWriterFatherName: ['', [Validators.required, Validators.maxLength(200)]],
             licenseNumber: ['', [Validators.required, Validators.maxLength(50)]],
             petitionCount: [null, [Validators.required, Validators.min(1)]],
-            amount: [null, [Validators.required, Validators.min(0)]],
+            amount: [{ value: null, disabled: true }],
             bankReceiptNumber: ['', [Validators.required, Validators.maxLength(100)]],
             serialNumberStart: ['', [Validators.required, Validators.maxLength(100)]],
             serialNumberEnd: ['', [Validators.required, Validators.maxLength(100)]],
-            distributionDate: [null, [Validators.required]]
+            distributionDate: [null, [Validators.required]],
+            deliveryDate: [null, [Validators.required]]
+        });
+
+        // Auto-calculate amount when petitionCount changes
+        this.petitionForm.get('petitionCount')?.valueChanges.subscribe(value => {
+            if (value && value > 0) {
+                const calculatedAmount = value * 5;
+                this.petitionForm.get('amount')?.setValue(calculatedAmount);
+            } else {
+                this.petitionForm.get('amount')?.setValue(null);
+            }
         });
     }
 
@@ -80,6 +112,9 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
                 });
                 if (data.distributionDateFormatted) {
                     this.petitionForm.patchValue({ distributionDate: data.distributionDateFormatted });
+                }
+                if (data.deliveryDateFormatted) {
+                    this.petitionForm.patchValue({ deliveryDate: data.deliveryDateFormatted });
                 }
             },
             error: (err) => {
@@ -132,6 +167,7 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
         const data: PetitionWriterSecuritiesData = {
             ...formValue,
             distributionDate: formValue.distributionDate ? this.formatDateForBackend(formValue.distributionDate) : undefined,
+            deliveryDate: formValue.deliveryDate ? this.formatDateForBackend(formValue.deliveryDate) : undefined,
             calendarType: this.calendarService.getSelectedCalendar()
         };
 
@@ -192,4 +228,5 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
     get serialNumberStart() { return this.petitionForm.get('serialNumberStart'); }
     get serialNumberEnd() { return this.petitionForm.get('serialNumberEnd'); }
     get distributionDate() { return this.petitionForm.get('distributionDate'); }
+    get deliveryDate() { return this.petitionForm.get('deliveryDate'); }
 }

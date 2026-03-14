@@ -57,8 +57,8 @@ export class PetitionWriterSecuritiesListComponent implements OnInit, OnDestroy 
 
     checkPermissions(): void {
         const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator || role === UserRoles.SecuritiesManager;
+        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesEntryManager || role === UserRoles.PetitionWriterSecuritiesEntryManager;
+        this.canEdit = this.rbacService.canEditPetitionWriterSecurities();
         this.canPrint = role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
         this.canDelete = role === UserRoles.Admin;
         this.currentUserId = this.rbacService.getCurrentUserId();

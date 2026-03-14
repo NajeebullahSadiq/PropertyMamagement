@@ -51,6 +51,16 @@ namespace WebAPIBackend.Configuration
         public const string SecuritiesManager = "SECURITIES_MANAGER";
 
         /// <summary>
+        /// کاربر ثبت اسناد بهادار - Securities entry manager with create-only access to securities module
+        /// </summary>
+        public const string SecuritiesEntryManager = "SECURITIES_ENTRY_MANAGER";
+
+        /// <summary>
+        /// کاربر ثبت سند بهادار عریضه‌نویسان - Petition writer securities entry manager with create-only access
+        /// </summary>
+        public const string PetitionWriterSecuritiesEntryManager = "PETITION_WRITER_SECURITIES_ENTRY_MANAGER";
+
+        /// <summary>
         /// کاربر مدیریت جواز عریضه‌نویسان - Petition writer license manager with full access to petition writer license module
         /// </summary>
         public const string PetitionWriterLicenseManager = "PETITION_WRITER_LICENSE_MANAGER";
@@ -69,6 +79,8 @@ namespace WebAPIBackend.Configuration
             LicenseApplicationManager,
             ActivityMonitoringManager,
             SecuritiesManager,
+            SecuritiesEntryManager,
+            PetitionWriterSecuritiesEntryManager,
             PetitionWriterLicenseManager
         };
 
@@ -88,6 +100,8 @@ namespace WebAPIBackend.Configuration
                 LicenseApplicationManager => "کاربر مدیریت درخواست جواز",
                 ActivityMonitoringManager => "کاربر مدیریت نظارت بر فعالیت‌ها",
                 SecuritiesManager => "کاربر مدیریت اسناد بهادار",
+                SecuritiesEntryManager => "کاربر ثبت اسناد بهادار",
+                PetitionWriterSecuritiesEntryManager => "کاربر ثبت سند بهادار عریضه‌نویسان",
                 PetitionWriterLicenseManager => "کاربر مدیریت جواز عریضه‌نویسان",
                 _ => role
             };
@@ -259,6 +273,20 @@ namespace WebAPIBackend.Configuration
                     Permissions.PropertyView,
                     Permissions.VehicleView,
                     Permissions.ReportsView,
+                    Permissions.DashboardView
+                },
+
+                UserRoles.SecuritiesEntryManager => new[]
+                {
+                    // Create-only access to securities module (no edit)
+                    // No access to any other modules
+                    Permissions.DashboardView
+                },
+
+                UserRoles.PetitionWriterSecuritiesEntryManager => new[]
+                {
+                    // Create-only access to petition writer securities module (no edit)
+                    // No access to any other modules
                     Permissions.DashboardView
                 },
 

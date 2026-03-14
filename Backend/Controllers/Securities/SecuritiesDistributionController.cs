@@ -172,7 +172,7 @@ namespace WebAPIBackend.Controllers.Securities
         /// Create new securities distribution
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER")]
+        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER,SECURITIES_ENTRY_MANAGER")]
         public async Task<IActionResult> Create([FromBody] SecuritiesDistributionData data)
         {
             try

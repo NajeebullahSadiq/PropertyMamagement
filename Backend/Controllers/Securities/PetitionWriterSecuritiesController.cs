@@ -70,6 +70,7 @@ namespace WebAPIBackend.Controllers.Securities
                         x.SerialNumberStart,
                         x.SerialNumberEnd,
                         x.DistributionDate,
+                        x.DeliveryDate,
                         x.CreatedAt,
                         x.CreatedBy
                     })
@@ -90,6 +91,8 @@ namespace WebAPIBackend.Controllers.Securities
                     x.SerialNumberEnd,
                     x.DistributionDate,
                     DistributionDateFormatted = DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar),
+                    x.DeliveryDate,
+                    DeliveryDateFormatted = DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar),
                     x.CreatedAt,
                     x.CreatedBy
                 }).ToList();
@@ -141,6 +144,8 @@ namespace WebAPIBackend.Controllers.Securities
                     item.SerialNumberEnd,
                     item.DistributionDate,
                     DistributionDateFormatted = DateConversionHelper.FormatDateOnly(item.DistributionDate, calendar),
+                    item.DeliveryDate,
+                    DeliveryDateFormatted = DateConversionHelper.FormatDateOnly(item.DeliveryDate, calendar),
                     item.CreatedAt,
                     item.CreatedBy,
                     item.UpdatedAt,
@@ -158,7 +163,7 @@ namespace WebAPIBackend.Controllers.Securities
         /// Create new petition writer securities
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER")]
+        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER,SECURITIES_ENTRY_MANAGER,PETITION_WRITER_SECURITIES_ENTRY_MANAGER")]
         public async Task<IActionResult> Create([FromBody] PetitionWriterSecuritiesData data)
         {
             try
@@ -185,6 +190,9 @@ namespace WebAPIBackend.Controllers.Securities
 
                 var userName = User.Identity?.Name ?? "System";
 
+                // Auto-calculate amount: PetitionCount * 5
+                var calculatedAmount = data.PetitionCount * 5;
+
                 var entity = new PetitionWriterSecurities
                 {
                     RegistrationNumber = data.RegistrationNumber,
@@ -192,11 +200,12 @@ namespace WebAPIBackend.Controllers.Securities
                     PetitionWriterFatherName = data.PetitionWriterFatherName,
                     LicenseNumber = data.LicenseNumber,
                     PetitionCount = data.PetitionCount,
-                    Amount = data.Amount,
+                    Amount = calculatedAmount,
                     BankReceiptNumber = data.BankReceiptNumber,
                     SerialNumberStart = data.SerialNumberStart,
                     SerialNumberEnd = data.SerialNumberEnd,
                     DistributionDate = data.DistributionDate!.Value,
+                    DeliveryDate = data.DeliveryDate!.Value,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = userName,
                     Status = true
@@ -250,16 +259,20 @@ namespace WebAPIBackend.Controllers.Securities
 
                 var userName = User.Identity?.Name ?? "System";
 
+                // Auto-calculate amount: PetitionCount * 5
+                var calculatedAmount = data.PetitionCount * 5;
+
                 entity.RegistrationNumber = data.RegistrationNumber;
                 entity.PetitionWriterName = data.PetitionWriterName;
                 entity.PetitionWriterFatherName = data.PetitionWriterFatherName;
                 entity.LicenseNumber = data.LicenseNumber;
                 entity.PetitionCount = data.PetitionCount;
-                entity.Amount = data.Amount;
+                entity.Amount = calculatedAmount;
                 entity.BankReceiptNumber = data.BankReceiptNumber;
                 entity.SerialNumberStart = data.SerialNumberStart;
                 entity.SerialNumberEnd = data.SerialNumberEnd;
                 entity.DistributionDate = data.DistributionDate!.Value;
+                entity.DeliveryDate = data.DeliveryDate!.Value;
                 entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = userName;
 

@@ -6,6 +6,7 @@ import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { AuthService } from 'src/app/shared/auth.service';
+import { RbacService } from 'src/app/shared/rbac.service';
 import { 
     SecuritiesDistributionData,
     SecuritiesDistributionItem,
@@ -22,6 +23,7 @@ export class SecuritiesFormComponent implements OnInit {
     securitiesForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
+    canEdit = true;
     
     // Company search states
     companySearching = false;
@@ -42,16 +44,27 @@ export class SecuritiesFormComponent implements OnInit {
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService,
         private companyService: CompnaydetailService,
-        private authService: AuthService
+        private authService: AuthService,
+        private rbacService: RbacService
     ) {
         this.initForm();
     }
 
     ngOnInit(): void {
+        this.canEdit = this.rbacService.canEditSecurities();
+        
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             this.isEditMode = true;
             this.editId = parseInt(id, 10);
+            
+            // SECURITIES_ENTRY_MANAGER cannot edit, redirect to list
+            if (!this.canEdit) {
+                this.toastr.warning('شما مجاز به ویرایش نیستید');
+                this.router.navigate(['/securities/list']);
+                return;
+            }
+            
             this.loadData(this.editId);
         }
     }

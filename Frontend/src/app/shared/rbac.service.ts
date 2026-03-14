@@ -14,6 +14,8 @@ export const UserRoles = {
   LicenseApplicationManager: 'LICENSE_APPLICATION_MANAGER',
   ActivityMonitoringManager: 'ACTIVITY_MONITORING_MANAGER',
   SecuritiesManager: 'SECURITIES_MANAGER',
+  SecuritiesEntryManager: 'SECURITIES_ENTRY_MANAGER',
+  PetitionWriterSecuritiesEntryManager: 'PETITION_WRITER_SECURITIES_ENTRY_MANAGER',
   PetitionWriterLicenseManager: 'PETITION_WRITER_LICENSE_MANAGER'
 } as const;
 
@@ -228,7 +230,14 @@ export class RbacService {
   // Check if user can create securities
   canCreateSecurities(): boolean {
     const role = this.getCurrentRole();
-    // Only Admin, Authority, and SECURITIES_MANAGER can create securities
+    // Only Admin, Authority, SECURITIES_MANAGER, and SECURITIES_ENTRY_MANAGER can create securities
+    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager;
+  }
+
+  // Check if user can edit securities
+  canEditSecurities(): boolean {
+    const role = this.getCurrentRole();
+    // Only Admin, Authority, and SECURITIES_MANAGER can edit securities (NOT SECURITIES_ENTRY_MANAGER)
     return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
   }
 
@@ -242,7 +251,14 @@ export class RbacService {
   // Check if user can create petition writer securities
   canCreatePetitionWriterSecurities(): boolean {
     const role = this.getCurrentRole();
-    // Only Admin, Authority, and SECURITIES_MANAGER can create petition writer securities
+    // Only Admin, Authority, SECURITIES_MANAGER, SECURITIES_ENTRY_MANAGER, and PETITION_WRITER_SECURITIES_ENTRY_MANAGER can create
+    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager || role === UserRoles.PetitionWriterSecuritiesEntryManager;
+  }
+
+  // Check if user can edit petition writer securities
+  canEditPetitionWriterSecurities(): boolean {
+    const role = this.getCurrentRole();
+    // Only Admin, Authority, and SECURITIES_MANAGER can edit (NOT entry managers)
     return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
   }
 
@@ -312,9 +328,9 @@ export class RbacService {
                role === UserRoles.SecuritiesManager ||
                licenseType === 'carSale';
       case 'securities':
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager;
       case 'petitionwriter':
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.PetitionWriterLicenseManager;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.PetitionWriterSecuritiesEntryManager || role === UserRoles.PetitionWriterLicenseManager;
       case 'activitymonitoring':
         return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.PetitionWriterLicenseManager;
       case 'verification':
@@ -380,6 +396,8 @@ export class RbacService {
       [UserRoles.LicenseApplicationManager]: 'کاربر مدیریت درخواست جواز',
       [UserRoles.ActivityMonitoringManager]: 'کاربر مدیریت نظارت بر فعالیت‌ها',
       [UserRoles.SecuritiesManager]: 'کاربر مدیریت اسناد بهادار',
+      [UserRoles.SecuritiesEntryManager]: 'کاربر ثبت اسناد بهادار',
+      [UserRoles.PetitionWriterSecuritiesEntryManager]: 'کاربر ثبت سند بهادار عریضه‌نویسان',
       [UserRoles.PetitionWriterLicenseManager]: 'کاربر مدیریت جواز عریضه‌نویسان'
     };
     return roleNames[role] || role;

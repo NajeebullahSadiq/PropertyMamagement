@@ -81,6 +81,11 @@ public partial class PetitionWriterSecurities
     [Required]
     public DateOnly DistributionDate { get; set; }
 
+    /// <summary>
+    /// تاریخ تحویلی اویز - Delivery Date
+    /// </summary>
+    public DateOnly? DeliveryDate { get; set; }
+
     // Audit Fields
     public DateTime? CreatedAt { get; set; }
     public string? CreatedBy { get; set; }

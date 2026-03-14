@@ -87,60 +87,163 @@ export class PrintvehicledataComponent implements OnInit {
       }
     }
 
-    // List of Dari label keywords to remove
-    const labelKeywords = [
-      'اسم', 'ولد', 'شماره تذکره', 'نمبر جواز سیر', 'نمبر پلیت', 'نوعیت',
-      'مودل', 'نمبر انجن', 'نمبر شاسی', 'رنگ', 'قیمت به عدد', 'قیمت به حروف',
-      'مناصفه قیمت', 'مبلغ حق الامتیاز', 'ولایت', 'ناحیه', 'ولسوالی', 'قریه', 'گذر',
-      'سکونت اصلی', 'سکونت فعلی', 'شهرت شهود', 'شماره', 'جزئیات',
-      'شهرت مکمل مالک ملکیت', 'شهرت مکمل مشتری', 'مشخصات و قیمت واسطه',
-      'شصت و امضای بایع', 'شصت و امضای مشتری', 'شصت و امضای شاهد',
-      'مهر و امضای دارنده جواز', 'حقوق و مکلفیت های بایع و مشتری',
-      'مکلفیت های دارنده جواز رهنمای معاملات'
-    ];
-
-    // Process all text nodes
-    const walker = document.createTreeWalker(
-      container,
-      NodeFilter.SHOW_TEXT,
-      null
-    );
-
-    const nodesToProcess: { node: Node; parent: Node }[] = [];
-    let node: Node | null;
-    
-    while (node = walker.nextNode()) {
-      if (node.parentNode) {
-        nodesToProcess.push({ node, parent: node.parentNode });
-      }
-    }
-
-    nodesToProcess.forEach(({ node, parent }) => {
-      const text = node.textContent || '';
-      let processedText = text;
-
-      // Remove label keywords
-      labelKeywords.forEach(keyword => {
-        const regex = new RegExp(keyword + '\\s*:?\\s*', 'g');
-        processedText = processedText.replace(regex, '');
-      });
-
-      // Remove common patterns like ":" followed by spaces
-      processedText = processedText.replace(/:\s*/g, '');
+    // Remove all existing content and create positioned layout
+    const firstTable = tables[0];
+    if (firstTable) {
+      // Clear the container and create absolute positioned layout
+      container.innerHTML = '';
       
-      // Remove parentheses if they're empty or contain only spaces
-      processedText = processedText.replace(/\(\s*\)/g, '');
+      // Create a positioned wrapper for exact placement
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'relative';
+      wrapper.style.width = '210mm';
+      wrapper.style.height = '297mm';
+      wrapper.style.margin = '0';
+      wrapper.style.padding = '0';
+      
+      // Helper function to create positioned text
+      const createField = (text: string, top: string, left: string, fontSize: string = '12pt') => {
+        const field = document.createElement('div');
+        field.style.position = 'absolute';
+        field.style.top = top;
+        field.style.left = left;
+        field.style.fontSize = fontSize;
+        field.style.fontFamily = 'B Nazanin, Arial';
+        field.style.whiteSpace = 'nowrap';
+        field.textContent = text || '';
+        return field;
+      };
 
-      // Update the text node if it changed
-      if (processedText !== text && processedText.trim()) {
-        node.textContent = processedText.trim();
-      } else if (!processedText.trim()) {
-        // If the text is now empty, remove the parent element
-        if (parent instanceof HTMLElement && parent.parentNode) {
-          parent.parentNode.removeChild(parent);
-        }
+      // Map data to exact positions based on the pre-printed form
+      // These positions need to be adjusted to match your exact form
+      
+      // Company name and phone (top section)
+      if (this.userDetails.companyName) {
+        wrapper.appendChild(createField(this.userDetails.companyName, '25mm', '80mm', '14pt'));
       }
-    });
+      if (this.userDetails.phoneNumber) {
+        wrapper.appendChild(createField(this.userDetails.phoneNumber, '32mm', '80mm', '12pt'));
+      }
+      
+      // Document number
+      if (this.documentData.permitNo) {
+        wrapper.appendChild(createField(this.documentData.permitNo, '50mm', '120mm'));
+      }
+      
+      // Seller information (left column)
+      if (this.documentData.sellerFirstName) {
+        wrapper.appendChild(createField(this.documentData.sellerFirstName, '65mm', '140mm'));
+      }
+      if (this.documentData.sellerFatherName) {
+        wrapper.appendChild(createField(this.documentData.sellerFatherName, '75mm', '140mm'));
+      }
+      if (this.documentData.sellerIndentityCardNumber) {
+        wrapper.appendChild(createField(this.documentData.sellerIndentityCardNumber, '85mm', '140mm'));
+      }
+      
+      // Vehicle information (center column)
+      if (this.documentData.pilateNo) {
+        wrapper.appendChild(createField(this.documentData.pilateNo, '60mm', '80mm'));
+      }
+      if (this.documentData.typeOfVehicle) {
+        wrapper.appendChild(createField(this.documentData.typeOfVehicle, '68mm', '80mm'));
+      }
+      if (this.documentData.model) {
+        wrapper.appendChild(createField(this.documentData.model, '76mm', '80mm'));
+      }
+      if (this.documentData.enginNo) {
+        wrapper.appendChild(createField(this.documentData.enginNo, '84mm', '80mm'));
+      }
+      if (this.documentData.shasiNo) {
+        wrapper.appendChild(createField(this.documentData.shasiNo, '92mm', '80mm'));
+      }
+      if (this.documentData.color) {
+        wrapper.appendChild(createField(this.documentData.color, '100mm', '80mm'));
+      }
+      if (this.documentData.price) {
+        wrapper.appendChild(createField(this.documentData.price, '108mm', '80mm'));
+      }
+      if (this.documentData.priceText) {
+        wrapper.appendChild(createField(this.documentData.priceText, '116mm', '80mm'));
+      }
+      
+      // Buyer information (right column)
+      if (this.documentData.buyerFirstName) {
+        wrapper.appendChild(createField(this.documentData.buyerFirstName, '65mm', '20mm'));
+      }
+      if (this.documentData.buyerFatherName) {
+        wrapper.appendChild(createField(this.documentData.buyerFatherName, '75mm', '20mm'));
+      }
+      if (this.documentData.buyerIndentityCardNumber) {
+        wrapper.appendChild(createField(this.documentData.buyerIndentityCardNumber, '85mm', '20mm'));
+      }
+      
+      // Seller address
+      if (this.documentData.sellerProvince) {
+        wrapper.appendChild(createField(this.documentData.sellerProvince, '135mm', '140mm', '11pt'));
+      }
+      if (this.documentData.sellerDistrict) {
+        wrapper.appendChild(createField(this.documentData.sellerDistrict, '142mm', '140mm', '11pt'));
+      }
+      if (this.documentData.sellerVillage) {
+        wrapper.appendChild(createField(this.documentData.sellerVillage, '149mm', '140mm', '11pt'));
+      }
+      
+      // Buyer address
+      if (this.documentData.buyerProvince) {
+        wrapper.appendChild(createField(this.documentData.buyerProvince, '135mm', '20mm', '11pt'));
+      }
+      if (this.documentData.buyerDistrict) {
+        wrapper.appendChild(createField(this.documentData.buyerDistrict, '142mm', '20mm', '11pt'));
+      }
+      if (this.documentData.buyerVillage) {
+        wrapper.appendChild(createField(this.documentData.buyerVillage, '149mm', '20mm', '11pt'));
+      }
+      
+      // Temporary address (سکونت فعلی)
+      if (this.documentData.tSellerProvince) {
+        wrapper.appendChild(createField(this.documentData.tSellerProvince, '170mm', '140mm', '11pt'));
+      }
+      if (this.documentData.tSellerDistrict) {
+        wrapper.appendChild(createField(this.documentData.tSellerDistrict, '177mm', '140mm', '11pt'));
+      }
+      if (this.documentData.tSellerVillage) {
+        wrapper.appendChild(createField(this.documentData.tSellerVillage, '184mm', '140mm', '11pt'));
+      }
+      
+      if (this.documentData.tBuyerProvince) {
+        wrapper.appendChild(createField(this.documentData.tBuyerProvince, '170mm', '20mm', '11pt'));
+      }
+      if (this.documentData.tBuyerDistrict) {
+        wrapper.appendChild(createField(this.documentData.tBuyerDistrict, '177mm', '20mm', '11pt'));
+      }
+      if (this.documentData.tBuyerVillage) {
+        wrapper.appendChild(createField(this.documentData.tBuyerVillage, '184mm', '20mm', '11pt'));
+      }
+      
+      // Witnesses
+      if (this.documentData.witnessOneFirstName) {
+        wrapper.appendChild(createField(this.documentData.witnessOneFirstName, '195mm', '90mm', '11pt'));
+      }
+      if (this.documentData.witnessOneFatherName) {
+        wrapper.appendChild(createField(this.documentData.witnessOneFatherName, '195mm', '70mm', '11pt'));
+      }
+      if (this.documentData.witnessOneIndentityCardNumber) {
+        wrapper.appendChild(createField(this.documentData.witnessOneIndentityCardNumber, '195mm', '50mm', '11pt'));
+      }
+      
+      if (this.documentData.witnessTwoFirstName) {
+        wrapper.appendChild(createField(this.documentData.witnessTwoFirstName, '205mm', '90mm', '11pt'));
+      }
+      if (this.documentData.witnessTwoFatherName) {
+        wrapper.appendChild(createField(this.documentData.witnessTwoFatherName, '205mm', '70mm', '11pt'));
+      }
+      if (this.documentData.witnessTwoIndentityCardNumber) {
+        wrapper.appendChild(createField(this.documentData.witnessTwoIndentityCardNumber, '205mm', '50mm', '11pt'));
+      }
+      
+      container.appendChild(wrapper);
+    }
   }
 
   cancelPrint(): void {
