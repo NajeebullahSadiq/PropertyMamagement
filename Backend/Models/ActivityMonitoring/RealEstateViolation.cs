@@ -17,20 +17,20 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         [Required]
         public int ActivityMonitoringRecordId { get; set; }
 
-        [Required]
         [MaxLength(50)]
-        public string ViolationSerialNumber { get; set; } = string.Empty;
+        public string? ViolationStatus { get; set; }
 
-        [Required]
-        [MaxLength(200)]
-        public string LicenseHolderName { get; set; } = string.Empty;
-
-        [Required]
+        // For عادی (Normal)
         [MaxLength(500)]
-        public string ViolationType { get; set; } = string.Empty;
+        public string? ViolationType { get; set; }
 
-        [Required]
         public DateOnly? ViolationDate { get; set; }
+
+        // For منجر به مسدودی (Leading to Closure)
+        public DateOnly? ClosureDate { get; set; }
+
+        [MaxLength(1000)]
+        public string? ClosureReason { get; set; }
 
         [MaxLength(1000)]
         public string? ActionsTaken { get; set; }

@@ -328,7 +328,7 @@ export class RbacService {
                role === UserRoles.SecuritiesManager ||
                licenseType === 'carSale';
       case 'securities':
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager;
+        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager || role === UserRoles.CompanyRegistrar;
       case 'petitionwriter':
         return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.PetitionWriterSecuritiesEntryManager || role === UserRoles.PetitionWriterLicenseManager;
       case 'activitymonitoring':

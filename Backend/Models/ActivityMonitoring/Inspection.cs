@@ -5,11 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WebAPIBackend.Models.ActivityMonitoring
 {
     /// <summary>
-    /// 3️⃣ Complaints Registration
-    /// ثبت شکایات
+    /// 5️⃣ Inspection Records
+    /// نظارت وبررسی فعالیت دفاتر رهنمای معاملات و عریضه نویسان
     /// </summary>
-    [Table("ActivityMonitoringComplaints", Schema = "org")]
-    public class Complaint
+    [Table("ActivityMonitoringInspections", Schema = "org")]
+    public class Inspection
     {
         [Key]
         public int Id { get; set; }
@@ -18,21 +18,15 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         public int ActivityMonitoringRecordId { get; set; }
 
         [Required]
-        [MaxLength(500)]
-        public string ComplaintSubject { get; set; } = string.Empty;
+        [MaxLength(100)]
+        public string MonitoringType { get; set; } = string.Empty;
 
         [Required]
-        public DateOnly? ComplaintRegistrationDate { get; set; }
+        [MaxLength(50)]
+        public string Month { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(200)]
-        public string ComplainantName { get; set; } = string.Empty;
-
-        [MaxLength(1000)]
-        public string? ActionsTaken { get; set; }
-
-        [MaxLength(1000)]
-        public string? Remarks { get; set; }
+        public int MonitoringCount { get; set; }
 
         // Audit
         public DateTime? CreatedAt { get; set; }

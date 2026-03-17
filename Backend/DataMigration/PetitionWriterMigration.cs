@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Npgsql;
 
@@ -11,9 +12,7 @@ namespace DataMigration
     public class PetitionWriterMigration
     {
         private static string connectionString = Environment.GetEnvironmentVariable("MIGRATION_CONNECTION_STRING") 
-            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=prmis_user;Password=SecurePassword@2024";
-        
-        private static PetitionWriterStats stats = new PetitionWriterStats();
+            ?? "Host=localhost;Port=5432;Database=PRMIS;Username=postgres;Password=Khan@223344";
         
         public static async Task RunPetitionWriterMigration()
         {
@@ -23,538 +22,235 @@ namespace DataMigration
             
             try
             {
-                // Load both JSON files
-                var records1403 = await LoadPetitionWriterRecords("petition_1403_records.json", 1403);
-                var records1404 = await LoadPetitionWriterRecords("petition_1404_records.json", 1404);
+                // Load JSON file
+                var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "petition_writer_records.json");
                 
-                // Combine all records
-                var allRecords = new List<PetitionWriterRecord>();
-                allRecords.AddRange(records1403);
-                allRecords.AddRange(records1404);
-                
-                stats.TotalRecords = allRecords.Count;
-                Console.WriteLine($"Loaded {records1403.Count} records from 1403");
-                Console.WriteLine($"Loaded {records1404.Count} records from 1404");
-                Console.WriteLine($"Total: {stats.TotalRecords} records\n");
-                
-                // Start migration
-                Console.WriteLine("Starting migration process...\n");
-                await MigrateAllPetitionWriterRecords(allRecords);
-                
-                // Print statistics
-                PrintPetitionWriterStatistics();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"\nFatal Error: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-            }
-        }
-        
-        private static async Task<List<PetitionWriterRecord>> LoadPetitionWriterRecords(string filename, int sourceYear)
-        {
-            try
-            {
-                if (!File.Exists(filename))
+                if (!File.Exists(jsonPath))
                 {
-                    Console.WriteLine($"Warning: File '{filename}' not found. Skipping...");
-                    return new List<PetitionWriterRecord>();
+                    Console.WriteLine($"Error: File not found: {jsonPath}");
+                    return;
                 }
                 
-                string jsonContent = await File.ReadAllTextAsync(filename);
+                var jsonString = await File.ReadAllTextAsync(jsonPath);
                 
-                // Replace NaN with null in the JSON string
-                jsonContent = jsonContent.Replace(": NaN", ": null");
+                // Replace NaN values with null (NaN is not valid JSON)
+                jsonString = jsonString.Replace(": NaN", ": null");
+                jsonString = jsonString.Replace(":NaN", ":null");
                 
+                // Configure JsonSerializer to handle mixed types
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
+                    NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
                 };
                 
-                var records = JsonSerializer.Deserialize<List<PetitionWriterRecord>>(jsonContent, options);
+                var records = JsonSerializer.Deserialize<List<PetitionWriterRecord>>(jsonString, options);
                 
-                // Set source year for all records
-                if (records != null)
+                Console.WriteLine($"Loaded {records?.Count ?? 0} records from JSON");
+                
+                if (records == null || records.Count == 0)
                 {
-                    foreach (var record in records)
-                    {
-                        record.SourceYear = sourceYear;
-                    }
+                    Console.WriteLine("No records to migrate.");
+                    return;
                 }
                 
-                return records ?? new List<PetitionWriterRecord>();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading {filename}: {ex.Message}");
-                return new List<PetitionWriterRecord>();
-            }
-        }
-        
-        private static async Task MigrateAllPetitionWriterRecords(List<PetitionWriterRecord> records)
-        {
-            int processedCount = 0;
-            int sequenceNumber = 1; // Start sequence for KBL licenses
-            
-            // Sort records by source year and original order to maintain chronological sequence
-            // Use null-safe sorting: nulls go to the end
-            var sortedRecords = records
-                .OrderBy(r => r.SourceYear ?? int.MaxValue)
-                .ThenBy(r => GetLicenseNumberString(r.LicenseNumber) ?? string.Empty)
-                .ToList();
-            
-            foreach (var record in sortedRecords)
-            {
-                try
-                {
-                    await MigratePetitionWriterRecord(record, sequenceNumber);
-                    sequenceNumber++; // Increment for next record
-                    processedCount++;
-                    
-                    if (processedCount % 50 == 0)
-                    {
-                        Console.WriteLine($"Processed {processedCount}/{stats.TotalRecords} records...");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    stats.Errors.Add(new PetitionWriterError
-                    {
-                        LicenseNumber = GetLicenseNumberString(record.LicenseNumber),
-                        ApplicantName = record.ApplicantName ?? "Unknown",
-                        ErrorMessage = ex.Message,
-                        SourceYear = record.SourceYear ?? 0
-                    });
-                    Console.WriteLine($"Error processing record (License: {GetLicenseNumberString(record.LicenseNumber)}): {ex.Message}");
-                }
-            }
-        }
-        
-        private static async Task MigratePetitionWriterRecord(PetitionWriterRecord record, int sequenceNumber)
-        {
-            using (var conn = new NpgsqlConnection(connectionString))
-            {
+                Console.WriteLine("\nStarting migration process...\n");
+                
+                int licensesCreated = 0;
+                int relocationsCreated = 0;
+                int errors = 0;
+                
+                await using var conn = new NpgsqlConnection(connectionString);
                 await conn.OpenAsync();
-                using (var transaction = await conn.BeginTransactionAsync())
+                
+                foreach (var record in records)
                 {
                     try
                     {
-                        // Generate new license number in format: KBL-00000001
-                        string newLicenseNumber = $"KBL-{sequenceNumber:D8}";
+                        // Skip records without required fields
+                        var applicantName = record.ApplicantName?.ToString();
+                        var electronicId = record.ElectronicNationalIdNumber?.ToString();
                         
-                        // Get original license number for reference
-                        string originalLicenseNumber = GetLicenseNumberString(record.LicenseNumber);
-                        
-                        if (string.IsNullOrWhiteSpace(originalLicenseNumber))
+                        if (string.IsNullOrWhiteSpace(applicantName) || 
+                            string.IsNullOrWhiteSpace(electronicId))
                         {
-                            stats.Skipped.Add(new PetitionWriterSkipped
-                            {
-                                ApplicantName = record.ApplicantName ?? "Unknown",
-                                Reason = "Missing original license number",
-                                SourceYear = record.SourceYear ?? 0
-                            });
-                            await transaction.CommitAsync();
-                            return;
+                            errors++;
+                            continue;
                         }
                         
-                        // Check if new license number already exists (shouldn't happen with sequential generation)
-                        bool licenseExists = await CheckLicenseExists(newLicenseNumber, conn, transaction);
-                        
-                        if (licenseExists)
+                        // Convert LicenseNumber from object to string and format it
+                        string licenseNumber = record.LicenseNumber?.ToString() ?? "";
+                        if (string.IsNullOrWhiteSpace(licenseNumber))
                         {
-                            stats.Skipped.Add(new PetitionWriterSkipped
+                            licenseNumber = $"KBL-{(record.ProvinceId ?? 1):D8}";
+                        }
+                        else
+                        {
+                            // Handle decimal format like "1560.0" or pure numbers
+                            if (double.TryParse(licenseNumber, out double numValue))
                             {
-                                ApplicantName = record.ApplicantName ?? "Unknown",
-                                Reason = $"License {newLicenseNumber} already exists",
-                                SourceYear = record.SourceYear ?? 0
-                            });
-                            await transaction.CommitAsync();
-                            return;
+                                licenseNumber = $"KBL-{(int)numValue:D8}";
+                            }
                         }
                         
-                        // Insert PetitionWriterLicense with new license number
-                        await InsertPetitionWriterLicense(record, newLicenseNumber, conn, transaction);
-                        stats.LicensesCreated++;
+                        // Convert MobileNumber from object to string
+                        string mobileNumber = record.MobileNumber?.ToString() ?? "";
                         
-                        Console.WriteLine($"Migrated: {originalLicenseNumber} -> {newLicenseNumber} ({record.ApplicantName})");
+                        // Convert village fields
+                        string permanentVillage = record.PermanentVillage?.ToString() ?? "";
+                        string currentVillage = record.CurrentVillage?.ToString() ?? "";
                         
-                        await transaction.CommitAsync();
+                        // Get location IDs from province/district names
+                        int? permanentProvinceId = await GetLocationId(conn, record.PermanentProvinceId);
+                        int? permanentDistrictId = await GetLocationId(conn, record.PermanentDistrictId);
+                        int? currentProvinceId = await GetLocationId(conn, record.CurrentProvinceId);
+                        int? currentDistrictId = await GetLocationId(conn, record.CurrentDistrictId);
+                        
+                        // Determine license type
+                        string licenseType = record.LicenseType ?? "new";
+                        if (licenseType == "renewal" || !string.IsNullOrEmpty(record.LicenseTypeExtend?.ToString()))
+                        {
+                            licenseType = "تجدید";
+                        }
+                        else
+                        {
+                            licenseType = "جدید";
+                        }
+                        
+                        // Parse license issue date
+                        DateOnly? licenseIssueDate = ParsePersianDate(record.LicenseIssueDate);
+                        
+                        // Insert license
+                        var licenseId = await InsertLicense(conn, new Dictionary<string, object?>
+                        {
+                            ["LicenseNumber"] = licenseNumber,
+                            ["ProvinceId"] = record.ProvinceId,
+                            ["ApplicantName"] = applicantName,
+                            ["ApplicantFatherName"] = record.ApplicantFatherName?.ToString(),
+                            ["ElectronicNationalIdNumber"] = electronicId,
+                            ["MobileNumber"] = mobileNumber,
+                            ["PermanentProvinceId"] = permanentProvinceId,
+                            ["PermanentDistrictId"] = permanentDistrictId,
+                            ["PermanentVillage"] = permanentVillage,
+                            ["CurrentProvinceId"] = currentProvinceId,
+                            ["CurrentDistrictId"] = currentDistrictId,
+                            ["CurrentVillage"] = currentVillage,
+                            ["DetailedAddress"] = record.DetailedAddress,
+                            ["ActivityNahia"] = record.ActivityNahia,
+                            ["LicenseType"] = licenseType,
+                            ["LicenseIssueDate"] = licenseIssueDate,
+                            ["LicenseStatus"] = 1,
+                            ["Status"] = true,
+                            ["CreatedAt"] = DateTime.Now,
+                            ["CreatedBy"] = "migration"
+                        });
+                        
+                        if (licenseId > 0)
+                        {
+                            licensesCreated++;
+                            
+                            // Handle relocations if present
+                            var relocationInfo = record.PetitionWriterRelocations?.ToString();
+                            if (!string.IsNullOrWhiteSpace(relocationInfo) && 
+                                relocationInfo != "NaN" && 
+                                relocationInfo != "null")
+                            {
+                                await InsertRelocation(conn, licenseId, relocationInfo);
+                                relocationsCreated++;
+                            }
+                        }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        await transaction.RollbackAsync();
-                        throw;
+                        Console.WriteLine($"Error processing record: {ex.Message}");
+                        errors++;
                     }
                 }
+                
+                Console.WriteLine("\n================================================================================");
+                Console.WriteLine("PETITION WRITER MIGRATION COMPLETED");
+                Console.WriteLine("================================================================================");
+                Console.WriteLine($"Total records processed: {records.Count}");
+                Console.WriteLine($"Licenses created: {licensesCreated}");
+                Console.WriteLine($"Relocations created: {relocationsCreated}");
+                Console.WriteLine($"Errors encountered: {errors}");
+                Console.WriteLine("================================================================================\n");
             }
-        }
-        
-        private static async Task<bool> CheckLicenseExists(string licenseNumber, 
-            NpgsqlConnection conn, NpgsqlTransaction transaction)
-        {
-            string query = @"
-                SELECT COUNT(*) FROM org.""PetitionWriterLicenses"" 
-                WHERE ""LicenseNumber"" = @licensenumber";
-            
-            using (var cmd = new NpgsqlCommand(query, conn, transaction))
+            catch (Exception ex)
             {
-                cmd.Parameters.AddWithValue("licensenumber", licenseNumber);
-                var count = await cmd.ExecuteScalarAsync();
-                return Convert.ToInt32(count) > 0;
+                Console.WriteLine($"Migration error: {ex.Message}");
             }
         }
         
-        private static async Task InsertPetitionWriterLicense(PetitionWriterRecord record, 
-            string licenseNumber, NpgsqlConnection conn, NpgsqlTransaction transaction)
+        private static async Task<int?> GetLocationId(NpgsqlConnection conn, string? locationName)
         {
-            string query = @"
-                INSERT INTO org.""PetitionWriterLicenses"" 
-                (""LicenseNumber"", ""ProvinceId"", ""ApplicantName"", ""ApplicantFatherName"", 
-                 ""ElectronicNationalIdNumber"",
-                 ""PermanentProvinceId"", ""PermanentDistrictId"", ""PermanentVillage"",
-                 ""CurrentProvinceId"", ""CurrentDistrictId"", ""CurrentVillage"",
-                 ""DetailedAddress"", ""LicenseIssueDate"", ""LicenseType"",
-                 ""Status"", ""CreatedAt"", ""CreatedBy"")
-                VALUES (@licensenumber, @provinceid, @applicantname, @fathername, 
-                        @electronicnationalidnumber,
-                        @permanentprovinceid, @permanentdistrictid, @permanentvillage,
-                        @currentprovinceid, @currentdistrictid, @currentvillage,
-                        @detailedaddress, @licenseissuedate, @licensetype,
-                        @status, @createdat, @createdby)";
+            if (string.IsNullOrWhiteSpace(locationName))
+                return null;
             
-            using (var cmd = new NpgsqlCommand(query, conn, transaction))
-            {
-                // License Number and Province
-                cmd.Parameters.AddWithValue("licensenumber", licenseNumber);
-                cmd.Parameters.AddWithValue("provinceid", 1); // All licenses are from Kabul
-                
-                // Basic Information
-                cmd.Parameters.AddWithValue("applicantname", record.ApplicantName ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("fathername", record.FatherName ?? (object)DBNull.Value);
-                
-                // Electronic National ID
-                string? electronicId = GetStringFromObject(record.ElectronicNationalIdNumber);
-                if (!string.IsNullOrEmpty(electronicId) && electronicId.Length > 50)
-                    electronicId = electronicId.Substring(0, 50);
-                cmd.Parameters.AddWithValue("electronicnationalidnumber", electronicId ?? (object)DBNull.Value);
-                
-                // Permanent Address
-                int? permProvinceId = await GetOrCreateProvinceId(record.PermanentProvince, conn, transaction);
-                int? permDistrictId = await GetOrCreateDistrictId(record.PermanentDistrict, permProvinceId, conn, transaction);
-                cmd.Parameters.AddWithValue("permanentprovinceid", permProvinceId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("permanentdistrictid", permDistrictId ?? (object)DBNull.Value);
-                
-                // Handle PermanentVillage (could be string or number)
-                string? permanentVillage = GetStringFromObject(record.PermanentVillage);
-                cmd.Parameters.AddWithValue("permanentvillage", permanentVillage ?? (object)DBNull.Value);
-                
-                // Current Address
-                int? currProvinceId = await GetOrCreateProvinceId(record.CurrentProvince, conn, transaction);
-                int? currDistrictId = await GetOrCreateDistrictId(record.CurrentDistrict, currProvinceId, conn, transaction);
-                cmd.Parameters.AddWithValue("currentprovinceid", currProvinceId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("currentdistrictid", currDistrictId ?? (object)DBNull.Value);
-                
-                // Handle CurrentVillage_Nahia field (could be string or number)
-                string? currentVillage = GetCurrentVillageString(record.CurrentVillageNahia);
-                cmd.Parameters.AddWithValue("currentvillage", currentVillage ?? (object)DBNull.Value);
-                
-                // Detailed Address (use ActivityLocation or DetailedAddress)
-                string? detailedAddress = record.ActivityLocation ?? record.DetailedAddress;
-                cmd.Parameters.AddWithValue("detailedaddress", detailedAddress ?? (object)DBNull.Value);
-                
-                // License Issue Date
-                DateTime? issueDate = ParsePersianDate(record.LicenseIssueDate);
-                cmd.Parameters.AddWithValue("licenseissuedate", issueDate ?? (object)DBNull.Value);
-                
-                // License Type (New or Renewal)
-                string? licenseType = DetermineLicenseType(record.LicenseTypeNew, record.LicenseTypeRenewal);
-                cmd.Parameters.AddWithValue("licensetype", licenseType ?? (object)DBNull.Value);
-                
-                // Status and Audit
-                cmd.Parameters.AddWithValue("status", true);
-                cmd.Parameters.AddWithValue("createdat", DateTime.Now);
-                cmd.Parameters.AddWithValue("createdby", $"MIGRATION_SCRIPT_{record.SourceYear}");
-                
-                await cmd.ExecuteNonQueryAsync();
-            }
+            await using var cmd = new NpgsqlCommand(
+                "SELECT \"ID\" FROM look.\"Location\" WHERE \"Dari\" = @name LIMIT 1", conn);
+            cmd.Parameters.AddWithValue("name", locationName);
+            
+            var result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt32(result) : null;
         }
         
-        // Helper Methods
-        private static string GetLicenseNumberString(object? licenseNumber)
+        private static DateOnly? ParsePersianDate(string? dateStr)
         {
-            if (licenseNumber == null) return string.Empty;
-            
-            if (licenseNumber is JsonElement jsonElement)
-            {
-                if (jsonElement.ValueKind == JsonValueKind.Number)
-                {
-                    return jsonElement.GetDouble().ToString("0");
-                }
-                else if (jsonElement.ValueKind == JsonValueKind.String)
-                {
-                    return jsonElement.GetString() ?? string.Empty;
-                }
-            }
-            
-            return licenseNumber.ToString() ?? string.Empty;
-        }
-        
-        private static string? GetMobileNumberString(object? mobileNumber)
-        {
-            if (mobileNumber == null) return null;
-            
-            if (mobileNumber is JsonElement jsonElement)
-            {
-                if (jsonElement.ValueKind == JsonValueKind.Number)
-                {
-                    return jsonElement.GetDouble().ToString("0");
-                }
-                else if (jsonElement.ValueKind == JsonValueKind.String)
-                {
-                    return jsonElement.GetString();
-                }
-            }
-            
-            return mobileNumber.ToString();
-        }
-        
-        private static string? GetStringFromObject(object? value)
-        {
-            if (value == null) return null;
-            
-            if (value is JsonElement jsonElement)
-            {
-                if (jsonElement.ValueKind == JsonValueKind.String)
-                {
-                    return jsonElement.GetString();
-                }
-                else if (jsonElement.ValueKind == JsonValueKind.Number)
-                {
-                    return jsonElement.GetDouble().ToString("0");
-                }
-            }
-            
-            return value.ToString();
-        }
-        
-        private static string? GetCurrentVillageString(object? currentVillageNahia)
-        {
-            if (currentVillageNahia == null) return null;
-            
-            string? value = GetStringFromObject(currentVillageNahia);
-            if (string.IsNullOrWhiteSpace(value)) return null;
-            
-            // Try to parse as number
-            if (double.TryParse(value, out double nahiaNumber))
-            {
-                return $"ناحیه {nahiaNumber}";
-            }
-            
-            return value;
-        }
-        
-        private static string? GetDistrictNahiaString(object? districtNahia)
-        {
-            return GetStringFromObject(districtNahia);
-        }
-        
-        private static DateTime? ParsePersianDate(string? dateString)
-        {
-            if (string.IsNullOrWhiteSpace(dateString))
+            if (string.IsNullOrWhiteSpace(dateStr))
                 return null;
             
             try
             {
-                // Try to parse Persian date format: "DD/MM/YYYY"
-                var parts = dateString.Split('/');
+                // Format: "17/1/1404" (day/month/year)
+                var parts = dateStr.Split('/');
                 if (parts.Length == 3)
                 {
-                    if (int.TryParse(parts[0], out int day) &&
-                        int.TryParse(parts[1], out int month) &&
-                        int.TryParse(parts[2], out int year))
-                    {
-                        // Validate ranges
-                        if (year >= 1 && year <= 9999 && month >= 1 && month <= 12 && day >= 1 && day <= 31)
-                        {
-                            return new DateTime(year, month, day);
-                        }
-                    }
+                    // For now, just return null - proper Persian date conversion would be needed
+                    return null;
                 }
             }
-            catch
-            {
-                // Ignore parsing errors
-            }
+            catch { }
             
             return null;
         }
         
-        private static string? DetermineLicenseType(object? licenseTypeNew, object? licenseTypeRenewal)
+        private static async Task<int> InsertLicense(NpgsqlConnection conn, Dictionary<string, object?> values)
         {
-            string? newType = GetStringFromObject(licenseTypeNew);
-            string? renewalType = GetStringFromObject(licenseTypeRenewal);
+            var columns = string.Join(", ", values.Keys.Select(k => $"\"{k}\""));
+            var paramNames = string.Join(", ", values.Keys.Select((_, i) => $"@p{i}"));
             
-            // Check if it's a new license
-            if (!string.IsNullOrWhiteSpace(newType) && 
-                (newType.Contains("//") || newType.Contains("جدید")))
+            var sql = $@"
+                INSERT INTO org.""PetitionWriterLicenses"" ({columns})
+                VALUES ({paramNames})
+                RETURNING ""Id""";
+            
+            await using var cmd = new NpgsqlCommand(sql, conn);
+            
+            int i = 0;
+            foreach (var value in values.Values)
             {
-                return "جدید";
+                cmd.Parameters.AddWithValue($"@p{i}", value ?? DBNull.Value);
+                i++;
             }
             
-            // Check if it's a renewal
-            if (!string.IsNullOrWhiteSpace(renewalType) && 
-                (renewalType.Contains("//") || renewalType.Contains("تجدید")))
-            {
-                return "تجدید";
-            }
-            
-            // Check for "مثنی" (duplicate)
-            if (!string.IsNullOrWhiteSpace(renewalType) && renewalType.Contains("مثنی"))
-            {
-                return "مثنی";
-            }
-            
-            return null;
+            var result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt32(result) : 0;
         }
         
-        private static async Task<int?> GetOrCreateProvinceId(string? provinceName, 
-            NpgsqlConnection conn, NpgsqlTransaction transaction)
+        private static async Task InsertRelocation(NpgsqlConnection conn, int licenseId, string relocationInfo)
         {
-            if (string.IsNullOrWhiteSpace(provinceName))
-                return null;
+            var sql = @"
+                INSERT INTO org.""PetitionWriterRelocations"" 
+                (""PetitionWriterLicenseId"", ""NewActivityLocation"", ""CreatedAt"")
+                VALUES (@licenseId, @location, @createdAt)";
             
-            // For Kabul, always return 1
-            if (provinceName.Contains("کابل"))
-                return 1;
+            await using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("licenseId", licenseId);
+            cmd.Parameters.AddWithValue("location", relocationInfo);
+            cmd.Parameters.AddWithValue("createdAt", DateTime.Now);
             
-            // Try to find existing province
-            string query = @"
-                SELECT ""ID"" FROM look.""Location"" 
-                WHERE ""Name"" = @name AND ""ParentID"" IS NULL
-                LIMIT 1";
-            
-            using (var cmd = new NpgsqlCommand(query, conn, transaction))
-            {
-                cmd.Parameters.AddWithValue("name", provinceName);
-                var result = await cmd.ExecuteScalarAsync();
-                
-                if (result != null)
-                    return Convert.ToInt32(result);
-            }
-            
-            // If not found, create it
-            string insertQuery = @"
-                INSERT INTO look.""Location"" (""Name"", ""Dari"", ""ParentID"", ""IsActive"")
-                VALUES (@name, @dari, NULL, 1)
-                RETURNING ""ID""";
-            
-            using (var insertCmd = new NpgsqlCommand(insertQuery, conn, transaction))
-            {
-                insertCmd.Parameters.AddWithValue("name", provinceName);
-                insertCmd.Parameters.AddWithValue("dari", provinceName);
-                
-                var insertResult = await insertCmd.ExecuteScalarAsync();
-                return Convert.ToInt32(insertResult);
-            }
+            await cmd.ExecuteNonQueryAsync();
         }
-        
-        private static async Task<int?> GetOrCreateDistrictId(string? districtName, int? provinceId,
-            NpgsqlConnection conn, NpgsqlTransaction transaction)
-        {
-            if (string.IsNullOrWhiteSpace(districtName) || !provinceId.HasValue)
-                return null;
-            
-            // Try to find existing district
-            string query = @"
-                SELECT ""ID"" FROM look.""Location"" 
-                WHERE ""Name"" = @name AND ""ParentID"" = @parentid
-                LIMIT 1";
-            
-            using (var cmd = new NpgsqlCommand(query, conn, transaction))
-            {
-                cmd.Parameters.AddWithValue("name", districtName);
-                cmd.Parameters.AddWithValue("parentid", provinceId.Value);
-                var result = await cmd.ExecuteScalarAsync();
-                
-                if (result != null)
-                    return Convert.ToInt32(result);
-            }
-            
-            // If not found, create it
-            string insertQuery = @"
-                INSERT INTO look.""Location"" (""Name"", ""Dari"", ""ParentID"", ""IsActive"")
-                VALUES (@name, @dari, @parentid, 1)
-                RETURNING ""ID""";
-            
-            using (var insertCmd = new NpgsqlCommand(insertQuery, conn, transaction))
-            {
-                insertCmd.Parameters.AddWithValue("name", districtName);
-                insertCmd.Parameters.AddWithValue("dari", districtName);
-                insertCmd.Parameters.AddWithValue("parentid", provinceId.Value);
-                
-                var insertResult = await insertCmd.ExecuteScalarAsync();
-                return Convert.ToInt32(insertResult);
-            }
-        }
-        
-        private static void PrintPetitionWriterStatistics()
-        {
-            Console.WriteLine("\n" + new string('=', 80));
-            Console.WriteLine("PETITION WRITER MIGRATION COMPLETED");
-            Console.WriteLine(new string('=', 80));
-            Console.WriteLine($"Total records processed: {stats.TotalRecords}");
-            Console.WriteLine($"Licenses created: {stats.LicensesCreated}");
-            Console.WriteLine($"Records skipped: {stats.Skipped.Count}");
-            Console.WriteLine($"Errors encountered: {stats.Errors.Count}");
-            
-            if (stats.Skipped.Count > 0)
-            {
-                Console.WriteLine("\nSkipped Records:");
-                foreach (var skip in stats.Skipped.Take(10))
-                {
-                    Console.WriteLine($"  - {skip.ApplicantName} ({skip.SourceYear}): {skip.Reason}");
-                }
-                if (stats.Skipped.Count > 10)
-                    Console.WriteLine($"  ... and {stats.Skipped.Count - 10} more");
-            }
-            
-            if (stats.Errors.Count > 0)
-            {
-                Console.WriteLine("\nErrors:");
-                foreach (var error in stats.Errors.Take(10))
-                {
-                    Console.WriteLine($"  - {error.ApplicantName} (License: {error.LicenseNumber}, Year: {error.SourceYear}): {error.ErrorMessage}");
-                }
-                if (stats.Errors.Count > 10)
-                    Console.WriteLine($"  ... and {stats.Errors.Count - 10} more");
-            }
-            
-            Console.WriteLine(new string('=', 80));
-        }
-    }
-    
-    // Statistics Classes
-    public class PetitionWriterStats
-    {
-        public int TotalRecords { get; set; }
-        public int LicensesCreated { get; set; }
-        public List<PetitionWriterError> Errors { get; set; } = new List<PetitionWriterError>();
-        public List<PetitionWriterSkipped> Skipped { get; set; } = new List<PetitionWriterSkipped>();
-    }
-    
-    public class PetitionWriterError
-    {
-        public string LicenseNumber { get; set; } = string.Empty;
-        public string ApplicantName { get; set; } = string.Empty;
-        public string ErrorMessage { get; set; } = string.Empty;
-        public int SourceYear { get; set; }
-    }
-    
-    public class PetitionWriterSkipped
-    {
-        public string ApplicantName { get; set; } = string.Empty;
-        public string Reason { get; set; } = string.Empty;
-        public int SourceYear { get; set; }
     }
 }

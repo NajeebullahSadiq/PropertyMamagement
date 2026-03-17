@@ -1,151 +1,108 @@
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
 {
     /// <summary>
-    /// DTO for Activity Monitoring Record API requests
+    /// DTO for Activity Monitoring Record API requests - Single Table Design
+    /// All sections in one DTO
     /// </summary>
     public class ActivityMonitoringData
     {
         public int? Id { get; set; }
 
-        // 1️⃣ Financial Clearance
-        [Required(ErrorMessage = "شهرت دارنده جواز الزامی است")]
+        // ============ Common Fields ============
+        [MaxLength(50)]
+        public string? SerialNumber { get; set; }
+
+        [MaxLength(50)]
+        public string? LicenseNumber { get; set; }
+
         [MaxLength(200)]
-        public string LicenseHolderName { get; set; } = string.Empty;
+        public string? LicenseHolderName { get; set; }
 
-        [MaxLength(100)]
-        public string? TaxClearanceStatus { get; set; }
+        [MaxLength(200)]
+        public string? District { get; set; }
 
-        [MaxLength(100)]
-        public string? TaxClearanceLetterNumber { get; set; }
-
-        [Required(ErrorMessage = "تاریخ تصفیه مالیاتی الزامی است")]
-        public string? TaxClearanceDate { get; set; }
-
-        public decimal? PaidTaxAmount { get; set; }
-
-        // 2️⃣ Annual Activity Report
         public string? ReportRegistrationDate { get; set; }
+
+        [MaxLength(50)]
+        public string? SectionType { get; set; }  // complaints, violations, inspection
+
+        // ============ Deed Counts ============
         public int? SaleDeedsCount { get; set; }
         public int? RentalDeedsCount { get; set; }
         public int? BaiUlWafaDeedsCount { get; set; }
         public int? VehicleTransactionDeedsCount { get; set; }
-        public int? CancelledMixedTransactions { get; set; }
-        public int? LostDeedsCount { get; set; }
 
         [MaxLength(1000)]
         public string? AnnualReportRemarks { get; set; }
 
-        // 6️⃣ Inspection & Supervision
-        [Required(ErrorMessage = "تاریخ نظارت الزامی است")]
-        public string? InspectionDate { get; set; }
+        // Deed items with serial numbers (stored as JSON)
+        public List<DeedItemData>? DeedItems { get; set; }
 
-        public int? InspectedRealEstateOfficesCount { get; set; }
-        public int? SealedOfficesCount { get; set; }
-        public int? InspectedPetitionWritersCount { get; set; }
-        public int? ViolatingPetitionWritersCount { get; set; }
-
-        public string? CalendarType { get; set; }
-    }
-
-    /// <summary>
-    /// DTO for Complaint API requests
-    /// </summary>
-    public class ComplaintData
-    {
-        public int? Id { get; set; }
-        public int? ActivityMonitoringRecordId { get; set; }
-
-        [Required(ErrorMessage = "نمبر مسلسل الزامی است")]
-        [MaxLength(50)]
-        public string ComplaintSerialNumber { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "شهرت عارض الزامی است")]
-        [MaxLength(200)]
-        public string ComplainantName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "موضوع شکایت الزامی است")]
-        [MaxLength(500)]
-        public string ComplaintSubject { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "تاریخ ثبت شکایت الزامی است")]
+        // ============ Section 2: Complaints ============
         public string? ComplaintRegistrationDate { get; set; }
 
-        [Required(ErrorMessage = "شهرت معروض علیه الزامی است")]
+        [MaxLength(500)]
+        public string? ComplaintSubject { get; set; }
+
         [MaxLength(200)]
-        public string AccusedPartyName { get; set; } = string.Empty;
+        public string? ComplainantName { get; set; }
 
         [MaxLength(1000)]
-        public string? ActionsTaken { get; set; }
+        public string? ComplaintActionsTaken { get; set; }
 
         [MaxLength(1000)]
-        public string? Remarks { get; set; }
+        public string? ComplaintRemarks { get; set; }
 
+        // ============ Section 3: Violations ============
+        [MaxLength(100)]
+        public string? ViolationStatus { get; set; }
+
+        [MaxLength(500)]
+        public string? ViolationType { get; set; }
+
+        public string? ViolationDate { get; set; }
+
+        public string? ClosureDate { get; set; }
+
+        [MaxLength(500)]
+        public string? ClosureReason { get; set; }
+
+        [MaxLength(1000)]
+        public string? ViolationActionsTaken { get; set; }
+
+        [MaxLength(1000)]
+        public string? ViolationRemarks { get; set; }
+
+        // ============ Section 4: Inspections ============
+        [MaxLength(100)]
+        public string? MonitoringType { get; set; }
+
+        [MaxLength(50)]
+        public string? Month { get; set; }
+
+        public int? MonitoringCount { get; set; }
+
+        // ============ Calendar Type for Date Conversion ============
         public string? CalendarType { get; set; }
     }
 
     /// <summary>
-    /// DTO for Real Estate Violation API requests
+    /// DTO for Deed Item with serial numbers
     /// </summary>
-    public class RealEstateViolationData
+    public class DeedItemData
     {
         public int? Id { get; set; }
-        public int? ActivityMonitoringRecordId { get; set; }
-
-        [Required(ErrorMessage = "نمبر مسلسل الزامی است")]
-        [MaxLength(50)]
-        public string ViolationSerialNumber { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "شهرت دارنده جواز الزامی است")]
-        [MaxLength(200)]
-        public string LicenseHolderName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "نوعیت تخلف الزامی است")]
-        [MaxLength(500)]
-        public string ViolationType { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "تاریخ ثبت تخلف الزامی است")]
-        public string? ViolationDate { get; set; }
-
-        [MaxLength(1000)]
-        public string? ActionsTaken { get; set; }
-
-        [MaxLength(1000)]
-        public string? Remarks { get; set; }
-
-        public string? CalendarType { get; set; }
-    }
-
-    /// <summary>
-    /// DTO for Petition Writer Violation API requests
-    /// </summary>
-    public class PetitionWriterViolationData
-    {
-        public int? Id { get; set; }
-        public int? ActivityMonitoringRecordId { get; set; }
-
-        [Required(ErrorMessage = "نمبر مسلسل الزامی است")]
-        [MaxLength(50)]
-        public string ViolationSerialNumber { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "شهرت عریضه نویس الزامی است")]
-        [MaxLength(200)]
-        public string PetitionWriterName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "نوعیت تخلف الزامی است")]
-        [MaxLength(500)]
-        public string ViolationType { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "تاریخ ثبت تخلف الزامی است")]
-        public string? ViolationDate { get; set; }
-
-        [MaxLength(1000)]
-        public string? ActionsTaken { get; set; }
-
-        [MaxLength(1000)]
-        public string? Remarks { get; set; }
-
-        public string? CalendarType { get; set; }
+        public int DeedType { get; set; }
+        
+        [MaxLength(100)]
+        public string? SerialStart { get; set; }
+        
+        [MaxLength(100)]
+        public string? SerialEnd { get; set; }
+        
+        public int Count { get; set; }
     }
 }

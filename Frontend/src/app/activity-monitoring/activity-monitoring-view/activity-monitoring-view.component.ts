@@ -3,12 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ActivityMonitoringService } from 'src/app/shared/activity-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
-import {
-    ActivityMonitoringRecord,
-    Complaint,
-    RealEstateViolation,
-    PetitionWriterViolation
-} from 'src/app/models/ActivityMonitoring';
+import { ActivityMonitoringRecord } from 'src/app/models/ActivityMonitoring';
 
 @Component({
     selector: 'app-activity-monitoring-view',
@@ -17,9 +12,6 @@ import {
 })
 export class ActivityMonitoringViewComponent implements OnInit {
     record: ActivityMonitoringRecord | null = null;
-    complaints: Complaint[] = [];
-    realEstateViolations: RealEstateViolation[] = [];
-    petitionWriterViolations: PetitionWriterViolation[] = [];
     recordId: number = 0;
     isLoading = false;
 
@@ -28,7 +20,6 @@ export class ActivityMonitoringViewComponent implements OnInit {
         annual: true,
         complaints: true,
         realEstateViolations: true,
-        petitionWriterViolations: true,
         inspection: true
     };
 
@@ -57,36 +48,15 @@ export class ActivityMonitoringViewComponent implements OnInit {
         const calendar = this.calendarService.getSelectedCalendar();
         
         this.service.getById(this.recordId, calendar).subscribe({
-            next: (data) => {
+            next: (data: ActivityMonitoringRecord) => {
                 this.record = data;
                 this.isLoading = false;
             },
-            error: (err) => {
+            error: (err: any) => {
                 this.toastr.error('خطا در بارگذاری اطلاعات');
                 console.error(err);
                 this.isLoading = false;
             }
-        });
-
-        this.service.getComplaints(this.recordId, calendar).subscribe({
-            next: (data) => {
-                this.complaints = data;
-            },
-            error: (err) => console.error(err)
-        });
-
-        this.service.getRealEstateViolations(this.recordId, calendar).subscribe({
-            next: (data) => {
-                this.realEstateViolations = data;
-            },
-            error: (err) => console.error(err)
-        });
-
-        this.service.getPetitionWriterViolations(this.recordId, calendar).subscribe({
-            next: (data) => {
-                this.petitionWriterViolations = data;
-            },
-            error: (err) => console.error(err)
         });
     }
 

@@ -1,13 +1,9 @@
 ﻿<!-- Toolbar -->
 <mat-toolbar class="toolbar-modern !h-14 !px-4">
   <div class="toolbar-bg"></div>
-  
-  <button
-    mat-icon-button
-    *ngIf="sidenav.mode === 'over'"
-    (click)="sidenav.toggle()"
-    class="toolbar-btn text-white hover:bg-white/10"
-  >
+
+  <button mat-icon-button *ngIf="sidenav.mode === 'over'" (click)="sidenav.toggle()"
+    class="toolbar-btn text-white hover:bg-white/10">
     <mat-icon *ngIf="!sidenav.opened">menu</mat-icon>
     <mat-icon *ngIf="sidenav.opened">close</mat-icon>
   </button>
@@ -26,37 +22,26 @@
     <app-calendar-selector></app-calendar-selector>
 
     <!-- User Account Button -->
-    <button 
-      (click)="toggleUserMenu($event)"
-      class="toolbar-btn flex items-center justify-center w-10 h-10 rounded-full text-white hover:bg-white/10 transition-colors cursor-pointer"
-    >
+    <button (click)="toggleUserMenu($event)"
+      class="toolbar-btn flex items-center justify-center w-10 h-10 rounded-full text-white hover:bg-white/10 transition-colors cursor-pointer">
       <mat-icon>account_circle</mat-icon>
     </button>
 
     <!-- Language Button -->
-    <button 
-      (click)="toggleLangMenu($event)"
-      class="toolbar-btn flex items-center justify-center w-10 h-10 rounded-full text-white hover:bg-white/10 transition-colors cursor-pointer"
-    >
+    <button (click)="toggleLangMenu($event)"
+      class="toolbar-btn flex items-center justify-center w-10 h-10 rounded-full text-white hover:bg-white/10 transition-colors cursor-pointer">
       <mat-icon>translate</mat-icon>
     </button>
   </div>
 </mat-toolbar>
 
 <!-- Backdrop -->
-<div 
-  *ngIf="isUserMenuOpen || isLangMenuOpen"
-  (click)="closeAllMenus()"
-  class="fixed inset-0 bg-transparent"
-  style="z-index: 9000;"
-></div>
+<div *ngIf="isUserMenuOpen || isLangMenuOpen" (click)="closeAllMenus()" class="fixed inset-0 bg-transparent"
+  style="z-index: 9000;"></div>
 
 <!-- User Dropdown Menu -->
-<div 
-  *ngIf="isUserMenuOpen"
-  class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
-  style="z-index: 9001; top: 60px; left: 20px; min-width: 220px;"
->
+<div *ngIf="isUserMenuOpen" class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
+  style="z-index: 9001; top: 60px; left: 20px; min-width: 220px;">
   <button *ngIf="canAccessUsers" (click)="navigateToRegister()" class="dropdown-item">
     <mat-icon class="text-gray-500">people</mat-icon>
     <span>ایجاد کاربر</span>
@@ -81,11 +66,8 @@
 </div>
 
 <!-- Language Dropdown Menu -->
-<div 
-  *ngIf="isLangMenuOpen"
-  class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
-  style="z-index: 9001; top: 60px; left: 70px; min-width: 150px;"
->
+<div *ngIf="isLangMenuOpen" class="fixed bg-white rounded-xl shadow-2xl border border-gray-200 py-2"
+  style="z-index: 9001; top: 60px; left: 70px; min-width: 150px;">
   <button (click)="setlang()" class="dropdown-item">
     <span>دری</span>
   </button>
@@ -98,45 +80,55 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav="matSidenav" class="sidenav-modern">
     <div class="p-3 border-b border-slate-200 text-center">
-      <img class="mx-auto h-12 w-12 rounded-full object-cover border-2 border-slate-200" [src]="filePath" (error)="handleImageError()" />
+      <img class="mx-auto h-12 w-12 rounded-full object-cover border-2 border-slate-200" [src]="filePath"
+        (error)="handleImageError()" />
       <div class="mt-2 text-sm font-bold text-slate-800">{{ userDetails.firstName }} {{ userDetails.lastName }}</div>
-      <div class="text-xs text-slate-500 font-semibold">{{ userRoleDari || (userRole == 'ADMIN' ? 'مدیر سیستم' : 'کاربر') }}</div>
-      <div *ngIf="isViewOnly" class="mt-1 inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">فقط مشاهده</div>
+      <div class="text-xs text-slate-500 font-semibold">{{ userRoleDari || (userRole == 'ADMIN' ? 'مدیر سیستم' :
+        'کاربر') }}</div>
+      <div *ngIf="isViewOnly" class="mt-1 inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">فقط
+        مشاهده</div>
     </div>
     <nav class="p-2">
-      <a *ngIf="canAccessDashboard" routerLink="/dashboard" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessDashboard" routerLink="/dashboard" routerLinkActive="active-nav"
+        [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>dashboard</mat-icon><span>{{ "dashboard" | translate }}</span>
       </a>
-       <div *ngIf="canAccessLicenseApplications" class="section-label">درخواست جواز رهنمای معاملات</div>
-      <a *ngIf="canAccessLicenseApplications && canManageLicenseApplications" routerLink="/license-applications" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <div *ngIf="canAccessLicenseApplications" class="section-label">درخواست جواز رهنمای معاملات</div>
+      <a *ngIf="canAccessLicenseApplications && canManageLicenseApplications" routerLink="/license-applications"
+        routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>assignment</mat-icon><span>ثبت درخواست متقاضیان</span>
       </a>
-      <a *ngIf="canAccessLicenseApplications" routerLink="/license-applications/list" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessLicenseApplications" routerLink="/license-applications/list" routerLinkActive="active-nav"
+        class="nav-link">
         <mat-icon>list_alt</mat-icon><span>جدول ثبت درخواست متقاضیان</span>
       </a>
       <div *ngIf="canAccessCompany" class="section-label">رهنما ها</div>
-      <a *ngIf="canAccessCompany && canCreateCompany" routerLink="/realestate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessCompany && canCreateCompany" routerLink="/realestate" routerLinkActive="active-nav"
+        [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>business</mat-icon><span>{{ "company" | translate }}</span>
       </a>
       <a *ngIf="canAccessCompany" routerLink="/realestate/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>list_alt</mat-icon><span>{{ "companylist" | translate }}</span>
       </a>
       <div *ngIf="canAccessProperty" class="section-label">ملکیت ها</div>
-      <a *ngIf="canAccessProperty && canCreateProperty" routerLink="/estate" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessProperty && canCreateProperty" routerLink="/estate" routerLinkActive="active-nav"
+        [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>apartment</mat-icon><span>{{ "property" | translate }}</span>
       </a>
       <a *ngIf="canAccessProperty" routerLink="/estate/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>format_list_bulleted</mat-icon><span>{{ "propertylist" | translate }}</span>
       </a>
       <div *ngIf="canAccessVehicle" class="section-label">وسایط نقلیه</div>
-      <a *ngIf="canAccessVehicle && canCreateVehicle" routerLink="/vehicle" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessVehicle && canCreateVehicle" routerLink="/vehicle" routerLinkActive="active-nav"
+        [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>directions_car</mat-icon><span>{{ "vehicle" | translate }}</span>
       </a>
       <a *ngIf="canAccessVehicle" routerLink="/vehicle/list" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>format_list_bulleted</mat-icon><span>{{ "vehiclelist" | translate }}</span>
       </a>
       <div *ngIf="canAccessSecurities" class="section-label">اسناد بهادار </div>
-      <a *ngIf="canAccessSecurities && canCreateSecurities" routerLink="/securities" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessSecurities && canCreateSecurities" routerLink="/securities" routerLinkActive="active-nav"
+        [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>receipt_long</mat-icon><span>اسناد بهادار رهنمای معاملات</span>
       </a>
       <a *ngIf="canAccessSecurities" routerLink="/securities/list" routerLinkActive="active-nav" class="nav-link">
@@ -150,10 +142,12 @@
         <mat-icon>list_alt</mat-icon><span>جدول کنټرول ورودی و خروجی اسناد بهادار</span>
       </a> -->
       <div *ngIf="canAccessPetitionWriter" class="section-label">سند بهادار عریضه‌ نویسان</div>
-      <a *ngIf="canAccessPetitionWriter && canCreatePetitionWriterSecurities" routerLink="/petition-writer-securities" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessPetitionWriter && canCreatePetitionWriterSecurities" routerLink="/petition-writer-securities"
+        routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>article</mat-icon><span>سند بهادار عریضه‌ نویسان</span>
       </a>
-      <a *ngIf="canAccessPetitionWriter" routerLink="/petition-writer-securities/list" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessPetitionWriter" routerLink="/petition-writer-securities/list" routerLinkActive="active-nav"
+        class="nav-link">
         <mat-icon>table_chart</mat-icon><span>جدول سند بهادار عریضه‌ نویسان</span>
       </a>
       <!-- <div *ngIf="canAccessSecurities || canAccessPetitionWriter" class="section-label">گزارش‌گیری اسناد بهادار</div>
@@ -163,26 +157,31 @@
       <a *ngIf="canAccessPetitionWriter" routerLink="/petition-writer-report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>analytics</mat-icon><span>گزارش‌گیری سند بهادار عریضه‌نویسان</span>
       </a> -->
-     
+
       <div *ngIf="canAccessPetitionWriter" class="section-label">ثبت جواز عریضه‌نویسان</div>
-      <a *ngIf="canAccessPetitionWriter && canCreatePetitionWriterLicense" routerLink="/petition-writer-license" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <a *ngIf="canAccessPetitionWriter && canCreatePetitionWriterLicense" routerLink="/petition-writer-license"
+        routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>edit_note</mat-icon><span>ثبت جواز عریضه‌نویسان</span>
       </a>
-      <a *ngIf="canAccessPetitionWriter" routerLink="/petition-writer-license/list" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessPetitionWriter" routerLink="/petition-writer-license/list" routerLinkActive="active-nav"
+        class="nav-link">
         <mat-icon>table_view</mat-icon><span>جدول ثبت جواز عریضه‌نویسان</span>
       </a>
-      <div *ngIf="canAccessActivityMonitoring" class="section-label">نظارت بر فعالیت‌ها</div>
-      <a *ngIf="canAccessActivityMonitoring && canCreateActivityMonitoring" routerLink="/activity-monitoring/form" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>fact_check</mat-icon><span>ثبت نظارت بر فعالیت‌ها</span>
+      <div *ngIf="canAccessActivityMonitoring" class="section-label"> نظارت بر فعالیت‌ های رهنما</div>
+      <a *ngIf="canAccessActivityMonitoring && canCreateActivityMonitoring" routerLink="/activity-monitoring/form"
+        routerLinkActive="active-nav" class="nav-link">
+        <mat-icon>fact_check</mat-icon><span> ثبت نظارت بر فعالیت‌ های رهنما</span>
       </a>
-      <a *ngIf="canAccessActivityMonitoring" routerLink="/activity-monitoring/list" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>list_alt</mat-icon><span>جدول نظارت بر فعالیت‌ها</span>
+      <a *ngIf="canAccessActivityMonitoring" routerLink="/activity-monitoring/list" routerLinkActive="active-nav"
+        class="nav-link">
+        <mat-icon>list_alt</mat-icon><span>جدول نظارت بر فعالیت‌ های رهنما</span>
       </a>
       <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
       <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>
       </a>
-      <a *ngIf="canAccessReports && canAccessUsers" routerLink="/userreport" routerLinkActive="active-nav" class="nav-link">
+      <a *ngIf="canAccessReports && canAccessUsers" routerLink="/userreport" routerLinkActive="active-nav"
+        class="nav-link">
         <mat-icon>summarize</mat-icon><span>{{ "reportbycompany" | translate }}</span>
       </a>
       <div *ngIf="canAccessUsers" class="section-label">مدیریت کاربران</div>
@@ -199,7 +198,7 @@
       <a *ngIf="canAccessVerification" routerLink="/verify" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>verified</mat-icon><span>تصدیق اسناد</span>
       </a>
-    
+
     </nav>
   </mat-sidenav>
   <mat-sidenav-content class="bg-slate-50">

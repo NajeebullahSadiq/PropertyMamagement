@@ -18,7 +18,7 @@
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                 <i class="fas fa-search"></i>
               </span>
-              <input type="text" [(ngModel)]="searchText" (keyup.enter)="onSearch()" placeholder="جستجو بر اساس نام دارنده جواز..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <input type="text" [(ngModel)]="searchText" (keyup.enter)="onSearch()" placeholder="جستجو..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
           </div>
           <div class="flex gap-3">
@@ -44,11 +44,10 @@
           <thead class="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200">
             <tr class="text-center">
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت دارنده جواز</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ تصفیه مالیاتی</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">مقدار مالیه</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت ثبت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ گزارش</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ نظارت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">ثبت کننده</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
@@ -56,11 +55,15 @@
           <tbody class="divide-y divide-gray-200">
             <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-blue-50 transition-colors">
               <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ item.id }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.taxClearanceDateFormatted || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.paidTaxAmount || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
+              <td class="px-4 py-3 text-sm">
+                <span *ngIf="item.sectionType === 'complaints'" class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">ثبت شکایات</span>
+                <span *ngIf="item.sectionType === 'violations'" class="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">تخلفات</span>
+                <span *ngIf="item.sectionType === 'inspection'" class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نظارت</span>
+                <span *ngIf="!item.sectionType" class="text-gray-400">-</span>
+              </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.inspectionDateFormatted || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.createdBy || '-' }}</td>
               <td class="px-4 py-3">
                 <div class="flex justify-center gap-2">
@@ -77,7 +80,7 @@
               </td>
             </tr>
             <tr *ngIf="items.length === 0">
-              <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+              <td colspan="7" class="px-4 py-8 text-center text-gray-500">
                 <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
                 <p>هیچ رکوردی یافت نشد</p>
               </td>

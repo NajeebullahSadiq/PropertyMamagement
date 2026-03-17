@@ -616,6 +616,7 @@ namespace WebAPIBackend.Controllers.Companies
                         LicenseType = l.LicenseType,
                         ProvinceId = l.ProvinceId,
                         ProvinceName = l.Province != null ? l.Province.Dari : null,
+                        ActivityLocation = l.ActivityLocation,
                         IssueDate = l.IssueDate,
                         ExpireDate = l.ExpireDate,
                         Status = l.Status

@@ -8,43 +8,34 @@ namespace DataMigration
     
     public class PetitionWriterRecord
     {
-        [JsonPropertyName("SequenceNumber")]
-        public double? SequenceNumber { get; set; }
-        
         [JsonPropertyName("ApplicantName")]
-        public string? ApplicantName { get; set; }
+        public object? ApplicantName { get; set; }
         
-        [JsonPropertyName("FatherName")]
-        public string? FatherName { get; set; }
-        
-        [JsonPropertyName("Tazkera_Jold")]
-        public object? TazkeraJold { get; set; }
-        
-        [JsonPropertyName("Tazkera_Page")]
-        public object? TazkeraPage { get; set; }
+        [JsonPropertyName("ApplicantFatherName")]
+        public object? ApplicantFatherName { get; set; }
         
         [JsonPropertyName("ElectronicNationalIdNumber")]
         public object? ElectronicNationalIdNumber { get; set; }
+        
+        // Current Address
+        [JsonPropertyName("CurrentVillage")]
+        public object? CurrentVillage { get; set; }
+        
+        [JsonPropertyName("CurrentDistrictId")]
+        public string? CurrentDistrictId { get; set; }
+        
+        [JsonPropertyName("CurrentProvinceId")]
+        public string? CurrentProvinceId { get; set; }
         
         // Permanent Address
         [JsonPropertyName("PermanentVillage")]
         public object? PermanentVillage { get; set; }
         
-        [JsonPropertyName("PermanentDistrict")]
-        public string? PermanentDistrict { get; set; }
+        [JsonPropertyName("PermanentDistrictId")]
+        public string? PermanentDistrictId { get; set; }
         
-        [JsonPropertyName("PermanentProvince")]
-        public string? PermanentProvince { get; set; }
-        
-        // Current Address
-        [JsonPropertyName("CurrentVillage_Nahia")]
-        public object? CurrentVillageNahia { get; set; }
-        
-        [JsonPropertyName("CurrentDistrict")]
-        public string? CurrentDistrict { get; set; }
-        
-        [JsonPropertyName("CurrentProvince")]
-        public string? CurrentProvince { get; set; }
+        [JsonPropertyName("PermanentProvinceId")]
+        public string? PermanentProvinceId { get; set; }
         
         // License Info
         [JsonPropertyName("MobileNumber")]
@@ -56,28 +47,28 @@ namespace DataMigration
         [JsonPropertyName("LicenseIssueDate")]
         public string? LicenseIssueDate { get; set; }
         
-        [JsonPropertyName("LicenseType_New")]
+        [JsonPropertyName("LicenseType(new)")]
         public object? LicenseTypeNew { get; set; }
         
-        [JsonPropertyName("LicenseType_Renewal")]
-        public object? LicenseTypeRenewal { get; set; }
+        [JsonPropertyName("LicenseType(extend)")]
+        public object? LicenseTypeExtend { get; set; }
         
-        // Activity Location (different field names in different years)
+        [JsonPropertyName("LicenseType")]
+        public string? LicenseType { get; set; }
+        
+        // Activity Location
         [JsonPropertyName("DetailedAddress")]
         public string? DetailedAddress { get; set; }
         
-        [JsonPropertyName("ActivityLocation")]
-        public string? ActivityLocation { get; set; }
-        
-        [JsonPropertyName("District_Nahia")]
-        public object? DistrictNahia { get; set; }
+        [JsonPropertyName("ActivityNahia")]
+        public string? ActivityNahia { get; set; }
         
         // Relocation
-        [JsonPropertyName("RelocationInfo")]
-        public object? RelocationInfo { get; set; }
+        [JsonPropertyName("PetitionWriterRelocations")]
+        public object? PetitionWriterRelocations { get; set; }
         
-        // Source tracking
-        [JsonPropertyName("SourceYear")]
-        public int? SourceYear { get; set; }
+        // Province
+        [JsonPropertyName("ProvinceId")]
+        public int? ProvinceId { get; set; }
     }
 }

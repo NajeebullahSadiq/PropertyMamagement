@@ -5,13 +5,7 @@ import { environment } from 'src/environments/environment';
 import {
     ActivityMonitoringRecord,
     ActivityMonitoringData,
-    ActivityMonitoringListResponse,
-    Complaint,
-    ComplaintData,
-    RealEstateViolation,
-    RealEstateViolationData,
-    PetitionWriterViolation,
-    PetitionWriterViolationData
+    ActivityMonitoringListResponse
 } from '../models/ActivityMonitoring';
 
 @Injectable({
@@ -31,7 +25,7 @@ export class ActivityMonitoringService {
         this.dataChangedSubject.next();
     }
 
-    // ==================== Main Record CRUD ====================
+    // ==================== Main Record CRUD (Single Table Design) ====================
 
     getAll(
         page: number = 1,
@@ -82,95 +76,13 @@ export class ActivityMonitoringService {
         );
     }
 
-    // ==================== Complaints CRUD ====================
-
-    getComplaints(recordId: number, calendarType?: string): Observable<Complaint[]> {
-        let params = new HttpParams();
-        if (calendarType) {
-            params = params.set('calendarType', calendarType);
-        }
-        return this.http.get<Complaint[]>(`${this.baseUrl}/${recordId}/complaints`, { params });
-    }
-
-    addComplaint(data: ComplaintData): Observable<{ id: number; message: string }> {
-        return this.http.post<{ id: number; message: string }>(
-            `${this.baseUrl}/${data.activityMonitoringRecordId}/complaints`, data
-        );
-    }
-
-    updateComplaint(data: ComplaintData): Observable<{ id: number; message: string }> {
-        return this.http.put<{ id: number; message: string }>(
-            `${this.baseUrl}/${data.activityMonitoringRecordId}/complaints/${data.id}`, data
-        );
-    }
-
-    deleteComplaint(recordId: number, complaintId: number): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${recordId}/complaints/${complaintId}`);
-    }
-
-    // ==================== Real Estate Violations CRUD ====================
-
-    getRealEstateViolations(recordId: number, calendarType?: string): Observable<RealEstateViolation[]> {
-        let params = new HttpParams();
-        if (calendarType) {
-            params = params.set('calendarType', calendarType);
-        }
-        return this.http.get<RealEstateViolation[]>(
-            `${this.baseUrl}/${recordId}/realestate-violations`, { params }
-        );
-    }
-
-    addRealEstateViolation(data: RealEstateViolationData): Observable<{ id: number; message: string }> {
-        return this.http.post<{ id: number; message: string }>(
-            `${this.baseUrl}/${data.activityMonitoringRecordId}/realestate-violations`, data
-        );
-    }
-
-    updateRealEstateViolation(data: RealEstateViolationData): Observable<{ id: number; message: string }> {
-        return this.http.put<{ id: number; message: string }>(
-            `${this.baseUrl}/${data.activityMonitoringRecordId}/realestate-violations/${data.id}`, data
-        );
-    }
-
-    deleteRealEstateViolation(recordId: number, violationId: number): Observable<void> {
-        return this.http.delete<void>(
-            `${this.baseUrl}/${recordId}/realestate-violations/${violationId}`
-        );
-    }
-
-    // ==================== Petition Writer Violations CRUD ====================
-
-    getPetitionWriterViolations(recordId: number, calendarType?: string): Observable<PetitionWriterViolation[]> {
-        let params = new HttpParams();
-        if (calendarType) {
-            params = params.set('calendarType', calendarType);
-        }
-        return this.http.get<PetitionWriterViolation[]>(
-            `${this.baseUrl}/${recordId}/petitionwriter-violations`, { params }
-        );
-    }
-
-    addPetitionWriterViolation(data: PetitionWriterViolationData): Observable<{ id: number; message: string }> {
-        return this.http.post<{ id: number; message: string }>(
-            `${this.baseUrl}/${data.activityMonitoringRecordId}/petitionwriter-violations`, data
-        );
-    }
-
-    updatePetitionWriterViolation(data: PetitionWriterViolationData): Observable<{ id: number; message: string }> {
-        return this.http.put<{ id: number; message: string }>(
-            `${this.baseUrl}/${data.activityMonitoringRecordId}/petitionwriter-violations/${data.id}`, data
-        );
-    }
-
-    deletePetitionWriterViolation(recordId: number, violationId: number): Observable<void> {
-        return this.http.delete<void>(
-            `${this.baseUrl}/${recordId}/petitionwriter-violations/${violationId}`
-        );
-    }
-
     // ==================== Utility ====================
 
     resetMainTableId(): void {
         this.mainTableId = 0;
+    }
+
+    getNextSerialNumber(): Observable<{ serialNumber: string }> {
+        return this.http.get<{ serialNumber: string }>(`${this.baseUrl}/next-serial-number`);
     }
 }
