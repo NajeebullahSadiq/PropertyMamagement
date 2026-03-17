@@ -1,24 +1,88 @@
-table {
-  width: 100%;
+/* ============================================
+   Print Document Styles - A4 Layout
+   ============================================ */
+
+/* Print Controls (Screen Only) */
+.print-controls {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.control-label {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: 2px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  
+  &.btn-full {
+    border-color: #3498db;
+    background: white;
+    color: #3498db;
+    &.active { background: #3498db; color: white; }
+  }
+  
+  &.btn-data {
+    border-color: #27ae60;
+    background: white;
+    color: #27ae60;
+    &.active { background: #27ae60; color: white; }
+  }
+  
+  &.btn-print {
+    border-color: #e67e22;
+    background: #e67e22;
+    color: white;
+  }
+  
+  &.btn-close {
+    border-color: #95a5a6;
+    background: white;
+    color: #95a5a6;
+  }
+  
+  &.btn-primary {
+    background-color: #3498db;
+    color: white;
+    border: none;
+  }
+}
+
+/* Loading & Error Containers */
+.loading-container,
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
   text-align: center;
-  border: none;
-  margin: 0;
-  padding: 0;
 }
 
-.dot-line {
-  border: none;
-  border-top: 1px dotted black;
-  width: 100%;
-  height: 0;
-  margin: 1px 0;
-}
-
-hr {
-  border: 0;
-  border-top: 3px solid #000;
-  width: 100%;
-  margin: 1px 0;
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
 }
 
 @keyframes spin {
@@ -26,79 +90,222 @@ hr {
   100% { transform: rotate(360deg); }
 }
 
-/* Data-Only Mode Styles */
+.error-container {
+  i { font-size: 48px; color: #e74c3c; margin-bottom: 20px; }
+  h3 { color: #e74c3c; margin-bottom: 10px; }
+  p { color: #555; }
+}
+
+/* ============================================
+   Main Print Document - A4 Sizing
+   ============================================ */
+
+.print-document {
+  width: 190mm;
+  min-height: 277mm;
+  max-width: 190mm;
+  margin: 0 auto;
+  padding: 4mm 5mm;
+  background: white;
+  box-sizing: border-box;
+  font-family: 'B Nazanin', 'Times New Roman', serif;
+  font-size: 9pt;
+  line-height: 1.2;
+}
+
+/* Header Section */
+.document-header {
+  margin-bottom: 2mm;
+}
+
+.photos-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5mm;
+}
+
+.photos-left,
+.photos-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: 55px;
+}
+
+.photo {
+  width: 55px;
+  height: 65px;
+  object-fit: cover;
+  border: 1px solid #333;
+}
+
+.header-center {
+  flex: 1;
+  text-align: center;
+  padding: 0 5px;
+  
+  .verse {
+    font-size: 9pt;
+    margin: 0 0 1px 0;
+    color: #333;
+  }
+  
+  .office-name {
+    font-size: 12pt;
+    margin: 1px 0;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  .phone {
+    font-size: 9pt;
+    margin: 1px 0;
+  }
+  
+  .doc-title {
+    font-size: 10pt;
+    margin: 2px 0 0 0;
+    font-weight: bold;
+  }
+}
+
+/* Info Bar - Exact match to design */
+.info-bar {
+  display: flex;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  margin-bottom: 2mm;
+  font-size: 9pt;
+  direction: rtl;
+  
+  .info-item {
+    flex: 1;
+    padding: 1mm 2mm;
+    text-align: center;
+    border-right: 1px solid #000;
+    
+    &:first-child {
+      border-right: none;
+    }
+  }
+}
+
+/* ============================================
+   Main Table Layout - Exact Design Match
+   ============================================ */
+
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+  direction: rtl;
+  table-layout: fixed;
+  
+  /* Column widths matching design */
+  .col-left { width: 25%; }
+  .col-center { width: 50%; }
+  .col-right { width: 25%; }
+  
+  th, td {
+    border: 1px solid #000;
+    padding: 1mm 1.5mm;
+    vertical-align: top;
+    text-align: right;
+    font-size: 9pt;
+    line-height: 1.2;
+  }
+  
+  th {
+    background: #f0f0f0;
+    font-weight: bold;
+    text-align: center;
+    font-size: 10pt;
+    padding: 1.5mm;
+  }
+  
+  .cell {
+    /* Address cells with multiple lines */
+    &.address {
+      line-height: 1.1;
+      font-size: 8pt;
+    }
+    
+    /* Empty cells for positioning */
+    &.empty {
+      background: transparent;
+      min-height: 4mm;
+    }
+    
+    /* Witness header */
+    &.witness-header {
+      text-align: center;
+      font-weight: bold;
+      font-size: 10pt;
+      background: #f5f5f5;
+    }
+    
+    /* Witness rows */
+    &.witness {
+      line-height: 1.2;
+    }
+  }
+  
+  .footer {
+    text-align: center;
+    padding: 1.5mm;
+    font-size: 9pt;
+  }
+}
+
+/* ============================================
+   Data-Only Mode (for pre-printed forms)
+   ============================================ */
+
 .data-only-mode {
-  /* Hide all borders and design elements */
-  table {
+  /* Hide borders and backgrounds */
+  .main-table {
     border: none !important;
     
-    td, th {
+    th, td {
       border: none !important;
       background: transparent !important;
     }
   }
   
-  /* Hide decorative elements */
-  .dot-line {
+  /* Hide structural elements */
+  th,
+  .empty,
+  .witness-header,
+  .footer {
     display: none !important;
   }
   
-  hr {
+  /* Hide photos and info bar */
+  .photo,
+  .info-bar {
     display: none !important;
+  }
+  
+  /* Show only values */
+  .cell {
+    font-size: 12pt !important;
+    padding: 1mm !important;
   }
 }
 
-/* Screen view - ensure proper A4 sizing */
-.container {
-  width: 210mm;
-  min-height: 297mm;
-  margin: 0 auto;
-  padding: 5mm;
-  background: white;
-  box-sizing: border-box;
-  font-size: 10pt;
-  line-height: 1.3;
-}
-
-/* Reduce spacing in all paragraphs and headings */
-.container p {
-  margin: 2px 0;
-  line-height: 1.3;
-}
-
-.container h3 {
-  margin: 3px 0;
-  line-height: 1.2;
-}
-
-.container ol, .container ul {
-  margin: 3px 0;
-  padding-right: 18pt;
-}
-
-.container li {
-  margin: 2px 0;
-  line-height: 1.35;
-}
-
-.container table {
-  margin: 0;
-}
-
-.container td {
-  padding: 2px 3px !important;
-  line-height: 1.2;
-}
+/* ============================================
+   Print Styles
+   ============================================ */
 
 @media print {
-  /* Hide no-print elements */
-  .no-print {
+  .no-print,
+  .print-controls {
     display: none !important;
   }
   
   @page {
     size: A4 portrait;
-    margin: 8mm 6mm;
+    margin: 5mm;
   }
   
   html, body {
@@ -109,144 +316,103 @@ hr {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-
-  .container {
+  
+  .print-document {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 4mm 5mm !important;
     page-break-after: auto;
-    font-size: 9.5pt;
-    transform: scale(0.98);
-    transform-origin: top left;
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
   }
   
-  img {
-    page-break-inside: avoid;
-    max-width: 100%;
-    height: auto;
+  .document-header {
+    margin-bottom: 2mm !important;
   }
   
-  table {
+  .photos-section {
+    margin-bottom: 1.5mm !important;
+  }
+  
+  .photo {
+    width: 50px !important;
+    height: 60px !important;
+  }
+  
+  .header-center {
+    .verse { font-size: 9pt !important; margin: 0 !important; }
+    .office-name { font-size: 12pt !important; margin: 0 !important; }
+    .phone { font-size: 9pt !important; margin: 0 !important; }
+    .doc-title { font-size: 10pt !important; margin: 0 !important; }
+  }
+  
+  .info-bar {
+    margin-bottom: 1.5mm !important;
+    font-size: 8pt !important;
+    border-top: 1px solid #000 !important;
+    border-bottom: 1px solid #000 !important;
+    
+    .info-item {
+      padding: 1mm 1.5mm !important;
+      border-right: 1px solid #000 !important;
+      
+      &:first-child {
+        border-right: none !important;
+      }
+    }
+  }
+  
+  .main-table {
     page-break-inside: auto;
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin: 0 !important;
+    
+    th, td {
+      padding: 1mm 1.5mm !important;
+      line-height: 1.1 !important;
+      font-size: 8pt !important;
+      border: 1px solid #000 !important;
+    }
+    
+    th {
+      font-size: 9pt !important;
+      padding: 1.5mm !important;
+    }
+    
+    .cell {
+      &.address {
+        line-height: 1.1 !important;
+        font-size: 7pt !important;
+      }
+      
+      &.witness-header {
+        font-size: 9pt !important;
+      }
+    }
+    
+    .footer {
+      padding: 1.5mm !important;
+      font-size: 8pt !important;
+    }
   }
   
   tr {
     page-break-inside: avoid;
-    page-break-after: auto;
   }
-
-  td {
-    padding: 1.5px 2.5px !important;
-    line-height: 1.15 !important;
-  }
-
-  p {
-    margin: 1.5px 0 !important;
-    line-height: 1.25 !important;
-  }
-
-  h3 {
-    margin: 2px 0 !important;
-    line-height: 1.15 !important;
-  }
-
-  ol, ul {
-    margin: 2px 0 !important;
-    padding-right: 18pt !important;
-  }
-
-  li {
-    margin: 1.5px 0 !important;
-    line-height: 1.3 !important;
-    font-size: 9.5pt !important;
-  }
-
-  br {
-    line-height: 0.5 !important;
-  }
-
-  /* Force page break before second page content (rights and obligations table) */
-  table:nth-of-type(2) {
-    page-break-before: always;
-    margin-top: 0 !important;
-  }
-
-  /* Ensure QR code doesn't break across pages */
-  div[style*="flex-direction: column"] {
-    page-break-inside: avoid;
-  }
-
-  /* Reduce spacing in the dot line */
-  .dot-line {
-    margin: 1px 0 !important;
-  }
-
-  /* Data-Only Mode Print Styles */
+  
+  /* Data-Only Mode Print */
   .data-only-mode {
-    /* Remove all borders and backgrounds */
-    table, td, th, tr {
-      border: none !important;
-      background: none !important;
-      box-shadow: none !important;
-    }
-    
-    /* Hide ALL images, QR codes, photos */
-    img {
-      display: none !important;
-      visibility: hidden !important;
-    }
-    
-    /* Hide decorative elements */
-    .dot-line, hr, br {
-      display: none !important;
-    }
-    
-    /* Hide all list items (rights and obligations section) */
-    ol, ul, li {
-      display: none !important;
-    }
-    
-    /* Hide all headers */
-    h1, h2, h3, h4, h5, h6 {
-      display: none !important;
-    }
-    
-    /* Hide underlined text (section headers) */
-    u {
-      display: none !important;
-    }
-    
-    /* Hide the second table (rights and obligations + signatures) */
-    table:nth-of-type(2) {
-      display: none !important;
-    }
-    
-    /* Remove padding/margins to match pre-printed form positions */
-    td {
-      padding: 2px !important;
-    }
-    
-    /* Ensure data text is visible and properly sized */
-    p, strong, span, b {
-      font-size: 12pt !important;
-      color: black !important;
-      font-weight: normal !important;
-    }
-    
-    /* Ensure single page - no page breaks */
-    .container {
-      page-break-after: avoid !important;
-      page-break-inside: avoid !important;
-    }
-    
-    table {
+    .main-table {
       page-break-before: avoid !important;
       page-break-after: avoid !important;
       page-break-inside: avoid !important;
+    }
+    
+    .cell {
+      font-size: 10pt !important;
+    }
+    
+    .info-bar {
+      display: none !important;
     }
   }
 }
