@@ -39,10 +39,8 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
   ) {
     this.isViewOnly = this.rbacService.isViewOnly();
     this.isAdmin = this.rbacService.isAdmin();
-    
-    // Check if user can edit and print companies
-    this.canEdit = this.rbacService.canCreateCompany();
-    this.canPrint = this.rbacService.canCreateCompany();
+    this.canEdit = this.rbacService.hasPermission('company.create') || this.rbacService.hasPermission('company.edit');
+    this.canPrint = this.rbacService.hasPermission('company.view');
     
     // Setup debounced search
     this.searchSubject.pipe(

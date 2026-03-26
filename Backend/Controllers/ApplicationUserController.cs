@@ -206,26 +206,31 @@ namespace WebAPI.Controllers
                     // Get role assigned to the user
                     var roles = await _userManager.GetRolesAsync(user);
                     var primaryRole = roles.FirstOrDefault() ?? user.UserRole ?? "USER";
-                    
-                    // Get permissions for the role
-                    var permissions = RolePermissions.GetPermissionsForRole(primaryRole);
-                    
-                    var userRoles = roles.Select(r => new Claim(ClaimTypes.Role, r)).ToArray();
-                    var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
-                    
-                    // Collect all role claims (permissions)
-                    var allRoleClaims = new List<Claim>();
-                    foreach (var userRole in roles)
+
+                    // Load permissions: prefer live DB claims, fall back to hardcoded defaults
+                    string[] permissions;
+                    var roleEntity = await _roleManager.FindByNameAsync(primaryRole);
+                    if (roleEntity != null)
                     {
-                        var role = await _roleManager.FindByNameAsync(userRole);
-                        if (role != null)
-                        {
-                            var roleClaims = await _roleManager.GetClaimsAsync(role);
-                            allRoleClaims.AddRange(roleClaims);
-                        }
+                        var roleClaims = await _roleManager.GetClaimsAsync(roleEntity);
+                        var livePermissions = roleClaims
+                            .Where(c => c.Type == "permission")
+                            .Select(c => c.Value)
+                            .Distinct()
+                            .ToArray();
+                        permissions = livePermissions.Length > 0
+                            ? livePermissions
+                            : RolePermissions.GetPermissionsForRole(primaryRole);
+                    }
+                    else
+                    {
+                        permissions = RolePermissions.GetPermissionsForRole(primaryRole);
                     }
 
-                    // Add custom claims for RBAC
+                    var userRoles = roles.Select(r => new Claim(ClaimTypes.Role, r)).ToArray();
+                    var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
+
+                    // Build custom claims — permissions only from our resolved list (no stale role claims)
                     var customClaims = new List<Claim>
                     {
                         new Claim("UserID", user.Id.ToString()),
@@ -239,19 +244,16 @@ namespace WebAPI.Controllers
 
                     // Add province claim for COMPANY_REGISTRAR users
                     if (primaryRole == UserRoles.CompanyRegistrar && user.ProvinceId.HasValue)
-                    {
                         customClaims.Add(new Claim(CustomClaimTypes.ProvinceId, user.ProvinceId.Value.ToString()));
-                    }
 
-                    // Add permissions as claims
-                    foreach (var permission in permissions)
-                    {
+                    // Add permissions as lowercase "permission" claims — deduplicated
+                    foreach (var permission in permissions.Distinct())
                         customClaims.Add(new Claim("permission", permission));
-                    }
 
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
-                        Subject = new ClaimsIdentity(customClaims.Union(userClaims).Union(userRoles).Union(allRoleClaims)),
+                        // Only use customClaims + userRoles — exclude allRoleClaims to avoid stale "Permission" duplicates
+                        Subject = new ClaimsIdentity(customClaims.Union(userClaims).Union(userRoles)),
                         Expires = DateTime.UtcNow.AddDays(1),
                         SigningCredentials = new SigningCredentials(
                             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret ?? "")), 
@@ -266,7 +268,7 @@ namespace WebAPI.Controllers
                         token,
                         role = primaryRole,
                         roleDari = UserRoles.GetDariName(primaryRole),
-                        permissions = permissions,
+                        permissions,
                         companyId = user.CompanyId,
                         licenseType = user.LicenseType,
                         isViewOnly = primaryRole == UserRoles.Authority || primaryRole == UserRoles.LicenseReviewer

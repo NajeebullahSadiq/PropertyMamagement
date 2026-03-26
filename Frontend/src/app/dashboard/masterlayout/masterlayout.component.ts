@@ -104,7 +104,7 @@ export class MasterlayoutComponent implements AfterViewInit {
     this.userRole = this.rbacService.getCurrentRole();
     this.userRoleDari = this.rbacService.getRoleDari(this.userRole);
     
-    // Set module access flags
+    // Set module access flags — all driven by permissions from JWT token
     this.canAccessDashboard = this.rbacService.canAccessModule('dashboard');
     this.canAccessCompany = this.rbacService.canAccessModule('company');
     this.canAccessProperty = this.rbacService.canAccessModule('property');
@@ -117,19 +117,19 @@ export class MasterlayoutComponent implements AfterViewInit {
     this.canAccessVerification = this.rbacService.canAccessModule('verification');
     this.isViewOnly = this.rbacService.isViewOnly();
     this.isAdmin = this.rbacService.isAdmin();
-    
+
     // License applications access
     this.canAccessLicenseApplications = this.rbacService.canAccessModule('licenseApplications');
     this.canManageLicenseApplications = this.rbacService.hasPermission('licenseapplication.create');
-    
+
     // Set module create/edit flags
-    this.canCreateCompany = this.rbacService.canCreateCompany();
-    this.canCreateProperty = this.rbacService.canCreateProperty();
-    this.canCreateVehicle = this.rbacService.canCreateVehicle();
-    this.canCreateSecurities = this.rbacService.canCreateSecurities();
-    this.canCreateActivityMonitoring = this.rbacService.canCreateActivityMonitoring();
-    this.canCreatePetitionWriterSecurities = this.rbacService.canCreatePetitionWriterSecurities();
-    this.canCreatePetitionWriterLicense = this.rbacService.canCreatePetitionWriterLicense();
+    this.canCreateCompany = this.rbacService.hasPermission('company.create') || this.rbacService.hasPermission('company.edit');
+    this.canCreateProperty = this.rbacService.hasPermission('property.create') || this.rbacService.hasPermission('property.edit') || this.rbacService.hasPermission('property.edit.own');
+    this.canCreateVehicle = this.rbacService.hasPermission('vehicle.create') || this.rbacService.hasPermission('vehicle.edit') || this.rbacService.hasPermission('vehicle.edit.own');
+    this.canCreateSecurities = this.rbacService.hasPermission('securities.create');
+    this.canCreateActivityMonitoring = this.rbacService.hasPermission('activitymonitoring.create');
+    this.canCreatePetitionWriterSecurities = this.rbacService.hasPermission('petitionwritersecurities.create');
+    this.canCreatePetitionWriterLicense = this.rbacService.hasPermission('petitionwriterlicense.create');
   }
 
   onLogout() {

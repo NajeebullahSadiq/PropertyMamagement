@@ -56,12 +56,10 @@ export class PetitionWriterSecuritiesListComponent implements OnInit, OnDestroy 
     }
 
     checkPermissions(): void {
-        const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesEntryManager || role === UserRoles.PetitionWriterSecuritiesEntryManager;
+        this.isViewOnly = !this.rbacService.hasPermission('petitionwritersecurities.create');
         this.canEdit = this.rbacService.canEditPetitionWriterSecurities();
-        // Entry managers can print but not edit
-        this.canPrint = role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager || role === UserRoles.PetitionWriterSecuritiesEntryManager;
-        this.canDelete = role === UserRoles.Admin;
+        this.canPrint = this.rbacService.hasPermission('petitionwritersecurities.view');
+        this.canDelete = this.rbacService.isAdmin();
         this.currentUserId = this.rbacService.getCurrentUserId();
     }
 

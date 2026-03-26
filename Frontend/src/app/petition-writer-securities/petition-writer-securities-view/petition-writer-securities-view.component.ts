@@ -39,10 +39,8 @@ export class PetitionWriterSecuritiesViewComponent implements OnInit {
     }
 
     checkPermissions(): void {
-        const role = this.rbacService.getCurrentRole();
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator || role === UserRoles.SecuritiesManager;
-        // Only Admin, Authority, and SECURITIES_MANAGER can print petition writer securities
-        this.canPrint = role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
+        this.canEdit = this.rbacService.canEditPetitionWriterSecurities();
+        this.canPrint = this.rbacService.hasPermission('petitionwritersecurities.view');
     }
 
     loadData(id: number): void {

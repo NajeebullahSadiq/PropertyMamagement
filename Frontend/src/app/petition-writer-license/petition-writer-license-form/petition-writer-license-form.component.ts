@@ -90,12 +90,10 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     }
 
     checkPermissions(): void {
-        const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PetitionWriterLicenseManager;
+        this.isViewOnly = !this.rbacService.hasPermission('petitionwriterlicense.create');
+        this.canEdit = this.rbacService.hasPermission('petitionwriterlicense.edit');
         this.isAdmin = this.rbacService.isAdmin();
-        // Check if user has province-based access (not system-level)
-        this.hasProvinceAccess = role === UserRoles.CompanyRegistrar || role === UserRoles.PetitionWriterLicenseManager;
+        this.hasProvinceAccess = this.rbacService.hasPermission('petitionwriterlicense.create') && !this.rbacService.isAdmin();
     }
 
     loadUserProvince(): void {

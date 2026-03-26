@@ -78,9 +78,8 @@ export class ActivityMonitoringFormComponent implements OnInit {
     }
 
     checkPermissions(): void {
-        const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar;
+        this.isViewOnly = !this.rbacService.hasPermission('activitymonitoring.create');
+        this.canEdit = this.rbacService.hasPermission('activitymonitoring.edit');
     }
 
     initForm(): void {

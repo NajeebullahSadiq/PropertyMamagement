@@ -52,10 +52,9 @@ export class SecuritiesControlListComponent implements OnInit, OnDestroy {
     }
 
     checkPermissions(): void {
-        const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PropertyOperator;
-        this.canDelete = role === UserRoles.Admin;
+        this.isViewOnly = !this.rbacService.hasPermission('securities.create');
+        this.canEdit = this.rbacService.hasPermission('securities.edit');
+        this.canDelete = this.rbacService.isAdmin();
     }
 
     loadData(): void {

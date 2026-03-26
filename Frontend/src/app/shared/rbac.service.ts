@@ -61,6 +61,30 @@ export const Permissions = {
   LicenseEdit: 'license.edit',
   LicenseApprove: 'license.approve',
 
+  // Securities
+  SecuritiesView: 'securities.view',
+  SecuritiesCreate: 'securities.create',
+  SecuritiesEdit: 'securities.edit',
+  SecuritiesDelete: 'securities.delete',
+
+  // Petition Writer Securities
+  PetitionWriterSecuritiesView: 'petitionwritersecurities.view',
+  PetitionWriterSecuritiesCreate: 'petitionwritersecurities.create',
+  PetitionWriterSecuritiesEdit: 'petitionwritersecurities.edit',
+  PetitionWriterSecuritiesDelete: 'petitionwritersecurities.delete',
+
+  // Petition Writer License
+  PetitionWriterLicenseView: 'petitionwriterlicense.view',
+  PetitionWriterLicenseCreate: 'petitionwriterlicense.create',
+  PetitionWriterLicenseEdit: 'petitionwriterlicense.edit',
+  PetitionWriterLicenseDelete: 'petitionwriterlicense.delete',
+
+  // Activity Monitoring
+  ActivityMonitoringView: 'activitymonitoring.view',
+  ActivityMonitoringCreate: 'activitymonitoring.create',
+  ActivityMonitoringEdit: 'activitymonitoring.edit',
+  ActivityMonitoringDelete: 'activitymonitoring.delete',
+
   // Reports
   ReportsView: 'reports.view',
   ReportsExport: 'reports.export',
@@ -206,10 +230,14 @@ export class RbacService {
     return '';
   }
 
-  // Check if user is view-only
+  // Check if user is view-only (has no create/edit permissions at all)
   isViewOnly(): boolean {
-    const role = this.getCurrentRole();
-    return role === UserRoles.Authority || role === UserRoles.LicenseReviewer;
+    return !this.hasAnyPermission([
+      Permissions.CompanyCreate, Permissions.PropertyCreate, Permissions.VehicleCreate,
+      Permissions.SecuritiesCreate, Permissions.PetitionWriterSecuritiesCreate,
+      Permissions.PetitionWriterLicenseCreate, Permissions.ActivityMonitoringCreate,
+      Permissions.LicenseApplicationCreate, Permissions.LicenseCreate
+    ]);
   }
 
   // Check if user can create/edit in Property module
@@ -229,44 +257,32 @@ export class RbacService {
 
   // Check if user can create securities
   canCreateSecurities(): boolean {
-    const role = this.getCurrentRole();
-    // Only Admin, Authority, SECURITIES_MANAGER, and SECURITIES_ENTRY_MANAGER can create securities
-    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager;
+    return this.hasPermission(Permissions.SecuritiesCreate);
   }
 
   // Check if user can edit securities
   canEditSecurities(): boolean {
-    const role = this.getCurrentRole();
-    // Only Admin, Authority, and SECURITIES_MANAGER can edit securities (NOT SECURITIES_ENTRY_MANAGER)
-    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
+    return this.hasPermission(Permissions.SecuritiesEdit);
   }
 
   // Check if user can create activity monitoring entries
   canCreateActivityMonitoring(): boolean {
-    const role = this.getCurrentRole();
-    // Only Admin, Authority, and ACTIVITY_MONITORING_MANAGER can create activity monitoring
-    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.ActivityMonitoringManager;
+    return this.hasPermission(Permissions.ActivityMonitoringCreate);
   }
 
   // Check if user can create petition writer securities
   canCreatePetitionWriterSecurities(): boolean {
-    const role = this.getCurrentRole();
-    // Only Admin, Authority, SECURITIES_MANAGER, SECURITIES_ENTRY_MANAGER, and PETITION_WRITER_SECURITIES_ENTRY_MANAGER can create
-    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager || role === UserRoles.PetitionWriterSecuritiesEntryManager;
+    return this.hasPermission(Permissions.PetitionWriterSecuritiesCreate);
   }
 
   // Check if user can edit petition writer securities
   canEditPetitionWriterSecurities(): boolean {
-    const role = this.getCurrentRole();
-    // Only Admin, Authority, and SECURITIES_MANAGER can edit (NOT entry managers)
-    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.SecuritiesManager;
+    return this.hasPermission(Permissions.PetitionWriterSecuritiesEdit);
   }
 
   // Check if user can create petition writer license
   canCreatePetitionWriterLicense(): boolean {
-    const role = this.getCurrentRole();
-    // Only Admin, Authority, and PETITION_WRITER_LICENSE_MANAGER can create petition writer license
-    return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.PetitionWriterLicenseManager;
+    return this.hasPermission(Permissions.PetitionWriterLicenseCreate);
   }
 
   // Check if user has specific permission
@@ -302,81 +318,46 @@ export class RbacService {
 
   // Check if user can access module
   canAccessModule(module: string): boolean {
-    const role = this.getCurrentRole();
-    const licenseType = this.getLicenseType();
-
-    // Admin and Authority can access all modules
-    if (role === UserRoles.Admin || role === UserRoles.Authority) {
-      return true;
-    }
-
+    // Admin has all permissions in token, so permission checks cover admin automatically
     switch (module.toLowerCase()) {
-      case 'company':
-        return role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseReviewer || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager;
-      case 'property':
-        return role === UserRoles.PropertyOperator || 
-               role === UserRoles.CompanyRegistrar ||
-               role === UserRoles.LicenseApplicationManager ||
-               role === UserRoles.ActivityMonitoringManager ||
-               role === UserRoles.SecuritiesManager ||
-               licenseType === 'realEstate';
-      case 'vehicle':
-        return role === UserRoles.VehicleOperator || 
-               role === UserRoles.CompanyRegistrar ||
-               role === UserRoles.LicenseApplicationManager ||
-               role === UserRoles.ActivityMonitoringManager ||
-               role === UserRoles.SecuritiesManager ||
-               licenseType === 'carSale';
-      case 'securities':
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.SecuritiesEntryManager || role === UserRoles.CompanyRegistrar;
-      case 'petitionwriter':
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.PetitionWriterSecuritiesEntryManager || role === UserRoles.PetitionWriterLicenseManager;
-      case 'activitymonitoring':
-        return role === UserRoles.Admin || role === UserRoles.Authority || role === UserRoles.LicenseApplicationManager || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.PetitionWriterLicenseManager;
-      case 'verification':
-        // Verification is accessible to all roles
-        return true;
-      case 'licenseapplications':
-        // License applications accessible to Admin, CompanyRegistrar (view-only), and LicenseApplicationManager (full access)
-        return role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.LicenseApplicationManager;
-      case 'reports':
-        // Reports accessible to all except License Reviewer
-        return role !== UserRoles.LicenseReviewer;
       case 'dashboard':
-        // Dashboard is ONLY for Admin and Authority
-        return role === UserRoles.Admin || role === UserRoles.Authority;
+        return this.hasPermission(Permissions.DashboardView);
+      case 'company':
+        return this.hasPermission(Permissions.CompanyView);
+      case 'property':
+        return this.hasPermission(Permissions.PropertyView) || this.hasPermission(Permissions.PropertyEditOwn);
+      case 'vehicle':
+        return this.hasPermission(Permissions.VehicleView) || this.hasPermission(Permissions.VehicleEditOwn);
+      case 'securities':
+        return this.hasPermission(Permissions.SecuritiesView);
+      case 'petitionwriter':
+        return this.hasPermission(Permissions.PetitionWriterSecuritiesView) || this.hasPermission(Permissions.PetitionWriterLicenseView);
+      case 'activitymonitoring':
+        return this.hasPermission(Permissions.ActivityMonitoringView);
+      case 'licenseapplications':
+        return this.hasPermission(Permissions.LicenseApplicationView);
+      case 'reports':
+        return this.hasPermission(Permissions.ReportsView);
+      case 'verification':
+        return true; // Public to all authenticated users
       case 'users':
-        return role === UserRoles.Admin;
+        return this.hasPermission(Permissions.UsersView);
       default:
         return false;
     }
   }
 
-  // Check if user can edit record (ownership check)
+  // Check if user can edit record (ownership check for property/vehicle operators)
   canEditRecord(createdBy: string): boolean {
-    const role = this.getCurrentRole();
-    
-    // Admin can edit all records
-    if (role === UserRoles.Admin) {
-      return true;
-    }
-
-    // View-only roles cannot edit
-    if (this.isViewOnly()) {
-      return false;
-    }
-
-    // Company registrar can edit company records but NOT property/vehicle records
-    if (role === UserRoles.CompanyRegistrar) {
-      return true; // This will be further restricted by permission checks in components
-    }
-
-    // Property/Vehicle operators can only edit their own records
-    if (role === UserRoles.PropertyOperator || role === UserRoles.VehicleOperator) {
+    if (this.isAdmin()) return true;
+    if (this.isViewOnly()) return false;
+    // Users with edit.own permission can only edit their own records
+    if (this.hasPermission(Permissions.PropertyEditOwn) || this.hasPermission(Permissions.VehicleEditOwn)) {
       return createdBy === this.getCurrentUserId();
     }
-
-    return false;
+    return this.hasAnyPermission([
+      Permissions.CompanyEdit, Permissions.PropertyEdit, Permissions.VehicleEdit
+    ]);
   }
 
   // Get all available roles (for admin UI)

@@ -153,13 +153,17 @@ export class RolePermissionsComponent implements OnInit {
     this.loadRoles();
   }
 
-  loadRoles(): void {
+  loadRoles(preserveRoleId?: string): void {
     this.isLoading = true;
     this.http.get<any[]>(`${this.baseUrl}/ApplicationUser/GetRoles`).subscribe({
       next: (roles) => {
         this.roles = roles;
         this.isLoading = false;
-        if (roles.length > 0) this.selectRole(roles[0]);
+        // Re-select the same role if we were editing one, otherwise pick first
+        const toSelect = preserveRoleId
+          ? roles.find(r => r.id === preserveRoleId) ?? roles[0]
+          : roles[0];
+        if (toSelect) this.selectRole(toSelect);
       },
       error: () => {
         this.toastr.error('خطا در بارگذاری نقش‌ها');
@@ -225,17 +229,36 @@ export class RolePermissionsComponent implements OnInit {
   save(): void {
     if (!this.selectedRole || !this.hasChanges) return;
     this.isSaving = true;
+    const roleId = this.selectedRole.id;
     const permissions = this.toArray(this.activePermissions);
     this.http.post(`${this.baseUrl}/ApplicationUser/UpdateRolePermissions`, {
-      roleName: this.selectedRole.id,
+      roleName: roleId,
       permissions
     }).subscribe({
-      next: (res: any) => {
-        this.isSaving = false;
-        this.toastr.success(res.message || 'صلاحیت‌ها با موفقیت ذخیره شد');
-        this.selectedRole.permissions = permissions;
-        this.originalPermissions = { ...this.activePermissions };
-        this.hasChanges = false;
+      next: () => {
+        // Reload this specific role's permissions directly from DB to confirm
+        this.http.get<any>(`${this.baseUrl}/ApplicationUser/GetRolePermissions/${roleId}`).subscribe({
+          next: (fresh) => {
+            this.isSaving = false;
+            this.hasChanges = false;
+            // Update the role in the sidebar list
+            const idx = this.roles.findIndex(r => r.id === roleId);
+            if (idx >= 0) {
+              this.roles[idx] = { ...this.roles[idx], permissions: fresh.permissions };
+              this.roles = [...this.roles]; // trigger change detection
+            }
+            // Update selected role state from server response
+            this.selectedRole = this.roles.find(r => r.id === roleId) ?? this.selectedRole;
+            this.activePermissions = this.toMap(fresh.permissions || []);
+            this.originalPermissions = this.toMap(fresh.permissions || []);
+            this.toastr.success('صلاحیت‌های نقش با موفقیت ذخیره شد');
+          },
+          error: () => {
+            this.isSaving = false;
+            this.hasChanges = false;
+            this.toastr.success('ذخیره شد — صفحه را رفرش کنید');
+          }
+        });
       },
       error: (err) => {
         this.isSaving = false;

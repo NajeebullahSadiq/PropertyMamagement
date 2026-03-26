@@ -64,10 +64,9 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
     }
 
     checkPermissions(): void {
-        const role = this.rbacService.getCurrentRole();
-        this.isViewOnly = role === UserRoles.Authority || role === UserRoles.LicenseReviewer || role === UserRoles.ActivityMonitoringManager || role === UserRoles.SecuritiesManager || role === UserRoles.PetitionWriterLicenseManager;
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar || role === UserRoles.PetitionWriterLicenseManager;
-        this.canDelete = role === UserRoles.Admin;
+        this.isViewOnly = !this.rbacService.hasPermission('petitionwriterlicense.create');
+        this.canEdit = this.rbacService.hasPermission('petitionwriterlicense.edit');
+        this.canDelete = this.rbacService.isAdmin();
     }
 
     loadData(): void {

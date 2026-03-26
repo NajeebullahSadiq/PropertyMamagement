@@ -51,8 +51,7 @@ export class PetitionWriterLicenseViewComponent implements OnInit {
     }
 
     checkPermissions(): void {
-        const role = this.rbacService.getCurrentRole();
-        this.canEdit = role === UserRoles.Admin || role === UserRoles.CompanyRegistrar;
+        this.canEdit = this.rbacService.hasPermission('petitionwriterlicense.edit');
     }
 
     loadData(id: number): void {

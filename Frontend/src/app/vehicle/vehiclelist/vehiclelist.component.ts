@@ -31,8 +31,8 @@ export class VehiclelistComponent {
     private rbacService: RbacService
   ) {
     this.isViewOnly = this.rbacService.isViewOnly();
-    this.canEdit = this.rbacService.canCreateVehicle();
-    this.canPrint = this.rbacService.canCreateVehicle();
+    this.canEdit = this.rbacService.hasPermission('vehicle.create') || this.rbacService.hasPermission('vehicle.edit');
+    this.canPrint = this.rbacService.hasPermission('vehicle.view');
   }
 
   ngOnInit() {
