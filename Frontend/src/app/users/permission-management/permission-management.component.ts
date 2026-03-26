@@ -4,6 +4,8 @@ import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/shared/auth.service';
 import { RoleAssignDialogComponent } from './role-assign-dialog/role-assign-dialog.component';
 import { environment } from 'src/environments/environment';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface UserPermissionData {
   id: string;
@@ -24,7 +26,6 @@ export interface UserPermissionData {
 })
 export class PermissionManagementComponent implements OnInit {
   users: UserPermissionData[] = [];
-  filteredUsers: UserPermissionData[] = [];
   roles: any[] = [];
   searchTerm = '';
   roleFilter = '';
@@ -32,8 +33,10 @@ export class PermissionManagementComponent implements OnInit {
   baseUrl = environment.apiURL + '/';
 
   page = 1;
-  tableSize = 15;
-  count = 0;
+  pageSize = 15;
+  total = 0;
+
+  private searchSubject = new Subject<string>();
 
   constructor(
     private authService: AuthService,
@@ -42,60 +45,72 @@ export class PermissionManagementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadData();
+    this.authService.getRoles().subscribe({
+      next: (roles: any) => { this.roles = roles; },
+      error: () => this.toastr.error('خطا در بارگذاری نقش‌ها')
+    });
+
+    this.searchSubject.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
+      this.page = 1;
+      this.loadUsers();
+    });
+
+    this.loadUsers();
   }
 
-  loadData(): void {
+  loadUsers(): void {
     this.isLoading = true;
-    this.authService.getRoles().subscribe({
-      next: (roles: any) => {
-        this.roles = roles;
-        this.authService.getUserProfile().subscribe({
-          next: (users: any) => {
-            this.users = users;
-            this.applyFilters();
-            this.isLoading = false;
-          },
-          error: () => {
-            this.toastr.error('خطا در بارگذاری کاربران');
-            this.isLoading = false;
-          }
-        });
+    this.authService.getUserProfile({
+      search: this.searchTerm || undefined,
+      role: this.roleFilter || undefined,
+      page: this.page,
+      pageSize: this.pageSize
+    }).subscribe({
+      next: (res: any) => {
+        this.users = res.users;
+        this.total = res.total;
+        this.isLoading = false;
       },
       error: () => {
-        this.toastr.error('خطا در بارگذاری نقش‌ها');
+        this.toastr.error('خطا در بارگذاری کاربران');
         this.isLoading = false;
       }
     });
   }
 
-  applyFilters(): void {
-    let result = [...this.users];
-    if (this.searchTerm) {
-      const t = this.searchTerm.toLowerCase();
-      result = result.filter(u =>
-        u.userName?.toLowerCase().includes(t) ||
-        u.firstName?.toLowerCase().includes(t) ||
-        u.lastName?.toLowerCase().includes(t)
-      );
-    }
-    if (this.roleFilter) {
-      result = result.filter(u => u.role === this.roleFilter);
-    }
-    this.filteredUsers = result;
-    this.count = result.length;
+  onSearchInput(): void {
+    this.searchSubject.next(this.searchTerm);
+  }
+
+  onFilterChange(): void {
     this.page = 1;
+    this.loadUsers();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.roleFilter = '';
+    this.page = 1;
+    this.loadUsers();
+  }
+
+  onPageChange(p: number): void {
+    this.page = p;
+    this.loadUsers();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.total / this.pageSize);
   }
 
   openRoleAssign(user: UserPermissionData): void {
     const dialogRef = this.dialog.open(RoleAssignDialogComponent, {
-      width: '700px',
+      width: '500px',
       maxWidth: '95vw',
       data: { user, roles: this.roles }
     });
-
     dialogRef.afterClosed().subscribe(changed => {
-      if (changed) this.loadData();
+      if (changed) this.loadUsers();
     });
   }
 
@@ -119,9 +134,5 @@ export class PermissionManagementComponent implements OnInit {
       'PETITION_WRITER_LICENSE_MANAGER': 'bg-rose-100 text-rose-700 border-rose-200',
     };
     return colors[role] || 'bg-gray-100 text-gray-700 border-gray-200';
-  }
-
-  onTableDataChange(event: number): void {
-    this.page = event;
   }
 }
