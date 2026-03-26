@@ -1,0 +1,76 @@
+<div class="bg-white rounded-xl overflow-hidden" style="min-width: 420px;">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-user-tag text-white text-lg"></i>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-white">تغییر نقش کاربر</h2>
+        <p class="text-blue-100 text-sm">{{ data.user.firstName }} {{ data.user.lastName }}
+          <span class="opacity-70">({{ data.user.userName }})</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6">
+
+    <!-- Current role info -->
+    <div class="mb-5 p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-3">
+      <i class="fas fa-info-circle text-gray-400"></i>
+      <div class="text-sm text-gray-600">
+        نقش فعلی:
+        <span class="font-semibold px-2 py-0.5 rounded-full text-xs border ml-1"
+          [ngClass]="getRoleColor(data.user.role)">
+          {{ data.user.roleDari }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Role selection grid -->
+    <p class="text-sm font-semibold text-gray-700 mb-3">نقش جدید را انتخاب کنید:</p>
+    <div class="grid grid-cols-1 gap-2 max-h-72 overflow-y-auto pl-1">
+      <button *ngFor="let role of data.roles"
+        (click)="onRoleSelect(role.id)"
+        class="w-full text-right px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all flex items-center justify-between gap-3"
+        [ngClass]="selectedRole === role.id
+          ? getRoleColor(role.id) + ' shadow-sm'
+          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 text-gray-700'">
+        <span>{{ role.dari }}</span>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <span *ngIf="isCurrentRole(role.id)"
+            class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full">فعلی</span>
+          <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+            [ngClass]="selectedRole === role.id ? 'border-current bg-current/20' : 'border-gray-300'">
+            <i *ngIf="selectedRole === role.id" class="fas fa-check text-current" style="font-size:9px"></i>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Change warning -->
+    <div *ngIf="isChanged()" class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
+      <i class="fas fa-exclamation-triangle text-amber-500 flex-shrink-0"></i>
+      <p class="text-sm text-amber-700">
+        نقش به <strong>{{ getRoleDari(selectedRole) }}</strong> تغییر خواهد کرد.
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+    <button (click)="onCancel()"
+      class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 font-medium rounded-lg transition-all text-sm">
+      انصراف
+    </button>
+    <button (click)="onSave()"
+      [disabled]="isSubmitting || !isChanged()"
+      class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+      <i [class]="isSubmitting ? 'fas fa-spinner fa-spin' : 'fas fa-check'"></i>
+      {{ isSubmitting ? 'در حال ذخیره...' : 'تأیید تغییر نقش' }}
+    </button>
+  </div>
+
+</div>

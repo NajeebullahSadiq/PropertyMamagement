@@ -353,16 +353,61 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
+        [HttpGet]
         [Authorize(Roles = "ADMIN")]
         [Route("GetAllUsers")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers(
+            [FromQuery] string? search = null,
+            [FromQuery] string? userType = null,  // "system" | "company"
+            [FromQuery] string? role = null,
+            [FromQuery] string? status = null,    // "active" | "inactive"
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 15)
         {
-            var users = await _userManager.Users.ToListAsync();
-            var userList = new List<object>();
+            var companyRoles = new[] { UserRoles.PropertyOperator, UserRoles.VehicleOperator };
 
+            var query = _userManager.Users.AsQueryable();
+
+            // User type filter
+            if (userType == "company")
+                query = query.Where(u => u.UserRole == UserRoles.PropertyOperator || u.UserRole == UserRoles.VehicleOperator);
+            else if (userType == "system")
+                query = query.Where(u => u.UserRole != UserRoles.PropertyOperator && u.UserRole != UserRoles.VehicleOperator);
+
+            // Role filter
+            if (!string.IsNullOrWhiteSpace(role))
+                query = query.Where(u => u.UserRole == role);
+
+            // Status filter
+            if (status == "active")
+                query = query.Where(u => !u.IsLocked);
+            else if (status == "inactive")
+                query = query.Where(u => u.IsLocked);
+
+            // Search
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.ToLower();
+                query = query.Where(u =>
+                    (u.UserName != null && u.UserName.ToLower().Contains(s)) ||
+                    (u.FirstName != null && u.FirstName.ToLower().Contains(s)) ||
+                    (u.LastName != null && u.LastName.ToLower().Contains(s)) ||
+                    (u.Email != null && u.Email.ToLower().Contains(s)) ||
+                    (u.PhoneNumber != null && u.PhoneNumber.Contains(s)));
+            }
+
+            var total = await query.CountAsync();
+            var users = await query
+                .OrderBy(u => u.UserName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var userList = new List<object>();
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
+                var primaryRole = roles.FirstOrDefault() ?? user.UserRole ?? "";
                 userList.Add(new
                 {
                     user.Id,
@@ -376,28 +421,116 @@ namespace WebAPI.Controllers
                     user.IsLocked,
                     user.PhotoPath,
                     user.CreatedAt,
-                    Role = roles.FirstOrDefault() ?? user.UserRole,
-                    RoleDari = UserRoles.GetDariName(roles.FirstOrDefault() ?? user.UserRole ?? "")
+                    Role = primaryRole,
+                    RoleDari = UserRoles.GetDariName(primaryRole),
+                    IsCompanyUser = companyRoles.Contains(primaryRole)
                 });
             }
 
-            return Ok(userList);
+            return Ok(new { total, page, pageSize, users = userList });
         }
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
         [Route("GetRoles")]
-        public IActionResult GetRoles()
+        public async Task<IActionResult> GetRoles()
         {
-            var roles = UserRoles.AllRoles.Select(r => new
+            var result = new List<object>();
+            foreach (var r in UserRoles.AllRoles)
             {
-                Id = r,
-                Name = r,
-                Dari = UserRoles.GetDariName(r),
-                Permissions = RolePermissions.GetPermissionsForRole(r)
-            });
+                var role = await _roleManager.FindByNameAsync(r);
+                string[] permissions;
+                if (role != null)
+                {
+                    var claims = await _roleManager.GetClaimsAsync(role);
 
-            return Ok(roles);
+                    // Only trust claims saved by our UpdateRolePermissions endpoint,
+                    // which stores them with lowercase "permission" type.
+                    // Old seeded claims used "Permission" (capital P) and are stale.
+                    var newStyleClaims = claims
+                        .Where(c => c.Type == "permission")
+                        .Select(c => c.Value)
+                        .Distinct()
+                        .ToArray();
+
+                    permissions = newStyleClaims.Length > 0
+                        ? newStyleClaims
+                        : RolePermissions.GetPermissionsForRole(r);
+                }
+                else
+                {
+                    permissions = RolePermissions.GetPermissionsForRole(r);
+                }
+                result.Add(new { Id = r, Name = r, Dari = UserRoles.GetDariName(r), Permissions = permissions });
+            }
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        [Route("GetRolePermissions/{roleName}")]
+        public async Task<IActionResult> GetRolePermissions(string roleName)
+        {
+            if (!UserRoles.AllRoles.Contains(roleName))
+                return BadRequest(new { message = "Invalid role" });
+
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+            {
+                // Role not yet in DB — return defaults
+                return Ok(new { role = roleName, permissions = RolePermissions.GetPermissionsForRole(roleName) });
+            }
+
+            var claims = await _roleManager.GetClaimsAsync(role);
+            var permissions = claims
+                .Where(c => c.Type == "permission")
+                .Select(c => c.Value)
+                .Distinct()
+                .ToArray();
+
+            if (permissions.Length == 0)
+                permissions = RolePermissions.GetPermissionsForRole(roleName);
+
+            return Ok(new { role = roleName, permissions });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        [Route("UpdateRolePermissions")]
+        public async Task<IActionResult> UpdateRolePermissions([FromBody] UpdateRolePermissionsModel model)
+        {
+            if (!UserRoles.AllRoles.Contains(model.RoleName))
+                return BadRequest(new { message = "Invalid role" });
+
+            // Protect ADMIN role from being modified
+            if (model.RoleName == UserRoles.Admin)
+                return BadRequest(new { message = "نقش مدیر سیستم قابل تغییر نیست" });
+
+            // Ensure role exists in DB
+            if (!await _roleManager.RoleExistsAsync(model.RoleName))
+                await _roleManager.CreateAsync(new IdentityRole(model.RoleName));
+
+            var role = await _roleManager.FindByNameAsync(model.RoleName);
+            if (role == null)
+                return NotFound(new { message = "نقش یافت نشد" });
+
+            // Remove all existing permission claims (both old "Permission" and new "permission" types)
+            var existingClaims = await _roleManager.GetClaimsAsync(role);
+            foreach (var claim in existingClaims.Where(c =>
+                c.Type == "permission" || c.Type == CustomClaimTypes.Permission))
+                await _roleManager.RemoveClaimAsync(role, claim);
+
+            // Add new permission claims
+            foreach (var permission in model.Permissions.Distinct())
+                await _roleManager.AddClaimAsync(role, new Claim("permission", permission));
+
+            return Ok(new { message = "صلاحیت‌های نقش با موفقیت به‌روز شد", role = model.RoleName, permissions = model.Permissions });
+        }
+
+        public class UpdateRolePermissionsModel
+        {
+            public string RoleName { get; set; } = "";
+            public List<string> Permissions { get; set; } = new();
         }
 
         [HttpPost]

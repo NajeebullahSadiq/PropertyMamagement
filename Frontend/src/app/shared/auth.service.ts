@@ -65,8 +65,19 @@ export class AuthService {
     return this.http.post(this.BaseURI + '/ApplicationUser/Register', body);
   }
 
-  getUserProfile() {
-    return this.http.get(this.BaseURI + '/ApplicationUser/GetAllUsers');
+  getUserProfile(params?: { search?: string; userType?: string; role?: string; status?: string; page?: number; pageSize?: number }) {
+    let query = '';
+    if (params) {
+      const p = new URLSearchParams();
+      if (params.search) p.set('search', params.search);
+      if (params.userType) p.set('userType', params.userType);
+      if (params.role) p.set('role', params.role);
+      if (params.status) p.set('status', params.status);
+      if (params.page) p.set('page', params.page.toString());
+      if (params.pageSize) p.set('pageSize', params.pageSize.toString());
+      query = '?' + p.toString();
+    }
+    return this.http.get(this.BaseURI + '/ApplicationUser/GetAllUsers' + query);
   }
 
   getCurrentUserProfile() {

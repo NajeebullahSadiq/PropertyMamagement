@@ -1,0 +1,145 @@
+<div class="flex bg-gray-50" style="min-height: calc(100vh - 88px);">
+
+  <!-- Sidebar: Role List -->
+  <div class="w-60 flex-shrink-0 bg-white border-l border-gray-200 flex flex-col shadow-sm">
+    <div class="px-4 py-4 border-b border-gray-100">
+      <h2 class="text-sm font-bold text-gray-700">نقش‌های سیستم</h2>
+      <p class="text-xs text-gray-400 mt-0.5">انتخاب نقش برای ویرایش صلاحیت</p>
+    </div>
+
+    <div *ngIf="isLoading" class="p-6 text-center text-gray-400">
+      <i class="fas fa-spinner fa-spin text-xl"></i>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto p-2 space-y-1">
+      <button *ngFor="let role of roles"
+        (click)="selectRole(role)"
+        class="w-full text-right px-3 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-between gap-2 border-2"
+        [ngClass]="selectedRole?.id === role.id
+          ? getRoleColor(role.id) + ' shadow-sm'
+          : 'border-transparent bg-transparent hover:bg-gray-100 text-gray-700'">
+        <span class="truncate leading-tight">{{ role.dari }}</span>
+        <span class="text-xs flex-shrink-0 bg-white/60 px-1.5 py-0.5 rounded-full">
+          {{ role.permissions?.length || 0 }}
+        </span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Main Panel -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Empty state -->
+    <div *ngIf="!selectedRole && !isLoading" class="flex-1 flex items-center justify-center text-gray-300">
+      <div class="text-center">
+        <i class="fas fa-shield-alt text-6xl mb-4 block"></i>
+        <p class="text-lg">یک نقش را انتخاب کنید</p>
+      </div>
+    </div>
+
+    <ng-container *ngIf="selectedRole">
+
+      <!-- Top action bar -->
+      <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="px-3 py-1.5 rounded-lg text-sm font-bold border-2"
+            [ngClass]="getRoleColor(selectedRole.id)">
+            {{ selectedRole.dari }}
+          </span>
+          <span class="text-sm text-gray-500">
+            <span class="font-semibold text-gray-800">{{ getActiveCount() }}</span>
+            از {{ getTotalCount() }} صلاحیت فعال
+          </span>
+          <span *ngIf="isAdminRole()"
+            class="text-xs px-2 py-1 bg-red-50 text-red-500 border border-red-200 rounded-full flex items-center gap-1">
+            <i class="fas fa-lock text-xs"></i> قابل تغییر نیست
+          </span>
+          <span *ngIf="hasChanges"
+            class="text-xs px-2 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-full flex items-center gap-1">
+            <i class="fas fa-circle text-xs"></i> تغییرات ذخیره نشده
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2" *ngIf="!isAdminRole()">
+          <button (click)="resetToOriginal()" [disabled]="!hasChanges"
+            class="px-4 py-2 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5">
+            <i class="fas fa-undo text-xs"></i> بازگشت
+          </button>
+          <button (click)="save()" [disabled]="!hasChanges || isSaving"
+            class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+            <i [class]="isSaving ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
+            {{ isSaving ? 'در حال ذخیره...' : 'ذخیره تغییرات' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin lock notice -->
+      <div *ngIf="isAdminRole()" class="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 flex-shrink-0">
+        <i class="fas fa-shield-alt text-red-400 text-xl"></i>
+        <div>
+          <p class="text-sm font-semibold text-red-700">نقش مدیر سیستم دارای تمام صلاحیت‌هاست و قابل تغییر نمی‌باشد.</p>
+        </div>
+      </div>
+
+      <!-- Permission Groups Grid -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div *ngFor="let group of permissionGroups"
+            class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+
+            <!-- Group header with select-all toggle -->
+            <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between"
+              [ngClass]="isGroupAllOn(group) ? 'bg-blue-50' : isGroupPartial(group) ? 'bg-blue-50/40' : 'bg-gray-50'">
+              <div class="flex items-center gap-3">
+                <button *ngIf="!isAdminRole()"
+                  (click)="toggleGroup(group)"
+                  class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 focus:outline-none"
+                  [ngClass]="{
+                    'bg-blue-600 border-blue-600': isGroupAllOn(group),
+                    'bg-blue-100 border-blue-400': isGroupPartial(group) && !isGroupAllOn(group),
+                    'bg-white border-gray-300 hover:border-blue-400': !isGroupAllOn(group) && !isGroupPartial(group)
+                  }">
+                  <i *ngIf="isGroupAllOn(group)" class="fas fa-check text-white" style="font-size:9px"></i>
+                  <i *ngIf="isGroupPartial(group) && !isGroupAllOn(group)" class="fas fa-minus text-blue-600" style="font-size:9px"></i>
+                </button>
+                <i class="fas {{ group.icon }} text-gray-500 text-sm"></i>
+                <span class="text-sm font-bold text-gray-700">{{ group.label }}</span>
+              </div>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                [ngClass]="isGroupAllOn(group) ? 'bg-blue-100 text-blue-700' :
+                           isGroupPartial(group) ? 'bg-blue-50 text-blue-600' :
+                           'bg-gray-100 text-gray-400'">
+                {{ group.keys | groupCount: activePermissions }} / {{ group.keys.length }}
+              </span>
+            </div>
+
+            <!-- Individual permissions -->
+            <div class="divide-y divide-gray-50">
+              <label *ngFor="let key of group.keys"
+                class="flex items-center gap-3 px-4 py-2.5 transition-colors"
+                [ngClass]="{
+                  'hover:bg-gray-50 cursor-pointer': !isAdminRole(),
+                  'cursor-default': isAdminRole(),
+                  'bg-green-50/60': activePermissions[key]
+                }">
+                <input type="checkbox"
+                  [checked]="activePermissions[key]"
+                  [disabled]="isAdminRole()"
+                  (change)="togglePermission(key)"
+                  class="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 flex-shrink-0"
+                  [ngClass]="isAdminRole() ? 'cursor-not-allowed' : 'cursor-pointer'">
+                <span class="text-sm flex-1"
+                  [ngClass]="activePermissions[key] ? 'text-gray-800 font-medium' : 'text-gray-500'">
+                  {{ permissionLabels[key] || key }}
+                </span>
+                <code class="text-xs text-gray-300 font-mono hidden sm:block">{{ key }}</code>
+              </label>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

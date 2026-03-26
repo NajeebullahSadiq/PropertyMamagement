@@ -8,15 +8,27 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { UserListComponent } from './user-list/user-list.component';
 import { UserEditDialogComponent } from './user-edit-dialog/user-edit-dialog.component';
+import { PermissionManagementComponent } from './permission-management/permission-management.component';
+import { RoleAssignDialogComponent } from './permission-management/role-assign-dialog/role-assign-dialog.component';
+import { RoleLabelPipe } from './permission-management/role-label.pipe';
+import { RolePermissionsComponent } from './role-permissions/role-permissions.component';
+import { GroupCountPipe } from './role-permissions/group-count.pipe';
 
 const routes: Routes = [
-  { path: '', component: UserListComponent }
+  { path: '', component: UserListComponent },
+  { path: 'permissions', component: PermissionManagementComponent },
+  { path: 'role-permissions', component: RolePermissionsComponent }
 ];
 
 @NgModule({
   declarations: [
     UserListComponent,
-    UserEditDialogComponent
+    UserEditDialogComponent,
+    PermissionManagementComponent,
+    RoleAssignDialogComponent,
+    RoleLabelPipe,
+    RolePermissionsComponent,
+    GroupCountPipe
   ],
   imports: [
     CommonModule,

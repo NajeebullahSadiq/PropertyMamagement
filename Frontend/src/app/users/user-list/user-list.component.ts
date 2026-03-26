@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/shared/auth.service';
-import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { UserEditDialogComponent } from '../user-edit-dialog/user-edit-dialog.component';
 import { environment } from 'src/environments/environment';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface UserData {
   id: string;
@@ -20,6 +21,7 @@ export interface UserData {
   createdAt: string;
   role: string;
   roleDari: string;
+  isCompanyUser: boolean;
 }
 
 @Component({
@@ -29,102 +31,92 @@ export interface UserData {
 })
 export class UserListComponent implements OnInit {
   users: UserData[] = [];
-  filteredUsers: UserData[] = [];
-  searchTerm: string = '';
-  roleFilter: string = '';
-  statusFilter: string = '';
-  
-  page: number = 1;
-  count: number = 0;
-  tableSize: number = 10;
-  tableSizes: number[] = [10, 25, 50, 100];
-  
   roles: any[] = [];
+  systemRoles: any[] = [];
+  companyRoles: any[] = [];
+
+  // Active tab: 'system' | 'company'
+  activeTab: 'system' | 'company' = 'system';
+
+  // Filters
+  searchTerm = '';
+  roleFilter = '';
+  statusFilter = '';
+
+  // Pagination
+  page = 1;
+  pageSize = 15;
+  total = 0;
+
+  isLoading = false;
   baseUrl = environment.apiURL + '/';
-  isLoading: boolean = false;
+
+  private searchSubject = new Subject<string>();
 
   constructor(
     private authService: AuthService,
-    private rbacService: RbacService,
     private toastr: ToastrService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    this.loadUsers();
     this.loadRoles();
-  }
-
-  loadUsers(): void {
-    this.isLoading = true;
-    this.authService.getUserProfile().subscribe({
-      next: (res: any) => {
-        this.users = res;
-        this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading users:', err);
-        this.toastr.error('خطا در بارگذاری لیست کاربران');
-        this.isLoading = false;
-      }
+    // Debounce search input
+    this.searchSubject.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
+      this.page = 1;
+      this.loadUsers();
     });
+    this.loadUsers();
   }
 
   loadRoles(): void {
     this.authService.getRoles().subscribe({
       next: (res: any) => {
         this.roles = res;
-      },
-      error: (err) => {
-        console.error('Error loading roles:', err);
+        const companyRoleIds = ['PROPERTY_OPERATOR', 'VEHICLE_OPERATOR'];
+        this.companyRoles = res.filter((r: any) => companyRoleIds.includes(r.id));
+        this.systemRoles = res.filter((r: any) => !companyRoleIds.includes(r.id));
       }
     });
   }
 
-  applyFilters(): void {
-    let filtered = [...this.users];
-
-    // Search filter
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(user =>
-        user.userName?.toLowerCase().includes(term) ||
-        user.firstName?.toLowerCase().includes(term) ||
-        user.lastName?.toLowerCase().includes(term) ||
-        user.email?.toLowerCase().includes(term) ||
-        user.phoneNumber?.includes(term)
-      );
-    }
-
-    // Role filter
-    if (this.roleFilter) {
-      filtered = filtered.filter(user => user.role === this.roleFilter);
-    }
-
-    // Status filter
-    if (this.statusFilter) {
-      const isLocked = this.statusFilter === 'inactive';
-      filtered = filtered.filter(user => user.isLocked === isLocked);
-    }
-
-    this.filteredUsers = filtered;
-    this.count = filtered.length;
+  loadUsers(): void {
+    this.isLoading = true;
+    this.authService.getUserProfile({
+      search: this.searchTerm || undefined,
+      userType: this.activeTab,
+      role: this.roleFilter || undefined,
+      status: this.statusFilter || undefined,
+      page: this.page,
+      pageSize: this.pageSize
+    }).subscribe({
+      next: (res: any) => {
+        this.users = res.users;
+        this.total = res.total;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.toastr.error('خطا در بارگذاری کاربران');
+        this.isLoading = false;
+      }
+    });
   }
 
-  onSearch(): void {
+  switchTab(tab: 'system' | 'company'): void {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+    this.roleFilter = '';
     this.page = 1;
-    this.applyFilters();
+    this.loadUsers();
   }
 
-  onRoleFilterChange(): void {
-    this.page = 1;
-    this.applyFilters();
+  onSearchInput(): void {
+    this.searchSubject.next(this.searchTerm);
   }
 
-  onStatusFilterChange(): void {
+  onFilterChange(): void {
     this.page = 1;
-    this.applyFilters();
+    this.loadUsers();
   }
 
   clearFilters(): void {
@@ -132,16 +124,12 @@ export class UserListComponent implements OnInit {
     this.roleFilter = '';
     this.statusFilter = '';
     this.page = 1;
-    this.applyFilters();
+    this.loadUsers();
   }
 
-  onTableDataChange(event: number): void {
-    this.page = event;
-  }
-
-  onTableSizeChange(event: any): void {
-    this.tableSize = event.target.value;
-    this.page = 1;
+  onPageChange(p: number): void {
+    this.page = p;
+    this.loadUsers();
   }
 
   onEdit(user: UserData): void {
@@ -150,60 +138,65 @@ export class UserListComponent implements OnInit {
       maxWidth: '95vw',
       data: { user, roles: this.roles }
     });
-
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadUsers();
-      }
+      if (result) this.loadUsers();
     });
   }
 
   onToggleStatus(user: UserData): void {
     const newStatus = !user.isLocked;
     const action = newStatus ? 'غیرفعال' : 'فعال';
-    
     if (confirm(`آیا مطمئن هستید که می‌خواهید حساب "${user.userName}" را ${action} کنید؟`)) {
       this.authService.lockUser(user.userName, newStatus).subscribe({
         next: () => {
           this.toastr.success(`حساب کاربری ${action} شد`);
           this.loadUsers();
         },
-        error: (err) => {
-          console.error('Error toggling user status:', err);
-          this.toastr.error('خطا در تغییر وضعیت کاربر');
-        }
+        error: () => this.toastr.error('خطا در تغییر وضعیت کاربر')
       });
     }
   }
 
-  getStatusClass(isLocked: boolean): string {
-    return isLocked 
-      ? 'bg-red-100 text-red-700' 
-      : 'bg-green-100 text-green-700';
+  get currentRoles(): any[] {
+    return this.activeTab === 'company' ? this.companyRoles : this.systemRoles;
   }
 
-  getStatusText(isLocked: boolean): string {
-    return isLocked ? 'غیرفعال' : 'فعال';
+  get totalPages(): number {
+    return Math.ceil(this.total / this.pageSize);
+  }
+
+  getUserPhoto(photoPath: string): string {
+    return photoPath ? this.baseUrl + photoPath : 'assets/img/avatar.png';
   }
 
   getLicenseTypeText(licenseType: string): string {
     switch (licenseType) {
       case 'realEstate': return 'املاک';
       case 'carSale': return 'موتر فروشی';
-      default: return '-';
+      default: return '—';
     }
-  }
-
-  getUserPhoto(photoPath: string): string {
-    if (photoPath) {
-      return this.baseUrl + photoPath;
-    }
-    return 'assets/img/avatar.png';
   }
 
   formatDate(dateStr: string): string {
-    if (!dateStr) return '-';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('fa-AF');
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('fa-AF');
+  }
+
+  getRoleColor(role: string): string {
+    const colors: Record<string, string> = {
+      'ADMIN': 'bg-red-100 text-red-700',
+      'AUTHORITY': 'bg-purple-100 text-purple-700',
+      'COMPANY_REGISTRAR': 'bg-blue-100 text-blue-700',
+      'LICENSE_REVIEWER': 'bg-cyan-100 text-cyan-700',
+      'PROPERTY_OPERATOR': 'bg-green-100 text-green-700',
+      'VEHICLE_OPERATOR': 'bg-teal-100 text-teal-700',
+      'LICENSE_APPLICATION_MANAGER': 'bg-orange-100 text-orange-700',
+      'ACTIVITY_MONITORING_MANAGER': 'bg-yellow-100 text-yellow-700',
+      'SECURITIES_MANAGER': 'bg-indigo-100 text-indigo-700',
+      'SECURITIES_ENTRY_MANAGER': 'bg-violet-100 text-violet-700',
+      'PETITION_WRITER_SECURITIES_ENTRY_MANAGER': 'bg-pink-100 text-pink-700',
+      'PETITION_WRITER_LICENSE_MANAGER': 'bg-rose-100 text-rose-700',
+    };
+    return colors[role] || 'bg-gray-100 text-gray-700';
   }
 }

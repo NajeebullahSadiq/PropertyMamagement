@@ -153,6 +153,30 @@ namespace WebAPIBackend.Configuration
         public const string LicenseEdit = "license.edit";
         public const string LicenseApprove = "license.approve";
 
+        // Securities (اسناد بهادار رهنمای معاملات)
+        public const string SecuritiesView = "securities.view";
+        public const string SecuritiesCreate = "securities.create";
+        public const string SecuritiesEdit = "securities.edit";
+        public const string SecuritiesDelete = "securities.delete";
+
+        // Petition Writer Securities (سند بهادار عریضه‌نویسان)
+        public const string PetitionWriterSecuritiesView = "petitionwritersecurities.view";
+        public const string PetitionWriterSecuritiesCreate = "petitionwritersecurities.create";
+        public const string PetitionWriterSecuritiesEdit = "petitionwritersecurities.edit";
+        public const string PetitionWriterSecuritiesDelete = "petitionwritersecurities.delete";
+
+        // Petition Writer License (جواز عریضه‌نویسان)
+        public const string PetitionWriterLicenseView = "petitionwriterlicense.view";
+        public const string PetitionWriterLicenseCreate = "petitionwriterlicense.create";
+        public const string PetitionWriterLicenseEdit = "petitionwriterlicense.edit";
+        public const string PetitionWriterLicenseDelete = "petitionwriterlicense.delete";
+
+        // Activity Monitoring (نظارت بر فعالیت‌ها)
+        public const string ActivityMonitoringView = "activitymonitoring.view";
+        public const string ActivityMonitoringCreate = "activitymonitoring.create";
+        public const string ActivityMonitoringEdit = "activitymonitoring.edit";
+        public const string ActivityMonitoringDelete = "activitymonitoring.delete";
+
         // Reports
         public const string ReportsView = "reports.view";
         public const string ReportsExport = "reports.export";
@@ -175,19 +199,22 @@ namespace WebAPIBackend.Configuration
             {
                 UserRoles.Admin => new[]
                 {
-                    // All permissions
-                    Permissions.UsersView, Permissions.UsersCreate, Permissions.UsersEdit, 
+                    Permissions.UsersView, Permissions.UsersCreate, Permissions.UsersEdit,
                     Permissions.UsersDelete, Permissions.UsersLock,
-                    Permissions.CompanyView, Permissions.CompanyCreate, Permissions.CompanyEdit, 
+                    Permissions.CompanyView, Permissions.CompanyCreate, Permissions.CompanyEdit,
                     Permissions.CompanyDelete, Permissions.CompanyApprove,
-                    Permissions.PropertyView, Permissions.PropertyCreate, Permissions.PropertyEdit, 
+                    Permissions.PropertyView, Permissions.PropertyCreate, Permissions.PropertyEdit,
                     Permissions.PropertyDelete,
-                    Permissions.VehicleView, Permissions.VehicleCreate, Permissions.VehicleEdit, 
+                    Permissions.VehicleView, Permissions.VehicleCreate, Permissions.VehicleEdit,
                     Permissions.VehicleDelete,
-                    Permissions.LicenseView, Permissions.LicenseCreate, Permissions.LicenseEdit, 
+                    Permissions.LicenseView, Permissions.LicenseCreate, Permissions.LicenseEdit,
                     Permissions.LicenseApprove,
-                    Permissions.LicenseApplicationView, Permissions.LicenseApplicationCreate, 
+                    Permissions.LicenseApplicationView, Permissions.LicenseApplicationCreate,
                     Permissions.LicenseApplicationEdit, Permissions.LicenseApplicationDelete,
+                    Permissions.SecuritiesView, Permissions.SecuritiesCreate, Permissions.SecuritiesEdit, Permissions.SecuritiesDelete,
+                    Permissions.PetitionWriterSecuritiesView, Permissions.PetitionWriterSecuritiesCreate, Permissions.PetitionWriterSecuritiesEdit, Permissions.PetitionWriterSecuritiesDelete,
+                    Permissions.PetitionWriterLicenseView, Permissions.PetitionWriterLicenseCreate, Permissions.PetitionWriterLicenseEdit, Permissions.PetitionWriterLicenseDelete,
+                    Permissions.ActivityMonitoringView, Permissions.ActivityMonitoringCreate, Permissions.ActivityMonitoringEdit, Permissions.ActivityMonitoringDelete,
                     Permissions.ReportsView, Permissions.ReportsExport,
                     Permissions.DashboardView,
                     Permissions.SystemConfigure
@@ -195,110 +222,84 @@ namespace WebAPIBackend.Configuration
 
                 UserRoles.Authority => new[]
                 {
-                    // View-only access to everything
                     Permissions.UsersView,
-                    Permissions.CompanyView,
-                    Permissions.PropertyView,
-                    Permissions.VehicleView,
-                    Permissions.LicenseView,
-                    Permissions.LicenseApplicationView,
-                    Permissions.ReportsView,
-                    Permissions.DashboardView
+                    Permissions.CompanyView, Permissions.PropertyView, Permissions.VehicleView,
+                    Permissions.LicenseView, Permissions.LicenseApplicationView,
+                    Permissions.SecuritiesView, Permissions.PetitionWriterSecuritiesView,
+                    Permissions.PetitionWriterLicenseView, Permissions.ActivityMonitoringView,
+                    Permissions.ReportsView, Permissions.DashboardView
                 },
 
                 UserRoles.CompanyRegistrar => new[]
                 {
-                    // Full access to company module + view all property and vehicle records
                     Permissions.CompanyView, Permissions.CompanyCreate, Permissions.CompanyEdit, Permissions.CompanyDelete,
                     Permissions.LicenseView, Permissions.LicenseCreate, Permissions.LicenseEdit,
-                    Permissions.PropertyView,  // Can view all property records
-                    Permissions.VehicleView,   // Can view all vehicle records
-                    Permissions.ReportsView,
-                    Permissions.LicenseApplicationView  // Can only view license applications, no edit/delete
+                    Permissions.PropertyView, Permissions.VehicleView,
+                    Permissions.LicenseApplicationView,
+                    Permissions.SecuritiesView, Permissions.SecuritiesCreate, Permissions.SecuritiesEdit,
+                    Permissions.ReportsView
                 },
 
                 UserRoles.LicenseReviewer => new[]
                 {
-                    // View-only company list
-                    Permissions.CompanyView,
-                    Permissions.LicenseView,
-                    Permissions.LicenseApplicationView
+                    Permissions.CompanyView, Permissions.LicenseView, Permissions.LicenseApplicationView
                 },
 
                 UserRoles.PropertyOperator => new[]
                 {
-                    // Property module - can create, edit own records
                     Permissions.PropertyView, Permissions.PropertyCreate, Permissions.PropertyEditOwn,
-                    Permissions.DashboardView,
-                    Permissions.ReportsView
+                    Permissions.DashboardView, Permissions.ReportsView
                 },
 
                 UserRoles.VehicleOperator => new[]
                 {
-                    // Vehicle module - can create, edit own records
                     Permissions.VehicleView, Permissions.VehicleCreate, Permissions.VehicleEditOwn,
-                    Permissions.DashboardView,
-                    Permissions.ReportsView
+                    Permissions.DashboardView, Permissions.ReportsView
                 },
 
                 UserRoles.LicenseApplicationManager => new[]
                 {
-                    // Full access to license applications
-                    Permissions.LicenseApplicationView, Permissions.LicenseApplicationCreate, 
+                    Permissions.LicenseApplicationView, Permissions.LicenseApplicationCreate,
                     Permissions.LicenseApplicationEdit, Permissions.LicenseApplicationDelete,
-                    // Read-only access to other modules
-                    Permissions.CompanyView,
-                    Permissions.PropertyView,
-                    Permissions.VehicleView,
-                    Permissions.ReportsView,
-                    Permissions.DashboardView
+                    Permissions.CompanyView, Permissions.PropertyView, Permissions.VehicleView,
+                    Permissions.ReportsView, Permissions.DashboardView
                 },
 
                 UserRoles.ActivityMonitoringManager => new[]
                 {
-                    // Full access to activity monitoring (handled by controller authorization)
-                    // Read-only access to other modules
-                    Permissions.CompanyView,
-                    Permissions.PropertyView,
-                    Permissions.VehicleView,
-                    Permissions.ReportsView,
-                    Permissions.DashboardView
+                    Permissions.ActivityMonitoringView, Permissions.ActivityMonitoringCreate,
+                    Permissions.ActivityMonitoringEdit, Permissions.ActivityMonitoringDelete,
+                    Permissions.CompanyView, Permissions.PropertyView, Permissions.VehicleView,
+                    Permissions.ReportsView, Permissions.DashboardView
                 },
 
                 UserRoles.SecuritiesManager => new[]
                 {
-                    // Full access to securities and petition writer securities (handled by controller authorization)
-                    // Read-only access to other modules
-                    Permissions.CompanyView,
-                    Permissions.PropertyView,
-                    Permissions.VehicleView,
-                    Permissions.ReportsView,
-                    Permissions.DashboardView
+                    Permissions.SecuritiesView, Permissions.SecuritiesCreate, Permissions.SecuritiesEdit, Permissions.SecuritiesDelete,
+                    Permissions.PetitionWriterSecuritiesView, Permissions.PetitionWriterSecuritiesCreate, Permissions.PetitionWriterSecuritiesEdit,
+                    Permissions.CompanyView, Permissions.PropertyView, Permissions.VehicleView,
+                    Permissions.ReportsView, Permissions.DashboardView
                 },
 
                 UserRoles.SecuritiesEntryManager => new[]
                 {
-                    // Create-only access to securities module (no edit)
-                    // No access to any other modules
+                    Permissions.SecuritiesView, Permissions.SecuritiesCreate,
                     Permissions.DashboardView
                 },
 
                 UserRoles.PetitionWriterSecuritiesEntryManager => new[]
                 {
-                    // Create-only access to petition writer securities module (no edit)
-                    // No access to any other modules
+                    Permissions.PetitionWriterSecuritiesView, Permissions.PetitionWriterSecuritiesCreate,
                     Permissions.DashboardView
                 },
 
                 UserRoles.PetitionWriterLicenseManager => new[]
                 {
-                    // Full access to petition writer license (handled by controller authorization)
-                    // Read-only access to other modules
-                    Permissions.CompanyView,
-                    Permissions.PropertyView,
-                    Permissions.VehicleView,
-                    Permissions.ReportsView,
-                    Permissions.DashboardView
+                    Permissions.PetitionWriterLicenseView, Permissions.PetitionWriterLicenseCreate,
+                    Permissions.PetitionWriterLicenseEdit, Permissions.PetitionWriterLicenseDelete,
+                    Permissions.PetitionWriterSecuritiesView, Permissions.PetitionWriterSecuritiesCreate, Permissions.PetitionWriterSecuritiesEdit,
+                    Permissions.CompanyView, Permissions.PropertyView, Permissions.VehicleView,
+                    Permissions.ReportsView, Permissions.DashboardView
                 },
 
                 _ => Array.Empty<string>()
