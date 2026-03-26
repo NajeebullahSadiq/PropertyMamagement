@@ -10,8 +10,11 @@ import { AuthService } from 'src/app/shared/auth.service';
 import {
     PetitionWriterMonitoringData,
     PetitionWriterMonitoringSectionTypes,
-    AfghanMonths
+    ShamsiMonths,
+    QamariMonths,
+    GregorianMonths
 } from 'src/app/models/PetitionWriterMonitoring';
+import { CalendarType } from 'src/app/models/calendar-type';
 
 @Component({
     selector: 'app-petition-writer-monitoring-form',
@@ -31,14 +34,14 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
 
     // Dropdown data
     sectionTypes = PetitionWriterMonitoringSectionTypes;
-    afghanMonths = AfghanMonths;
-
-    // Years for monitoring (current year ± 5 years)
-    monitoringYears: string[] = [];
+    monitoringMonths: { value: string; label: string }[] = [];  // Dynamic months based on calendar type
+    monitoringYears: string[] = [];  // Dynamic years
     
     // RBAC
     canEdit = false;
     isViewOnly = false;
+    isSearching = false;
+    licenseFound = false;
 
     constructor(
         private fb: FormBuilder,
@@ -52,11 +55,11 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         private authService: AuthService
     ) {
         this.initForm();
-        this.generateYears();
     }
 
     ngOnInit(): void {
         this.checkPermissions();
+        this.updateYearsAndMonths();
 
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
@@ -67,6 +70,11 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         } else {
             this.loadNextSerialNumber();
         }
+
+        // Subscribe to calendar changes
+        this.calendarService.selectedCalendar$.subscribe(() => {
+            this.updateYearsAndMonths();
+        });
     }
 
     checkPermissions(): void {
@@ -74,10 +82,57 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         this.canEdit = this.rbacService.hasPermission('petitionwritermonitoring.edit');
     }
 
-    generateYears(): void {
-        const currentYear = new Date().getFullYear();
-        for (let i = currentYear - 5; i <= currentYear + 5; i++) {
-            this.monitoringYears.push(i.toString());
+    updateYearsAndMonths(): void {
+        const calendar = this.calendarService.getSelectedCalendar();
+        
+        // Update months based on calendar type
+        switch (calendar) {
+            case CalendarType.HIJRI_SHAMSI:
+                this.monitoringMonths = ShamsiMonths;
+                break;
+            case CalendarType.HIJRI_QAMARI:
+                this.monitoringMonths = QamariMonths;
+                break;
+            case CalendarType.GREGORIAN:
+                this.monitoringMonths = GregorianMonths;
+                break;
+            default:
+                this.monitoringMonths = ShamsiMonths;
+        }
+
+        // Generate years dynamically based on calendar type
+        this.generateYears(calendar);
+    }
+
+    generateYears(calendarType: CalendarType): void {
+        this.monitoringYears = [];
+        const now = new Date();
+        
+        let currentYear: number;
+        let startYear: number;
+        
+        switch (calendarType) {
+            case CalendarType.HIJRI_SHAMSI:
+                // Shamsi year is approximately 621 years behind Gregorian
+                currentYear = now.getFullYear() - 621;
+                // Generate 10 years back and unlimited future
+                startYear = currentYear - 10;
+                break;
+            case CalendarType.HIJRI_QAMARI:
+                // Qamari year is approximately 579 years behind Gregorian
+                currentYear = Math.floor((now.getFullYear() - 622) * 1.0307);
+                startYear = currentYear - 10;
+                break;
+            case CalendarType.GREGORIAN:
+            default:
+                currentYear = now.getFullYear();
+                startYear = currentYear - 10;
+                break;
+        }
+
+        // Generate years from startYear to currentYear + 50 (unlimited future)
+        for (let year = startYear; year <= currentYear + 50; year++) {
+            this.monitoringYears.push(year.toString());
         }
     }
 
@@ -322,5 +377,38 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         if (!this.isEditMode) {
             this.loadNextSerialNumber();
         }
+    }
+
+    searchLicense(): void {
+        const licenseNumber = this.mainForm.get('petitionWriterLicenseNumber')?.value;
+        if (!licenseNumber) {
+            this.toastr.warning('لطفا نمبر جواز را وارد کنید');
+            return;
+        }
+
+        this.isSearching = true;
+        this.licenseFound = false;
+        this.service.searchLicenseByNumber(licenseNumber).subscribe({
+            next: (result) => {
+                this.isSearching = false;
+                this.licenseFound = true;
+                // Auto-populate the fields
+                this.mainForm.patchValue({
+                    petitionWriterName: result.petitionWriterName,
+                    petitionWriterDistrict: result.petitionWriterDistrict
+                });
+                this.toastr.success('معلومات عریضه نویس یافت شد');
+            },
+            error: (err) => {
+                this.isSearching = false;
+                this.licenseFound = false;
+                if (err.status === 404) {
+                    this.toastr.error('جواز با این نمبر یافت نشد');
+                } else {
+                    this.toastr.error('خطا در جستجو');
+                }
+                console.error(err);
+            }
+        });
     }
 }

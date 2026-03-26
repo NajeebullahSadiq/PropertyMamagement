@@ -89,4 +89,19 @@ export class PetitionWriterMonitoringService {
     getNextSerialNumber(): Observable<{ serialNumber: string }> {
         return this.http.get<{ serialNumber: string }>(`${this.baseUrl}/next-serial-number`);
     }
+
+    // Search petition writer license by license number for violations section
+    searchLicenseByNumber(licenseNumber: string): Observable<{
+        id: number;
+        licenseNumber: string;
+        petitionWriterName: string;
+        petitionWriterDistrict: string;
+    }> {
+        return this.http.get<{
+            id: number;
+            licenseNumber: string;
+            petitionWriterName: string;
+            petitionWriterDistrict: string;
+        }>(`${this.baseUrl}/search-license/${encodeURIComponent(licenseNumber)}`);
+    }
 }

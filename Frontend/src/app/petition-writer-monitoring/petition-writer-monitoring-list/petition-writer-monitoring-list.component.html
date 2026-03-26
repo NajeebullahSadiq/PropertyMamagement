@@ -49,18 +49,17 @@
         <table class="w-full">
           <thead class="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت ثبت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عارض</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت / نام</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ثبت کننده</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
             <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-teal-50 transition-colors">
-              <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ item.id }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
               <td class="px-4 py-3 text-sm">
                 <span [ngClass]="getSectionTypeClass(item.sectionType!)" class="px-2 py-1 rounded-full text-xs font-medium">
@@ -68,10 +67,9 @@
                 </span>
               </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.registrationDateFormatted || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">
-                {{ item.complainantName || item.petitionWriterName || '-' }}
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.createdBy || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.complainantName || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterLicenseNumber || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName || '-' }}</td>
               <td class="px-4 py-3">
                 <div class="flex justify-center gap-2">
                   <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">

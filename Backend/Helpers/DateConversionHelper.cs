@@ -54,6 +54,10 @@ namespace WebAPIBackend.Helpers
         public static string FormatDateOnly(DateOnly? date, CalendarType calendarType)
         {
             if (!date.HasValue) return "";
+            
+            // Check for DateOnly.MinValue (1/1/0001) which is invalid for calendar conversion
+            if (date.Value == DateOnly.MinValue) return "";
+            
             var (year, month, day) = FromGregorian(date.Value.ToDateTime(TimeOnly.MinValue), calendarType);
             return $"{year:D4}/{month:D2}/{day:D2}";
         }

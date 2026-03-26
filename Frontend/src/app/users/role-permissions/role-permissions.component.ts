@@ -56,9 +56,14 @@ export const ALL_PERMISSION_GROUPS: PermissionGroup[] = [
     keys: ['petitionwriterlicense.view', 'petitionwriterlicense.create', 'petitionwriterlicense.edit', 'petitionwriterlicense.delete']
   },
   {
-    label: 'نظارت بر فعالیت‌ها',
+    label: 'نظارت بر فعالیت دفاتر رهنمای معاملات',
     icon: 'fa-eye',
     keys: ['activitymonitoring.view', 'activitymonitoring.create', 'activitymonitoring.edit', 'activitymonitoring.delete']
+  },
+  {
+    label: 'نظارت بر فعالیت عریضه نویسان',
+    icon: 'fa-clipboard-check',
+    keys: ['petitionwritermonitoring.view', 'petitionwritermonitoring.create', 'petitionwritermonitoring.edit', 'petitionwritermonitoring.delete']
   },
   {
     label: 'داشبورد و گزارشات',
@@ -118,10 +123,15 @@ export const PERMISSION_LABELS: Record<string, string> = {
   'petitionwriterlicense.edit': 'ویرایش جواز عریضه‌نویسان',
   'petitionwriterlicense.delete': 'حذف جواز عریضه‌نویسان',
   // Activity Monitoring
-  'activitymonitoring.view': 'مشاهده نظارت فعالیت‌ها',
-  'activitymonitoring.create': 'ثبت نظارت فعالیت‌ها',
-  'activitymonitoring.edit': 'ویرایش نظارت فعالیت‌ها',
-  'activitymonitoring.delete': 'حذف نظارت فعالیت‌ها',
+  'activitymonitoring.view': 'مشاهده نظارت بر فعالیت دفاتر رهنما',
+  'activitymonitoring.create': 'ثبت نظارت بر فعالیت دفاتر رهنما',
+  'activitymonitoring.edit': 'ویرایش نظارت بر فعالیت دفاتر رهنما',
+  'activitymonitoring.delete': 'حذف نظارت بر فعالیت دفاتر رهنما',
+  // Petition Writer Monitoring
+  'petitionwritermonitoring.view': 'مشاهده نظارت بر فعالیت عریضه نویسان',
+  'petitionwritermonitoring.create': 'ثبت نظارت بر فعالیت عریضه نویسان',
+  'petitionwritermonitoring.edit': 'ویرایش نظارت بر فعالیت عریضه نویسان',
+  'petitionwritermonitoring.delete': 'حذف نظارت بر فعالیت عریضه نویسان',
   // System
   'dashboard.view': 'مشاهده داشبورد',
   'reports.view': 'مشاهده گزارشات',

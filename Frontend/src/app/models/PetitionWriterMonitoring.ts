@@ -99,9 +99,9 @@ export const PetitionWriterMonitoringSectionTypes = [
 ];
 
 /**
- * Afghan calendar months
+ * Afghan calendar months (Hijri Shamsi)
  */
-export const AfghanMonths = [
+export const ShamsiMonths = [
     { value: 'حمل', label: 'حمل (Hamal)' },
     { value: 'ثور', label: 'ثور (Saur)' },
     { value: 'جوزا', label: 'جوزا (Jawza)' },
@@ -115,3 +115,44 @@ export const AfghanMonths = [
     { value: 'دلو', label: 'دلو (Dalw)' },
     { value: 'حوت', label: 'حوت (Hoot)' }
 ];
+
+/**
+ * Hijri Qamari months (Islamic Lunar)
+ */
+export const QamariMonths = [
+    { value: 'محرم', label: 'محرم (Muharram)' },
+    { value: 'صفر', label: 'صفر (Safar)' },
+    { value: 'ربیع الاول', label: 'ربیع الاول (Rabi al-Awwal)' },
+    { value: 'ربیع الثانی', label: 'ربیع الثانی (Rabi al-Thani)' },
+    { value: 'جمادی الاول', label: 'جمادی الاول (Jumada al-Awwal)' },
+    { value: 'جمادی الثانی', label: 'جمادی الثانی (Jumada al-Thani)' },
+    { value: 'رجب', label: 'رجب (Rajab)' },
+    { value: 'شعبان', label: 'شعبان (Shaban)' },
+    { value: 'رمضان', label: 'رمضان (Ramadan)' },
+    { value: 'شوال', label: 'شوال (Shawwal)' },
+    { value: 'ذی القعده', label: 'ذی القعده (Dhu al-Qadah)' },
+    { value: 'ذی الحجه', label: 'ذی الحجه (Dhu al-Hijjah)' }
+];
+
+/**
+ * Gregorian months (Miladi)
+ */
+export const GregorianMonths = [
+    { value: 'January', label: 'جنوری (January)' },
+    { value: 'February', label: 'فبروری (February)' },
+    { value: 'March', label: 'مارچ (March)' },
+    { value: 'April', label: 'اپریل (April)' },
+    { value: 'May', label: 'می (May)' },
+    { value: 'June', label: 'جون (June)' },
+    { value: 'July', label: 'جولای (July)' },
+    { value: 'August', label: 'اگست (August)' },
+    { value: 'September', label: 'سپتمبر (September)' },
+    { value: 'October', label: 'اکتوبر (October)' },
+    { value: 'November', label: 'نومبر (November)' },
+    { value: 'December', label: 'دسمبر (December)' }
+];
+
+/**
+ * Legacy export for backward compatibility
+ */
+export const AfghanMonths = ShamsiMonths;

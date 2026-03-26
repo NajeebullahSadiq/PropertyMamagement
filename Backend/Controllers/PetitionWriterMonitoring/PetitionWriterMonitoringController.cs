@@ -62,7 +62,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 }
 
                 var totalCount = await query.CountAsync();
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                // Always use HijriShamsi for list display
+                var calendar = CalendarType.HijriShamsi;
 
                 var items = await query
                     .OrderByDescending(x => x.CreatedAt)
@@ -195,8 +196,16 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
 
                 var userId = userIdClaim.Value;
 
-                // Parse dates
-                DateConversionHelper.TryParseToDateOnly(request.RegistrationDate, request.CalendarType, out var registrationDate);
+                // Parse dates - use null for empty strings instead of DateOnly.MinValue
+                DateOnly? registrationDate = null;
+                if (!string.IsNullOrWhiteSpace(request.RegistrationDate))
+                {
+                    var calendar = DateConversionHelper.ParseCalendarType(request.CalendarType);
+                    if (DateConversionHelper.TryParseToDateOnly(request.RegistrationDate, calendar, out var parsedDate))
+                    {
+                        registrationDate = parsedDate;
+                    }
+                }
 
                 var entity = new PetitionWriterMonitoringRecord
                 {
@@ -262,8 +271,16 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                     return NotFound("رکورد یافت نشد");
                 }
 
-                // Parse dates
-                DateConversionHelper.TryParseToDateOnly(request.RegistrationDate, request.CalendarType, out var registrationDate);
+                // Parse dates - use null for empty strings instead of DateOnly.MinValue
+                DateOnly? registrationDate = null;
+                if (!string.IsNullOrWhiteSpace(request.RegistrationDate))
+                {
+                    var calendar = DateConversionHelper.ParseCalendarType(request.CalendarType);
+                    if (DateConversionHelper.TryParseToDateOnly(request.RegistrationDate, calendar, out var parsedDate))
+                    {
+                        registrationDate = parsedDate;
+                    }
+                }
 
                 // Update all fields
                 entity.SectionType = request.SectionType;
@@ -352,6 +369,44 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 }
 
                 return Ok(new { serialNumber = nextNumber.ToString() });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Search petition writer license by license number for violations section
+        /// Returns: PetitionWriterName, PetitionWriterLicenseNumber, PetitionWriterDistrict
+        /// </summary>
+        [HttpGet("search-license/{licenseNumber}")]
+        public async Task<IActionResult> SearchLicenseByNumber(string licenseNumber)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(licenseNumber))
+                {
+                    return BadRequest(new { message = "نمبر جواز الزامی است" });
+                }
+
+                var license = await _context.PetitionWriterLicenses
+                    .Where(x => x.LicenseNumber == licenseNumber && x.Status == true)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.LicenseNumber,
+                        PetitionWriterName = x.ApplicantName,
+                        PetitionWriterDistrict = x.ActivityNahia ?? x.District ?? ""
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (license == null)
+                {
+                    return NotFound(new { message = "جواز با این نمبر یافت نشد" });
+                }
+
+                return Ok(license);
             }
             catch (Exception ex)
             {
