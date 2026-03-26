@@ -1,0 +1,224 @@
+<div class="container">
+  <section class="w-full bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">{{ isEditMode ? 'ویرایش' : 'ثبت' }} نظارت بر فعالیت عریضه نویسان</h1>
+        <p class="text-center text-gray-600">لطفا معلومات را با دقت تکمیل نمایید</p>
+      </div>
+
+      <form [formGroup]="mainForm" (ngSubmit)="saveForm()">
+        <!-- Section 1: Common Information -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-teal-600 to-cyan-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-clipboard-list"></i>
+              <span>معلومات عمومی</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مسلسل</label>
+                <input type="text" formControlName="serialNumber" readonly
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ثبت <span class="text-red-500">*</span></label>
+                <select formControlName="sectionType" (change)="onSectionTypeChange()"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                  <option value="">انتخاب کنید</option>
+                  <option *ngFor="let type of sectionTypes" [value]="type.value">{{ type.label }}</option>
+                </select>
+                <div *ngIf="mainForm.get('sectionType')?.invalid && mainForm.get('sectionType')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <app-multi-calendar-datepicker formControlName="registrationDate" label="تاریخ ثبت">
+                </app-multi-calendar-datepicker>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Complaints Registration (ثبت شکایات) -->
+        <div *ngIf="showComplaintsSection" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>۱. ثبت شکایات</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عارض <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="complainantName"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('complainantName')?.invalid && mainForm.get('complainantName')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">موضوع شکایت <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="complaintSubject"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('complaintSubject')?.invalid && mainForm.get('complaintSubject')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
+                <textarea formControlName="complaintActionsTaken" rows="3"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+                <textarea formControlName="complaintRemarks" rows="3"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Violations (تخلفات عریضه نویسان) -->
+        <div *ngIf="showViolationsSection" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-gavel"></i>
+              <span>۲. تخلفات عریضه نویسان</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عریضه نویس <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="petitionWriterName"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('petitionWriterName')?.invalid && mainForm.get('petitionWriterName')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر جواز <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="petitionWriterLicenseNumber"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('petitionWriterLicenseNumber')?.invalid && mainForm.get('petitionWriterLicenseNumber')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="petitionWriterDistrict"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('petitionWriterDistrict')?.invalid && mainForm.get('petitionWriterDistrict')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div class="md:col-span-3">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تخلف <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="violationType"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('violationType')?.invalid && mainForm.get('violationType')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
+                <textarea formControlName="violationActionsTaken" rows="3"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+                <textarea formControlName="violationRemarks" rows="3"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Monitoring Activities (نظارت فعالیت عریضه نویسان) -->
+        <div *ngIf="showMonitoringSection" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-chart-line"></i>
+              <span>۳. نظارت فعالیت عریضه نویسان</span>
+            </h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+              <p class="text-sm text-green-800">
+                <i class="fas fa-info-circle ml-2"></i>
+                تفکیک به سال و ماه‌های سال: حمل، ثور، جوزا، سرطان، اسد، سنبله، میزان، عقرب، قوس، جدی، دلو، حوت
+              </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">سال <span class="text-red-500">*</span></label>
+                <select formControlName="monitoringYear"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <option value="">انتخاب کنید</option>
+                  <option *ngFor="let year of monitoringYears" [value]="year">{{ year }}</option>
+                </select>
+                <div *ngIf="mainForm.get('monitoringYear')?.invalid && mainForm.get('monitoringYear')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ماه <span class="text-red-500">*</span></label>
+                <select formControlName="monitoringMonth"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <option value="">انتخاب کنید</option>
+                  <option *ngFor="let month of afghanMonths" [value]="month.value">{{ month.label }}</option>
+                </select>
+                <div *ngIf="mainForm.get('monitoringMonth')?.invalid && mainForm.get('monitoringMonth')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد نظارت <span class="text-red-500">*</span></label>
+                <input type="number" formControlName="monitoringCount"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('monitoringCount')?.invalid && mainForm.get('monitoringCount')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+                <textarea formControlName="monitoringRemarks" rows="2"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+          <div class="px-6 py-6">
+            <div class="flex flex-wrap gap-4 justify-center">
+              <button type="submit" [disabled]="isViewOnly || mainForm.invalid"
+                class="px-8 py-3 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-save"></i>
+                <span>ذخیره معلومات</span>
+              </button>
+              <button type="button" (click)="goToList()"
+                class="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
+                <i class="fas fa-list"></i>
+                <span>برگشت به لیست</span>
+              </button>
+              <button type="button" (click)="resetForm()"
+                class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
+                <i class="fas fa-redo"></i>
+                <span>پاک کردن فورم</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>

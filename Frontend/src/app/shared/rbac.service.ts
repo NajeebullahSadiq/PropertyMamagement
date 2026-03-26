@@ -85,6 +85,12 @@ export const Permissions = {
   ActivityMonitoringEdit: 'activitymonitoring.edit',
   ActivityMonitoringDelete: 'activitymonitoring.delete',
 
+  // Petition Writer Monitoring
+  PetitionWriterMonitoringView: 'petitionwritermonitoring.view',
+  PetitionWriterMonitoringCreate: 'petitionwritermonitoring.create',
+  PetitionWriterMonitoringEdit: 'petitionwritermonitoring.edit',
+  PetitionWriterMonitoringDelete: 'petitionwritermonitoring.delete',
+
   // Reports
   ReportsView: 'reports.view',
   ReportsExport: 'reports.export',
@@ -236,7 +242,7 @@ export class RbacService {
       Permissions.CompanyCreate, Permissions.PropertyCreate, Permissions.VehicleCreate,
       Permissions.SecuritiesCreate, Permissions.PetitionWriterSecuritiesCreate,
       Permissions.PetitionWriterLicenseCreate, Permissions.ActivityMonitoringCreate,
-      Permissions.LicenseApplicationCreate, Permissions.LicenseCreate
+      Permissions.PetitionWriterMonitoringCreate, Permissions.LicenseApplicationCreate, Permissions.LicenseCreate
     ]);
   }
 
@@ -268,6 +274,11 @@ export class RbacService {
   // Check if user can create activity monitoring entries
   canCreateActivityMonitoring(): boolean {
     return this.hasPermission(Permissions.ActivityMonitoringCreate);
+  }
+
+  // Check if user can create petition writer monitoring entries
+  canCreatePetitionWriterMonitoring(): boolean {
+    return this.hasPermission(Permissions.PetitionWriterMonitoringCreate);
   }
 
   // Check if user can create petition writer securities
@@ -334,6 +345,8 @@ export class RbacService {
         return this.hasPermission(Permissions.PetitionWriterSecuritiesView) || this.hasPermission(Permissions.PetitionWriterLicenseView);
       case 'activitymonitoring':
         return this.hasPermission(Permissions.ActivityMonitoringView);
+      case 'petitionwritermonitoring':
+        return this.hasPermission(Permissions.PetitionWriterMonitoringView);
       case 'licenseapplications':
         return this.hasPermission(Permissions.LicenseApplicationView);
       case 'reports':

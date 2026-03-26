@@ -213,3 +213,24 @@ export class ActivityMonitoringGuard implements CanActivate {
     return true;
   }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PetitionWriterMonitoringGuard implements CanActivate {
+  constructor(private router: Router, private rbacService: RbacService) {}
+
+  canActivate(): boolean {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/Auth']);
+      return false;
+    }
+
+    if (!this.rbacService.canAccessModule('petitionWriterMonitoring')) {
+      this.router.navigate(['/forbidden']);
+      return false;
+    }
+
+    return true;
+  }
+}

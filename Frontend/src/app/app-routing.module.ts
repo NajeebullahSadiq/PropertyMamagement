@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/authSetting/auth.guard';
 import { GeolocationGuard } from './auth/authSetting/geolocation.guard';
-import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard, DashboardGuard, SecuritiesModuleGuard, PetitionWriterModuleGuard, ActivityMonitoringGuard } from './auth/authSetting/role.guard';
+import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard, DashboardGuard, SecuritiesModuleGuard, PetitionWriterModuleGuard, ActivityMonitoringGuard, PetitionWriterMonitoringGuard } from './auth/authSetting/role.guard';
 import { ForbiddenComponent } from './auth/forbidden/forbidden.component';
 import { AccessDeniedComponent } from './auth/access-denied/access-denied.component';
 import { PrintComponent } from './print/print.component';
@@ -156,6 +156,14 @@ const routes: Routes = [
     canActivate: [GeolocationGuard, AuthGuard, ActivityMonitoringGuard],
     children: [
       { path: '', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule) }
+    ]
+  },
+  { 
+    path: 'petition-writer-monitoring', 
+    component: MasterlayoutComponent,
+    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterMonitoringGuard],
+    children: [
+      { path: '', loadChildren: () => import('./petition-writer-monitoring/petition-writer-monitoring.module').then(m => m.PetitionWriterMonitoringModule) }
     ]
   },
   { 

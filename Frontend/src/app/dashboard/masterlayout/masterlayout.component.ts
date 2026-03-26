@@ -37,6 +37,7 @@ export class MasterlayoutComponent implements AfterViewInit {
   canAccessSecurities = false;
   canAccessPetitionWriter = false;
   canAccessActivityMonitoring = false;
+  canAccessPetitionWriterMonitoring = false;
   canAccessVerification = false;
   isViewOnly = false;
   isAdmin = false;
@@ -49,6 +50,7 @@ export class MasterlayoutComponent implements AfterViewInit {
   canCreateVehicle = false;
   canCreateSecurities = false;
   canCreateActivityMonitoring = false;
+  canCreatePetitionWriterMonitoring = false;
   canCreatePetitionWriterSecurities = false;
   canCreatePetitionWriterLicense = false;
 
@@ -114,6 +116,7 @@ export class MasterlayoutComponent implements AfterViewInit {
     this.canAccessSecurities = this.rbacService.canAccessModule('securities');
     this.canAccessPetitionWriter = this.rbacService.canAccessModule('petitionWriter');
     this.canAccessActivityMonitoring = this.rbacService.canAccessModule('activityMonitoring');
+    this.canAccessPetitionWriterMonitoring = this.rbacService.canAccessModule('petitionWriterMonitoring');
     this.canAccessVerification = this.rbacService.canAccessModule('verification');
     this.isViewOnly = this.rbacService.isViewOnly();
     this.isAdmin = this.rbacService.isAdmin();
@@ -128,6 +131,7 @@ export class MasterlayoutComponent implements AfterViewInit {
     this.canCreateVehicle = this.rbacService.hasPermission('vehicle.create') || this.rbacService.hasPermission('vehicle.edit') || this.rbacService.hasPermission('vehicle.edit.own');
     this.canCreateSecurities = this.rbacService.hasPermission('securities.create');
     this.canCreateActivityMonitoring = this.rbacService.hasPermission('activitymonitoring.create');
+    this.canCreatePetitionWriterMonitoring = this.rbacService.hasPermission('petitionwritermonitoring.create');
     this.canCreatePetitionWriterSecurities = this.rbacService.hasPermission('petitionwritersecurities.create');
     this.canCreatePetitionWriterLicense = this.rbacService.hasPermission('petitionwriterlicense.create');
   }

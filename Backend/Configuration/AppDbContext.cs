@@ -135,6 +135,9 @@ namespace WebAPIBackend.Configuration
         // Activity Monitoring Module (Single Table Design)
         public virtual DbSet<WebAPIBackend.Models.ActivityMonitoring.ActivityMonitoringRecord> ActivityMonitoringRecords { get; set; }
         
+        // Petition Writer Monitoring Module (Single Table Design)
+        public virtual DbSet<WebAPIBackend.Models.PetitionWriterMonitoring.PetitionWriterMonitoringRecord> PetitionWriterMonitoringRecords { get; set; }
+        
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         // GetPrintType view removed - use direct queries instead
@@ -565,6 +568,52 @@ namespace WebAPIBackend.Configuration
                 entity.HasIndex(e => e.LicenseHolderName);
                 entity.HasIndex(e => e.District);
                 entity.HasIndex(e => e.SectionType);
+                entity.HasIndex(e => e.Status);
+            });
+
+            // Petition Writer Monitoring Module Configuration (Single Table Design)
+            modelBuilder.Entity<WebAPIBackend.Models.PetitionWriterMonitoring.PetitionWriterMonitoringRecord>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PetitionWriterMonitoringRecords_pkey");
+                entity.ToTable("PetitionWriterMonitoringRecords", "org");
+
+                // Audit fields
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone").HasColumnName("CreatedAt");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50).HasColumnName("CreatedBy");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone").HasColumnName("UpdatedAt");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50).HasColumnName("UpdatedBy");
+                entity.Property(e => e.Status).HasColumnName("Status");
+
+                // Common fields
+                entity.Property(e => e.SerialNumber).HasMaxLength(50).HasColumnName("SerialNumber");
+                entity.Property(e => e.SectionType).HasMaxLength(50).HasColumnName("SectionType");
+                entity.Property(e => e.RegistrationDate).HasColumnName("RegistrationDate");
+
+                // Complaints fields
+                entity.Property(e => e.ComplainantName).HasMaxLength(200).HasColumnName("ComplainantName");
+                entity.Property(e => e.ComplaintSubject).HasMaxLength(500).HasColumnName("ComplaintSubject");
+                entity.Property(e => e.ComplaintActionsTaken).HasMaxLength(1000).HasColumnName("ComplaintActionsTaken");
+                entity.Property(e => e.ComplaintRemarks).HasMaxLength(1000).HasColumnName("ComplaintRemarks");
+
+                // Violations fields
+                entity.Property(e => e.PetitionWriterName).HasMaxLength(200).HasColumnName("PetitionWriterName");
+                entity.Property(e => e.PetitionWriterLicenseNumber).HasMaxLength(50).HasColumnName("PetitionWriterLicenseNumber");
+                entity.Property(e => e.PetitionWriterDistrict).HasMaxLength(200).HasColumnName("PetitionWriterDistrict");
+                entity.Property(e => e.ViolationType).HasMaxLength(500).HasColumnName("ViolationType");
+                entity.Property(e => e.ViolationActionsTaken).HasMaxLength(1000).HasColumnName("ViolationActionsTaken");
+                entity.Property(e => e.ViolationRemarks).HasMaxLength(1000).HasColumnName("ViolationRemarks");
+
+                // Monitoring fields
+                entity.Property(e => e.MonitoringYear).HasMaxLength(20).HasColumnName("MonitoringYear");
+                entity.Property(e => e.MonitoringMonth).HasMaxLength(50).HasColumnName("MonitoringMonth");
+                entity.Property(e => e.MonitoringCount).HasColumnName("MonitoringCount");
+                entity.Property(e => e.MonitoringRemarks).HasMaxLength(1000).HasColumnName("MonitoringRemarks");
+
+                // Indexes
+                entity.HasIndex(e => e.SerialNumber);
+                entity.HasIndex(e => e.SectionType);
+                entity.HasIndex(e => e.PetitionWriterName);
+                entity.HasIndex(e => e.PetitionWriterLicenseNumber);
                 entity.HasIndex(e => e.Status);
             });
 

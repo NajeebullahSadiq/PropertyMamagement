@@ -177,6 +177,12 @@ namespace WebAPIBackend.Configuration
         public const string ActivityMonitoringEdit = "activitymonitoring.edit";
         public const string ActivityMonitoringDelete = "activitymonitoring.delete";
 
+        // Petition Writer Monitoring (نظارت بر فعالیت عریضه نویسان)
+        public const string PetitionWriterMonitoringView = "petitionwritermonitoring.view";
+        public const string PetitionWriterMonitoringCreate = "petitionwritermonitoring.create";
+        public const string PetitionWriterMonitoringEdit = "petitionwritermonitoring.edit";
+        public const string PetitionWriterMonitoringDelete = "petitionwritermonitoring.delete";
+
         // Reports
         public const string ReportsView = "reports.view";
         public const string ReportsExport = "reports.export";
@@ -215,6 +221,7 @@ namespace WebAPIBackend.Configuration
                     Permissions.PetitionWriterSecuritiesView, Permissions.PetitionWriterSecuritiesCreate, Permissions.PetitionWriterSecuritiesEdit, Permissions.PetitionWriterSecuritiesDelete,
                     Permissions.PetitionWriterLicenseView, Permissions.PetitionWriterLicenseCreate, Permissions.PetitionWriterLicenseEdit, Permissions.PetitionWriterLicenseDelete,
                     Permissions.ActivityMonitoringView, Permissions.ActivityMonitoringCreate, Permissions.ActivityMonitoringEdit, Permissions.ActivityMonitoringDelete,
+                    Permissions.PetitionWriterMonitoringView, Permissions.PetitionWriterMonitoringCreate, Permissions.PetitionWriterMonitoringEdit, Permissions.PetitionWriterMonitoringDelete,
                     Permissions.ReportsView, Permissions.ReportsExport,
                     Permissions.DashboardView,
                     Permissions.SystemConfigure
@@ -227,6 +234,7 @@ namespace WebAPIBackend.Configuration
                     Permissions.LicenseView, Permissions.LicenseApplicationView,
                     Permissions.SecuritiesView, Permissions.PetitionWriterSecuritiesView,
                     Permissions.PetitionWriterLicenseView, Permissions.ActivityMonitoringView,
+                    Permissions.PetitionWriterMonitoringView,
                     Permissions.ReportsView, Permissions.DashboardView
                 },
 
@@ -269,6 +277,8 @@ namespace WebAPIBackend.Configuration
                 {
                     Permissions.ActivityMonitoringView, Permissions.ActivityMonitoringCreate,
                     Permissions.ActivityMonitoringEdit, Permissions.ActivityMonitoringDelete,
+                    Permissions.PetitionWriterMonitoringView, Permissions.PetitionWriterMonitoringCreate,
+                    Permissions.PetitionWriterMonitoringEdit, Permissions.PetitionWriterMonitoringDelete,
                     Permissions.CompanyView, Permissions.PropertyView, Permissions.VehicleView,
                     Permissions.ReportsView, Permissions.DashboardView
                 },
