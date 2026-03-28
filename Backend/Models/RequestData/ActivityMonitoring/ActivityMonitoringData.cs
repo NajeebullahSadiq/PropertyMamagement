@@ -35,15 +35,10 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         public int? BaiUlWafaDeedsCount { get; set; }
         public int? VehicleTransactionDeedsCount { get; set; }
 
-        [MaxLength(1000)]
-        public string? AnnualReportRemarks { get; set; }
-
         // Deed items with serial numbers (stored as JSON)
         public List<DeedItemData>? DeedItems { get; set; }
 
         // ============ Section 2: Complaints ============
-        public string? ComplaintRegistrationDate { get; set; }
-
         [MaxLength(500)]
         public string? ComplaintSubject { get; set; }
 
@@ -77,9 +72,6 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         public string? ViolationRemarks { get; set; }
 
         // ============ Section 4: Inspections ============
-        [MaxLength(100)]
-        public string? MonitoringType { get; set; }
-
         [MaxLength(20)]
         public string? Year { get; set; }
 
@@ -87,6 +79,9 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         public string? Month { get; set; }
 
         public int? MonitoringCount { get; set; }
+
+        [MaxLength(1000)]
+        public string? MonitoringRemarks { get; set; }
 
         // ============ Calendar Type for Date Conversion ============
         public string? CalendarType { get; set; }

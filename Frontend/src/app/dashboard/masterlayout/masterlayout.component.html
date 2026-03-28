@@ -192,21 +192,12 @@
         class="nav-link">
         <mat-icon>summarize</mat-icon><span>{{ "reportbycompany" | translate }}</span>
       </a>
-      <div *ngIf="canAccessUsers" class="section-label">مدیریت کاربران</div>
-      <a *ngIf="canAccessUsers" routerLink="/users" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>people</mat-icon><span>لیست کاربران</span>
+      <div *ngIf="canAccessUsers" class="section-label">تنظیمات سیستم</div>
+      <a *ngIf="canAccessUsers" routerLink="/configuration" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <mat-icon>settings</mat-icon><span>تنظیمات</span>
       </a>
       <a *ngIf="canAccessUsers" routerLink="/Auth/Register" routerLinkActive="active-nav" class="nav-link">
         <mat-icon>person_add</mat-icon><span>ایجاد کاربر جدید</span>
-      </a>
-      <a *ngIf="canAccessUsers" routerLink="/users/permissions" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>admin_panel_settings</mat-icon><span>مدیریت صلاحیت‌ها</span>
-      </a>
-      <a *ngIf="canAccessUsers" routerLink="/users/role-permissions" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>manage_accounts</mat-icon><span>صلاحیت‌های نقش‌ها</span>
-      </a>
-      <a *ngIf="canAccessUsers" routerLink="/district-management" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>location_city</mat-icon><span>مدیریت ولسوالی ها</span>
       </a>
       <div *ngIf="canAccessVerification" class="section-label">تصدیق اسناد</div>
       <a *ngIf="canAccessVerification" routerLink="/verify" routerLinkActive="active-nav" class="nav-link">

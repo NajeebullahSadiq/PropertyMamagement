@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ActivityMonitoringService } from 'src/app/shared/activity-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
-import { ActivityMonitoringRecord } from 'src/app/models/ActivityMonitoring';
+import { ActivityMonitoringRecord, ActivityMonitoringSectionTypes } from 'src/app/models/ActivityMonitoring';
 
 @Component({
     selector: 'app-activity-monitoring-list',
@@ -18,6 +18,8 @@ export class ActivityMonitoringListComponent implements OnInit {
     pageSize = 10;
     pageSizes = [5, 10, 25, 50];
     searchText = '';
+    selectedSectionType = '';
+    sectionTypes = ActivityMonitoringSectionTypes;
     isLoading = false;
 
     canCreate = false;
@@ -48,7 +50,7 @@ export class ActivityMonitoringListComponent implements OnInit {
     loadData(): void {
         this.isLoading = true;
         const calendar = this.calendarService.getSelectedCalendar();
-        this.service.getAll(this.page, this.pageSize, this.searchText, calendar).subscribe({
+        this.service.getAll(this.page, this.pageSize, this.searchText, this.selectedSectionType, calendar).subscribe({
             next: (response) => {
                 this.items = response.items;
                 this.totalCount = response.totalCount;
@@ -63,6 +65,11 @@ export class ActivityMonitoringListComponent implements OnInit {
     }
 
     onSearch(): void {
+        this.page = 1;
+        this.loadData();
+    }
+
+    onSectionTypeChange(): void {
         this.page = 1;
         this.loadData();
     }
@@ -101,6 +108,41 @@ export class ActivityMonitoringListComponent implements OnInit {
                     console.error(err);
                 }
             });
+        }
+    }
+
+    getSectionTypeLabel(sectionType: string): string {
+        const found = this.sectionTypes.find(s => s.value === sectionType);
+        return found ? found.label : '-';
+    }
+
+    getSectionTypeClass(sectionType: string): string {
+        switch (sectionType) {
+            case 'annualReport':
+                return 'bg-purple-100 text-purple-700';
+            case 'complaints':
+                return 'bg-red-100 text-red-700';
+            case 'violations':
+                return 'bg-orange-100 text-orange-700';
+            case 'inspection':
+                return 'bg-green-100 text-green-700';
+            default:
+                return 'bg-gray-100 text-gray-700';
+        }
+    }
+
+    getColspan(): number {
+        switch (this.selectedSectionType) {
+            case 'annualReport':
+                return 5;
+            case 'complaints':
+                return 6;
+            case 'violations':
+                return 7;
+            case 'inspection':
+                return 5;
+            default:
+                return 6;
         }
     }
 }

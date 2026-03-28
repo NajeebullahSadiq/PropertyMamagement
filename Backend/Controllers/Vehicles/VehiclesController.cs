@@ -19,10 +19,13 @@ namespace WebAPIBackend.Controllers.Vehicles
     {
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
-        public VehiclesController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
+
+        public VehiclesController(AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService)
         {
             _context = context;
             _userManager = userManager;
+            _auditService = auditService;
 
         }
 
@@ -360,6 +363,15 @@ namespace WebAPIBackend.Controllers.Vehicles
             };
             _context.Add(property);
             await _context.SaveChangesAsync();
+
+            // Log the creation to comprehensive audit
+            await _auditService.LogCreateAsync(
+                WebAPIBackend.Models.Audit.AuditModules.Vehicle,
+                "Vehicle",
+                property.Id.ToString(),
+                newValues: new { property.Id, property.PermitNo, property.PilateNo, property.PropertyTypeId },
+                descriptionDari: $"ثبت سند واسطه نقلیه با شماره {property.PermitNo ?? property.PilateNo}");
+
             var result = new { Id = property.Id, PropertyTypeId = property.PropertyTypeId };
             return Ok(result);
         }
@@ -428,6 +440,20 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
 
             await _context.SaveChangesAsync();
+
+            // Log the update to comprehensive audit
+            var modifiedChanges = changes.Where(c => c.Value.OldValue != null && !c.Value.OldValue.Equals(c.Value.NewValue))
+                .ToDictionary(c => c.Key, c => new { OldValue = c.Value.OldValue, NewValue = c.Value.NewValue });
+            if (modifiedChanges.Any())
+            {
+                await _auditService.LogUpdateAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Vehicle,
+                    "Vehicle",
+                    id.ToString(),
+                    oldValues: modifiedChanges.ToDictionary(c => c.Key, c => c.Value.OldValue),
+                    newValues: modifiedChanges.ToDictionary(c => c.Key, c => c.Value.NewValue),
+                    descriptionDari: $"تغییر سند واسطه نقلیه با شماره {existingProperty.PermitNo ?? existingProperty.PilateNo}");
+            }
 
             var result = new { Id = request.Id, PropertyTypeId = request.PropertyTypeId };
             return Ok(result);

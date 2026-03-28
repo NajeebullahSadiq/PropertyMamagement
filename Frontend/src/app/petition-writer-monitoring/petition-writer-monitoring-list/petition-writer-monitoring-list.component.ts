@@ -128,4 +128,17 @@ export class PetitionWriterMonitoringListComponent implements OnInit {
                 return 'bg-gray-100 text-gray-700';
         }
     }
+
+    getColspan(): number {
+        switch (this.selectedSectionType) {
+            case 'complaints':
+                return 6;
+            case 'violations':
+                return 7;
+            case 'monitoring':
+                return 5;
+            default:
+                return 7;
+        }
+    }
 }

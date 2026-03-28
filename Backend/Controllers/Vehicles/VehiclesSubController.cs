@@ -17,6 +17,7 @@ namespace WebAPIBackend.Controllers.Vehicles
     {
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
+        private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
         
         // Allowed seller role types for Vehicle module
         private static readonly string[] AllowedSellerRoles = { "Seller", "Sellers", "Sales Agent", "Heirs" };
@@ -27,10 +28,11 @@ namespace WebAPIBackend.Controllers.Vehicles
         // Single-buyer roles (only one buyer allowed)
         private static readonly string[] SingleBuyerRoles = { "Buyer", "Purchase Agent" };
         
-        public VehiclesSubController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public VehiclesSubController(AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService)
         {
             _context = context;
             _userManager = userManager;
+            _auditService = auditService;
         }
 
         /// <summary>
@@ -766,8 +768,18 @@ namespace WebAPIBackend.Controllers.Vehicles
                     return NotFound();
                 }
 
+                var sellerInfo = new { seller.Id, seller.FirstName, seller.FatherName, seller.PropertyDetailsId };
+
                 _context.VehiclesSellerDetails.Remove(seller);
                 await _context.SaveChangesAsync();
+
+                // Log the deletion to comprehensive audit
+                await _auditService.LogDeleteAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Vehicle,
+                    "VehicleSeller",
+                    id.ToString(),
+                    oldValues: sellerInfo,
+                    descriptionDari: $"حذف فروشنده واسطه نقلیه {seller.FirstName}");
 
                 return Ok(new { message = "Seller deleted successfully" });
             }
@@ -788,8 +800,18 @@ namespace WebAPIBackend.Controllers.Vehicles
                     return NotFound();
                 }
 
+                var buyerInfo = new { buyer.Id, buyer.FirstName, buyer.FatherName, buyer.PropertyDetailsId };
+
                 _context.VehiclesBuyerDetails.Remove(buyer);
                 await _context.SaveChangesAsync();
+
+                // Log the deletion to comprehensive audit
+                await _auditService.LogDeleteAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Vehicle,
+                    "VehicleBuyer",
+                    id.ToString(),
+                    oldValues: buyerInfo,
+                    descriptionDari: $"حذف خریدار واسطه نقلیه {buyer.FirstName}");
 
                 return Ok(new { message = "Buyer deleted successfully" });
             }

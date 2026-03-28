@@ -167,6 +167,22 @@ const routes: Routes = [
     ]
   },
   { 
+    path: 'audit-log', 
+    component: MasterlayoutComponent,
+    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
+    children: [
+      { path: '', loadChildren: () => import('./audit-log/audit-log.module').then(m => m.AuditLogModule) }
+    ]
+  },
+  { 
+    path: 'configuration', 
+    component: MasterlayoutComponent,
+    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
+    children: [
+      { path: '', loadChildren: () => import('./configuration/configuration.module').then(m => m.ConfigurationModule) }
+    ]
+  },
+  { 
     path: 'district-management', 
     component: MasterlayoutComponent,
     canActivate: [GeolocationGuard, AuthGuard, AdminGuard],

@@ -44,6 +44,23 @@ export class ActivityMonitoringFormComponent implements OnInit {
     showInspectionSection = false;
     selectedCompanyId: number | null = null;
 
+    // Monitoring years and months for inspection section
+    monitoringYears: string[] = [];
+    monitoringMonths = [
+        { value: 'حمل', label: 'حمل' },
+        { value: 'ثور', label: 'ثور' },
+        { value: 'جوزا', label: 'جوزا' },
+        { value: 'سرطان', label: 'سرطان' },
+        { value: 'اسد', label: 'اسد' },
+        { value: 'سنبله', label: 'سنبله' },
+        { value: 'میزان', label: 'میزان' },
+        { value: 'عقرب', label: 'عقرب' },
+        { value: 'قوس', label: 'قوس' },
+        { value: 'جدی', label: 'جدی' },
+        { value: 'دلو', label: 'دلو' },
+        { value: 'حوت', label: 'حوت' }
+    ];
+
     // RBAC
     canEdit = false;
     isViewOnly = false;
@@ -65,6 +82,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
 
     ngOnInit(): void {
         this.checkPermissions();
+        this.initMonitoringYears();
 
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
@@ -75,6 +93,14 @@ export class ActivityMonitoringFormComponent implements OnInit {
         } else {
             // New record - fetch next serial number
             this.loadNextSerialNumber();
+        }
+    }
+
+    initMonitoringYears(): void {
+        const currentYear = new Date().getFullYear();
+        const persianYear = currentYear - 621; // Approximate Hijri Shamsi year
+        for (let i = 0; i < 10; i++) {
+            this.monitoringYears.push((persianYear - i).toString());
         }
     }
 
@@ -98,10 +124,8 @@ export class ActivityMonitoringFormComponent implements OnInit {
             rentalDeedsCount: [''],
             baiUlWafaDeedsCount: [''],
             vehicleTransactionDeedsCount: [''],
-            annualReportRemarks: [''],
             
             // Section 2: Complaints fields (conditionally required)
-            complaintRegistrationDate: [''],
             complaintSubject: [''],
             complainantName: [''],
             complaintActionsTaken: [''],
@@ -117,10 +141,10 @@ export class ActivityMonitoringFormComponent implements OnInit {
             violationRemarks: [''],
             
             // Section 4: Inspection fields (conditionally required)
-            monitoringType: [''],
             year: [''],
             month: [''],
             monitoringCount: [''],
+            monitoringRemarks: [''],
         });
     }
 
@@ -200,12 +224,6 @@ export class ActivityMonitoringFormComponent implements OnInit {
                 complaintActionsTaken: complaint.actionsTaken,
                 complaintRemarks: complaint.remarks,
             });
-            if (complaint.complaintRegistrationDateFormatted) {
-                const date = this.parseDateString(complaint.complaintRegistrationDateFormatted);
-                if (date) {
-                    this.mainForm.patchValue({ complaintRegistrationDate: date });
-                }
-            }
         } else if (data.sectionType === 'violations' && data.realEstateViolations && data.realEstateViolations.length > 0) {
             const violation = data.realEstateViolations[0];
             this.mainForm.patchValue({
@@ -230,12 +248,11 @@ export class ActivityMonitoringFormComponent implements OnInit {
             this.onViolationStatusChange();
         } else if (data.sectionType === 'inspection') {
             this.mainForm.patchValue({
-                monitoringType: data.monitoringType,
                 year: data.year,
                 month: data.month,
                 monitoringCount: data.monitoringCount,
+                monitoringRemarks: data.monitoringRemarks,
             });
-            this.onMonitoringTypeChange();
         }
 
         // Trigger section visibility based on sectionType
@@ -315,7 +332,6 @@ export class ActivityMonitoringFormComponent implements OnInit {
 
     clearAllConditionalValidators(): void {
         // Complaint fields
-        this.mainForm.get('complaintRegistrationDate')?.clearValidators();
         this.mainForm.get('complaintSubject')?.clearValidators();
         this.mainForm.get('complainantName')?.clearValidators();
         
@@ -327,13 +343,11 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.mainForm.get('closureReason')?.clearValidators();
         
         // Inspection fields
-        this.mainForm.get('monitoringType')?.clearValidators();
         this.mainForm.get('year')?.clearValidators();
         this.mainForm.get('month')?.clearValidators();
         this.mainForm.get('monitoringCount')?.clearValidators();
         
         // Update validity
-        this.mainForm.get('complaintRegistrationDate')?.updateValueAndValidity();
         this.mainForm.get('complaintSubject')?.updateValueAndValidity();
         this.mainForm.get('complainantName')?.updateValueAndValidity();
         this.mainForm.get('violationStatus')?.updateValueAndValidity();
@@ -341,18 +355,15 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.mainForm.get('violationDate')?.updateValueAndValidity();
         this.mainForm.get('closureDate')?.updateValueAndValidity();
         this.mainForm.get('closureReason')?.updateValueAndValidity();
-        this.mainForm.get('monitoringType')?.updateValueAndValidity();
         this.mainForm.get('year')?.updateValueAndValidity();
         this.mainForm.get('month')?.updateValueAndValidity();
         this.mainForm.get('monitoringCount')?.updateValueAndValidity();
     }
 
     setComplaintValidators(): void {
-        this.mainForm.get('complaintRegistrationDate')?.setValidators([Validators.required]);
         this.mainForm.get('complaintSubject')?.setValidators([Validators.required, Validators.maxLength(500)]);
         this.mainForm.get('complainantName')?.setValidators([Validators.required, Validators.maxLength(200)]);
         
-        this.mainForm.get('complaintRegistrationDate')?.updateValueAndValidity();
         this.mainForm.get('complaintSubject')?.updateValueAndValidity();
         this.mainForm.get('complainantName')?.updateValueAndValidity();
     }
@@ -367,12 +378,13 @@ export class ActivityMonitoringFormComponent implements OnInit {
     }
 
     setInspectionValidators(): void {
-        this.mainForm.get('monitoringType')?.setValidators([Validators.required]);
+        this.mainForm.get('year')?.setValidators([Validators.required]);
+        this.mainForm.get('month')?.setValidators([Validators.required]);
+        this.mainForm.get('monitoringCount')?.setValidators([Validators.required, Validators.min(1)]);
         
-        this.mainForm.get('monitoringType')?.updateValueAndValidity();
-        
-        // Additional validators based on monitoring type
-        this.onMonitoringTypeChange();
+        this.mainForm.get('year')?.updateValueAndValidity();
+        this.mainForm.get('month')?.updateValueAndValidity();
+        this.mainForm.get('monitoringCount')?.updateValueAndValidity();
     }
 
     onViolationStatusChange(): void {
@@ -403,24 +415,6 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.mainForm.get('closureReason')?.updateValueAndValidity();
     }
 
-    onMonitoringTypeChange(): void {
-        const monitoringType = this.mainForm.get('monitoringType')?.value;
-        
-        if (monitoringType) {
-            this.mainForm.get('year')?.setValidators([Validators.required, Validators.maxLength(20)]);
-            this.mainForm.get('month')?.setValidators([Validators.required]);
-            this.mainForm.get('monitoringCount')?.setValidators([Validators.required, Validators.min(1)]);
-        } else {
-            this.mainForm.get('year')?.clearValidators();
-            this.mainForm.get('month')?.clearValidators();
-            this.mainForm.get('monitoringCount')?.clearValidators();
-        }
-
-        this.mainForm.get('year')?.updateValueAndValidity();
-        this.mainForm.get('month')?.updateValueAndValidity();
-        this.mainForm.get('monitoringCount')?.updateValueAndValidity();
-    }
-
     // ==================== Single Save Function ====================
 
     saveForm(): void {
@@ -446,12 +440,10 @@ export class ActivityMonitoringFormComponent implements OnInit {
             rentalDeedsCount: formValue.rentalDeedsCount ? Number(formValue.rentalDeedsCount) : undefined,
             baiUlWafaDeedsCount: formValue.baiUlWafaDeedsCount ? Number(formValue.baiUlWafaDeedsCount) : undefined,
             vehicleTransactionDeedsCount: formValue.vehicleTransactionDeedsCount ? Number(formValue.vehicleTransactionDeedsCount) : undefined,
-            annualReportRemarks: formValue.annualReportRemarks,
             deedItems: this.deedItems,
             calendarType: currentCalendar,
             
             // Complaints fields (directly on data)
-            complaintRegistrationDate: this.formatDateForBackend(formValue.complaintRegistrationDate),
             complaintSubject: formValue.complaintSubject,
             complainantName: formValue.complainantName,
             complaintActionsTaken: formValue.complaintActionsTaken,
@@ -467,10 +459,10 @@ export class ActivityMonitoringFormComponent implements OnInit {
             violationRemarks: formValue.violationRemarks,
             
             // Inspections fields (directly on data)
-            monitoringType: formValue.monitoringType,
             year: formValue.year,
             month: formValue.month,
-            monitoringCount: formValue.monitoringCount ? Number(formValue.monitoringCount) : undefined
+            monitoringCount: formValue.monitoringCount ? Number(formValue.monitoringCount) : undefined,
+            monitoringRemarks: formValue.monitoringRemarks
         };
 
         if (this.isEditMode && this.editId) {

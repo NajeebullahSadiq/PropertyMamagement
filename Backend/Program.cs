@@ -133,6 +133,9 @@ builder.Services.AddScoped<WebAPIBackend.Services.ILicenseService, WebAPIBackend
 // Register Security Audit Logger
 builder.Services.AddScoped<WebAPIBackend.Services.ISecurityAuditLogger, WebAPIBackend.Services.SecurityAuditLogger>();
 
+// Register Comprehensive Audit Service
+builder.Services.AddScoped<WebAPIBackend.Services.IComprehensiveAuditService, WebAPIBackend.Services.ComprehensiveAuditService>();
+
 // Register Exception Handler
 builder.Services.AddExceptionHandler<WebAPIBackend.Middleware.GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

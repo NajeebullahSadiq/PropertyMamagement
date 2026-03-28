@@ -80,10 +80,6 @@
               <p class="font-bold text-gray-800 mt-1">{{ record.vehicleTransactionDeedsCount || '-' }}</p>
             </div>
           </div>
-          <div *ngIf="record.annualReportRemarks" class="mt-4 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
-            <span class="text-sm text-gray-500 flex items-center gap-2 mb-2"><i class="fas fa-comment text-purple-500"></i>ملاحظات</span>
-            <p class="text-gray-800">{{ record.annualReportRemarks }}</p>
-          </div>
         </div>
       </div>
 
@@ -100,10 +96,6 @@
         </div>
         <div *ngIf="sections.complaints" class="p-6">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-red-500"></i>تاریخ ثبت شکایت</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.complaintRegistrationDateFormatted || '-' }}</p>
-            </div>
             <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-red-500"></i>شهرت عارض</span>
               <p class="font-bold text-gray-800 mt-1">{{ record.complainantName || '-' }}</p>
@@ -181,11 +173,7 @@
           <i class="fas text-white" [ngClass]="sections.inspection ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
         </div>
         <div *ngIf="sections.inspection" class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-tag text-green-500"></i>نوعیت نظارت</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.monitoringType || '-' }}</p>
-            </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-green-500"></i>سال</span>
               <p class="font-bold text-gray-800 mt-1">{{ record.year || '-' }}</p>
@@ -197,6 +185,10 @@
             <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-hashtag text-green-500"></i>تعداد نظارت</span>
               <p class="font-bold text-gray-800 mt-1">{{ record.monitoringCount || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-comment text-green-500"></i>ملاحظات</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.monitoringRemarks || '-' }}</p>
             </div>
           </div>
         </div>

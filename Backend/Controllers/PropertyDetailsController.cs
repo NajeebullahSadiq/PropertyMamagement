@@ -20,10 +20,13 @@ namespace WebAPIBackend.Controllers
     {
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
-        public PropertyDetailsController ( AppDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
+
+        public PropertyDetailsController ( AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService)
         {
             _context = context;
             _userManager = userManager;
+            _auditService = auditService;
         }
 
         private static readonly HashSet<string> AllowedPropertyTypeNames = new(StringComparer.OrdinalIgnoreCase)
@@ -479,6 +482,14 @@ namespace WebAPIBackend.Controllers
 
             await UpsertPropertyAddressAsync(property.Id, userId, request);
 
+            // Log the creation to comprehensive audit
+            await _auditService.LogCreateAsync(
+                WebAPIBackend.Models.Audit.AuditModules.Property,
+                "Property",
+                property.Id.ToString(),
+                newValues: new { property.Id, property.Pnumber, property.IssuanceNumber, property.SerialNumber, property.PropertyTypeId },
+                descriptionDari: $"ثبت سند ملکیت با شماره {property.Pnumber}");
+
             var result = new { Id = property.Id, PropertyTypeId = property.PropertyTypeId };
             return Ok(result);
         }
@@ -621,6 +632,20 @@ namespace WebAPIBackend.Controllers
             await _context.SaveChangesAsync();
 
             await UpsertPropertyAddressAsync(existingProperty.Id, userId, request);
+
+            // Log the update to comprehensive audit
+            var modifiedChanges = changes.Where(c => c.Value.OldValue != null && !c.Value.OldValue.Equals(c.Value.NewValue))
+                .ToDictionary(c => c.Key, c => new { OldValue = c.Value.OldValue, NewValue = c.Value.NewValue });
+            if (modifiedChanges.Any())
+            {
+                await _auditService.LogUpdateAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Property,
+                    "Property",
+                    id.ToString(),
+                    oldValues: modifiedChanges.ToDictionary(c => c.Key, c => c.Value.OldValue),
+                    newValues: modifiedChanges.ToDictionary(c => c.Key, c => c.Value.NewValue),
+                    descriptionDari: $"تغییر سند ملکیت با شماره {existingProperty.Pnumber}");
+            }
 
             var result = new { Id = request.Id, PropertyTypeId = request.PropertyTypeId };
             return Ok(result);
@@ -952,6 +977,14 @@ namespace WebAPIBackend.Controllers
                 _context.PropertyDetails.Remove(property);
 
                 await _context.SaveChangesAsync();
+
+                // Log the deletion to comprehensive audit
+                await _auditService.LogDeleteAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Property,
+                    "Property",
+                    id.ToString(),
+                    oldValues: new { property.Id, property.Pnumber, property.SerialNumber },
+                    descriptionDari: $"حذف سند ملکیت با شماره {property.Pnumber}");
 
                 return Ok(new { message = "سند ملکیت با موفقیت حذف شد" });
             }

@@ -20,12 +20,9 @@ export interface ActivityMonitoringRecord {
     rentalDeedsCount?: number;
     baiUlWafaDeedsCount?: number;
     vehicleTransactionDeedsCount?: number;
-    annualReportRemarks?: string;
     deedItems?: string;  // JSON string
     
     // ============ Section 2: Complaints ============
-    complaintRegistrationDate?: Date | string;
-    complaintRegistrationDateFormatted?: string;
     complaintSubject?: string;
     complainantName?: string;
     complaintActionsTaken?: string;
@@ -43,10 +40,10 @@ export interface ActivityMonitoringRecord {
     violationRemarks?: string;
     
     // ============ Section 4: Inspections ============
-    monitoringType?: string;
     year?: string;
     month?: string;
     monitoringCount?: number;
+    monitoringRemarks?: string;
     
     // ============ Audit ============
     status?: boolean;
@@ -75,11 +72,9 @@ export interface ActivityMonitoringData {
     rentalDeedsCount?: number;
     baiUlWafaDeedsCount?: number;
     vehicleTransactionDeedsCount?: number;
-    annualReportRemarks?: string;
     deedItems?: DeedItem[];
     
     // Complaints
-    complaintRegistrationDate?: string;
     complaintSubject?: string;
     complainantName?: string;
     complaintActionsTaken?: string;
@@ -95,14 +90,24 @@ export interface ActivityMonitoringData {
     violationRemarks?: string;
     
     // Inspections
-    monitoringType?: string;
     year?: string;
     month?: string;
     monitoringCount?: number;
+    monitoringRemarks?: string;
     
     // Calendar type for date conversion
     calendarType?: string;
 }
+
+/**
+ * Section types for dropdown
+ */
+export const ActivityMonitoringSectionTypes = [
+    { value: 'annualReport', label: 'گزارش سالانه', labelEn: 'Annual Report' },
+    { value: 'complaints', label: 'ثبت شکایات', labelEn: 'Complaints Registration' },
+    { value: 'violations', label: 'تخلفات دفاتر رهنمای معاملات', labelEn: 'Real Estate Violations' },
+    { value: 'inspection', label: 'نظارت وبررسی فعالیت دفاتر رهنمای معاملات', labelEn: 'Inspection & Supervision' }
+];
 
 /**
  * List response

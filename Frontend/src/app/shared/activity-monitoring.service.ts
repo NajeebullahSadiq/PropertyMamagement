@@ -31,6 +31,7 @@ export class ActivityMonitoringService {
         page: number = 1,
         pageSize: number = 10,
         search?: string,
+        sectionType?: string,
         calendarType?: string
     ): Observable<ActivityMonitoringListResponse> {
         let params = new HttpParams()
@@ -39,6 +40,9 @@ export class ActivityMonitoringService {
 
         if (search) {
             params = params.set('search', search);
+        }
+        if (sectionType) {
+            params = params.set('sectionType', sectionType);
         }
         if (calendarType) {
             params = params.set('calendarType', calendarType);

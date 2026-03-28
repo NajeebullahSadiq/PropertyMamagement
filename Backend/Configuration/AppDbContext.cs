@@ -138,6 +138,9 @@ namespace WebAPIBackend.Configuration
         // Petition Writer Monitoring Module (Single Table Design)
         public virtual DbSet<WebAPIBackend.Models.PetitionWriterMonitoring.PetitionWriterMonitoringRecord> PetitionWriterMonitoringRecords { get; set; }
         
+        // Comprehensive Audit Log
+        public virtual DbSet<WebAPIBackend.Models.Audit.ComprehensiveAuditLog> ComprehensiveAuditLogs { get; set; }
+        
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
         // GetPrintType view removed - use direct queries instead
@@ -530,7 +533,6 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.District).HasMaxLength(200).HasColumnName("District");
                 entity.Property(e => e.SectionType).HasMaxLength(50).HasColumnName("SectionType");
                 entity.Property(e => e.ReportRegistrationDate).HasColumnName("ReportRegistrationDate");
-                entity.Property(e => e.AnnualReportRemarks).HasMaxLength(1000).HasColumnName("AnnualReportRemarks");
                 
                 // Deed Counts
                 entity.Property(e => e.SaleDeedsCount).HasColumnName("SaleDeedsCount");
@@ -542,7 +544,6 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.DeedItems).HasColumnType("jsonb").HasColumnName("DeedItems");
                 
                 // Complaints fields
-                entity.Property(e => e.ComplaintRegistrationDate).HasColumnName("ComplaintRegistrationDate");
                 entity.Property(e => e.ComplaintSubject).HasMaxLength(500).HasColumnName("ComplaintSubject");
                 entity.Property(e => e.ComplainantName).HasMaxLength(200).HasColumnName("ComplainantName");
                 entity.Property(e => e.ComplaintActionsTaken).HasMaxLength(1000).HasColumnName("ComplaintActionsTaken");
@@ -558,9 +559,10 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.ViolationRemarks).HasMaxLength(1000).HasColumnName("ViolationRemarks");
                 
                 // Inspections fields
-                entity.Property(e => e.MonitoringType).HasMaxLength(100).HasColumnName("MonitoringType");
+                entity.Property(e => e.Year).HasMaxLength(20).HasColumnName("Year");
                 entity.Property(e => e.Month).HasMaxLength(50).HasColumnName("Month");
                 entity.Property(e => e.MonitoringCount).HasColumnName("MonitoringCount");
+                entity.Property(e => e.MonitoringRemarks).HasMaxLength(1000).HasColumnName("MonitoringRemarks");
 
                 // Indexes
                 entity.HasIndex(e => e.SerialNumber);

@@ -54,18 +54,11 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         [Column("VehicleTransactionDeedsCount")]
         public int? VehicleTransactionDeedsCount { get; set; }
 
-        [MaxLength(1000)]
-        [Column("AnnualReportRemarks")]
-        public string? AnnualReportRemarks { get; set; }
-
         // Deed Items as JSONB (flexible array storage)
         [Column("DeedItems", TypeName = "jsonb")]
         public string? DeedItems { get; set; }
 
         // ============ Section 2: Complaints (ثبت شکایات) ============
-        [Column("ComplaintRegistrationDate")]
-        public DateOnly? ComplaintRegistrationDate { get; set; }
-
         [MaxLength(500)]
         [Column("ComplaintSubject")]
         public string? ComplaintSubject { get; set; }
@@ -110,10 +103,6 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         public string? ViolationRemarks { get; set; }
 
         // ============ Section 4: Inspections (نظارت و بازرسی) ============
-        [MaxLength(100)]
-        [Column("MonitoringType")]
-        public string? MonitoringType { get; set; }
-
         [MaxLength(20)]
         [Column("Year")]
         public string? Year { get; set; }
@@ -124,6 +113,10 @@ namespace WebAPIBackend.Models.ActivityMonitoring
 
         [Column("MonitoringCount")]
         public int? MonitoringCount { get; set; }
+
+        [MaxLength(1000)]
+        [Column("MonitoringRemarks")]
+        public string? MonitoringRemarks { get; set; }
 
         // ============ Audit Fields ============
         [Column("Status")]

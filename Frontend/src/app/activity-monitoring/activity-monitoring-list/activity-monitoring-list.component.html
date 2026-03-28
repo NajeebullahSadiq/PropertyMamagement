@@ -2,10 +2,10 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
     <!-- Page Header -->
     <div class="mb-8 text-center">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/30 mb-4">
         <i class="fas fa-clipboard-check text-white text-2xl"></i>
       </div>
-      <h1 class="text-3xl font-bold text-gray-800 mb-2">جدول نظارت بر فعالیت دفاتر رهنمای معاملات و عریضه نویسان</h1>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">جدول نظارت بر فعالیت دفاتر رهنمای معاملات   </h1>
       <p class="text-gray-500 max-w-md mx-auto">لیست تمام رکوردهای نظارت بر فعالیت</p>
     </div>
 
@@ -18,8 +18,14 @@
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                 <i class="fas fa-search"></i>
               </span>
-              <input type="text" [(ngModel)]="searchText" (keyup.enter)="onSearch()" placeholder="جستجو..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <input type="text" [(ngModel)]="searchText" (keyup.enter)="onSearch()" placeholder="جستجو..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
             </div>
+          </div>
+          <div class="flex-1 min-w-[150px] max-w-xs">
+            <select [(ngModel)]="selectedSectionType" (change)="onSectionTypeChange()" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              <option value="">همه انواع ثبت</option>
+              <option *ngFor="let type of sectionTypes" [value]="type.value">{{ type.label }}</option>
+            </select>
           </div>
           <div class="flex gap-3">
             <button *ngIf="canCreate" (click)="goToForm()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
@@ -33,7 +39,7 @@
 
     <!-- Loading -->
     <div *ngIf="isLoading" class="text-center py-8">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-purple-500 border-t-transparent"></div>
       <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
     </div>
 
@@ -41,47 +47,192 @@
     <div *ngIf="!isLoading" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200">
+          
+          <!-- Annual Report Columns -->
+          <thead *ngIf="selectedSectionType === 'annualReport'" class="bg-gradient-to-r from-purple-100 to-indigo-100 border-b-2 border-purple-200">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت دارنده جواز</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت ثبت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ گزارش</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ثبت کننده</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت دارنده جواز دفتر رهنمای معاملات</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-blue-50 transition-colors">
-              <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ item.id }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
-              <td class="px-4 py-3 text-sm">
-                <span *ngIf="item.sectionType === 'annualReport'" class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">گزارش سالانه</span>
-                <span *ngIf="item.sectionType === 'complaints'" class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">ثبت شکایات</span>
-                <span *ngIf="item.sectionType === 'violations'" class="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">تخلفات</span>
-                <span *ngIf="item.sectionType === 'inspection'" class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نظارت</span>
-                <span *ngIf="!item.sectionType" class="text-gray-400">-</span>
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.createdBy || '-' }}</td>
-              <td class="px-4 py-3">
-                <div class="flex justify-center gap-2">
-                  <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </td>
+
+          <!-- Complaints Columns -->
+          <thead *ngIf="selectedSectionType === 'complaints'" class="bg-gradient-to-r from-red-100 to-rose-100 border-b-2 border-red-200">
+            <tr class="text-center">
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عارض</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">موضوع شکایت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">اجراآت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
+          </thead>
+
+          <!-- Violations Columns -->
+          <thead *ngIf="selectedSectionType === 'violations'" class="bg-gradient-to-r from-orange-100 to-amber-100 border-b-2 border-orange-200">
+            <tr class="text-center">
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">علت مسدودی</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت تخلف</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+            </tr>
+          </thead>
+
+          <!-- Inspection Columns -->
+          <thead *ngIf="selectedSectionType === 'inspection'" class="bg-gradient-to-r from-green-100 to-emerald-100 border-b-2 border-green-200">
+            <tr class="text-center">
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">سال</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ماه</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تعداد نظارت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">ملاحظات</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+            </tr>
+          </thead>
+
+          <!-- All Types (Default) Columns -->
+          <thead *ngIf="!selectedSectionType" class="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200">
+            <tr class="text-center">
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت دارنده جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-200">
+            <!-- Annual Report Rows -->
+            <ng-container *ngIf="selectedSectionType === 'annualReport'">
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-purple-50 transition-colors">
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.district || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-center gap-2">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- Complaints Rows -->
+            <ng-container *ngIf="selectedSectionType === 'complaints'">
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-red-50 transition-colors">
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.complainantName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintSubject || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintActionsTaken || '-' }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-center gap-2">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- Violations Rows -->
+            <ng-container *ngIf="selectedSectionType === 'violations'">
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-orange-50 transition-colors">
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.district || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.closureReason || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationType || '-' }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-center gap-2">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- Inspection Rows -->
+            <ng-container *ngIf="selectedSectionType === 'inspection'">
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-green-50 transition-colors">
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.year || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.month || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.monitoringCount || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.monitoringRemarks || '-' }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-center gap-2">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- All Types (Default) Rows -->
+            <ng-container *ngIf="!selectedSectionType">
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-purple-50 transition-colors">
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm">
+                  <span [ngClass]="getSectionTypeClass(item.sectionType!)" class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{ getSectionTypeLabel(item.sectionType!) }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-center gap-2">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
             <tr *ngIf="items.length === 0">
-              <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+              <td [attr.colspan]="getColspan()" class="px-4 py-8 text-center text-gray-500">
                 <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
                 <p>هیچ رکوردی یافت نشد</p>
               </td>
@@ -94,7 +245,7 @@
       <div *ngIf="items.length > 0" class="px-6 py-4 border-t border-gray-200 flex flex-wrap justify-between items-center gap-4">
         <div class="flex items-center gap-2">
           <span class="text-sm text-gray-600">نمایش</span>
-          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500">
             <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
           </select>
           <span class="text-sm text-gray-600">مورد از {{ totalCount }}</span>

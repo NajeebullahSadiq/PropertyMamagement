@@ -26,15 +26,17 @@ namespace WebAPI.Controllers
         private readonly ApplicationSettings _appSettings;
         private AppDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
 
         public ApplicationUserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IOptions<ApplicationSettings> appSettings,
-           RoleManager<IdentityRole> roleManager, AppDbContext context)
+           RoleManager<IdentityRole> roleManager, AppDbContext context, WebAPIBackend.Services.IComprehensiveAuditService auditService)
         {
             _userManager = userManager;
             _singInManager = signInManager;
             _appSettings = appSettings.Value;
             _context = context;
             _roleManager = roleManager;
+            _auditService = auditService;
         }
 
         [Authorize(Roles = "ADMIN")]
@@ -264,6 +266,9 @@ namespace WebAPI.Controllers
                     var securityToken = tokenHandler.CreateToken(tokenDescriptor);
                     var token = tokenHandler.WriteToken(securityToken);
 
+                    // Log successful login
+                    await _auditService.LogLoginAsync(user.Id, user.UserName, primaryRole, true);
+
                     return Ok(new { 
                         token,
                         role = primaryRole,
@@ -275,7 +280,15 @@ namespace WebAPI.Controllers
                     });
                 }
                 else
+                {
+                    // Log failed login attempt
+                    var failedUser = await _userManager.FindByNameAsync(model.UserName ?? "");
+                    if (failedUser != null)
+                    {
+                        await _auditService.LogLoginAsync(failedUser.Id, failedUser.UserName, null, false, "Invalid password");
+                    }
                     return BadRequest(new { message = "نام کاربری یا رمز عبور اشتباه است" });
+                }
             }
             catch (Exception ex)
             {
@@ -297,10 +310,16 @@ namespace WebAPI.Controllers
                 if (result.Succeeded)
                 {
                     await _singInManager.RefreshSignInAsync(user);
+                    
+                    // Log password change
+                    await _auditService.LogPasswordChangeAsync(user.Id, true);
+                    
                     return Ok(result);
                 }
                 else
                 {
+                    // Log failed password change
+                    await _auditService.LogPasswordChangeAsync(user.Id, false);
                     return BadRequest(new { message = "رمز عبور فعلی اشتباه است" });
                 }
             }
@@ -321,6 +340,10 @@ namespace WebAPI.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword ?? "");
+            
+            // Log password reset
+            await _auditService.LogPasswordResetAsync(user.Id, User.Claims.First(c => c.Type == "UserID").Value);
+            
             return Ok(result);
         }
 
@@ -350,6 +373,13 @@ namespace WebAPI.Controllers
 
             user.IsLocked = model.IsLooked;
             await _userManager.UpdateAsync(user);
+
+            // Log user lock/unlock
+            var performedByUserId = User.Claims.First(c => c.Type == "UserID").Value;
+            if (model.IsLooked)
+                await _auditService.LogUserLockAsync(user.Id, performedByUserId);
+            else
+                await _auditService.LogUserUnlockAsync(user.Id, performedByUserId);
 
             return Ok(new { message = model.IsLooked ? "حساب کاربری قفل شد" : "حساب کاربری باز شد" });
         }

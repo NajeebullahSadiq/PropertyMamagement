@@ -21,15 +21,18 @@ namespace WebAPIBackend.Controllers.Companies
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly WebAPIBackend.Services.IProvinceFilterService _provinceFilter;
+        private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
 
         public CompanyDetailsController(
             AppDbContext context, 
             UserManager<ApplicationUser> userManager,
-            WebAPIBackend.Services.IProvinceFilterService provinceFilter)
+            WebAPIBackend.Services.IProvinceFilterService provinceFilter,
+            WebAPIBackend.Services.IComprehensiveAuditService auditService)
         {
             _context = context;
             _userManager = userManager;
             _provinceFilter = provinceFilter;
+            _auditService = auditService;
         }
 
         [HttpGet]
@@ -437,6 +440,14 @@ namespace WebAPIBackend.Controllers.Companies
                 _context.Add(property);
                 await _context.SaveChangesAsync();
 
+                // Log the creation to comprehensive audit
+                await _auditService.LogCreateAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Company,
+                    "Company",
+                    property.Id.ToString(),
+                    newValues: new { property.Id, property.Title, property.Tin, property.ProvinceId },
+                    descriptionDari: $"ثبت رهنما {property.Title} با شماره {property.Id}");
+
                 var result = new { Id = property.Id };
                 return Ok(result);
             }
@@ -539,6 +550,17 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 await _context.SaveChangesAsync();
+
+                // Log the update to comprehensive audit
+                await _auditService.LogUpdateAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Company,
+                    "Company",
+                    id.ToString(),
+                    oldValues: changes.Where(c => c.Value.OldValue != null && !c.Value.OldValue.Equals(c.Value.NewValue))
+                        .ToDictionary(c => c.Key, c => c.Value.OldValue),
+                    newValues: changes.Where(c => c.Value.OldValue != null && !c.Value.OldValue.Equals(c.Value.NewValue))
+                        .ToDictionary(c => c.Key, c => c.Value.NewValue),
+                    descriptionDari: $"تغییر رهنما {existingProperty.Title} با شماره {id}");
 
                 var result = new { Id = request.Id };
                 return Ok(result);
@@ -782,10 +804,27 @@ namespace WebAPIBackend.Controllers.Companies
                     _context.CompanyOwners.RemoveRange(company.CompanyOwners);
                 }
 
+                // Store company info for audit before deletion
+                var companyInfo = new
+                {
+                    company.Id,
+                    company.Title,
+                    company.Tin,
+                    company.ProvinceId
+                };
+
                 // Remove the company itself
                 _context.CompanyDetails.Remove(company);
 
                 await _context.SaveChangesAsync();
+
+                // Log the deletion to comprehensive audit
+                await _auditService.LogDeleteAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Company,
+                    "Company",
+                    id.ToString(),
+                    oldValues: companyInfo,
+                    descriptionDari: $"حذف رهنما {company.Title} با شماره {id}");
 
                 return Ok(new { message = "???? ?? ?????? ??? ??" });
             }

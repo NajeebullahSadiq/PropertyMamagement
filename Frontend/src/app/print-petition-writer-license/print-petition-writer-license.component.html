@@ -284,12 +284,6 @@
 
         <!-- Footer Section -->
         <footer class="certificate-footer">
-          <!-- License Details Row -->
-          <div class="footer-row details-row" style="margin-bottom: 1rem; padding: 0.75rem; background-color: #f9fafb; border-radius: 0.5rem;">
-            <span>شماره تماس: <strong class="footer-value">{{data.mobileNumber || '—'}}</strong></span>
-            <span>شماره تذکره: <strong class="footer-value">{{data.electronicNationalIdNumber || '—'}}</strong></span>
-            <span>قیمت جوازنامه: <strong class="footer-value">{{ data.licenseCost ? (data.licenseCost + ' افغانی') : '—' }}</strong></span>
-          </div>
 
           <!-- QR Code Verification Row -->
           <div class="verification-row" *ngIf="verificationCode">

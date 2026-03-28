@@ -35,6 +35,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? search = null,
+            [FromQuery] string? sectionType = null,
             [FromQuery] string? calendarType = null)
         {
             try
@@ -51,6 +52,12 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.LicenseNumber!.Contains(search) ||
                         x.LicenseHolderName!.Contains(search) ||
                         x.District!.Contains(search));
+                }
+
+                // Section type filter
+                if (!string.IsNullOrEmpty(sectionType))
+                {
+                    query = query.Where(x => x.SectionType == sectionType);
                 }
 
                 var totalCount = await query.CountAsync();
@@ -76,14 +83,9 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.RentalDeedsCount,
                         x.BaiUlWafaDeedsCount,
                         x.VehicleTransactionDeedsCount,
-                        x.AnnualReportRemarks,
                         x.DeedItems,
                         
                         // Complaints
-                        x.ComplaintRegistrationDate,
-                        ComplaintRegistrationDateFormatted = x.ComplaintRegistrationDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ComplaintRegistrationDate, calendar)
-                            : "",
                         x.ComplaintSubject,
                         x.ComplainantName,
                         x.ComplaintActionsTaken,
@@ -105,10 +107,10 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.ViolationRemarks,
                         
                         // Inspections
-                        x.MonitoringType,
                         x.Year,
                         x.Month,
                         x.MonitoringCount,
+                        x.MonitoringRemarks,
                         
                         x.Status,
                         x.CreatedAt,
@@ -158,14 +160,9 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.RentalDeedsCount,
                         x.BaiUlWafaDeedsCount,
                         x.VehicleTransactionDeedsCount,
-                        x.AnnualReportRemarks,
                         x.DeedItems,
                         
                         // Complaints
-                        x.ComplaintRegistrationDate,
-                        ComplaintRegistrationDateFormatted = x.ComplaintRegistrationDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ComplaintRegistrationDate, calendar)
-                            : "",
                         x.ComplaintSubject,
                         x.ComplainantName,
                         x.ComplaintActionsTaken,
@@ -187,10 +184,10 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.ViolationRemarks,
                         
                         // Inspections
-                        x.MonitoringType,
                         x.Year,
                         x.Month,
                         x.MonitoringCount,
+                        x.MonitoringRemarks,
                         
                         x.Status,
                         x.CreatedAt,
@@ -229,7 +226,6 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
 
                 // Parse dates
                 DateConversionHelper.TryParseToDateOnly(request.ReportRegistrationDate, request.CalendarType, out var reportRegistrationDate);
-                DateConversionHelper.TryParseToDateOnly(request.ComplaintRegistrationDate, request.CalendarType, out var complaintRegistrationDate);
                 DateConversionHelper.TryParseToDateOnly(request.ViolationDate, request.CalendarType, out var violationDate);
                 DateConversionHelper.TryParseToDateOnly(request.ClosureDate, request.CalendarType, out var closureDate);
 
@@ -252,11 +248,9 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     RentalDeedsCount = request.RentalDeedsCount,
                     BaiUlWafaDeedsCount = request.BaiUlWafaDeedsCount,
                     VehicleTransactionDeedsCount = request.VehicleTransactionDeedsCount,
-                    AnnualReportRemarks = request.AnnualReportRemarks,
                     DeedItems = deedItemsJson,
                     
                     // Complaints
-                    ComplaintRegistrationDate = complaintRegistrationDate,
                     ComplaintSubject = request.ComplaintSubject,
                     ComplainantName = request.ComplainantName,
                     ComplaintActionsTaken = request.ComplaintActionsTaken,
@@ -272,10 +266,10 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     ViolationRemarks = request.ViolationRemarks,
                     
                     // Inspections
-                    MonitoringType = request.MonitoringType,
                     Year = request.Year,
                     Month = request.Month,
                     MonitoringCount = request.MonitoringCount,
+                    MonitoringRemarks = request.MonitoringRemarks,
                     
                     Status = true,
                     CreatedAt = DateTime.UtcNow,
@@ -317,7 +311,6 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
 
                 // Parse dates
                 DateConversionHelper.TryParseToDateOnly(request.ReportRegistrationDate, request.CalendarType, out var reportRegistrationDate);
-                DateConversionHelper.TryParseToDateOnly(request.ComplaintRegistrationDate, request.CalendarType, out var complaintRegistrationDate);
                 DateConversionHelper.TryParseToDateOnly(request.ViolationDate, request.CalendarType, out var violationDate);
                 DateConversionHelper.TryParseToDateOnly(request.ClosureDate, request.CalendarType, out var closureDate);
 
@@ -338,11 +331,9 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 entity.RentalDeedsCount = request.RentalDeedsCount;
                 entity.BaiUlWafaDeedsCount = request.BaiUlWafaDeedsCount;
                 entity.VehicleTransactionDeedsCount = request.VehicleTransactionDeedsCount;
-                entity.AnnualReportRemarks = request.AnnualReportRemarks;
                 entity.DeedItems = deedItemsJson;
                 
                 // Complaints
-                entity.ComplaintRegistrationDate = complaintRegistrationDate;
                 entity.ComplaintSubject = request.ComplaintSubject;
                 entity.ComplainantName = request.ComplainantName;
                 entity.ComplaintActionsTaken = request.ComplaintActionsTaken;
@@ -358,10 +349,10 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 entity.ViolationRemarks = request.ViolationRemarks;
                 
                 // Inspections
-                entity.MonitoringType = request.MonitoringType;
                 entity.Year = request.Year;
                 entity.Month = request.Month;
                 entity.MonitoringCount = request.MonitoringCount;
+                entity.MonitoringRemarks = request.MonitoringRemarks;
                 
                 entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = userId;

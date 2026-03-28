@@ -1,0 +1,298 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { AuditLogService, AuditLog, AuditStatistics, AuditLogDetail } from './audit-log.service';
+
+@Component({
+  selector: 'app-audit-log',
+  templateUrl: './audit-log.component.html',
+  styleUrls: ['./audit-log.component.scss']
+})
+export class AuditLogComponent implements OnInit {
+  auditLogs: AuditLog[] = [];
+  statistics: AuditStatistics | null = null;
+  modules: string[] = [];
+  actionTypes: string[] = [];
+  
+  // Pagination
+  currentPage = 1;
+  pageSize = 20;
+  totalCount = 0;
+  totalPages = 0;
+
+  // Filters
+  filterForm: FormGroup;
+  showFilters = false;
+
+  // Loading states
+  isLoading = false;
+  isLoadingStats = false;
+
+  // View modes
+  viewMode: 'list' | 'statistics' = 'list';
+
+  // Selected log for detail view
+  selectedLog: AuditLogDetail | null = null;
+  showDetailPanel = false;
+
+  // Action type translations
+  actionTypeTranslations: { [key: string]: string } = {
+    'Create': 'ثبت',
+    'Update': 'تغییر',
+    'Delete': 'حذف',
+    'Login': 'ورود',
+    'Logout': 'خروج',
+    'View': 'مشاهده',
+    'Export': 'صادر کردن',
+    'Print': 'چاپ',
+    'Verify': 'تصدیق',
+    'Approve': 'تایید',
+    'Reject': 'رد',
+    'Assign': 'تعیین',
+    'Revoke': 'لغو',
+    'PasswordChange': 'تغییر پسورد',
+    'PasswordReset': 'بازنشانی پسورد',
+    'UserLock': 'قفل کاربر',
+    'UserUnlock': 'باز کردن کاربر',
+    'FailedLogin': 'ورود ناموفق',
+    'Unauthorized': 'غیرمجاز',
+    'Error': 'خطا'
+  };
+
+  // Module translations
+  moduleTranslations: { [key: string]: string } = {
+    'Authentication': 'احراز هویت',
+    'UserManagement': 'مدیریت کاربران',
+    'RoleManagement': 'مدیریت نقش‌ها',
+    'PermissionManagement': 'مدیریت صلاحیت‌ها',
+    'Property': 'ملکیت',
+    'Vehicle': 'وسایط نقلیه',
+    'Company': 'شرکت',
+    'License': 'جواز',
+    'Securities': 'اسناد بهادار',
+    'PetitionWriter': 'عریضه‌نویس',
+    'ActivityMonitoring': 'نظارت فعالیت',
+    'DistrictManagement': 'مدیریت ولسوالی',
+    'Report': 'گزارش',
+    'Verification': 'تصدیق',
+    'System': 'سیستم'
+  };
+
+  // Status translations
+  statusTranslations: { [key: string]: string } = {
+    'Success': 'موفق',
+    'Failed': 'ناموفق',
+    'Error': 'خطا'
+  };
+
+  constructor(
+    private auditLogService: AuditLogService,
+    private fb: FormBuilder,
+    private dialog: MatDialog
+  ) {
+    this.filterForm = this.fb.group({
+      module: [''],
+      actionType: [''],
+      status: [''],
+      startDate: [''],
+      endDate: [''],
+      searchTerm: ['']
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadModules();
+    this.loadActionTypes();
+    this.loadAuditLogs();
+  }
+
+  loadModules(): void {
+    this.auditLogService.getModules().subscribe({
+      next: (modules) => this.modules = modules,
+      error: (err) => console.error('Failed to load modules', err)
+    });
+  }
+
+  loadActionTypes(): void {
+    this.auditLogService.getActionTypes().subscribe({
+      next: (types) => this.actionTypes = types,
+      error: (err) => console.error('Failed to load action types', err)
+    });
+  }
+
+  loadAuditLogs(): void {
+    this.isLoading = true;
+    const filters = this.filterForm.value;
+    
+    this.auditLogService.getAuditLogs({
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      ...filters,
+      startDate: filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
+      endDate: filters.endDate ? new Date(filters.endDate).toISOString() : undefined
+    }).subscribe({
+      next: (response) => {
+        this.auditLogs = response.data;
+        this.totalCount = response.pagination.totalCount;
+        this.totalPages = response.pagination.totalPages;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load audit logs', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadStatistics(): void {
+    this.isLoadingStats = true;
+    const filters = this.filterForm.value;
+    
+    this.auditLogService.getStatistics(
+      filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
+      filters.endDate ? new Date(filters.endDate).toISOString() : undefined
+    ).subscribe({
+      next: (stats) => {
+        this.statistics = stats;
+        this.isLoadingStats = false;
+      },
+      error: (err) => {
+        console.error('Failed to load statistics', err);
+        this.isLoadingStats = false;
+      }
+    });
+  }
+
+  onFilter(): void {
+    this.currentPage = 1;
+    if (this.viewMode === 'statistics') {
+      this.loadStatistics();
+    }
+    this.loadAuditLogs();
+  }
+
+  resetFilters(): void {
+    this.filterForm.reset();
+    this.currentPage = 1;
+    this.loadAuditLogs();
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadAuditLogs();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1;
+    this.loadAuditLogs();
+  }
+
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'list' ? 'statistics' : 'list';
+    if (this.viewMode === 'statistics') {
+      this.loadStatistics();
+    }
+  }
+
+  viewLogDetail(log: AuditLog): void {
+    this.auditLogService.getAuditLogById(log.id).subscribe({
+      next: (detail) => {
+        this.selectedLog = detail;
+        this.showDetailPanel = true;
+      },
+      error: (err) => console.error('Failed to load log detail', err)
+    });
+  }
+
+  closeDetailPanel(): void {
+    this.showDetailPanel = false;
+    this.selectedLog = null;
+  }
+
+  exportLogs(): void {
+    const filters = this.filterForm.value;
+    this.auditLogService.exportAuditLogs({
+      module: filters.module,
+      actionType: filters.actionType,
+      startDate: filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
+      endDate: filters.endDate ? new Date(filters.endDate).toISOString() : undefined
+    }).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `audit_logs_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Failed to export logs', err)
+    });
+  }
+
+  translateActionType(type: string): string {
+    return this.actionTypeTranslations[type] || type;
+  }
+
+  translateModule(module: string): string {
+    return this.moduleTranslations[module] || module;
+  }
+
+  translateStatus(status: string): string {
+    return this.statusTranslations[status] || status;
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'Success': return 'bg-emerald-100 text-emerald-700';
+      case 'Failed': return 'bg-red-100 text-red-700';
+      case 'Error': return 'bg-amber-100 text-amber-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  }
+
+  getActionTypeClass(type: string): string {
+    switch (type) {
+      case 'Create': return 'bg-blue-100 text-blue-700';
+      case 'Update': return 'bg-purple-100 text-purple-700';
+      case 'Delete': return 'bg-red-100 text-red-700';
+      case 'Login': return 'bg-green-100 text-green-700';
+      case 'Logout': return 'bg-gray-100 text-gray-700';
+      case 'Print': return 'bg-indigo-100 text-indigo-700';
+      case 'Export': return 'bg-cyan-100 text-cyan-700';
+      default: return 'bg-slate-100 text-slate-700';
+    }
+  }
+
+  formatDateTime(date: string): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleString('fa-AF', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  formatJson(jsonStr: string | null | undefined): string {
+    if (!jsonStr) return '';
+    try {
+      const obj = JSON.parse(jsonStr);
+      return JSON.stringify(obj, null, 2);
+    } catch {
+      return jsonStr;
+    }
+  }
+
+  getPaginationArray(): number[] {
+    const pages: number[] = [];
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(this.totalPages, this.currentPage + 2);
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+}

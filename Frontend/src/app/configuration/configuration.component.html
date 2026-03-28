@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 p-6">
+  <!-- Page Header -->
+  <div class="mb-10 text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 mb-4">
+      <mat-icon class="text-white text-3xl">settings</mat-icon>
+    </div>
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">تنظیمات سیستم</h1>
+    <p class="text-gray-500">مدیریت کاربران، صلاحیت‌ها و تنظیمات سیستم</p>
+  </div>
+
+  <!-- Configuration Cards Grid -->
+  <div class="max-w-5xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let card of configCards"
+           (click)="navigateTo(card.route)"
+           class="group bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+        
+        <!-- Card Content -->
+        <div class="flex items-start gap-4">
+          <!-- Icon Container -->
+          <div [class]="'w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 ' + card.gradient">
+            <mat-icon class="text-white text-2xl">{{ card.icon }}</mat-icon>
+          </div>
+          
+          <!-- Text Content -->
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-gray-800 mb-1 group-hover:text-indigo-600 transition-colors">
+              {{ card.title }}
+            </h3>
+            <p class="text-sm text-gray-500 leading-relaxed">
+              {{ card.description }}
+            </p>
+          </div>
+          
+          <!-- Arrow Icon -->
+          <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <mat-icon class="text-indigo-500">arrow_back</mat-icon>
+          </div>
+        </div>
+        
+        <!-- Bottom Accent Line -->
+        <div [class]="'h-1 w-0 group-hover:w-full rounded-full bg-gradient-to-r transition-all duration-500 mt-4 ' + card.gradient"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats Section -->
+  <div class="max-w-5xl mx-auto mt-10">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+      <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <mat-icon class="text-indigo-500">info</mat-icon>
+        راهنمای تنظیمات
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+        <div class="flex items-start gap-2">
+          <mat-icon class="text-blue-500 text-lg">check_circle</mat-icon>
+          <span>از بخش لیست کاربران می‌توانید کاربران جدید را مشاهده و مدیریت کنید</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <mat-icon class="text-purple-500 text-lg">check_circle</mat-icon>
+          <span>از بخش مدیریت صلاحیت‌ها می‌توانید صلاحیت‌های هر کاربر را تعیین کنید</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <mat-icon class="text-emerald-500 text-lg">check_circle</mat-icon>
+          <span>از بخش صلاحیت‌های نقش‌ها می‌توانید نقش‌های سیستم را مدیریت کنید</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <mat-icon class="text-amber-500 text-lg">check_circle</mat-icon>
+          <span>از بخش مدیریت ولسوالی‌ها می‌توانید ولسوالی‌ها را فعال کنید</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <mat-icon class="text-rose-500 text-lg">check_circle</mat-icon>
+          <span>از بخش لاگ فعالیت‌ها می‌توانید تمام فعالیت‌های سیستم را بررسی کنید</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
