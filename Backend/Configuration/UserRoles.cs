@@ -192,6 +192,10 @@ namespace WebAPIBackend.Configuration
 
         // System
         public const string SystemConfigure = "system.configure";
+
+        // Audit Log
+        public const string AuditLogView = "auditlog.view";
+        public const string AuditLogExport = "auditlog.export";
     }
 
     /// <summary>
@@ -224,7 +228,8 @@ namespace WebAPIBackend.Configuration
                     Permissions.PetitionWriterMonitoringView, Permissions.PetitionWriterMonitoringCreate, Permissions.PetitionWriterMonitoringEdit, Permissions.PetitionWriterMonitoringDelete,
                     Permissions.ReportsView, Permissions.ReportsExport,
                     Permissions.DashboardView,
-                    Permissions.SystemConfigure
+                    Permissions.SystemConfigure,
+                    Permissions.AuditLogView, Permissions.AuditLogExport
                 },
 
                 UserRoles.Authority => new[]

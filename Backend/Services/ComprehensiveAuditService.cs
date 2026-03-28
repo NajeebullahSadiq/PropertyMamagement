@@ -77,36 +77,49 @@ namespace WebAPIBackend.Services
             object? metadata = null,
             long? durationMs = null)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            var user = httpContext?.User;
-
-            var auditLog = new ComprehensiveAuditLog
+            try
             {
-                UserId = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "System",
-                UserName = user?.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? user?.Identity?.Name,
-                UserRole = user?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value,
-                ActionType = actionType,
-                Module = module,
-                EntityType = entityType,
-                EntityId = entityId,
-                Description = description,
-                DescriptionDari = descriptionDari,
-                OldValues = oldValues != null ? JsonSerializer.Serialize(oldValues, _jsonOptions) : null,
-                NewValues = newValues != null ? JsonSerializer.Serialize(newValues, _jsonOptions) : null,
-                IpAddress = GetClientIpAddress(httpContext),
-                UserAgent = httpContext?.Request.Headers["User-Agent"].ToString(),
-                RequestUrl = httpContext?.Request.Path.Value,
-                HttpMethod = httpContext?.Request.Method,
-                Status = status,
-                ErrorMessage = errorMessage,
-                Metadata = metadata != null ? JsonSerializer.Serialize(metadata, _jsonOptions) : null,
-                UserProvince = user?.FindFirst("ProvinceId")?.Value,
-                Timestamp = DateTime.UtcNow,
-                DurationMs = durationMs
-            };
+                var httpContext = _httpContextAccessor.HttpContext;
+                var user = httpContext?.User;
 
-            _context.Set<ComprehensiveAuditLog>().Add(auditLog);
-            await _context.SaveChangesAsync();
+                var auditLog = new ComprehensiveAuditLog
+                {
+                    UserId = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "System",
+                    UserName = user?.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? user?.Identity?.Name,
+                    UserRole = user?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value,
+                    ActionType = actionType,
+                    Module = module,
+                    EntityType = entityType,
+                    EntityId = entityId,
+                    Description = description,
+                    DescriptionDari = descriptionDari,
+                    OldValues = oldValues != null ? JsonSerializer.Serialize(oldValues, _jsonOptions) : null,
+                    NewValues = newValues != null ? JsonSerializer.Serialize(newValues, _jsonOptions) : null,
+                    IpAddress = GetClientIpAddress(httpContext),
+                    UserAgent = httpContext?.Request.Headers["User-Agent"].ToString(),
+                    RequestUrl = httpContext?.Request.Path.Value,
+                    HttpMethod = httpContext?.Request.Method,
+                    Status = status,
+                    ErrorMessage = errorMessage,
+                    Metadata = metadata != null ? JsonSerializer.Serialize(metadata, _jsonOptions) : null,
+                    UserProvince = user?.FindFirst("ProvinceId")?.Value,
+                    Timestamp = DateTime.UtcNow,
+                    DurationMs = durationMs
+                };
+
+                _context.Set<ComprehensiveAuditLog>().Add(auditLog);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log to console but don't break the main functionality
+                Console.WriteLine($"[AuditLog Error] Failed to log audit entry: {ex.Message}");
+                // Optionally log inner exception for debugging
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[AuditLog Error] Inner exception: {ex.InnerException.Message}");
+                }
+            }
         }
 
         public async Task LogLoginAsync(string userId, string? userName, string? userRole, bool success, string? errorMessage = null)

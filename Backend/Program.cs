@@ -39,6 +39,9 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(PolicyTypes.Users.View, policy => { policy.RequireClaim(CustomClaimTypes.Permission, UserPermissions.View); });
     options.AddPolicy(PolicyTypes.Users.EditRole, policy => { policy.RequireClaim(CustomClaimTypes.Permission, UserPermissions.ViewUserTest); });
+    // Audit Log Policies
+    options.AddPolicy("AuditLogViewPolicy", policy => { policy.RequireClaim(CustomClaimTypes.Permission, Permissions.AuditLogView); });
+    options.AddPolicy("AuditLogExportPolicy", policy => { policy.RequireClaim(CustomClaimTypes.Permission, Permissions.AuditLogExport); });
 });
 //End Policy Authorization
 builder.Services.Configure<IdentityOptions>(options =>

@@ -15,7 +15,7 @@ namespace WebAPIBackend.Controllers.Audit
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class AuditLogController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -29,6 +29,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Get paginated audit logs with filtering
         /// </summary>
         [HttpGet]
+        [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<object>> GetAuditLogs(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
@@ -130,6 +131,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Get a specific audit log by ID with full details
         /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<object>> GetAuditLogById(long id)
         {
             var log = await _context.ComprehensiveAuditLogs.FindAsync(id);
@@ -170,6 +172,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Get audit statistics for dashboard
         /// </summary>
         [HttpGet("statistics")]
+        [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<object>> GetStatistics([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
         {
             var query = _context.ComprehensiveAuditLogs.AsQueryable();
@@ -258,6 +261,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Get distinct modules for filtering
         /// </summary>
         [HttpGet("modules")]
+        [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<IEnumerable<string>>> GetModules()
         {
             var modules = await _context.ComprehensiveAuditLogs
@@ -273,6 +277,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Get distinct action types for filtering
         /// </summary>
         [HttpGet("action-types")]
+        [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<IEnumerable<string>>> GetActionTypes()
         {
             var actionTypes = await _context.ComprehensiveAuditLogs
@@ -288,6 +293,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Get audit logs for a specific entity
         /// </summary>
         [HttpGet("entity/{entityType}/{entityId}")]
+        [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<object>> GetEntityAuditHistory(string entityType, string entityId)
         {
             var logs = await _context.ComprehensiveAuditLogs
@@ -320,6 +326,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Get user activity history
         /// </summary>
         [HttpGet("user/{userId}")]
+        [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<object>> GetUserActivity(
             string userId,
             [FromQuery] int page = 1,
@@ -367,6 +374,7 @@ namespace WebAPIBackend.Controllers.Audit
         /// Export audit logs to CSV format
         /// </summary>
         [HttpGet("export")]
+        [Authorize(Policy = "AuditLogExportPolicy")]
         public async Task<IActionResult> ExportAuditLogs(
             [FromQuery] string? module = null,
             [FromQuery] string? actionType = null,
