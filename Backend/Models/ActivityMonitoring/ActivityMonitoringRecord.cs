@@ -114,6 +114,10 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         [Column("MonitoringType")]
         public string? MonitoringType { get; set; }
 
+        [MaxLength(20)]
+        [Column("Year")]
+        public string? Year { get; set; }
+
         [MaxLength(50)]
         [Column("Month")]
         public string? Month { get; set; }

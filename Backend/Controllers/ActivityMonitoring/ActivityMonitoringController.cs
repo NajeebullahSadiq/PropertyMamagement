@@ -106,6 +106,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         
                         // Inspections
                         x.MonitoringType,
+                        x.Year,
                         x.Month,
                         x.MonitoringCount,
                         
@@ -187,6 +188,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         
                         // Inspections
                         x.MonitoringType,
+                        x.Year,
                         x.Month,
                         x.MonitoringCount,
                         
@@ -271,6 +273,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     
                     // Inspections
                     MonitoringType = request.MonitoringType,
+                    Year = request.Year,
                     Month = request.Month,
                     MonitoringCount = request.MonitoringCount,
                     
@@ -356,6 +359,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 
                 // Inspections
                 entity.MonitoringType = request.MonitoringType;
+                entity.Year = request.Year;
                 entity.Month = request.Month;
                 entity.MonitoringCount = request.MonitoringCount;
                 

@@ -44,6 +44,7 @@ export interface ActivityMonitoringRecord {
     
     // ============ Section 4: Inspections ============
     monitoringType?: string;
+    year?: string;
     month?: string;
     monitoringCount?: number;
     
@@ -95,6 +96,7 @@ export interface ActivityMonitoringData {
     
     // Inspections
     monitoringType?: string;
+    year?: string;
     month?: string;
     monitoringCount?: number;
     

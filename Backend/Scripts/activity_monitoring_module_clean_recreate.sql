@@ -179,6 +179,7 @@ CREATE TABLE org."ActivityMonitoringInspections" (
     
     -- Inspection information
     "MonitoringType" VARCHAR(100),
+    "Year" VARCHAR(20),
     "Month" VARCHAR(50),
     "MonitoringCount" INTEGER,
     "SealedCount" INTEGER,
@@ -264,6 +265,8 @@ CREATE INDEX "IX_ActivityMonitoringInspections_ActivityMonitoringRecordId"
     ON org."ActivityMonitoringInspections"("ActivityMonitoringRecordId");
 CREATE INDEX "IX_ActivityMonitoringInspections_MonitoringType" 
     ON org."ActivityMonitoringInspections"("MonitoringType");
+CREATE INDEX "IX_ActivityMonitoringInspections_Year" 
+    ON org."ActivityMonitoringInspections"("Year");
 
 DO $$ 
 BEGIN
@@ -333,6 +336,7 @@ COMMENT ON COLUMN org."ActivityMonitoringPetitionWriterViolations"."Remarks" IS 
 
 -- ActivityMonitoringInspections column comments
 COMMENT ON COLUMN org."ActivityMonitoringInspections"."MonitoringType" IS 'نوعیت نظارت - Monitoring type';
+COMMENT ON COLUMN org."ActivityMonitoringInspections"."Year" IS 'سال - Year';
 COMMENT ON COLUMN org."ActivityMonitoringInspections"."Month" IS 'ماه - Month';
 COMMENT ON COLUMN org."ActivityMonitoringInspections"."MonitoringCount" IS 'تعداد نظارت - Monitoring count';
 COMMENT ON COLUMN org."ActivityMonitoringInspections"."SealedCount" IS 'تعداد مهرولاک شده - Sealed count';

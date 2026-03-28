@@ -80,6 +80,9 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         [MaxLength(100)]
         public string? MonitoringType { get; set; }
 
+        [MaxLength(20)]
+        public string? Year { get; set; }
+
         [MaxLength(50)]
         public string? Month { get; set; }
 

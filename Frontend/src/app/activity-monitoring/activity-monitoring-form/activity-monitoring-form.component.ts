@@ -118,6 +118,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
             
             // Section 4: Inspection fields (conditionally required)
             monitoringType: [''],
+            year: [''],
             month: [''],
             monitoringCount: [''],
         });
@@ -227,12 +228,12 @@ export class ActivityMonitoringFormComponent implements OnInit {
                 }
             }
             this.onViolationStatusChange();
-        } else if (data.sectionType === 'inspection' && data.inspections && data.inspections.length > 0) {
-            const inspection = data.inspections[0];
+        } else if (data.sectionType === 'inspection') {
             this.mainForm.patchValue({
-                monitoringType: inspection.monitoringType,
-                month: inspection.month,
-                monitoringCount: inspection.monitoringCount,
+                monitoringType: data.monitoringType,
+                year: data.year,
+                month: data.month,
+                monitoringCount: data.monitoringCount,
             });
             this.onMonitoringTypeChange();
         }
@@ -327,6 +328,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
         
         // Inspection fields
         this.mainForm.get('monitoringType')?.clearValidators();
+        this.mainForm.get('year')?.clearValidators();
         this.mainForm.get('month')?.clearValidators();
         this.mainForm.get('monitoringCount')?.clearValidators();
         
@@ -340,6 +342,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.mainForm.get('closureDate')?.updateValueAndValidity();
         this.mainForm.get('closureReason')?.updateValueAndValidity();
         this.mainForm.get('monitoringType')?.updateValueAndValidity();
+        this.mainForm.get('year')?.updateValueAndValidity();
         this.mainForm.get('month')?.updateValueAndValidity();
         this.mainForm.get('monitoringCount')?.updateValueAndValidity();
     }
@@ -404,13 +407,16 @@ export class ActivityMonitoringFormComponent implements OnInit {
         const monitoringType = this.mainForm.get('monitoringType')?.value;
         
         if (monitoringType) {
+            this.mainForm.get('year')?.setValidators([Validators.required, Validators.maxLength(20)]);
             this.mainForm.get('month')?.setValidators([Validators.required]);
             this.mainForm.get('monitoringCount')?.setValidators([Validators.required, Validators.min(1)]);
         } else {
+            this.mainForm.get('year')?.clearValidators();
             this.mainForm.get('month')?.clearValidators();
             this.mainForm.get('monitoringCount')?.clearValidators();
         }
 
+        this.mainForm.get('year')?.updateValueAndValidity();
         this.mainForm.get('month')?.updateValueAndValidity();
         this.mainForm.get('monitoringCount')?.updateValueAndValidity();
     }
@@ -462,6 +468,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
             
             // Inspections fields (directly on data)
             monitoringType: formValue.monitoringType,
+            year: formValue.year,
             month: formValue.month,
             monitoringCount: formValue.monitoringCount ? Number(formValue.monitoringCount) : undefined
         };
