@@ -141,6 +141,9 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
+                // ALWAYS use Hijri Shamsi (Solar Hijri) calendar for print license dates
+                var printCalendar = CalendarType.HijriShamsi;
+
                 var item = await _context.PetitionWriterLicenses
                     .Where(x => x.Id == id && x.Status == true)
                     .Include(x => x.Province)
@@ -178,7 +181,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.BankReceiptNumber,
                         x.BankReceiptDate,
                         BankReceiptDateFormatted = x.BankReceiptDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.BankReceiptDate, calendar)
+                            ? DateConversionHelper.FormatDateOnly(x.BankReceiptDate, printCalendar)
                             : "",
                         x.District,
                         x.LicenseType,
@@ -186,16 +189,16 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         x.LicenseCost,
                         x.LicenseIssueDate,
                         LicenseIssueDateFormatted = x.LicenseIssueDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, calendar)
+                            ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, printCalendar)
                             : "",
                         x.LicenseExpiryDate,
                         LicenseExpiryDateFormatted = x.LicenseExpiryDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.LicenseExpiryDate, calendar)
+                            ? DateConversionHelper.FormatDateOnly(x.LicenseExpiryDate, printCalendar)
                             : "",
                         x.LicenseStatus,
                         x.CancellationDate,
                         CancellationDateFormatted = x.CancellationDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.CancellationDate, calendar)
+                            ? DateConversionHelper.FormatDateOnly(x.CancellationDate, printCalendar)
                             : "",
                         x.Status,
                         x.CreatedAt,
@@ -208,7 +211,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                             r.NewActivityLocation,
                             r.RelocationDate,
                             RelocationDateFormatted = r.RelocationDate.HasValue
-                                ? DateConversionHelper.FormatDateOnly(r.RelocationDate, calendar)
+                                ? DateConversionHelper.FormatDateOnly(r.RelocationDate, printCalendar)
                                 : "",
                             r.Remarks
                         }).ToList()

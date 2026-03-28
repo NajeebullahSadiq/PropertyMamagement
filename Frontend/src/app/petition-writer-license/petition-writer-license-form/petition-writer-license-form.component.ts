@@ -315,7 +315,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         const calendar = this.calendarService.getSelectedCalendar();
         // Use getRawValue() to include disabled fields (like provinceId for province-based users)
         const formData = this.licenseForm.getRawValue();
-        const financialData = this.financialForm.value;
+        // Use getRawValue() to include disabled fields like licenseCost
+        const financialData = this.financialForm.getRawValue();
 
         // Get date values
         const bankReceiptDateValue = this.financialForm.get('bankReceiptDate')?.value;

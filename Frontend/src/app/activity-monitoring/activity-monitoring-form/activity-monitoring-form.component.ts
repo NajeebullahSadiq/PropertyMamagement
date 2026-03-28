@@ -38,6 +38,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
     companyNotFound = false;
 
     // Section visibility based on sectionType selection
+    showAnnualReportSection = false;
     showComplaintsSection = false;
     showViolationsSection = false;
     showInspectionSection = false;
@@ -188,7 +189,9 @@ export class ActivityMonitoringFormComponent implements OnInit {
         }
 
         // Load section-specific data based on sectionType
-        if (data.sectionType === 'complaints' && data.complaints && data.complaints.length > 0) {
+        if (data.sectionType === 'annualReport') {
+            // Annual report data is already loaded in deed items above
+        } else if (data.sectionType === 'complaints' && data.complaints && data.complaints.length > 0) {
             const complaint = data.complaints[0];
             this.mainForm.patchValue({
                 complaintSubject: complaint.complaintSubject,
@@ -261,8 +264,10 @@ export class ActivityMonitoringFormComponent implements OnInit {
 
     onSectionTypeChange(): void {
         const sectionType = this.mainForm.get('sectionType')?.value;
+        console.log('Section type changed to:', sectionType); // Debug log
         
         // Reset all section visibility
+        this.showAnnualReportSection = false;
         this.showComplaintsSection = false;
         this.showViolationsSection = false;
         this.showInspectionSection = false;
@@ -271,7 +276,11 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.clearAllConditionalValidators();
         
         // Show the selected section and set validators
-        if (sectionType === 'complaints') {
+        if (sectionType === 'annualReport') {
+            this.showAnnualReportSection = true;
+            console.log('Showing annual report section'); // Debug log
+            // No additional validators needed for annual report
+        } else if (sectionType === 'complaints') {
             this.showComplaintsSection = true;
             this.setComplaintValidators();
         } else if (sectionType === 'violations') {
@@ -281,6 +290,26 @@ export class ActivityMonitoringFormComponent implements OnInit {
             this.showInspectionSection = true;
             this.setInspectionValidators();
         }
+        
+        // Update validators for license fields based on section type
+        this.updateLicenseFieldValidators();
+    }
+    
+    updateLicenseFieldValidators(): void {
+        const sectionType = this.mainForm.get('sectionType')?.value;
+        
+        if (sectionType === 'inspection') {
+            // Remove required validators for license fields when inspection is selected
+            this.mainForm.get('licenseNumber')?.clearValidators();
+            this.mainForm.get('licenseHolderName')?.clearValidators();
+        } else {
+            // Set required validators for other section types
+            this.mainForm.get('licenseNumber')?.setValidators([Validators.required, Validators.maxLength(50)]);
+            this.mainForm.get('licenseHolderName')?.setValidators([Validators.required, Validators.maxLength(200)]);
+        }
+        
+        this.mainForm.get('licenseNumber')?.updateValueAndValidity();
+        this.mainForm.get('licenseHolderName')?.updateValueAndValidity();
     }
 
     clearAllConditionalValidators(): void {
@@ -487,6 +516,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.selectedCompanyId = null;
         this.isEditMode = false;
         this.editId = null;
+        this.showAnnualReportSection = false;
         this.showComplaintsSection = false;
         this.showViolationsSection = false;
         this.showInspectionSection = false;

@@ -11,7 +11,7 @@ export interface ActivityMonitoringRecord {
     licenseNumber?: string;
     licenseHolderName?: string;
     district?: string;
-    sectionType?: string;  // complaints, violations, inspection
+    sectionType?: string;  // annualReport, complaints, violations, inspection
     reportRegistrationDate?: Date | string;
     reportRegistrationDateFormatted?: string;
     

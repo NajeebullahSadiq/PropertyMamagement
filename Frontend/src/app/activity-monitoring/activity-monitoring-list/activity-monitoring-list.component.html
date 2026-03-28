@@ -58,6 +58,7 @@
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
               <td class="px-4 py-3 text-sm">
+                <span *ngIf="item.sectionType === 'annualReport'" class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">گزارش سالانه</span>
                 <span *ngIf="item.sectionType === 'complaints'" class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">ثبت شکایات</span>
                 <span *ngIf="item.sectionType === 'violations'" class="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">تخلفات</span>
                 <span *ngIf="item.sectionType === 'inspection'" class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نظارت</span>
