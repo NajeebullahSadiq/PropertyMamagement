@@ -9,6 +9,8 @@ public partial class PunitType
 
     public string Name { get; set; } = null!;
 
+    public string? Dari { get; set; }
+
     public string? Des { get; set; }
 
     public virtual ICollection<PropertyDetail> PropertyDetails { get; } = new List<PropertyDetail>();

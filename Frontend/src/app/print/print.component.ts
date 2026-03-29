@@ -31,9 +31,16 @@ export class PrintComponent implements OnInit {
   qrCodeUrl: string = '';
   verificationError: string | null = null;
 
-  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms
-  printMode: 'full' | 'data-only' = 'full';
+  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms, 'new-design' = modern table layout, 'upload-docts' = upload documents
+  printMode: 'full' | 'data-only' | 'new-design' | 'upload-docts' = 'full';
   window = window; // Make window available in template
+
+  // Upload document properties
+  uploadSetaNumber: string = '';
+  selectedFile: File | null = null;
+  uploadMessage: string = '';
+  uploadError: string = '';
+  isUploading: boolean = false;
 
   constructor(
     public service: AuthService,
@@ -48,13 +55,13 @@ export class PrintComponent implements OnInit {
   ngOnInit(): void {
     // Check if print mode is specified in URL
     const mode = this.route.snapshot.queryParamMap.get('mode');
-    if (mode === 'data-only' || mode === 'full') {
-      this.printMode = mode as 'full' | 'data-only';
+    if (mode === 'data-only' || mode === 'full' || mode === 'new-design') {
+      this.printMode = mode as 'full' | 'data-only' | 'new-design';
     }
     this.loadPrintData();
   }
 
-  setPrintMode(mode: 'full' | 'data-only'): void {
+  setPrintMode(mode: 'full' | 'data-only' | 'new-design' | 'upload-docts'): void {
     this.printMode = mode;
     
     // If switching to data-only mode, process the DOM to remove labels
@@ -63,6 +70,51 @@ export class PrintComponent implements OnInit {
         this.processDataOnlyMode();
       }, 100);
     }
+  }
+
+  // File selection handler
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.uploadError = '';
+    }
+  }
+
+  // Upload document handler
+  uploadDocument(): void {
+    if (!this.selectedFile) {
+      this.uploadError = 'لطفاً فایل را انتخاب کنید';
+      return;
+    }
+    if (!this.uploadSetaNumber.trim()) {
+      this.uploadError = 'لطفاً سټه نمبر را وارد کنید';
+      return;
+    }
+
+    this.isUploading = true;
+    this.uploadMessage = '';
+    this.uploadError = '';
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+    formData.append('setaNumber', this.uploadSetaNumber);
+
+    this.pservice.uploadSetaDocument(formData).subscribe({
+      next: (response: any) => {
+        this.isUploading = false;
+        this.uploadMessage = 'فایل با موفقیت آپلود شد';
+        this.selectedFile = null;
+        this.uploadSetaNumber = '';
+        // Reset file input
+        const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+      },
+      error: (err: any) => {
+        this.isUploading = false;
+        this.uploadError = err?.error?.message || 'خطا در آپلود فایل';
+      }
+    });
   }
 
   /**

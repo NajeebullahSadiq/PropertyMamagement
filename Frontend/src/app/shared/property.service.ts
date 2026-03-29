@@ -71,5 +71,9 @@ export class PropertyService {
     return this.http.delete(url);
   }
 
+  uploadSetaDocument(formData: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl2}/SetaDocument/upload`, formData);
+  }
+
   
 }

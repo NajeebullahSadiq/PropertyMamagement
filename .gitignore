@@ -49,6 +49,16 @@
 !/Resources/Images/.gitkeep
 
 # ============================================
+# SETA DOCUMENTS
+# ============================================
+# Note: SetaDocuments directory structure is kept in git via .gitkeep files
+# Only ignore actual uploaded files, not the directory structure
+/Backend/SetaDocuments/*
+!/Backend/SetaDocuments/.gitkeep
+/SetaDocuments/*
+!/SetaDocuments/.gitkeep
+
+# ============================================
 # IDE & Editor
 # ============================================
 .vscode/

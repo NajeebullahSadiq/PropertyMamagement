@@ -5,6 +5,7 @@ using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
 using WebAPIBackend.Models.ViewModels;
+using WebAPIBackend.Models.Property;
 
 namespace WebAPIBackend.Configuration
 {
@@ -140,6 +141,9 @@ namespace WebAPIBackend.Configuration
         
         // Comprehensive Audit Log
         public virtual DbSet<WebAPIBackend.Models.Audit.ComprehensiveAuditLog> ComprehensiveAuditLogs { get; set; }
+        
+        // Seta Documents Upload
+        public virtual DbSet<SetaDocument> SetaDocuments { get; set; }
         
         public DbSet<UserProfileWithCompany> UserProfileWithCompany { get; set; }
 
@@ -982,8 +986,9 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.West).HasColumnName("West");
                 
                 // Configure Price and RoyaltyAmount to handle text columns
-                entity.Property(e => e.Price).HasColumnType("text");
-                entity.Property(e => e.RoyaltyAmount).HasColumnType("text");
+                entity.Property(e => e.Price).HasColumnName("Price").HasColumnType("text");
+                entity.Property(e => e.PriceText).HasColumnName("PriceText").HasColumnType("text");
+                entity.Property(e => e.RoyaltyAmount).HasColumnName("RoyaltyAmount").HasColumnType("text");
 
                 entity.HasOne(d => d.PropertyType).WithMany(p => p.PropertyDetails)
                     .HasForeignKey(d => d.PropertyTypeId)

@@ -774,6 +774,7 @@ namespace WebAPIBackend.Controllers
                 }).ToList();
 
                 // Create result with all sellers and buyers
+                var firstBuyer = property.BuyerDetails.FirstOrDefault();
                 var result = new
                 {
                     Id = property.Id,
@@ -786,13 +787,15 @@ namespace WebAPIBackend.Controllers
                     PNumber = property.Pnumber,
                     PArea = property.Parea,
                     NumofRooms = property.NumofRooms,
+                    NumofHouses = property.NumofFloor,
                     North = property.North,
                     South = property.South,
                     West = property.West,
                     East = property.East,
-                    Price = property.Price,
-                    PriceText = property.PriceText ?? string.Empty,
-                    RoyaltyAmount = property.RoyaltyAmount,
+                    Price = firstBuyer?.Price ?? property.Price,
+                    PriceText = firstBuyer?.PriceText ?? property.PriceText ?? string.Empty,
+                    RoyaltyAmount = firstBuyer?.RoyaltyAmount ?? property.RoyaltyAmount,
+                    HalfPrice = firstBuyer?.HalfPrice,
                     PropertypeType = property.PropertyType?.Name,
                     CustomPropertyType = property.CustomPropertyType,
                     CreatedAt = property.CreatedAt,
@@ -854,6 +857,7 @@ namespace WebAPIBackend.Controllers
                     
                     // Property Unit Type and Transaction Type
                     UnitType = property.PunitType?.Name,
+                    UnitTypeDari = property.PunitType?.Dari,
                     TransactionType = property.TransactionType?.Name,
                     
                     // Property Documents and Images

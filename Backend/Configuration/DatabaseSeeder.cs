@@ -423,14 +423,14 @@ namespace WebAPIBackend.Configuration
             {
                 var punitTypes = new[]
                 {
-                    new PunitType { Name = "Square Meter (m²)", Des = "Square meter measurement" },
-                    new PunitType { Name = "Square Foot (ft²)", Des = "Square foot measurement" },
-                    new PunitType { Name = "Jerib", Des = "Traditional Afghan land measurement (1 Jerib ≈ 2000 m²)" },
-                    new PunitType { Name = "Acre", Des = "Acre measurement" },
-                    new PunitType { Name = "Hectare", Des = "Hectare measurement" },
-                    new PunitType { Name = "Biswa", Des = "Traditional measurement unit" },
-                    new PunitType { Name = "Kanal", Des = "Traditional measurement unit" },
-                    new PunitType { Name = "Marla", Des = "Traditional measurement unit" }
+                    new PunitType { Name = "Square Meter (m²)", Dari = "متر مربع", Des = "Square meter measurement" },
+                    new PunitType { Name = "Square Foot (ft²)", Dari = "فوت مربع", Des = "Square foot measurement" },
+                    new PunitType { Name = "Jerib", Dari = "جریب", Des = "Traditional Afghan land measurement (1 Jerib ≈ 2000 m²)" },
+                    new PunitType { Name = "Acre", Dari = "ایکړ", Des = "Acre measurement" },
+                    new PunitType { Name = "Hectare", Dari = "هکتار", Des = "Hectare measurement" },
+                    new PunitType { Name = "Biswa", Dari = "بسوا", Des = "Traditional measurement unit" },
+                    new PunitType { Name = "Kanal", Dari = "کنال", Des = "Traditional measurement unit" },
+                    new PunitType { Name = "Marla", Dari = "مرله", Des = "Traditional measurement unit" }
                 };
                 await context.PunitTypes.AddRangeAsync(punitTypes);
             }
