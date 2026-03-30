@@ -177,6 +177,113 @@
         </div>
       </div>
 
+      <!-- Property Details Section (for PropertyDocument) -->
+      <div *ngIf="result.documentType === 'PropertyDocument'" class="property-details-section">
+        <div class="detail-section-header">
+          <h4>معلومات ملکیت</h4>
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-item" *ngIf="result.serialNumber">
+            <label>نمبر مسلسل:</label>
+            <span>{{ result.serialNumber }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.customDocumentType">
+            <label>نوعیت سند:</label>
+            <span>{{ result.customDocumentType }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.propertyTypeName || result.propertyTypeDari">
+            <label>نوعیت ملکیت:</label>
+            <span>{{ result.propertyTypeDari || result.propertyTypeName }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.area">
+            <label>مساحت:</label>
+            <span>{{ result.area }} {{ result.unitTypeDari || result.unitType || '' }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.provinceDari || result.province">
+            <label>ولایت:</label>
+            <span>{{ result.provinceDari || result.province }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.districtDari || result.district">
+            <label>ناحیه/ولسوالی:</label>
+            <span>{{ result.districtDari || result.district }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.village">
+            <label>قریه/گذر:</label>
+            <span>{{ result.village }}</span>
+          </div>
+        </div>
+
+        <!-- Boundaries -->
+        <div class="info-section" *ngIf="result.north || result.south || result.east || result.west">
+          <h5 class="section-title">حدود اربعه</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.north">
+              <label>شمال:</label>
+              <span>{{ result.north }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.south">
+              <label>جنوب:</label>
+              <span>{{ result.south }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.east">
+              <label>شرق:</label>
+              <span>{{ result.east }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.west">
+              <label>غرب:</label>
+              <span>{{ result.west }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Info -->
+        <div class="info-section" *ngIf="result.price || result.priceText || result.royaltyAmount">
+          <h5 class="section-title">معلومات معاملہ</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.price">
+              <label>قیمت (عدد):</label>
+              <span>{{ result.price }} افغانی</span>
+            </div>
+            <div class="info-item full-width" *ngIf="result.priceText">
+              <label>قیمت (حروف):</label>
+              <span>{{ result.priceText }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.royaltyAmount">
+              <label>حق العمل رهنما:</label>
+              <span>{{ result.royaltyAmount }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.halfPrice">
+              <label>مناصفه قیمت:</label>
+              <span>{{ result.halfPrice }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Witnesses -->
+        <div class="info-section" *ngIf="result.witnessOne || result.witnessTwo">
+          <h5 class="section-title">شاهدان</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.witnessOne?.firstName">
+              <label>شاهد اول:</label>
+              <span>{{ result.witnessOne?.firstName }} ولد {{ result.witnessOne?.fatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.witnessOne?.electronicNationalIdNumber">
+              <label>تذکره شاهد اول:</label>
+              <span dir="ltr">{{ result.witnessOne?.electronicNationalIdNumber }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.witnessTwo?.firstName">
+              <label>شاهد دوم:</label>
+              <span>{{ result.witnessTwo?.firstName }} ولد {{ result.witnessTwo?.fatherName }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.witnessTwo?.electronicNationalIdNumber">
+              <label>تذکره شاهد دوم:</label>
+              <span dir="ltr">{{ result.witnessTwo?.electronicNationalIdNumber }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Petition Writer Information (for PetitionWriterLicense documents) -->
       <div *ngIf="result.petitionWriterInfo" class="petition-writer-details">
         <div class="detail-section-header">

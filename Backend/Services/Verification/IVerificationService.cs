@@ -59,6 +59,37 @@ namespace WebAPIBackend.Services.Verification
         public string? CompanyTitle { get; set; }
         public string? OfficeAddress { get; set; }
         
+        // Property details (for Property documents)
+        public string? SerialNumber { get; set; }
+        public string? CustomDocumentType { get; set; }
+        public string? PropertyType { get; set; }
+        public string? PropertyTypeName { get; set; }
+        public string? PropertyTypeDari { get; set; }
+        public decimal? Area { get; set; }
+        public string? UnitType { get; set; }
+        public string? UnitTypeDari { get; set; }
+        public string? Province { get; set; }
+        public string? ProvinceDari { get; set; }
+        public string? District { get; set; }
+        public string? DistrictDari { get; set; }
+        public string? Village { get; set; }
+        
+        // Boundaries
+        public string? North { get; set; }
+        public string? South { get; set; }
+        public string? East { get; set; }
+        public string? West { get; set; }
+        
+        // Price info
+        public decimal? Price { get; set; }
+        public string? PriceText { get; set; }
+        public decimal? RoyaltyAmount { get; set; }
+        public decimal? HalfPrice { get; set; }
+        
+        // Witnesses
+        public WitnessInfoDto? WitnessOne { get; set; }
+        public WitnessInfoDto? WitnessTwo { get; set; }
+        
         // Seller information (for Property and Vehicle documents)
         public SellerInfoDto? SellerInfo { get; set; }
         
@@ -67,6 +98,16 @@ namespace WebAPIBackend.Services.Verification
         
         // Petition Writer information (for PetitionWriterLicense documents)
         public PetitionWriterInfoDto? PetitionWriterInfo { get; set; }
+    }
+
+    /// <summary>
+    /// Witness information DTO
+    /// </summary>
+    public class WitnessInfoDto
+    {
+        public string? FirstName { get; set; }
+        public string? FatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
     }
 
     /// <summary>

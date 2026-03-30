@@ -586,7 +586,13 @@ export class PrintComponent implements OnInit {
         
         this.verificationCode = result.verificationCode;
         this.verificationUrl = result.verificationUrl;
-        this.qrCodeUrl = this.verificationService.generateQrCodeUrl(result.verificationUrl);
+        
+        // Generate QR code with full document information
+        this.qrCodeUrl = this.verificationService.generateDocumentQrCodeUrl(
+          this.documentData,
+          result.verificationCode,
+          result.verificationUrl
+        );
         
         console.log('[PrintProperty] Verification Code:', this.verificationCode);
         console.log('[PrintProperty] Verification URL:', this.verificationUrl);

@@ -238,6 +238,54 @@ namespace WebAPIBackend.Services.Verification
                 result.CompanyTitle = currentData.CompanyTitle;
                 result.OfficeAddress = currentData.OfficeAddress;
                 
+                // Populate property details
+                result.SerialNumber = currentData.SerialNumber;
+                result.CustomDocumentType = currentData.CustomDocumentType;
+                result.PropertyType = currentData.PropertyType;
+                result.PropertyTypeName = currentData.PropertyTypeName;
+                result.PropertyTypeDari = currentData.PropertyTypeDari;
+                result.Area = currentData.Area;
+                result.UnitType = currentData.UnitType;
+                result.UnitTypeDari = currentData.UnitTypeDari;
+                result.Province = currentData.Province;
+                result.ProvinceDari = currentData.ProvinceDari;
+                result.District = currentData.District;
+                result.DistrictDari = currentData.DistrictDari;
+                result.Village = currentData.Village;
+                
+                // Populate boundaries
+                result.North = currentData.North;
+                result.South = currentData.South;
+                result.East = currentData.East;
+                result.West = currentData.West;
+                
+                // Populate price info
+                result.Price = currentData.Price;
+                result.PriceText = currentData.PriceText;
+                result.RoyaltyAmount = currentData.RoyaltyAmount;
+                result.HalfPrice = currentData.HalfPrice;
+                
+                // Populate witnesses
+                if (currentData.WitnessOne != null)
+                {
+                    result.WitnessOne = new WitnessInfoDto
+                    {
+                        FirstName = currentData.WitnessOne.FirstName,
+                        FatherName = currentData.WitnessOne.FatherName,
+                        ElectronicNationalIdNumber = currentData.WitnessOne.ElectronicNationalIdNumber
+                    };
+                }
+                
+                if (currentData.WitnessTwo != null)
+                {
+                    result.WitnessTwo = new WitnessInfoDto
+                    {
+                        FirstName = currentData.WitnessTwo.FirstName,
+                        FatherName = currentData.WitnessTwo.FatherName,
+                        ElectronicNationalIdNumber = currentData.WitnessTwo.ElectronicNationalIdNumber
+                    };
+                }
+                
                 // Populate seller and buyer information (for Property and Vehicle documents)
                 if (currentData.Seller != null)
                 {
@@ -499,7 +547,10 @@ namespace WebAPIBackend.Services.Verification
             var property = await _context.PropertyDetails
                 .Include(p => p.SellerDetails)
                 .Include(p => p.BuyerDetails)
+                .Include(p => p.WitnessDetails)
                 .Include(p => p.PropertyAddresses)
+                .Include(p => p.PropertyType)
+                .Include(p => p.PunitType)
                 .FirstOrDefaultAsync(p => p.Id == propertyId);
 
             if (property == null) return null;
@@ -507,23 +558,29 @@ namespace WebAPIBackend.Services.Verification
             var seller = property.SellerDetails.FirstOrDefault();
             var buyer = property.BuyerDetails.FirstOrDefault();
             var address = property.PropertyAddresses.FirstOrDefault();
+            var witnessOne = property.WitnessDetails.FirstOrDefault();
+            var witnessTwo = property.WitnessDetails.Skip(1).FirstOrDefault();
 
             // Get province and district names from Location table
             string province = "";
+            string provinceDari = "";
             string district = "";
+            string districtDari = "";
             
             if (address != null)
             {
                 if (address.ProvinceId.HasValue)
                 {
                     var provinceLocation = await _context.Locations.FindAsync(address.ProvinceId.Value);
-                    province = provinceLocation?.Dari ?? provinceLocation?.Name ?? "";
+                    province = provinceLocation?.Name ?? "";
+                    provinceDari = provinceLocation?.Dari ?? "";
                 }
                 
                 if (address.DistrictId.HasValue)
                 {
                     var districtLocation = await _context.Locations.FindAsync(address.DistrictId.Value);
-                    district = districtLocation?.Dari ?? districtLocation?.Name ?? "";
+                    district = districtLocation?.Name ?? "";
+                    districtDari = districtLocation?.Dari ?? "";
                 }
             }
 
@@ -593,6 +650,63 @@ namespace WebAPIBackend.Services.Verification
                 };
             }
 
+            // Prepare witness data
+            WitnessData? witnessOneData = null;
+            if (witnessOne != null)
+            {
+                witnessOneData = new WitnessData
+                {
+                    FirstName = witnessOne.FirstName,
+                    FatherName = witnessOne.FatherName,
+                    ElectronicNationalIdNumber = witnessOne.ElectronicNationalIdNumber
+                };
+            }
+            
+            WitnessData? witnessTwoData = null;
+            if (witnessTwo != null)
+            {
+                witnessTwoData = new WitnessData
+                {
+                    FirstName = witnessTwo.FirstName,
+                    FatherName = witnessTwo.FatherName,
+                    ElectronicNationalIdNumber = witnessTwo.ElectronicNationalIdNumber
+                };
+            }
+
+            // Parse area to decimal
+            decimal? areaValue = null;
+            if (!string.IsNullOrEmpty(property.Parea) && decimal.TryParse(property.Parea, out var parsedArea))
+            {
+                areaValue = parsedArea;
+            }
+
+            // Parse price values
+            decimal? priceValue = null;
+            if (buyer?.Price != null && decimal.TryParse(buyer.Price, out var parsedPrice))
+            {
+                priceValue = parsedPrice;
+            }
+            else if (property.Price != null && decimal.TryParse(property.Price, out parsedPrice))
+            {
+                priceValue = parsedPrice;
+            }
+
+            decimal? royaltyValue = null;
+            if (buyer?.RoyaltyAmount != null && decimal.TryParse(buyer.RoyaltyAmount, out var parsedRoyalty))
+            {
+                royaltyValue = parsedRoyalty;
+            }
+            else if (property.RoyaltyAmount != null && decimal.TryParse(property.RoyaltyAmount, out parsedRoyalty))
+            {
+                royaltyValue = parsedRoyalty;
+            }
+
+            decimal? halfPriceValue = null;
+            if (buyer?.HalfPrice != null && decimal.TryParse(buyer.HalfPrice, out var parsedHalfPrice))
+            {
+                halfPriceValue = parsedHalfPrice;
+            }
+
             return new DocumentDataDto
             {
                 LicenseNumber = property.IssuanceNumber ?? property.Pnumber ?? "",
@@ -602,6 +716,38 @@ namespace WebAPIBackend.Services.Verification
                 ExpiryDate = null, // Property documents don't expire
                 CompanyTitle = null,
                 OfficeAddress = $"{province}, {district}",
+                
+                // Property details
+                SerialNumber = property.SerialNumber,
+                CustomDocumentType = property.CustomDocumentType,
+                PropertyType = property.CustomPropertyType,
+                PropertyTypeName = property.PropertyType?.Name,
+                PropertyTypeDari = property.PropertyType?.Dari,
+                Area = areaValue,
+                UnitType = property.PunitType?.Name,
+                UnitTypeDari = property.PunitType?.Dari,
+                Province = province,
+                ProvinceDari = provinceDari,
+                District = district,
+                DistrictDari = districtDari,
+                Village = address?.Village,
+                
+                // Boundaries (from PropertyDetail, not PropertyAddress)
+                North = property.North,
+                South = property.South,
+                East = property.East,
+                West = property.West,
+                
+                // Price info (from buyer)
+                Price = priceValue,
+                PriceText = buyer?.PriceText ?? property.PriceText,
+                RoyaltyAmount = royaltyValue,
+                HalfPrice = halfPriceValue,
+                
+                // Witnesses
+                WitnessOne = witnessOneData,
+                WitnessTwo = witnessTwoData,
+                
                 Seller = sellerData,
                 Buyer = buyerData
             };
@@ -718,6 +864,37 @@ namespace WebAPIBackend.Services.Verification
         public string? CompanyTitle { get; set; }
         public string? OfficeAddress { get; set; }
         
+        // Property details
+        public string? SerialNumber { get; set; }
+        public string? CustomDocumentType { get; set; }
+        public string? PropertyType { get; set; }
+        public string? PropertyTypeName { get; set; }
+        public string? PropertyTypeDari { get; set; }
+        public decimal? Area { get; set; }
+        public string? UnitType { get; set; }
+        public string? UnitTypeDari { get; set; }
+        public string? Province { get; set; }
+        public string? ProvinceDari { get; set; }
+        public string? District { get; set; }
+        public string? DistrictDari { get; set; }
+        public string? Village { get; set; }
+        
+        // Boundaries
+        public string? North { get; set; }
+        public string? South { get; set; }
+        public string? East { get; set; }
+        public string? West { get; set; }
+        
+        // Price info
+        public decimal? Price { get; set; }
+        public string? PriceText { get; set; }
+        public decimal? RoyaltyAmount { get; set; }
+        public decimal? HalfPrice { get; set; }
+        
+        // Witnesses
+        public WitnessData? WitnessOne { get; set; }
+        public WitnessData? WitnessTwo { get; set; }
+        
         // Seller information (for Property and Vehicle documents)
         public SellerData? Seller { get; set; }
         
@@ -726,6 +903,16 @@ namespace WebAPIBackend.Services.Verification
         
         // Petition Writer specific information
         public PetitionWriterData? PetitionWriterData { get; set; }
+    }
+
+    /// <summary>
+    /// Internal witness data
+    /// </summary>
+    internal class WitnessData
+    {
+        public string? FirstName { get; set; }
+        public string? FatherName { get; set; }
+        public string? ElectronicNationalIdNumber { get; set; }
     }
 
     /// <summary>

@@ -28,9 +28,47 @@ export interface DocumentVerificationDto {
   officeAddress?: string;
   revokedReason?: string;
   verifiedAt: string;
+  
+  // Property details
+  serialNumber?: string;
+  customDocumentType?: string;
+  propertyType?: string;
+  propertyTypeName?: string;
+  propertyTypeDari?: string;
+  area?: number;
+  unitType?: string;
+  unitTypeDari?: string;
+  province?: string;
+  provinceDari?: string;
+  district?: string;
+  districtDari?: string;
+  village?: string;
+  
+  // Boundaries
+  north?: string;
+  south?: string;
+  east?: string;
+  west?: string;
+  
+  // Price info
+  price?: number;
+  priceText?: string;
+  royaltyAmount?: number;
+  halfPrice?: number;
+  
+  // Witnesses
+  witnessOne?: WitnessInfoDto;
+  witnessTwo?: WitnessInfoDto;
+  
   sellerInfo?: SellerInfoDto;
   buyerInfo?: BuyerInfoDto;
   petitionWriterInfo?: PetitionWriterInfoDto;
+}
+
+export interface WitnessInfoDto {
+  firstName?: string;
+  fatherName?: string;
+  electronicNationalIdNumber?: string;
 }
 
 export interface SellerInfoDto {
@@ -133,5 +171,87 @@ export class VerificationService {
     // Use QR Server API for QR code generation (free, reliable, no library needed)
     const encodedUrl = encodeURIComponent(verificationUrl);
     return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodedUrl}`;
+  }
+
+  /**
+   * Generate QR code with full document information
+   */
+  generateDocumentQrCodeUrl(documentData: any, verificationCode: string, verificationUrl: string): string {
+    // Build comprehensive document info for QR code
+    const lines: string[] = [];
+    
+    // Header
+    lines.push('═══════════════════════════════');
+    lines.push('      سند معاملات ملکیت');
+    lines.push('═══════════════════════════════');
+    lines.push('');
+    
+    // Document info
+    lines.push(`کود تصدیق: ${verificationCode}`);
+    lines.push(`نوعیت سند: ${documentData.documentType || documentData.customDocumentType || '-'}`);
+    lines.push(`نمبر مسلسل: ${documentData.serialNumber || documentData.id || '-'}`);
+    lines.push(`نوعیت ملکیت: ${documentData.propertypeType || documentData.customPropertyType || '-'}`);
+    lines.push('');
+    
+    // Property info
+    lines.push('─── معلومات ملکیت ───');
+    lines.push(`مساحت: ${documentData.pArea || '-'} ${documentData.unitTypeDari || documentData.unitType || ''}`);
+    lines.push(`ولایت: ${documentData.provinceDari || documentData.province || '-'}`);
+    lines.push(`ناحیه: ${documentData.districtDari || documentData.district || '-'}`);
+    lines.push(`قریه: ${documentData.village || '-'}`);
+    lines.push('');
+    
+    // Boundaries
+    lines.push('─── حدود اربعه ───');
+    lines.push(`شمال: ${documentData.north || '-'} | جنوب: ${documentData.south || '-'}`);
+    lines.push(`شرق: ${documentData.east || '-'} | غرب: ${documentData.west || '-'}`);
+    lines.push('');
+    
+    // Price
+    lines.push('─── معلومات معاملہ ───');
+    lines.push(`قیمت: ${documentData.price || '-'} افغانی`);
+    lines.push(`قیمت (حروف): ${documentData.priceText || '-'}`);
+    lines.push(`حق العمل: ${documentData.royaltyAmount || '-'}`);
+    lines.push('');
+    
+    // Sellers
+    if (documentData.sellers && documentData.sellers.length > 0) {
+      lines.push('─── فروشندگان ───');
+      documentData.sellers.forEach((seller: any, i: number) => {
+        lines.push(`${i + 1}. ${seller.firstName || '-'} ولد ${seller.fatherName || '-'}`);
+        lines.push(`   تذکره: ${seller.electronicNationalIdNumber || '-'}`);
+      });
+      lines.push('');
+    }
+    
+    // Buyers
+    if (documentData.buyers && documentData.buyers.length > 0) {
+      lines.push('─── خریداران ───');
+      documentData.buyers.forEach((buyer: any, i: number) => {
+        lines.push(`${i + 1}. ${buyer.firstName || '-'} ولد ${buyer.fatherName || '-'}`);
+        lines.push(`   تذکره: ${buyer.electronicNationalIdNumber || '-'}`);
+      });
+      lines.push('');
+    }
+    
+    // Witnesses
+    lines.push('─── شاهدان ───');
+    lines.push(`شاهد اول: ${documentData.witnessOneFirstName || '-'} ولد ${documentData.witnessOneFatherName || '-'}`);
+    lines.push(`شاهد دوم: ${documentData.witnessTwoFirstName || '-'} ولد ${documentData.witnessTwoFatherName || '-'}`);
+    lines.push('');
+    
+    // Footer
+    lines.push('───────────────────────────────');
+    lines.push(`تاریخ: ${documentData.createdAtFormatted || documentData.createdAt || '-'}`);
+    lines.push('');
+    lines.push(`لینک تصدیق: ${verificationUrl}`);
+    lines.push('═══════════════════════════════');
+    
+    // Encode the content for QR code
+    const qrContent = lines.join('\n');
+    const encodedContent = encodeURIComponent(qrContent);
+    
+    // Use larger QR code for more data
+    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedContent}`;
   }
 }
