@@ -103,8 +103,8 @@
         <p style="margin: 1mm 0; font-size: 9pt; text-align: center;"><u><b>ای کسانیکه ایمان آورده اید به قراردادها وفا کنید.</b></u><b> (مایده آیه اول)</b></p>
         <table style="width: 100%; table-layout: fixed; font-size: 8pt; margin: 1mm 0;">
             <tr>
-                <td style="width: 33.33%; text-align: right;"><b>دفتر رهنمایی معاملات ({{userDetails.companyName}})</b></td>
-                <td style="width: 33.33%; text-align: center;"><b>نمبر مسلسل سند:</b> {{documentData.serialNumber || documentData.id}}</td>
+                <td style="width: 33.33%; text-align: right;"><b>دفتر رهنمایی معاملات ({{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || 'ادمین'}})</b></td>
+                <td style="width: 33.33%; text-align: center;"><b></b> </td>
                 <td style="width: 33.33%; text-align: left;"><b>شماره تماس:</b> {{userDetails.phoneNumber}}</td>
             </tr>
             <tr>
