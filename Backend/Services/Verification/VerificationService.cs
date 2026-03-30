@@ -343,6 +343,15 @@ namespace WebAPIBackend.Services.Verification
                     };
                 }
 
+                // Populate vehicle details (for VehicleDocument)
+                result.PlateNumber = currentData.PlateNumber;
+                result.VehicleType = currentData.VehicleType;
+                result.VehicleModel = currentData.VehicleModel;
+                result.EngineNumber = currentData.EngineNumber;
+                result.ChassisNumber = currentData.ChassisNumber;
+                result.VehicleColor = currentData.VehicleColor;
+                result.Description = currentData.Description;
+
                 return result;
             }
             catch (Exception)
@@ -845,6 +854,22 @@ namespace WebAPIBackend.Services.Verification
                 ExpiryDate = null, // Vehicle documents don't expire
                 CompanyTitle = null,
                 OfficeAddress = $"{sellerProvince}, {sellerDistrict}",
+                
+                // Vehicle details
+                PlateNumber = vehicle.PilateNo,
+                VehicleType = vehicle.TypeOfVehicle,
+                VehicleModel = vehicle.Model,
+                EngineNumber = vehicle.EnginNo,
+                ChassisNumber = vehicle.ShasiNo,
+                VehicleColor = vehicle.Color,
+                Description = vehicle.Des,
+                
+                // Price info
+                Price = decimal.TryParse(vehicle.Price, out var parsedPrice) ? parsedPrice : null,
+                PriceText = vehicle.PriceText,
+                RoyaltyAmount = decimal.TryParse(vehicle.RoyaltyAmount, out var parsedRoyalty) ? parsedRoyalty : null,
+                HalfPrice = decimal.TryParse(vehicle.HalfPrice, out var parsedHalfPrice) ? parsedHalfPrice : null,
+                
                 Seller = sellerData,
                 Buyer = buyerData
             };
@@ -903,6 +928,15 @@ namespace WebAPIBackend.Services.Verification
         
         // Petition Writer specific information
         public PetitionWriterData? PetitionWriterData { get; set; }
+        
+        // Vehicle details
+        public string? PlateNumber { get; set; }
+        public string? VehicleType { get; set; }
+        public string? VehicleModel { get; set; }
+        public string? EngineNumber { get; set; }
+        public string? ChassisNumber { get; set; }
+        public string? VehicleColor { get; set; }
+        public string? Description { get; set; }
     }
 
     /// <summary>

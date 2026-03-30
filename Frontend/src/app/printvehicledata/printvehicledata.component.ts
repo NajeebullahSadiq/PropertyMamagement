@@ -28,9 +28,15 @@ export class PrintvehicledataComponent implements OnInit {
   qrCodeUrl: string = '';
   verificationError: string | null = null;
 
-  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms
-  printMode: 'full' | 'data-only' = 'full';
-  showPrintOptions: boolean = true;
+  // Print mode: 'new-design' = modern table layout, 'upload-docts' = upload documents
+  printMode: 'new-design' | 'upload-docts' = 'new-design';
+
+  // Upload properties
+  uploadSetaNumber: string = '';
+  selectedFile: File | null = null;
+  isUploading: boolean = false;
+  uploadError: string = '';
+  uploadMessage: string = '';
 
   constructor(
     public service: AuthService,
@@ -46,208 +52,74 @@ export class PrintvehicledataComponent implements OnInit {
   ngOnInit(): void {
     // Check if print mode is specified in URL
     const mode = this.route.snapshot.queryParamMap.get('mode');
-    if (mode === 'data-only' || mode === 'full') {
-      this.printMode = mode as 'full' | 'data-only';
-      this.showPrintOptions = false;
+    if (mode === 'upload-docts' || mode === 'new-design') {
+      this.printMode = mode as 'new-design' | 'upload-docts';
     }
-    console.log('Vehicle print component initialized. showPrintOptions:', this.showPrintOptions, 'mode:', mode);
+    console.log('Vehicle print component initialized. Mode:', this.printMode);
     this.loadPrintData();
   }
 
-  setPrintMode(mode: 'full' | 'data-only'): void {
+  setPrintMode(mode: 'new-design' | 'upload-docts'): void {
     this.printMode = mode;
-    this.showPrintOptions = false;
-    
-    // If switching to data-only mode, process the DOM to remove labels
-    if (mode === 'data-only') {
-      setTimeout(() => {
-        this.processDataOnlyMode();
-        window.print();
-      }, 100);
-    } else {
-      setTimeout(() => {
-        window.print();
-      }, 100);
+    this.uploadError = '';
+    this.uploadMessage = '';
+  }
+
+  /**
+   * Handle file selection for upload
+   */
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.uploadError = '';
+      this.uploadMessage = '';
     }
   }
 
   /**
-   * Process the DOM to remove all label text and keep only dynamic data values
+   * Upload document to server
    */
-  private processDataOnlyMode(): void {
-    const container = this.elementRef.nativeElement.querySelector('.container');
-    if (!container) return;
-
-    // Remove the second table (rights and obligations + signatures) completely
-    const tables = container.querySelectorAll('table');
-    if (tables.length > 1) {
-      // Remove all tables after the first one
-      for (let i = 1; i < tables.length; i++) {
-        tables[i].remove();
-      }
+  uploadDocument(): void {
+    if (!this.uploadSetaNumber.trim()) {
+      this.uploadError = 'لطفاً سټه نمبر را وارد کنید';
+      return;
     }
 
-    // Remove all existing content and create positioned layout
-    const firstTable = tables[0];
-    if (firstTable) {
-      // Clear the container and create absolute positioned layout
-      container.innerHTML = '';
-      
-      // Create a positioned wrapper for exact placement
-      const wrapper = document.createElement('div');
-      wrapper.style.position = 'relative';
-      wrapper.style.width = '210mm';
-      wrapper.style.height = '297mm';
-      wrapper.style.margin = '0';
-      wrapper.style.padding = '0';
-      
-      // Helper function to create positioned text
-      const createField = (text: string, top: string, left: string, fontSize: string = '12pt') => {
-        const field = document.createElement('div');
-        field.style.position = 'absolute';
-        field.style.top = top;
-        field.style.left = left;
-        field.style.fontSize = fontSize;
-        field.style.fontFamily = 'B Nazanin, Arial';
-        field.style.whiteSpace = 'nowrap';
-        field.textContent = text || '';
-        return field;
-      };
-
-      // Map data to exact positions based on the pre-printed form
-      // These positions need to be adjusted to match your exact form
-      
-      // Company name and phone (top section)
-      if (this.userDetails.companyName) {
-        wrapper.appendChild(createField(this.userDetails.companyName, '25mm', '80mm', '14pt'));
-      }
-      if (this.userDetails.phoneNumber) {
-        wrapper.appendChild(createField(this.userDetails.phoneNumber, '32mm', '80mm', '12pt'));
-      }
-      
-      // Document number
-      if (this.documentData.permitNo) {
-        wrapper.appendChild(createField(this.documentData.permitNo, '50mm', '120mm'));
-      }
-      
-      // Seller information (left column)
-      if (this.documentData.sellerFirstName) {
-        wrapper.appendChild(createField(this.documentData.sellerFirstName, '65mm', '140mm'));
-      }
-      if (this.documentData.sellerFatherName) {
-        wrapper.appendChild(createField(this.documentData.sellerFatherName, '75mm', '140mm'));
-      }
-      if (this.documentData.sellerIndentityCardNumber) {
-        wrapper.appendChild(createField(this.documentData.sellerIndentityCardNumber, '85mm', '140mm'));
-      }
-      
-      // Vehicle information (center column)
-      if (this.documentData.pilateNo) {
-        wrapper.appendChild(createField(this.documentData.pilateNo, '60mm', '80mm'));
-      }
-      if (this.documentData.typeOfVehicle) {
-        wrapper.appendChild(createField(this.documentData.typeOfVehicle, '68mm', '80mm'));
-      }
-      if (this.documentData.model) {
-        wrapper.appendChild(createField(this.documentData.model, '76mm', '80mm'));
-      }
-      if (this.documentData.enginNo) {
-        wrapper.appendChild(createField(this.documentData.enginNo, '84mm', '80mm'));
-      }
-      if (this.documentData.shasiNo) {
-        wrapper.appendChild(createField(this.documentData.shasiNo, '92mm', '80mm'));
-      }
-      if (this.documentData.color) {
-        wrapper.appendChild(createField(this.documentData.color, '100mm', '80mm'));
-      }
-      if (this.documentData.price) {
-        wrapper.appendChild(createField(this.documentData.price, '108mm', '80mm'));
-      }
-      if (this.documentData.priceText) {
-        wrapper.appendChild(createField(this.documentData.priceText, '116mm', '80mm'));
-      }
-      
-      // Buyer information (right column)
-      if (this.documentData.buyerFirstName) {
-        wrapper.appendChild(createField(this.documentData.buyerFirstName, '65mm', '20mm'));
-      }
-      if (this.documentData.buyerFatherName) {
-        wrapper.appendChild(createField(this.documentData.buyerFatherName, '75mm', '20mm'));
-      }
-      if (this.documentData.buyerIndentityCardNumber) {
-        wrapper.appendChild(createField(this.documentData.buyerIndentityCardNumber, '85mm', '20mm'));
-      }
-      
-      // Seller address
-      if (this.documentData.sellerProvince) {
-        wrapper.appendChild(createField(this.documentData.sellerProvince, '135mm', '140mm', '11pt'));
-      }
-      if (this.documentData.sellerDistrict) {
-        wrapper.appendChild(createField(this.documentData.sellerDistrict, '142mm', '140mm', '11pt'));
-      }
-      if (this.documentData.sellerVillage) {
-        wrapper.appendChild(createField(this.documentData.sellerVillage, '149mm', '140mm', '11pt'));
-      }
-      
-      // Buyer address
-      if (this.documentData.buyerProvince) {
-        wrapper.appendChild(createField(this.documentData.buyerProvince, '135mm', '20mm', '11pt'));
-      }
-      if (this.documentData.buyerDistrict) {
-        wrapper.appendChild(createField(this.documentData.buyerDistrict, '142mm', '20mm', '11pt'));
-      }
-      if (this.documentData.buyerVillage) {
-        wrapper.appendChild(createField(this.documentData.buyerVillage, '149mm', '20mm', '11pt'));
-      }
-      
-      // Temporary address (سکونت فعلی)
-      if (this.documentData.tSellerProvince) {
-        wrapper.appendChild(createField(this.documentData.tSellerProvince, '170mm', '140mm', '11pt'));
-      }
-      if (this.documentData.tSellerDistrict) {
-        wrapper.appendChild(createField(this.documentData.tSellerDistrict, '177mm', '140mm', '11pt'));
-      }
-      if (this.documentData.tSellerVillage) {
-        wrapper.appendChild(createField(this.documentData.tSellerVillage, '184mm', '140mm', '11pt'));
-      }
-      
-      if (this.documentData.tBuyerProvince) {
-        wrapper.appendChild(createField(this.documentData.tBuyerProvince, '170mm', '20mm', '11pt'));
-      }
-      if (this.documentData.tBuyerDistrict) {
-        wrapper.appendChild(createField(this.documentData.tBuyerDistrict, '177mm', '20mm', '11pt'));
-      }
-      if (this.documentData.tBuyerVillage) {
-        wrapper.appendChild(createField(this.documentData.tBuyerVillage, '184mm', '20mm', '11pt'));
-      }
-      
-      // Witnesses
-      if (this.documentData.witnessOneFirstName) {
-        wrapper.appendChild(createField(this.documentData.witnessOneFirstName, '195mm', '90mm', '11pt'));
-      }
-      if (this.documentData.witnessOneFatherName) {
-        wrapper.appendChild(createField(this.documentData.witnessOneFatherName, '195mm', '70mm', '11pt'));
-      }
-      if (this.documentData.witnessOneIndentityCardNumber) {
-        wrapper.appendChild(createField(this.documentData.witnessOneIndentityCardNumber, '195mm', '50mm', '11pt'));
-      }
-      
-      if (this.documentData.witnessTwoFirstName) {
-        wrapper.appendChild(createField(this.documentData.witnessTwoFirstName, '205mm', '90mm', '11pt'));
-      }
-      if (this.documentData.witnessTwoFatherName) {
-        wrapper.appendChild(createField(this.documentData.witnessTwoFatherName, '205mm', '70mm', '11pt'));
-      }
-      if (this.documentData.witnessTwoIndentityCardNumber) {
-        wrapper.appendChild(createField(this.documentData.witnessTwoIndentityCardNumber, '205mm', '50mm', '11pt'));
-      }
-      
-      container.appendChild(wrapper);
+    if (!this.selectedFile) {
+      this.uploadError = 'لطفاً فایل را انتخاب کنید';
+      return;
     }
+
+    this.isUploading = true;
+    this.uploadError = '';
+    this.uploadMessage = '';
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile);
+    formData.append('setaNumber', this.uploadSetaNumber);
+
+    // Use the vehicle service to upload
+    this.pservice.uploadVehicleDocument(formData).subscribe({
+      next: (response: any) => {
+        this.isUploading = false;
+        this.uploadMessage = 'فایل با موفقیت افلوډ شد';
+        this.selectedFile = null;
+        this.uploadSetaNumber = '';
+      },
+      error: (err: any) => {
+        this.isUploading = false;
+        this.uploadError = err?.error?.message || 'خطا در افلوډ فایل';
+      }
+    });
   }
 
   cancelPrint(): void {
     window.close();
+  }
+
+  printPage(): void {
+    window.print();
   }
 
   private loadPrintData(): void {
@@ -329,13 +201,7 @@ export class PrintvehicledataComponent implements OnInit {
       loadedCount++;
       if (loadedCount >= totalImages) {
         this.isLoading = false;
-        console.log('Vehicle images loaded. showPrintOptions:', this.showPrintOptions, 'isLoading:', this.isLoading);
-        // Don't auto-print if showing options
-        if (!this.showPrintOptions) {
-          setTimeout(() => {
-            window.print();
-          }, 500);
-        }
+        console.log('Vehicle images loaded. Mode:', this.printMode, 'isLoading:', this.isLoading);
       }
     };
 

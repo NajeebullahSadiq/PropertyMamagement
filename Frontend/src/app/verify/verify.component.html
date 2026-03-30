@@ -284,6 +284,73 @@
         </div>
       </div>
 
+      <!-- Vehicle Details Section (for VehicleDocument) -->
+      <div *ngIf="result.documentType === 'VehicleDocument'" class="vehicle-details-section">
+        <div class="detail-section-header">
+          <h4>معلومات واسطه</h4>
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-item" *ngIf="result.plateNumber">
+            <label>نمبر پلیټ:</label>
+            <span>{{ result.plateNumber }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.vehicleType">
+            <label>نوعیت واسطه:</label>
+            <span>{{ result.vehicleType }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.vehicleModel">
+            <label>مدل:</label>
+            <span>{{ result.vehicleModel }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.engineNumber">
+            <label>نمبر انجن:</label>
+            <span dir="ltr">{{ result.engineNumber }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.chassisNumber">
+            <label>نمبر شاسی:</label>
+            <span dir="ltr">{{ result.chassisNumber }}</span>
+          </div>
+          <div class="info-item" *ngIf="result.vehicleColor">
+            <label>رنگ:</label>
+            <span>{{ result.vehicleColor }}</span>
+          </div>
+        </div>
+
+        <!-- Price Info -->
+        <div class="info-section" *ngIf="result.price || result.priceText || result.royaltyAmount">
+          <h5 class="section-title">معلومات معاملہ</h5>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="result.price">
+              <label>قیمت (عدد):</label>
+              <span>{{ result.price }} افغانی</span>
+            </div>
+            <div class="info-item full-width" *ngIf="result.priceText">
+              <label>قیمت (حروف):</label>
+              <span>{{ result.priceText }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.royaltyAmount">
+              <label>حق العمل رهنما:</label>
+              <span>{{ result.royaltyAmount }}</span>
+            </div>
+            <div class="info-item" *ngIf="result.halfPrice">
+              <label>مناصفه قیمت:</label>
+              <span>{{ result.halfPrice }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="info-section" *ngIf="result.description">
+          <h5 class="section-title">توضیحات</h5>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <span>{{ result.description }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Petition Writer Information (for PetitionWriterLicense documents) -->
       <div *ngIf="result.petitionWriterInfo" class="petition-writer-details">
         <div class="detail-section-header">

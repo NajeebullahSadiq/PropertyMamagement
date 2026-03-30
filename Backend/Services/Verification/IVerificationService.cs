@@ -98,6 +98,15 @@ namespace WebAPIBackend.Services.Verification
         
         // Petition Writer information (for PetitionWriterLicense documents)
         public PetitionWriterInfoDto? PetitionWriterInfo { get; set; }
+        
+        // Vehicle details (for VehicleDocument)
+        public string? PlateNumber { get; set; }
+        public string? VehicleType { get; set; }
+        public string? VehicleModel { get; set; }
+        public string? EngineNumber { get; set; }
+        public string? ChassisNumber { get; set; }
+        public string? VehicleColor { get; set; }
+        public string? Description { get; set; }
     }
 
     /// <summary>

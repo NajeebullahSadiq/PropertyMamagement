@@ -63,6 +63,15 @@ export interface DocumentVerificationDto {
   sellerInfo?: SellerInfoDto;
   buyerInfo?: BuyerInfoDto;
   petitionWriterInfo?: PetitionWriterInfoDto;
+  
+  // Vehicle details
+  plateNumber?: string;
+  vehicleType?: string;
+  vehicleModel?: string;
+  engineNumber?: string;
+  chassisNumber?: string;
+  vehicleColor?: string;
+  description?: string;
 }
 
 export interface WitnessInfoDto {

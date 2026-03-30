@@ -43,4 +43,11 @@ export class VehicleService {
   getVehicleViewById(id: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/View/${id}`);
   }
+
+  /**
+   * Upload vehicle document (seta)
+   */
+  uploadVehicleDocument(formData: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/SetaDocument/upload`, formData);
+  }
 }

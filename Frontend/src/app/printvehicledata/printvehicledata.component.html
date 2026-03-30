@@ -1,522 +1,287 @@
 
-<!-- Print Mode Selection Dialog -->
-<div *ngIf="showPrintOptions && !isLoading && !loadError" class="print-options-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 99999;">
-    <div class="print-options-dialog" style="background: white; border-radius: 12px; padding: 40px; max-width: 600px; width: 90%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);">
-        <h2 style="text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 24px;">
-            <i class="fas fa-print"></i> انتخاب نوع چاپ
-        </h2>
-        <p style="text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 16px;">
-            لطفاً نوع چاپ مورد نظر خود را انتخاب کنید
-        </p>
-        
-        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
-            <button (click)="setPrintMode('full')" style="flex: 1; padding: 30px 20px; border: 2px solid #3498db; border-radius: 8px; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <i class="fas fa-file-alt" style="font-size: 48px; color: #3498db;"></i>
-                <span style="font-size: 18px; font-weight: bold; color: #2c3e50;">چاپ با دیزاین کامل</span>
-                <span style="font-size: 14px; color: #7f8c8d;">برای کاغذ سفید A4</span>
-            </button>
-            
-            <button (click)="setPrintMode('data-only')" style="flex: 1; padding: 30px 20px; border: 2px solid #27ae60; border-radius: 8px; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <i class="fas fa-align-left" style="font-size: 48px; color: #27ae60;"></i>
-                <span style="font-size: 18px; font-weight: bold; color: #2c3e50;">چاپ فقط معلومات</span>
-                <span style="font-size: 14px; color: #7f8c8d;">برای فورم چاپ شده</span>
-            </button>
-        </div>
-        
-        <button (click)="cancelPrint()" style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; color: #7f8c8d; cursor: pointer; font-size: 16px;">
-            <i class="fas fa-times"></i> لغو
-        </button>
-    </div>
+<!-- Print Mode Selection Buttons - Always visible on screen, hidden when printing -->
+<div class="no-print"
+    style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center;">
+    <span style="font-weight: bold; color: #2c3e50;">انتخاب:</span>
+    <button (click)="setPrintMode('new-design')" [style.background]="printMode === 'new-design' ? '#9b59b6' : 'white'"
+        [style.color]="printMode === 'new-design' ? 'white' : '#9b59b6'"
+        style="padding: 10px 20px; border: 2px solid #9b59b6; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-th-large"></i> طراحی جدید
+    </button>
+    <button (click)="setPrintMode('upload-docts')" [style.background]="printMode === 'upload-docts' ? '#e67e22' : 'white'"
+        [style.color]="printMode === 'upload-docts' ? 'white' : '#e67e22'"
+        style="padding: 10px 20px; border: 2px solid #e67e22; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-upload"></i> افلوډ سټه
+    </button>
+    <button (click)="printPage()"
+        style="padding: 10px 20px; border: 2px solid #27ae60; background: #27ae60; color: white; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-print"></i> چاپ
+    </button>
+    <button (click)="cancelPrint()"
+        style="padding: 10px 20px; border: 2px solid #95a5a6; background: white; color: #95a5a6; border-radius: 6px; cursor: pointer;">
+        <i class="fas fa-times"></i> بستن
+    </button>
 </div>
 
-<div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column;">
+<div *ngIf="isLoading"
+    style="display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column;">
     <div style="text-align: center;">
-        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+        <div
+            style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;">
+        </div>
         <p style="margin-top: 20px; font-size: 16px; color: #555;">در حال بارگذاری اطلاعات واسطه...</p>
     </div>
 </div>
 
-<div *ngIf="loadError" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column;">
+<div *ngIf="loadError"
+    style="display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column;">
     <div style="text-align: center; padding: 20px;">
         <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 20px;"></i>
         <h3 style="color: #e74c3c; margin-bottom: 10px;">خطا در بارگذاری</h3>
         <p style="color: #555;">{{errorMessage}}</p>
-        <button onclick="window.close()" style="margin-top: 20px; padding: 10px 20px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">بستن</button>
+        <button type="button" onclick="window.close()"
+            style="margin-top: 20px; padding: 10px 20px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">بستن</button>
     </div>
 </div>
 
-<div class="container" *ngIf="!isLoading && !loadError" [class.data-only-mode]="printMode === 'data-only'">
-    <br *ngIf="printMode === 'full'">
-    <div class="dot-line" *ngIf="printMode === 'full'"></div>
-    <br *ngIf="printMode === 'full'">
-    <table>
-        <tr >
-          <td  colspan="4">
-            <img [src]="SellerfilePath" alt="Seller Photo" style="height: 100px; width:95px;">
-            <p><strong>عکس مالک</strong></p>
-            <p><strong>تاریخ معامله: &nbsp;{{documentData.createdAt | calendarDate}}</strong></p>
-          </td>
-          <td style="text-align: center;" colspan="4">
-            <p><u><b style="font-size: 20px;">ای کسانیکه ایمان آورده اید به قراردادها وفا کنید. </b></u><span ><b> (مایده آیه اول) </b></span></p>
-           
-            <h3  style="font-size: 24px;font-weight: bold;">دفتر رهنمایی معاملات <span>(</span><span>  {{userDetails.companyName}}</span><span>)</span></h3>
-            <h3 ><b style="font-size: 24px;">شماره تماس دفتر:</b> <span style="font-size: 22px; font-weight: bold;">  {{userDetails.phoneNumber}}  </span></h3>
-            <br>
-            <h3  style="font-size: 22px;font-weight: bold;">سته/سند معامله بیع قطعی (خرید و فروش وسایط)</h3>
-            
-            <!-- QR Code in Header - Centered -->
-            <div *ngIf="verificationCode" style="margin: 5px auto; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <img [src]="qrCodeUrl" alt="QR Code" style="width: 85px; height: 85px; border: 2px solid #1976d2; padding: 2px; background: white; display: block;" *ngIf="qrCodeUrl">
-                <p style="margin: 2px 0; font-size: 10.5px; font-weight: bold; color: #1976d2; text-align: center;">{{ verificationCode }}</p>
-                <p style="margin: 1px 0; font-size: 9.5px; color: #555; text-align: center;">کود تصدیق سند</p>
-            </div>
-          </td>
-          <td  colspan="4">
-            <img [src]="BuyerfilePath" style="height: 100px; width:95px;">
-            <p><strong>عکس مشتری</strong></p>
-          </td>
-        </tr> 
-        </table>
-    
-        <div class="container">
-            <div dir="rtl" style="text-align:center">
-                <table cellspacing="0" cellpadding="0" style="width:100%; border-collapse:collapse;">
-                    <tbody>
-                       
-                        <tr style="height:2.5pt;">
-                            <td colspan="13" style="width:555.15pt; border-top-style:solid; border-top-width:1.5pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; font-size:1pt;"><span dir="ltr">&nbsp;</span></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:21pt;">
-                            <td colspan="4" style="width:160.65pt; border-style:solid; border-width:1pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مالک ملکیت</span></strong></p>
-                            </td>
-                            <td colspan="6" style="width:223.15pt; border-style:solid; border-width:1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">مشخصات و قیمت واسطه </span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:149.75pt; border-style:solid; border-width:1pt 0.75pt 0.75pt 1pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت مکمل مشتری</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:18.75pt;">
-                            <td rowspan="3" style="width:18.15pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">اسم</span></strong></p>
-                            </td>
-                            <td colspan="3" rowspan="3" style="width:131.7pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr"><strong>{{documentData.sellerFirstName}}</strong></span></p>
-                            </td>
-                            <td colspan="3" style="width:75.95pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">نمبر جواز سیر</span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.permitNo}}</span></strong></p>
-                            </td>
-                            <td rowspan="3" style="width:18.1pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">اسم</span></strong></p>
-                            </td>
-                            <td colspan="2" rowspan="3" style="width:120.85pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:1pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr"><strong>{{documentData.buyerFirstName}}</strong></span></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:5.45pt;">
-                            <td colspan="3" style="width:75.95pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';"> نمبر پلیت</span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.pilateNo}}</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:23pt;">
-                            <td colspan="3" style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">نوعیت</span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.typeOfVehicle}}</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:11.75pt;">
-                            <td rowspan="3" style="width:18.15pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">ولد</span></strong></p>
-                            </td>
-                            <td colspan="3" rowspan="3" style="width:131.7pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong>{{documentData.sellerFatherName}}</strong></p>
-                            </td>
-                            <td colspan="3"  style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">مودل </span></strong><strong>:&nbsp;</strong></p>
-                            </td>
-                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.model}}</span></strong></p>
-                            </td>
-                            <td rowspan="3" style="width:18.1pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">ولد</span></strong></p>
-                            </td>
-                            <td colspan="2" rowspan="3" style="width:120.85pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:1pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong>{{documentData.buyerFatherName}}</strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr>
-                           
-                            <td colspan="3" style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">نمبر انجن</span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.enginNo}}</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td> 
-                        </tr>
-                        
-                        <tr style="height:17.5pt;">
-                            <td colspan="3" style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">نمبر شاسی</span></strong><strong>:</strong></p>
-                            </td>
-                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.shasiNo}}</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:18.75pt;">
-                            <td rowspan="4" style="width:18.15pt; height:18.75pt; margin-right:auto; margin-left:auto; writing-mode:tb-rl; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle; overflow:hidden;">
-                                <div>
-                                    <p dir="rtl" style="margin:0pt 5.65pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">شماره تذکره</span></strong></p>
-                                </div>
-                            </td>
-                            <td colspan="3" rowspan="4">
-                                <div>
-                                    <p><strong>{{documentData.sellerIndentityCardNumber}}</strong></p>
-                                </div>
-                            </td>
-                            <td colspan="3" style="width:75.95pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';"> رنگ </span></strong><strong>:</strong></p>
-                            </td>
-                            <td colspan="3" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.color}}</span></strong></p>
-                            </td>
-                            <td rowspan="4" style="width:18.1pt; height:18.75pt; margin-right:auto; margin-left:auto; writing-mode:tb-rl; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle; overflow:hidden;">
-                                <div>
-                                    <p dir="rtl" style="margin:0pt 5.65pt; font-size:11pt;"><strong><span style="font-family:'B Nazanin';">شماره تذکره</span></strong></p>
-                                </div>
-                            </td>
-                            <td colspan="2" rowspan="4" style="width:120.85pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:1pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong>{{documentData.buyerIndentityCardNumber}}</strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:8.15pt;">
-                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">قیمت به عدد</span></strong><strong>:&nbsp;</strong></p>
-                            </td>
-                            <td colspan="4" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.price}}</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:16.1pt;">
-                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';"> قیمت به حروف</span></strong><strong>:</strong></p>
-                            </td>
-                            <td colspan="4" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.priceText}}</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:21.45pt;">
-                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">مناصفه قیمت</span></strong><strong>:</strong></p>
-                            </td>
-                            <td colspan="4" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.price/2}}</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:3.55pt;">
-                            <td colspan="4" style="width:160.65pt; border-style:solid; border-width:0.75pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت اصلی</span></strong></p>
-                            </td>
-                            <td colspan="2" style="width:29.45pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">مبلغ حق الامتیاز</span></strong><strong>:</strong></p>
-                            </td>
-                            <td colspan="4" style="width:136.4pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p  style="margin-top:0pt; margin-bottom:0pt; font-size:12pt; text-align: center;"><strong><span style="font-family:'B Nazanin';">{{documentData.royaltyAmount}}</span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:149.75pt; border-style:solid; border-width:0.75pt 0.75pt 0.75pt 1pt; padding-right:4.9pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت اصلی</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:15.5pt;">
-                            <td colspan="4" rowspan="5" style="width:160.65pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.sellerProvince}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.sellerDistrict}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.sellerVillage}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr">&nbsp;</span></p>
-                            </td>
-                            <td colspan="4" style="vertical-align:top;"><br></td>
-                            <td colspan="2" style="vertical-align:top;"><br></td>
-                            <td colspan="3" rowspan="5" style="width:149.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.buyerProvince}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.buyerDistrict}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.buyerVillage}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><span dir="ltr">&nbsp;</span></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:18.4pt;">
-                            <td colspan="4" style="vertical-align:top; text-align:right;"><strong>جزئیات: </strong><strong>{{documentData.description}}</strong></td>
-                           
-                           
-                        </tr>
-                        <tr style="height:16.85pt;">
-                            <td colspan="4" style="vertical-align:top;"><br></td>
-                            <td colspan="2" style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:13.05pt;">
-                            <td colspan="4" style="vertical-align:top;"><br></td>
-                            <td colspan="2" style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:38.2pt;">
-                            <td colspan="6" rowspan="2" style="width:223.15pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شهرت شهود</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:4.9pt;">
-                            <td colspan="4" style="width:160.65pt; border-style:solid; border-width:0.75pt 1pt 0.75pt 0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت فعلی</span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:149.75pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:center; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">سکونت فعلی</span></strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:19.95pt;">
-                            <td colspan="4" rowspan="2" style="width:160.65pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.tSellerProvince}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.tSellerDistrict}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.tSellerVillage}}</strong></p>
-         
-                            </td>
-                            <td style="width:24.9pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شماره</span></strong></p>
-                            </td>
-                            <td colspan="3" style="width:46.5pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">اسم</span></strong></p>
-                            </td>
-                            <td style="width:47.7pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">ولد</span></strong></p>
-                            </td>
-                            <td style="width:71.65pt; border-style:solid; border-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شماره تذکره</span></strong></p>
-                            </td>
-                            <td colspan="3" rowspan="2" style="width:149.75pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولایت:&nbsp;&nbsp;{{documentData.tBuyerProvince}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>ولسوالی/ناحیه:&nbsp;&nbsp;{{documentData.tBuyerDistrict}}</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;">&nbsp;</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:justify; font-size:12pt;"><strong>قریه/گذر:&nbsp;&nbsp;{{documentData.tBuyerVillage}}</strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:50.7pt;">
-                            <td style="width:24.9pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;">1</p>
-                            </td>
-                            <td colspan="3" style="width:46.5pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessOneFirstName}}&nbsp;</strong></p>
-                            </td>
-                            <td style="width:47.7pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessOneFatherName}}&nbsp;</strong></p>
-                            </td>
-                            <td style="width:71.65pt; border-top-style:solid; border-top-width:0.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessOneIndentityCardNumber}}&nbsp;</strong></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:5.4pt;">
-                            <td colspan="4" style="width:160.65pt; border-right-style:solid; border-right-width:1pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:4.9pt; vertical-align:middle;">
-                               
-                            </td>
-                            <td style="width:24.9pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-left:5.65pt; margin-bottom:0pt; font-size:12pt;">2</p>
-                            </td>
-                            <td colspan="3" style="width:46.5pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-right:5.65pt; margin-bottom:0pt; font-size:12pt;"><span dir="ltr">&nbsp;<strong>{{documentData.witnessTwoFirstName}}</strong></span></p>
-                            </td>
-                            <td style="width:47.7pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-right:5.65pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessTwoFatherName}}&nbsp;</strong></p>
-                            </td>
-                            <td style="width:71.65pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>{{documentData.witnessTwoIndentityCardNumber}}&nbsp;</strong></p>
-                            </td>
-                            <td colspan="3" style="width:149.75pt; border-right-style:solid; border-right-width:0.75pt; border-left-style:solid; border-left-width:0.75pt; border-bottom-style:solid; border-bottom-width:0.75pt; padding-right:5.03pt; padding-left:5.03pt; vertical-align:middle;">
-                              
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-
-
-                <table>
-                    <tbody>
-                        <tr>
-                            <td colspan="13" style="width:100%;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><strong><u><span style="font-family:'B Nazanin';">حقوق و مکلفیت های بایع و مشتری&nbsp;</span></u></strong></p>
-                                <ol type="1" style="margin:0pt; padding-right:0pt;">
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-size:12pt;">&nbsp;</span><span style="font-family:'B Nazanin';">حق العمل رهنمای معاملات&nbsp;</span><span style="font-family:'B Nazanin';">یک فیصد بوده که با المناصفه توسط فروشنده و مشتری قابل پرداخت می باشد</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">اینجانب فروشنده که شهرتم در این سند درج می باشد ملکیت مندرج این سند از شخص بنده بوده و هیچ دعوای در رابطه به آن از طرف افراد و اشخاص موجود نمی باشد در صورت بروز، مسول و جوابگو می باشم</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">فروشنده و مشتری مكلف اند به رویت تذکره و اسناد یکدیگر را شناسایی و تضمين خط معتبر را اخذ نمایند تا آینده باعث سرگردانی و دچار مشکل نگردند و یک کاپی تضمین خط در دفتر رهنمای معاملات ثبت و قید می گردد</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">تکس و مالیه جایداد بر عهده فروشنده می باشد</span>.</li>
-                                    <li dir="rtl" style="margin-right:31.94pt; text-align:right; padding-right:4.06pt; font-size:11pt;"><span style="font-family:'B Nazanin';">فروشنده و مشتری می توانند این سند را جهت صحت آن در مرکز به وزارت عدلیه و در ولایات به ریاست عدلیه مربوط ارایه دارند</span>.</li>
-                                </ol>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-right:18pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><strong><u><span style="font-family:'B Nazanin';">مکلفیت های دارنده جواز رهنمای معاملات</span></u></strong></p>
-                                <ol start="6" type="1" style="margin:0pt; padding-right:0pt;">
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">هرگاه معامله بر اثر عیب، غبن، فریب و سایر تخلفات مطابق احکام قانون فسخ گردد، دارنده جواز نامه مکلف اسن، حق العمل اخذ شده را به متضرر معامله مسترد نماید و هرگاه به توافق طرفین انجام ولی فسخ گردد مسترد نمی گردد</span>.</li>
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">متصدی رهنمای معاملات مسئول و مکلف است تا معاملات خویش را به ملاحظه اسناد مدار اعتبار به حضور داشت مالک جایداد یا وکیل قانونی آنها در حضور دو نفر شاهد انجام دهد</span>.</li>
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">اين سند به داخل چهار نقل مي باشدکه يك نقل نزد فروشنده، یک نقل نزد مشتری یک نقل به شعبات مالیاتی و نقل دیگر آن بعد از درج در کتاب ثبت معاملات به حیث کنده در دفتر رهنمای معاملات حفظ می گردد</span>.</li>
-                                    <li dir="rtl" style="margin-right:32.76pt; text-align:right; padding-right:3.24pt; font-size:12pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام و ثبت معاملات درسته های کاپی،جعلی وخودساخته وسته های بدون مهرو نشانی شد اداره انسجام،</span></li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">ایجاد یک دفتر مشخص جهت فعالیت و اجتناب از حق العمل&nbsp;</span>(<span style="font-family:'B Nazanin';">کمیشن</span>) <span style="font-family:'B Nazanin';">اضافه خلاف اصول و مقررات</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">دارنده جواز نمی تواند بر اساس جواز تاریخ گذشته، معاملات را ثبت و یا فعالیت نماید و مکلف است یک ماه قبل از تاریخ ختم، جواز نامه رهنمای معاملات را تمدید نماید</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">تحریر سند بعد از حصول اطمینان از سند مدار اعتبار در حضور و بعد از موافقه طرفین معامله، نصب عکس، اخذ شصت و امضای آنها و درج مهر و امضای دفتر رهنمای معاملات در سته، و ثبت آن در کتاب ثبت معاملات</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:12pt;">&nbsp;<span style="font-family:'B Nazanin';">اجتناب از اخذ شصت و امضای اشخاص دیگر بجای فروشنده و مشتری</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:11pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق کتاب ثبت</span>.</li>
-                                    <li dir="rtl" style="margin-right:36pt; text-align:right; font-size:11pt;"><span style="font-family:'B Nazanin';">موجودیت همیشگی حضور دارنده جواز،اصل جواز، مهر، سته ها، کتاب ثبت و لوحه در دفتر و ارایه آن به هیت نظارت جهت بررسی و تصفیه مالیه بصورت سالانه مطابق سته و کتاب ثبت معاملات</span></li>
-                                    <li dir="rtl" style="margin-right:36pt; margin-bottom:10pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">اجتناب از انجام معاملات و ثبت ملکیت های، دولتی، عامه، غصبی، تحت استملاک و یا جایداد های که تحت تضمین باشند</span></li>
-                                </ol>
-                            </td>
-                            <td colspan="2" style="width:100.65pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:10pt; line-height:115%; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:10pt; line-height:115%; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
-                        <tr style="height:14.65pt;">
-                            <td colspan="13" rowspan="2" style="width:555.15pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; text-align:right; font-size:12pt;"><span style="font-family:'B Nazanin';">مایان فروشنده، مشتری در حالیکه دارای اهلیت کامل شرعی و حقوقی هستیم، با قبول حقوق و مکلفیت های خویش مندرج در این سند با هم به موافقه رسیده و در اقرار خویش صادق مي باشیم</span>.</p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';"> شصت و امضای بایع  &nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای مشتری</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>&nbsp;</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد&nbsp;</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong></strong><strong><span style="font-family:'B Nazanin';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></strong><strong><span style="font-family:'B Nazanin';">شصت و امضای شاهد</span></strong><strong>(</strong><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong><strong>)</strong></p>
-                                <br>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><strong>مهر و امضای دارنده جواز رهنمایی معاملات</strong></p>
-                                <p dir="rtl" style="margin-top:0pt; margin-bottom:0pt; font-size:12pt;"><span dir="ltr">&nbsp;</span></p>
-                            </td>
-                            <td style="width:94.75pt; padding-right:5.4pt; padding-left:5.4pt; vertical-align:middle;">
-                                <p dir="ltr" style="margin-top:0pt; margin-bottom:10pt; line-height:115%; font-size:11pt;"><span dir="ltr">&nbsp;</span></p>
-                            </td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                            <td style="vertical-align:top;"><br></td>
-                        </tr>
+<!-- Upload Docts Section -->
+<div *ngIf="printMode === 'upload-docts'" class="no-print"
+    style="display: flex; justify-content: center; align-items: center; min-height: 80vh; padding-top: 100px;">
+    <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); max-width: 500px; width: 100%; direction: rtl;">
+        <h2 style="text-align: center; color: #e67e22; margin-bottom: 30px; font-size: 24px;">
+            <i class="fas fa-upload"></i> افلوډ سټه
+        </h2>
         
-                    
-                       
-                       
-                    </tbody>
-                </table>
-            </div>
-          
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; font-size: 14px;">
+                سټه نمبر:
+            </label>
+            <input type="text" [(ngModel)]="uploadSetaNumber" placeholder="سټه نمبر را وارد کنید"
+                style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; direction: rtl; transition: border-color 0.3s;">
         </div>
+
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; font-size: 14px;">
+                انتخاب فایل:
+            </label>
+            <div style="position: relative;">
+                <input #fileInput type="file" (change)="onFileSelected($event)"
+                    style="display: none;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                <button type="button" (click)="fileInput.click()"
+                    style="width: 100%; padding: 15px; border: 2px dashed #e67e22; border-radius: 8px; background: #fff5eb; color: #e67e22; font-size: 14px; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-file-upload" style="margin-left: 8px;"></i>
+                    {{ selectedFile ? selectedFile.name : 'فایل را انتخاب کنید' }}
+                </button>
+            </div>
+            <p style="margin-top: 8px; font-size: 12px; color: #7f8c8d;">
+                فرمت‌های مجاز: PDF, JPG, PNG, DOC, DOCX
+            </p>
+        </div>
+
+        <div *ngIf="uploadError" style="margin-bottom: 20px; padding: 12px; background: #fee; border: 1px solid #e74c3c; border-radius: 8px; color: #e74c3c; text-align: center;">
+            <i class="fas fa-exclamation-circle"></i> {{ uploadError }}
+        </div>
+
+        <div *ngIf="uploadMessage" style="margin-bottom: 20px; padding: 12px; background: #e8f5e9; border: 1px solid #27ae60; border-radius: 8px; color: #27ae60; text-align: center;">
+            <i class="fas fa-check-circle"></i> {{ uploadMessage }}
+        </div>
+
+        <button type="button" (click)="uploadDocument()" [disabled]="isUploading"
+            style="width: 100%; padding: 15px; background: linear-gradient(135deg, #e67e22, #f39c12); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+            [style.opacity]="isUploading ? '0.7' : '1'"
+            [style.cursor]="isUploading ? 'not-allowed' : 'pointer'">
+            <span *ngIf="!isUploading"><i class="fas fa-cloud-upload-alt"></i> افلوډ</span>
+            <span *ngIf="isUploading"><i class="fas fa-spinner fa-spin"></i> در حال افلوډ...</span>
+        </button>
+    </div>
+</div>
+
+<!-- ==================== NEW DESIGN TEMPLATE ==================== -->
+<div class="container new-design-container" *ngIf="!isLoading && !loadError && printMode === 'new-design'" dir="rtl"
+    style="font-family: 'B Nazanin', Arial, sans-serif; padding: 5mm; max-width: 210mm; margin: 0 auto; font-size: 9pt;">
+
+    <!-- Section 1: Company Information Header - Simple -->
+    <div class="company-header" style="border: 1px solid #2c3e50; padding: 2mm; margin-bottom: 3mm; background: #f8f9fa;">
+        <p style="margin: 1mm 0; font-size: 9pt; text-align: center;"><u><b>ای کسانیکه ایمان آورده اید به قراردادها وفا کنید.</b></u><b> (مایده آیه اول)</b></p>
+        <table style="width: 100%; table-layout: fixed; font-size: 8pt; margin: 1mm 0;">
+            <tr>
+                <td style="width: 33.33%; text-align: right;"><b>دفتر رهنمایی معاملات ({{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || 'ادمین'}})</b></td>
+                <td style="width: 33.33%; text-align: center;"><b></b> </td>
+                <td style="width: 33.33%; text-align: left;"><b>شماره تماس:</b> {{userDetails.phoneNumber}}</td>
+            </tr>
+            <tr>
+                <td style="width: 33.33%; text-align: right; color: #c0392b; font-size: 7pt; white-space: nowrap;"><b>توجه:</b> انجام معامله در کاپی و یا سکن این سند با اسکن این سند باطل و مدار اعتبار نمی باشد</td>
+                <td style="width: 33.33%; text-align: center;"></td>
+                <td style="width: 33.33%; text-align: left; font-size: 7pt;"><b>قیمت سند:</b> 33.3 افغانی</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 2: Vehicle Information Table - Compact -->
+    <div class="vehicle-section" style="margin-bottom: 3mm;">
+        <h3 style="margin: 0 0 1mm 0; font-size: 9pt; color: #3498db; text-align: center; background: #e3f2fd; padding: 1mm;">سته/سند معامله بیع قطعی (خرید و فروش وسایط)</h3>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 8pt;">
+            <tr style="background: #e8e8e8;">
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نمبر جواز سیر</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.permitNo}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نمبر پلیت</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.pilateNo}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نوعیت</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.typeOfVehicle}}</td>
+            </tr>
+            <tr>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>مودل</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.model}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نمبر انجن</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.enginNo}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نمبر شاسی</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.shasiNo}}</td>
+            </tr>
+            <tr style="background: #e8e8e8;">
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>رنگ</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.color}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قیمت (عدد)</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.price}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>مناصفه قیمت</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.price/2}}</td>
+            </tr>
+            <tr>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قیمت (حروف)</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;" colspan="3">{{documentData.priceText}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>مبلغ حق الامتیاز</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.royaltyAmount}}</td>
+            </tr>
+            <tr style="background: #e8e8e8;">
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>تاریخ معامله</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;" colspan="5">{{documentData.createdAt | calendarDate}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 3: Seller/Owner Table - Compact -->
+    <div class="seller-section" style="margin-bottom: 3mm;">
+        <h3 style="margin: 0 0 1mm 0; font-size: 8pt; color: #27ae60; text-align: center; background: #e8f5e9; padding: 1mm;">مالک / فروشنده</h3>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt;">
+            <thead>
+                <tr style="background: #27ae60; color: white;">
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت (فعلی)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی (فعلی)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه (فعلی)</th>
+                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm;">عکس</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerFirstName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerFatherName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerIndentityCardNumber}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerProvinceDari || documentData.sellerProvince}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerDistrictDari || documentData.sellerDistrict}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerVillage}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tSellerProvinceDari || documentData.tSellerProvince}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tSellerDistrictDari || documentData.tSellerDistrict}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tSellerVillage}}</td>
+                    <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
+                        <img [src]="SellerfilePath" alt="Owner" style="width: 10mm; height: 12mm; object-fit: cover;">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section 4: Buyer Table - Compact -->
+    <div class="buyer-section" style="margin-bottom: 3mm;">
+        <h3 style="margin: 0 0 1mm 0; font-size: 8pt; color: #e67e22; text-align: center; background: #fff3e0; padding: 1mm;">مشتری / خریدار</h3>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt;">
+            <thead>
+                <tr style="background: #e67e22; color: white;">
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت فعلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی فعلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه فعلی</th>
+                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm;">عکس</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerFirstName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerFatherName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerIndentityCardNumber}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerProvinceDari || documentData.buyerProvince}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerDistrictDari || documentData.buyerDistrict}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerVillage}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tBuyerProvinceDari || documentData.tBuyerProvince}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tBuyerDistrictDari || documentData.tBuyerDistrict}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tBuyerVillage}}</td>
+                    <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
+                        <img [src]="BuyerfilePath" alt="Buyer" style="width: 10mm; height: 12mm; object-fit: cover;">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section 5: Witnesses Table - Compact -->
+    <div class="witnesses-section" style="margin-bottom: 3mm;">
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt; direction: rtl;">
+            <thead>
+                <tr style="background: #9b59b6; color: white;">
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم شاهد اول</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم شاهد دوم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessOneFirstName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessOneFatherName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessOneIndentityCardNumber}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessTwoFirstName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessTwoFatherName}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessTwoIndentityCardNumber}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section 6: Description -->
+    <div class="description-section" style="margin-bottom: 3mm;" *ngIf="documentData.description">
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt;">
+            <tr style="background: #f5f5f5;">
+                <td style="padding: 1mm 2mm; border: 1px solid #333; width: 20%;"><b>جزئیات:</b></td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.description}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 7: Fixed QR Code with Transaction Record -->
+    <div class="qr-section"
+        style="position: fixed; bottom: 5mm; left: 0; right: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 5mm; background: white; padding: 2mm; border: 1px solid #1976d2; direction: rtl;"
+        *ngIf="verificationCode">
+        <div style="display: flex; align-items: center; gap: 2mm;">
+            <img [src]="qrCodeUrl" alt="QR Code" style="width: 15mm; height: 15mm;" *ngIf="qrCodeUrl">
+            <div style="text-align: right; white-space: nowrap;">
+                <p style="margin: 0; font-size: 7pt; font-weight: bold; color: #1976d2;">{{ verificationCode }}</p>
+                <p style="margin: 0; font-size: 6pt; color: #555;">کود تصدیق سند</p>
+            </div>
+        </div>
+        <div style="flex-grow: 1; text-align: right; font-size: 8pt; white-space: nowrap;">
+            معامله این سند به شماره (                        ) صفحه (                ) کتاب معاملات درج گردید.
+        </div>
+    </div>
+
 </div>
