@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MatSidenav } from '@angular/material/sidenav';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
 import { ChangepasswordComponent } from 'src/app/auth/changepassword/changepassword.component';
 import { ResetpasswordComponent } from 'src/app/auth/resetpassword/resetpassword.component';
 import { LockuserComponent } from 'src/app/auth/lockuser/lockuser.component';
@@ -78,7 +79,8 @@ export class MasterlayoutComponent implements AfterViewInit {
     public dialog: MatDialog,
     public service: AuthService,
     public rbacService: RbacService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService
   ) {
     translate.addLangs(['English', 'دری']);
     translate.setDefaultLang('دری');
@@ -207,6 +209,24 @@ export class MasterlayoutComponent implements AfterViewInit {
       maxWidth: '95vw',
       hasBackdrop: true,
       disableClose: false
+    });
+  }
+
+  refreshPermissions(): void {
+    this.closeAllMenus();
+    this.rbacService.refreshPermissions().subscribe({
+      next: (response) => {
+        this.toastr.success('دسترسی‌های شما به‌روز شد. صفحه در حال بارگذاری مجدد است...', 'موفق');
+        // Reload permissions
+        this.loadUserPermissions();
+        // Reload the page to refresh all components with new permissions
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      },
+      error: (err) => {
+        this.toastr.error('خطا در به‌روزرسانی دسترسی‌ها', 'خطا');
+      }
     });
   }
 }

@@ -35,6 +35,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.S
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 //Policy Base Authorization
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, WebAPIBackend.Authorization.PermissionPolicyProvider>();
+builder.Services.AddScoped<IAuthorizationHandler, WebAPIBackend.Authorization.PermissionAuthorizationHandler>();
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(PolicyTypes.Users.View, policy => { policy.RequireClaim(CustomClaimTypes.Permission, UserPermissions.View); });

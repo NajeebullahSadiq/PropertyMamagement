@@ -50,6 +50,10 @@
     <mat-icon class="text-gray-500">lock</mat-icon>
     <span>تغیر پسورد</span>
   </button>
+  <button (click)="refreshPermissions()" class="dropdown-item">
+    <mat-icon class="text-gray-500">refresh</mat-icon>
+    <span>به‌روزرسانی دسترسی‌ها</span>
+  </button>
   <button *ngIf="canAccessUsers" (click)="openReset()" class="dropdown-item">
     <mat-icon class="text-gray-500">lock_reset</mat-icon>
     <span>باز نشانی پسورد</span>

@@ -86,12 +86,14 @@ namespace WebAPIBackend.Services
             try
             {
                 // Acquire advisory lock (will wait if another transaction holds it)
+                #pragma warning disable EF1002 // SQL injection risk is mitigated - lockKey is an integer
                 await _context.Database.ExecuteSqlRawAsync($"SELECT pg_advisory_xact_lock({lockKey})");
+                #pragma warning restore EF1002
                 
                 // Get all license numbers for this province and find the max numeric value
                 var licenses = await _context.LicenseDetails
                     .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
-                    .Select(l => l.LicenseNumber)
+                    .Select(l => l.LicenseNumber!)
                     .ToListAsync();
 
                 int nextNumber = 1;
@@ -145,12 +147,14 @@ namespace WebAPIBackend.Services
             try
             {
                 // Acquire advisory lock (will wait if another transaction holds it)
+                #pragma warning disable EF1002 // SQL injection risk is mitigated - lockKey is an integer
                 await _context.Database.ExecuteSqlRawAsync($"SELECT pg_advisory_xact_lock({lockKey})");
+                #pragma warning restore EF1002
                 
                 // Get all license numbers for this province and find the max numeric value
                 var licenses = await _context.PetitionWriterLicenses
                     .Where(l => l.LicenseNumber != null && l.LicenseNumber.StartsWith(provinceCode + "-"))
-                    .Select(l => l.LicenseNumber)
+                    .Select(l => l.LicenseNumber!)
                     .ToListAsync();
 
                 int nextNumber = 1;
@@ -193,15 +197,15 @@ namespace WebAPIBackend.Services
                 throw new ArgumentException($"Province with ID {provinceId} not found");
             }
 
-            if (ProvinceCodeMap.TryGetValue(province.Name, out var code))
+            if (province.Name != null && ProvinceCodeMap.TryGetValue(province.Name, out var code))
             {
                 return code;
             }
 
             // Fallback: use first 3 letters of province name in uppercase
-            return province.Name.Length >= 3 
+            return (province.Name?.Length >= 3) 
                 ? province.Name.Substring(0, 3).ToUpper() 
-                : province.Name.ToUpper();
+                : (province.Name ?? "UNK").ToUpper();
         }
     }
 }

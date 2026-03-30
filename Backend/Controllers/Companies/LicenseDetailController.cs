@@ -199,7 +199,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 // DON'T generate license number on creation - it will be generated when IsComplete becomes true
                 // This prevents wasting license numbers when users abandon incomplete forms
-                string licenseNumber = null;
+                string? licenseNumber = null;
 
                 var property = new LicenseDetail
                 {
@@ -238,7 +238,10 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 // Update the IsComplete status and generate license number if complete
-                await _companyService.UpdateLicenseCompletionStatusAsync(property.CompanyId.Value);
+                if (property.CompanyId.HasValue)
+                {
+                    await _companyService.UpdateLicenseCompletionStatusAsync(property.CompanyId.Value);
+                }
 
                 var result = new { Id = property.Id };
                 return Ok(result);
@@ -435,7 +438,10 @@ namespace WebAPIBackend.Controllers.Companies
                 await _context.SaveChangesAsync();
 
                 // Update the IsComplete status based on validation
-                await _companyService.UpdateLicenseCompletionStatusAsync(existingProperty.CompanyId.Value);
+                if (existingProperty.CompanyId.HasValue)
+                {
+                    await _companyService.UpdateLicenseCompletionStatusAsync(existingProperty.CompanyId.Value);
+                }
 
                 var result = new { Id = request.Id };
                 return Ok(result);

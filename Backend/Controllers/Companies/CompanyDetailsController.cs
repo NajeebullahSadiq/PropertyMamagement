@@ -613,7 +613,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var query = _context.LicenseDetails
                     .Include(l => l.Company)
-                        .ThenInclude(c => c.CompanyOwners)
+                        .ThenInclude(c => c!.CompanyOwners)
                     .Include(l => l.Province)
                     .Where(l => l.LicenseNumber == licenseNumber);
 

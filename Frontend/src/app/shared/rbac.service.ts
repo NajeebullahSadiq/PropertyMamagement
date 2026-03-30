@@ -402,4 +402,33 @@ export class RbacService {
     this.userProfile$.next(null);
     this.permissions$.next([]);
   }
+
+  // Refresh permissions from server and update token
+  refreshPermissions(): Observable<any> {
+    return new Observable(observer => {
+      this.http.get<any>(`${this.BaseURI}/ApplicationUser/RefreshPermissions`).subscribe({
+        next: (response) => {
+          // Update token in localStorage
+          localStorage.setItem('token', response.token);
+          
+          // Reload permissions from new token
+          this.loadUserFromToken();
+          
+          // Reload user profile
+          this.loadUserProfile().subscribe({
+            next: () => {
+              observer.next(response);
+              observer.complete();
+            },
+            error: (err) => {
+              // Even if profile load fails, we have the new token
+              observer.next(response);
+              observer.complete();
+            }
+          });
+        },
+        error: (err) => observer.error(err)
+      });
+    });
+  }
 }

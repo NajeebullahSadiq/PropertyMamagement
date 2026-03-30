@@ -2,7 +2,7 @@
 {
     public class CustomClaimTypes
     {
-        public const string Permission = "Permission";
+        public const string Permission = "permission";  // Changed to lowercase to match JWT claims
         public const string ProvinceId = "province_id";
     }
 

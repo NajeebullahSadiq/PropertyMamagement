@@ -246,7 +246,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 }
 
                 // Auto-generate license number if provinceId is provided
-                string licenseNumber = data.LicenseNumber;
+                string? licenseNumber = data.LicenseNumber;
                 if (data.ProvinceId.HasValue && string.IsNullOrWhiteSpace(data.LicenseNumber))
                 {
                     licenseNumber = await _licenseNumberGenerator.GenerateNextPetitionWriterLicenseNumber(data.ProvinceId.Value);
@@ -266,7 +266,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 var entity = new PetitionWriterLicenseEntity
                 {
-                    LicenseNumber = licenseNumber,
+                    LicenseNumber = licenseNumber ?? string.Empty,
                     ProvinceId = data.ProvinceId,
                     ApplicantName = data.ApplicantName,
                     ApplicantFatherName = data.ApplicantFatherName,

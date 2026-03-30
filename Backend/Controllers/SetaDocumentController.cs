@@ -153,7 +153,7 @@ namespace WebAPIBackend.Controllers
                 }
 
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-                var contentType = GetContentType(document.FileType);
+                var contentType = GetContentType(document.FileType ?? "");
                 return File(fileBytes, contentType, document.OriginalFileName);
             }
             catch (Exception ex)

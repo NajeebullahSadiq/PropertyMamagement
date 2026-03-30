@@ -172,7 +172,7 @@ namespace WebAPIBackend.Controllers.Securities
         /// Create new securities distribution
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER,SECURITIES_ENTRY_MANAGER")]
+        [Authorize(Policy = "securities.create")]
         public async Task<IActionResult> Create([FromBody] SecuritiesDistributionData data)
         {
             try
@@ -248,7 +248,7 @@ namespace WebAPIBackend.Controllers.Securities
         /// Update securities distribution
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN,COMPANY_REGISTRAR,PROPERTY_OPERATOR,SECURITIES_MANAGER")]
+        [Authorize(Policy = "securities.edit")]
         public async Task<IActionResult> Update(int id, [FromBody] SecuritiesDistributionData data)
         {
             try
@@ -331,7 +331,7 @@ namespace WebAPIBackend.Controllers.Securities
         /// Delete (soft delete) securities distribution
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Policy = "securities.delete")]
         public async Task<IActionResult> Delete(int id)
         {
             try

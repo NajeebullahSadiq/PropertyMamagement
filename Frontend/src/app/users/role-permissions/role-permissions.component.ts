@@ -262,6 +262,13 @@ export class RolePermissionsComponent implements OnInit {
             this.activePermissions = this.toMap(fresh.permissions || []);
             this.originalPermissions = this.toMap(fresh.permissions || []);
             this.toastr.success('صلاحیت‌های نقش با موفقیت ذخیره شد');
+            
+            // Show additional warning about users needing to refresh
+            this.toastr.warning(
+              'کاربران با این نقش باید از منوی کاربری گزینه "به‌روزرسانی دسترسی‌ها" را انتخاب کنند یا دوباره وارد شوند',
+              'توجه',
+              { timeOut: 10000, closeButton: true }
+            );
           },
           error: () => {
             this.isSaving = false;

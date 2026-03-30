@@ -799,9 +799,11 @@ namespace WebAPIBackend.Configuration
                     .HasConstraintName("Guarantors_TaddressProvinceId_fkey");
 
                 // GuaranteeDistrict navigation for Customary Deed
+                #pragma warning disable CS0618 // Type or member is obsolete
                 entity.HasOne(d => d.GuaranteeDistrict).WithMany()
                     .HasForeignKey(d => d.GuaranteeDistrictId)
                     .HasConstraintName("Guarantors_GuaranteeDistrictId_fkey");
+                #pragma warning restore CS0618
 
                 // Self-referencing relationship for witness history
                 entity.HasOne(d => d.ReplacedByGuarantor)

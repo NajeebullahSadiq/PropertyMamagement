@@ -843,5 +843,88 @@ namespace WebAPI.Controllers
             public string UserId { get; set; } = "";
             public bool IsLocked { get; set; }
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("RefreshPermissions")]
+        public async Task<IActionResult> RefreshPermissions()
+        {
+            string userId = User.Claims.First(c => c.Type == "UserID").Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            
+            if (user == null)
+            {
+                return NotFound(new { message = "کاربر یافت نشد" });
+            }
+
+            // Get current role
+            var roles = await _userManager.GetRolesAsync(user);
+            var primaryRole = roles.FirstOrDefault() ?? user.UserRole ?? "USER";
+
+            // Load fresh permissions from database
+            string[] permissions;
+            var roleEntity = await _roleManager.FindByNameAsync(primaryRole);
+            if (roleEntity != null)
+            {
+                var roleClaims = await _roleManager.GetClaimsAsync(roleEntity);
+                var livePermissions = roleClaims
+                    .Where(c => c.Type == "permission")
+                    .Select(c => c.Value)
+                    .Distinct()
+                    .ToArray();
+                permissions = livePermissions.Length > 0
+                    ? livePermissions
+                    : RolePermissions.GetPermissionsForRole(primaryRole);
+            }
+            else
+            {
+                permissions = RolePermissions.GetPermissionsForRole(primaryRole);
+            }
+
+            // Generate new token with fresh permissions
+            var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
+            var customClaims = new List<Claim>
+            {
+                new Claim("UserID", user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email ?? ""),
+                new Claim(ClaimTypes.Name, user.UserName ?? ""),
+                new Claim("companyId", user.CompanyId.ToString()),
+                new Claim("licenseType", user.LicenseType ?? ""),
+                new Claim("userRole", primaryRole),
+                new Claim("isViewOnly", (primaryRole == UserRoles.Authority || primaryRole == UserRoles.LicenseReviewer).ToString().ToLower())
+            };
+
+            // Add province claim for COMPANY_REGISTRAR users
+            if (primaryRole == UserRoles.CompanyRegistrar && user.ProvinceId.HasValue)
+                customClaims.Add(new Claim(CustomClaimTypes.ProvinceId, user.ProvinceId.Value.ToString()));
+
+            // Add fresh permissions
+            foreach (var permission in permissions.Distinct())
+                customClaims.Add(new Claim("permission", permission));
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(customClaims.Union(userClaims).Union(roles.Select(r => new Claim(ClaimTypes.Role, r)))),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret ?? "")), 
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.WriteToken(securityToken);
+
+            return Ok(new { 
+                token,
+                role = primaryRole,
+                roleDari = UserRoles.GetDariName(primaryRole),
+                permissions,
+                companyId = user.CompanyId,
+                licenseType = user.LicenseType,
+                isViewOnly = primaryRole == UserRoles.Authority || primaryRole == UserRoles.LicenseReviewer,
+                message = "صلاحیت‌ها با موفقیت به‌روز شد"
+            });
+        }
     }
 }

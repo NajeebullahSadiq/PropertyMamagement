@@ -90,7 +90,9 @@ namespace WebAPIBackend.Controllers.Companies
                     // PropertyDocumentDate is kept - it's always visible
                     // Clear Customary Deed fields
                     guarantor.SetSerialNumber = null;
+                    #pragma warning disable CS0618 // Type or member is obsolete
                     guarantor.GuaranteeDistrictId = null;
+                    #pragma warning restore CS0618
                     guarantor.GuaranteeDistrictName = null;
                     break;
 
@@ -102,7 +104,9 @@ namespace WebAPIBackend.Controllers.Companies
                     guarantor.DepositDate = null;
                     // Clear Customary Deed fields
                     guarantor.SetSerialNumber = null;
+                    #pragma warning disable CS0618 // Type or member is obsolete
                     guarantor.GuaranteeDistrictId = null;
+                    #pragma warning restore CS0618
                     guarantor.GuaranteeDistrictName = null;
                     break;
 
@@ -117,7 +121,9 @@ namespace WebAPIBackend.Controllers.Companies
                     guarantor.PropertyDocumentNumber = null;
                     // PropertyDocumentDate is kept - it's always visible
                     // Keep GuaranteeDistrictName and clear legacy GuaranteeDistrictId
+                    #pragma warning disable CS0618 // Type or member is obsolete
                     guarantor.GuaranteeDistrictId = null;
+                    #pragma warning restore CS0618
                     break;
 
                 default:
@@ -125,7 +131,9 @@ namespace WebAPIBackend.Controllers.Companies
                     guarantor.CourtName = null;
                     guarantor.CollateralNumber = null;
                     guarantor.SetSerialNumber = null;
+                    #pragma warning disable CS0618 // Type or member is obsolete
                     guarantor.GuaranteeDistrictId = null;
+                    #pragma warning restore CS0618
                     guarantor.GuaranteeDistrictName = null;
                     guarantor.BankName = null;
                     guarantor.DepositNumber = null;
@@ -301,7 +309,9 @@ namespace WebAPIBackend.Controllers.Companies
                 CollateralNumber = request.CollateralNumber,
                 // Conditional fields - Customary Deed
                 SetSerialNumber = request.SetSerialNumber,
+                #pragma warning disable CS0618 // Type or member is obsolete
                 GuaranteeDistrictId = request.GuaranteeDistrictId,
+                #pragma warning restore CS0618
                 GuaranteeDistrictName = request.GuaranteeDistrictName,
                 // Conditional fields - Cash
                 BankName = request.BankName,
@@ -428,7 +438,9 @@ namespace WebAPIBackend.Controllers.Companies
             existingProperty.CollateralNumber = request.CollateralNumber;
             // Conditional fields - Customary Deed
             existingProperty.SetSerialNumber = request.SetSerialNumber;
+            #pragma warning disable CS0618 // Type or member is obsolete
             existingProperty.GuaranteeDistrictId = request.GuaranteeDistrictId;
+            #pragma warning restore CS0618
             existingProperty.GuaranteeDistrictName = request.GuaranteeDistrictName;
             // Conditional fields - Cash
             existingProperty.BankName = request.BankName;
