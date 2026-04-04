@@ -28,8 +28,12 @@ export class PrintvehicledataComponent implements OnInit {
   qrCodeUrl: string = '';
   verificationError: string | null = null;
 
-  // Print mode: 'new-design' = modern table layout, 'upload-docts' = upload documents
-  printMode: 'new-design' | 'upload-docts' = 'new-design';
+  // Print mode: 'new-design' = modern table layout, 'old-design' = traditional form overlay, 'upload-docts' = upload documents
+  printMode: 'new-design' | 'old-design' | 'upload-docts' = 'new-design';
+
+  // Old design data toggle
+  showOldDesignData: boolean = true;
+  showOldDesignBackground: boolean = true;
 
   // Upload properties
   uploadSetaNumber: string = '';
@@ -52,17 +56,32 @@ export class PrintvehicledataComponent implements OnInit {
   ngOnInit(): void {
     // Check if print mode is specified in URL
     const mode = this.route.snapshot.queryParamMap.get('mode');
-    if (mode === 'upload-docts' || mode === 'new-design') {
-      this.printMode = mode as 'new-design' | 'upload-docts';
+    if (mode === 'upload-docts' || mode === 'new-design' || mode === 'old-design') {
+      this.printMode = mode as 'new-design' | 'old-design' | 'upload-docts';
     }
     console.log('Vehicle print component initialized. Mode:', this.printMode);
     this.loadPrintData();
   }
 
-  setPrintMode(mode: 'new-design' | 'upload-docts'): void {
+  setPrintMode(mode: 'new-design' | 'old-design' | 'upload-docts'): void {
     this.printMode = mode;
+    
+    // Reset data visibility when switching to old design
+    if (mode === 'old-design') {
+      this.showOldDesignData = true;
+      this.showOldDesignBackground = true;
+    }
+    
     this.uploadError = '';
     this.uploadMessage = '';
+  }
+
+  toggleOldDesignData(): void {
+    this.showOldDesignData = !this.showOldDesignData;
+  }
+
+  toggleOldDesignBackground(): void {
+    this.showOldDesignBackground = !this.showOldDesignBackground;
   }
 
   /**

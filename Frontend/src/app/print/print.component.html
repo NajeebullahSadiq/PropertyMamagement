@@ -2,12 +2,30 @@
 <div class="no-print"
     style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center;">
     <span style="font-weight: bold; color: #2c3e50;">انتخاب:</span>
+    <button (click)="setPrintMode('old-design')" [style.background]="printMode === 'old-design' ? '#3498db' : 'white'"
+        [style.color]="printMode === 'old-design' ? 'white' : '#3498db'"
+        style="padding: 10px 20px; border: 2px solid #3498db; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-file-alt"></i> طراحی قدیم
+    </button>
+    <button *ngIf="printMode === 'old-design'" (click)="toggleOldDesignBackground()"
+        [style.background]="showOldDesignBackground ? '#e74c3c' : '#27ae60'"
+        style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white;">
+        <i [class]="showOldDesignBackground ? 'fas fa-image' : 'fas fa-ban'"></i>
+        {{ showOldDesignBackground ? 'پنهان کردن فورم' : 'نمایش فورم' }}
+    </button>
+    <button *ngIf="printMode === 'old-design'" (click)="toggleOldDesignData()"
+        [style.background]="showOldDesignData ? '#e74c3c' : '#27ae60'"
+        style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white;">
+        <i [class]="showOldDesignData ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+        {{ showOldDesignData ? 'پنهان کردن معلومات' : 'نمایش معلومات' }}
+    </button>
     <button (click)="setPrintMode('new-design')" [style.background]="printMode === 'new-design' ? '#9b59b6' : 'white'"
         [style.color]="printMode === 'new-design' ? 'white' : '#9b59b6'"
         style="padding: 10px 20px; border: 2px solid #9b59b6; border-radius: 6px; cursor: pointer; font-weight: bold;">
         <i class="fas fa-th-large"></i> طراحی جدید
     </button>
-    <button (click)="setPrintMode('upload-docts')" [style.background]="printMode === 'upload-docts' ? '#e67e22' : 'white'"
+    <button (click)="setPrintMode('upload-docts')"
+        [style.background]="printMode === 'upload-docts' ? '#e67e22' : 'white'"
         [style.color]="printMode === 'upload-docts' ? 'white' : '#e67e22'"
         style="padding: 10px 20px; border: 2px solid #e67e22; border-radius: 6px; cursor: pointer; font-weight: bold;">
         <i class="fas fa-upload"></i> افلوډ سټه
@@ -46,11 +64,12 @@
 <!-- Upload Docts Section -->
 <div *ngIf="printMode === 'upload-docts'" class="no-print"
     style="display: flex; justify-content: center; align-items: center; min-height: 80vh; padding-top: 100px;">
-    <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); max-width: 500px; width: 100%; direction: rtl;">
+    <div
+        style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); max-width: 500px; width: 100%; direction: rtl;">
         <h2 style="text-align: center; color: #e67e22; margin-bottom: 30px; font-size: 24px;">
             <i class="fas fa-upload"></i> افلوډ سټه
         </h2>
-        
+
         <div style="margin-bottom: 25px;">
             <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; font-size: 14px;">
                 سټه نمبر:
@@ -64,8 +83,8 @@
                 انتخاب فایل:
             </label>
             <div style="position: relative;">
-                <input #fileInput type="file" (change)="onFileSelected($event)"
-                    style="display: none;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                <input #fileInput type="file" (change)="onFileSelected($event)" style="display: none;"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
                 <button type="button" (click)="fileInput.click()"
                     style="width: 100%; padding: 15px; border: 2px dashed #e67e22; border-radius: 8px; background: #fff5eb; color: #e67e22; font-size: 14px; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-file-upload" style="margin-left: 8px;"></i>
@@ -77,18 +96,19 @@
             </p>
         </div>
 
-        <div *ngIf="uploadError" style="margin-bottom: 20px; padding: 12px; background: #fee; border: 1px solid #e74c3c; border-radius: 8px; color: #e74c3c; text-align: center;">
+        <div *ngIf="uploadError"
+            style="margin-bottom: 20px; padding: 12px; background: #fee; border: 1px solid #e74c3c; border-radius: 8px; color: #e74c3c; text-align: center;">
             <i class="fas fa-exclamation-circle"></i> {{ uploadError }}
         </div>
 
-        <div *ngIf="uploadMessage" style="margin-bottom: 20px; padding: 12px; background: #e8f5e9; border: 1px solid #27ae60; border-radius: 8px; color: #27ae60; text-align: center;">
+        <div *ngIf="uploadMessage"
+            style="margin-bottom: 20px; padding: 12px; background: #e8f5e9; border: 1px solid #27ae60; border-radius: 8px; color: #27ae60; text-align: center;">
             <i class="fas fa-check-circle"></i> {{ uploadMessage }}
         </div>
 
         <button type="button" (click)="uploadDocument()" [disabled]="isUploading"
             style="width: 100%; padding: 15px; background: linear-gradient(135deg, #e67e22, #f39c12); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
-            [style.opacity]="isUploading ? '0.7' : '1'"
-            [style.cursor]="isUploading ? 'not-allowed' : 'pointer'">
+            [style.opacity]="isUploading ? '0.7' : '1'" [style.cursor]="isUploading ? 'not-allowed' : 'pointer'">
             <span *ngIf="!isUploading"><i class="fas fa-cloud-upload-alt"></i> افلوډ</span>
             <span *ngIf="isUploading"><i class="fas fa-spinner fa-spin"></i> در حال افلوډ...</span>
         </button>
@@ -96,79 +116,87 @@
 </div>
 <!-- ==================== NEW DESIGN TEMPLATE ==================== -->
 <div class="container new-design-container" *ngIf="!isLoading && !loadError && printMode === 'new-design'" dir="rtl"
-    style="font-family: 'B Nazanin', Arial, sans-serif; padding: 5mm; max-width: 210mm; margin: 0 auto; font-size: 9pt;">
+    style="font-family: 'B Nazanin', Arial, sans-serif; padding: 5mm; max-width: 210mm; margin: 0 auto; font-size: 10pt; font-weight: bold;">
 
     <!-- Section 1: Company Information Header - Simple -->
-    <div class="company-header" style="border: 1px solid #2c3e50; padding: 2mm; margin-bottom: 3mm; background: #f8f9fa;">
-        <p style="margin: 1mm 0; font-size: 9pt; text-align: center;"><u><b>ای کسانیکه ایمان آورده اید به قراردادها وفا کنید.</b></u><b> (مایده آیه اول)</b></p>
-        <table style="width: 100%; table-layout: fixed; font-size: 8pt; margin: 1mm 0;">
+    <div class="company-header"
+        style="border: 1px solid #2c3e50; padding: 2mm; margin-bottom: 3mm; background: #f8f9fa;">
+        <p style="margin: 1mm 0; font-size: 11pt; text-align: center; font-weight: bold;"><u><b>ای کسانیکه ایمان آورده
+                    اید به قراردادها وفا کنید.</b></u><b> (مایده آیه اول)</b></p>
+        <table style="width: 100%; table-layout: fixed; font-size: 10pt; margin: 1mm 0; font-weight: bold;">
             <tr>
-                <td style="width: 33.33%; text-align: right;"><b>دفتر رهنمایی معاملات ({{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || 'ادمین'}})</b></td>
+                <td style="width: 33.33%; text-align: right;"><b>دفتر رهنمایی معاملات ({{userDetails.companyName ||
+                        (userDetails.firstName + ' ' + userDetails.lastName) || 'ادمین'}})</b></td>
                 <td style="width: 33.33%; text-align: center;"><b></b> </td>
                 <td style="width: 33.33%; text-align: left;"><b>شماره تماس:</b> {{userDetails.phoneNumber}}</td>
             </tr>
             <tr>
-                <td style="width: 33.33%; text-align: right; color: #c0392b; font-size: 7pt; white-space: nowrap;"><b>توجه:</b> انجام معامله در کاپی و یا سکن این سند با اسکن این سند باطل و مدار اعتبار نمی باشد</td>
+                <td style="width: 33.33%; text-align: right; color: #c0392b; font-size: 9pt; white-space: nowrap;">
+                    <b>توجه:</b> انجام معامله در کاپی و یا سکن این سند با اسکن این سند باطل و مدار اعتبار نمی باشد
+                </td>
                 <td style="width: 33.33%; text-align: center;"></td>
-                <td style="width: 33.33%; text-align: left; font-size: 7pt;"><b>قیمت سند:</b> 33.3 افغانی</td>
+                <td style="width: 33.33%; text-align: left; font-size: 9pt;"><b>قیمت سند:</b> 33.3 افغانی</td>
             </tr>
         </table>
     </div>
 
     <!-- Section 2: Property Information Table - Compact -->
     <div class="property-section" style="margin-bottom: 3mm;">
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 8pt;">
+        <table
+            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 10pt; font-weight: bold;">
             <tr style="background: #e8e8e8;">
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نوعیت سند</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{ getDocumentTypeDisplay() }}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{ getDocumentTypeDisplay() }}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{ getIssuanceNumberLabel() }}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.issuanceNumber ||
-                    documentData.pNumber}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.issuanceNumber ||
+                        documentData.pNumber}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نوعیت ملکیت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.propertypeType}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.propertypeType}}</b></td>
             </tr>
             <tr>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b> مساحت ملکیت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.pArea}} {{documentData.unitTypeDari || documentData.unitType}}
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.pArea}}
+                        {{documentData.unitTypeDari || documentData.unitType}}</b>
                 </td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>ولایت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.provinceDari ||
-                    documentData.province}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.provinceDari ||
+                        documentData.province}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>ناحیه/ولسوالی</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.districtDari ||
-                    documentData.district}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.districtDari ||
+                        documentData.district}}</b></td>
             </tr>
             <tr style="background: #e8e8e8;">
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قریه/گذر</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.village}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.village}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>شرق</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.east}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.east}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>شمال</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.north}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.north}}</b></td>
             </tr>
             <tr>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>تعداد اطاق</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.numofRooms}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.numofRooms}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>غرب</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.west}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.west}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>جنوب</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.south}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.south}}</b></td>
             </tr>
             <tr style="background: #e8e8e8;">
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قیمت (حروف)</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.priceText}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.priceText}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قیمت (عدد)</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.price}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.price}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>مناصفه قیمت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.price/2}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.price/2}}</b></td>
             </tr>
             <tr>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>حق العمل رهنما</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.royaltyAmount}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.royaltyAmount}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>تعداد منزل</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.numofHouses}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.numofHouses}}</b></td>
                 <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>واحد اندازه گیری</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;">{{documentData.unitTypeDari || documentData.unitType}}</td>
+                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.unitTypeDari ||
+                        documentData.unitType}}</b></td>
             </tr>
         </table>
     </div>
@@ -176,37 +204,46 @@
     <!-- Section 3: Owners (Sellers) Table - Compact -->
     <div class="owners-section" style="margin-bottom: 3mm;"
         *ngIf="documentData.sellers && documentData.sellers.length > 0">
-        <h3 style="margin: 0 0 1mm 0; font-size: 8pt; color: #27ae60; text-align: center; background: #e8f5e9; padding: 1mm;">مالکین / فروشندگان</h3>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt;">
+        <h3
+            style="margin: 0 0 1mm 0; font-size: 11pt; color: #27ae60; text-align: center; background: #e8f5e9; padding: 1mm; font-weight: bold;">
+            مالکین / فروشندگان</h3>
+        <table
+            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
             <thead>
                 <tr style="background: #27ae60; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه (فعلی)</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm;">عکس</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (فعلی)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (فعلی)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (فعلی)</th>
+                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let seller of documentData.sellers; let i = index"
                     [style.background]="i % 2 === 0 ? '#fff' : '#f9f9f9'">
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.firstName || seller.name}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.fatherName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.electronicNationalIdNumber}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.paddressProvinceDari || seller.paddressProvince}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.paddressDistrictDari || seller.paddressDistrict}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.paddressVillage}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.taddressProvinceDari || seller.taddressProvince}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.taddressDistrictDari || seller.taddressDistrict}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{seller.taddressVillage}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.firstName || seller.name}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.fatherName}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.electronicNationalIdNumber}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.paddressProvinceDari ||
+                            seller.paddressProvince}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.paddressDistrictDari ||
+                            seller.paddressDistrict}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.paddressVillage}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.taddressProvinceDari ||
+                            seller.taddressProvince}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.taddressDistrictDari ||
+                            seller.taddressDistrict}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.taddressVillage}}</b></td>
                     <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
                         <img [src]="constructImageUrlPublic(seller.photo)" alt="Owner"
-                            style="width: 10mm; height: 12mm; object-fit: cover;">
+                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
                     </td>
                 </tr>
             </tbody>
@@ -216,40 +253,45 @@
     <!-- Fallback for single seller -->
     <div class="owners-section" style="margin-bottom: 3mm;"
         *ngIf="!documentData.sellers || documentData.sellers.length === 0">
-        <h3 style="margin: 0 0 1mm 0; font-size: 8pt; color: #27ae60; text-align: center; background: #e8f5e9; padding: 1mm;">فروشنده</h3>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt;">
+        <h3
+            style="margin: 0 0 1mm 0; font-size: 11pt; color: #27ae60; text-align: center; background: #e8f5e9; padding: 1mm; font-weight: bold;">
+            فروشنده</h3>
+        <table
+            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
             <thead>
                 <tr style="background: #27ae60; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه (فعلی)</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm;">عکس</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (اصل)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (فعلی)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (فعلی)</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (فعلی)</th>
+                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerFirstName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerFatherName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerIndentityCardNumber}}
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerFirstName}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerFatherName}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
+                        <b>{{documentData.sellerIndentityCardNumber}}</b>
                     </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerProvinceDari ||
-                        documentData.sellerProvince}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerDistrictDari ||
-                        documentData.sellerDistrict}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.sellerVillage}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tSellerProvinceDari ||
-                        documentData.tSellerProvince}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tSellerDistrictDari ||
-                        documentData.tSellerDistrict}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tSellerVillage}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerProvinceDari ||
+                            documentData.sellerProvince}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerDistrictDari ||
+                            documentData.sellerDistrict}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerVillage}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tSellerProvinceDari ||
+                            documentData.tSellerProvince}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tSellerDistrictDari ||
+                            documentData.tSellerDistrict}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tSellerVillage}}</b></td>
                     <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
-                        <img [src]="SellerfilePath" alt="Owner" style="width: 10mm; height: 12mm; object-fit: cover;">
+                        <img [src]="SellerfilePath" alt="Owner"
+                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
                     </td>
                 </tr>
             </tbody>
@@ -259,39 +301,47 @@
     <!-- Section 4: Buyers Table - Compact -->
     <div class="buyers-section" style="margin-bottom: 3mm;"
         *ngIf="documentData.buyers && documentData.buyers.length > 0">
-        <h3 style="margin: 0 0 1mm 0; font-size: 8pt; color: #e67e22; text-align: center; background: #fff3e0; padding: 1mm;">مشتریان / خریداران</h3>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt;">
+        <h3
+            style="margin: 0 0 1mm 0; font-size: 11pt; color: #e67e22; text-align: center; background: #fff3e0; padding: 1mm; font-weight: bold;">
+            مشتریان / خریداران</h3>
+        <table
+            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
             <thead>
                 <tr style="background: #e67e22; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه فعلی</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm;">عکس</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت فعلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی فعلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه فعلی</th>
+                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let buyer of documentData.buyers; let i = index"
                     [style.background]="i % 2 === 0 ? '#fff' : '#f9f9f9'">
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.firstName || buyer.name}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.fatherName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.electronicNationalIdNumber}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.paddressProvinceDari || buyer.paddressProvince}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.paddressDistrictDari || buyer.paddressDistrict}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.paddressVillage}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.taddressProvinceDari || buyer.taddressProvince}}
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.firstName || buyer.name}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.fatherName}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.electronicNationalIdNumber}}</b>
                     </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.taddressDistrictDari || buyer.taddressDistrict}}
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.paddressProvinceDari ||
+                            buyer.paddressProvince}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.paddressDistrictDari ||
+                            buyer.paddressDistrict}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.paddressVillage}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.taddressProvinceDari ||
+                            buyer.taddressProvince}}</b>
                     </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{buyer.taddressVillage}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.taddressDistrictDari ||
+                            buyer.taddressDistrict}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.taddressVillage}}</b></td>
                     <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
                         <img [src]="constructImageUrlPublic(buyer.photo)" alt="Buyer"
-                            style="width: 10mm; height: 12mm; object-fit: cover;">
+                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
                     </td>
                 </tr>
             </tbody>
@@ -301,39 +351,45 @@
     <!-- Fallback for single buyer -->
     <div class="buyers-section" style="margin-bottom: 3mm;"
         *ngIf="!documentData.buyers || documentData.buyers.length === 0">
-        <h3 style="margin: 0 0 1mm 0; font-size: 8pt; color: #e67e22; text-align: center; background: #fff3e0; padding: 1mm;">خریدار</h3>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt;">
+        <h3
+            style="margin: 0 0 1mm 0; font-size: 11pt; color: #e67e22; text-align: center; background: #fff3e0; padding: 1mm; font-weight: bold;">
+            خریدار</h3>
+        <table
+            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
             <thead>
                 <tr style="background: #e67e22; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولایت فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولسوالی فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">قریه فعلی</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm;">عکس</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه اصلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت فعلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی فعلی</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه فعلی</th>
+                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerFirstName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerFatherName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerIndentityCardNumber}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerProvinceDari ||
-                        documentData.buyerProvince}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerDistrictDari ||
-                        documentData.buyerDistrict}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.buyerVillage}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tBuyerProvinceDari ||
-                        documentData.tBuyerProvince}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tBuyerDistrictDari ||
-                        documentData.tBuyerDistrict}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.tBuyerVillage}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerFirstName}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerFatherName}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
+                        <b>{{documentData.buyerIndentityCardNumber}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerProvinceDari ||
+                            documentData.buyerProvince}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerDistrictDari ||
+                            documentData.buyerDistrict}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerVillage}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tBuyerProvinceDari ||
+                            documentData.tBuyerProvince}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tBuyerDistrictDari ||
+                            documentData.tBuyerDistrict}}</b></td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tBuyerVillage}}</b></td>
                     <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
-                        <img [src]="BuyerfilePath" alt="Buyer" style="width: 10mm; height: 12mm; object-fit: cover;">
+                        <img [src]="BuyerfilePath" alt="Buyer"
+                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
                     </td>
                 </tr>
             </tbody>
@@ -342,25 +398,34 @@
 
     <!-- Section 5: Witnesses Table - Compact -->
     <div class="witnesses-section" style="margin-bottom: 3mm;">
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 7pt; direction: rtl;">
+        <table
+            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; direction: rtl; font-weight: bold;">
             <thead>
                 <tr style="background: #9b59b6; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم شاهد اول</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">اسم شاهد دوم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم شاهد اول</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم شاهد دوم</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
+                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessOneFirstName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessOneFatherName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessOneIndentityCardNumber}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessTwoFirstName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessTwoFatherName}}</td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">{{documentData.witnessTwoIndentityCardNumber}}</td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessOneFirstName}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessOneFatherName}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
+                        <b>{{documentData.witnessOneIndentityCardNumber}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessTwoFirstName}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessTwoFatherName}}</b>
+                    </td>
+                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
+                        <b>{{documentData.witnessTwoIndentityCardNumber}}</b>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -368,18 +433,236 @@
 
     <!-- Section 6: Fixed QR Code with Transaction Record -->
     <div class="qr-section"
-        style="position: fixed; bottom: 5mm; left: 0; right: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 5mm; background: white; padding: 2mm; border: 1px solid #1976d2; direction: rtl;"
+        style="position: fixed; bottom: 5mm; left: 0; right: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 5mm; background: white; padding: 2mm; border: 2px solid #0066cc; direction: rtl;"
         *ngIf="verificationCode">
-        <div style="display: flex; align-items: center; gap: 2mm;">
-            <img [src]="qrCodeUrl" alt="QR Code" style="width: 15mm; height: 15mm;" *ngIf="qrCodeUrl">
+        <div
+            style="display: flex; align-items: center; gap: 3mm; padding: 2mm; border: 2px solid #0066cc; border-radius: 4px; background: white;">
+            <div
+                style="border: 3px solid #000; padding: 1mm; background: white; display: flex; align-items: center; justify-content: center;">
+                <img [src]="qrCodeUrl" alt="QR Code"
+                    style="width: 20mm !important; height: 20mm !important; display: block; max-width: 20mm; max-height: 20mm; min-width: 20mm; min-height: 20mm; object-fit: contain;"
+                    *ngIf="qrCodeUrl">
+            </div>
             <div style="text-align: right; white-space: nowrap;">
-                <p style="margin: 0; font-size: 7pt; font-weight: bold; color: #1976d2;">{{ verificationCode }}</p>
-                <p style="margin: 0; font-size: 6pt; color: #555;">کود تصدیق سند</p>
+                <p style="margin: 0; font-size: 8pt; font-weight: bold; color: #0066cc; letter-spacing: 1px;">{{
+                    verificationCode }}</p>
+                <p style="margin: 0; font-size: 7pt; color: #555; margin-top: 1mm;">کود تصدیق سند</p>
             </div>
         </div>
         <div style="flex-grow: 1; text-align: right; font-size: 8pt; white-space: nowrap;">
-            معامله این سند به شماره (                        ) صفحه (                ) کتاب معاملات درج گردید.
+            معامله این سند به شماره ( ) صفحه ( ) کتاب معاملات درج گردید.
         </div>
     </div>
 
+</div>
+
+<!-- ==================== OLD DESIGN TEMPLATE (Traditional Form) ==================== -->
+<div class="container old-design-container" *ngIf="!isLoading && !loadError && printMode === 'old-design'" dir="rtl"
+    style="font-family: 'B Nazanin', Arial, sans-serif; width: 210mm; height: 297mm; margin: 20px auto; padding: 0; position: relative; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden;">
+
+    <!-- Background image of the form -->
+    <img *ngIf="showOldDesignBackground" src="assets/img/Sitas/Dari/Sita_Frosh_Front 01.webp" alt="Form Background"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 1;">
+
+    <!-- Overlay content with exact positioning - DATA WILL BE ADDED HERE LATER -->
+    <div *ngIf="showOldDesignData"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
+
+        <!-- Company Name and Phone - Top Center -->
+        <div
+            style="position: absolute; top: 31mm; left: 42%; transform: translateX(-50%); text-align: center; width: 100mm;">
+            <div style="font-size: 11pt; font-weight: bold; margin-bottom: 1mm;">
+                {{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || ''}}
+            </div>
+
+        </div>
+        <div
+            style="position:  absolute; top: 40mm; left: 42%; transform: translateX(-50%); text-align: center; width: 100mm;">
+            {{userDetails.phoneNumber}}
+        </div>
+
+        <!-- Seller Photo - Left Side -->
+        <img [src]="SellerfilePath" alt="Seller"
+            style="position: absolute; top: 25mm; right: 12mm; width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
+
+        <!-- Buyer Photo - Right Side -->
+        <img [src]="BuyerfilePath" alt="Buyer"
+            style="position: absolute; top: 25mm; left: 12mm; width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
+
+        <!-- Row 1: Document Type, Number, Property Type -->
+        <div style="position: absolute; top: 84mm; left: 72mm; font-size: 11pt; font-weight: bold;">
+            {{ getDocumentTypeDisplay() }}
+        </div>
+        <div style="position: absolute; top: 92mm; left: 72mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.issuanceNumber || documentData.pNumber}}
+        </div>
+        <div style="position:absolute; top: 129mm; left: 67mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.propertypeType}}
+        </div>
+
+        <!-- Row 2: Property Area, Rooms, Houses -->
+        <div style="position: absolute; top: 102mm; left: 90mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.pArea}} {{documentData.unitTypeDari || documentData.unitType}}
+        </div>
+        <div style="position: absolute; top: 138mm; right: 82mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.numofRooms}}
+        </div>
+
+
+        <!-- Row 3: Province, District, Village -->
+        <div style="position: absolute; top: 111mm; right: 105mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.provinceDari || documentData.province}}
+        </div>
+        <div style="position: absolute;  top: 111mm; right: 136mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.districtDari || documentData.district}}
+        </div>
+        <div style="position: absolute;  top: 120mm; right: 125mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.village}}
+        </div>
+
+        <!-- Boundaries (حدود اربعه) - Center Column -->
+
+
+        <div style="position: absolute;  top: 145mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.east}}
+        </div>
+        <div style="position: absolute;  top: 154mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.west}}
+        </div>
+
+        <div style="position: absolute;  top: 164mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.south}}
+        </div>
+        <div style="position: absolute; top: 174mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.north}}
+        </div>
+
+        <!-- Price Information - Center Column -->
+        <div style="position: absolute; top: 185mm; right: 95mm; font-size: 10pt; max-width: 80mm; font-weight: bold;">
+            {{documentData.priceText}}
+        </div>
+        <div style="position: absolute; top: 193mm; right: 95mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.price}}
+        </div>
+        <div style="position: absolute; top: 206mm; right: 95mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.price ? (documentData.price/2) : ''}}
+        </div>
+        <div style="position: absolute; top: 215mm; right: 95mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.royaltyAmount}}
+        </div>
+
+        <!-- SELLER INFORMATION (Left Column) -->
+        <div style="position: absolute; top: 90mm; right: 22mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.sellerFirstName}}
+        </div>
+        <div style="position: absolute; top: 120mm; right: 22mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.sellerFatherName}}
+        </div>
+        <div style="position: absolute; top: 147mm; right: 22mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.sellerIndentityCardNumber}}
+        </div>
+
+        <!-- Seller Permanent Address -->
+        <div style="position: absolute; bottom: 110mm; right: 26mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.sellerProvinceDari || documentData.sellerProvince}}
+        </div>
+        <div style="position: absolute; bottom: 93mm; right: 37mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.sellerDistrictDari || documentData.sellerDistrict}}
+        </div>
+        <div style="position: absolute; bottom: 77mm; right: 29mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.sellerVillage}}
+        </div>
+
+        <!-- Seller Current Address -->
+        <div style="position: absolute; bottom: 57mm; right:  26mm;font-size: 10pt; font-weight: bold;">
+            {{documentData.tSellerProvinceDari || documentData.tSellerProvince}}
+        </div>
+        <div style="position: absolute; bottom: 40mm; right: 37mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.tSellerDistrictDari || documentData.tSellerDistrict}}
+        </div>
+        <div style="position: absolute; bottom: 24mm; right:29mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.tSellerVillage}}
+        </div>
+
+        <!-- BUYER INFORMATION (Right Column) -->
+        <div style="position: absolute; top: 90mm; left: 22mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.buyerFirstName}}
+        </div>
+        <div style="position: absolute; top: 120mm; left: 22mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.buyerFatherName}}
+        </div>
+        <div style="position: absolute;  top: 147mm; left: 22mm; font-size: 11pt; font-weight: bold;">
+            {{documentData.buyerIndentityCardNumber}}
+        </div>
+
+        <!-- Buyer Permanent Address -->
+        <div style="position: absolute; bottom: 110mm; left: 43mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.buyerProvinceDari || documentData.buyerProvince}}
+        </div>
+        <div style="position: absolute; bottom: 93mm; left: 29mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.buyerDistrictDari || documentData.buyerDistrict}}
+        </div>
+        <div style="position: absolute; bottom: 77mm; left: 32mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.buyerVillage}}
+        </div>
+
+        <!-- Buyer Current Address -->
+        <div style="position: absolute;  bottom: 57mm; left:  43mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.tBuyerProvinceDari || documentData.tBuyerProvince}}
+        </div>
+        <div style="position: absolute; bottom: 40mm; left: 29mm;  font-size: 10pt; font-weight: bold;">
+            {{documentData.tBuyerDistrictDari || documentData.tBuyerDistrict}}
+        </div>
+        <div style="position: absolute;bottom: 24mm; left:32mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.tBuyerVillage}}
+        </div>
+
+        <!-- WITNESSES INFORMATION (Bottom Section) -->
+        <div style="position: absolute; bottom: 36mm; right:75mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.witnessOneFirstName}}
+        </div>
+        <div style="position: absolute;  bottom: 36mm; right:100mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.witnessOneFatherName}}
+        </div>
+        <div style="position: absolute; bottom: 36mm; right:124mm; font-size: 7pt; font-weight: bold;">
+            {{documentData.witnessOneIndentityCardNumber}}
+        </div>
+
+        <div style="position: absolute; bottom: 30mm; right:75mm;  font-size: 10pt; font-weight: bold;">
+            {{documentData.witnessTwoFirstName}}
+        </div>
+        <div style="position: absolute; bottom: 30mm; right:100mm; font-size: 10pt; font-weight: bold;">
+            {{documentData.witnessTwoFatherName}}
+        </div>
+        <div style="position: absolute; bottom: 30mm; right:124mm; font-size: 7pt; font-weight: bold;">
+            {{documentData.witnessTwoIndentityCardNumber}}
+        </div>
+
+
+    </div>
+</div>
+
+<!-- ==================== OLD DESIGN - SECOND PAGE (Back Side) ==================== -->
+<div class="container old-design-container-page2" *ngIf="!isLoading && !loadError && printMode === 'old-design'" dir="rtl"
+    style="font-family: 'B Nazanin', Arial, sans-serif; width: 210mm; height: 297mm; margin: 20px auto; padding: 0; position: relative; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden; page-break-before: always;">
+
+
+    <!-- Overlay content for back page -->
+    <div *ngIf="showOldDesignData"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
+
+        <!-- QR Code and Verification - Bottom of Page -->
+        <div style="position: absolute; bottom: 10mm; left: 50%; transform: translateX(-50%); text-align: center;"
+            *ngIf="verificationCode && qrCodeUrl">
+            <img [src]="qrCodeUrl" alt="QR Code"
+                style="width: 35mm !important; height: 35mm !important; display: block; max-width: 35mm; max-height: 35mm; min-width: 35mm; min-height: 35mm; object-fit: contain; margin: 0 auto;">
+            <div style="margin-top: 2mm; font-size: 11pt; font-weight: bold; color: #0066cc; letter-spacing: 1px;">
+                {{ verificationCode }}
+            </div>
+            <div style="margin-top: 1mm; font-size: 9pt; font-weight: bold; color: #2c3e50;">
+                کود تصدیق سند
+            </div>
+        </div>
+
+    </div>
 </div>

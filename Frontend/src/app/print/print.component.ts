@@ -31,8 +31,8 @@ export class PrintComponent implements OnInit {
   qrCodeUrl: string = '';
   verificationError: string | null = null;
 
-  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms, 'new-design' = modern table layout, 'upload-docts' = upload documents
-  printMode: 'full' | 'data-only' | 'new-design' | 'upload-docts' = 'full';
+  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms, 'new-design' = modern table layout, 'old-design' = traditional form overlay, 'upload-docts' = upload documents
+  printMode: 'full' | 'data-only' | 'new-design' | 'old-design' | 'upload-docts' = 'full';
   window = window; // Make window available in template
 
   // Upload document properties
@@ -41,6 +41,10 @@ export class PrintComponent implements OnInit {
   uploadMessage: string = '';
   uploadError: string = '';
   isUploading: boolean = false;
+
+  // Old design data toggle
+  showOldDesignData: boolean = true;
+  showOldDesignBackground: boolean = true;
 
   constructor(
     public service: AuthService,
@@ -55,14 +59,20 @@ export class PrintComponent implements OnInit {
   ngOnInit(): void {
     // Check if print mode is specified in URL
     const mode = this.route.snapshot.queryParamMap.get('mode');
-    if (mode === 'data-only' || mode === 'full' || mode === 'new-design') {
-      this.printMode = mode as 'full' | 'data-only' | 'new-design';
+    if (mode === 'data-only' || mode === 'full' || mode === 'new-design' || mode === 'old-design') {
+      this.printMode = mode as 'full' | 'data-only' | 'new-design' | 'old-design';
     }
     this.loadPrintData();
   }
 
-  setPrintMode(mode: 'full' | 'data-only' | 'new-design' | 'upload-docts'): void {
+  setPrintMode(mode: 'full' | 'data-only' | 'new-design' | 'old-design' | 'upload-docts'): void {
     this.printMode = mode;
+    
+    // Reset data visibility when switching to old design
+    if (mode === 'old-design') {
+      this.showOldDesignData = true;
+      this.showOldDesignBackground = true;
+    }
     
     // If switching to data-only mode, process the DOM to remove labels
     if (mode === 'data-only') {
@@ -70,6 +80,14 @@ export class PrintComponent implements OnInit {
         this.processDataOnlyMode();
       }, 100);
     }
+  }
+
+  toggleOldDesignData(): void {
+    this.showOldDesignData = !this.showOldDesignData;
+  }
+
+  toggleOldDesignBackground(): void {
+    this.showOldDesignBackground = !this.showOldDesignBackground;
   }
 
   // File selection handler

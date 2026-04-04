@@ -165,27 +165,117 @@ hr {
 
 /* Screen view - ensure proper A4 sizing */
 .container {
-  width: 210mm;
-  margin: 0 auto;
+  width: 210mm !important;
+  max-width: 210mm !important;
+  margin: 20px auto !important;
   padding: 5mm;
   background: white;
   box-sizing: border-box;
   font-size: 10pt;
   line-height: 1.2;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  display: block !important;
+  position: relative !important;
 }
 
-/* New design container - compact for single page */
-.new-design-container {
-  min-height: auto !important;
-  padding: 2mm !important;
-  font-size: 7pt !important;
+/* Old design container - A4 page with shadow on screen */
+.old-design-container {
+  width: 210mm;
+  max-width: 210mm;
+  height: 297mm;
+  margin: 20px auto;
+  padding: 0;
+  box-sizing: border-box;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: 'B Nazanin', Arial, sans-serif;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Old design second page - A4 page with shadow on screen */
+.old-design-container-page2 {
+  width: 210mm;
+  max-width: 210mm;
+  height: 297mm;
+  margin: 20px auto;
+  padding: 0;
+  box-sizing: border-box;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: 'B Nazanin', Arial, sans-serif;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+/* New design container - A4 page with shadow on screen */
+.container.new-design-container {
+  width: 210mm !important;
+  max-width: 210mm !important;
+  min-height: 297mm !important;
+  padding: 5mm !important;
+  margin: 20px auto !important;
+  font-size: 10pt !important;
+  font-weight: bold !important;
+  box-sizing: border-box !important;
+  background: white !important;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1) !important;
+  font-family: 'B Nazanin', Arial, sans-serif !important;
+  display: block !important;
+  position: relative !important;
+  
+  * {
+    font-weight: bold !important;
+  }
   
   table {
-    font-size: 6pt !important;
+    font-size: 10pt !important;
+    font-weight: bold !important;
   }
   
   td, th {
-    padding: 0.3mm 0.5mm !important;
+    padding: 1mm 2mm !important;
+    font-weight: bold !important;
+    font-size: 9pt !important;
+  }
+  
+  h3 {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+  }
+  
+  .company-header {
+    margin-bottom: 3mm !important;
+    
+    p {
+      font-size: 11pt !important;
+    }
+    
+    table {
+      font-size: 10pt !important;
+      
+      td {
+        font-size: 9pt !important;
+      }
+    }
+  }
+  
+  .vehicle-section,
+  .seller-section,
+  .buyer-section,
+  .witnesses-section,
+  .description-section {
+    margin-bottom: 3mm !important;
+  }
+  
+  img[alt="Owner"],
+  img[alt="Buyer"] {
+    width: 10mm !important;
+    height: 12mm !important;
+    object-fit: cover !important;
+    border: 1px solid #333 !important;
   }
 }
 
@@ -219,62 +309,186 @@ hr {
   line-height: 1.2;
 }
 
+/* ============================================
+   PRINT STYLES
+   ============================================ */
 @media print {
-  /* Hide print options dialog when printing */
-  .print-options-overlay {
+  .print-options-overlay,
+  .no-print {
     display: none !important;
   }
   
   @page {
     size: A4 portrait;
-    margin: 5mm;
+    margin: 0 !important;
   }
   
-  html, body {
-    width: 210mm;
-    height: 297mm;
-    margin: 0;
-    padding: 0;
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: auto !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    color-adjust: exact;
   }
   
-  /* Force colors to print for all elements */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Reset container margins for print */
+  .container {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
   }
 
-  .container {
+  /* New design container print */
+  .new-design-container {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
+    padding: 5mm !important;
+    box-shadow: none !important;
+    page-break-after: avoid !important;
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    
+    * {
+      font-weight: bold !important;
+    }
+    
+    table {
+      font-size: 10pt !important;
+    }
+    
+    td, th {
+      padding: 1mm 2mm !important;
+      font-size: 9pt !important;
+    }
+    
+    h3 {
+      font-size: 11pt !important;
+    }
+    
+    .company-header {
+      margin-bottom: 3mm !important;
+      
+      p {
+        font-size: 11pt !important;
+      }
+      
+      table {
+        font-size: 10pt !important;
+        
+        td {
+          font-size: 9pt !important;
+        }
+      }
+    }
+    
+    .vehicle-section,
+    .seller-section,
+    .buyer-section,
+    .witnesses-section,
+    .description-section {
+      margin-bottom: 3mm !important;
+    }
+    
+    img[alt="Owner"],
+    img[alt="Buyer"] {
+      width: 10mm !important;
+      height: 12mm !important;
+      object-fit: cover !important;
+      border: 1px solid #333 !important;
+    }
+  }
+  
+  /* Old Design Mode Print - First Page */
+  .old-design-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
     padding: 0 !important;
-    page-break-after: auto;
-  }
-
-  /* New design container */
-  .new-design-container {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+    position: relative !important;
+    
+    * {
+      font-weight: bold !important;
+    }
+    
+    > div[style*="position: absolute"] {
+      font-size: 11pt !important;
+      font-weight: bold !important;
+    }
+    
+    img[alt="Seller"],
+    img[alt="Buyer"] {
+      width: 25mm !important;
+      height: 30mm !important;
+      object-fit: cover !important;
+      border: 1px solid #333 !important;
+    }
+    
+    img[alt="Form Background"] {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: fill !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
   }
   
-  /* Ensure th backgrounds print */
-  .new-design-container th,
-  .new-design-container h3 {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-  }
-
-  .no-print {
-    display: none !important;
+  /* Old Design Second Page */
+  .old-design-container-page2 {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-before: always !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+    position: relative !important;
+    
+    * {
+      font-weight: bold !important;
+    }
+    
+    img[alt="Form Background Back"] {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: fill !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    
+    img[alt="QR Code"] {
+      width: 35mm !important;
+      height: 35mm !important;
+      object-fit: contain !important;
+      display: block !important;
+    }
   }
   
+  /* Ensure all images maintain their dimensions */
   img {
+    max-width: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
     page-break-inside: avoid;
   }
   
@@ -298,73 +512,12 @@ hr {
     page-break-inside: avoid !important;
   }
 
-  /* Reduce spacing in the dot line */
   .dot-line {
     margin: 1px 0 !important;
   }
-
-  /* Data-Only Mode Print Styles */
-  .data-only-mode {
-    /* Remove all borders and backgrounds */
-    table, td, th, tr {
-      border: none !important;
-      background: none !important;
-      box-shadow: none !important;
-    }
-    
-    /* Hide ALL images, QR codes, photos */
-    img {
-      display: none !important;
-      visibility: hidden !important;
-    }
-    
-    /* Hide decorative elements */
-    .dot-line, hr, br {
-      display: none !important;
-    }
-    
-    /* Hide all list items (rights and obligations section) */
-    ol, ul, li {
-      display: none !important;
-    }
-    
-    /* Hide all headers */
-    h1, h2, h3, h4, h5, h6 {
-      display: none !important;
-    }
-    
-    /* Hide underlined text (section headers) */
-    u {
-      display: none !important;
-    }
-    
-    /* Hide the second table (rights and obligations + signatures) */
-    table:nth-of-type(2) {
-      display: none !important;
-    }
-    
-    /* Remove padding/margins to match pre-printed form positions */
-    td {
-      padding: 2px !important;
-    }
-    
-    /* Ensure data text is visible and properly sized */
-    p, strong, span, b {
-      font-size: 12pt !important;
-      color: black !important;
-      font-weight: normal !important;
-    }
-    
-    /* Ensure single page - no page breaks */
-    .container {
-      page-break-after: avoid !important;
-      page-break-inside: avoid !important;
-    }
-    
-    table {
-      page-break-before: avoid !important;
-      page-break-after: avoid !important;
-      page-break-inside: avoid !important;
-    }
+  
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
