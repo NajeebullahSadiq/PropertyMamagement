@@ -12,6 +12,7 @@ import { MultiCalendarDatepickerComponent } from './multi-calendar-datepicker/mu
 import { CalendarSelectorComponent } from './calendar-selector/calendar-selector.component';
 import { CalendarDatePipe } from './calendar-date.pipe';
 import { DeleteConfirmationDialogComponent } from './delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 
 // RBAC Directives
 import {
@@ -42,6 +43,7 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     CalendarSelectorComponent,
     CalendarDatePipe,
     DeleteConfirmationDialogComponent,
+    ConfirmationDialogComponent,
     // RBAC Directives
     HasPermissionDirective,
     HasRoleDirective,
@@ -73,6 +75,7 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     CalendarSelectorComponent,
     CalendarDatePipe,
     DeleteConfirmationDialogComponent,
+    ConfirmationDialogComponent,
     // RBAC Directives
     HasPermissionDirective,
     HasRoleDirective,

@@ -5,6 +5,7 @@ export interface companydetails{
     docPath:string;
     provinceId?:number;
     calendarType?:string;
+    confirmRevokedDuplicate?:boolean;
 }
 
 export interface companydetailsList {

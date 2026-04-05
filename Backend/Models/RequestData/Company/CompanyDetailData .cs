@@ -23,5 +23,10 @@
         /// Defaults to "hijriShamsi" if not provided
         /// </summary>
         public string? CalendarType { get; set; }
+
+        /// <summary>
+        /// Confirmation flag to allow creating a company with a duplicate name when the existing one is revoked (فسخ)
+        /// </summary>
+        public bool? ConfirmRevokedDuplicate { get; set; }
     }
 }

@@ -412,7 +412,33 @@ namespace WebAPIBackend.Controllers.Companies
                 
                 if (existingCompany != null)
                 {
-                    return BadRequest(new { message = "این عنوان رهنمایی معاملات قبلاً ثبت شده است" });
+                    // Check if the existing company has cancellation info (فسخ)
+                    var cancellationInfo = await _context.CompanyCancellationInfos
+                        .FirstOrDefaultAsync(c => c.CompanyId == existingCompany.Id);
+                    
+                    // If cancellation info exists and all three fields are filled
+                    bool isRevoked = cancellationInfo != null && 
+                        !string.IsNullOrWhiteSpace(cancellationInfo.LicenseCancellationLetterNumber) &&
+                        !string.IsNullOrWhiteSpace(cancellationInfo.RevenueCancellationLetterNumber) &&
+                        cancellationInfo.LicenseCancellationLetterDate.HasValue;
+                    
+                    if (isRevoked)
+                    {
+                        // If user hasn't confirmed, return a warning response
+                        if (request.ConfirmRevokedDuplicate != true)
+                        {
+                            return BadRequest(new { 
+                                requiresConfirmation = true,
+                                message = "این عنوان رهنمایی معاملات قبلاً ثبت شده است اما جواز آن فسخ شده است. آیا میخواهید ادامه دهید؟" 
+                            });
+                        }
+                        // If confirmed, allow creation (continue with the rest of the code)
+                    }
+                    else
+                    {
+                        // License is not revoked, block the creation
+                        return BadRequest(new { message = "این عنوان رهنمایی معاملات قبلاً ثبت شده است" });
+                    }
                 }
 
                 // Auto-populate province for COMPANY_REGISTRAR, use provided for administrators

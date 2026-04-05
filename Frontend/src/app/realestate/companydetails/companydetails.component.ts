@@ -2,6 +2,7 @@ import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@
 import '@angular/localize/init';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
 import { companydetails } from 'src/app/models/companydetails';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { FileuploadComponent } from '../fileupload/fileupload.component';
@@ -11,6 +12,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
 import { RbacService } from 'src/app/shared/rbac.service';
+import { ConfirmationDialogComponent } from 'src/app/shared/confirmation-dialog/confirmation-dialog.component';
 @Component({
   selector: 'app-companydetails',
   templateUrl: './companydetails.component.html',
@@ -39,7 +41,7 @@ export class CompanydetailsComponent {
   constructor(private fb: FormBuilder,private toastr: ToastrService, private comservice:CompnaydetailService,
 	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent,
 	private calendarConversionService: CalendarConversionService, private calendarService: CalendarService,
-	private rbacService: RbacService){
+	private rbacService: RbacService, private dialog: MatDialog){
 	this.companyForm = this.fb.group({
 		id: [0],
 		title: ['', Validators.required],
@@ -98,9 +100,48 @@ export class CompanydetailsComponent {
 		  },
 		  error => {
 		    console.error('Error adding company:', error);
-		    // Check if error has a specific message from backend
-		    const errorMessage = error.error?.message || error.message || 'نامعلوم';
-		    this.toastr.error(errorMessage);
+		    
+		    // Check if this is a revoked license duplicate that requires confirmation
+		    if (error.error?.requiresConfirmation) {
+		      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+		        width: '500px',
+		        data: {
+		          title: 'تایید ثبت رهنمایی معاملات',
+		          message: error.error.message,
+		          confirmText: 'بله، ادامه دهید',
+		          cancelText: 'انصراف',
+		          icon: 'fa-exclamation-circle',
+		          confirmButtonClass: 'btn-confirm'
+		        }
+		      });
+
+		      dialogRef.afterClosed().subscribe(confirmed => {
+		        if (confirmed) {
+		          // User confirmed, retry with confirmation flag
+		          const confirmedDetail = { ...companyDetail, confirmRevokedDuplicate: true };
+		          this.comservice.addcompanies(confirmedDetail).subscribe(
+		            result => {
+		              console.log('Company added successfully after confirmation:', result);
+		              if(result.id!==0) {
+		                this.toastr.success("معلومات موفقانه ثبت شد");
+		                this.comservice.updateMainTableId(result.id);
+		                this.selectedId=result.id;
+		                this.onNextClick();
+		              }
+		            },
+		            error => {
+		              console.error('Error adding company after confirmation:', error);
+		              const errorMessage = error.error?.message || error.message || 'نامعلوم';
+		              this.toastr.error(errorMessage);
+		            }
+		          );
+		        }
+		      });
+		    } else {
+		      // Regular error, show error message
+		      const errorMessage = error.error?.message || error.message || 'نامعلوم';
+		      this.toastr.error(errorMessage);
+		    }
 		  }
 		);
 	}
