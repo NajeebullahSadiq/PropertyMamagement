@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <form [formGroup]="buyerForm" (ngSubmit)="buyerForm.valid && canAddNewBuyer() ? selectedbuyerId ? updateBuyerDetails() : addBuyerDetail() : null">
+        <form [formGroup]="buyerForm" (ngSubmit)="buyerForm.valid && (selectedbuyerId || canAddNewBuyer()) ? selectedbuyerId ? updateBuyerDetails() : addBuyerDetail() : null">
             <div class="hidden">
                 <input type="hidden" formControlName="id" />
             </div>

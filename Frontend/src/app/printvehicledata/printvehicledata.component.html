@@ -345,13 +345,13 @@
 
         <!-- Company Name and Phone - Top Center -->
         <div
-            style="position: absolute; top: 28mm; left: 42%; transform: translateX(-50%); text-align: center; width: 100mm;">
+            style="position: absolute; top: 33mm; left: 41%; transform: translateX(-50%); text-align: center; width: 100mm;">
             <div style="font-size: 11pt; font-weight: bold; margin-bottom: 1mm;">
                 {{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || ''}}
             </div>
         </div>
         <div
-            style="position: absolute; top: 40mm; left: 42%; transform: translateX(-50%); text-align: center; width: 100mm;">
+            style="position: absolute; top: 42mm; left: 42%; transform: translateX(-50%); text-align: center; width: 100mm;">
             {{userDetails.phoneNumber}}
         </div>
 
@@ -364,39 +364,39 @@
             style="position: absolute; top: 25mm; left: 12mm; width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
 
         <!-- Vehicle Information -->
-        <div style="position: absolute; top: 84mm; left: 72mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 84mm; left: 82mm; font-size: 11pt; font-weight: bold;">
             {{documentData.permitNo}}
         </div>
-        <div style="position: absolute; top: 92mm; left: 72mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 92mm; left: 82mm; font-size: 11pt; font-weight: bold;">
             {{documentData.pilateNo}}
         </div>
-        <div style="position: absolute; top: 102mm; left: 90mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 102mm; left: 82mm; font-size: 11pt; font-weight: bold;">
             {{documentData.typeOfVehicle}}
         </div>
-        <div style="position: absolute; top: 111mm; right: 105mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 111mm; left: 82mm; font-size: 11pt; font-weight: bold;">
             {{documentData.model}}
         </div>
-        <div style="position: absolute; top: 111mm; right: 136mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 121mm; left: 82mm; font-size: 11pt; font-weight: bold;">
             {{documentData.enginNo}}
         </div>
-        <div style="position: absolute; top: 120mm; right: 125mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 130mm; left: 82mm; font-size: 11pt; font-weight: bold;">
             {{documentData.shasiNo}}
         </div>
-        <div style="position: absolute; top: 129mm; left: 67mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 139mm; left: 82mm; font-size: 11pt; font-weight: bold;">
             {{documentData.color}}
         </div>
 
         <!-- Price Information -->
-        <div style="position: absolute; top: 148mm; right: 110mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 147mm; right: 110mm; font-size: 11pt; font-weight: bold;">
             {{documentData.price}}
         </div>
-        <div style="position: absolute; top: 158mm; right: 110mm; font-size: 10pt; max-width: 80mm; font-weight: bold;">
+        <div style="position: absolute; top: 156mm; right: 110mm; font-size: 10pt; max-width: 80mm; font-weight: bold;">
             {{documentData.priceText}}
         </div>
-        <div style="position: absolute; top: 166mm; right: 110mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 165mm; right: 110mm; font-size: 11pt; font-weight: bold;">
             {{documentData.price ? (documentData.price/2) : ''}}
         </div>
-        <div style="position: absolute; top: 175mm; right: 110mm; font-size: 11pt; font-weight: bold;">
+        <div style="position: absolute; top: 173mm; right: 110mm; font-size: 11pt; font-weight: bold;">
             {{documentData.royaltyAmount}}
         </div>
 
@@ -423,13 +423,13 @@
         </div>
 
         <!-- Seller Current Address -->
-        <div style="position: absolute; bottom: 57mm; right: 26mm; font-size: 10pt; font-weight: bold;">
+        <div style="position: absolute; bottom: 52mm; right: 26mm; font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerProvinceDari || documentData.tSellerProvince}}
         </div>
-        <div style="position: absolute; bottom: 40mm; right: 37mm; font-size: 10pt; font-weight: bold;">
+        <div style="position: absolute; bottom: 37mm; right: 37mm; font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerDistrictDari || documentData.tSellerDistrict}}
         </div>
-        <div style="position: absolute; bottom: 24mm; right: 29mm; font-size: 10pt; font-weight: bold;">
+        <div style="position: absolute; bottom: 20mm; right: 30mm; font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerVillage}}
         </div>
 
@@ -445,7 +445,7 @@
         </div>
 
         <!-- Buyer Permanent Address -->
-        <div style="position: absolute; bottom: 110mm; left: 43mm; font-size: 10pt; font-weight: bold;">
+        <div style="position: absolute; bottom: 110mm; left: 40mm; font-size: 10pt; font-weight: bold;">
             {{documentData.buyerProvinceDari || documentData.buyerProvince}}
         </div>
         <div style="position: absolute; bottom: 93mm; left: 29mm; font-size: 10pt; font-weight: bold;">
@@ -456,13 +456,13 @@
         </div>
 
         <!-- Buyer Current Address -->
-        <div style="position: absolute; bottom: 57mm; left: 43mm; font-size: 10pt; font-weight: bold;">
+        <div style="position: absolute; bottom: 54mm; left: 43mm; font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerProvinceDari || documentData.tBuyerProvince}}
         </div>
-        <div style="position: absolute; bottom: 40mm; left: 29mm; font-size: 10pt; font-weight: bold;">
+        <div style="position: absolute; bottom: 37mm; left: 29mm; font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerDistrictDari || documentData.tBuyerDistrict}}
         </div>
-        <div style="position: absolute; bottom: 24mm; left: 32mm; font-size: 10pt; font-weight: bold;">
+        <div style="position: absolute; bottom: 20mm; left: 32mm; font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerVillage}}
         </div>
 
@@ -473,7 +473,7 @@
         <div style="position: absolute; bottom:  86mm; left: 100mm; font-size: 10pt; font-weight: bold;">
             {{documentData.witnessOneFatherName}}
         </div>
-        <div style="position: absolute; bottom:  86mm; left: 70mm; font-size: 7pt; font-weight: bold;">
+        <div style="position: absolute; bottom:  86mm; left: 69mm; font-size: 7pt; font-weight: bold;">
             {{documentData.witnessOneIndentityCardNumber}}
         </div>
 
@@ -483,7 +483,7 @@
         <div style="position: absolute;  bottom:  75mm; left: 100mm; font-size: 10pt; font-weight: bold;">
             {{documentData.witnessTwoFatherName}}
         </div>
-        <div style="position: absolute;  bottom: 75mm; left: 70mm; font-size: 7pt; font-weight: bold;">
+        <div style="position: absolute;  bottom: 75mm; left: 69mm; font-size: 7pt; font-weight: bold;">
             {{documentData.witnessTwoIndentityCardNumber}}
         </div>
 
