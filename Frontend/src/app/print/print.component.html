@@ -5,31 +5,19 @@
     <button (click)="setPrintMode('old-design')" [style.background]="printMode === 'old-design' ? '#3498db' : 'white'"
         [style.color]="printMode === 'old-design' ? 'white' : '#3498db'"
         style="padding: 10px 20px; border: 2px solid #3498db; border-radius: 6px; cursor: pointer; font-weight: bold;">
-        <i class="fas fa-file-alt"></i> طراحی قدیم
-    </button>
-    <button *ngIf="printMode === 'old-design'" (click)="toggleOldDesignBackground()"
-        [style.background]="showOldDesignBackground ? '#e74c3c' : '#27ae60'"
-        style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white;">
-        <i [class]="showOldDesignBackground ? 'fas fa-image' : 'fas fa-ban'"></i>
-        {{ showOldDesignBackground ? 'پنهان کردن فورم' : 'نمایش فورم' }}
-    </button>
-    <button *ngIf="printMode === 'old-design'" (click)="toggleOldDesignData()"
-        [style.background]="showOldDesignData ? '#e74c3c' : '#27ae60'"
-        style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white;">
-        <i [class]="showOldDesignData ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-        {{ showOldDesignData ? 'پنهان کردن معلومات' : 'نمایش معلومات' }}
+        <i class="fas fa-file-alt"></i> سټه سابقه
     </button>
     <button (click)="setPrintMode('new-design')" [style.background]="printMode === 'new-design' ? '#9b59b6' : 'white'"
         [style.color]="printMode === 'new-design' ? 'white' : '#9b59b6'"
         style="padding: 10px 20px; border: 2px solid #9b59b6; border-radius: 6px; cursor: pointer; font-weight: bold;">
-        <i class="fas fa-th-large"></i> طراحی جدید
+        <i class="fas fa-th-large"></i> سټه خالی
     </button>
-    <button (click)="setPrintMode('upload-docts')"
+    <!-- <button (click)="setPrintMode('upload-docts')"
         [style.background]="printMode === 'upload-docts' ? '#e67e22' : 'white'"
         [style.color]="printMode === 'upload-docts' ? 'white' : '#e67e22'"
         style="padding: 10px 20px; border: 2px solid #e67e22; border-radius: 6px; cursor: pointer; font-weight: bold;">
         <i class="fas fa-upload"></i> افلوډ سټه
-    </button>
+    </button> -->
     <button (click)="window.print()"
         style="padding: 10px 20px; border: 2px solid #27ae60; background: #27ae60; color: white; border-radius: 6px; cursor: pointer; font-weight: bold;">
         <i class="fas fa-print"></i> چاپ
@@ -401,12 +389,11 @@
     style="font-family: 'B Nazanin', Arial, sans-serif; width: 210mm; height: 297mm; margin: 20px auto; padding: 0; position: relative; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden;">
 
     <!-- Background image of the form -->
-    <img *ngIf="showOldDesignBackground" src="assets/img/Sitas/Dari/Sita_Frosh_Front 01.webp" alt="Form Background"
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 1;">
+    <!-- <img *ngIf="showOldDesignBackground" src="assets/img/Sitas/Dari/Sita_Frosh_Front 01.webp" alt="Form Background"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 1;"> -->
 
     <!-- Overlay content with exact positioning - DATA WILL BE ADDED HERE LATER -->
-    <div *ngIf="showOldDesignData"
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
 
         <!-- Company Name and Phone - Top Center -->
         <div [style.position]="'absolute'" 
@@ -775,8 +762,7 @@
 
 
     <!-- Overlay content for back page -->
-    <div *ngIf="showOldDesignData"
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
 
         <!-- QR Code and Verification - Bottom of Page -->
         <div style="position: absolute; bottom: 0mm; left: 50%; transform: translateX(-50%); text-align: center;"
