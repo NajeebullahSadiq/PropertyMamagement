@@ -59,8 +59,8 @@ export class PrintComponent implements OnInit {
   ngOnInit(): void {
     // Check if print mode is specified in URL
     const mode = this.route.snapshot.queryParamMap.get('mode');
-    if (mode === 'data-only' || mode === 'full' || mode === 'new-design' || mode === 'old-design') {
-      this.printMode = mode as 'full' | 'data-only' | 'new-design' | 'old-design';
+    if (mode === 'data-only' || mode === 'full' || mode === 'new-design' || mode === 'old-design' || mode === 'upload-docts') {
+      this.printMode = mode as 'full' | 'data-only' | 'new-design' | 'old-design' | 'upload-docts';
     }
     this.loadPrintData();
   }
@@ -534,6 +534,52 @@ export class PrintComponent implements OnInit {
     return docType || this.documentData?.doctype || '';
   }
 
+  /**
+   * Get the transaction type for conditional rendering (کرایه, خرید و فروش, etc.)
+   */
+  getTransactionType(): string {
+    // Check buyers array first (transaction type is stored per buyer)
+    if (this.documentData?.buyers && this.documentData.buyers.length > 0) {
+      const firstBuyer = this.documentData.buyers[0];
+      if (firstBuyer.transactionType) {
+        return firstBuyer.transactionType;
+      }
+    }
+    // Fallback to top-level transactionType field
+    return this.documentData?.transactionType || '';
+  }
+
+  /**
+   * Check if current transaction is Rent (کرایه)
+   */
+  isRentTransaction(): boolean {
+    const transactionType = this.getTransactionType();
+    return transactionType === 'Rent' || transactionType === 'کرایه';
+  }
+
+  /**
+   * Get position value based on transaction type
+   * @param buyAndSellValue - Position for خرید و فروش (Purchase)
+   * @param rentValue - Position for کرایه (Rent)
+   * @param saleValue - Position for بیع جایزی (Revocable Sale)
+   */
+  getPositionByDocType(buyAndSellValue: string, rentValue: string, saleValue: string): string {
+    const transactionType = this.getTransactionType();
+    
+    // Check for Rent (کرایه)
+    if (transactionType === 'Rent' || transactionType === 'کرایه') {
+      return rentValue;
+    } 
+    // Check for Revocable Sale (بیع جایزی)
+    else if (transactionType === 'Revocable Sale' || transactionType === 'بیع جایزی') {
+      return saleValue;
+    } 
+    // Default to Purchase (خرید و فروش)
+    else {
+      return buyAndSellValue;
+    }
+  }
+
   private constructImageUrl(path: string): string {
     if (!path) return 'assets/img/avatar2.png';
     
@@ -605,12 +651,8 @@ export class PrintComponent implements OnInit {
         this.verificationCode = result.verificationCode;
         this.verificationUrl = result.verificationUrl;
         
-        // Generate QR code with full document information
-        this.qrCodeUrl = this.verificationService.generateDocumentQrCodeUrl(
-          this.documentData,
-          result.verificationCode,
-          result.verificationUrl
-        );
+        // Generate QR code with just the verification URL (same as vehicle)
+        this.qrCodeUrl = this.verificationService.generateQrCodeUrl(result.verificationUrl);
         
         console.log('[PrintProperty] Verification Code:', this.verificationCode);
         console.log('[PrintProperty] Verification URL:', this.verificationUrl);

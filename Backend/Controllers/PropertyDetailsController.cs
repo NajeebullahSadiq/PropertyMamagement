@@ -713,6 +713,7 @@ namespace WebAPIBackend.Controllers
                         FirstName = seller.FirstName,
                         FatherName = seller.FatherName,
                         GrandFather = seller.GrandFather,
+                        PhoneNumber = seller.PhoneNumber,
                         ElectronicNationalIdNumber = seller.ElectronicNationalIdNumber,
                         Photo = seller.Photo,
                         PaddressProvince = sellerPProvince?.Name,
@@ -750,8 +751,10 @@ namespace WebAPIBackend.Controllers
                         FirstName = buyer.FirstName,
                         FatherName = buyer.FatherName,
                         GrandFather = buyer.GrandFather,
+                        PhoneNumber = buyer.PhoneNumber,
                         ElectronicNationalIdNumber = buyer.ElectronicNationalIdNumber,
                         Photo = buyer.Photo,
+                        TransactionType = buyer.TransactionType,
                         PaddressProvince = buyerPProvince?.Name,
                         PaddressProvinceDari = buyerPProvince?.Dari,
                         PaddressDistrict = buyerPDistrict?.Name,
@@ -770,6 +773,7 @@ namespace WebAPIBackend.Controllers
                 {
                     FirstName = w.FirstName,
                     FatherName = w.FatherName,
+                    PhoneNumber = w.PhoneNumber,
                     ElectronicNationalIdNumber = w.ElectronicNationalIdNumber
                 }).ToList();
 
@@ -820,6 +824,8 @@ namespace WebAPIBackend.Controllers
                     // Backward compatibility - first seller/buyer
                     SellerFirstName = property.SellerDetails.FirstOrDefault()?.FirstName,
                     SellerFatherName = property.SellerDetails.FirstOrDefault()?.FatherName,
+                    SellerGrandFather = property.SellerDetails.FirstOrDefault()?.GrandFather,
+                    SellerPhoneNumber = property.SellerDetails.FirstOrDefault()?.PhoneNumber,
                     SellerIndentityCardNumber = property.SellerDetails.FirstOrDefault()?.ElectronicNationalIdNumber,
                     SellerPhoto = property.SellerDetails.FirstOrDefault()?.Photo,
                     SellerProvince = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.PaddressProvinceId),
@@ -835,6 +841,8 @@ namespace WebAPIBackend.Controllers
                     
                     BuyerFirstName = property.BuyerDetails.FirstOrDefault()?.FirstName,
                     BuyerFatherName = property.BuyerDetails.FirstOrDefault()?.FatherName,
+                    BuyerGrandFather = property.BuyerDetails.FirstOrDefault()?.GrandFather,
+                    BuyerPhoneNumber = property.BuyerDetails.FirstOrDefault()?.PhoneNumber,
                     BuyerIndentityCardNumber = property.BuyerDetails.FirstOrDefault()?.ElectronicNationalIdNumber,
                     BuyerPhoto = property.BuyerDetails.FirstOrDefault()?.Photo,
                     BuyerProvince = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.PaddressProvinceId),
@@ -850,15 +858,17 @@ namespace WebAPIBackend.Controllers
                     
                     WitnessOneFirstName = witnesses.ElementAtOrDefault(0)?.FirstName,
                     WitnessOneFatherName = witnesses.ElementAtOrDefault(0)?.FatherName,
+                    WitnessOnePhoneNumber = witnesses.ElementAtOrDefault(0)?.PhoneNumber,
                     WitnessOneIndentityCardNumber = witnesses.ElementAtOrDefault(0)?.ElectronicNationalIdNumber,
                     WitnessTwoFirstName = witnesses.ElementAtOrDefault(1)?.FirstName,
                     WitnessTwoFatherName = witnesses.ElementAtOrDefault(1)?.FatherName,
+                    WitnessTwoPhoneNumber = witnesses.ElementAtOrDefault(1)?.PhoneNumber,
                     WitnessTwoIndentityCardNumber = witnesses.ElementAtOrDefault(1)?.ElectronicNationalIdNumber,
                     
                     // Property Unit Type and Transaction Type
                     UnitType = property.PunitType?.Name,
                     UnitTypeDari = property.PunitType?.Dari,
-                    TransactionType = property.TransactionType?.Name,
+                    TransactionType = firstBuyer?.TransactionType ?? property.TransactionType?.Name,
                     
                     // Property Documents and Images
                     FilePath = property.FilePath,

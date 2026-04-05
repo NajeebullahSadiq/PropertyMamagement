@@ -116,345 +116,285 @@
 </div>
 <!-- ==================== NEW DESIGN TEMPLATE ==================== -->
 <div class="container new-design-container" *ngIf="!isLoading && !loadError && printMode === 'new-design'" dir="rtl"
-    style="font-family: 'B Nazanin', Arial, sans-serif; padding: 5mm; max-width: 210mm; margin: 0 auto; font-size: 10pt; font-weight: bold;">
+    style="font-family: 'B Nazanin', Arial, sans-serif; width: 210mm; height: 297mm; padding: 0; margin: 20px auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; overflow: hidden;">
 
-    <!-- Section 1: Company Information Header - Simple -->
-    <div class="company-header"
-        style="border: 1px solid #2c3e50; padding: 2mm; margin-bottom: 3mm; background: #f8f9fa;">
-        <p style="margin: 1mm 0; font-size: 11pt; text-align: center; font-weight: bold;"><u><b>ای کسانیکه ایمان آورده
-                    اید به قراردادها وفا کنید.</b></u><b> (مایده آیه اول)</b></p>
-        <table style="width: 100%; table-layout: fixed; font-size: 10pt; margin: 1mm 0; font-weight: bold;">
+    <!-- Certificate Frame with Triple Border -->
+    <div style="position: relative; z-index: 10; margin: 8mm; height: calc(100% - 16mm); border: 3px solid #1B365D; border-radius: 2px; background: transparent; overflow: hidden;">
+        
+        <!-- Inner border effect -->
+        <div style="position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid #42a5f5; border-radius: 1px; pointer-events: none; z-index: 1;"></div>
+        
+        <!-- Decorative dashed line -->
+        <div style="position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 1px dashed rgba(25, 118, 210, 0.3); border-radius: 1px; pointer-events: none; z-index: 1;"></div>
+
+        <!-- Content Container -->
+        <div style="position: relative; z-index: 2; padding: 8mm 10mm; height: 100%; box-sizing: border-box; overflow: hidden;">
+
+    <!-- HEADER SECTION -->
+    <div style="text-align: center; margin-bottom: 2mm;">
+        <p style="font-style: italic; font-size: 6.5pt; color: #666; margin: 0 0 0.5mm 0;">بسم الله الرحمن الرحیم - و أوفوا بالعهد إن العهد كان مسئولا</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1B365D; padding-bottom: 1.5mm; margin-bottom: 0.5mm;">
+            <div style="text-align: right; flex: 1;">
+                <h1 style="font-size: 13pt; font-weight: 900; color: #1a1a1a; margin: 0; line-height: 1.1;">{{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || 'رهنمای معاملات'}}</h1>
+                <h2 style="font-size: 11pt; font-weight: bold; color: #1a1a1a; margin: 0;">دفتر رهنمایی معاملات</h2>
+            </div>
+            <div style="flex: 1; text-align: left; font-size: 7.5pt; line-height: 1.3;">
+                <p style="margin: 0; font-weight: bold; color: #1B365D;">قیمت: 33.3 افغانی</p>
+                <p style="margin: 0;">موبایل: {{userDetails.phoneNumber}}</p>
+                <p style="margin: 0;">تاریخ: {{documentData.createdAt | date:'yyyy/MM/dd'}}</p>
+            </div>
+        </div>
+        <div style="font-size: 6pt; color: #dc2626; padding: 0.5mm 0; font-weight: bold;">
+            هر نوع تزویر، اضافه نمودن یا تغییر جرم پنداشته شده و مرتکب مورد پیگرد قانونی قرار میگیرد.
+        </div>
+    </div>
+
+    <!-- PROPERTY DETAILS SECTION -->
+    <div style="background-color: #1B365D; color: white; padding: 0.5mm 2mm; font-size: 8.5pt; font-weight: bold; margin-top: 1.5mm;">جزئیات ملک</div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 1.5mm;">
+        <tbody>
             <tr>
-                <td style="width: 33.33%; text-align: right;"><b>دفتر رهنمایی معاملات ({{userDetails.companyName ||
-                        (userDetails.firstName + ' ' + userDetails.lastName) || 'ادمین'}})</b></td>
-                <td style="width: 33.33%; text-align: center;"><b></b> </td>
-                <td style="width: 33.33%; text-align: left;"><b>شماره تماس:</b> {{userDetails.phoneNumber}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 14%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">نوع سند</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{ getDocumentTypeDisplay() }}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 14%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">نمبر مسلسل</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.issuanceNumber || documentData.pNumber}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 14%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">نوع جایداد</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.propertypeType}}</td>
             </tr>
             <tr>
-                <td style="width: 33.33%; text-align: right; color: #c0392b; font-size: 9pt; white-space: nowrap;">
-                    <b>توجه:</b> انجام معامله در کاپی و یا سکن این سند با اسکن این سند باطل و مدار اعتبار نمی باشد
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">مساحت کل</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.pArea}} {{documentData.unitTypeDari || documentData.unitType}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">ولایت</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.provinceDari || documentData.province}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">ناحیه</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.districtDari || documentData.district}}</td>
+            </tr>
+            <tr>
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">قریه</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.village}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">تعداد اطاق</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.numofRooms}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">تعداد منزل</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.numofHouses}}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- BOUNDARIES TABLE -->
+    <table style="width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 1.5mm; border-top: 0;">
+        <tbody>
+            <tr>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 10%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">حدود</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 10%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">شمال</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.north}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 10%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">جنوب</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.south}}</td>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 10%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">شرق</td>
+                <td style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.east}}</td>
+            </tr>
+            <tr>
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;"></td>
+                <td style="background-color: #f9f9f9; font-weight: bold; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">غرب</td>
+                <td colspan="5" style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">{{documentData.west}}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- PRICE TABLE -->
+    <table style="width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 1.5mm; border-top: 0;">
+        <tbody>
+            <tr>
+                <td style="background-color: #f9f9f9; font-weight: bold; width: 15%; color: #1a1a1a; text-align: center; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm;">قیمت کل</td>
+                <td colspan="5" style="background-color: #ffffff; color: #1a1a1a; text-align: right; border: 1px solid #e0e0e0; padding: 0.5mm 1.5mm; font-weight: bold;">{{documentData.price}} افغانی ({{documentData.priceText}})</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- SELLERS SECTION -->
+    <div style="background-color: #1B365D; color: white; padding: 0.5mm 2mm; font-size: 8.5pt; font-weight: bold; margin-top: 1.5mm;">مالکین / فروشندگان</div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 7pt; margin-bottom: 1.5mm; border-top: 0;" *ngIf="documentData.sellers && documentData.sellers.length > 0">
+        <thead>
+            <tr style="background-color: #f3f4f6;">
+                <th style="width: 20%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">شهرت</th>
+                <th style="width: 12%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">نام پدر</th>
+                <th style="width: 15%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">نمبر تذکره</th>
+                <th style="width: 18%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">سکونت اصلی</th>
+                <th style="width: 18%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">سکونت فعلی</th>
+                <th style="width: 8%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">عکس</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let seller of documentData.sellers; let i = index" style="height: 12mm;">
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm 1mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{seller.firstName || seller.name}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm 1mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{seller.fatherName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm 1mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{seller.electronicNationalIdNumber}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm 1mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{seller.paddressProvinceDari || seller.paddressProvince}}, {{seller.paddressDistrictDari || seller.paddressDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm 1mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{seller.taddressProvinceDari || seller.taddressProvince}}, {{seller.taddressDistrictDari || seller.taddressDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.3mm; text-align: center;">
+                    <div style="width: 8mm; height: 10mm; border: 1px solid #adb3b4; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <img [src]="constructImageUrlPublic(seller.photo)" alt="Seller" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                 </td>
-                <td style="width: 33.33%; text-align: center;"></td>
-                <td style="width: 33.33%; text-align: left; font-size: 9pt;"><b>قیمت سند:</b> 33.3 افغانی</td>
             </tr>
-        </table>
-    </div>
-
-    <!-- Section 2: Property Information Table - Compact -->
-    <div class="property-section" style="margin-bottom: 3mm;">
-        <table
-            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 10pt; font-weight: bold;">
-            <tr style="background: #e8e8e8;">
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نوعیت سند</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{ getDocumentTypeDisplay() }}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{ getIssuanceNumberLabel() }}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.issuanceNumber ||
-                        documentData.pNumber}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>نوعیت ملکیت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.propertypeType}}</b></td>
-            </tr>
-            <tr>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b> مساحت ملکیت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.pArea}}
-                        {{documentData.unitTypeDari || documentData.unitType}}</b>
-                </td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>ولایت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.provinceDari ||
-                        documentData.province}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>ناحیه/ولسوالی</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.districtDari ||
-                        documentData.district}}</b></td>
-            </tr>
-            <tr style="background: #e8e8e8;">
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قریه/گذر</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.village}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>شرق</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.east}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>شمال</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.north}}</b></td>
-            </tr>
-            <tr>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>تعداد اطاق</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.numofRooms}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>غرب</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.west}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>جنوب</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.south}}</b></td>
-            </tr>
-            <tr style="background: #e8e8e8;">
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قیمت (حروف)</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.priceText}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>قیمت (عدد)</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.price}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>مناصفه قیمت</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.price/2}}</b></td>
-            </tr>
-            <tr>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>حق العمل رهنما</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.royaltyAmount}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>تعداد منزل</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.numofHouses}}</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>واحد اندازه گیری</b></td>
-                <td style="padding: 1mm 2mm; border: 1px solid #333;"><b>{{documentData.unitTypeDari ||
-                        documentData.unitType}}</b></td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Section 3: Owners (Sellers) Table - Compact -->
-    <div class="owners-section" style="margin-bottom: 3mm;"
-        *ngIf="documentData.sellers && documentData.sellers.length > 0">
-        <h3
-            style="margin: 0 0 1mm 0; font-size: 11pt; color: #27ae60; text-align: center; background: #e8f5e9; padding: 1mm; font-weight: bold;">
-            مالکین / فروشندگان</h3>
-        <table
-            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
-            <thead>
-                <tr style="background: #27ae60; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (فعلی)</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let seller of documentData.sellers; let i = index"
-                    [style.background]="i % 2 === 0 ? '#fff' : '#f9f9f9'">
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.firstName || seller.name}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.fatherName}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.electronicNationalIdNumber}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.paddressProvinceDari ||
-                            seller.paddressProvince}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.paddressDistrictDari ||
-                            seller.paddressDistrict}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.paddressVillage}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.taddressProvinceDari ||
-                            seller.taddressProvince}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.taddressDistrictDari ||
-                            seller.taddressDistrict}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{seller.taddressVillage}}</b></td>
-                    <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
-                        <img [src]="constructImageUrlPublic(seller.photo)" alt="Owner"
-                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        </tbody>
+    </table>
 
     <!-- Fallback for single seller -->
-    <div class="owners-section" style="margin-bottom: 3mm;"
-        *ngIf="!documentData.sellers || documentData.sellers.length === 0">
-        <h3
-            style="margin: 0 0 1mm 0; font-size: 11pt; color: #27ae60; text-align: center; background: #e8f5e9; padding: 1mm; font-weight: bold;">
-            فروشنده</h3>
-        <table
-            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
-            <thead>
-                <tr style="background: #27ae60; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (اصل)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی (فعلی)</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه (فعلی)</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerFirstName}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerFatherName}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
-                        <b>{{documentData.sellerIndentityCardNumber}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerProvinceDari ||
-                            documentData.sellerProvince}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerDistrictDari ||
-                            documentData.sellerDistrict}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.sellerVillage}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tSellerProvinceDari ||
-                            documentData.tSellerProvince}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tSellerDistrictDari ||
-                            documentData.tSellerDistrict}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tSellerVillage}}</b></td>
-                    <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
-                        <img [src]="SellerfilePath" alt="Owner"
-                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 7pt; margin-bottom: 1.5mm; border-top: 0;" *ngIf="!documentData.sellers || documentData.sellers.length === 0">
+        <thead>
+            <tr style="background-color: #f3f4f6;">
+                <th style="width: 20%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">شهرت</th>
+                <th style="width: 12%; border: 1px solid #e0e0e0; padding: 0.5mm 1mm; font-weight: bold; text-align: center;">نام پدر</th>
+                <th style="width: 15%; border: 1px solid #e0e0e0; padding: 0.5mm 1; font-weight: bold; text-align: center;">نمبر تذکره</th>
+                <th style="width: 17.5%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">سکونت اصلی</th>
+                <th style="width: 17.5%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">سکونت فعلی</th>
+                <th style="width: 10%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">عکس</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="height: 14mm;">
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.sellerFirstName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.sellerFatherName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.sellerIndentityCardNumber}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.sellerProvinceDari || documentData.sellerProvince}}, {{documentData.sellerDistrictDari || documentData.sellerDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.tSellerProvinceDari || documentData.tSellerProvince}}, {{documentData.tSellerDistrictDari || documentData.tSellerDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm; text-align: center;">
+                    <div style="width: 10mm; height: 12mm; border: 1px solid #adb3b4; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <img [src]="SellerfilePath" alt="Seller" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-    <!-- Section 4: Buyers Table - Compact -->
-    <div class="buyers-section" style="margin-bottom: 3mm;"
-        *ngIf="documentData.buyers && documentData.buyers.length > 0">
-        <h3
-            style="margin: 0 0 1mm 0; font-size: 11pt; color: #e67e22; text-align: center; background: #fff3e0; padding: 1mm; font-weight: bold;">
-            مشتریان / خریداران</h3>
-        <table
-            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
-            <thead>
-                <tr style="background: #e67e22; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه فعلی</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let buyer of documentData.buyers; let i = index"
-                    [style.background]="i % 2 === 0 ? '#fff' : '#f9f9f9'">
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.firstName || buyer.name}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.fatherName}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.electronicNationalIdNumber}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.paddressProvinceDari ||
-                            buyer.paddressProvince}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.paddressDistrictDari ||
-                            buyer.paddressDistrict}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.paddressVillage}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.taddressProvinceDari ||
-                            buyer.taddressProvince}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.taddressDistrictDari ||
-                            buyer.taddressDistrict}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{buyer.taddressVillage}}</b></td>
-                    <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
-                        <img [src]="constructImageUrlPublic(buyer.photo)" alt="Buyer"
-                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- BUYERS SECTION -->
+    <div style="background-color: #1B365D; color: white; padding: 1mm 2mm; font-size: 9pt; font-weight: bold; margin-top: 2mm;">مشتریان / خریداران</div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 2mm; border-top: 0;" *ngIf="documentData.buyers && documentData.buyers.length > 0">
+        <thead>
+            <tr style="background-color: #f3f4f6;">
+                <th style="width: 25%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">شهرت</th>
+                <th style="width: 15%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">نام پدر</th>
+                <th style="width: 15%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">نمبر تذکره</th>
+                <th style="width: 17.5%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">سکونت اصلی</th>
+                <th style="width: 17.5%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">سکونت فعلی</th>
+                <th style="width: 10%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">عکس</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let buyer of documentData.buyers; let i = index" style="height: 14mm;">
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{buyer.firstName || buyer.name}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{buyer.fatherName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{buyer.electronicNationalIdNumber}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{buyer.paddressProvinceDari || buyer.paddressProvince}}, {{buyer.paddressDistrictDari || buyer.paddressDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{buyer.taddressProvinceDari || buyer.taddressProvince}}, {{buyer.taddressDistrictDari || buyer.taddressDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm; text-align: center;">
+                    <div style="width: 10mm; height: 12mm; border: 1px solid #adb3b4; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <img [src]="constructImageUrlPublic(buyer.photo)" alt="Buyer" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     <!-- Fallback for single buyer -->
-    <div class="buyers-section" style="margin-bottom: 3mm;"
-        *ngIf="!documentData.buyers || documentData.buyers.length === 0">
-        <h3
-            style="margin: 0 0 1mm 0; font-size: 11pt; color: #e67e22; text-align: center; background: #fff3e0; padding: 1mm; font-weight: bold;">
-            خریدار</h3>
-        <table
-            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; font-weight: bold;">
-            <thead>
-                <tr style="background: #e67e22; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه اصلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولایت فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولسوالی فعلی</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">قریه فعلی</th>
-                    <th style="padding: 1mm; border: 1px solid #333; width: 10mm; font-weight: bold;">عکس</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerFirstName}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerFatherName}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
-                        <b>{{documentData.buyerIndentityCardNumber}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerProvinceDari ||
-                            documentData.buyerProvince}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerDistrictDari ||
-                            documentData.buyerDistrict}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.buyerVillage}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tBuyerProvinceDari ||
-                            documentData.tBuyerProvince}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tBuyerDistrictDari ||
-                            documentData.tBuyerDistrict}}</b></td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.tBuyerVillage}}</b></td>
-                    <td style="padding: 1mm; border: 1px solid #333; text-align: center;">
-                        <img [src]="BuyerfilePath" alt="Buyer"
-                            style="width: 10mm !important; height: 12mm !important; object-fit: cover; max-width: 10mm; max-height: 12mm; min-width: 10mm; min-height: 12mm;">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 2mm; border-top: 0;" *ngIf="!documentData.buyers || documentData.buyers.length === 0">
+        <thead>
+            <tr style="background-color: #f3f4f6;">
+                <th style="width: 25%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">شهرت</th>
+                <th style="width: 15%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">نام پدر</th>
+                <th style="width: 15%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">نمبر تذکره</th>
+                <th style="width: 17.5%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">سکونت اصلی</th>
+                <th style="width: 17.5%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">سکونت فعلی</th>
+                <th style="width: 10%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold; text-align: center;">عکس</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="height: 14mm;">
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.buyerFirstName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.buyerFatherName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.buyerIndentityCardNumber}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.buyerProvinceDari || documentData.buyerProvince}}, {{documentData.buyerDistrictDari || documentData.buyerDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.tBuyerProvinceDari || documentData.tBuyerProvince}}, {{documentData.tBuyerDistrictDari || documentData.tBuyerDistrict}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 0.5mm; text-align: center;">
+                    <div style="width: 10mm; height: 12mm; border: 1px solid #adb3b4; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <img [src]="BuyerfilePath" alt="Buyer" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-    <!-- Section 5: Witnesses Table - Compact -->
-    <div class="witnesses-section" style="margin-bottom: 3mm;">
-        <table
-            style="width: 100%; border-collapse: collapse; border: 1px solid #333; font-size: 9pt; direction: rtl; font-weight: bold;">
-            <thead>
-                <tr style="background: #9b59b6; color: white;">
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم شاهد اول</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">اسم شاهد دوم</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">ولد</th>
-                    <th style="padding: 1mm 1mm; border: 1px solid #333; font-weight: bold;">شماره تذکره</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessOneFirstName}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessOneFatherName}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
-                        <b>{{documentData.witnessOneIndentityCardNumber}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessTwoFirstName}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;"><b>{{documentData.witnessTwoFatherName}}</b>
-                    </td>
-                    <td style="padding: 1mm 1mm; border: 1px solid #333;">
-                        <b>{{documentData.witnessTwoIndentityCardNumber}}</b>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- WITNESSES SECTION -->
+    <div style="background-color: #1B365D; color: white; padding: 1mm 2mm; font-size: 9pt; font-weight: bold; margin-top: 2mm;">شاهدین</div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 2mm; border-top: 0;">
+        <thead>
+            <tr style="background-color: #f3f4f6; text-align: center;">
+                <th style="width: 5%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold;">#</th>
+                <th style="width: 35%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold;">شهرت کامل</th>
+                <th style="width: 20%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold;">نام پدر</th>
+                <th style="width: 20%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold;">نمبر هویت</th>
+                <th style="width: 20%; border: 1px solid #e0e0e0; padding: 1mm 2mm; font-weight: bold;">امضا و شصت</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="height: 10mm;">
+                <td style="text-align: center; border: 1px solid #e0e0e0; padding: 1mm 2mm; background-color: #ffffff; color: #1a1a1a;">1</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.witnessOneFirstName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.witnessOneFatherName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.witnessOneIndentityCardNumber}}</td>
+                <td style="background-color: #f9fafb; border: 2px dashed #e0e0e0; opacity: 0.3;"></td>
+            </tr>
+            <tr style="height: 10mm;">
+                <td style="text-align: center; border: 1px solid #e0e0e0; padding: 1mm 2mm; background-color: #ffffff; color: #1a1a1a;">2</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.witnessTwoFirstName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.witnessTwoFatherName}}</td>
+                <td style="border: 1px solid #e0e0e0; padding: 1mm 2mm; text-align: right; background-color: #ffffff; color: #1a1a1a;">{{documentData.witnessTwoIndentityCardNumber}}</td>
+                <td style="background-color: #f9fafb; border: 2px dashed #e0e0e0; opacity: 0.3;"></td>
+            </tr>
+        </tbody>
+    </table>
 
-    <!-- Section 6: Fixed QR Code with Transaction Record -->
-    <div class="qr-section"
-        style="position: fixed; bottom: 5mm; left: 0; right: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 5mm; background: white; padding: 2mm; border: 2px solid #0066cc; direction: rtl;"
-        *ngIf="verificationCode">
-        <div
-            style="display: flex; align-items: center; gap: 3mm; padding: 2mm; border: 2px solid #0066cc; border-radius: 4px; background: white;">
-            <div
-                style="border: 3px solid #000; padding: 1mm; background: white; display: flex; align-items: center; justify-content: center;">
-                <img [src]="qrCodeUrl" alt="QR Code"
-                    style="width: 20mm !important; height: 20mm !important; display: block; max-width: 20mm; max-height: 20mm; min-width: 20mm; min-height: 20mm; object-fit: contain;"
-                    *ngIf="qrCodeUrl">
+    <!-- CLAUSE & STAMPS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 4mm;">
+        <div style="border: 1px solid #e0e0e0; padding: 2mm; font-size: 7.5pt; color: #1a1a1a; line-height: 1.6; text-align: justify;">
+            <p style="font-weight: bold; margin: 0 0 1mm 0;">اقرار و تعهد:</p>
+            اینجانبان فروشنده و مشتری با کمال رضایت خاطر و عقل سلیم، معامله فوق را انجام داده و مبلغ مندرج در جدول قیمت را تسلیم و تسلم نمودیم. هر نوع ادعای بعدی باطل است. این سند در حضور شاهدین ترتیب و تایید گردید.
+        </div>
+        <div style="display: flex; justify-content: space-around; align-items: center;">
+            <div style="text-align: center;">
+                <div style="width: 16mm; height: 16mm; border: 2px double #1B365D; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1mm;">
+                    <span style="font-size: 5.5pt; color: #1B365D; text-align: center; font-weight: bold;">مهر رهنمای<br/>معاملات</span>
+                </div>
+                <p style="font-size: 6.5pt; font-weight: bold; margin: 0;">مهر {{userDetails.companyName || 'الامان'}}</p>
             </div>
-            <div style="text-align: right; white-space: nowrap;">
-                <p style="margin: 0; font-size: 8pt; font-weight: bold; color: #0066cc; letter-spacing: 1px;">{{
-                    verificationCode }}</p>
-                <p style="margin: 0; font-size: 7pt; color: #555; margin-top: 1mm;">کود تصدیق سند</p>
+            <div style="text-align: center;">
+                <div style="width: 16mm; height: 12mm; border-bottom: 1px solid black; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 1mm;">
+                </div>
+                <p style="font-size: 6.5pt; font-weight: bold; margin: 0;">امضای مدیر</p>
             </div>
         </div>
-        <div style="flex-grow: 1; text-align: right; font-size: 8pt; white-space: nowrap;">
-            معامله این سند به شماره ( ) صفحه ( ) کتاب معاملات درج گردید.
-        </div>
     </div>
 
-</div>
+    <!-- FOOTER & QR CODE -->
+    <footer style="position: absolute; bottom: 6mm; left: 12mm; right: 12mm; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 2mm; border-top: 1px solid #e0e0e0;">
+        <div style="text-align: left; font-size: 7pt; color: #6b7280; font-weight: 500;">
+            <p style="text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">THE DIGITAL LEDGER - SOVEREIGN AUTHORITY UNIT</p>
+            <p style="margin: 0;">© 2024 مرکز ثبت اسناد دیجیتال</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 3mm;" *ngIf="verificationCode && qrCodeUrl">
+            <div style="text-align: right; font-size: 7.5pt;">
+                <p style="margin: 0; font-weight: bold; color: #1B365D;">کد تایید: {{verificationCode}}</p>
+                <p style="margin: 0; color: #6b7280; font-size: 6.5pt;">sovereign.ledger.gov.af</p>
+            </div>
+            <div style="width: 20mm; height: 20mm; border: 1px solid #e0e0e0; background: white; padding: 1mm;">
+                <img [src]="qrCodeUrl" alt="کد کیو آر" style="width: 100%; height: 100%; filter: grayscale(100%); object-fit: contain;">
+            </div>
+        </div>
+    </footer>
+
+        </div><!-- Close content container -->
+    </div><!-- Close certificate frame -->
+</div><!-- Close new-design-container -->
 
 <!-- ==================== OLD DESIGN TEMPLATE (Traditional Form) ==================== -->
 <div class="container old-design-container" *ngIf="!isLoading && !loadError && printMode === 'old-design'" dir="rtl"
@@ -469,173 +409,360 @@
         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
 
         <!-- Company Name and Phone - Top Center -->
-        <div
-            style="position: absolute; top: 31mm; left: 42%; transform: translateX(-50%); text-align: center; width: 100mm;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('32mm', '35mm', '28mm')"
+             [style.left]="getPositionByDocType('42%', '42%', '42%')"
+             style="transform: translateX(-50%); text-align: center; width: 100mm;">
             <div style="font-size: 11pt; font-weight: bold; margin-bottom: 1mm;">
                 {{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || ''}}
             </div>
-
         </div>
-        <div
-            style="position:  absolute; top: 40mm; left: 42%; transform: translateX(-50%); text-align: center; width: 100mm;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('42mm', '44mm', '40mm')"
+             [style.left]="getPositionByDocType('42%', '42%', '42%')"
+             style="transform: translateX(-50%); text-align: center; width: 100mm;">
             {{userDetails.phoneNumber}}
         </div>
 
         <!-- Seller Photo - Left Side -->
         <img [src]="SellerfilePath" alt="Seller"
-            style="position: absolute; top: 25mm; right: 12mm; width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
+            [style.position]="'absolute'" 
+            [style.top]="getPositionByDocType('25mm', '25mm', '25mm')"
+            [style.right]="getPositionByDocType('12mm', '12mm', '12mm')"
+            style="width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
 
         <!-- Buyer Photo - Right Side -->
         <img [src]="BuyerfilePath" alt="Buyer"
-            style="position: absolute; top: 25mm; left: 12mm; width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
+            [style.position]="'absolute'" 
+            [style.top]="getPositionByDocType('25mm', '25mm', '25mm')"
+            [style.left]="getPositionByDocType('12mm', '12mm', '12mm')"
+            style="width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
 
         <!-- Row 1: Document Type, Number, Property Type -->
-        <div style="position: absolute; top: 84mm; left: 72mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('82mm', '82mm', '82mm')"
+             [style.left]="getPositionByDocType('70mm', '70mm', '70mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{ getDocumentTypeDisplay() }}
         </div>
-        <div style="position: absolute; top: 92mm; left: 72mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('92mm', '92mm', '92mm')"
+             [style.left]="getPositionByDocType('100mm', '100mm', '100mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.issuanceNumber || documentData.pNumber}}
         </div>
-        <div style="position:absolute; top: 129mm; left: 67mm; font-size: 11pt; font-weight: bold;">
-            {{documentData.propertypeType}}
-        </div>
+       
 
         <!-- Row 2: Property Area, Rooms, Houses -->
-        <div style="position: absolute; top: 102mm; left: 90mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('100mm', '100mm', '100mm')"
+             [style.left]="getPositionByDocType('90mm', '90mm', '90mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.pArea}} {{documentData.unitTypeDari || documentData.unitType}}
         </div>
-        <div style="position: absolute; top: 138mm; right: 82mm; font-size: 11pt; font-weight: bold;">
+         <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('128mm', '128mm', '128mm')"
+             [style.left]="getPositionByDocType('64mm', '64mm', '64mm')"
+             style="font-size: 11pt; font-weight: bold;">
+            {{documentData.propertypeType}}
+        </div>
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('138mm', '138mm', '138mm')"
+             [style.right]="getPositionByDocType('83mm', '83mm', '83mm')"
+             style="font-size: 7pt; font-weight: bold;">
             {{documentData.numofRooms}}
         </div>
 
 
         <!-- Row 3: Province, District, Village -->
-        <div style="position: absolute; top: 111mm; right: 105mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('109mm', '109mm', '109mm')"
+             [style.right]="getPositionByDocType('105mm', '105mm', '105mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.provinceDari || documentData.province}}
         </div>
-        <div style="position: absolute;  top: 111mm; right: 136mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('110mm', '110mm', '110mm')"
+             [style.right]="getPositionByDocType('136mm', '136mm', '136mm')"
+             style="font-size: 7pt; font-weight: bold;">
             {{documentData.districtDari || documentData.district}}
         </div>
-        <div style="position: absolute;  top: 120mm; right: 125mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('118mm', '118mm', '118mm')"
+             [style.right]="getPositionByDocType('125mm', '125mm', '125mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.village}}
         </div>
 
         <!-- Boundaries (حدود اربعه) - Center Column -->
-
-
-        <div style="position: absolute;  top: 145mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('145mm', '145mm', '145mm')"
+             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.east}}
         </div>
-        <div style="position: absolute;  top: 154mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('155mm', '155mm', '155mm')"
+             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.west}}
         </div>
-
-        <div style="position: absolute;  top: 164mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('165mm', '165mm', '165mm')"
+             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.south}}
         </div>
-        <div style="position: absolute; top: 174mm; right: 87mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('175mm', '175mm', '175mm')"
+             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.north}}
         </div>
 
         <!-- Price Information - Center Column -->
-        <div style="position: absolute; top: 185mm; right: 95mm; font-size: 10pt; max-width: 80mm; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('182mm', '205mm', '182mm')"
+             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')"
+             style="font-size: 10pt; max-width: 80mm; font-weight: bold;">
             {{documentData.priceText}}
         </div>
-        <div style="position: absolute; top: 193mm; right: 95mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('193mm', '198mm', '188mm')"
+             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.price}}
         </div>
-        <div style="position: absolute; top: 206mm; right: 95mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('206mm', '211mm', '196mm')"
+             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.price ? (documentData.price/2) : ''}}
         </div>
-        <div style="position: absolute; top: 215mm; right: 95mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('215mm', '218mm', '210mm')"
+             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.royaltyAmount}}
         </div>
 
         <!-- SELLER INFORMATION (Left Column) -->
-        <div style="position: absolute; top: 90mm; right: 22mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('92mm', '90mm', '92mm')"
+             [style.right]="getPositionByDocType('22mm', '22mm', '22mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerFirstName}}
         </div>
-        <div style="position: absolute; top: 120mm; right: 22mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('119mm', '108mm', '119mm')"
+             [style.right]="getPositionByDocType('22mm', '22mm', '22mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerFatherName}}
         </div>
-        <div style="position: absolute; top: 147mm; right: 22mm; font-size: 11pt; font-weight: bold;">
+
+        <!-- Seller Grandfather Name (Only for کرایه) -->
+        <div *ngIf="isRentTransaction()" 
+             [style.position]="'absolute'" 
+             [style.top]="'124mm'"
+             [style.right]="'22mm'"
+             style="font-size: 11pt; font-weight: bold;">
+            {{documentData.sellerGrandFather}}
+        </div>
+
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('151mm', '140mm', '151mm')"
+             [style.right]="getPositionByDocType('22mm', '28mm', '22mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerIndentityCardNumber}}
         </div>
 
+        <!-- Seller Phone Number (Only for کرایه) -->
+        <div *ngIf="isRentTransaction()" 
+             [style.position]="'absolute'" 
+             [style.top]="'160mm'"
+             [style.right]="'28mm'"
+             style="font-size: 11pt; font-weight: bold;">
+            {{documentData.sellerPhoneNumber || documentData.sellerPhone}}
+        </div>
+
         <!-- Seller Permanent Address -->
-        <div style="position: absolute; bottom: 110mm; right: 26mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('110mm', '110mm', '110mm')"
+             [style.right]="getPositionByDocType('26mm', '26mm', '26mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerProvinceDari || documentData.sellerProvince}}
         </div>
-        <div style="position: absolute; bottom: 93mm; right: 37mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('93mm', '93mm', '93mm')"
+             [style.right]="getPositionByDocType('37mm', '37mm', '37mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerDistrictDari || documentData.sellerDistrict}}
         </div>
-        <div style="position: absolute; bottom: 77mm; right: 29mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('77mm', '77mm', '77mm')"
+             [style.right]="getPositionByDocType('29mm', '29mm', '29mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerVillage}}
         </div>
 
         <!-- Seller Current Address -->
-        <div style="position: absolute; bottom: 57mm; right:  26mm;font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('57mm', '57mm', '57mm')"
+             [style.right]="getPositionByDocType('26mm', '26mm', '26mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerProvinceDari || documentData.tSellerProvince}}
         </div>
-        <div style="position: absolute; bottom: 40mm; right: 37mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('39mm', '39mm', '39mm')"
+             [style.right]="getPositionByDocType('40mm', '37mm', '40mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerDistrictDari || documentData.tSellerDistrict}}
         </div>
-        <div style="position: absolute; bottom: 24mm; right:29mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('24mm', '24mm', '24mm')"
+             [style.right]="getPositionByDocType('29mm', '31mm', '29mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerVillage}}
         </div>
 
         <!-- BUYER INFORMATION (Right Column) -->
-        <div style="position: absolute; top: 90mm; left: 22mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('91mm', '88mm', '90mm')"
+             [style.left]="getPositionByDocType('22mm', '22mm', '22mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerFirstName}}
         </div>
-        <div style="position: absolute; top: 120mm; left: 22mm; font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('116mm', '107mm', '116mm')"
+             [style.left]="getPositionByDocType('22mm', '22mm', '22mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerFatherName}}
         </div>
-        <div style="position: absolute;  top: 147mm; left: 22mm; font-size: 11pt; font-weight: bold;">
+
+        <!-- Buyer Grandfather Name (Only for کرایه) -->
+        <div *ngIf="isRentTransaction()" 
+             [style.position]="'absolute'" 
+             [style.top]="'123mm'"
+             [style.left]="'22mm'"
+             style="font-size: 11pt; font-weight: bold;">
+            {{documentData.buyerGrandFather}}
+        </div>
+
+        <div [style.position]="'absolute'" 
+             [style.top]="getPositionByDocType('150mm', '140mm', '150mm')"
+             [style.left]="getPositionByDocType('22mm', '12mm', '22mm')"
+             style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerIndentityCardNumber}}
         </div>
 
+        <!-- Buyer Phone Number (Only for کرایه) -->
+        <div *ngIf="isRentTransaction()" 
+             [style.position]="'absolute'" 
+             [style.top]="'160mm'"
+             [style.left]="'22mm'"
+             style="font-size: 11pt; font-weight: bold;">
+            {{documentData.buyerPhoneNumber || documentData.buyerPhone}}
+        </div>
+
         <!-- Buyer Permanent Address -->
-        <div style="position: absolute; bottom: 110mm; left: 43mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('110mm', '109mm', '110mm')"
+             [style.left]="getPositionByDocType('35mm', '38mm', '43mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerProvinceDari || documentData.buyerProvince}}
         </div>
-        <div style="position: absolute; bottom: 93mm; left: 29mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('93mm', '93mm', '93mm')"
+             [style.left]="getPositionByDocType('21mm', '24mm', '29mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerDistrictDari || documentData.buyerDistrict}}
         </div>
-        <div style="position: absolute; bottom: 77mm; left: 32mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('77mm', '75mm', '77mm')"
+             [style.left]="getPositionByDocType('23mm', '25mm', '32mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerVillage}}
         </div>
 
         <!-- Buyer Current Address -->
-        <div style="position: absolute;  bottom: 57mm; left:  43mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('57mm', '57mm', '57mm')"
+             [style.left]="getPositionByDocType('33mm', '38mm', '43mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerProvinceDari || documentData.tBuyerProvince}}
         </div>
-        <div style="position: absolute; bottom: 40mm; left: 29mm;  font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('40mm', '40mm', '40mm')"
+             [style.left]="getPositionByDocType('19mm', '24mm', '29mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerDistrictDari || documentData.tBuyerDistrict}}
         </div>
-        <div style="position: absolute;bottom: 24mm; left:32mm; font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('24mm', '21mm', '24mm')"
+             [style.left]="getPositionByDocType('22mm', '28mm', '32mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerVillage}}
         </div>
 
         <!-- WITNESSES INFORMATION (Bottom Section) -->
-        <div style="position: absolute; bottom: 36mm; right:75mm; font-size: 10pt; font-weight: bold;">
+        <!-- Witness One First Name -->
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('36mm', '48mm', '36mm')"
+             [style.right]="getPositionByDocType('80mm', '95mm', '80mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessOneFirstName}}
         </div>
-        <div style="position: absolute;  bottom: 36mm; right:100mm; font-size: 10pt; font-weight: bold;">
+        <!-- Witness One Father Name -->
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('36mm', '38mm', '36mm')"
+             [style.right]="getPositionByDocType('105mm', '95mm', '103mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessOneFatherName}}
         </div>
-        <div style="position: absolute; bottom: 36mm; right:124mm; font-size: 7pt; font-weight: bold;">
+        <!-- Witness One ID Number -->
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('36mm', '31mm', '36mm')"
+             [style.right]="getPositionByDocType('126mm', '99mm', '124mm')"
+             style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessOneIndentityCardNumber}}
         </div>
+        <!-- Witness One Phone Number (Only for کرایه) -->
+        <div *ngIf="isRentTransaction()" 
+             [style.position]="'absolute'" 
+             [style.bottom]="'22mm'"
+             [style.right]="'95mm'"
+             style="font-size: 7pt; font-weight: bold;">
+            {{documentData.witnessOnePhoneNumber}}
+        </div>
 
-        <div style="position: absolute; bottom: 30mm; right:75mm;  font-size: 10pt; font-weight: bold;">
+        <!-- Witness Two First Name -->
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('24mm', '47mm', '24mm')"
+             [style.right]="getPositionByDocType('80mm', '125mm', '80mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessTwoFirstName}}
         </div>
-        <div style="position: absolute; bottom: 30mm; right:100mm; font-size: 10pt; font-weight: bold;">
+        <!-- Witness Two Father Name -->
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('24mm', '38mm', '24mm')"
+             [style.right]="getPositionByDocType('105mm', '125mm', '103mm')"
+             style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessTwoFatherName}}
         </div>
-        <div style="position: absolute; bottom: 30mm; right:124mm; font-size: 7pt; font-weight: bold;">
+        <!-- Witness Two ID Number -->
+        <div [style.position]="'absolute'" 
+             [style.bottom]="getPositionByDocType('21mm', '31mm', '22mm')"
+             [style.right]="getPositionByDocType('126mm', '125mm', '127mm')"
+             style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessTwoIndentityCardNumber}}
+        </div>
+        <!-- Witness Two Phone Number (Only for کرایه) -->
+        <div *ngIf="isRentTransaction()" 
+             [style.position]="'absolute'" 
+             [style.bottom]="'22mm'"
+             [style.right]="'125mm'"
+             style="font-size: 7pt; font-weight: bold;">
+            {{documentData.witnessTwoPhoneNumber}}
         </div>
 
 
@@ -652,7 +779,7 @@
         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
 
         <!-- QR Code and Verification - Bottom of Page -->
-        <div style="position: absolute; bottom: 10mm; left: 50%; transform: translateX(-50%); text-align: center;"
+        <div style="position: absolute; bottom: 0mm; left: 50%; transform: translateX(-50%); text-align: center;"
             *ngIf="verificationCode && qrCodeUrl">
             <img [src]="qrCodeUrl" alt="QR Code"
                 style="width: 35mm !important; height: 35mm !important; display: block; max-width: 35mm; max-height: 35mm; min-width: 35mm; min-height: 35mm; object-fit: contain; margin: 0 auto;">
