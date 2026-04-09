@@ -30,6 +30,10 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         [Column("LicenseHolderName")]
         public string? LicenseHolderName { get; set; }
 
+        [MaxLength(300)]
+        [Column("CompanyTitle")]
+        public string? CompanyTitle { get; set; }
+
         [MaxLength(200)]
         [Column("District")]
         public string? District { get; set; }

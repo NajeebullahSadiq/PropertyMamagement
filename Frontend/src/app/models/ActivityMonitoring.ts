@@ -10,6 +10,7 @@ export interface ActivityMonitoringRecord {
     serialNumber?: string;
     licenseNumber?: string;
     licenseHolderName?: string;
+    companyTitle?: string;
     district?: string;
     sectionType?: string;  // annualReport, complaints, violations, inspection
     reportRegistrationDate?: Date | string;
@@ -63,6 +64,7 @@ export interface ActivityMonitoringData {
     serialNumber?: string;
     licenseNumber?: string;
     licenseHolderName?: string;
+    companyTitle?: string;
     district?: string;
     sectionType?: string;
     reportRegistrationDate?: string;
@@ -145,4 +147,5 @@ export interface DeedItem {
     serialStart?: string;
     serialEnd?: string;
     count: number;
+    remarks?: string;
 }

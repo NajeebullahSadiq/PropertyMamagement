@@ -117,6 +117,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
             serialNumber: [{ value: '', disabled: true }], // Auto-generated, readonly
             licenseNumber: ['', [Validators.required, Validators.maxLength(50)]],
             licenseHolderName: ['', [Validators.required, Validators.maxLength(200)]],
+            companyTitle: [''],
             district: [''],
             reportRegistrationDate: [''],
             sectionType: ['', Validators.required],
@@ -180,13 +181,13 @@ export class ActivityMonitoringFormComponent implements OnInit {
             serialNumber: data.serialNumber,
             licenseNumber: data.licenseNumber,
             licenseHolderName: data.licenseHolderName,
+            companyTitle: data.companyTitle,
             district: data.district,
             sectionType: data.sectionType,
             saleDeedsCount: data.saleDeedsCount,
             rentalDeedsCount: data.rentalDeedsCount,
             baiUlWafaDeedsCount: data.baiUlWafaDeedsCount,
             vehicleTransactionDeedsCount: data.vehicleTransactionDeedsCount,
-            annualReportRemarks: data.annualReportRemarks,
         });
 
         // Set company found state if license number exists
@@ -209,7 +210,8 @@ export class ActivityMonitoringFormComponent implements OnInit {
                 deedType: item.deedType,
                 serialStart: item.serialStart,
                 serialEnd: item.serialEnd,
-                count: item.count
+                count: item.count,
+                remarks: item.remarks
             }));
         }
 
@@ -431,9 +433,11 @@ export class ActivityMonitoringFormComponent implements OnInit {
         // Build data for single table design - all fields in one object
         const data: ActivityMonitoringData = {
             id: formValue.id,
+            serialNumber: this.mainForm.getRawValue().serialNumber,
             sectionType: sectionType,
             licenseNumber: formValue.licenseNumber,
             licenseHolderName: formValue.licenseHolderName,
+            companyTitle: formValue.companyTitle,
             district: formValue.district,
             reportRegistrationDate: this.formatDateForBackend(formValue.reportRegistrationDate),
             saleDeedsCount: formValue.saleDeedsCount ? Number(formValue.saleDeedsCount) : undefined,
@@ -536,7 +540,8 @@ export class ActivityMonitoringFormComponent implements OnInit {
             deedType: this.selectedDeedType,
             serialStart: docType.hasSerial ? '' : undefined,
             serialEnd: docType.hasSerial ? '' : undefined,
-            count: 0
+            count: 0,
+            remarks: ''
         };
 
         this.deedItems.push(newItem);
@@ -607,7 +612,8 @@ export class ActivityMonitoringFormComponent implements OnInit {
                     this.mainForm.patchValue({
                         licenseHolderName: company.ownerName || '',
                         district: company.activityLocation || company.district || company.area || '',
-                        licenseNumber: company.licenseNumber || licenseNumber
+                        licenseNumber: company.licenseNumber || licenseNumber,
+                        companyTitle: company.companyTitle || company.companyName || ''
                     });
 
                     this.toastr.success('معلومات شرکت با موفقیت بارگذاری شد');

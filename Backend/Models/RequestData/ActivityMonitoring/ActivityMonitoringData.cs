@@ -21,6 +21,9 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         [MaxLength(200)]
         public string? LicenseHolderName { get; set; }
 
+        [MaxLength(300)]
+        public string? CompanyTitle { get; set; }
+
         [MaxLength(200)]
         public string? District { get; set; }
 
@@ -102,5 +105,8 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         public string? SerialEnd { get; set; }
         
         public int Count { get; set; }
+        
+        [MaxLength(1000)]
+        public string? Remarks { get; set; }
     }
 }

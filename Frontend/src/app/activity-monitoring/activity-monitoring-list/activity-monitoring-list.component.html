@@ -53,6 +53,7 @@
             <tr class="text-center">
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت دارنده جواز دفتر رهنمای معاملات</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عنوان رهنمایی معاملات</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
@@ -103,6 +104,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت دارنده جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">عنوان رهنمایی معاملات</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
           </thead>
@@ -113,6 +115,7 @@
               <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-purple-50 transition-colors">
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.companyTitle || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.district || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
                 <td class="px-4 py-3">
@@ -215,6 +218,7 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ item.companyTitle || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
                     <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">

@@ -134,7 +134,7 @@ export class ActivityMonitoringListComponent implements OnInit {
     getColspan(): number {
         switch (this.selectedSectionType) {
             case 'annualReport':
-                return 5;
+                return 6;
             case 'complaints':
                 return 6;
             case 'violations':
@@ -142,7 +142,7 @@ export class ActivityMonitoringListComponent implements OnInit {
             case 'inspection':
                 return 5;
             default:
-                return 6;
+                return 7;
         }
     }
 }

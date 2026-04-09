@@ -73,6 +73,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.SerialNumber,
                         x.LicenseNumber,
                         x.LicenseHolderName,
+                        x.CompanyTitle,
                         x.District,
                         x.SectionType,
                         x.ReportRegistrationDate,
@@ -150,6 +151,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.SerialNumber,
                         x.LicenseNumber,
                         x.LicenseHolderName,
+                        x.CompanyTitle,
                         x.District,
                         x.SectionType,
                         x.ReportRegistrationDate,
@@ -241,6 +243,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     SerialNumber = request.SerialNumber,
                     LicenseNumber = request.LicenseNumber,
                     LicenseHolderName = request.LicenseHolderName,
+                    CompanyTitle = request.CompanyTitle,
                     District = request.District,
                     SectionType = request.SectionType,
                     ReportRegistrationDate = reportRegistrationDate,
@@ -324,6 +327,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 // Update all fields
                 entity.LicenseNumber = request.LicenseNumber;
                 entity.LicenseHolderName = request.LicenseHolderName;
+                entity.CompanyTitle = request.CompanyTitle;
                 entity.District = request.District;
                 entity.SectionType = request.SectionType;
                 entity.ReportRegistrationDate = reportRegistrationDate;
