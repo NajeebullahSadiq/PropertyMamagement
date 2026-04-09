@@ -56,10 +56,21 @@ namespace WebAPIBackend.Helpers
             if (!date.HasValue) return "";
             
             // Check for DateOnly.MinValue (1/1/0001) which is invalid for calendar conversion
-            if (date.Value == DateOnly.MinValue) return "";
+            if (date.Value == DateOnly.MinValue || date.Value.Year < 100) return "";
             
-            var (year, month, day) = FromGregorian(date.Value.ToDateTime(TimeOnly.MinValue), calendarType);
-            return $"{year:D4}/{month:D2}/{day:D2}";
+            try
+            {
+                var (year, month, day) = FromGregorian(date.Value.ToDateTime(TimeOnly.MinValue), calendarType);
+                
+                // If conversion returned default date (1/1/1), return empty string
+                if (year == 1 && month == 1 && day == 1) return "";
+                
+                return $"{year:D4}/{month:D2}/{day:D2}";
+            }
+            catch
+            {
+                return "";
+            }
         }
 
         /// <summary>
@@ -110,6 +121,19 @@ namespace WebAPIBackend.Helpers
         {
             try
             {
+                // Check for invalid dates (before year 622 for Hijri calendars)
+                if (targetCalendar == CalendarType.HijriQamari && gregorianDate.Year < 622)
+                {
+                    // Return a default valid date instead of throwing
+                    return (1, 1, 1);
+                }
+                
+                // Check for DateOnly.MinValue equivalent (1/1/0001)
+                if (gregorianDate.Year == 1 && gregorianDate.Month == 1 && gregorianDate.Day == 1)
+                {
+                    return (1, 1, 1);
+                }
+
                 switch (targetCalendar)
                 {
                     case CalendarType.Gregorian:
@@ -135,9 +159,16 @@ namespace WebAPIBackend.Helpers
                         throw new ArgumentException("Unknown calendar type", nameof(targetCalendar));
                 }
             }
+            catch (ArgumentOutOfRangeException)
+            {
+                // Date is out of range for the target calendar, return a default valid date
+                return (1, 1, 1);
+            }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Failed to convert Gregorian date {gregorianDate} to {targetCalendar}", ex);
+                // Log the error but don't throw - return a default valid date
+                Console.WriteLine($"Warning: Failed to convert Gregorian date {gregorianDate} to {targetCalendar}: {ex.Message}");
+                return (1, 1, 1);
             }
         }
 
