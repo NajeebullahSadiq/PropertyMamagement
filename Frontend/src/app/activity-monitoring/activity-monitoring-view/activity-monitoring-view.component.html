@@ -63,6 +63,44 @@
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-purple-500"></i>تاریخ ثبت گزارش</span>
               <p class="font-bold text-gray-800 mt-1">{{ record.reportRegistrationDateFormatted || '-' }}</p>
             </div>
+          </div>
+
+          <!-- Deed Items with Serial Numbers -->
+          <div *ngIf="deedItems && deedItems.length > 0" class="mt-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-file-alt text-purple-600"></i>
+              جزئیات سته‌ها و سریال نمبرها
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div *ngFor="let item of deedItems" class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border-2 border-purple-300 shadow-sm">
+                <div class="flex items-center gap-2 mb-3">
+                  <i class="fas fa-file-invoice text-purple-600 text-lg"></i>
+                  <span class="font-bold text-gray-800">{{ getDeedTypeName(item.deedType) }}</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">تعداد:</span>
+                    <span class="font-semibold text-gray-800">{{ item.count || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">آغاز سریال نمبر:</span>
+                    <span class="font-semibold text-purple-700">{{ item.serialStart || '-' }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">ختم سریال نمبر:</span>
+                    <span class="font-semibold text-purple-700">{{ item.serialEnd || '-' }}</span>
+                  </div>
+                  <div *ngIf="item.remarks" class="pt-2 border-t border-purple-200">
+                    <span class="text-xs text-gray-500">ملاحظات:</span>
+                    <p class="text-sm text-gray-700 mt-1">{{ item.remarks }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legacy deed counts (if no deedItems) -->
+          <div *ngIf="!deedItems || deedItems.length === 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
             <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-file text-purple-500"></i>سته‌های فروش</span>
               <p class="font-bold text-gray-800 mt-1">{{ record.saleDeedsCount || '-' }}</p>

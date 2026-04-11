@@ -14,6 +14,7 @@ export class ActivityMonitoringViewComponent implements OnInit {
     record: ActivityMonitoringRecord | null = null;
     recordId: number = 0;
     isLoading = false;
+    deedItems: any[] = [];
 
     sections = {
         financial: true,
@@ -50,6 +51,24 @@ export class ActivityMonitoringViewComponent implements OnInit {
         this.service.getById(this.recordId, calendar).subscribe({
             next: (data: ActivityMonitoringRecord) => {
                 this.record = data;
+                // Parse deedItems if it exists
+                if (data.deedItems) {
+                    try {
+                        const parsed = JSON.parse(data.deedItems);
+                        // Normalize property names from PascalCase to camelCase
+                        this.deedItems = parsed.map((item: any) => ({
+                            id: item.Id || item.id,
+                            deedType: item.DeedType || item.deedType,
+                            serialStart: (item.SerialStart || item.serialStart || '').trim(),
+                            serialEnd: (item.SerialEnd || item.serialEnd || '').trim(),
+                            count: item.Count || item.count,
+                            remarks: item.Remarks || item.remarks
+                        }));
+                    } catch (e) {
+                        console.error('Error parsing deedItems:', e);
+                        this.deedItems = [];
+                    }
+                }
                 this.isLoading = false;
             },
             error: (err: any) => {
@@ -58,6 +77,16 @@ export class ActivityMonitoringViewComponent implements OnInit {
                 this.isLoading = false;
             }
         });
+    }
+
+    getDeedTypeName(deedType: number): string {
+        const types: { [key: number]: string } = {
+            1: 'سته‌های وسایط نقلیه',
+            2: 'سته‌های کرایی',
+            3: 'سته‌های فروش',
+            4: 'سته‌های بیع الوفا'
+        };
+        return types[deedType] || 'نامشخص';
     }
 
     goToList(): void {

@@ -14,7 +14,6 @@ import { SecuritiesDistribution } from 'src/app/models/SecuritiesDistribution';
 })
 export class SecuritiesListComponent implements OnInit, OnDestroy {
     items: SecuritiesDistribution[] = [];
-    filteredItems: SecuritiesDistribution[] = [];
     totalCount = 0;
     page = 1;
     pageSize = 10;
@@ -63,11 +62,11 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         const calendar = this.calendarService.getSelectedCalendar();
         
-        this.securitiesService.getAll(1, 1000, '', calendar).subscribe({
+        // Call API with search parameter - backend will handle serial number range search
+        this.securitiesService.getAll(this.page, this.pageSize, this.searchTerm, calendar).subscribe({
             next: (response) => {
                 this.items = response.items;
                 this.totalCount = response.totalCount;
-                this.applyFilter();
                 this.isLoading = false;
             },
             error: (err) => {
@@ -78,35 +77,19 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
         });
     }
 
-    applyFilter(): void {
-        if (!this.searchTerm.trim()) {
-            this.filteredItems = [...this.items];
-        } else {
-            const term = this.searchTerm.toLowerCase().trim();
-            this.filteredItems = this.items.filter(item =>
-                (item.registrationNumber?.toLowerCase().includes(term)) ||
-                (item.transactionGuideName?.toLowerCase().includes(term)) ||
-                (item.licenseNumber?.toLowerCase().includes(term)) ||
-                (item.bankReceiptNumber?.toLowerCase().includes(term)) ||
-                (item.licenseOwnerName?.toLowerCase().includes(term))
-            );
-        }
-        this.totalCount = this.filteredItems.length;
-        // Reset items to filtered for pagination
-        this.items = this.filteredItems;
-    }
-
     onSearch(): void {
         this.page = 1;
-        this.applyFilter();
+        this.loadData(); // Call API with search term
     }
 
     onPageChange(page: number): void {
         this.page = page;
+        this.loadData(); // Reload data when page changes
     }
 
     onPageSizeChange(): void {
         this.page = 1;
+        this.loadData(); // Reload data when page size changes
     }
 
     viewDetails(id: number): void {

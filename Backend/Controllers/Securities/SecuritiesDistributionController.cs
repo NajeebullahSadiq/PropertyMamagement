@@ -41,56 +41,176 @@ namespace WebAPIBackend.Controllers.Securities
                     .Where(x => x.Status == true)
                     .AsQueryable();
 
-                // Search by registration number, license number, or transaction guide name
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                int totalCount;
+                object items;
+
+                // Search by registration number, license number, transaction guide name, or serial number range
                 if (!string.IsNullOrWhiteSpace(search))
                 {
-                    query = query.Where(x =>
-                        x.RegistrationNumber.Contains(search) ||
-                        x.LicenseNumber.Contains(search) ||
-                        x.TransactionGuideName.Contains(search) ||
-                        (x.BankReceiptNumber != null && x.BankReceiptNumber.Contains(search)));
-                }
+                    // Try to parse search term as a number for serial range search
+                    bool isNumericSearch = long.TryParse(search, out long searchNumber);
 
-                var totalCount = await query.CountAsync();
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
-
-                var items = await query
-                    .OrderByDescending(x => x.CreatedAt)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .Select(x => new
+                    if (isNumericSearch)
                     {
-                        x.Id,
-                        x.RegistrationNumber,
-                        x.LicenseOwnerName,
-                        x.LicenseOwnerFatherName,
-                        x.TransactionGuideName,
-                        x.LicenseNumber,
-                        Items = x.Items.Select(i => new
+                        // For numeric search, we need to load data into memory first
+                        // because EF can't translate complex parsing logic
+                        var allItems = await query.ToListAsync();
+                        
+                        var filteredBySerial = allItems.Where(x =>
+                            x.RegistrationNumber.Contains(search) ||
+                            x.LicenseNumber.Contains(search) ||
+                            x.TransactionGuideName.Contains(search) ||
+                            (x.BankReceiptNumber != null && x.BankReceiptNumber.Contains(search)) ||
+                            // Search in serial number ranges
+                            x.Items.Any(item => 
+                            {
+                                if (string.IsNullOrEmpty(item.SerialStart) || string.IsNullOrEmpty(item.SerialEnd))
+                                    return false;
+                                
+                                if (long.TryParse(item.SerialStart, out long startNum) && 
+                                    long.TryParse(item.SerialEnd, out long endNum))
+                                {
+                                    return searchNumber >= startNum && searchNumber <= endNum;
+                                }
+                                return false;
+                            })
+                        ).ToList();
+
+                        totalCount = filteredBySerial.Count;
+
+                        items = filteredBySerial
+                            .OrderByDescending(x => x.CreatedAt)
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .Select(x => new
+                            {
+                                x.Id,
+                                x.RegistrationNumber,
+                                x.LicenseOwnerName,
+                                x.LicenseOwnerFatherName,
+                                x.TransactionGuideName,
+                                x.LicenseNumber,
+                                Items = x.Items.Select(i => new
+                                {
+                                    i.Id,
+                                    i.DocumentType,
+                                    i.SerialStart,
+                                    i.SerialEnd,
+                                    i.Count,
+                                    i.Price
+                                }).ToList(),
+                                x.PricePerDocument,
+                                x.TotalDocumentsPrice,
+                                x.TotalSecuritiesPrice,
+                                x.BankReceiptNumber,
+                                x.DeliveryDate,
+                                DeliveryDateFormatted = x.DeliveryDate.HasValue
+                                    ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
+                                    : "",
+                                x.DistributionDate,
+                                DistributionDateFormatted = x.DistributionDate.HasValue
+                                    ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
+                                    : "",
+                                x.CreatedAt,
+                                x.CreatedBy
+                            })
+                            .ToList();
+                    }
+                    else
+                    {
+                        // Text-based search can use normal query
+                        query = query.Where(x =>
+                            x.RegistrationNumber.Contains(search) ||
+                            x.LicenseNumber.Contains(search) ||
+                            x.TransactionGuideName.Contains(search) ||
+                            (x.BankReceiptNumber != null && x.BankReceiptNumber.Contains(search))
+                        );
+
+                        totalCount = await query.CountAsync();
+
+                        items = await query
+                            .OrderByDescending(x => x.CreatedAt)
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .Select(x => new
+                            {
+                                x.Id,
+                                x.RegistrationNumber,
+                                x.LicenseOwnerName,
+                                x.LicenseOwnerFatherName,
+                                x.TransactionGuideName,
+                                x.LicenseNumber,
+                                Items = x.Items.Select(i => new
+                                {
+                                    i.Id,
+                                    i.DocumentType,
+                                    i.SerialStart,
+                                    i.SerialEnd,
+                                    i.Count,
+                                    i.Price
+                                }).ToList(),
+                                x.PricePerDocument,
+                                x.TotalDocumentsPrice,
+                                x.TotalSecuritiesPrice,
+                                x.BankReceiptNumber,
+                                x.DeliveryDate,
+                                DeliveryDateFormatted = x.DeliveryDate.HasValue
+                                    ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
+                                    : "",
+                                x.DistributionDate,
+                                DistributionDateFormatted = x.DistributionDate.HasValue
+                                    ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
+                                    : "",
+                                x.CreatedAt,
+                                x.CreatedBy
+                            })
+                            .ToListAsync();
+                    }
+                }
+                else
+                {
+                    // No search term - return all
+                    totalCount = await query.CountAsync();
+
+                    items = await query
+                        .OrderByDescending(x => x.CreatedAt)
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .Select(x => new
                         {
-                            i.Id,
-                            i.DocumentType,
-                            i.SerialStart,
-                            i.SerialEnd,
-                            i.Count,
-                            i.Price
-                        }).ToList(),
-                        x.PricePerDocument,
-                        x.TotalDocumentsPrice,
-                        x.TotalSecuritiesPrice,
-                        x.BankReceiptNumber,
-                        x.DeliveryDate,
-                        DeliveryDateFormatted = x.DeliveryDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
-                            : "",
-                        x.DistributionDate,
-                        DistributionDateFormatted = x.DistributionDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
-                            : "",
-                        x.CreatedAt,
-                        x.CreatedBy
-                    })
-                    .ToListAsync();
+                            x.Id,
+                            x.RegistrationNumber,
+                            x.LicenseOwnerName,
+                            x.LicenseOwnerFatherName,
+                            x.TransactionGuideName,
+                            x.LicenseNumber,
+                            Items = x.Items.Select(i => new
+                            {
+                                i.Id,
+                                i.DocumentType,
+                                i.SerialStart,
+                                i.SerialEnd,
+                                i.Count,
+                                i.Price
+                            }).ToList(),
+                            x.PricePerDocument,
+                            x.TotalDocumentsPrice,
+                            x.TotalSecuritiesPrice,
+                            x.BankReceiptNumber,
+                            x.DeliveryDate,
+                            DeliveryDateFormatted = x.DeliveryDate.HasValue
+                                ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
+                                : "",
+                            x.DistributionDate,
+                            DistributionDateFormatted = x.DistributionDate.HasValue
+                                ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
+                                : "",
+                            x.CreatedAt,
+                            x.CreatedBy
+                        })
+                        .ToListAsync();
+                }
 
                 return Ok(new
                 {

@@ -133,9 +133,9 @@ export interface DeedDocumentTypeInfo {
 
 export const DeedDocumentTypes: DeedDocumentTypeInfo[] = [
     { id: 1, name: 'سته‌های وسایط نقلیه', nameEn: 'Vehicle Transaction Deeds', hasSerial: true },
-    { id: 2, name: 'سته‌های کرایی', nameEn: 'Rental Deeds', hasSerial: true },
     { id: 3, name: 'سته‌های فروش', nameEn: 'Sale Deeds', hasSerial: true },
-    { id: 4, name: 'سته‌های بیع الوفا', nameEn: 'Bai Ul Wafa Deeds', hasSerial: true }
+    { id: 4, name: 'سته‌های بیع الوفا', nameEn: 'Bai Ul Wafa Deeds', hasSerial: true },
+    { id: 2, name: 'سته‌های کرایی', nameEn: 'Rental Deeds', hasSerial: true }
 ];
 
 /**
