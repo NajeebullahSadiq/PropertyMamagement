@@ -22,6 +22,10 @@
             </div>
           </div>
           <div class="flex gap-3">
+            <button (click)="toggleReports()" class="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+              <i class="fas fa-chart-bar"></i>
+              گزارشات
+            </button>
             <button (click)="toggleAdvancedSearch()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
               <i class="fas fa-filter"></i>
               جستجوی پیشرفته
@@ -30,6 +34,125 @@
               <i class="fas fa-plus"></i>
               ثبت جدید
             </button>
+          </div>
+        </div>
+
+        <!-- Reports Panel -->
+        <div *ngIf="showReports" class="mt-6 pt-6 border-t border-gray-200">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-bar text-purple-600"></i>
+            گزارشات آماری
+          </h3>
+          
+          <!-- Date Range Selection -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" label="از تاریخ" [required]="false">
+              </app-multi-calendar-datepicker>
+            </div>
+            <div>
+              <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" label="تا تاریخ" [required]="false">
+              </app-multi-calendar-datepicker>
+            </div>
+            <div class="flex items-end gap-2">
+              <button (click)="generateReport()" [disabled]="isLoadingReport" class="flex-1 px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50">
+                <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingReport"></i>
+                تولید گزارش
+              </button>
+              <button *ngIf="reportData" (click)="exportToExcel()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+                <i class="fas fa-file-excel"></i>
+                صادرات Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- Report Results -->
+          <div *ngIf="reportData" class="mt-6 space-y-4">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Applicants Card -->
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-blue-600 font-medium mb-1">تعداد متقاضیان</p>
+                    <p class="text-3xl font-bold text-blue-900">{{ reportData.totalApplicants }}</p>
+                  </div>
+                  <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-users text-white text-xl"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Guarantors Card -->
+              <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-green-600 font-medium mb-1">تعداد تضمین‌کنندگان</p>
+                    <p class="text-3xl font-bold text-green-900">{{ reportData.totalGuarantors }}</p>
+                  </div>
+                  <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-handshake text-white text-xl"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Withdrawals Card -->
+              <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-red-600 font-medium mb-1">تعداد انصراف‌ها</p>
+                    <p class="text-3xl font-bold text-red-900">{{ reportData.totalWithdrawals }}</p>
+                  </div>
+                  <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-times-circle text-white text-xl"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guarantors by Type Table -->
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div class="px-6 py-4 bg-gradient-to-r from-slate-100 to-gray-100 border-b border-gray-200">
+                <h4 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                  <i class="fas fa-chart-pie text-purple-600"></i>
+                  تضمین‌کنندگان بر اساس نوع
+                </h4>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr class="text-center">
+                      <th class="px-6 py-3 text-sm font-bold text-gray-700">نوع تضمین</th>
+                      <th class="px-6 py-3 text-sm font-bold text-gray-700">تعداد</th>
+                      <th class="px-6 py-3 text-sm font-bold text-gray-700">درصد</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200">
+                    <tr *ngFor="let item of reportData.guarantorsByType" class="text-center hover:bg-gray-50">
+                      <td class="px-6 py-3 text-sm text-gray-700">{{ item.guaranteeTypeName }}</td>
+                      <td class="px-6 py-3 text-sm font-semibold text-gray-900">{{ item.count }}</td>
+                      <td class="px-6 py-3 text-sm text-gray-700">
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                          {{ reportData.totalGuarantors > 0 ? ((item.count / reportData.totalGuarantors) * 100).toFixed(1) : 0 }}%
+                        </span>
+                      </td>
+                    </tr>
+                    <tr *ngIf="reportData.guarantorsByType.length === 0">
+                      <td colspan="3" class="px-6 py-4 text-center text-gray-500">هیچ تضمین‌کننده‌ای یافت نشد</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Date Range Info -->
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+              <p class="text-sm text-gray-700 text-center">
+                <i class="fas fa-calendar-alt text-purple-600 ml-2"></i>
+                گزارش از تاریخ <span class="font-bold text-purple-900">{{ reportData.startDate }}</span> 
+                تا تاریخ <span class="font-bold text-purple-900">{{ reportData.endDate }}</span>
+              </p>
+            </div>
           </div>
         </div>
 

@@ -36,6 +36,13 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     searchCustomaryDeedSerial = '';
     searchGuarantorName = '';
 
+    // Report fields
+    showReports = false;
+    reportStartDate = '';
+    reportEndDate = '';
+    reportData: any = null;
+    isLoadingReport = false;
+
     // RBAC
     canEdit = false;
     canDelete = false;
@@ -237,5 +244,86 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     createNew(): void {
         this.licenseAppService.resetMainTableId();
         this.router.navigate(['/license-applications']);
+    }
+
+    // ==================== Reports ====================
+
+    toggleReports(): void {
+        this.showReports = !this.showReports;
+        if (!this.showReports) {
+            this.reportData = null;
+        }
+    }
+
+    generateReport(): void {
+        if (!this.reportStartDate || !this.reportEndDate) {
+            this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+            return;
+        }
+
+        this.isLoadingReport = true;
+        const calendar = this.calendarService.getSelectedCalendar();
+
+        this.licenseAppService.getComprehensiveReport(
+            this.reportStartDate,
+            this.reportEndDate,
+            calendar
+        ).subscribe({
+            next: (data) => {
+                this.reportData = data;
+                this.isLoadingReport = false;
+            },
+            error: (err) => {
+                this.toastr.error('خطا در تولید گزارش');
+                this.isLoadingReport = false;
+                console.error(err);
+            }
+        });
+    }
+
+    exportToExcel(): void {
+        if (!this.reportData) {
+            this.toastr.warning('ابتدا گزارش را تولید کنید');
+            return;
+        }
+
+        // Create Excel data
+        const excelData: any[] = [];
+        
+        // Header
+        excelData.push(['گزارش درخواست‌های جواز رهنمای معاملات']);
+        excelData.push([`از تاریخ: ${this.reportData.startDate} تا تاریخ: ${this.reportData.endDate}`]);
+        excelData.push([]);
+        
+        // Applicants count
+        excelData.push(['تعداد متقاضیان', this.reportData.totalApplicants]);
+        excelData.push([]);
+        
+        // Guarantors by type
+        excelData.push(['تعداد تضمین‌کنندگان بر اساس نوع']);
+        excelData.push(['نوع تضمین', 'تعداد']);
+        this.reportData.guarantorsByType.forEach((item: any) => {
+            excelData.push([item.guaranteeTypeName, item.count]);
+        });
+        excelData.push(['مجموع تضمین‌کنندگان', this.reportData.totalGuarantors]);
+        excelData.push([]);
+        
+        // Withdrawals
+        excelData.push(['تعداد انصراف‌ها', this.reportData.totalWithdrawals]);
+        
+        // Convert to CSV
+        const csv = excelData.map(row => row.join(',')).join('\n');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `license-applications-report-${Date.now()}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        this.toastr.success('گزارش با موفقیت صادر شد');
     }
 }

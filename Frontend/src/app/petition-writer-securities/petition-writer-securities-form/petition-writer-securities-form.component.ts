@@ -110,11 +110,15 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
                     serialNumberStart: data.serialNumberStart,
                     serialNumberEnd: data.serialNumberEnd
                 });
-                if (data.distributionDateFormatted) {
-                    this.petitionForm.patchValue({ distributionDate: data.distributionDateFormatted });
+                
+                // Use the raw Date values instead of formatted strings
+                if (data.distributionDate) {
+                    const distDate = new Date(data.distributionDate);
+                    this.petitionForm.patchValue({ distributionDate: distDate });
                 }
-                if (data.deliveryDateFormatted) {
-                    this.petitionForm.patchValue({ deliveryDate: data.deliveryDateFormatted });
+                if (data.deliveryDate) {
+                    const delDate = new Date(data.deliveryDate);
+                    this.petitionForm.patchValue({ deliveryDate: delDate });
                 }
             },
             error: (err) => {

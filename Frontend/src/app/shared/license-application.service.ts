@@ -193,4 +193,62 @@ export class LicenseApplicationService {
     resetMainTableId(): void {
         this.mainTableId = 0;
     }
+
+    // ==================== Reports ====================
+
+    getApplicantsCountReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+        let params = new HttpParams();
+        if (startDate) {
+            params = params.set('startDate', startDate);
+        }
+        if (endDate) {
+            params = params.set('endDate', endDate);
+        }
+        if (calendarType) {
+            params = params.set('calendarType', calendarType);
+        }
+        return this.http.get(`${this.baseUrl}/reports/applicants-count`, { params });
+    }
+
+    getGuarantorsByTypeReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+        let params = new HttpParams();
+        if (startDate) {
+            params = params.set('startDate', startDate);
+        }
+        if (endDate) {
+            params = params.set('endDate', endDate);
+        }
+        if (calendarType) {
+            params = params.set('calendarType', calendarType);
+        }
+        return this.http.get(`${this.baseUrl}/reports/guarantors-by-type`, { params });
+    }
+
+    getWithdrawalsCountReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+        let params = new HttpParams();
+        if (startDate) {
+            params = params.set('startDate', startDate);
+        }
+        if (endDate) {
+            params = params.set('endDate', endDate);
+        }
+        if (calendarType) {
+            params = params.set('calendarType', calendarType);
+        }
+        return this.http.get(`${this.baseUrl}/reports/withdrawals-count`, { params });
+    }
+
+    getComprehensiveReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+        let params = new HttpParams();
+        if (startDate) {
+            params = params.set('startDate', startDate);
+        }
+        if (endDate) {
+            params = params.set('endDate', endDate);
+        }
+        if (calendarType) {
+            params = params.set('calendarType', calendarType);
+        }
+        return this.http.get(`${this.baseUrl}/reports/comprehensive`, { params });
+    }
 }

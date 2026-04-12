@@ -48,9 +48,8 @@ public class PetitionWriterSecuritiesData
     [MaxLength(100)]
     public string SerialNumberEnd { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "تاریخ توزیع عریضه الزامی است")]
-    public DateOnly? DistributionDate { get; set; }
-
-    [Required(ErrorMessage = "تاریخ تحویلی اویز الزامی است")]
-    public DateOnly? DeliveryDate { get; set; }
+    // Date fields - sent as strings from frontend with calendar type
+    public string? DistributionDate { get; set; }
+    public string? DeliveryDate { get; set; }
+    public string? CalendarType { get; set; }
 }

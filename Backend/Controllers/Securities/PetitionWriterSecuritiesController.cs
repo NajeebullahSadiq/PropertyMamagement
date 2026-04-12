@@ -173,6 +173,20 @@ namespace WebAPIBackend.Controllers.Securities
                     return BadRequest(ModelState);
                 }
 
+                // Parse calendar type
+                var calendar = DateConversionHelper.ParseCalendarType(data.CalendarType);
+
+                // Parse and validate dates
+                if (!DateConversionHelper.TryParseToDateOnly(data.DistributionDate, calendar, out DateOnly distributionDate))
+                {
+                    return BadRequest(new { message = "تاریخ توزیع عریضه نامعتبر است" });
+                }
+
+                if (!DateConversionHelper.TryParseToDateOnly(data.DeliveryDate, calendar, out DateOnly deliveryDate))
+                {
+                    return BadRequest(new { message = "تاریخ تحویلی اویز نامعتبر است" });
+                }
+
                 // Check for unique registration number
                 var exists = await _context.PetitionWriterSecurities
                     .AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Status == true);
@@ -204,8 +218,8 @@ namespace WebAPIBackend.Controllers.Securities
                     BankReceiptNumber = data.BankReceiptNumber,
                     SerialNumberStart = data.SerialNumberStart,
                     SerialNumberEnd = data.SerialNumberEnd,
-                    DistributionDate = data.DistributionDate!.Value,
-                    DeliveryDate = data.DeliveryDate!.Value,
+                    DistributionDate = distributionDate,
+                    DeliveryDate = deliveryDate,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = userName,
                     Status = true
@@ -242,6 +256,20 @@ namespace WebAPIBackend.Controllers.Securities
                     return NotFound(new { message = "رکورد یافت نشد" });
                 }
 
+                // Parse calendar type
+                var calendar = DateConversionHelper.ParseCalendarType(data.CalendarType);
+
+                // Parse and validate dates
+                if (!DateConversionHelper.TryParseToDateOnly(data.DistributionDate, calendar, out DateOnly distributionDate))
+                {
+                    return BadRequest(new { message = "تاریخ توزیع عریضه نامعتبر است" });
+                }
+
+                if (!DateConversionHelper.TryParseToDateOnly(data.DeliveryDate, calendar, out DateOnly deliveryDate))
+                {
+                    return BadRequest(new { message = "تاریخ تحویلی اویز نامعتبر است" });
+                }
+
                 // Check for unique registration number (excluding current record)
                 var exists = await _context.PetitionWriterSecurities
                     .AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Id != id && x.Status == true);
@@ -271,8 +299,8 @@ namespace WebAPIBackend.Controllers.Securities
                 entity.BankReceiptNumber = data.BankReceiptNumber;
                 entity.SerialNumberStart = data.SerialNumberStart;
                 entity.SerialNumberEnd = data.SerialNumberEnd;
-                entity.DistributionDate = data.DistributionDate!.Value;
-                entity.DeliveryDate = data.DeliveryDate!.Value;
+                entity.DistributionDate = distributionDate;
+                entity.DeliveryDate = deliveryDate;
                 entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = userName;
 

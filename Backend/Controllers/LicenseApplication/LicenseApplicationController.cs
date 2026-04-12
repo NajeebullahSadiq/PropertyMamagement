@@ -854,5 +854,287 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         }
 
         #endregion
+
+        #region Reports
+
+        /// <summary>
+        /// Get report: Count of applicants saved in DB within date range
+        /// </summary>
+        [HttpGet("reports/applicants-count")]
+        public async Task<IActionResult> GetApplicantsCountReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                var query = _context.LicenseApplications.Where(x => x.Status == true);
+
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendarType, out var start))
+                    {
+                        parsedStartDate = start;
+                        query = query.Where(x => x.RequestDate >= start);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendarType, out var end))
+                    {
+                        parsedEndDate = end;
+                        query = query.Where(x => x.RequestDate <= end);
+                    }
+                }
+
+                var totalCount = await query.CountAsync();
+
+                return Ok(new
+                {
+                    totalApplicants = totalCount,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get report: Count of guarantors by type within date range
+        /// </summary>
+        [HttpGet("reports/guarantors-by-type")]
+        public async Task<IActionResult> GetGuarantorsByTypeReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                // Get applications within date range
+                var applicationsQuery = _context.LicenseApplications.Where(x => x.Status == true);
+
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendarType, out var start))
+                    {
+                        parsedStartDate = start;
+                        applicationsQuery = applicationsQuery.Where(x => x.RequestDate >= start);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendarType, out var end))
+                    {
+                        parsedEndDate = end;
+                        applicationsQuery = applicationsQuery.Where(x => x.RequestDate <= end);
+                    }
+                }
+
+                var applicationIds = await applicationsQuery.Select(x => x.Id).ToListAsync();
+
+                // Get guarantors for these applications
+                var guarantorsQuery = _context.LicenseApplicationGuarantors
+                    .Where(g => applicationIds.Contains(g.LicenseApplicationId));
+
+                var guarantorsByType = await guarantorsQuery
+                    .GroupBy(g => g.GuaranteeTypeId)
+                    .Select(g => new
+                    {
+                        guaranteeTypeId = g.Key,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                // Get guarantee type names
+                var guaranteeTypes = await _context.GuaranteeTypes.ToListAsync();
+
+                var result = guarantorsByType.Select(g => new
+                {
+                    g.guaranteeTypeId,
+                    guaranteeTypeName = guaranteeTypes.FirstOrDefault(gt => gt.Id == g.guaranteeTypeId)?.Name ?? "Unknown",
+                    g.count
+                }).ToList();
+
+                var totalGuarantors = result.Sum(r => r.count);
+
+                return Ok(new
+                {
+                    guarantorsByType = result,
+                    totalGuarantors,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get report: Count of withdrawals (انصراف) within date range
+        /// </summary>
+        [HttpGet("reports/withdrawals-count")]
+        public async Task<IActionResult> GetWithdrawalsCountReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                var query = _context.LicenseApplicationWithdrawals.AsQueryable();
+
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendarType, out var start))
+                    {
+                        parsedStartDate = start;
+                        query = query.Where(x => x.WithdrawalDate >= start);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendarType, out var end))
+                    {
+                        parsedEndDate = end;
+                        query = query.Where(x => x.WithdrawalDate <= end);
+                    }
+                }
+
+                var totalWithdrawals = await query.CountAsync();
+
+                return Ok(new
+                {
+                    totalWithdrawals,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get comprehensive report with all statistics
+        /// </summary>
+        [HttpGet("reports/comprehensive")]
+        public async Task<IActionResult> GetComprehensiveReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                    }
+                }
+
+                // Get applicants count
+                var applicationsQuery = _context.LicenseApplications.Where(x => x.Status == true);
+                if (parsedStartDate.HasValue)
+                {
+                    applicationsQuery = applicationsQuery.Where(x => x.RequestDate >= parsedStartDate);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    applicationsQuery = applicationsQuery.Where(x => x.RequestDate <= parsedEndDate);
+                }
+                var totalApplicants = await applicationsQuery.CountAsync();
+                var applicationIds = await applicationsQuery.Select(x => x.Id).ToListAsync();
+
+                // Get guarantors by type
+                var guarantorsQuery = _context.LicenseApplicationGuarantors
+                    .Where(g => applicationIds.Contains(g.LicenseApplicationId));
+
+                var guarantorsByType = await guarantorsQuery
+                    .GroupBy(g => g.GuaranteeTypeId)
+                    .Select(g => new
+                    {
+                        guaranteeTypeId = g.Key,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                var guaranteeTypes = await _context.GuaranteeTypes.ToListAsync();
+                var guarantorsResult = guarantorsByType.Select(g => new
+                {
+                    g.guaranteeTypeId,
+                    guaranteeTypeName = guaranteeTypes.FirstOrDefault(gt => gt.Id == g.guaranteeTypeId)?.Name ?? "Unknown",
+                    g.count
+                }).ToList();
+
+                var totalGuarantors = guarantorsResult.Sum(r => r.count);
+
+                // Get withdrawals count
+                var withdrawalsQuery = _context.LicenseApplicationWithdrawals.AsQueryable();
+                if (parsedStartDate.HasValue)
+                {
+                    withdrawalsQuery = withdrawalsQuery.Where(x => x.WithdrawalDate >= parsedStartDate);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    withdrawalsQuery = withdrawalsQuery.Where(x => x.WithdrawalDate <= parsedEndDate);
+                }
+                var totalWithdrawals = await withdrawalsQuery.CountAsync();
+
+                return Ok(new
+                {
+                    totalApplicants,
+                    guarantorsByType = guarantorsResult,
+                    totalGuarantors,
+                    totalWithdrawals,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        #endregion
     }
 }

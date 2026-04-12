@@ -60,15 +60,24 @@ namespace WebAPIBackend.Helpers
             
             try
             {
-                var (year, month, day) = FromGregorian(date.Value.ToDateTime(TimeOnly.MinValue), calendarType);
+                var dateTime = date.Value.ToDateTime(TimeOnly.MinValue);
+                var (year, month, day) = FromGregorian(dateTime, calendarType);
                 
                 // If conversion returned default date (1/1/1), return empty string
                 if (year == 1 && month == 1 && day == 1) return "";
                 
+                // Additional validation to ensure year is reasonable
+                if (year < 1 || year > 9999)
+                {
+                    Console.WriteLine($"Warning: Invalid year {year} for date {date.Value} in calendar {calendarType}");
+                    return "";
+                }
+                
                 return $"{year:D4}/{month:D2}/{day:D2}";
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error formatting date {date.Value} to {calendarType}: {ex.Message}");
                 return "";
             }
         }
@@ -121,16 +130,17 @@ namespace WebAPIBackend.Helpers
         {
             try
             {
-                // Check for invalid dates (before year 622 for Hijri calendars)
-                if (targetCalendar == CalendarType.HijriQamari && gregorianDate.Year < 622)
-                {
-                    // Return a default valid date instead of throwing
-                    return (1, 1, 1);
-                }
-                
                 // Check for DateOnly.MinValue equivalent (1/1/0001)
                 if (gregorianDate.Year == 1 && gregorianDate.Month == 1 && gregorianDate.Day == 1)
                 {
+                    return (1, 1, 1);
+                }
+
+                // Check for invalid dates (before year 622 for Hijri calendars)
+                if ((targetCalendar == CalendarType.HijriQamari || targetCalendar == CalendarType.HijriShamsi) 
+                    && gregorianDate.Year < 622)
+                {
+                    // Return a default valid date instead of throwing
                     return (1, 1, 1);
                 }
 
@@ -141,19 +151,31 @@ namespace WebAPIBackend.Helpers
 
                     case CalendarType.HijriShamsi:
                         var persianCalendar = new PersianCalendar();
-                        return (
-                            persianCalendar.GetYear(gregorianDate),
-                            persianCalendar.GetMonth(gregorianDate),
-                            persianCalendar.GetDayOfMonth(gregorianDate)
-                        );
+                        var shamsiYear = persianCalendar.GetYear(gregorianDate);
+                        var shamsiMonth = persianCalendar.GetMonth(gregorianDate);
+                        var shamsiDay = persianCalendar.GetDayOfMonth(gregorianDate);
+                        
+                        // Validate the result
+                        if (shamsiYear < 1 || shamsiYear > 9999)
+                        {
+                            return (1, 1, 1);
+                        }
+                        
+                        return (shamsiYear, shamsiMonth, shamsiDay);
 
                     case CalendarType.HijriQamari:
                         var hijriCalendar = new HijriCalendar();
-                        return (
-                            hijriCalendar.GetYear(gregorianDate),
-                            hijriCalendar.GetMonth(gregorianDate),
-                            hijriCalendar.GetDayOfMonth(gregorianDate)
-                        );
+                        var hijriYear = hijriCalendar.GetYear(gregorianDate);
+                        var hijriMonth = hijriCalendar.GetMonth(gregorianDate);
+                        var hijriDay = hijriCalendar.GetDayOfMonth(gregorianDate);
+                        
+                        // Validate the result
+                        if (hijriYear < 1 || hijriYear > 9999)
+                        {
+                            return (1, 1, 1);
+                        }
+                        
+                        return (hijriYear, hijriMonth, hijriDay);
 
                     default:
                         throw new ArgumentException("Unknown calendar type", nameof(targetCalendar));
