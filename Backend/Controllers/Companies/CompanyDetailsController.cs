@@ -1262,6 +1262,44 @@ namespace WebAPIBackend.Controllers.Companies
                 }).ToList();
                 var totalGuarantors = guarantorsResult.Sum(r => r.count);
 
+                // Get licenses by type (املاک vs موټر فروشی) with revenue calculation
+                var licensesByType = await licensesQuery
+                    .GroupBy(l => l.LicenseType ?? "نامشخص")
+                    .Select(g => new
+                    {
+                        licenseType = g.Key,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                // Calculate revenue based on license type
+                // املاک = 25,000 AFN per license
+                // موټر فروشی = 20,000 AFN per license
+                var amlakCount = licensesByType.FirstOrDefault(l => l.licenseType == "املاک")?.count ?? 0;
+                var motorCount = licensesByType.FirstOrDefault(l => l.licenseType == "موټر فروشی")?.count ?? 0;
+                
+                var amlakRevenue = amlakCount * 25000;
+                var motorRevenue = motorCount * 20000;
+                var totalRevenue = amlakRevenue + motorRevenue;
+
+                var licenseRevenueByType = new[]
+                {
+                    new
+                    {
+                        licenseType = "املاک",
+                        count = amlakCount,
+                        pricePerLicense = 25000,
+                        totalRevenue = amlakRevenue
+                    },
+                    new
+                    {
+                        licenseType = "موټر فروشی",
+                        count = motorCount,
+                        pricePerLicense = 20000,
+                        totalRevenue = motorRevenue
+                    }
+                };
+
                 return Ok(new
                 {
                     totalCancellations,
@@ -1272,6 +1310,8 @@ namespace WebAPIBackend.Controllers.Companies
                     totalLicenses,
                     guarantorsByType = guarantorsResult,
                     totalGuarantors,
+                    licenseRevenueByType,
+                    totalRevenue,
                     startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
                     endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
                     reportGeneratedAt = DateTime.UtcNow

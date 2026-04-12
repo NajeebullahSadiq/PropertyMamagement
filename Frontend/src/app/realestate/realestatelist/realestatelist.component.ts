@@ -240,6 +240,15 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
       excelData.push([item.guaranteeTypeName, item.count]);
     });
     excelData.push(['مجموع تضمین‌کنندگان', this.reportData.totalGuarantors]);
+    excelData.push([]);
+    
+    // Revenue by license type
+    excelData.push(['عواید بر اساس نوع جواز']);
+    excelData.push(['نوع جواز', 'تعداد', 'قیمت فی جواز', 'مجموع عواید']);
+    this.reportData.licenseRevenueByType.forEach((item: any) => {
+      excelData.push([item.licenseType, item.count, item.pricePerLicense, item.totalRevenue]);
+    });
+    excelData.push(['مجموع عواید', '', '', this.reportData.totalRevenue]);
     
     // Convert to CSV
     const csv = excelData.map(row => row.join(',')).join('\n');
