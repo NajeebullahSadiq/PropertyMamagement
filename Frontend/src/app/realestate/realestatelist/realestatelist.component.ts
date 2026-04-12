@@ -29,6 +29,13 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
   canPrint: boolean = false;
   private searchSubject = new Subject<string>();
 
+  // Report fields
+  showReports = false;
+  reportStartDate: any = '';
+  reportEndDate: any = '';
+  reportData: any = null;
+  isLoadingReport = false;
+
   constructor(
     private http: HttpClient, 
     private comservice: CompnaydetailService, 
@@ -126,5 +133,127 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  // ==================== Reports ====================
+
+  toggleReports(): void {
+    this.showReports = !this.showReports;
+    if (!this.showReports) {
+      this.reportData = null;
+    }
+  }
+
+  generateReport(): void {
+    console.log('=== Generate Report Called ===');
+    console.log('reportStartDate:', this.reportStartDate);
+    console.log('reportEndDate:', this.reportEndDate);
+    console.log('reportStartDate type:', typeof this.reportStartDate);
+    console.log('reportEndDate type:', typeof this.reportEndDate);
+    
+    if (!this.reportStartDate || !this.reportEndDate) {
+      this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+      return;
+    }
+
+    // Check if dates are empty strings
+    if (this.reportStartDate === '' || this.reportEndDate === '') {
+      this.toastr.warning('لطفاً تاریخ شروع و پایان را انتخاب کنید');
+      return;
+    }
+
+    this.isLoadingReport = true;
+
+    // Format dates - the date picker returns dates in format like "1403/01/15"
+    let startDate = this.reportStartDate;
+    let endDate = this.reportEndDate;
+
+    // If it's a Date object, convert to string
+    if (typeof this.reportStartDate === 'object' && this.reportStartDate !== null) {
+      // For Jalali calendar, we need to format it properly
+      startDate = this.reportStartDate.toISOString ? this.reportStartDate.toISOString().split('T')[0] : String(this.reportStartDate);
+    }
+    if (typeof this.reportEndDate === 'object' && this.reportEndDate !== null) {
+      endDate = this.reportEndDate.toISOString ? this.reportEndDate.toISOString().split('T')[0] : String(this.reportEndDate);
+    }
+
+    console.log('Sending startDate:', startDate);
+    console.log('Sending endDate:', endDate);
+
+    // The date picker returns Gregorian dates, so use 'gregorian' calendar type
+    this.comservice.getComprehensiveReport(
+      startDate,
+      endDate,
+      'gregorian'
+    ).subscribe({
+      next: (data) => {
+        console.log('Report data received:', data);
+        this.reportData = data;
+        this.isLoadingReport = false;
+      },
+      error: (err) => {
+        this.toastr.error('خطا در تولید گزارش');
+        this.isLoadingReport = false;
+        console.error('Report error:', err);
+      }
+    });
+  }
+
+  exportToExcel(): void {
+    if (!this.reportData) {
+      this.toastr.warning('ابتدا گزارش را تولید کنید');
+      return;
+    }
+
+    // Create Excel data
+    const excelData: any[] = [];
+    
+    // Header
+    excelData.push(['گزارش دفتر‌های رهنمایی معاملات']);
+    excelData.push([`از تاریخ: ${this.reportData.startDate} تا تاریخ: ${this.reportData.endDate}`]);
+    excelData.push([]);
+    
+    // Cancellations
+    excelData.push(['تعداد فسخ/لغوه', this.reportData.totalCancellations]);
+    excelData.push([]);
+    
+    // Companies status
+    excelData.push(['وضعیت دفتر‌ها']);
+    excelData.push(['دفتر‌های فعال', this.reportData.activeCompanies]);
+    excelData.push(['دفتر‌های غیرفعال', this.reportData.inactiveCompanies]);
+    excelData.push(['مجموع دفتر‌ها', this.reportData.totalCompanies]);
+    excelData.push([]);
+    
+    // Licenses by category
+    excelData.push(['جواز‌ها بر اساس نوعیت']);
+    excelData.push(['نوعیت جواز', 'تعداد']);
+    this.reportData.licensesByCategory.forEach((item: any) => {
+      excelData.push([item.category, item.count]);
+    });
+    excelData.push(['مجموع جواز‌ها', this.reportData.totalLicenses]);
+    excelData.push([]);
+    
+    // Guarantors by type
+    excelData.push(['تضمین‌کنندگان بر اساس نوع']);
+    excelData.push(['نوع تضمین', 'تعداد']);
+    this.reportData.guarantorsByType.forEach((item: any) => {
+      excelData.push([item.guaranteeTypeName, item.count]);
+    });
+    excelData.push(['مجموع تضمین‌کنندگان', this.reportData.totalGuarantors]);
+    
+    // Convert to CSV
+    const csv = excelData.map(row => row.join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `companies-report-${Date.now()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    this.toastr.success('گزارش با موفقیت صادر شد');
   }
 }

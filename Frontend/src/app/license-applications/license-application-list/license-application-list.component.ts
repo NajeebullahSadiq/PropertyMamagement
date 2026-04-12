@@ -38,8 +38,8 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
 
     // Report fields
     showReports = false;
-    reportStartDate = '';
-    reportEndDate = '';
+    reportStartDate: any = '';
+    reportEndDate: any = '';
     reportData: any = null;
     isLoadingReport = false;
 
@@ -262,12 +262,23 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         }
 
         this.isLoadingReport = true;
-        const calendar = this.calendarService.getSelectedCalendar();
 
+        // Format dates if they are Date objects
+        let startDate = this.reportStartDate;
+        let endDate = this.reportEndDate;
+
+        if (typeof this.reportStartDate === 'object' && this.reportStartDate !== null) {
+            startDate = this.reportStartDate.toISOString ? this.reportStartDate.toISOString().split('T')[0] : String(this.reportStartDate);
+        }
+        if (typeof this.reportEndDate === 'object' && this.reportEndDate !== null) {
+            endDate = this.reportEndDate.toISOString ? this.reportEndDate.toISOString().split('T')[0] : String(this.reportEndDate);
+        }
+
+        // The date picker returns Gregorian dates, so use 'gregorian' calendar type
         this.licenseAppService.getComprehensiveReport(
-            this.reportStartDate,
-            this.reportEndDate,
-            calendar
+            startDate,
+            endDate,
+            'gregorian'
         ).subscribe({
             next: (data) => {
                 this.reportData = data;

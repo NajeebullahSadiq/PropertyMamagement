@@ -165,4 +165,60 @@ export class CompnaydetailService {
     }
     return this.http.get<any[]>(url);
   }
+
+  // ==================== Reports ====================
+
+  getCancellationsCountReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/cancellations-count?`;
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+    if (calendarType) url += `calendarType=${calendarType}`;
+    return this.http.get(url);
+  }
+
+  getCompaniesStatusReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/companies-status?`;
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+    if (calendarType) url += `calendarType=${calendarType}`;
+    return this.http.get(url);
+  }
+
+  getLicensesByCategoryReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/licenses-by-category?`;
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+    if (calendarType) url += `calendarType=${calendarType}`;
+    return this.http.get(url);
+  }
+
+  getGuarantorsByTypeReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/guarantors-by-type?`;
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+    if (calendarType) url += `calendarType=${calendarType}`;
+    return this.http.get(url);
+  }
+
+  getComprehensiveReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/comprehensive?`;
+    const params: string[] = [];
+    
+    if (startDate) {
+      console.log('Service - Adding startDate:', startDate);
+      params.push(`startDate=${encodeURIComponent(startDate)}`);
+    }
+    if (endDate) {
+      console.log('Service - Adding endDate:', endDate);
+      params.push(`endDate=${encodeURIComponent(endDate)}`);
+    }
+    if (calendarType) {
+      params.push(`calendarType=${calendarType}`);
+    }
+    
+    url += params.join('&');
+    console.log('Service - Final URL:', url);
+    
+    return this.http.get(url);
+  }
 }

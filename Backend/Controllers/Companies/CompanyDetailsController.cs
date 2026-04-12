@@ -878,6 +878,412 @@ namespace WebAPIBackend.Controllers.Companies
             public string? Title { get; set; }
             public int? ProvinceId { get; set; }
         }
+
+        #region Reports
+
+        /// <summary>
+        /// Get report: Count of cancellations (فسخ/لغوه) within date range
+        /// </summary>
+        [HttpGet("reports/cancellations-count")]
+        public async Task<IActionResult> GetCancellationsCountReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                var query = _context.CompanyCancellationInfos.Where(x => x.Status == true);
+
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                        query = query.Where(x => x.LicenseCancellationLetterDate >= start);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                        query = query.Where(x => x.LicenseCancellationLetterDate <= end);
+                    }
+                }
+
+                var totalCancellations = await query.CountAsync();
+
+                return Ok(new
+                {
+                    totalCancellations,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get report: Count of active and inactive companies within date range
+        /// </summary>
+        [HttpGet("reports/companies-status")]
+        public async Task<IActionResult> GetCompaniesStatusReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                // Get companies within date range based on CreatedAt
+                var companiesQuery = _context.CompanyDetails.AsQueryable();
+                companiesQuery = _provinceFilter.ApplyProvinceFilter(companiesQuery);
+
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                        var startDateTime = start.ToDateTime(TimeOnly.MinValue);
+                        companiesQuery = companiesQuery.Where(x => x.CreatedAt >= startDateTime);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                        var endDateTime = end.ToDateTime(TimeOnly.MaxValue);
+                        companiesQuery = companiesQuery.Where(x => x.CreatedAt <= endDateTime);
+                    }
+                }
+
+                var activeCount = await companiesQuery.CountAsync(x => x.Status == true);
+                var inactiveCount = await companiesQuery.CountAsync(x => x.Status == false || x.Status == null);
+                var totalCompanies = activeCount + inactiveCount;
+
+                return Ok(new
+                {
+                    activeCompanies = activeCount,
+                    inactiveCompanies = inactiveCount,
+                    totalCompanies,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get report: Count of licenses by category (نوعیت جواز) within date range
+        /// Categories: جدید (New), تجدید (Renewal), مثنی (Duplicate)
+        /// </summary>
+        [HttpGet("reports/licenses-by-category")]
+        public async Task<IActionResult> GetLicensesByCategoryReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                // Get licenses within date range
+                var licensesQuery = _context.LicenseDetails.Where(x => x.Status == true);
+                
+                // Apply province filter through company
+                var allowedCompanyIds = _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
+                    .Select(c => c.Id)
+                    .ToList();
+                licensesQuery = licensesQuery.Where(l => l.CompanyId.HasValue && allowedCompanyIds.Contains(l.CompanyId.Value));
+
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                        licensesQuery = licensesQuery.Where(x => x.IssueDate >= start);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                        licensesQuery = licensesQuery.Where(x => x.IssueDate <= end);
+                    }
+                }
+
+                var licensesByCategory = await licensesQuery
+                    .GroupBy(l => l.LicenseCategory ?? "نامشخص")
+                    .Select(g => new
+                    {
+                        category = g.Key,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                var totalLicenses = licensesByCategory.Sum(l => l.count);
+
+                return Ok(new
+                {
+                    licensesByCategory,
+                    totalLicenses,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get report: Count of guarantors by type within date range
+        /// </summary>
+        [HttpGet("reports/guarantors-by-type")]
+        public async Task<IActionResult> GetGuarantorsByTypeReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                // Get guarantors within date range
+                var guarantorsQuery = _context.Guarantors.Where(x => x.Status == true && x.IsActive == true);
+                
+                // Apply province filter through company
+                var allowedCompanyIds = _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
+                    .Select(c => c.Id)
+                    .ToList();
+                guarantorsQuery = guarantorsQuery.Where(g => g.CompanyId.HasValue && allowedCompanyIds.Contains(g.CompanyId.Value));
+
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                        var startDateTime = start.ToDateTime(TimeOnly.MinValue);
+                        guarantorsQuery = guarantorsQuery.Where(x => x.CreatedAt >= startDateTime);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                        var endDateTime = end.ToDateTime(TimeOnly.MaxValue);
+                        guarantorsQuery = guarantorsQuery.Where(x => x.CreatedAt <= endDateTime);
+                    }
+                }
+
+                var guarantorsByType = await guarantorsQuery
+                    .Where(g => g.GuaranteeTypeId.HasValue)
+                    .GroupBy(g => g.GuaranteeTypeId!.Value)
+                    .Select(g => new
+                    {
+                        guaranteeTypeId = g.Key,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                // Get guarantee type names
+                var guaranteeTypes = await _context.GuaranteeTypes.ToListAsync();
+
+                var result = guarantorsByType.Select(g => new
+                {
+                    g.guaranteeTypeId,
+                    guaranteeTypeName = guaranteeTypes.FirstOrDefault(gt => gt.Id == g.guaranteeTypeId)?.Name ?? "Unknown",
+                    g.count
+                }).ToList();
+
+                var totalGuarantors = result.Sum(r => r.count);
+
+                return Ok(new
+                {
+                    guarantorsByType = result,
+                    totalGuarantors,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get comprehensive report with all statistics
+        /// </summary>
+        [HttpGet("reports/comprehensive")]
+        public async Task<IActionResult> GetComprehensiveReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                    }
+                }
+
+                // Get cancellations count
+                var cancellationsQuery = _context.CompanyCancellationInfos.Where(x => x.Status == true);
+                if (parsedStartDate.HasValue)
+                {
+                    cancellationsQuery = cancellationsQuery.Where(x => x.LicenseCancellationLetterDate >= parsedStartDate);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    cancellationsQuery = cancellationsQuery.Where(x => x.LicenseCancellationLetterDate <= parsedEndDate);
+                }
+                var totalCancellations = await cancellationsQuery.CountAsync();
+
+                // Get companies status
+                var companiesQuery = _context.CompanyDetails.AsQueryable();
+                companiesQuery = _provinceFilter.ApplyProvinceFilter(companiesQuery);
+                if (parsedStartDate.HasValue)
+                {
+                    var startDateTime = parsedStartDate.Value.ToDateTime(TimeOnly.MinValue);
+                    companiesQuery = companiesQuery.Where(x => x.CreatedAt >= startDateTime);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    var endDateTime = parsedEndDate.Value.ToDateTime(TimeOnly.MaxValue);
+                    companiesQuery = companiesQuery.Where(x => x.CreatedAt <= endDateTime);
+                }
+                var activeCompanies = await companiesQuery.CountAsync(x => x.Status == true);
+                var inactiveCompanies = await companiesQuery.CountAsync(x => x.Status == false || x.Status == null);
+                var totalCompanies = activeCompanies + inactiveCompanies;
+
+                // Get licenses by category
+                var allowedCompanyIds = await _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
+                    .Select(c => c.Id)
+                    .ToListAsync();
+                
+                var licensesQuery = _context.LicenseDetails
+                    .Where(x => x.Status == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
+                if (parsedStartDate.HasValue)
+                {
+                    licensesQuery = licensesQuery.Where(x => x.IssueDate >= parsedStartDate);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    licensesQuery = licensesQuery.Where(x => x.IssueDate <= parsedEndDate);
+                }
+                var licensesByCategory = await licensesQuery
+                    .GroupBy(l => l.LicenseCategory ?? "نامشخص")
+                    .Select(g => new
+                    {
+                        category = g.Key,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+                var totalLicenses = licensesByCategory.Sum(l => l.count);
+
+                // Get guarantors by type
+                var guarantorsQuery = _context.Guarantors
+                    .Where(x => x.Status == true && x.IsActive == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
+                if (parsedStartDate.HasValue)
+                {
+                    var startDateTime = parsedStartDate.Value.ToDateTime(TimeOnly.MinValue);
+                    guarantorsQuery = guarantorsQuery.Where(x => x.CreatedAt >= startDateTime);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    var endDateTime = parsedEndDate.Value.ToDateTime(TimeOnly.MaxValue);
+                    guarantorsQuery = guarantorsQuery.Where(x => x.CreatedAt <= endDateTime);
+                }
+                var guarantorsByType = await guarantorsQuery
+                    .Where(g => g.GuaranteeTypeId.HasValue)
+                    .GroupBy(g => g.GuaranteeTypeId!.Value)
+                    .Select(g => new
+                    {
+                        guaranteeTypeId = g.Key,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                var guaranteeTypes = await _context.GuaranteeTypes.ToListAsync();
+                var guarantorsResult = guarantorsByType.Select(g => new
+                {
+                    g.guaranteeTypeId,
+                    guaranteeTypeName = guaranteeTypes.FirstOrDefault(gt => gt.Id == g.guaranteeTypeId)?.Name ?? "Unknown",
+                    g.count
+                }).ToList();
+                var totalGuarantors = guarantorsResult.Sum(r => r.count);
+
+                return Ok(new
+                {
+                    totalCancellations,
+                    activeCompanies,
+                    inactiveCompanies,
+                    totalCompanies,
+                    licensesByCategory,
+                    totalLicenses,
+                    guarantorsByType = guarantorsResult,
+                    totalGuarantors,
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    reportGeneratedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        #endregion
     }
 }
 
