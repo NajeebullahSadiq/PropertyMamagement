@@ -934,6 +934,8 @@ namespace WebAPIBackend.Controllers.Companies
 
         /// <summary>
         /// Get report: Count of active and inactive companies within date range
+        /// Active = license expiry date (تاریخ ختم جواز) is >= today
+        /// Inactive = license expiry date is < today or no license
         /// </summary>
         [HttpGet("reports/companies-status")]
         public async Task<IActionResult> GetCompaniesStatusReport(
@@ -972,8 +974,35 @@ namespace WebAPIBackend.Controllers.Companies
                     }
                 }
 
-                var activeCount = await companiesQuery.CountAsync(x => x.Status == true);
-                var inactiveCount = await companiesQuery.CountAsync(x => x.Status == false || x.Status == null);
+                // Get company IDs within date range
+                var companyIdsInRange = await companiesQuery.Select(c => c.Id).ToListAsync();
+                
+                // Get licenses for these companies to check expiry dates
+                var today = DateOnly.FromDateTime(DateTime.Today);
+                var licensesForStatus = await _context.LicenseDetails
+                    .Where(l => l.Status == true && l.CompanyId.HasValue && companyIdsInRange.Contains(l.CompanyId.Value))
+                    .Select(l => new { l.CompanyId, l.ExpireDate })
+                    .ToListAsync();
+                
+                // Group by company and get the latest expiry date for each company
+                var companyExpiryStatus = licensesForStatus
+                    .GroupBy(l => l.CompanyId)
+                    .Select(g => new
+                    {
+                        CompanyId = g.Key,
+                        LatestExpireDate = g.Max(l => l.ExpireDate),
+                        IsActive = g.Max(l => l.ExpireDate).HasValue && g.Max(l => l.ExpireDate) >= today
+                    })
+                    .ToList();
+                
+                // Count active and inactive companies based on license expiry
+                var activeCount = companyExpiryStatus.Count(c => c.IsActive);
+                var inactiveCount = companyExpiryStatus.Count(c => !c.IsActive);
+                
+                // Add companies without licenses as inactive
+                var companiesWithoutLicenses = companyIdsInRange.Count - companyExpiryStatus.Count;
+                inactiveCount += companiesWithoutLicenses;
+                
                 var totalCompanies = activeCount + inactiveCount;
 
                 return Ok(new
@@ -1188,7 +1217,7 @@ namespace WebAPIBackend.Controllers.Companies
                 }
                 var totalCancellations = await cancellationsQuery.CountAsync();
 
-                // Get companies status
+                // Get companies status based on license expiry date
                 var companiesQuery = _context.CompanyDetails.AsQueryable();
                 companiesQuery = _provinceFilter.ApplyProvinceFilter(companiesQuery);
                 if (parsedStartDate.HasValue)
@@ -1201,8 +1230,36 @@ namespace WebAPIBackend.Controllers.Companies
                     var endDateTime = parsedEndDate.Value.ToDateTime(TimeOnly.MaxValue);
                     companiesQuery = companiesQuery.Where(x => x.CreatedAt <= endDateTime);
                 }
-                var activeCompanies = await companiesQuery.CountAsync(x => x.Status == true);
-                var inactiveCompanies = await companiesQuery.CountAsync(x => x.Status == false || x.Status == null);
+                
+                // Get company IDs within date range
+                var companyIdsInRange = await companiesQuery.Select(c => c.Id).ToListAsync();
+                
+                // Get licenses for these companies to check expiry dates
+                var today = DateOnly.FromDateTime(DateTime.Today);
+                var licensesForStatus = await _context.LicenseDetails
+                    .Where(l => l.Status == true && l.CompanyId.HasValue && companyIdsInRange.Contains(l.CompanyId.Value))
+                    .Select(l => new { l.CompanyId, l.ExpireDate })
+                    .ToListAsync();
+                
+                // Group by company and get the latest expiry date for each company
+                var companyExpiryStatus = licensesForStatus
+                    .GroupBy(l => l.CompanyId)
+                    .Select(g => new
+                    {
+                        CompanyId = g.Key,
+                        LatestExpireDate = g.Max(l => l.ExpireDate),
+                        IsActive = g.Max(l => l.ExpireDate).HasValue && g.Max(l => l.ExpireDate) >= today
+                    })
+                    .ToList();
+                
+                // Count active and inactive companies based on license expiry
+                var activeCompanies = companyExpiryStatus.Count(c => c.IsActive);
+                var inactiveCompanies = companyExpiryStatus.Count(c => !c.IsActive);
+                
+                // Add companies without licenses as inactive
+                var companiesWithoutLicenses = companyIdsInRange.Count - companyExpiryStatus.Count;
+                inactiveCompanies += companiesWithoutLicenses;
+                
                 var totalCompanies = activeCompanies + inactiveCompanies;
 
                 // Get licenses by category
