@@ -45,7 +45,7 @@
         </h3>
         
         <!-- Date Range Selection -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
           <div>
             <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" label="از تاریخ" [required]="false">
             </app-multi-calendar-datepicker>
@@ -53,6 +53,18 @@
           <div>
             <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" label="تا تاریخ" [required]="false">
             </app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ولایت</label>
+            <ng-select [(ngModel)]="reportProvinceId" [items]="provinces" bindLabel="dari" bindValue="id" (change)="onReportProvinceChange(reportProvinceId)" placeholder="همه ولایات" [clearable]="true" class="custom-ng-select">
+              <ng-option [value]="0">همه ولایات</ng-option>
+            </ng-select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ولسوالی</label>
+            <ng-select [(ngModel)]="reportDistrictId" [items]="reportDistricts" bindLabel="dari" bindValue="id" placeholder="همه ولسوالی‌ها" [clearable]="true" [disabled]="!reportProvinceId || reportProvinceId === 0" class="custom-ng-select">
+              <ng-option [value]="0">همه ولسوالی‌ها</ng-option>
+            </ng-select>
           </div>
           <div class="flex items-end gap-2">
             <button (click)="generateReport()" [disabled]="isLoadingReport" class="flex-1 px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50">

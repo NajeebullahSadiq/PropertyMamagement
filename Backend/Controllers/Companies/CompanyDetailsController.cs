@@ -1175,7 +1175,9 @@ namespace WebAPIBackend.Controllers.Companies
         public async Task<IActionResult> GetComprehensiveReport(
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
-            [FromQuery] string? calendarType = null)
+            [FromQuery] string? calendarType = null,
+            [FromQuery] int? provinceId = null,
+            [FromQuery] int? districtId = null)
         {
             try
             {
@@ -1217,13 +1219,28 @@ namespace WebAPIBackend.Controllers.Companies
                 var allCompaniesQuery = _context.CompanyDetails.AsQueryable();
                 allCompaniesQuery = _provinceFilter.ApplyProvinceFilter(allCompaniesQuery);
                 
-                // Get all company IDs (not filtered by date)
+                // Apply province filter if specified
+                if (provinceId.HasValue && provinceId.Value > 0)
+                {
+                    allCompaniesQuery = allCompaniesQuery.Where(c => c.ProvinceId == provinceId.Value);
+                }
+                
+                // Get all company IDs (not filtered by date, but filtered by province if specified)
                 var allCompanyIds = await allCompaniesQuery.Select(c => c.Id).ToListAsync();
                 
-                // Get licenses for these companies to check expiry dates
+                // Get licenses for these companies to check expiry dates and apply district filter
                 var today = DateOnly.FromDateTime(DateTime.Today);
-                var licensesForStatus = await _context.LicenseDetails
-                    .Where(l => l.Status == true && l.CompanyId.HasValue && allCompanyIds.Contains(l.CompanyId.Value))
+                var licensesForStatusQuery = _context.LicenseDetails
+                    .Where(l => l.Status == true && l.CompanyId.HasValue && allCompanyIds.Contains(l.CompanyId.Value));
+                
+                // Apply district filter if specified
+                if (districtId.HasValue && districtId.Value > 0)
+                {
+                    // Filter by license province (which represents district in the license context)
+                    licensesForStatusQuery = licensesForStatusQuery.Where(l => l.ProvinceId == districtId.Value);
+                }
+                
+                var licensesForStatus = await licensesForStatusQuery
                     .Select(l => new { l.CompanyId, l.ExpireDate })
                     .ToListAsync();
                 
@@ -1253,8 +1270,25 @@ namespace WebAPIBackend.Controllers.Companies
                     .Select(c => c.Id)
                     .ToListAsync();
                 
+                // Apply province filter to allowed companies
+                if (provinceId.HasValue && provinceId.Value > 0)
+                {
+                    var provinceFilteredCompanyIds = await _context.CompanyDetails
+                        .Where(c => c.ProvinceId == provinceId.Value && allowedCompanyIds.Contains(c.Id))
+                        .Select(c => c.Id)
+                        .ToListAsync();
+                    allowedCompanyIds = provinceFilteredCompanyIds;
+                }
+                
                 var licensesQuery = _context.LicenseDetails
                     .Where(x => x.Status == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
+                
+                // Apply district filter
+                if (districtId.HasValue && districtId.Value > 0)
+                {
+                    licensesQuery = licensesQuery.Where(x => x.ProvinceId == districtId.Value);
+                }
+                
                 if (parsedStartDate.HasValue)
                 {
                     licensesQuery = licensesQuery.Where(x => x.IssueDate >= parsedStartDate);
@@ -1307,7 +1341,12 @@ namespace WebAPIBackend.Controllers.Companies
 
                 // Get licenses by type (املاک vs موټر فروشی) with revenue calculation
                 var licensesByType = await licensesQuery
-                    .GroupBy(l => l.LicenseType ?? "نامشخص")
+                    .Select(l => new
+                    {
+                        // Default to 'realEstate' if LicenseType is null or empty
+                        licenseType = string.IsNullOrWhiteSpace(l.LicenseType) ? "realEstate" : l.LicenseType
+                    })
+                    .GroupBy(l => l.licenseType)
                     .Select(g => new
                     {
                         licenseType = g.Key,
@@ -1316,13 +1355,20 @@ namespace WebAPIBackend.Controllers.Companies
                     .ToListAsync();
 
                 // Calculate revenue based on license type
-                // املاک = 25,000 AFN per license
-                // موټر فروشی = 20,000 AFN per license
-                var amlakCount = licensesByType.FirstOrDefault(l => l.licenseType == "املاک")?.count ?? 0;
-                var motorCount = licensesByType.FirstOrDefault(l => l.licenseType == "موټر فروشی")?.count ?? 0;
+                // املاک (realEstate) = 20,000 AFN per license
+                // موټر فروشی (carSale) = 25,000 AFN per license
+                // The database stores English values: 'realEstate' and 'carSale'
+                var amlakCount = licensesByType.FirstOrDefault(l => 
+                    l.licenseType != null && 
+                    (l.licenseType.Equals("realEstate", StringComparison.OrdinalIgnoreCase) || 
+                     l.licenseType == "املاک"))?.count ?? 0;
+                var motorCount = licensesByType.FirstOrDefault(l => 
+                    l.licenseType != null && 
+                    (l.licenseType.Equals("carSale", StringComparison.OrdinalIgnoreCase) || 
+                     l.licenseType == "موټر فروشی"))?.count ?? 0;
                 
-                var amlakRevenue = amlakCount * 25000;
-                var motorRevenue = motorCount * 20000;
+                var amlakRevenue = amlakCount * 20000;
+                var motorRevenue = motorCount * 25000;
                 var totalRevenue = amlakRevenue + motorRevenue;
 
                 var licenseRevenueByType = new[]
@@ -1331,14 +1377,14 @@ namespace WebAPIBackend.Controllers.Companies
                     {
                         licenseType = "املاک",
                         count = amlakCount,
-                        pricePerLicense = 25000,
+                        pricePerLicense = 20000,
                         totalRevenue = amlakRevenue
                     },
                     new
                     {
                         licenseType = "موټر فروشی",
                         count = motorCount,
-                        pricePerLicense = 20000,
+                        pricePerLicense = 25000,
                         totalRevenue = motorRevenue
                     }
                 };

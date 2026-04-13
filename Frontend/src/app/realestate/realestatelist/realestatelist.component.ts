@@ -9,6 +9,7 @@ import { RbacService } from 'src/app/shared/rbac.service';
 import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-realestatelist',
@@ -33,8 +34,14 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
   showReports = false;
   reportStartDate: any = '';
   reportEndDate: any = '';
+  reportProvinceId: number = 0;
+  reportDistrictId: number = 0;
   reportData: any = null;
   isLoadingReport = false;
+  
+  // Dropdowns for reports
+  provinces: any[] = [];
+  reportDistricts: any[] = [];
 
   constructor(
     private http: HttpClient, 
@@ -62,6 +69,7 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadData();
+    this.loadProvinces();
   }
 
   ngOnDestroy() {
@@ -74,6 +82,32 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
       this.filteredProperties = properties;
       this.count = properties.length;
     });
+  }
+
+  loadProvinces(): void {
+    this.comservice.getProvinces().subscribe((res: any) => {
+      this.provinces = res as any[];
+    });
+  }
+
+  onReportProvinceChange(event: any): void {
+    this.reportDistrictId = 0;
+    this.reportDistricts = [];
+    
+    const provinceId = event?.id || event;
+    
+    if (provinceId && provinceId > 0) {
+      this.http.get(`${environment.apiURL}/SellerDetails/${provinceId}`).subscribe({
+        next: (res: any) => {
+          this.reportDistricts = res as any[];
+          console.log('Districts loaded:', this.reportDistricts);
+        },
+        error: (err) => {
+          console.error('Error loading districts:', err);
+          this.toastr.error('خطا در بارگذاری ولسوالی‌ها');
+        }
+      });
+    }
   }
 
   onEdit(propertyId: number) {
@@ -184,7 +218,9 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     this.comservice.getComprehensiveReport(
       startDate,
       endDate,
-      'gregorian'
+      'gregorian',
+      this.reportProvinceId > 0 ? this.reportProvinceId : undefined,
+      this.reportDistrictId > 0 ? this.reportDistrictId : undefined
     ).subscribe({
       next: (data) => {
         console.log('Report data received:', data);

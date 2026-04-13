@@ -200,7 +200,7 @@ export class CompnaydetailService {
     return this.http.get(url);
   }
 
-  getComprehensiveReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+  getComprehensiveReport(startDate?: string, endDate?: string, calendarType?: string, provinceId?: number, districtId?: number): Observable<any> {
     let url = `${this.baseUrl}/reports/comprehensive?`;
     const params: string[] = [];
     
@@ -214,6 +214,12 @@ export class CompnaydetailService {
     }
     if (calendarType) {
       params.push(`calendarType=${calendarType}`);
+    }
+    if (provinceId && provinceId > 0) {
+      params.push(`provinceId=${provinceId}`);
+    }
+    if (districtId && districtId > 0) {
+      params.push(`districtId=${districtId}`);
     }
     
     url += params.join('&');
