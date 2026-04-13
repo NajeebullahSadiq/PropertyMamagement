@@ -55,7 +55,8 @@ export class CancellationPageComponent implements OnInit {
   }
 
   loadCancellationReasons(): void {
-    this.cancellationReasons = (this.localizationService as any).cancellationReasons || [];
+    this.cancellationReasons = this.localizationService.cancellationReasons || [];
+    console.log('Loaded cancellation reasons:', this.cancellationReasons);
   }
 
   loadActiveTransactions(): void {
@@ -100,6 +101,7 @@ export class CancellationPageComponent implements OnInit {
     this.submitted = false;
     this.cancellationDocuments = [];
     this.showCancellationModal = true;
+    console.log('Modal opened. Cancellation reasons available:', this.cancellationReasons.length);
   }
 
   closeCancellationModal(): void {
@@ -109,6 +111,14 @@ export class CancellationPageComponent implements OnInit {
     this.otherCancellationReasonText = '';
     this.submitted = false;
     this.cancellationDocuments = [];
+  }
+
+  onOverlayClick(event: MouseEvent): void {
+    // Only close if clicking directly on the overlay, not on mat-select dropdown
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('modal-overlay')) {
+      this.closeCancellationModal();
+    }
   }
 
   isOtherReasonSelected(): boolean {

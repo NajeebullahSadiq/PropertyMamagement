@@ -167,7 +167,7 @@
   </div>
 
   <!-- Cancellation Modal -->
-  <div class="modal-overlay" *ngIf="showCancellationModal" (click)="closeCancellationModal()">
+  <div class="modal-overlay" *ngIf="showCancellationModal" (click)="onOverlayClick($event)">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>تایید ابطال معامله</h2>
@@ -183,14 +183,19 @@
 
         <div class="form-group">
           <label for="reason">دلایل فسخ / ابطال معامله:</label>
-          <mat-form-field appearance="outline" class="mat-form-field-full">
-            <mat-select
-              id="reason"
-              [(ngModel)]="cancellationReason"
-              multiple>
-              <mat-option *ngFor="let r of cancellationReasons" [value]="r.value">{{ r.label }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <ng-select
+            id="reason"
+            name="cancellationReason"
+            [(ngModel)]="cancellationReason"
+            [items]="cancellationReasons"
+            bindLabel="label"
+            bindValue="value"
+            [multiple]="true"
+            [closeOnSelect]="false"
+            [selectOnTab]="true"
+            placeholder="انتخاب دلایل"
+            class="custom-ng-select">
+          </ng-select>
           <div class="validation-error" *ngIf="submitted && cancellationReason.length === 0">حداقل یک دلیل ابطال ضروری است</div>
         </div>
 

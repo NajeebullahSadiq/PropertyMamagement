@@ -169,7 +169,7 @@ namespace WebAPIBackend.Controllers
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized();
+                    return Unauthorized(new { error = "User ID not found in claims" });
                 }
 
                 if (string.IsNullOrWhiteSpace(request.CancellationReason))
@@ -202,7 +202,19 @@ namespace WebAPIBackend.Controllers
                 };
 
                 _context.PropertyCancellations.Add(cancellation);
-                await _context.SaveChangesAsync();
+                
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    var innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                    return StatusCode(500, new { 
+                        error = "Database error while saving cancellation", 
+                        details = innerMessage 
+                    });
+                }
 
                 var documents = request.Documents ?? new List<CancellationDocumentRequest>();
                 foreach (var doc in documents)
@@ -222,13 +234,29 @@ namespace WebAPIBackend.Controllers
                     });
                 }
 
-                await _context.SaveChangesAsync();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    var innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                    return StatusCode(500, new { 
+                        error = "Database error while saving documents", 
+                        details = innerMessage 
+                    });
+                }
 
                 return Ok(new { id = cancellation.Id, message = "Transaction cancelled successfully" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = ex.Message });
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { 
+                    error = "An error occurred while cancelling the transaction", 
+                    details = innerMessage,
+                    stackTrace = ex.StackTrace
+                });
             }
         }
 
