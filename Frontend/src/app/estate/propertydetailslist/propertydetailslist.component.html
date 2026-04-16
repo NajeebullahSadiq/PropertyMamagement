@@ -49,6 +49,7 @@
           <thead class="bg-gray-50 border-b-2 border-gray-200">
             <tr class="text-center">
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نام رهنما</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نوع ملکیت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نوع معامله</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">فروشنده</th>
@@ -60,6 +61,9 @@
           <tbody class="divide-y divide-gray-200">
             <tr *ngFor="let property of filteredProperties | paginate: { itemsPerPage: tableSize, currentPage: page, totalItems: count }; let i = index" class="text-center hover:bg-blue-50 transition-colors">
               <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ (page - 1) * tableSize + i + 1 }}</td>
+              <td class="px-4 py-3 text-sm" [ngClass]="property.companyTitle ? 'text-gray-700' : 'text-gray-400'">
+                {{ property.companyTitle ? property.companyTitle : 'نامشخص' }}
+              </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.propertyTypeText }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.transactionTypeText }}</td>
               <td class="px-4 py-3 text-sm" [ngClass]="property.sellerName ? 'text-gray-700' : 'text-red-600 font-semibold'">

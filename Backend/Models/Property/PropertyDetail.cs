@@ -104,4 +104,10 @@ public partial class PropertyDetail
     public virtual ICollection<PropertyPayment> PropertyPayments { get; set; } = new List<PropertyPayment>();
     public virtual ICollection<PropertyValuation> PropertyValuations { get; set; } = new List<PropertyValuation>();
     public virtual ICollection<PropertyDocument> PropertyDocuments { get; set; } = new List<PropertyDocument>();
+    
+    /// <summary>
+    /// Navigation property to the company that created this property record
+    /// </summary>
+    [ForeignKey("CompanyId")]
+    public virtual CompanyDetail? Company { get; set; }
 }

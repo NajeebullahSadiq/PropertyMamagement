@@ -128,24 +128,31 @@ namespace WebAPIBackend.Controllers
 
             IQueryable<PropertyDetail> propertyQuery;
 
-            // Check if user can view all records
+            // Check if user can view all records (Admin, Authority, etc.)
             if (RbacHelper.CanViewAllRecords(roles, "property"))
             {
-                propertyQuery = _context.PropertyDetails;
+                // Admin and Authority can see ALL records
+                propertyQuery = _context.PropertyDetails
+                    .Include(p => p.Company);
             }
             else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
             {
                 // Filter by company ID for PropertyOperator
-                if (user.CompanyId == 0)
+                if (user.CompanyId == 0 || user.CompanyId == null)
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
-                propertyQuery = _context.PropertyDetails.Where(p => p.CompanyId == user.CompanyId);
+                // Only show properties that belong to this company
+                propertyQuery = _context.PropertyDetails
+                    .Include(p => p.Company)
+                    .Where(p => p.CompanyId == user.CompanyId);
             }
             else
             {
                 // Fallback: Filter by user ID
-                propertyQuery = _context.PropertyDetails.Where(p => p.CreatedBy == userId);
+                propertyQuery = _context.PropertyDetails
+                    .Include(p => p.Company)
+                    .Where(p => p.CreatedBy == userId);
             }
 
             var query = (from p in propertyQuery
@@ -175,7 +182,9 @@ namespace WebAPIBackend.Controllers
                              BuyerName = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().FirstName : null,
                              SellerElectronicNationalIdNumber = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().ElectronicNationalIdNumber : null,
                              BuyerElectronicNationalIdNumber = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().ElectronicNationalIdNumber : null,
-                             p.CreatedBy
+                             p.CreatedBy,
+                             p.CompanyId,
+                             CompanyTitle = p.Company != null ? p.Company.Title : null
                          }).ToList();
 
             return Ok(query);
@@ -221,21 +230,28 @@ namespace WebAPIBackend.Controllers
             // ADMIN and AUTHORITY can view all records
             if (RbacHelper.CanViewAllRecords(roles, "property"))
             {
-                propertyQuery = _context.PropertyDetails;
+                // Admin and Authority can see ALL records
+                propertyQuery = _context.PropertyDetails
+                    .Include(p => p.Company);
             }
             else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
             {
                 // Filter by company ID for PropertyOperator
-                if (user.CompanyId == 0)
+                if (user.CompanyId == 0 || user.CompanyId == null)
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
-                propertyQuery = _context.PropertyDetails.Where(p => p.CompanyId == user.CompanyId);
+                // Only show properties that belong to this company
+                propertyQuery = _context.PropertyDetails
+                    .Include(p => p.Company)
+                    .Where(p => p.CompanyId == user.CompanyId);
             }
             else
             {
                 // Fallback: Filter by user ID
-                propertyQuery = _context.PropertyDetails.Where(p => p.CreatedBy == userId);
+                propertyQuery = _context.PropertyDetails
+                    .Include(p => p.Company)
+                    .Where(p => p.CreatedBy == userId);
             }
 
             var data = await propertyQuery
@@ -276,6 +292,8 @@ namespace WebAPIBackend.Controllers
                     p.FilePath,
                     p.PreviousDocumentsPath,
                     p.ExistingDocumentsPath,
+                    p.CompanyId,
+                    CompanyTitle = p.Company != null ? p.Company.Title : null,
                     Address = p.PropertyAddresses
                         .Select(a => new
                         {

@@ -66,6 +66,8 @@ export interface PropertyDetails {
     sellerElectronicNationalIdNumber?: string;
     status?: string;
     createdBy?: string;
+    companyId?: number;
+    companyTitle?: string;
 
   }
 
