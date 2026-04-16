@@ -260,7 +260,7 @@ export class BuyerdetailComponent {
           transactionType: firstBuyer.transactionType || '',
           transactionTypeDescription: firstBuyer.transactionTypeDescription || '',
         });
-        this.imagePath=this.baseUrl+firstBuyer.photo;
+        this.imagePath=this.constructImageUrl(firstBuyer.photo);
         this.imageName=firstBuyer.photo || '';
         this.nationalIdFileName=existingNationalIdPath;
         this.authorizationLetterName=firstBuyer.authorizationLetter || '';
@@ -268,9 +268,9 @@ export class BuyerdetailComponent {
         
         if (firstBuyer.photo) {
           if (this.childComponent) {
-            this.childComponent.setExistingImage(this.baseUrl + firstBuyer.photo);
+            this.childComponent.setExistingImage(firstBuyer.photo);
           } else {
-            this.pendingImagePath = this.baseUrl + firstBuyer.photo;
+            this.pendingImagePath = firstBuyer.photo;
           }
         }
         
@@ -417,7 +417,7 @@ updateBuyerDetails(): void {
       transactionType: selectedBuyer.transactionType || '',
       transactionTypeDescription: selectedBuyer.transactionTypeDescription || '',
     });
-    this.imagePath = selectedBuyer.photo ? `${this.baseUrl}api/Upload/view/${selectedBuyer.photo}` : 'assets/img/avatar.png';
+    this.imagePath = this.constructImageUrl(selectedBuyer.photo);
     this.imageName = selectedBuyer.photo || '';
     this.nationalIdFileName = existingNationalIdPath;
     this.authorizationLetterName = selectedBuyer.authorizationLetter || '';
@@ -496,7 +496,7 @@ profilePreviewChanged = (localObjectUrl: string) => {
   }
 
   if (this.imageName) {
-    this.imagePath = this.baseUrl + this.imageName;
+    this.imagePath = this.constructImageUrl(this.imageName);
     return;
   }
 
@@ -506,7 +506,7 @@ profilePreviewChanged = (localObjectUrl: string) => {
 profileImageUploaded = (dbPath: string) => {
   this.imageName = dbPath || '';
   this.buyerForm.patchValue({ photo: this.imageName });
-  this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
+  this.imagePath = this.constructImageUrl(this.imageName);
 }
 
 isAuthorizedAgent(): boolean {
@@ -607,5 +607,36 @@ mapPropertyTypesToLocalized(backendTypes: any[]): any[] {
   isLesseeRole(): boolean {
     // Lessee roles are not applicable in Vehicle buyer module (restricted to 3 options)
     return false;
+  }
+
+  private constructImageUrl(path: string): string {
+    if (!path) return 'assets/img/avatar.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with /api/, remove it to avoid duplication
+    let cleanPath = path;
+    if (cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.substring(5); // Remove '/api/'
+    } else if (cleanPath.startsWith('api/')) {
+      cleanPath = cleanPath.substring(4); // Remove 'api/'
+    }
+    
+    // If path starts with Resources/, use Upload/view endpoint
+    if (cleanPath.startsWith('Resources/') || cleanPath.startsWith('/Resources/')) {
+      const resourcePath = cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath;
+      return `${this.baseUrl}Upload/view/${resourcePath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${cleanPath}`;
   }
 }

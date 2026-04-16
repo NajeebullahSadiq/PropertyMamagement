@@ -56,6 +56,10 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
 
     const currentPropertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
     this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
+    this.applyApartmentFieldValidation(currentPropertyTypeId);
+
+    const currentDocumentType = this.propertyForm.get('documentType')?.value;
+    this.applyPrivateDeedNumberValidation(currentDocumentType);
 
     // Validate document uploads for non-"سایر" document types
     if (this.documentsRequired()) {
@@ -115,6 +119,10 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
         issuanceDate: [''],
         serialNumber: [''],
         transactionDate: [''],
+        apartmentNumber: [''],
+        above: [''],
+        below: [''],
+        privateDeedNumber: [''],
         des: ['', [Validators.pattern(/.*\S.*/)]],
         filePath: [''],
         previousDocumentsPath: [''],
@@ -145,6 +153,11 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
   this.propertyForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
     this.onPropertyTypeChange();
     this.applyCustomPropertyTypeValidation(propertyTypeId);
+    this.applyApartmentFieldValidation(propertyTypeId);
+  });
+
+  this.propertyForm.get('documentType')?.valueChanges.subscribe(documentType => {
+    this.applyPrivateDeedNumberValidation(documentType);
   });
 
   }
@@ -167,69 +180,107 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
 
     if (effectiveId > 0) {
       this.propertyDetailsService.getPropertyDetailsById(effectiveId)
-          .subscribe(properties => {
-            this.properties = properties;
+          .subscribe({
+            next: (properties) => {
+              if (!properties || properties.length === 0) {
+                this.toastr.error('سند ملکیت یافت نشد یا شما اجازه دسترسی ندارید');
+                console.error('Empty property array returned for ID:', effectiveId);
+                this.router.navigate(['/estate']);
+                return;
+              }
+
+              this.properties = properties;
             
-            // Convert ISO date strings to Date objects for date pickers
-            const issuanceDate = properties[0].issuanceDate ? new Date(properties[0].issuanceDate) : '';
-            const transactionDate = properties[0].transactionDate ? new Date(properties[0].transactionDate) : '';
+              // Convert ISO date strings to Date objects for date pickers
+              const issuanceDate = properties[0].issuanceDate ? new Date(properties[0].issuanceDate) : '';
+              const transactionDate = properties[0].transactionDate ? new Date(properties[0].transactionDate) : '';
             
-            this.propertyForm.patchValue({
-              id: properties[0].id,
-              propertyTypeId: properties[0].propertyTypeId || '',
-              customPropertyType: (properties[0] as any).customPropertyType || '',
-              parea: properties[0].parea,
-              punitTypeId: properties[0].punitTypeId,
-              numofFloor: properties[0].numofFloor,
-              numofRooms: properties[0].numofRooms,
-              des: properties[0].des,
-              filePath: properties[0].filePath,
-              previousDocumentsPath: properties[0].previousDocumentsPath || '',
-              existingDocumentsPath: properties[0].existingDocumentsPath || '',
-              iscomplete: properties[0].iscomplete,
-              iseditable:properties[0].iseditable,
-              north:properties[0].north,
-              west:properties[0].west,
-              east:properties[0].east,
-              south:properties[0].south,
-              documentType:properties[0].documentType || '',
-              customDocumentType:(properties[0] as any).customDocumentType || '',
-              issuanceNumber:properties[0].issuanceNumber || '',
-              issuanceDate: issuanceDate,
-              serialNumber:properties[0].serialNumber || '',
-              transactionDate: transactionDate
-            });
-            this.imageName=properties.map(item => item.filePath).toString();
-            this.previousDocumentsPath = properties[0].previousDocumentsPath || '';
-            this.existingDocumentsPath = properties[0].existingDocumentsPath || '';
-            this.propertyDetailsService.updateMainTableId(effectiveId);
-            this.updateDocumentFieldValidation();
+              this.propertyForm.patchValue({
+                id: properties[0].id,
+                propertyTypeId: properties[0].propertyTypeId || '',
+                customPropertyType: (properties[0] as any).customPropertyType || '',
+                parea: properties[0].parea,
+                punitTypeId: properties[0].punitTypeId,
+                numofFloor: properties[0].numofFloor,
+                numofRooms: properties[0].numofRooms,
+                des: properties[0].des,
+                filePath: properties[0].filePath,
+                previousDocumentsPath: properties[0].previousDocumentsPath || '',
+                existingDocumentsPath: properties[0].existingDocumentsPath || '',
+                iscomplete: properties[0].iscomplete,
+                iseditable:properties[0].iseditable,
+                north:properties[0].north,
+                west:properties[0].west,
+                east:properties[0].east,
+                south:properties[0].south,
+                documentType:properties[0].documentType || '',
+                customDocumentType:(properties[0] as any).customDocumentType || '',
+                issuanceNumber:properties[0].issuanceNumber || '',
+                issuanceDate: issuanceDate,
+                serialNumber:properties[0].serialNumber || '',
+                transactionDate: transactionDate,
+                apartmentNumber: (properties[0] as any).apartmentNumber || '',
+                above: (properties[0] as any).above || '',
+                below: (properties[0] as any).below || '',
+                privateDeedNumber: (properties[0] as any).privateDeedNumber || ''
+              });
+              this.imageName=properties.map(item => item.filePath).toString();
+              this.previousDocumentsPath = properties[0].previousDocumentsPath || '';
+              this.existingDocumentsPath = properties[0].existingDocumentsPath || '';
+              this.propertyDetailsService.updateMainTableId(effectiveId);
+              this.updateDocumentFieldValidation();
+            },
+            error: (error) => {
+              console.error('Error loading property details:', error);
+              console.error('Property ID:', effectiveId);
+              console.error('Error status:', error.status);
+              console.error('Error message:', error.message);
+              
+              if (error.status === 403) {
+                this.toastr.error('شما اجازه دسترسی به این سند را ندارید');
+              } else if (error.status === 404) {
+                this.toastr.error('سند ملکیت یافت نشد');
+              } else if (error.status === 401) {
+                this.toastr.error('لطفاً دوباره وارد شوید');
+                this.router.navigate(['/login']);
+                return;
+              } else {
+                this.toastr.error('خطا در بارگذاری معلومات ملکیت');
+              }
+              this.router.navigate(['/estate']);
+            }
           });
 
       this.selerService.getPaddressById(effectiveId)
-        .subscribe(addr => {
-          if (addr && addr.length > 0) {
-            this.selectedAddressId = addr[0].id;
+        .subscribe({
+          next: (addr) => {
+            if (addr && addr.length > 0) {
+              this.selectedAddressId = addr[0].id;
 
-            const provinceId = addr[0].provinceId != null ? Number(addr[0].provinceId) : '';
-            const districtId = addr[0].districtId != null ? Number(addr[0].districtId) : '';
+              const provinceId = addr[0].provinceId != null ? Number(addr[0].provinceId) : '';
+              const districtId = addr[0].districtId != null ? Number(addr[0].districtId) : '';
 
-            // First set province and village
-            this.propertyForm.patchValue({
-              provinceId: provinceId,
-              village: addr[0].village
-            });
-
-            // Then load districts and set districtId after districts are loaded
-            if (provinceId) {
-              this.selerService.getdistrict(provinceId).subscribe(res => {
-                this.districts = res;
-                // Set districtId after districts are loaded
-                this.propertyForm.patchValue({
-                  districtId: districtId
-                });
+              // First set province and village
+              this.propertyForm.patchValue({
+                provinceId: provinceId,
+                village: addr[0].village
               });
+
+              // Then load districts and set districtId after districts are loaded
+              if (provinceId) {
+                this.selerService.getdistrict(provinceId).subscribe(res => {
+                  this.districts = res;
+                  // Set districtId after districts are loaded
+                  this.propertyForm.patchValue({
+                    districtId: districtId
+                  });
+                });
+              }
             }
+          },
+          error: (error) => {
+            console.error('Error loading property address:', error);
+            // Address is optional, so just log the error
           }
         });
     }
@@ -440,7 +491,11 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
       issuanceNumber:'',
       issuanceDate:'',
       serialNumber:'',
-      transactionDate:''
+      transactionDate:'',
+      apartmentNumber:'',
+      above:'',
+      below:'',
+      privateDeedNumber:''
     });
     const numofFloorControl = this.propertyForm.get('numofFloor');
     const numofRoomControl = this.propertyForm.get('numofRooms');
@@ -626,7 +681,7 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     if (docType === 'سند ملکیت') {
       return 'نمبر سند ملکیت';
     } else if (docType === 'قباله شرعی') {
-      return 'نمبر قباله';
+      return 'نمبر عمومی قباله شرعی';
     }
     return 'نمبر سند';
   }
@@ -717,6 +772,81 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
       this.districts = res;
     });
   }
+
+  /**
+   * Check if property type is Apartment (آپارتمان)
+   */
+  isApartmentPropertyType(): boolean {
+    const propertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
+    const selectedPropertyType = this.localizedPropertyTypes?.find((pt: any) => pt.id === propertyTypeId);
+    return selectedPropertyType && selectedPropertyType.name === 'آپارتمان';
+  }
+
+  /**
+   * Apply validation for apartment-specific fields
+   */
+  private applyApartmentFieldValidation(propertyTypeId: any): void {
+    const apartmentNumberControl = this.propertyForm.get('apartmentNumber');
+    const aboveControl = this.propertyForm.get('above');
+    const belowControl = this.propertyForm.get('below');
+
+    if (!apartmentNumberControl || !aboveControl || !belowControl) {
+      return;
+    }
+
+    if (!this.localizedPropertyTypes || this.localizedPropertyTypes.length === 0) {
+      return;
+    }
+
+    const selectedPropertyType = this.localizedPropertyTypes.find((pt: any) => pt.id === propertyTypeId);
+    if (selectedPropertyType && selectedPropertyType.name === 'آپارتمان') {
+      apartmentNumberControl.setValidators([Validators.required]);
+      aboveControl.setValidators([Validators.required]);
+      belowControl.setValidators([Validators.required]);
+    } else {
+      apartmentNumberControl.clearValidators();
+      aboveControl.clearValidators();
+      belowControl.clearValidators();
+      apartmentNumberControl.reset();
+      aboveControl.reset();
+      belowControl.reset();
+    }
+    apartmentNumberControl.updateValueAndValidity();
+    aboveControl.updateValueAndValidity();
+    belowControl.updateValueAndValidity();
+  }
+
+  /**
+   * Check if document type is قباله شرعی
+   */
+  isQabalaShariDocumentType(): boolean {
+    const docType = this.propertyForm.get('documentType')?.value;
+    return docType === 'قباله شرعی';
+  }
+
+  /**
+   * Apply validation for private deed number when قباله شرعی is selected
+   */
+  private applyPrivateDeedNumberValidation(documentType: any): void {
+    const privateDeedNumberControl = this.propertyForm.get('privateDeedNumber');
+
+    if (!privateDeedNumberControl) {
+      return;
+    }
+
+    if (documentType === 'قباله شرعی') {
+      privateDeedNumberControl.setValidators([Validators.required]);
+    } else {
+      privateDeedNumberControl.clearValidators();
+      privateDeedNumberControl.reset();
+    }
+    privateDeedNumberControl.updateValueAndValidity();
+  }
+
+  get apartmentNumber() { return this.propertyForm.get('apartmentNumber'); }
+  get above() { return this.propertyForm.get('above'); }
+  get below() { return this.propertyForm.get('below'); }
+  get privateDeedNumber() { return this.propertyForm.get('privateDeedNumber'); }
 
 
 }

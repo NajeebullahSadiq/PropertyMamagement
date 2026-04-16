@@ -197,7 +197,7 @@
               <!-- Seller Photo -->
               <div class="mr-auto" *ngIf="s.photo">
                 <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-300 shadow-lg">
-                  <img [src]="s.photo" alt="عکس فروشنده" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                  <img [src]="getPhotoUrl(s.photo)" alt="عکس فروشنده" class="w-full h-full object-cover" onerror="this.style.display='none'">
                 </div>
               </div>
             </div>
@@ -253,7 +253,7 @@
               <!-- Buyer Photo -->
               <div class="mr-auto" *ngIf="b.photo">
                 <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-300 shadow-lg">
-                  <img [src]="b.photo" alt="عکس مشتری" class="w-full h-full object-cover" onerror="this.style.display='none'">
+                  <img [src]="getPhotoUrl(b.photo)" alt="عکس مشتری" class="w-full h-full object-cover" onerror="this.style.display='none'">
                 </div>
               </div>
             </div>

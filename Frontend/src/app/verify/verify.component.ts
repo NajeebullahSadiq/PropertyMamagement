@@ -284,37 +284,46 @@ export class VerifyComponent implements OnInit, OnDestroy {
   }
 
   getPhotoUrl(): string {
-    if (this.result?.holderPhoto) {
-      // Use the same logic as print components for photo URLs
-      if (this.result.holderPhoto.startsWith('Resources/') || this.result.holderPhoto.startsWith('/Resources/')) {
-        const cleanPath = this.result.holderPhoto.startsWith('/') ? this.result.holderPhoto.substring(1) : this.result.holderPhoto;
-        return `${this.baseUrl}${cleanPath}`;
-      }
-      return this.baseUrl + this.result.holderPhoto;
-    }
-    return 'assets/img/avatar2.png';
+    return this.constructImageUrl(this.result?.holderPhoto);
   }
 
   getSellerPhotoUrl(): string {
-    if (this.result?.sellerInfo?.photo) {
-      if (this.result.sellerInfo.photo.startsWith('Resources/') || this.result.sellerInfo.photo.startsWith('/Resources/')) {
-        const cleanPath = this.result.sellerInfo.photo.startsWith('/') ? this.result.sellerInfo.photo.substring(1) : this.result.sellerInfo.photo;
-        return `${this.baseUrl}${cleanPath}`;
-      }
-      return this.baseUrl + this.result.sellerInfo.photo;
-    }
-    return 'assets/img/avatar2.png';
+    return this.constructImageUrl(this.result?.sellerInfo?.photo);
   }
 
   getBuyerPhotoUrl(): string {
-    if (this.result?.buyerInfo?.photo) {
-      if (this.result.buyerInfo.photo.startsWith('Resources/') || this.result.buyerInfo.photo.startsWith('/Resources/')) {
-        const cleanPath = this.result.buyerInfo.photo.startsWith('/') ? this.result.buyerInfo.photo.substring(1) : this.result.buyerInfo.photo;
-        return `${this.baseUrl}${cleanPath}`;
-      }
-      return this.baseUrl + this.result.buyerInfo.photo;
+    return this.constructImageUrl(this.result?.buyerInfo?.photo);
+  }
+
+  private constructImageUrl(path: string | undefined): string {
+    if (!path) return 'assets/img/avatar2.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
     }
-    return 'assets/img/avatar2.png';
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with /api/, remove it to avoid duplication
+    let cleanPath = path;
+    if (cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.substring(5); // Remove '/api/'
+    } else if (cleanPath.startsWith('api/')) {
+      cleanPath = cleanPath.substring(4); // Remove 'api/'
+    }
+    
+    // If path starts with Resources/, use Upload/view endpoint
+    if (cleanPath.startsWith('Resources/') || cleanPath.startsWith('/Resources/')) {
+      const resourcePath = cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath;
+      return `${this.baseUrl}Upload/view/${resourcePath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${cleanPath}`;
   }
 
   getCompetencyDisplay(competency: string | undefined): string {

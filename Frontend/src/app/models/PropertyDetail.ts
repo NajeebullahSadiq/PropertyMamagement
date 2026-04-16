@@ -35,6 +35,10 @@ export interface PropertyDetails {
     verifiedAt?: string;
     approvedBy?: string;
     approvedAt?: string;
+    apartmentNumber?:string;
+    above?:string;
+    below?:string;
+    privateDeedNumber?:string;
 
     propertyAddresses?: any[];
 

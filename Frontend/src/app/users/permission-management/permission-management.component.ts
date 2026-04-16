@@ -115,7 +115,38 @@ export class PermissionManagementComponent implements OnInit {
   }
 
   getUserPhoto(photoPath: string): string {
-    return photoPath ? this.baseUrl + photoPath : 'assets/img/avatar.png';
+    return this.constructImageUrl(photoPath);
+  }
+
+  private constructImageUrl(path: string | null | undefined): string {
+    if (!path) return 'assets/img/avatar.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with /api/, remove it to avoid duplication
+    let cleanPath = path;
+    if (cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.substring(5); // Remove '/api/'
+    } else if (cleanPath.startsWith('api/')) {
+      cleanPath = cleanPath.substring(4); // Remove 'api/'
+    }
+    
+    // If path starts with Resources/, use Upload/view endpoint
+    if (cleanPath.startsWith('Resources/') || cleanPath.startsWith('/Resources/')) {
+      const resourcePath = cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath;
+      return `${this.baseUrl}Upload/view/${resourcePath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${cleanPath}`;
   }
 
   getRoleColor(role: string): string {

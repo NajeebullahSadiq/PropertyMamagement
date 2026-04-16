@@ -177,7 +177,7 @@ export class SellerdetailComponent {
           authorizationLetter: firstSeller.authorizationLetter || '',
           heirsLetter: firstSeller.heirsLetter || '',
         });
-        this.imagePath=this.baseUrl+firstSeller.photo;
+        this.imagePath=this.constructImageUrl(firstSeller.photo);
         this.imageName=firstSeller.photo || '';
         this.nationalIdFileName=firstSeller.nationalIdCard || '';
         this.authorizationLetterName=firstSeller.authorizationLetter || '';
@@ -186,9 +186,9 @@ export class SellerdetailComponent {
         
         if (firstSeller.photo) {
           if (this.childComponent) {
-            this.childComponent.setExistingImage(this.baseUrl + firstSeller.photo);
+            this.childComponent.setExistingImage(firstSeller.photo);
           } else {
-            this.pendingImagePath = this.baseUrl + firstSeller.photo;
+            this.pendingImagePath = firstSeller.photo;
           }
         }
         
@@ -323,7 +323,7 @@ updateSellerDetails(): void {
       authorizationLetter: selectedSeller.authorizationLetter || '',
       heirsLetter: selectedSeller.heirsLetter || '',
     });
-    this.imagePath = selectedSeller.photo ? `${this.baseUrl}api/Upload/view/${selectedSeller.photo}` : 'assets/img/avatar.png';
+    this.imagePath = this.constructImageUrl(selectedSeller.photo);
     this.imageName = selectedSeller.photo || '';
     this.nationalIdFileName = selectedSeller.nationalIdCard || '';
     this.authorizationLetterName = selectedSeller.authorizationLetter || '';
@@ -332,9 +332,9 @@ updateSellerDetails(): void {
     
     if (selectedSeller.photo) {
       if (this.childComponent) {
-        this.childComponent.setExistingImage(this.baseUrl + selectedSeller.photo);
+        this.childComponent.setExistingImage(selectedSeller.photo);
       } else {
-        this.pendingImagePath = this.baseUrl + selectedSeller.photo;
+        this.pendingImagePath = selectedSeller.photo;
       }
     }
     
@@ -419,7 +419,7 @@ profilePreviewChanged = (localObjectUrl: string) => {
   }
 
   if (this.imageName) {
-    this.imagePath = this.baseUrl + this.imageName;
+    this.imagePath = this.constructImageUrl(this.imageName);
     return;
   }
 
@@ -429,7 +429,7 @@ profilePreviewChanged = (localObjectUrl: string) => {
 profileImageUploaded = (dbPath: string) => {
   this.imageName = dbPath || '';
   this.SellerForm.patchValue({ photo: this.imageName });
-  this.imagePath = this.imageName ? `${this.baseUrl}api/Upload/view/${this.imageName}` : 'assets/img/avatar.png';
+  this.imagePath = this.constructImageUrl(this.imageName);
 }
 
 isAuthorizedAgent(): boolean {
@@ -481,4 +481,35 @@ isHeirs(): boolean {
   get roleType() { return this.SellerForm.get('roleType'); }
   get authorizationLetter() { return this.SellerForm.get('authorizationLetter'); }
   get heirsLetter() { return this.SellerForm.get('heirsLetter'); }
+
+  private constructImageUrl(path: string): string {
+    if (!path) return 'assets/img/avatar.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with /api/, remove it to avoid duplication
+    let cleanPath = path;
+    if (cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.substring(5); // Remove '/api/'
+    } else if (cleanPath.startsWith('api/')) {
+      cleanPath = cleanPath.substring(4); // Remove 'api/'
+    }
+    
+    // If path starts with Resources/, use Upload/view endpoint
+    if (cleanPath.startsWith('Resources/') || cleanPath.startsWith('/Resources/')) {
+      const resourcePath = cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath;
+      return `${this.baseUrl}Upload/view/${resourcePath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${cleanPath}`;
+  }
 }

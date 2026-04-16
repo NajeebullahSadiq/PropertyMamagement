@@ -5,6 +5,7 @@ import { VehicleService } from 'src/app/shared/vehicle.service';
 import { FileService } from 'src/app/shared/file.service';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-vehicledetailsview',
@@ -15,6 +16,7 @@ export class VehicledetailsviewComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   viewData: any = null;
+  baseUrl: string = environment.apiURL + '/';
 
   constructor(
     private route: ActivatedRoute,
@@ -148,5 +150,40 @@ export class VehicledetailsviewComponent implements OnInit {
 
   printPage(): void {
     window.print();
+  }
+
+  getPhotoUrl(photoPath: string | null | undefined): string {
+    return this.constructImageUrl(photoPath);
+  }
+
+  private constructImageUrl(path: string | null | undefined): string {
+    if (!path) return 'assets/img/avatar2.png';
+    
+    // If path already starts with http/https or is a blob URL, return as is
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+      return path;
+    }
+    
+    // If it's an assets path, return as is
+    if (path.startsWith('assets/')) {
+      return path;
+    }
+    
+    // If path starts with /api/, remove it to avoid duplication
+    let cleanPath = path;
+    if (cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.substring(5); // Remove '/api/'
+    } else if (cleanPath.startsWith('api/')) {
+      cleanPath = cleanPath.substring(4); // Remove 'api/'
+    }
+    
+    // If path starts with Resources/, use Upload/view endpoint
+    if (cleanPath.startsWith('Resources/') || cleanPath.startsWith('/Resources/')) {
+      const resourcePath = cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath;
+      return `${this.baseUrl}Upload/view/${resourcePath}`;
+    }
+    
+    // Otherwise, use Upload/view endpoint
+    return `${this.baseUrl}Upload/view/${cleanPath}`;
   }
 }

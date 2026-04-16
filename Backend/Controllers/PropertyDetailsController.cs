@@ -131,7 +131,7 @@ namespace WebAPIBackend.Controllers
             // Check if user can view all records (Admin, Authority, etc.)
             if (RbacHelper.CanViewAllRecords(roles, "property"))
             {
-                // Admin and Authority can see ALL records
+                // Admin and Authority can see ALL records (including those with NULL CompanyId)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company);
             }
@@ -142,14 +142,14 @@ namespace WebAPIBackend.Controllers
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
-                // Only show properties that belong to this company
+                // Only show properties that belong to this company OR have NULL CompanyId (legacy records)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company)
-                    .Where(p => p.CompanyId == user.CompanyId);
+                    .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
             }
             else
             {
-                // Fallback: Filter by user ID
+                // Fallback: Filter by user ID (show user's own records regardless of CompanyId)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company)
                     .Where(p => p.CreatedBy == userId);
@@ -195,16 +195,64 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var Pro = await _context.PropertyDetails
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Unauthorized();
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                IQueryable<PropertyDetail> propertyQuery;
+
+                // Apply RBAC filtering to ensure users only see authorized records
+                if (RbacHelper.CanViewAllRecords(roles, "property"))
+                {
+                    // Admin and Authority can see ALL records (including those with NULL CompanyId)
+                    propertyQuery = _context.PropertyDetails;
+                }
+                else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
+                {
+                    // Filter by company ID for PropertyOperator
+                    if (user.CompanyId == 0 || user.CompanyId == null)
+                    {
+                        return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
+                    }
+                    // Show properties that belong to this company OR have NULL CompanyId (legacy records)
+                    propertyQuery = _context.PropertyDetails
+                        .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
+                }
+                else
+                {
+                    // Filter by user ID for regular users (show user's own records regardless of CompanyId)
+                    propertyQuery = _context.PropertyDetails
+                        .Where(p => p.CreatedBy == userId);
+                }
+
+                var property = await propertyQuery
                     .Include(p => p.PropertyAddresses)
-                    .Where(x => x.Id.Equals(id))
+                    .Where(x => x.Id == id)
                     .ToListAsync();
 
-                return Ok(Pro);
+                if (property == null || !property.Any())
+                {
+                    return NotFound(new { message = "سند ملکیت یافت نشد یا شما اجازه دسترسی ندارید" });
+                }
+
+                return Ok(property);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex}");
+                // Log the exception for debugging
+                Console.WriteLine($"Error in GetPropertyById: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { message = "خطای داخلی سرور", error = ex.Message });
             }
         }
 
@@ -230,7 +278,7 @@ namespace WebAPIBackend.Controllers
             // ADMIN and AUTHORITY can view all records
             if (RbacHelper.CanViewAllRecords(roles, "property"))
             {
-                // Admin and Authority can see ALL records
+                // Admin and Authority can see ALL records (including those with NULL CompanyId)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company);
             }
@@ -241,14 +289,14 @@ namespace WebAPIBackend.Controllers
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
-                // Only show properties that belong to this company
+                // Only show properties that belong to this company OR have NULL CompanyId (legacy records)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company)
-                    .Where(p => p.CompanyId == user.CompanyId);
+                    .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
             }
             else
             {
-                // Fallback: Filter by user ID
+                // Fallback: Filter by user ID (show user's own records regardless of CompanyId)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company)
                     .Where(p => p.CreatedBy == userId);

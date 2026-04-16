@@ -68,6 +68,14 @@ public partial class PropertyDetail
 
     public DateTime? TransactionDate { get; set; }
 
+    public string? ApartmentNumber { get; set; }
+
+    public string? Above { get; set; }
+
+    public string? Below { get; set; }
+
+    public string? PrivateDeedNumber { get; set; }
+
     /// <summary>
     /// Calendar type for date conversion (not mapped to database)
     /// </summary>
