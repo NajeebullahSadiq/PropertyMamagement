@@ -51,7 +51,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره مسلسل</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نام رهنما</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نوع ملکیت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوع معامله</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت معامله</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">فروشنده</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">مشتری</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">حالت</th>
@@ -65,7 +65,9 @@
                 {{ property.companyTitle ? property.companyTitle : 'نامشخص' }}
               </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.propertyTypeText }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ property.transactionTypeText }}</td>
+              <td class="px-4 py-3 text-sm" [ngClass]="property.transactionTypeText && property.transactionTypeText !== 'نامشخص' ? 'text-gray-700' : 'text-gray-400'">
+                {{ property.transactionTypeText }}
+              </td>
               <td class="px-4 py-3 text-sm" [ngClass]="property.sellerName ? 'text-gray-700' : 'text-red-600 font-semibold'">
                 {{ property.sellerName ? property.sellerName : 'تکیمل ناشده' }}
               </td>

@@ -63,10 +63,10 @@
           </div>
         </div>
         <div class="group">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع معامله</p>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوعیت معامله</p>
           <div class="flex items-center gap-2">
             <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
-            <p class="text-gray-900 font-bold text-lg">{{ getDariTransactionTypeLabel(viewData.transactionTypeName) }}</p>
+            <p class="text-gray-900 font-bold text-lg">{{ getTransactionTypeDisplay() }}</p>
           </div>
         </div>
         <div class="group">
@@ -101,11 +101,11 @@
         </div>
         <div class="p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 hover:border-green-300 transition-colors">
           <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">قیمت</p>
-          <p class="text-green-900 font-bold text-xl">{{ safeValue(viewData.priceText || viewData.price) }}</p>
+          <p class="text-green-900 font-bold text-xl">{{ getPriceDisplay() }}</p>
         </div>
         <div class="p-5 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200 hover:border-amber-300 transition-colors">
           <p class="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2">حق‌الامتیاز</p>
-          <p class="text-amber-900 font-bold text-xl">{{ safeValue(viewData.royaltyAmount) }}</p>
+          <p class="text-amber-900 font-bold text-xl">{{ getRoyaltyAmountDisplay() }}</p>
         </div>
 
         <div class="md:col-span-3 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
@@ -394,15 +394,7 @@
                 <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.taxIdentificationNumber) }}</p>
               </div>
 
-              <div class="p-4 bg-white rounded-xl border border-gray-200">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع تذکره</p>
-                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.tazkiraType) }}</p>
-              </div>
-              <div class="p-4 bg-white rounded-xl border border-gray-200">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">جلد / صفحه / نمبر</p>
-                <p class="text-gray-900 font-semibold text-base">{{ safeValue(s.tazkiraVolume) }} / {{ safeValue(s.tazkiraPage) }} / {{ safeValue(s.tazkiraNumber) }}</p>
-              </div>
-              <div class="p-4 bg-white rounded-xl border border-gray-200">
+              <div class="p-4 bg-white rounded-xl border border-gray-200 md:col-span-3">
                 <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">معلومات اضافی</p>
                 <p class="text-gray-900 whitespace-pre-line text-sm">{{ safeValue(s.additionalDetails) }}</p>
               </div>
@@ -544,6 +536,13 @@
                 <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.taxIdentificationNumber) }}</p>
               </div>
 
+              <div class="p-4 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200">
+                <p class="text-xs font-bold text-amber-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-handshake"></i>
+                  <span>نوعیت معامله</span>
+                </p>
+                <p class="text-amber-900 font-bold text-lg">{{ getDariTransactionTypeLabel(b.transactionType) }}</p>
+              </div>
               <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
                 <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-2 flex items-center gap-2">
                   <i class="fas fa-dollar-sign"></i>
@@ -551,12 +550,30 @@
                 </p>
                 <p class="text-green-900 font-bold text-lg">{{ safeValue(b.priceText || b.price) }}</p>
               </div>
-              <div class="p-4 bg-white rounded-xl border border-gray-200">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوع معامله</p>
-                <p class="text-gray-900 font-semibold text-base">{{ safeValue(b.transactionType) }}</p>
+              <div class="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+                <p class="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-coins"></i>
+                  <span>حق الامتیاز</span>
+                </p>
+                <p class="text-purple-900 font-bold text-lg">{{ safeValue(b.royaltyAmount) }}</p>
               </div>
-              <div class="p-4 bg-white rounded-xl border border-gray-200">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">توضیحات</p>
+
+              <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-file-alt"></i>
+                  <span>نمبر سند</span>
+                </p>
+                <p class="text-blue-900 font-bold text-lg">{{ safeValue(viewData.issuanceNumber) }}</p>
+              </div>
+              <div class="p-4 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-200">
+                <p class="text-xs font-bold text-teal-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>تاریخ صدور</span>
+                </p>
+                <p class="text-teal-900 font-bold text-lg">{{ viewData.issuanceDate | calendarDate }}</p>
+              </div>
+              <div class="p-4 bg-white rounded-xl border border-gray-200" *ngIf="b.transactionTypeDescription">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">توضیحات معامله</p>
                 <p class="text-gray-900 text-sm">{{ safeValue(b.transactionTypeDescription) }}</p>
               </div>
 

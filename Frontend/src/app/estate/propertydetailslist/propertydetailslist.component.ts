@@ -60,10 +60,11 @@ export class PropertydetailslistComponent {
 
   loadData(){
     this.propertyService.getPropertyDetails().subscribe(properties => {
-      // Ensure no English is visible in UI for property type.
+      // Ensure no English is visible in UI for property type and transaction type.
       const mapped = (properties || []).map(p => ({
         ...p,
-        propertyTypeText: this.getDariPropertyTypeLabel(p.propertyTypeText)
+        propertyTypeText: this.getDariPropertyTypeLabel(p.propertyTypeText),
+        transactionTypeText: this.getDariTransactionTypeLabel(p.transactionTypeText)
       }));
       this.properties = mapped;
       this.filteredProperties = this.filterProperties(mapped, this.searchTerm);
@@ -75,6 +76,35 @@ export class PropertydetailslistComponent {
     const value = (propertyTypeValue ?? '').toString();
     const match = this.localizationService.propertyTypes.find(pt => pt.value === value);
     return match?.label || 'سایر';
+  }
+
+  private getDariTransactionTypeLabel(transactionTypeValue: any): string {
+    const value = (transactionTypeValue ?? '').toString().trim();
+    if (!value) {
+      return 'نامشخص';
+    }
+    // Convert to lowercase for case-insensitive matching
+    const lowerValue = value.toLowerCase();
+    switch (lowerValue) {
+      case 'sale':
+      case 'purchase':
+        return 'خرید و فروش';
+      case 'rent':
+        return 'کرایه';
+      case 'lease':
+        return 'اجاره';
+      case 'mortgage':
+        return 'رهن';
+      case 'exchange':
+        return 'تبادله';
+      case 'gift':
+        return 'هبه';
+      case 'inheritance':
+        return 'ارث';
+      default:
+        // If it's already in Dari, return as is, otherwise return the value
+        return value;
+    }
   }
 
   canEditRecord(createdBy: string): boolean {

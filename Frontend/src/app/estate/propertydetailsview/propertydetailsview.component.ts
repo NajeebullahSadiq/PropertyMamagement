@@ -45,6 +45,8 @@ export class PropertydetailsviewComponent {
 
     this.propertyService.getPropertyViewById(id).subscribe({
       next: (data) => {
+        console.log('Property View Data:', data);
+        console.log('Buyers:', data.buyers);
         this.viewData = data;
         this.isLoading = false;
       },
@@ -69,24 +71,31 @@ export class PropertydetailsviewComponent {
   }
 
   getDariTransactionTypeLabel(transactionTypeValue: any): string {
-    const value = (transactionTypeValue ?? '').toString();
-    switch (value) {
-      case 'Sale':
+    const value = (transactionTypeValue ?? '').toString().trim();
+    if (!value) {
+      return '---';
+    }
+    // Convert to lowercase for case-insensitive matching
+    const lowerValue = value.toLowerCase();
+    switch (lowerValue) {
+      case 'sale':
+      case 'purchase':
         return 'خرید و فروش';
-      case 'Rent':
+      case 'rent':
         return 'کرایه';
-      case 'Lease':
+      case 'lease':
         return 'اجاره';
-      case 'Mortgage':
+      case 'mortgage':
         return 'رهن';
-      case 'Exchange':
+      case 'exchange':
         return 'تبادله';
-      case 'Gift':
+      case 'gift':
         return 'هبه';
-      case 'Inheritance':
+      case 'inheritance':
         return 'ارث';
       default:
-        return value || '---';
+        // If it's already in Dari, return as is, otherwise return the value
+        return value;
     }
   }
 
@@ -102,6 +111,42 @@ export class PropertydetailsviewComponent {
       return '---';
     }
     return String(value);
+  }
+
+  getTransactionTypeDisplay(): string {
+    const propValue = this.viewData?.transactionTypeName;
+    if (propValue) {
+      return this.getDariTransactionTypeLabel(propValue);
+    }
+    const buyerType = this.viewData?.buyers?.[0]?.transactionType;
+    if (buyerType) {
+      return this.getDariTransactionTypeLabel(buyerType);
+    }
+    return '---';
+  }
+
+  getPriceDisplay(): string {
+    const propPrice = this.viewData?.priceText || this.viewData?.price;
+    if (propPrice) {
+      return this.safeValue(propPrice);
+    }
+    const buyerPrice = this.viewData?.buyers?.[0]?.priceText || this.viewData?.buyers?.[0]?.price;
+    if (buyerPrice) {
+      return this.safeValue(buyerPrice);
+    }
+    return '---';
+  }
+
+  getRoyaltyAmountDisplay(): string {
+    const propRoyalty = this.viewData?.royaltyAmount;
+    if (propRoyalty && propRoyalty !== '0' && propRoyalty !== 0) {
+      return this.safeValue(propRoyalty);
+    }
+    const buyerRoyalty = this.viewData?.buyers?.[0]?.royaltyAmount;
+    if (buyerRoyalty && buyerRoyalty !== '0' && buyerRoyalty !== 0) {
+      return this.safeValue(buyerRoyalty);
+    }
+    return '---';
   }
 
   /**

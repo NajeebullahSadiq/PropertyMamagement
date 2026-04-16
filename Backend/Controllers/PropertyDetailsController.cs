@@ -133,18 +133,20 @@ namespace WebAPIBackend.Controllers
             {
                 // Admin and Authority can see ALL records (including those with NULL CompanyId)
                 propertyQuery = _context.PropertyDetails
-                    .Include(p => p.Company);
+                    .Include(p => p.Company)
+                    .Include(p => p.BuyerDetails);
             }
             else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
             {
                 // Filter by company ID for PropertyOperator
-                if (user.CompanyId == 0 || user.CompanyId == null)
+                if (user.CompanyId == 0)
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
                 // Only show properties that belong to this company OR have NULL CompanyId (legacy records)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company)
+                    .Include(p => p.BuyerDetails)
                     .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
             }
             else
@@ -152,6 +154,7 @@ namespace WebAPIBackend.Controllers
                 // Fallback: Filter by user ID (show user's own records regardless of CompanyId)
                 propertyQuery = _context.PropertyDetails
                     .Include(p => p.Company)
+                    .Include(p => p.BuyerDetails)
                     .Where(p => p.CreatedBy == userId);
             }
 
@@ -176,7 +179,12 @@ namespace WebAPIBackend.Controllers
                                 ? p.CustomPropertyType
                                 : p.PropertyType != null ? p.PropertyType.Name : null,
                              UnitTypeText = p.PunitType != null ? p.PunitType.Name : null,
-                             TransactionTypeText = p.TransactionType != null ? p.TransactionType.Name : null,
+                             // Get transaction type from PropertyDetails if available, otherwise from first BuyerDetails
+                             TransactionTypeText = p.TransactionType != null 
+                                ? p.TransactionType.Name 
+                                : (p.BuyerDetails != null && p.BuyerDetails.Any() && p.BuyerDetails.First().TransactionType != null)
+                                    ? p.BuyerDetails.First().TransactionType
+                                    : null,
                              p.iscomplete,
                              SellerName = (p.SellerDetails != null && p.SellerDetails.Any()) ? p.SellerDetails.First().FirstName : null,
                              BuyerName = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().FirstName : null,
@@ -220,7 +228,7 @@ namespace WebAPIBackend.Controllers
                 else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
                 {
                     // Filter by company ID for PropertyOperator
-                    if (user.CompanyId == 0 || user.CompanyId == null)
+                    if (user.CompanyId == 0)
                     {
                         return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                     }
@@ -285,7 +293,7 @@ namespace WebAPIBackend.Controllers
             else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
             {
                 // Filter by company ID for PropertyOperator
-                if (user.CompanyId == 0 || user.CompanyId == null)
+                if (user.CompanyId == 0)
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
