@@ -559,6 +559,27 @@ namespace WebAPIBackend.Controllers
                 rentEndDate = rentEndDate.Value.ToUniversalTime();
             }
 
+            // Convert contract dates to UTC if they exist
+            var contractStartDate = request.ContractStartDate;
+            var contractEndDate = request.ContractEndDate;
+            if (contractStartDate.HasValue)
+            {
+                contractStartDate = contractStartDate.Value.ToUniversalTime();
+            }
+            if (contractEndDate.HasValue)
+            {
+                contractEndDate = contractEndDate.Value.ToUniversalTime();
+            }
+
+            // Validate contract dates for Rent transaction type
+            if (request.TransactionType == "Rent")
+            {
+                if (!contractStartDate.HasValue || !contractEndDate.HasValue)
+                {
+                    return StatusCode(400, "تاریخ اغاز و ختم قرار داد برای کرایه الزامی است");
+                }
+            }
+
             var buyer = new BuyerDetail
             {
                 FirstName = request.FirstName,
@@ -589,6 +610,8 @@ namespace WebAPIBackend.Controllers
                 TransactionTypeDescription = request.TransactionTypeDescription,
                 RentStartDate = rentStartDate,
                 RentEndDate = rentEndDate,
+                ContractStartDate = contractStartDate,
+                ContractEndDate = contractEndDate,
             };
             try
             {
@@ -716,6 +739,25 @@ namespace WebAPIBackend.Controllers
                 request.RentEndDate = request.RentEndDate.Value.ToUniversalTime();
             }
 
+            // Convert contract dates to UTC if they exist
+            if (request.ContractStartDate.HasValue)
+            {
+                request.ContractStartDate = request.ContractStartDate.Value.ToUniversalTime();
+            }
+            if (request.ContractEndDate.HasValue)
+            {
+                request.ContractEndDate = request.ContractEndDate.Value.ToUniversalTime();
+            }
+
+            // Validate contract dates for Rent transaction type
+            if (request.TransactionType == "Rent")
+            {
+                if (!request.ContractStartDate.HasValue || !request.ContractEndDate.HasValue)
+                {
+                    return StatusCode(400, "تاریخ اغاز و ختم قرار داد برای کرایه الزامی است");
+                }
+            }
+
             // Map indentityCardNumber to ElectronicNationalIdNumber
             var electronicId = request.ElectronicNationalIdNumber;
 
@@ -745,6 +787,8 @@ namespace WebAPIBackend.Controllers
             existingProperty.TransactionTypeDescription = request.TransactionTypeDescription;
             existingProperty.RentStartDate = request.RentStartDate;
             existingProperty.RentEndDate = request.RentEndDate;
+            existingProperty.ContractStartDate = request.ContractStartDate;
+            existingProperty.ContractEndDate = request.ContractEndDate;
 
             // Restore the original values of the CreatedBy and CreatedOn properties
             existingProperty.CreatedBy = createdBy;

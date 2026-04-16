@@ -26,6 +26,8 @@ export interface SellerDetail {
     halfPrice?:number;
     rentStartDate?:Date; // Rental start date for lessee roles
     rentEndDate?:Date; // Rental end date for lessee roles
+    contractStartDate?:Date; // Contract start date for rental transactions
+    contractEndDate?:Date; // Contract end date for rental transactions
     transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
     transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
     taxIdentificationNumber?:string;
@@ -62,6 +64,8 @@ export interface VBuyerDetail {
     halfPrice?:number;
     rentStartDate?:Date; // Rental start date for lessee roles
     rentEndDate?:Date; // Rental end date for lessee roles
+    contractStartDate?:Date; // Contract start date for rental transactions
+    contractEndDate?:Date; // Contract end date for rental transactions
     transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
     transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
     sharePercentage?:number;

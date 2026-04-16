@@ -106,6 +106,8 @@ export class BuyerdetailComponent {
       halfPrice: [''],
       rentStartDate: [''],
       rentEndDate: [''],
+      contractStartDate: [''],
+      contractEndDate: [''],
       transactionType: ['', Validators.required],
       transactionTypeDescription: [''],
       taxIdentificationNumber: [''],
@@ -157,6 +159,8 @@ export class BuyerdetailComponent {
       const descriptionControl = this.sellerForm.get('transactionTypeDescription');
       const priceControl = this.sellerForm.get('price');
       const priceTextControl = this.sellerForm.get('priceText');
+      const contractStartDateControl = this.sellerForm.get('contractStartDate');
+      const contractEndDateControl = this.sellerForm.get('contractEndDate');
 
       const supportedTypes = ['Purchase', 'Rent', 'Revocable Sale'];
       const shouldResetPricePair =
@@ -173,6 +177,19 @@ export class BuyerdetailComponent {
       }
 
       this.updatePriceValidators(transactionType);
+      
+      // Set contract date validation for Rent transaction type
+      if (transactionType === 'Rent') {
+        contractStartDateControl?.setValidators([Validators.required]);
+        contractEndDateControl?.setValidators([Validators.required]);
+      } else {
+        contractStartDateControl?.clearValidators();
+        contractEndDateControl?.clearValidators();
+        contractStartDateControl?.reset();
+        contractEndDateControl?.reset();
+      }
+      contractStartDateControl?.updateValueAndValidity();
+      contractEndDateControl?.updateValueAndValidity();
       
       if (transactionType === 'Other') {
         descriptionControl?.setValidators([Validators.required]);
@@ -262,6 +279,8 @@ export class BuyerdetailComponent {
           halfPrice: firstBuyer.halfPrice || '',
           rentStartDate: firstBuyer.rentStartDate || '',
           rentEndDate: firstBuyer.rentEndDate || '',
+          contractStartDate: firstBuyer.contractStartDate || '',
+          contractEndDate: firstBuyer.contractEndDate || '',
           transactionType: firstBuyer.transactionType || '',
           transactionTypeDescription: firstBuyer.transactionTypeDescription || '',
           taxIdentificationNumber: (firstBuyer as any).taxIdentificationNumber || '',
@@ -433,6 +452,8 @@ updateBuyerDetails(): void {
       halfPrice: selectedBuyer.halfPrice || '',
       rentStartDate: selectedBuyer.rentStartDate || '',
       rentEndDate: selectedBuyer.rentEndDate || '',
+      contractStartDate: selectedBuyer.contractStartDate || '',
+      contractEndDate: selectedBuyer.contractEndDate || '',
       transactionType: selectedBuyer.transactionType || '',
       transactionTypeDescription: selectedBuyer.transactionTypeDescription || '',
       taxIdentificationNumber: (selectedBuyer as any).taxIdentificationNumber || '',
@@ -691,6 +712,8 @@ isAuthorizedAgent(): boolean {
   get halfPrice() { return this.sellerForm.get('halfPrice'); }
   get rentStartDate() { return this.sellerForm.get('rentStartDate'); }
   get rentEndDate() { return this.sellerForm.get('rentEndDate'); }
+  get contractStartDate() { return this.sellerForm.get('contractStartDate'); }
+  get contractEndDate() { return this.sellerForm.get('contractEndDate'); }
   get transactionType() { return this.sellerForm.get('transactionType'); }
   get transactionTypeDescription() { return this.sellerForm.get('transactionTypeDescription'); }
 
@@ -702,6 +725,10 @@ isAuthorizedAgent(): boolean {
     const roleType = this.sellerForm.get('roleType')?.value;
     const lesseeRoles = ['Lessee', 'Lessees', 'Agent for lessee'];
     return roleType && lesseeRoles.includes(roleType);
+  }
+
+  isRentTransaction(): boolean {
+    return this.sellerForm.get('transactionType')?.value === 'Rent';
   }
 
   allowsMultipleBuyers(): boolean {

@@ -67,6 +67,10 @@ public partial class BuyerDetail
 
     public DateTime? RentEndDate { get; set; }
 
+    public DateTime? ContractStartDate { get; set; }
+
+    public DateTime? ContractEndDate { get; set; }
+
     public virtual Location? PaddressDistrict { get; set; }
 
     public virtual Location? PaddressProvince { get; set; }
