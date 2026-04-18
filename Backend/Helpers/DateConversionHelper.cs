@@ -49,6 +49,44 @@ namespace WebAPIBackend.Helpers
         }
 
         /// <summary>
+        /// Try to parse a date string with automatic calendar detection fallback
+        /// First tries the specified calendar, then falls back to Gregorian if that fails
+        /// </summary>
+        public static bool TryParseToDateOnlyFlexible(string? input, string? calendarTypeStr, out DateOnly result)
+        {
+            result = default;
+            if (string.IsNullOrWhiteSpace(input)) return false;
+
+            var calendarType = ParseCalendarType(calendarTypeStr);
+            
+            // First try with the specified calendar type
+            if (TryParseToDateOnly(input, calendarType, out result))
+            {
+                return true;
+            }
+
+            // If that fails and the specified type wasn't Gregorian, try Gregorian as fallback
+            if (calendarType != CalendarType.Gregorian)
+            {
+                if (TryParseToDateOnly(input, CalendarType.Gregorian, out result))
+                {
+                    return true;
+                }
+            }
+
+            // If still failing, try all calendar types
+            foreach (var fallbackType in new[] { CalendarType.HijriShamsi, CalendarType.HijriQamari })
+            {
+                if (fallbackType != calendarType && TryParseToDateOnly(input, fallbackType, out result))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Convert DateOnly to formatted string in the specified calendar
         /// </summary>
         public static string FormatDateOnly(DateOnly? date, CalendarType calendarType)

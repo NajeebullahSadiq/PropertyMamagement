@@ -101,10 +101,10 @@ namespace WebAPIBackend.Controllers.Companies
                 // Validate province access to parent company
                 _provinceFilter.ValidateProvinceAccess(company.ProvinceId);
 
-                // Parse dates using multi-calendar helper
-                if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
+                // Parse dates using flexible multi-calendar helper with fallback
+                if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.IssueDate, request.CalendarType, out var issueDate))
                 {
-                    return BadRequest("????? ???? ???? ????? ???? / ? ???? ? ???? ???? ??? ?? ??");
+                    return BadRequest($"تاریخ صدور جواز نامعتبر است. لطفاً تاریخ را به فارمت صحیح وارد کنید. (مثال: 1402/06/09 یا 2023-08-31) / Invalid issue date format. Please enter date in correct format (e.g., 1402/06/09 or 2023-08-31)");
                 }
 
                 var expectedExpireDate = issueDate.AddYears(3);
@@ -112,14 +112,14 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly expireDate = expectedExpireDate;
                 if (!string.IsNullOrWhiteSpace(request.ExpireDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
                     {
-                        return BadRequest("????? ??? ???? ????? ???? / ? ???? ? ??? ???? ??? ?? ??");
+                        return BadRequest($"تاریخ ختم جواز نامعتبر است. لطفاً تاریخ را به فارمت صحیح وارد کنید. / Invalid expiry date format. Please enter date in correct format.");
                     }
 
                     if (submittedExpireDate != expectedExpireDate)
                     {
-                        return BadRequest("????? ??? ???? ???? ?????? ?? ??? ??? ?? ????? ???? ???? ???? / ? ???? ? ??? ???? ???? ?????? ? ???? ?? ???? ??? ???? ?????? ??");
+                        return BadRequest($"تاریخ ختم جواز باید دقیقاً سه سال بعد از تاریخ صدور جواز باشد. / Expiry date must be exactly 3 years after issue date.");
                     }
                 }
 
@@ -134,9 +134,9 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly? hrLetterDate = null;
                 if (!string.IsNullOrWhiteSpace(request.HrLetterDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
                     {
-                        return BadRequest("????? ????? ???? ???? ????? ????");
+                        return BadRequest($"تاریخ مکتوب قوای بشری نامعتبر است. / Invalid HR letter date format.");
                     }
                     hrLetterDate = parsedHrLetterDate;
                 }
@@ -145,9 +145,9 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly? royaltyDate = null;
                 if (!string.IsNullOrWhiteSpace(request.RoyaltyDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
                     {
-                        return BadRequest("????? ?????? ????? ????? ????");
+                        return BadRequest($"تاریخ حق‌الامتیاز نامعتبر است. / Invalid royalty date format.");
                     }
                     royaltyDate = parsedRoyaltyDate;
                 }
@@ -156,9 +156,9 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly? penaltyDate = null;
                 if (!string.IsNullOrWhiteSpace(request.PenaltyDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
                     {
-                        return BadRequest("????? ????? ????? ????");
+                        return BadRequest($"تاریخ جریمه نامعتبر است. / Invalid penalty date format.");
                     }
                     penaltyDate = parsedPenaltyDate;
                 }
@@ -261,10 +261,10 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                // Parse dates using multi-calendar helper
-                if (!DateConversionHelper.TryParseToDateOnly(request.IssueDate, request.CalendarType, out var issueDate))
+                // Parse dates using flexible multi-calendar helper with fallback
+                if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.IssueDate, request.CalendarType, out var issueDate))
                 {
-                    return BadRequest("????? ???? ???? ????? ???? / ? ???? ? ???? ???? ??? ?? ??");
+                    return BadRequest($"تاریخ صدور جواز نامعتبر است. لطفاً تاریخ را به فارمت صحیح وارد کنید. (مثال: 1402/06/09 یا 2023-08-31) / Invalid issue date format. Please enter date in correct format (e.g., 1402/06/09 or 2023-08-31)");
                 }
 
                 var expectedExpireDate = issueDate.AddYears(3);
@@ -272,9 +272,9 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly expireDate = expectedExpireDate;
                 if (!string.IsNullOrWhiteSpace(request.ExpireDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.ExpireDate, request.CalendarType, out var submittedExpireDate))
                     {
-                        return BadRequest("????? ??? ???? ????? ???? / ? ???? ? ??? ???? ??? ?? ??");
+                        return BadRequest($"تاریخ ختم جواز نامعتبر است. لطفاً تاریخ را به فارمت صحیح وارد کنید. / Invalid expiry date format. Please enter date in correct format.");
                     }
                     
                     // For updates, allow the existing expire date or the expected expire date
@@ -322,9 +322,9 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly? hrLetterDate = null;
                 if (!string.IsNullOrWhiteSpace(request.HrLetterDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.HrLetterDate, request.CalendarType, out var parsedHrLetterDate))
                     {
-                        return BadRequest("????? ????? ???? ???? ????? ????");
+                        return BadRequest($"تاریخ مکتوب قوای بشری نامعتبر است. / Invalid HR letter date format.");
                     }
                     hrLetterDate = parsedHrLetterDate;
                 }
@@ -333,9 +333,9 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly? royaltyDate = null;
                 if (!string.IsNullOrWhiteSpace(request.RoyaltyDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.RoyaltyDate, request.CalendarType, out var parsedRoyaltyDate))
                     {
-                        return BadRequest("????? ?????? ????? ????? ????");
+                        return BadRequest($"تاریخ حق‌الامتیاز نامعتبر است. / Invalid royalty date format.");
                     }
                     royaltyDate = parsedRoyaltyDate;
                 }
@@ -344,9 +344,9 @@ namespace WebAPIBackend.Controllers.Companies
                 DateOnly? penaltyDate = null;
                 if (!string.IsNullOrWhiteSpace(request.PenaltyDate))
                 {
-                    if (!DateConversionHelper.TryParseToDateOnly(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.PenaltyDate, request.CalendarType, out var parsedPenaltyDate))
                     {
-                        return BadRequest("????? ????? ????? ????");
+                        return BadRequest($"تاریخ جریمه نامعتبر است. / Invalid penalty date format.");
                     }
                     penaltyDate = parsedPenaltyDate;
                 }
