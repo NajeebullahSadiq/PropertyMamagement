@@ -84,4 +84,25 @@ export class SecuritiesService {
             tap(() => this.notifyDataChanged())
         );
     }
+
+    /**
+     * Get comprehensive securities report
+     */
+    getComprehensiveReport(
+        startDate: string,
+        endDate: string,
+        calendarType: string,
+        licenseNumber?: string
+    ): Observable<any> {
+        let params = new HttpParams()
+            .set('startDate', startDate)
+            .set('endDate', endDate)
+            .set('calendarType', calendarType);
+
+        if (licenseNumber) {
+            params = params.set('licenseNumber', licenseNumber);
+        }
+
+        return this.http.get(`${this.baseUrl}/reports/comprehensive`, { params });
+    }
 }

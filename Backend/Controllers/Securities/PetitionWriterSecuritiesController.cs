@@ -371,5 +371,85 @@ namespace WebAPIBackend.Controllers.Securities
 
             return true;
         }
+
+        /// <summary>
+        /// Get comprehensive petition writer securities report
+        /// </summary>
+        [HttpGet("reports/comprehensive")]
+        public async Task<IActionResult> GetComprehensiveReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null,
+            [FromQuery] string? licenseNumber = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                    }
+                }
+
+                // Base query - all active petition writer securities
+                var query = _context.PetitionWriterSecurities
+                    .Where(x => x.Status == true)
+                    .AsQueryable();
+
+                // Filter by license number if provided (single petition writer)
+                if (!string.IsNullOrWhiteSpace(licenseNumber))
+                {
+                    query = query.Where(x => x.LicenseNumber == licenseNumber);
+                }
+
+                // Filter by date range (distribution date)
+                if (parsedStartDate.HasValue)
+                {
+                    query = query.Where(x => x.DistributionDate >= parsedStartDate);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    query = query.Where(x => x.DistributionDate <= parsedEndDate);
+                }
+
+                var securities = await query.ToListAsync();
+
+                // Calculate totals
+                var totalPetitionCount = securities.Sum(s => s.PetitionCount);
+                var totalAmount = securities.Sum(s => s.Amount);
+
+                return Ok(new
+                {
+                    // Counts and amounts
+                    petitionCount = totalPetitionCount,
+                    petitionAmount = totalAmount,
+                    
+                    // Metadata
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    licenseNumber = licenseNumber ?? "همه عریضه‌نویسان",
+                    reportGeneratedAt = DateTime.UtcNow,
+                    totalDistributions = securities.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در تولید گزارش", error = ex.Message });
+            }
+        }
     }
 }

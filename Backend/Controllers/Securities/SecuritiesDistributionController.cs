@@ -527,5 +527,130 @@ namespace WebAPIBackend.Controllers.Securities
 
             return (true, null);
         }
+
+        /// <summary>
+        /// Get comprehensive securities report
+        /// </summary>
+        [HttpGet("reports/comprehensive")]
+        public async Task<IActionResult> GetComprehensiveReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null,
+            [FromQuery] string? licenseNumber = null)
+        {
+            try
+            {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                
+                DateOnly? parsedStartDate = null;
+                DateOnly? parsedEndDate = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    {
+                        parsedStartDate = start;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(endDate))
+                {
+                    if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    {
+                        parsedEndDate = end;
+                    }
+                }
+
+                // Base query - all active securities distributions
+                var query = _context.SecuritiesDistributions
+                    .Include(x => x.Items)
+                    .Where(x => x.Status == true)
+                    .AsQueryable();
+
+                // Filter by license number if provided (single company)
+                if (!string.IsNullOrWhiteSpace(licenseNumber))
+                {
+                    query = query.Where(x => x.LicenseNumber == licenseNumber);
+                }
+
+                // Filter by date range (distribution date)
+                if (parsedStartDate.HasValue)
+                {
+                    query = query.Where(x => x.DistributionDate >= parsedStartDate);
+                }
+                if (parsedEndDate.HasValue)
+                {
+                    query = query.Where(x => x.DistributionDate <= parsedEndDate);
+                }
+
+                var distributions = await query.ToListAsync();
+
+                // Document types:
+                // 1 = سټه خرید و فروش جایداد
+                // 2 = سټه بیع وفا
+                // 3 = سټه کرایی
+                // 4 = سټه وسایط نقلیه
+                // 5 = کتاب ثبت معاملات
+                // 6 = کتاب ثبت معاملات مثنی
+
+                // Count documents by type
+                var type1Count = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 1).Sum(i => i.Count);
+                var type2Count = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 2).Sum(i => i.Count);
+                var type3Count = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 3).Sum(i => i.Count);
+                var type4Count = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 4).Sum(i => i.Count);
+                var type5Count = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 5).Sum(i => i.Count);
+                var type6Count = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 6).Sum(i => i.Count);
+
+                // Total of 4 types (سته های 4 گانه)
+                var fourTypesTotal = type1Count + type2Count + type3Count + type4Count;
+
+                // Calculate revenue by type
+                var type1Revenue = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 1).Sum(i => i.Price * i.Count);
+                var type2Revenue = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 2).Sum(i => i.Price * i.Count);
+                var type3Revenue = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 3).Sum(i => i.Price * i.Count);
+                var type4Revenue = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 4).Sum(i => i.Price * i.Count);
+                var type5Revenue = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 5).Sum(i => i.Price * i.Count);
+                var type6Revenue = distributions.SelectMany(d => d.Items).Where(i => i.DocumentType == 6).Sum(i => i.Price * i.Count);
+
+                // Total revenue for 4 types
+                var fourTypesRevenue = type1Revenue + type2Revenue + type3Revenue + type4Revenue;
+
+                // Total revenue for all securities
+                var totalRevenue = fourTypesRevenue + type5Revenue + type6Revenue;
+
+                return Ok(new
+                {
+                    // Counts
+                    propertyBuySellCount = type1Count,
+                    bayeWafaCount = type2Count,
+                    rentalCount = type3Count,
+                    vehicleCount = type4Count,
+                    fourTypesTotal,
+                    registrationBookCount = type5Count,
+                    registrationBookDuplicateCount = type6Count,
+                    
+                    // Revenue
+                    propertyBuySellRevenue = type1Revenue,
+                    bayeWafaRevenue = type2Revenue,
+                    rentalRevenue = type3Revenue,
+                    vehicleRevenue = type4Revenue,
+                    registrationBookRevenue = type5Revenue,
+                    registrationBookDuplicateRevenue = type6Revenue,
+                    fourTypesRevenue,
+                    totalRevenue,
+                    
+                    // Metadata
+                    startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
+                    endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
+                    licenseNumber = licenseNumber ?? "همه دفاتر",
+                    reportGeneratedAt = DateTime.UtcNow,
+                    totalDistributions = distributions.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در تولید گزارش", error = ex.Message });
+            }
+        }
     }
 }

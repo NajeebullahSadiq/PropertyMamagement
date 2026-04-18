@@ -73,4 +73,25 @@ export class PetitionWriterSecuritiesService {
     delete(id: number): Observable<{ message: string }> {
         return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`);
     }
+
+    /**
+     * Get comprehensive petition writer securities report
+     */
+    getComprehensiveReport(
+        startDate: string,
+        endDate: string,
+        calendarType: string,
+        licenseNumber?: string
+    ): Observable<any> {
+        let params = new HttpParams()
+            .set('startDate', startDate)
+            .set('endDate', endDate)
+            .set('calendarType', calendarType);
+
+        if (licenseNumber) {
+            params = params.set('licenseNumber', licenseNumber);
+        }
+
+        return this.http.get(`${this.baseUrl}/reports/comprehensive`, { params });
+    }
 }

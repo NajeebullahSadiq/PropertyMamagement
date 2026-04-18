@@ -27,6 +27,15 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
     canPrint = false;
     isViewOnly = false;
 
+    // Report fields
+    showReports = false;
+    reportStartDate: any = '';
+    reportEndDate: any = '';
+    reportType: string = 'all'; // 'all' or 'single'
+    reportLicenseNumber: string = '';
+    reportData: any = null;
+    isLoadingReport = false;
+
     private dataChangedSub?: Subscription;
 
     constructor(
@@ -152,5 +161,115 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
             .filter(name => name);
         
         return typeNames.join('، ') || '-';
+    }
+
+    // ==================== Reports ====================
+
+    toggleReports(): void {
+        this.showReports = !this.showReports;
+        if (!this.showReports) {
+            this.reportData = null;
+        }
+    }
+
+    generateReport(): void {
+        if (!this.reportStartDate || !this.reportEndDate) {
+            this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+            return;
+        }
+
+        if (this.reportStartDate === '' || this.reportEndDate === '') {
+            this.toastr.warning('لطفاً تاریخ شروع و پایان را انتخاب کنید');
+            return;
+        }
+
+        if (this.reportType === 'single' && !this.reportLicenseNumber) {
+            this.toastr.warning('لطفاً نمبر جواز را وارد کنید');
+            return;
+        }
+
+        this.isLoadingReport = true;
+
+        // Format dates
+        let startDate = this.reportStartDate;
+        let endDate = this.reportEndDate;
+
+        if (typeof this.reportStartDate === 'object' && this.reportStartDate !== null) {
+            startDate = this.reportStartDate.toISOString ? this.reportStartDate.toISOString().split('T')[0] : String(this.reportStartDate);
+        }
+        if (typeof this.reportEndDate === 'object' && this.reportEndDate !== null) {
+            endDate = this.reportEndDate.toISOString ? this.reportEndDate.toISOString().split('T')[0] : String(this.reportEndDate);
+        }
+
+        const licenseNumber = this.reportType === 'single' ? this.reportLicenseNumber : undefined;
+
+        this.securitiesService.getComprehensiveReport(
+            startDate,
+            endDate,
+            'gregorian',
+            licenseNumber
+        ).subscribe({
+            next: (data) => {
+                this.reportData = data;
+                this.isLoadingReport = false;
+            },
+            error: (err) => {
+                this.toastr.error('خطا در تولید گزارش');
+                this.isLoadingReport = false;
+                console.error('Report error:', err);
+            }
+        });
+    }
+
+    exportToExcel(): void {
+        if (!this.reportData) {
+            this.toastr.warning('ابتدا گزارش را تولید کنید');
+            return;
+        }
+
+        const excelData: any[] = [];
+        
+        // Header
+        excelData.push(['گزارش اسناد بهادار رهنمای معاملات']);
+        excelData.push([`از تاریخ: ${this.reportData.startDate} تا تاریخ: ${this.reportData.endDate}`]);
+        excelData.push([`دفتر: ${this.reportData.licenseNumber}`]);
+        excelData.push([]);
+        
+        // Document counts
+        excelData.push(['تعداد اسناد']);
+        excelData.push(['سټه خرید و فروش جایداد', this.reportData.propertyBuySellCount]);
+        excelData.push(['سټه بیع وفا', this.reportData.bayeWafaCount]);
+        excelData.push(['سټه کرایی', this.reportData.rentalCount]);
+        excelData.push(['سټه وسایط نقلیه', this.reportData.vehicleCount]);
+        excelData.push(['مجموع سته های 4 گانه', this.reportData.fourTypesTotal]);
+        excelData.push(['کتاب ثبت معاملات', this.reportData.registrationBookCount]);
+        excelData.push(['کتاب ثبت معاملات مثنی', this.reportData.registrationBookDuplicateCount]);
+        excelData.push([]);
+        
+        // Revenue
+        excelData.push(['مبلغ پول (افغانی)']);
+        excelData.push(['سټه خرید و فروش جایداد', this.reportData.propertyBuySellRevenue]);
+        excelData.push(['سټه بیع وفا', this.reportData.bayeWafaRevenue]);
+        excelData.push(['سټه کرایی', this.reportData.rentalRevenue]);
+        excelData.push(['سټه وسایط نقلیه', this.reportData.vehicleRevenue]);
+        excelData.push(['مجموع سته های 4 گانه', this.reportData.fourTypesRevenue]);
+        excelData.push(['کتاب ثبت معاملات', this.reportData.registrationBookRevenue]);
+        excelData.push(['کتاب ثبت مثنی', this.reportData.registrationBookDuplicateRevenue]);
+        excelData.push(['مجموع اسناد بهادار', this.reportData.totalRevenue]);
+        
+        // Convert to CSV
+        const csv = excelData.map(row => row.join(',')).join('\n');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `securities-report-${Date.now()}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        this.toastr.success('گزارش با موفقیت صادر شد');
     }
 }
