@@ -16,6 +16,7 @@ export interface companydetailsList {
     ownerFatherName:string;
     ownerElectronicNationalIdNumber:string;
     licenseNumber:string;
+    licenseCategory:string;
     licenseIssueDate:string;
     licenseExpiryDate:string;
     granator:string;

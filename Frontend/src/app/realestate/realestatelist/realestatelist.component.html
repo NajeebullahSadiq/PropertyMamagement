@@ -253,6 +253,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نام پدر مالک دفتر</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره تذکره مالک دفتر</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز دفتر</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ صدور جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ختم جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">تضمین کننده دفتر</th>
@@ -272,6 +273,19 @@
               </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.ownerElectronicNationalIdNumber }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ property.licenseNumber }}</td>
+              <td class="px-4 py-3 text-sm">
+                <span *ngIf="property.licenseCategory" 
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': property.licenseCategory === 'جدید',
+                        'bg-blue-100 text-blue-800': property.licenseCategory === 'تجدید',
+                        'bg-purple-100 text-purple-800': property.licenseCategory === 'مثنی',
+                        'bg-gray-100 text-gray-800': !['جدید', 'تجدید', 'مثنی'].includes(property.licenseCategory)
+                      }">
+                  {{ property.licenseCategory }}
+                </span>
+                <span *ngIf="!property.licenseCategory" class="text-gray-400 text-xs">-</span>
+              </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ (property.licenseIssueDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ (property.licenseExpiryDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3 text-sm" [ngClass]="property.granator ? 'text-gray-700' : 'text-red-600 font-semibold'">

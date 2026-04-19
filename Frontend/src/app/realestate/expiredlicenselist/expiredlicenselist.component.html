@@ -28,6 +28,7 @@
             <th>نام پدر مالک دفتر</th>
             <th>شماره تذکره مالک دفتر</th>
             <th>نمبر جواز دفتر</th>
+            <th>نوعیت جواز</th>
             <th>تاریخ صدور جواز</th>
             <th>تاریخ ختم جواز</th>
             <th>تضمین کننده دفتر</th>
@@ -43,6 +44,19 @@
             <td>{{ property.ownerFatherName }}</td>
             <td>{{ property.ownerElectronicNationalIdNumber }}</td>
             <td>{{ property.licenseNumber }}</td>
+            <td>
+              <span *ngIf="property.licenseCategory" 
+                    class="badge"
+                    [ngClass]="{
+                      'bg-success': property.licenseCategory === 'جدید',
+                      'bg-primary': property.licenseCategory === 'تجدید',
+                      'bg-info': property.licenseCategory === 'مثنی',
+                      'bg-secondary': !['جدید', 'تجدید', 'مثنی'].includes(property.licenseCategory)
+                    }">
+                {{ property.licenseCategory }}
+              </span>
+              <span *ngIf="!property.licenseCategory" class="text-muted">-</span>
+            </td>
             <td>{{ (property.licenseIssueDate | calendarDate) || '-' }}</td>
             <td>{{ (property.licenseExpiryDate | calendarDate) || '-' }}</td>
             <td>{{ property.granator }}</td>

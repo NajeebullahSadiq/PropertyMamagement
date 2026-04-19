@@ -99,6 +99,7 @@ namespace WebAPIBackend.Controllers.Companies
                         OwnerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
                         OwnerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
                         LicenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        LicenseCategory = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseCategory).FirstOrDefault(),
                         LicenseIssueDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IssueDate).FirstOrDefault(),
                         LicenseExpiryDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.ExpireDate).FirstOrDefault(),
                         Granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 
@@ -162,6 +163,7 @@ namespace WebAPIBackend.Controllers.Companies
                         ownerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
                         ownerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
                         licenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        licenseCategory = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseCategory).FirstOrDefault(),
                         licenseIssueDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IssueDate).FirstOrDefault(),
                         licenseExpiryDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.ExpireDate).FirstOrDefault(),
                         granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 

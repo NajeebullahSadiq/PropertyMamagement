@@ -10,6 +10,7 @@ namespace WebAPIBackend.Models.ViewModels
         public string? OwnerFatherName { get; set; }
         public string? OwnerElectronicNationalIdNumber { get; set; }
         public string? LicenseNumber { get; set; }
+        public string? LicenseCategory { get; set; }
         public DateOnly? LicenseIssueDate { get; set; }
         public DateOnly? LicenseExpiryDate { get; set; }
         public string? Granator { get; set; }
