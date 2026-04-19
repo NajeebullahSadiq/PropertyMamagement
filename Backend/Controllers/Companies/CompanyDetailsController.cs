@@ -1232,7 +1232,7 @@ namespace WebAPIBackend.Controllers.Companies
                     }
                 }
 
-                // Get cancellations count
+                // Get cancellations count (date range)
                 var cancellationsQuery = _context.CompanyCancellationInfos.Where(x => x.Status != false);
                 if (parsedStartDate.HasValue)
                 {
@@ -1243,6 +1243,9 @@ namespace WebAPIBackend.Controllers.Companies
                     cancellationsQuery = cancellationsQuery.Where(x => x.LicenseCancellationLetterDate <= parsedEndDate);
                 }
                 var totalCancellations = await cancellationsQuery.CountAsync();
+
+                // Get all-time cancellations count (no date filter)
+                var totalCancellationsAllTime = await _context.CompanyCancellationInfos.Where(x => x.Status != false).CountAsync();
 
                 // Get companies status based on license expiry date
                 // Note: We check ALL companies' license status, not just those created in date range
@@ -1426,6 +1429,7 @@ namespace WebAPIBackend.Controllers.Companies
                 return Ok(new
                 {
                     totalCancellations,
+                    totalCancellationsAllTime,
                     activeCompanies,
                     inactiveCompanies,
                     totalCompanies,

@@ -290,6 +290,7 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     
     // Cancellations
     excelData.push(['تعداد فسخ/لغوه', this.reportData.totalCancellations]);
+    excelData.push(['کل فسخ/لغوه (همه زمان)', this.reportData.totalCancellationsAllTime]);
     excelData.push([]);
     
     // Companies status
