@@ -189,11 +189,24 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
    * Convert Gregorian Date object to Hijri Shamsi string format (YYYY/MM/DD)
    */
   private convertGregorianToHijriShamsiString(gregorianDate: Date): string {
+    console.log('[Report] Converting Gregorian to Hijri Shamsi:');
+    console.log('[Report]   Input Gregorian Date:', gregorianDate);
+    console.log('[Report]   Date details:', {
+      year: gregorianDate.getFullYear(),
+      month: gregorianDate.getMonth() + 1,
+      day: gregorianDate.getDate()
+    });
+    
     const hijriDate = this.calendarConversion.fromGregorian(gregorianDate, CalendarType.HIJRI_SHAMSI);
+    console.log('[Report]   Converted Hijri Date:', hijriDate);
+    
     const yearStr = hijriDate.year.toString().padStart(4, '0');
     const monthStr = hijriDate.month.toString().padStart(2, '0');
     const dayStr = hijriDate.day.toString().padStart(2, '0');
-    return `${yearStr}/${monthStr}/${dayStr}`;
+    const result = `${yearStr}/${monthStr}/${dayStr}`;
+    
+    console.log('[Report]   Final string:', result);
+    return result;
   }
 
   generateReport(): void {

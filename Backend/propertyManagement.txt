@@ -112,7 +112,7 @@ sudo systemctl restart prmis-backend
 sudo systemctl status prmis-backend
 echo "Full deployment completed!"
 
-
+2
 # ============================================
 # QUICK BACKEND REDEPLOY (for small fixes)
 # ============================================
@@ -180,7 +180,7 @@ sudo -u postgres psql -d PRMIS -f Scripts/company_module_clean_recreate.sql
 sudo -u postgres psql -d PRMIS -f Scripts/add_applicant_name_fields.sql
 sudo -u postgres psql -d PRMIS -f Scripts/add_punittype_dari.sql
 sudo -u postgres psql -d PRMIS -f Scripts/AddApartmentAndDeedFields.sql
-sudo -u postgres psql -d PRMIS -f Scripts/AddContractDatesToBuyerDetails.sql
+sudo -u postgres psql -d PRMIS -f Scripts/fix_null_status_company_records.sql
 
 sudo systemctl restart prmis-backend
 echo "Vehicle electronic ID columns fixed!"

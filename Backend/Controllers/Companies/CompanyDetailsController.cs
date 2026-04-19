@@ -23,17 +23,20 @@ namespace WebAPIBackend.Controllers.Companies
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly WebAPIBackend.Services.IProvinceFilterService _provinceFilter;
         private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
+        private readonly WebAPIBackend.Services.ICompanyService _companyService;
 
         public CompanyDetailsController(
             AppDbContext context, 
             UserManager<ApplicationUser> userManager,
             WebAPIBackend.Services.IProvinceFilterService provinceFilter,
-            WebAPIBackend.Services.IComprehensiveAuditService auditService)
+            WebAPIBackend.Services.IComprehensiveAuditService auditService,
+            WebAPIBackend.Services.ICompanyService companyService)
         {
             _context = context;
             _userManager = userManager;
             _provinceFilter = provinceFilter;
             _auditService = auditService;
+            _companyService = companyService;
         }
 
         [HttpGet]
@@ -867,11 +870,6 @@ namespace WebAPIBackend.Controllers.Companies
             }
             catch (Exception ex)
             {
-                // Log the detailed error for debugging
-                Console.WriteLine($"Error deleting company: {ex.Message}");
-                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                
                 return StatusCode(500, new { 
                     message = $"??? ?? ??? ????: {ex.Message}",
                     details = ex.InnerException?.Message 
@@ -902,9 +900,12 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
+                // Auto-update license Status based on ExpireDate
+                await _companyService.UpdateLicenseStatusByExpiryAsync();
+
                 // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
                 var calendar = CalendarType.HijriShamsi;
-                var query = _context.CompanyCancellationInfos.Where(x => x.Status == true);
+                var query = _context.CompanyCancellationInfos.Where(x => x.Status != false);
 
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;
@@ -1042,11 +1043,14 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
+                // Auto-update license Status based on ExpireDate
+                await _companyService.UpdateLicenseStatusByExpiryAsync();
+
                 // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
                 var calendar = CalendarType.HijriShamsi;
                 
                 // Get licenses within date range
-                var licensesQuery = _context.LicenseDetails.Where(x => x.Status == true);
+                var licensesQuery = _context.LicenseDetails.AsQueryable();
                 
                 // Apply province filter through company
                 var allowedCompanyIds = _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
@@ -1113,11 +1117,14 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
+                // Auto-update license Status based on ExpireDate
+                await _companyService.UpdateLicenseStatusByExpiryAsync();
+
                 // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
                 var calendar = CalendarType.HijriShamsi;
                 
                 // Get guarantors within date range
-                var guarantorsQuery = _context.Guarantors.Where(x => x.Status == true && x.IsActive == true);
+                var guarantorsQuery = _context.Guarantors.Where(x => x.Status != false && x.IsActive == true);
                 
                 // Apply province filter through company
                 var allowedCompanyIds = _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
@@ -1199,14 +1206,12 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
+                // Auto-update license Status based on ExpireDate (تاریخ ختم جواز)
+                // If ExpireDate has passed: Status = false (inactive); otherwise Status = true (active)
+                await _companyService.UpdateLicenseStatusByExpiryAsync();
+
                 // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
                 var calendar = CalendarType.HijriShamsi;
-                
-                // Debug logging
-                Console.WriteLine($"[CompanyReport] Received startDate: {startDate}");
-                Console.WriteLine($"[CompanyReport] Received endDate: {endDate}");
-                Console.WriteLine($"[CompanyReport] Received calendarType: {calendarType}");
-                Console.WriteLine($"[CompanyReport] Using calendar: {calendar}");
                 
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;
@@ -1216,11 +1221,6 @@ namespace WebAPIBackend.Controllers.Companies
                     if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
                     {
                         parsedStartDate = start;
-                        Console.WriteLine($"[CompanyReport] Parsed startDate: {parsedStartDate} (Gregorian)");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[CompanyReport] Failed to parse startDate: {startDate}");
                     }
                 }
 
@@ -1229,16 +1229,11 @@ namespace WebAPIBackend.Controllers.Companies
                     if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
                     {
                         parsedEndDate = end;
-                        Console.WriteLine($"[CompanyReport] Parsed endDate: {parsedEndDate} (Gregorian)");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[CompanyReport] Failed to parse endDate: {endDate}");
                     }
                 }
 
                 // Get cancellations count
-                var cancellationsQuery = _context.CompanyCancellationInfos.Where(x => x.Status == true);
+                var cancellationsQuery = _context.CompanyCancellationInfos.Where(x => x.Status != false);
                 if (parsedStartDate.HasValue)
                 {
                     cancellationsQuery = cancellationsQuery.Where(x => x.LicenseCancellationLetterDate >= parsedStartDate);
@@ -1266,7 +1261,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Get licenses for these companies to check expiry dates and apply district filter
                 var today = DateOnly.FromDateTime(DateTime.Today);
                 var licensesForStatusQuery = _context.LicenseDetails
-                    .Where(l => l.Status == true && l.CompanyId.HasValue && allCompanyIds.Contains(l.CompanyId.Value));
+                    .Where(l => l.CompanyId.HasValue && allCompanyIds.Contains(l.CompanyId.Value));
                 
                 // Apply district filter if specified
                 if (districtId.HasValue && districtId.Value > 0)
@@ -1305,8 +1300,6 @@ namespace WebAPIBackend.Controllers.Companies
                     .Select(c => c.Id)
                     .ToListAsync();
                 
-                Console.WriteLine($"[CompanyReport] Allowed company IDs count: {allowedCompanyIds.Count}");
-                
                 // Apply province filter to allowed companies
                 if (provinceId.HasValue && provinceId.Value > 0)
                 {
@@ -1314,12 +1307,11 @@ namespace WebAPIBackend.Controllers.Companies
                         .Where(c => c.ProvinceId == provinceId.Value && allowedCompanyIds.Contains(c.Id))
                         .Select(c => c.Id)
                         .ToListAsync();
-                    Console.WriteLine($"[CompanyReport] After province filter ({provinceId}): {provinceFilteredCompanyIds.Count} companies");
                     allowedCompanyIds = provinceFilteredCompanyIds;
                 }
                 
                 var licensesQuery = _context.LicenseDetails
-                    .Where(x => x.Status == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
+                    .Where(x => x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
                 
                 // Apply district filter
                 if (districtId.HasValue && districtId.Value > 0)
@@ -1327,47 +1319,18 @@ namespace WebAPIBackend.Controllers.Companies
                     licensesQuery = licensesQuery.Where(x => x.ProvinceId == districtId.Value);
                 }
                 
-                // Debug: Count before date filter
-                var countBeforeDateFilter = await licensesQuery.CountAsync();
-                Console.WriteLine($"[CompanyReport] Licenses before date filter: {countBeforeDateFilter}");
-                
                 if (parsedStartDate.HasValue)
                 {
-                    Console.WriteLine($"[CompanyReport] Filtering IssueDate >= {parsedStartDate}");
                     licensesQuery = licensesQuery.Where(x => x.IssueDate >= parsedStartDate);
                 }
                 if (parsedEndDate.HasValue)
                 {
-                    Console.WriteLine($"[CompanyReport] Filtering IssueDate <= {parsedEndDate}");
                     licensesQuery = licensesQuery.Where(x => x.IssueDate <= parsedEndDate);
                 }
                 
                 // Get all licenses that match the criteria
                 var allLicenses = await licensesQuery.ToListAsync();
-                Console.WriteLine($"[CompanyReport] Licenses after date filter: {allLicenses.Count}");
-                
-                // Debug: Show sample license dates
-                if (allLicenses.Any())
-                {
-                    var sampleLicenses = allLicenses.Take(10).Select(l => new { 
-                        l.Id, 
-                        l.LicenseNumber, 
-                        IssueDate = l.IssueDate?.ToString("yyyy-MM-dd"),
-                        l.LicenseCategory,
-                        l.CompanyId,
-                        l.ProvinceId
-                    }).ToList();
-                    Console.WriteLine($"[CompanyReport] Sample licenses: {System.Text.Json.JsonSerializer.Serialize(sampleLicenses)}");
-                }
-                else
-                {
-                    Console.WriteLine($"[CompanyReport] No licenses found in date range!");
-                    Console.WriteLine($"[CompanyReport] Checking total licenses without date filter...");
-                    var totalLicensesCount = await _context.LicenseDetails
-                        .Where(x => x.Status == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value))
-                        .CountAsync();
-                    Console.WriteLine($"[CompanyReport] Total licenses (no date filter): {totalLicensesCount}");
-                }
+
                 
                 // Group by LicenseCategory with proper handling of NULL/empty values
                 var licensesByCategory = allLicenses
@@ -1384,7 +1347,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 // Get guarantors by type
                 var guarantorsQuery = _context.Guarantors
-                    .Where(x => x.Status == true && x.IsActive == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
+                    .Where(x => x.Status != false && x.IsActive == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
                 if (parsedStartDate.HasValue)
                 {
                     var startDateTime = parsedStartDate.Value.ToDateTime(TimeOnly.MinValue);

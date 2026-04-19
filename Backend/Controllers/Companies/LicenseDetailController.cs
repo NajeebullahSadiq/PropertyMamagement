@@ -223,6 +223,7 @@ namespace WebAPIBackend.Controllers.Companies
                     PenaltyDate = penaltyDate,
                     HrLetter = request.HrLetter,
                     HrLetterDate = hrLetterDate,
+                    Status = expireDate >= DateOnly.FromDateTime(DateTime.Today),
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = userId,
                 };
@@ -400,6 +401,9 @@ namespace WebAPIBackend.Controllers.Companies
                 existingProperty.PenaltyDate = penaltyDate;
                 existingProperty.HrLetter = request.HrLetter;
                 existingProperty.HrLetterDate = hrLetterDate;
+
+                // Update Status based on ExpireDate (تاریخ ختم جواز)
+                existingProperty.Status = expireDate >= DateOnly.FromDateTime(DateTime.Today);
 
                 // Restore the original values
                 existingProperty.CreatedBy = createdBy;

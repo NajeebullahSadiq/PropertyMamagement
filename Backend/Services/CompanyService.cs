@@ -13,6 +13,7 @@ namespace WebAPIBackend.Services
         Task<CompanyDetail> UpdateCompanyAsync(int id, CompanyDetail company);
         Task DeleteCompanyAsync(int id);
         Task UpdateLicenseCompletionStatusAsync(int companyId);
+        Task UpdateLicenseStatusByExpiryAsync();
     }
 
     public class CompanyService : ICompanyService
@@ -213,6 +214,47 @@ namespace WebAPIBackend.Services
                         }
                     }
                 }
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Automatically updates the Status of all licenses based on their ExpireDate (تاریخ ختم جواز)
+        /// - If ExpireDate has passed (less than today): Status = false (inactive/expired)
+        /// - If ExpireDate is in the future or today: Status = true (active)
+        /// - If ExpireDate is null: Status = true (treat as active until expiry is set)
+        /// </summary>
+        public async Task UpdateLicenseStatusByExpiryAsync()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            // Get all licenses that need status update
+            var allLicenses = await _context.LicenseDetails.ToListAsync();
+
+            int updatedCount = 0;
+            foreach (var license in allLicenses)
+            {
+                bool expectedStatus;
+                if (license.ExpireDate.HasValue)
+                {
+                    // If ExpireDate has passed, license is inactive; otherwise active
+                    expectedStatus = license.ExpireDate.Value >= today;
+                }
+                else
+                {
+                    // No expiry date set - treat as active
+                    expectedStatus = true;
+                }
+
+                if (license.Status != expectedStatus)
+                {
+                    license.Status = expectedStatus;
+                    updatedCount++;
+                }
+            }
+
+            if (updatedCount > 0)
+            {
                 await _context.SaveChangesAsync();
             }
         }

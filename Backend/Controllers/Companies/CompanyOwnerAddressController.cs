@@ -77,6 +77,7 @@ namespace WebAPIBackend.Controllers.Companies
                 DistrictId = request.DistrictId,
                 CompanyOwnerId = request.CompanyOwnerId,
                 Village=request.Village,
+                Status = true,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
 

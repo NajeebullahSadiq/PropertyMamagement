@@ -95,6 +95,7 @@ namespace WebAPIBackend.Controllers.Companies
                 GuaranteeDate = guaranteeDate,
                 CompanyId = request.CompanyId,
                 DocPath = request.DocPath,
+                Status = true,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
             };

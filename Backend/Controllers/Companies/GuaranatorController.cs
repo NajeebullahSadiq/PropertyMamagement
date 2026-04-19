@@ -319,6 +319,7 @@ namespace WebAPIBackend.Controllers.Companies
                 DepositDate = depositDate,
                 // Witness history fields
                 IsActive = true, // New witness is always active
+                Status = true,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
             };

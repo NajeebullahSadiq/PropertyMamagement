@@ -159,6 +159,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Contact Information
                 PhoneNumber = request.PhoneNumber?.Trim(),
                 WhatsAppNumber = request.WhatsAppNumber?.Trim(),
+                Status = true,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
                 // Owner's Own Address Fields (???? ???? ????)
