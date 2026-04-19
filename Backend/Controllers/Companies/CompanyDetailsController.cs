@@ -1200,6 +1200,12 @@ namespace WebAPIBackend.Controllers.Companies
                 // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
                 var calendar = CalendarType.HijriShamsi;
                 
+                // Debug logging
+                Console.WriteLine($"[CompanyReport] Received startDate: {startDate}");
+                Console.WriteLine($"[CompanyReport] Received endDate: {endDate}");
+                Console.WriteLine($"[CompanyReport] Received calendarType: {calendarType}");
+                Console.WriteLine($"[CompanyReport] Using calendar: {calendar}");
+                
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;
 
@@ -1208,6 +1214,11 @@ namespace WebAPIBackend.Controllers.Companies
                     if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
                     {
                         parsedStartDate = start;
+                        Console.WriteLine($"[CompanyReport] Parsed startDate: {parsedStartDate} (Gregorian)");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[CompanyReport] Failed to parse startDate: {startDate}");
                     }
                 }
 
@@ -1216,6 +1227,11 @@ namespace WebAPIBackend.Controllers.Companies
                     if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
                     {
                         parsedEndDate = end;
+                        Console.WriteLine($"[CompanyReport] Parsed endDate: {parsedEndDate} (Gregorian)");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[CompanyReport] Failed to parse endDate: {endDate}");
                     }
                 }
 
@@ -1306,22 +1322,43 @@ namespace WebAPIBackend.Controllers.Companies
                     licensesQuery = licensesQuery.Where(x => x.ProvinceId == districtId.Value);
                 }
                 
+                // Debug: Count before date filter
+                var countBeforeDateFilter = await licensesQuery.CountAsync();
+                Console.WriteLine($"[CompanyReport] Licenses before date filter: {countBeforeDateFilter}");
+                
                 if (parsedStartDate.HasValue)
                 {
+                    Console.WriteLine($"[CompanyReport] Filtering IssueDate >= {parsedStartDate}");
                     licensesQuery = licensesQuery.Where(x => x.IssueDate >= parsedStartDate);
                 }
                 if (parsedEndDate.HasValue)
                 {
+                    Console.WriteLine($"[CompanyReport] Filtering IssueDate <= {parsedEndDate}");
                     licensesQuery = licensesQuery.Where(x => x.IssueDate <= parsedEndDate);
                 }
-                var licensesByCategory = await licensesQuery
-                    .GroupBy(l => l.LicenseCategory ?? "نامشخص")
+                
+                // Get all licenses that match the criteria
+                var allLicenses = await licensesQuery.ToListAsync();
+                Console.WriteLine($"[CompanyReport] Licenses after date filter: {allLicenses.Count}");
+                
+                // Debug: Show sample license dates
+                if (allLicenses.Any())
+                {
+                    var sampleLicenses = allLicenses.Take(5).Select(l => new { l.Id, l.LicenseNumber, l.IssueDate, l.LicenseCategory }).ToList();
+                    Console.WriteLine($"[CompanyReport] Sample licenses: {System.Text.Json.JsonSerializer.Serialize(sampleLicenses)}");
+                }
+                
+                // Group by LicenseCategory with proper handling of NULL/empty values
+                var licensesByCategory = allLicenses
+                    .GroupBy(l => string.IsNullOrWhiteSpace(l.LicenseCategory) ? "نامشخص" : l.LicenseCategory)
                     .Select(g => new
                     {
                         category = g.Key,
                         count = g.Count()
                     })
-                    .ToListAsync();
+                    .OrderByDescending(x => x.count)
+                    .ToList();
+                    
                 var totalLicenses = licensesByCategory.Sum(l => l.count);
 
                 // Get guarantors by type

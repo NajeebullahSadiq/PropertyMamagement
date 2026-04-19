@@ -11,6 +11,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { CalendarType } from 'src/app/models/calendar-type';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 
 @Component({
   selector: 'app-realestatelist',
@@ -54,7 +55,8 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     private toastr: ToastrService, 
     private router: Router,
     private rbacService: RbacService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private calendarConversion: CalendarConversionService
   ) {
     this.isViewOnly = this.rbacService.isViewOnly();
     this.isAdmin = this.rbacService.isAdmin();
@@ -183,6 +185,17 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Convert Gregorian Date object to Hijri Shamsi string format (YYYY/MM/DD)
+   */
+  private convertGregorianToHijriShamsiString(gregorianDate: Date): string {
+    const hijriDate = this.calendarConversion.fromGregorian(gregorianDate, CalendarType.HIJRI_SHAMSI);
+    const yearStr = hijriDate.year.toString().padStart(4, '0');
+    const monthStr = hijriDate.month.toString().padStart(2, '0');
+    const dayStr = hijriDate.day.toString().padStart(2, '0');
+    return `${yearStr}/${monthStr}/${dayStr}`;
+  }
+
   generateReport(): void {
     console.log('=== Generate Report Called ===');
     console.log('reportStartDate:', this.reportStartDate);
@@ -203,24 +216,31 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
 
     this.isLoadingReport = true;
 
-    // Format dates - the date picker returns dates in format like "1403/01/15"
-    let startDate = this.reportStartDate;
-    let endDate = this.reportEndDate;
+    // The date picker returns Gregorian Date objects
+    // We need to convert them to Hijri Shamsi string format for the backend
+    let startDate: string;
+    let endDate: string;
 
-    // If it's a Date object, convert to string
-    if (typeof this.reportStartDate === 'object' && this.reportStartDate !== null) {
-      // For Jalali calendar, we need to format it properly
-      startDate = this.reportStartDate.toISOString ? this.reportStartDate.toISOString().split('T')[0] : String(this.reportStartDate);
-    }
-    if (typeof this.reportEndDate === 'object' && this.reportEndDate !== null) {
-      endDate = this.reportEndDate.toISOString ? this.reportEndDate.toISOString().split('T')[0] : String(this.reportEndDate);
+    if (typeof this.reportStartDate === 'object' && this.reportStartDate !== null && this.reportStartDate instanceof Date) {
+      // Convert Gregorian Date to Hijri Shamsi string
+      startDate = this.convertGregorianToHijriShamsiString(this.reportStartDate);
+    } else {
+      // If it's already a string, use it as is
+      startDate = String(this.reportStartDate);
     }
 
-    console.log('Sending startDate:', startDate);
-    console.log('Sending endDate:', endDate);
+    if (typeof this.reportEndDate === 'object' && this.reportEndDate !== null && this.reportEndDate instanceof Date) {
+      // Convert Gregorian Date to Hijri Shamsi string
+      endDate = this.convertGregorianToHijriShamsiString(this.reportEndDate);
+    } else {
+      // If it's already a string, use it as is
+      endDate = String(this.reportEndDate);
+    }
+
+    console.log('Sending startDate (Hijri Shamsi):', startDate);
+    console.log('Sending endDate (Hijri Shamsi):', endDate);
 
     // Company module always uses Hijri Shamsi calendar
-    // The multi-calendar date picker returns dates in the selected calendar format
     this.comservice.getComprehensiveReport(
       startDate,
       endDate,
