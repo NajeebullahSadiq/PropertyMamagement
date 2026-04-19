@@ -28,6 +28,8 @@
             <th>نام پدر مالک دفتر</th>
             <th>شماره تذکره مالک دفتر</th>
             <th>نمبر جواز دفتر</th>
+            <th>تاریخ صدور جواز</th>
+            <th>تاریخ ختم جواز</th>
             <th>تضمین کننده دفتر</th>
             <th>جزئیات دیگر</th>
       
@@ -41,6 +43,8 @@
             <td>{{ property.ownerFatherName }}</td>
             <td>{{ property.ownerElectronicNationalIdNumber }}</td>
             <td>{{ property.licenseNumber }}</td>
+            <td>{{ property.licenseIssueDate || '-' }}</td>
+            <td>{{ property.licenseExpiryDate || '-' }}</td>
             <td>{{ property.granator }}</td>
             <td>
               <div class="d-flex justify-content-center gap-1">

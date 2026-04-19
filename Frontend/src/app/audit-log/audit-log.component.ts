@@ -108,14 +108,20 @@ export class AuditLogComponent implements OnInit {
 
   loadModules(): void {
     this.auditLogService.getModules().subscribe({
-      next: (modules) => this.modules = modules,
+      next: (modules: any) => {
+        console.log('Modules response:', modules);
+        this.modules = modules || [];
+      },
       error: (err) => console.error('Failed to load modules', err)
     });
   }
 
   loadActionTypes(): void {
     this.auditLogService.getActionTypes().subscribe({
-      next: (types) => this.actionTypes = types,
+      next: (types: any) => {
+        console.log('Action types response:', types);
+        this.actionTypes = types || [];
+      },
       error: (err) => console.error('Failed to load action types', err)
     });
   }
@@ -131,10 +137,33 @@ export class AuditLogComponent implements OnInit {
       startDate: filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
       endDate: filters.endDate ? new Date(filters.endDate).toISOString() : undefined
     }).subscribe({
-      next: (response) => {
-        this.auditLogs = response.data;
-        this.totalCount = response.pagination.totalCount;
-        this.totalPages = response.pagination.totalPages;
+      next: (response: any) => {
+        console.log('Audit logs response:', response);
+        // Backend returns PascalCase, map to camelCase
+        this.auditLogs = (response.data || response.Data || []).map((log: any) => ({
+          id: log.id || log.Id,
+          userId: log.userId || log.UserId,
+          userName: log.userName || log.UserName,
+          userRole: log.userRole || log.UserRole,
+          actionType: log.actionType || log.ActionType,
+          module: log.module || log.Module,
+          entityType: log.entityType || log.EntityType,
+          entityId: log.entityId || log.EntityId,
+          description: log.description || log.Description,
+          descriptionDari: log.descriptionDari || log.DescriptionDari,
+          ipAddress: log.ipAddress || log.IpAddress,
+          requestUrl: log.requestUrl || log.RequestUrl,
+          httpMethod: log.httpMethod || log.HttpMethod,
+          status: log.status || log.Status,
+          errorMessage: log.errorMessage || log.ErrorMessage,
+          userProvince: log.userProvince || log.UserProvince,
+          timestamp: log.timestamp || log.Timestamp,
+          durationMs: log.durationMs || log.DurationMs
+        }));
+        
+        const pagination = response.pagination || response.Pagination || {};
+        this.totalCount = pagination.totalCount || pagination.TotalCount || 0;
+        this.totalPages = pagination.totalPages || pagination.TotalPages || 0;
         this.isLoading = false;
       },
       error: (err) => {
@@ -152,8 +181,39 @@ export class AuditLogComponent implements OnInit {
       filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
       filters.endDate ? new Date(filters.endDate).toISOString() : undefined
     ).subscribe({
-      next: (stats) => {
-        this.statistics = stats;
+      next: (stats: any) => {
+        console.log('Statistics response:', stats);
+        // Map PascalCase to camelCase
+        this.statistics = {
+          dateRange: {
+            startDate: stats.dateRange?.startDate || stats.DateRange?.StartDate,
+            endDate: stats.dateRange?.endDate || stats.DateRange?.EndDate
+          },
+          summary: {
+            totalActions: stats.summary?.totalActions || stats.Summary?.TotalActions || 0,
+            successfulActions: stats.summary?.successfulActions || stats.Summary?.SuccessfulActions || 0,
+            failedActions: stats.summary?.failedActions || stats.Summary?.FailedActions || 0,
+            successRate: stats.summary?.successRate || stats.Summary?.SuccessRate || 0
+          },
+          actionsByModule: (stats.actionsByModule || stats.ActionsByModule || []).map((item: any) => ({
+            module: item.module || item.Module,
+            count: item.count || item.Count
+          })),
+          actionsByType: (stats.actionsByType || stats.ActionsByType || []).map((item: any) => ({
+            actionType: item.actionType || item.ActionType,
+            count: item.count || item.Count
+          })),
+          topUsers: (stats.topUsers || stats.TopUsers || []).map((item: any) => ({
+            userId: item.userId || item.UserId,
+            userName: item.userName || item.UserName,
+            count: item.count || item.Count
+          })),
+          dailyActivity: (stats.dailyActivity || stats.DailyActivity || []).map((item: any) => ({
+            date: item.date || item.Date,
+            count: item.count || item.Count
+          })),
+          recentErrors: stats.recentErrors || stats.RecentErrors || []
+        };
         this.isLoadingStats = false;
       },
       error: (err) => {
@@ -197,8 +257,33 @@ export class AuditLogComponent implements OnInit {
 
   viewLogDetail(log: AuditLog): void {
     this.auditLogService.getAuditLogById(log.id).subscribe({
-      next: (detail) => {
-        this.selectedLog = detail;
+      next: (detail: any) => {
+        console.log('Log detail response:', detail);
+        // Map PascalCase to camelCase
+        this.selectedLog = {
+          id: detail.id || detail.Id,
+          userId: detail.userId || detail.UserId,
+          userName: detail.userName || detail.UserName,
+          userRole: detail.userRole || detail.UserRole,
+          actionType: detail.actionType || detail.ActionType,
+          module: detail.module || detail.Module,
+          entityType: detail.entityType || detail.EntityType,
+          entityId: detail.entityId || detail.EntityId,
+          description: detail.description || detail.Description,
+          descriptionDari: detail.descriptionDari || detail.DescriptionDari,
+          ipAddress: detail.ipAddress || detail.IpAddress,
+          requestUrl: detail.requestUrl || detail.RequestUrl,
+          httpMethod: detail.httpMethod || detail.HttpMethod,
+          status: detail.status || detail.Status,
+          errorMessage: detail.errorMessage || detail.ErrorMessage,
+          userProvince: detail.userProvince || detail.UserProvince,
+          timestamp: detail.timestamp || detail.Timestamp,
+          durationMs: detail.durationMs || detail.DurationMs,
+          oldValues: detail.oldValues || detail.OldValues,
+          newValues: detail.newValues || detail.NewValues,
+          userAgent: detail.userAgent || detail.UserAgent,
+          metadata: detail.metadata || detail.Metadata
+        };
         this.showDetailPanel = true;
       },
       error: (err) => console.error('Failed to load log detail', err)

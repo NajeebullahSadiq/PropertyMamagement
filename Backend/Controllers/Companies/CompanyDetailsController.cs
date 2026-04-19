@@ -98,6 +98,8 @@ namespace WebAPIBackend.Controllers.Companies
                         ownerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
                         ownerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
                         licenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        licenseIssueDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IssueDate).FirstOrDefault(),
+                        licenseExpiryDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.ExpireDate).FirstOrDefault(),
                         granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 
                             (g.FirstName ?? "") + 
                             (string.IsNullOrWhiteSpace(g.GrandFatherName) ? "" : " " + g.GrandFatherName) + 
@@ -159,6 +161,8 @@ namespace WebAPIBackend.Controllers.Companies
                         ownerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
                         ownerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
                         licenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        licenseIssueDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IssueDate).FirstOrDefault(),
+                        licenseExpiryDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.ExpireDate).FirstOrDefault(),
                         granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 
                             (g.FirstName ?? "") + 
                             (string.IsNullOrWhiteSpace(g.GrandFatherName) ? "" : " " + g.GrandFatherName) + 
