@@ -1303,6 +1303,8 @@ namespace WebAPIBackend.Controllers.Companies
                     .Select(c => c.Id)
                     .ToListAsync();
                 
+                Console.WriteLine($"[CompanyReport] Allowed company IDs count: {allowedCompanyIds.Count}");
+                
                 // Apply province filter to allowed companies
                 if (provinceId.HasValue && provinceId.Value > 0)
                 {
@@ -1310,6 +1312,7 @@ namespace WebAPIBackend.Controllers.Companies
                         .Where(c => c.ProvinceId == provinceId.Value && allowedCompanyIds.Contains(c.Id))
                         .Select(c => c.Id)
                         .ToListAsync();
+                    Console.WriteLine($"[CompanyReport] After province filter ({provinceId}): {provinceFilteredCompanyIds.Count} companies");
                     allowedCompanyIds = provinceFilteredCompanyIds;
                 }
                 
@@ -1344,8 +1347,24 @@ namespace WebAPIBackend.Controllers.Companies
                 // Debug: Show sample license dates
                 if (allLicenses.Any())
                 {
-                    var sampleLicenses = allLicenses.Take(5).Select(l => new { l.Id, l.LicenseNumber, l.IssueDate, l.LicenseCategory }).ToList();
+                    var sampleLicenses = allLicenses.Take(10).Select(l => new { 
+                        l.Id, 
+                        l.LicenseNumber, 
+                        IssueDate = l.IssueDate?.ToString("yyyy-MM-dd"),
+                        l.LicenseCategory,
+                        l.CompanyId,
+                        l.ProvinceId
+                    }).ToList();
                     Console.WriteLine($"[CompanyReport] Sample licenses: {System.Text.Json.JsonSerializer.Serialize(sampleLicenses)}");
+                }
+                else
+                {
+                    Console.WriteLine($"[CompanyReport] No licenses found in date range!");
+                    Console.WriteLine($"[CompanyReport] Checking total licenses without date filter...");
+                    var totalLicensesCount = await _context.LicenseDetails
+                        .Where(x => x.Status == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value))
+                        .CountAsync();
+                    Console.WriteLine($"[CompanyReport] Total licenses (no date filter): {totalLicensesCount}");
                 }
                 
                 // Group by LicenseCategory with proper handling of NULL/empty values
@@ -1394,19 +1413,15 @@ namespace WebAPIBackend.Controllers.Companies
                 var totalGuarantors = guarantorsResult.Sum(r => r.count);
 
                 // Get licenses by type (املاک vs موټر فروشی) with revenue calculation
-                var licensesByType = await licensesQuery
-                    .Select(l => new
-                    {
-                        // Default to 'realEstate' if LicenseType is null or empty
-                        licenseType = string.IsNullOrWhiteSpace(l.LicenseType) ? "realEstate" : l.LicenseType
-                    })
-                    .GroupBy(l => l.licenseType)
+                // Use the already filtered allLicenses list instead of querying again
+                var licensesByType = allLicenses
+                    .GroupBy(l => string.IsNullOrWhiteSpace(l.LicenseType) ? "realEstate" : l.LicenseType)
                     .Select(g => new
                     {
                         licenseType = g.Key,
                         count = g.Count()
                     })
-                    .ToListAsync();
+                    .ToList();
 
                 // Calculate revenue based on license type
                 // املاک (realEstate) = 20,000 AFN per license
