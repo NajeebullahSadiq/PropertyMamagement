@@ -219,11 +219,12 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     console.log('Sending startDate:', startDate);
     console.log('Sending endDate:', endDate);
 
-    // The date picker returns Gregorian dates, so use 'gregorian' calendar type
+    // Company module always uses Hijri Shamsi calendar
+    // The multi-calendar date picker returns dates in the selected calendar format
     this.comservice.getComprehensiveReport(
       startDate,
       endDate,
-      'gregorian',
+      'hijriShamsi', // Company module always uses Hijri Shamsi
       this.reportProvinceId > 0 ? this.reportProvinceId : undefined,
       this.reportDistrictId > 0 ? this.reportDistrictId : undefined
     ).subscribe({
