@@ -111,13 +111,21 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
                     serialNumberEnd: data.serialNumberEnd
                 });
                 
-                // Use the raw Date values instead of formatted strings
+                // Parse date values - if already Hijri Shamsi format, keep as string
+                const parseDate = (dateValue: any) => {
+                    if (!dateValue) return null;
+                    if (typeof dateValue === 'string' && /^\d{4}\/\d{2}\/\d{2}$/.test(dateValue)) {
+                        return dateValue; // Already Hijri Shamsi format
+                    }
+                    return new Date(dateValue);
+                };
+                
                 if (data.distributionDate) {
-                    const distDate = new Date(data.distributionDate);
+                    const distDate = parseDate(data.distributionDate);
                     this.petitionForm.patchValue({ distributionDate: distDate });
                 }
                 if (data.deliveryDate) {
-                    const delDate = new Date(data.deliveryDate);
+                    const delDate = parseDate(data.deliveryDate);
                     this.petitionForm.patchValue({ deliveryDate: delDate });
                 }
             },

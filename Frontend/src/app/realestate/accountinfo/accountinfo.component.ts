@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 import { NumeralService } from 'src/app/shared/numeral.service';
 import { AccountInfo, AccountInfoData } from 'src/app/models/AccountInfo';
 
@@ -17,6 +18,9 @@ export class AccountinfoComponent {
     accountForm!: FormGroup;
     selectedId: number = 0;
     accountInfo: AccountInfo | null = null;
+    
+    // Force Hijri Shamsi calendar for company module
+    readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
 
     @Input() id: number = 0;
     @Output() next = new EventEmitter<void>();

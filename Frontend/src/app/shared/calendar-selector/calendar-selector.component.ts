@@ -2,27 +2,28 @@ import { Component, OnInit } from '@angular/core';
 import { CalendarService } from '../calendar.service';
 import { CalendarType, CalendarOption, CALENDAR_OPTIONS } from '../../models/calendar-type';
 
+/**
+ * Calendar Selector Component - HIDDEN
+ * System uses only Hijri Shamsi calendar.
+ * This component is hidden but kept for compatibility.
+ */
 @Component({
   selector: 'app-calendar-selector',
-  templateUrl: './calendar-selector.component.html',
+  template: `<!-- Calendar selector hidden - System uses Hijri Shamsi only -->`,
   styleUrls: ['./calendar-selector.component.scss']
 })
 export class CalendarSelectorComponent implements OnInit {
-  calendarOptions: CalendarOption[] = CALENDAR_OPTIONS;
+  calendarOptions: CalendarOption[] = [];
   selectedCalendar: CalendarType = CalendarType.HIJRI_SHAMSI;
 
   constructor(private calendarService: CalendarService) {}
 
   ngOnInit(): void {
-    this.selectedCalendar = this.calendarService.getSelectedCalendar();
-    
-    this.calendarService.selectedCalendar$.subscribe(calendar => {
-      this.selectedCalendar = calendar;
-    });
+    // System always uses Hijri Shamsi
+    this.selectedCalendar = CalendarType.HIJRI_SHAMSI;
   }
 
   onCalendarChange(event: any): void {
-    const selectedValue = event.target.value as CalendarType;
-    this.calendarService.setSelectedCalendar(selectedValue);
+    // Disabled - calendar is fixed
   }
 }

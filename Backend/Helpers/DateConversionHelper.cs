@@ -6,20 +6,13 @@ namespace WebAPIBackend.Helpers
     public static class DateConversionHelper
     {
         /// <summary>
-        /// Parse calendar type string to CalendarType enum, defaults to HijriShamsi
+        /// Parse calendar type string to CalendarType enum
+        /// SYSTEM ALWAYS USES HIJRI SHAMSI - This method always returns HijriShamsi regardless of input
         /// </summary>
         public static CalendarType ParseCalendarType(string? calendarTypeStr)
         {
-            if (string.IsNullOrWhiteSpace(calendarTypeStr))
-                return CalendarType.HijriShamsi;
-
-            return calendarTypeStr.ToLowerInvariant() switch
-            {
-                "gregorian" => CalendarType.Gregorian,
-                "hijrishamsi" => CalendarType.HijriShamsi,
-                "hijriqamari" => CalendarType.HijriQamari,
-                _ => CalendarType.HijriShamsi
-            };
+            // SYSTEM-WIDE: Always use Hijri Shamsi
+            return CalendarType.HijriShamsi;
         }
 
         /// <summary>
@@ -245,6 +238,9 @@ namespace WebAPIBackend.Helpers
 
             try
             {
+                // Normalize Persian/Arabic digits to Western digits
+                dateString = NormalizeDigits(dateString);
+
                 var parts = dateString.Split('/', '-');
                 if (parts.Length != 3)
                     return null;
@@ -256,16 +252,77 @@ namespace WebAPIBackend.Helpers
                     return null;
                 }
 
+                // Validate the date before conversion
+                var (isValid, errorMessage) = ValidateDateWithMessage(year, month, day, calendarType);
+                if (!isValid)
+                {
+                    Console.WriteLine($"Date validation failed: {errorMessage}");
+                    return null;
+                }
+
                 return ToGregorian(year, month, day, calendarType);
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error parsing date '{dateString}' for calendar {calendarType}: {ex.Message}");
                 return null;
             }
         }
 
+        /// <summary>
+        /// Normalize Persian and Arabic-Indic digits to Western digits
+        /// </summary>
+        private static string NormalizeDigits(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            var persianDigits = new[] { '۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹' };
+            var arabicDigits = new[] { '٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩' };
+            var result = new char[input.Length];
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+                
+                // Check Persian digits
+                int persianIndex = Array.IndexOf(persianDigits, c);
+                if (persianIndex >= 0)
+                {
+                    result[i] = (char)('0' + persianIndex);
+                    continue;
+                }
+
+                // Check Arabic digits
+                int arabicIndex = Array.IndexOf(arabicDigits, c);
+                if (arabicIndex >= 0)
+                {
+                    result[i] = (char)('0' + arabicIndex);
+                    continue;
+                }
+
+                // Keep original character
+                result[i] = c;
+            }
+
+            return new string(result);
+        }
+
         public static bool IsValidDate(int year, int month, int day, CalendarType calendarType)
         {
+            // Validate month range
+            if (month < 1 || month > 12)
+                return false;
+
+            // Validate day range based on calendar type
+            if (day < 1)
+                return false;
+
+            // Get maximum days for the month
+            int maxDays = GetDaysInMonth(year, month, calendarType);
+            if (day > maxDays)
+                return false;
+
             try
             {
                 ToGregorian(year, month, day, calendarType);
@@ -275,6 +332,97 @@ namespace WebAPIBackend.Helpers
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Get the number of days in a specific month for a given calendar type
+        /// Hijri Shamsi: First 6 months = 31 days, Next 5 months = 30 days, Last month = 29 days (30 in leap years)
+        /// </summary>
+        public static int GetDaysInMonth(int year, int month, CalendarType calendarType)
+        {
+            if (month < 1 || month > 12)
+                return 0;
+
+            switch (calendarType)
+            {
+                case CalendarType.Gregorian:
+                    return DateTime.DaysInMonth(year, month);
+
+                case CalendarType.HijriShamsi:
+                    // First 6 months (حمل to سنبله) have 31 days
+                    if (month <= 6)
+                        return 31;
+                    
+                    // Next 5 months (میزان to دلو) have 30 days
+                    if (month <= 11)
+                        return 30;
+                    
+                    // Last month (حوت) has 29 days normally, 30 in leap years
+                    var persianCalendar = new PersianCalendar();
+                    return persianCalendar.IsLeapYear(year) ? 30 : 29;
+
+                case CalendarType.HijriQamari:
+                    var hijriCalendar = new HijriCalendar();
+                    return hijriCalendar.GetDaysInMonth(year, month);
+
+                default:
+                    return 0;
+            }
+        }
+
+        /// <summary>
+        /// Validate a date and return a detailed error message if invalid
+        /// </summary>
+        public static (bool isValid, string? errorMessage) ValidateDateWithMessage(int year, int month, int day, CalendarType calendarType)
+        {
+            // Validate year
+            if (year < 1 || year > 9999)
+            {
+                return (false, GetErrorMessage("سال باید بین ۱ تا ۹۹۹۹ باشد", "Year must be between 1 and 9999", calendarType));
+            }
+
+            // Validate month
+            if (month < 1 || month > 12)
+            {
+                return (false, GetErrorMessage("ماه باید بین ۱ تا ۱۲ باشد", "Month must be between 1 and 12", calendarType));
+            }
+
+            // Validate day
+            if (day < 1)
+            {
+                return (false, GetErrorMessage("روز باید بزرگتر از صفر باشد", "Day must be greater than 0", calendarType));
+            }
+
+            int maxDays = GetDaysInMonth(year, month, calendarType);
+            if (day > maxDays)
+            {
+                string monthName = GetMonthName(month, calendarType);
+                if (calendarType == CalendarType.HijriShamsi)
+                {
+                    return (false, $"{monthName} در این سال {maxDays} روز دارد");
+                }
+                else
+                {
+                    return (false, $"{monthName} has {maxDays} days in this year");
+                }
+            }
+
+            // Try actual conversion
+            try
+            {
+                ToGregorian(year, month, day, calendarType);
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, GetErrorMessage("تاریخ نامعتبر است", $"Invalid date: {ex.Message}", calendarType));
+            }
+        }
+
+        private static string GetErrorMessage(string persianMessage, string englishMessage, CalendarType calendarType)
+        {
+            // Return Persian message for Hijri calendars, English for Gregorian
+            return (calendarType == CalendarType.Gregorian) ? englishMessage : persianMessage;
         }
 
         public static string GetMonthName(int month, CalendarType calendarType)

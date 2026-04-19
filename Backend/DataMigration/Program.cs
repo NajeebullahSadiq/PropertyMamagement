@@ -41,6 +41,14 @@ namespace DataMigration
                 await CompanyMigration.RunCompanyMigration();
                 return;
             }
+            else if (args.Length > 0 && args[0].ToLower() == "convertdates")
+            {
+                // Convert all Hijri Shamsi dates to Gregorian
+                Console.WriteLine("Converting all Hijri Shamsi dates to Gregorian...\n");
+                var converter = new ConvertDatesToGregorian(connectionString);
+                await converter.ConvertAllDates();
+                return;
+            }
             else if (args.Length > 0 && args[0].ToLower() == "all")
             {
                 // Run All Migrations
@@ -56,8 +64,10 @@ namespace DataMigration
             Console.WriteLine("  company        - Migrate company/license data");
             Console.WriteLine("  securities     - Migrate securities data");
             Console.WriteLine("  petitionwriter - Migrate petition writer licenses");
+            Console.WriteLine("  convertdates   - Convert all Hijri Shamsi dates to Gregorian");
             Console.WriteLine("  all            - Run all migrations");
             Console.WriteLine("\nExample: dotnet run company");
+            Console.WriteLine("\nIMPORTANT: Run 'convertdates' to fix mixed date formats in database!");
         }
         
         static async Task RunCompanyMigration()

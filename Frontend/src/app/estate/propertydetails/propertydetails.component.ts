@@ -190,10 +190,19 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
               }
 
               this.properties = properties;
-            
-              // Convert ISO date strings to Date objects for date pickers
-              const issuanceDate = properties[0].issuanceDate ? new Date(properties[0].issuanceDate) : '';
-              const transactionDate = properties[0].transactionDate ? new Date(properties[0].transactionDate) : '';
+              // Convert date strings to appropriate format for date pickers
+              // If already in Hijri Shamsi format (YYYY/MM/DD), keep as string
+              // Otherwise convert to Date object
+              const parseDate = (dateValue: any) => {
+                if (!dateValue) return '';
+                if (typeof dateValue === 'string' && /^\d{4}\/\d{2}\/\d{2}$/.test(dateValue)) {
+                  return dateValue; // Already Hijri Shamsi format
+                }
+                return new Date(dateValue);
+              };
+              
+              const issuanceDate = parseDate(properties[0].issuanceDate);
+              const transactionDate = parseDate(properties[0].transactionDate);
             
               this.propertyForm.patchValue({
                 id: properties[0].id,

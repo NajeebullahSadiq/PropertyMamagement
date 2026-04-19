@@ -2,44 +2,48 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CalendarType, CALENDAR_OPTIONS } from '../models/calendar-type';
 
+/**
+ * Calendar Service - SYSTEM-WIDE HIJRI SHAMSI ONLY
+ * The entire system uses only Hijri Shamsi calendar.
+ * Calendar selection has been removed.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class CalendarService {
-  private readonly STORAGE_KEY = 'selectedCalendar';
+  // SYSTEM ALWAYS USES HIJRI SHAMSI - No other calendars supported
+  private readonly FIXED_CALENDAR = CalendarType.HIJRI_SHAMSI;
   
   private selectedCalendarSubject: BehaviorSubject<CalendarType>;
   public selectedCalendar$: Observable<CalendarType>;
 
   constructor() {
-    const storedCalendar = this.getStoredCalendar();
-    this.selectedCalendarSubject = new BehaviorSubject<CalendarType>(storedCalendar);
+    // Always initialize with Hijri Shamsi
+    this.selectedCalendarSubject = new BehaviorSubject<CalendarType>(this.FIXED_CALENDAR);
     this.selectedCalendar$ = this.selectedCalendarSubject.asObservable();
   }
 
+  /**
+   * Always returns Hijri Shamsi
+   */
   getSelectedCalendar(): CalendarType {
-    return this.selectedCalendarSubject.value;
+    return this.FIXED_CALENDAR;
   }
 
+  /**
+   * Ignored - system always uses Hijri Shamsi
+   */
   setSelectedCalendar(calendarType: CalendarType): void {
-    this.selectedCalendarSubject.next(calendarType);
-    localStorage.setItem(this.STORAGE_KEY, calendarType);
-  }
-
-  private getStoredCalendar(): CalendarType {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    if (stored && Object.values(CalendarType).includes(stored as CalendarType)) {
-      return stored as CalendarType;
-    }
-    return CalendarType.HIJRI_SHAMSI;
+    // Do nothing - calendar is fixed to Hijri Shamsi
+    console.warn('Calendar selection is disabled. System uses Hijri Shamsi only.');
   }
 
   getCalendarOptions() {
-    return CALENDAR_OPTIONS;
+    // Return only Hijri Shamsi option
+    return CALENDAR_OPTIONS.filter(opt => opt.value === CalendarType.HIJRI_SHAMSI);
   }
 
   getCalendarLabel(calendarType: CalendarType): string {
-    const option = CALENDAR_OPTIONS.find(opt => opt.value === calendarType);
-    return option ? option.labelFa : '';
+    return 'تقویم هجری شمسی';
   }
 }

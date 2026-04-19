@@ -9,6 +9,7 @@ import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropp
 import { environment } from 'src/environments/environment';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 
 @Component({
 	selector: 'app-companyowner',
@@ -20,6 +21,10 @@ export class CompanyownerComponent {
 	imagePath: string = 'assets/img/avatar.png';
 	imageName: string = '';
 	selectedId: number = 0;
+	
+	// Force Hijri Shamsi calendar for company module
+	readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
+	
 	IdTypes: any;
 	EducationLevel: any;
 	ownerForm!: FormGroup;
@@ -152,17 +157,14 @@ export class CompanyownerComponent {
 					if (detail && detail.length > 0) {
 						this.ownerDetails = detail;
 						
-						// Parse the date properly for the multi-calendar datepicker
-						let dateOfBirthValue: Date | null = null;
+						// Backend now sends dates in Hijri Shamsi format as strings
+						// Pass them directly to the datepicker without conversion
+						let dateOfBirthValue: string | Date | null = null;
 						if (detail[0].dateofBirth) {
 							const dateString: any = detail[0].dateofBirth;
-							// Try to parse as Date object
+							// If it's already a string in Hijri Shamsi format (YYYY/MM/DD), use it directly
 							if (typeof dateString === 'string') {
-								dateOfBirthValue = new Date(dateString);
-								// Check if date is valid
-								if (isNaN(dateOfBirthValue.getTime())) {
-									dateOfBirthValue = null;
-								}
+								dateOfBirthValue = dateString;
 							} else if (dateString instanceof Date) {
 								dateOfBirthValue = dateString;
 							}
@@ -365,7 +367,8 @@ export class CompanyownerComponent {
 	}
 
 	private formatDateForBackend(dateValue: any): string {
-		const currentCalendar = this.calendarService.getSelectedCalendar();
+		// Company module ALWAYS uses Hijri Shamsi
+		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 		
 		if (dateValue instanceof Date) {
 			const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
@@ -388,7 +391,8 @@ export class CompanyownerComponent {
 
 		const details = this.ownerForm.value as companyowner;
 		const dateValue = this.ownerForm.get('dateofBirth')?.value;
-		const currentCalendar = this.calendarService.getSelectedCalendar();
+		// Company module ALWAYS uses Hijri Shamsi
+		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
 		if (dateValue) {
 			details.dateofBirth = this.formatDateForBackend(dateValue);
@@ -440,7 +444,8 @@ export class CompanyownerComponent {
 	updateOwner(): void {
 		const details = this.ownerForm.value as companyowner;
 		const dateValue = this.ownerForm.get('dateofBirth')?.value;
-		const currentCalendar = this.calendarService.getSelectedCalendar();
+		// Company module ALWAYS uses Hijri Shamsi
+		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
 		if (dateValue) {
 			details.dateofBirth = this.formatDateForBackend(dateValue);

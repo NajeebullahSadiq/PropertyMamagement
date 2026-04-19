@@ -11,6 +11,7 @@ import { FileuploadComponent } from '../fileupload/fileupload.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 import '@angular/localize/init';
 
 @Component({
@@ -22,6 +23,9 @@ export class GuaranatorsComponent {
 
   baseUrl: string = environment.apiURL + '/';
   guaranteeDocName: string = '';
+  
+  // Force Hijri Shamsi calendar for company module
+  readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
   selectedId: number = 0;
   IdTypes: any;
   province: any;
@@ -173,7 +177,8 @@ export class GuaranatorsComponent {
   }
 
   private formatDateForBackend(dateValue: any): string {
-    const currentCalendar = this.calendarService.getSelectedCalendar();
+    // Company module ALWAYS uses Hijri Shamsi
+    const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
     if (dateValue instanceof Date) {
       const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
@@ -199,7 +204,8 @@ export class GuaranatorsComponent {
 
   addData(): void {
     const details = this.guaranatorForm.value as Guarantor;
-    const currentCalendar = this.calendarService.getSelectedCalendar();
+    // Company module ALWAYS uses Hijri Shamsi
+    const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
     details.companyId = this.comservice.mainTableId;
     details.guaranteeDocPath = this.guaranteeDocName;
@@ -253,7 +259,8 @@ export class GuaranatorsComponent {
 
   updateData(): void {
     const details = this.guaranatorForm.value as Guarantor;
-    const currentCalendar = this.calendarService.getSelectedCalendar();
+    // Company module ALWAYS uses Hijri Shamsi
+    const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
     details.companyId = this.comservice.mainTableId;
     details.guaranteeDocPath = this.guaranteeDocName;
@@ -449,9 +456,14 @@ export class GuaranatorsComponent {
       }
 
       // Parse all date fields properly for the multi-calendar datepicker
-      const parseDateField = (dateValue: any): Date | null => {
+      const parseDateField = (dateValue: any): string | Date | null => {
         if (!dateValue) return null;
         if (typeof dateValue === 'string') {
+          // If it's already a Hijri Shamsi string (YYYY/MM/DD), return as-is
+          if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateValue)) {
+            return dateValue;
+          }
+          // Otherwise try to parse as Date
           const date = new Date(dateValue);
           return isNaN(date.getTime()) ? null : date;
         } else if (dateValue instanceof Date) {

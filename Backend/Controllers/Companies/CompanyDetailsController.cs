@@ -10,6 +10,7 @@ using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
+using WebAPIBackend.Models.ViewModels;
 
 namespace WebAPIBackend.Controllers.Companies
 {
@@ -90,22 +91,22 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 var result = await orderedQuery
-                    .Select(p => new
+                    .Select(p => new CompanyListDto
                     {
-                        p.Id,
-                        p.Title,
-                        ownerFullName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
-                        ownerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
-                        ownerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
-                        licenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
-                        licenseIssueDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IssueDate).FirstOrDefault(),
-                        licenseExpiryDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.ExpireDate).FirstOrDefault(),
-                        granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 
+                        Id = p.Id,
+                        Title = p.Title,
+                        OwnerFullName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
+                        OwnerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
+                        OwnerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
+                        LicenseNumber = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        LicenseIssueDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IssueDate).FirstOrDefault(),
+                        LicenseExpiryDate = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.ExpireDate).FirstOrDefault(),
+                        Granator = p.Guarantors.OrderBy(g => g.Id).Select(g => 
                             (g.FirstName ?? "") + 
                             (string.IsNullOrWhiteSpace(g.GrandFatherName) ? "" : " " + g.GrandFatherName) + 
                             " " + (g.FatherName ?? "")
                         ).FirstOrDefault(),
-                        isComplete = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IsComplete).FirstOrDefault(),
+                        IsComplete = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IsComplete).FirstOrDefault(),
                     })
                     .ToListAsync();
 
@@ -887,6 +888,9 @@ namespace WebAPIBackend.Controllers.Companies
 
         /// <summary>
         /// Get report: Count of cancellations (فسخ/لغوه) within date range
+        /// <summary>
+        /// Get report: Count of cancellations within date range
+        /// Company module ALWAYS uses Hijri Shamsi calendar
         /// </summary>
         [HttpGet("reports/cancellations-count")]
         public async Task<IActionResult> GetCancellationsCountReport(
@@ -896,7 +900,8 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
+                var calendar = CalendarType.HijriShamsi;
                 var query = _context.CompanyCancellationInfos.Where(x => x.Status == true);
 
                 DateOnly? parsedStartDate = null;
@@ -941,6 +946,7 @@ namespace WebAPIBackend.Controllers.Companies
         /// Active = license expiry date (تاریخ ختم جواز) is >= today
         /// Inactive = license expiry date is < today or no license
         /// Note: Checks ALL companies regardless of date range
+        /// Company module ALWAYS uses Hijri Shamsi calendar
         /// </summary>
         [HttpGet("reports/companies-status")]
         public async Task<IActionResult> GetCompaniesStatusReport(
@@ -950,7 +956,8 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
+                var calendar = CalendarType.HijriShamsi;
                 
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;
@@ -1023,6 +1030,7 @@ namespace WebAPIBackend.Controllers.Companies
         /// <summary>
         /// Get report: Count of licenses by category (نوعیت جواز) within date range
         /// Categories: جدید (New), تجدید (Renewal), مثنی (Duplicate)
+        /// Company module ALWAYS uses Hijri Shamsi calendar
         /// </summary>
         [HttpGet("reports/licenses-by-category")]
         public async Task<IActionResult> GetLicensesByCategoryReport(
@@ -1032,7 +1040,8 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
+                var calendar = CalendarType.HijriShamsi;
                 
                 // Get licenses within date range
                 var licensesQuery = _context.LicenseDetails.Where(x => x.Status == true);
@@ -1092,6 +1101,7 @@ namespace WebAPIBackend.Controllers.Companies
 
         /// <summary>
         /// Get report: Count of guarantors by type within date range
+        /// Company module ALWAYS uses Hijri Shamsi calendar
         /// </summary>
         [HttpGet("reports/guarantors-by-type")]
         public async Task<IActionResult> GetGuarantorsByTypeReport(
@@ -1101,7 +1111,8 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
+                var calendar = CalendarType.HijriShamsi;
                 
                 // Get guarantors within date range
                 var guarantorsQuery = _context.Guarantors.Where(x => x.Status == true && x.IsActive == true);
@@ -1174,6 +1185,7 @@ namespace WebAPIBackend.Controllers.Companies
 
         /// <summary>
         /// Get comprehensive report with all statistics
+        /// Company module ALWAYS uses Hijri Shamsi calendar
         /// </summary>
         [HttpGet("reports/comprehensive")]
         public async Task<IActionResult> GetComprehensiveReport(
@@ -1185,7 +1197,8 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+                // Company module ALWAYS uses Hijri Shamsi - ignore calendarType parameter
+                var calendar = CalendarType.HijriShamsi;
                 
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;

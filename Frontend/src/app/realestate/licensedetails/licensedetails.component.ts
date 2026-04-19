@@ -23,6 +23,9 @@ export class LicensedetailsComponent {
 
 	licenseForm: FormGroup = new FormGroup({});
 	selectedId: number = 0;
+	
+	// Force Hijri Shamsi calendar for company module
+	readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
 	Areas: any;
 	provinces: any[] = [];  // Add provinces array
 	isAdmin: boolean = false;  // Track if user is admin
@@ -159,6 +162,9 @@ export class LicensedetailsComponent {
 	}
 
 	private tryResolveGregorianDate(value: any, calendar: CalendarType): Date | null {
+		// Company module ALWAYS uses Hijri Shamsi - ignore calendar parameter
+		const fixedCalendar = CalendarType.HIJRI_SHAMSI;
+		
 		if (!value) return null;
 
 		if (value instanceof Date && !isNaN(value.getTime())) {
@@ -171,7 +177,7 @@ export class LicensedetailsComponent {
 					year: value.year,
 					month: value.month,
 					day: value.day,
-					calendarType: calendar
+					calendarType: fixedCalendar
 				});
 			} catch {
 				return null;
@@ -188,11 +194,10 @@ export class LicensedetailsComponent {
 				return isNaN(date.getTime()) ? null : date;
 			}
 
-			const normalizedForParser = calendar === CalendarType.GREGORIAN
-				? normalized
-				: normalized.replace(/-/g, '/');
+			// Company module always uses Hijri Shamsi, so always use / separator
+			const normalizedForParser = normalized.replace(/-/g, '/');
 
-			return this.calendarConversionService.parseInputDate(normalizedForParser, calendar);
+			return this.calendarConversionService.parseInputDate(normalizedForParser, fixedCalendar);
 		}
 
 		return null;
@@ -269,7 +274,8 @@ export class LicensedetailsComponent {
 	}
 
 	private formatDateForBackend(dateValue: any): string {
-		const currentCalendar = this.calendarService.getSelectedCalendar();
+		// Company module ALWAYS uses Hijri Shamsi
+		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
 		if (dateValue instanceof Date) {
 			const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
@@ -296,7 +302,8 @@ export class LicensedetailsComponent {
 		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;
 		const royaltyDateValue = this.licenseForm.get('royaltyDate')?.value;
 		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
-		const currentCalendar = this.calendarService.getSelectedCalendar();
+		// Company module ALWAYS uses Hijri Shamsi
+		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
 		if (!issueDateValue) {
 			this.toastr.warning('تاریخ صدور جواز الزامی است');
@@ -361,7 +368,8 @@ export class LicensedetailsComponent {
 		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;
 		const royaltyDateValue = this.licenseForm.get('royaltyDate')?.value;
 		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
-		const currentCalendar = this.calendarService.getSelectedCalendar();
+		// Company module ALWAYS uses Hijri Shamsi
+		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
 		if (!issueDateValue) {
 			this.toastr.warning('تاریخ صدور جواز الزامی است');

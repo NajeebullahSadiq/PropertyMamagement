@@ -164,11 +164,11 @@
           </div>
           <div class="info-item" *ngIf="result.issueDate">
             <label>تاریخ صدور:</label>
-            <span>{{ result.issueDate | date:'yyyy/MM/dd' }}</span>
+            <span>{{ result.issueDate | calendarDate }}</span>
           </div>
           <div class="info-item" *ngIf="result.expiryDate">
             <label>تاریخ انقضا:</label>
-            <span>{{ result.expiryDate | date:'yyyy/MM/dd' }}</span>
+            <span>{{ result.expiryDate | calendarDate }}</span>
           </div>
           <div class="info-item full-width" *ngIf="result.officeAddress">
             <label>آدرس دفتر:</label>
@@ -557,7 +557,7 @@
 
       <div class="verification-info">
         <p>کود تصدیق: <strong dir="ltr">{{ result.verificationCode }}</strong></p>
-        <p>تاریخ تصدیق: {{ result.verifiedAt | date:'yyyy/MM/dd HH:mm' }}</p>
+        <p>تاریخ تصدیق: {{ result.verifiedAt | calendarDate }}</p>
       </div>
     </div>
 

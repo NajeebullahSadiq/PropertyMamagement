@@ -370,8 +370,8 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ history.provinceName }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ history.districtName }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ history.village }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ history.effectiveFrom | date:'yyyy/MM/dd' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ history.effectiveTo | date:'yyyy/MM/dd' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ history.effectiveFrom | calendarDate }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ history.effectiveTo | calendarDate }}</td>
               </tr>
             </tbody>
           </table>

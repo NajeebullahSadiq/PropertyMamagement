@@ -154,6 +154,22 @@ export class CalendarConversionService {
   }
 
   isValidDate(year: number, month: number, day: number, calendarType: CalendarType): boolean {
+    // Validate month range
+    if (month < 1 || month > 12) {
+      return false;
+    }
+
+    // Validate day range
+    if (day < 1) {
+      return false;
+    }
+
+    // Get maximum days for the month
+    const maxDays = this.getDaysInMonth(year, month, calendarType);
+    if (day > maxDays) {
+      return false;
+    }
+
     try {
       const date = this.toGregorian({ year, month, day, calendarType });
       return date instanceof Date && !isNaN(date.getTime());
@@ -162,12 +178,87 @@ export class CalendarConversionService {
     }
   }
 
+  /**
+   * Validate a date and return a detailed error message if invalid
+   */
+  validateDateWithMessage(year: number, month: number, day: number, calendarType: CalendarType): { isValid: boolean; errorMessage?: string } {
+    // Validate year
+    if (year < 1 || year > 9999) {
+      return { 
+        isValid: false, 
+        errorMessage: calendarType === CalendarType.GREGORIAN 
+          ? 'Year must be between 1 and 9999' 
+          : 'سال باید بین ۱ تا ۹۹۹۹ باشد' 
+      };
+    }
+
+    // Validate month
+    if (month < 1 || month > 12) {
+      return { 
+        isValid: false, 
+        errorMessage: calendarType === CalendarType.GREGORIAN 
+          ? 'Month must be between 1 and 12' 
+          : 'ماه باید بین ۱ تا ۱۲ باشد' 
+      };
+    }
+
+    // Validate day
+    if (day < 1) {
+      return { 
+        isValid: false, 
+        errorMessage: calendarType === CalendarType.GREGORIAN 
+          ? 'Day must be greater than 0' 
+          : 'روز باید بزرگتر از صفر باشد' 
+      };
+    }
+
+    const maxDays = this.getDaysInMonth(year, month, calendarType);
+    if (day > maxDays) {
+      const monthName = this.getMonthName(month, calendarType);
+      return { 
+        isValid: false, 
+        errorMessage: calendarType === CalendarType.GREGORIAN 
+          ? `${monthName} has ${maxDays} days in this year` 
+          : `${monthName} در این سال ${this.toPersianDigits(maxDays)} روز دارد` 
+      };
+    }
+
+    // Try actual conversion
+    try {
+      const date = this.toGregorian({ year, month, day, calendarType });
+      if (!(date instanceof Date) || isNaN(date.getTime())) {
+        return { 
+          isValid: false, 
+          errorMessage: calendarType === CalendarType.GREGORIAN 
+            ? 'Invalid date' 
+            : 'تاریخ نامعتبر است' 
+        };
+      }
+      return { isValid: true };
+    } catch (error) {
+      return { 
+        isValid: false, 
+        errorMessage: calendarType === CalendarType.GREGORIAN 
+          ? 'Invalid date' 
+          : 'تاریخ نامعتبر است' 
+      };
+    }
+  }
+
+  /**
+   * Convert Western digits to Persian digits
+   */
+  private toPersianDigits(num: number): string {
+    const persianDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+    return num.toString().split('').map(d => persianDigits[parseInt(d)] || d).join('');
+  }
+
   private padZero(num: number): string {
     return num < 10 ? `0${num}` : `${num}`;
   }
 
   getDaysInMonth(year: number, month: number, calendarType: CalendarType): number {
-    if (!year || !month) {
+    if (!year || !month || month < 1 || month > 12) {
       return 0;
     }
 
@@ -176,8 +267,20 @@ export class CalendarConversionService {
         return new Date(year, month, 0).getDate();
 
       case CalendarType.HIJRI_SHAMSI: {
-        const jalaali = momentJalaali(`${year}/${this.padZero(month)}`, 'jYYYY/jMM');
-        return typeof jalaali.jDaysInMonth === 'function' ? jalaali.jDaysInMonth() : 30;
+        // First 6 months (حمل to سنبله) have 31 days
+        if (month <= 6) {
+          return 31;
+        }
+        
+        // Next 5 months (میزان to دلو) have 30 days
+        if (month <= 11) {
+          return 30;
+        }
+        
+        // Last month (حوت) has 29 days normally, 30 in leap years
+        const jalaali = momentJalaali(`${year}/01/01`, 'jYYYY/jMM/jDD');
+        const isLeapYear = typeof jalaali.isLeapYear === 'function' ? jalaali.isLeapYear() : false;
+        return isLeapYear ? 30 : 29;
       }
 
       case CalendarType.HIJRI_QAMARI: {

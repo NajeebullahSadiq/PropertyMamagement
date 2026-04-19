@@ -174,8 +174,17 @@ export class LicenseApplicationFormComponent implements OnInit {
             });
         }
 
-        // Convert ISO date string to Date object (same as property module)
-        const requestDate = data.requestDate ? new Date(data.requestDate) : '';
+        // Convert date string to appropriate format for date picker
+        // If already in Hijri Shamsi format (YYYY/MM/DD), keep as string
+        const parseDate = (dateValue: any) => {
+          if (!dateValue) return '';
+          if (typeof dateValue === 'string' && /^\d{4}\/\d{2}\/\d{2}$/.test(dateValue)) {
+            return dateValue; // Already Hijri Shamsi format
+          }
+          return new Date(dateValue);
+        };
+        
+        const requestDate = parseDate(data.requestDate);
 
         this.applicationForm.patchValue({
             id: data.id,
@@ -221,8 +230,16 @@ export class LicenseApplicationFormComponent implements OnInit {
     }
 
     patchWithdrawalForm(data: LicenseApplicationWithdrawal): void {
-        // Convert ISO date string to Date object (same as property module)
-        const withdrawalDate = data.withdrawalDate ? new Date(data.withdrawalDate) : '';
+        // Convert date string to appropriate format for date picker
+        const parseDate = (dateValue: any) => {
+          if (!dateValue) return '';
+          if (typeof dateValue === 'string' && /^\d{4}\/\d{2}\/\d{2}$/.test(dateValue)) {
+            return dateValue; // Already Hijri Shamsi format
+          }
+          return new Date(dateValue);
+        };
+        
+        const withdrawalDate = parseDate(data.withdrawalDate);
 
         this.withdrawalForm.patchValue({
             id: data.id,
@@ -497,8 +514,16 @@ export class LicenseApplicationFormComponent implements OnInit {
             });
         }
 
-        // Convert ISO date string to Date object (same as property module)
-        const shariaDeedDate = guarantor.shariaDeedDate ? new Date(guarantor.shariaDeedDate) : '';
+        // Convert date string to appropriate format for date picker
+        const parseDate = (dateValue: any) => {
+          if (!dateValue) return '';
+          if (typeof dateValue === 'string' && /^\d{4}\/\d{2}\/\d{2}$/.test(dateValue)) {
+            return dateValue; // Already Hijri Shamsi format
+          }
+          return new Date(dateValue);
+        };
+        
+        const shariaDeedDate = parseDate(guarantor.shariaDeedDate);
 
         this.guarantorForm.patchValue({
             id: guarantor.id,

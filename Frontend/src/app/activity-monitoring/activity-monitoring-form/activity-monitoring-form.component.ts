@@ -261,8 +261,14 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.onSectionTypeChange();
     }
 
-    private parseDateString(dateStr: string): Date | null {
+    private parseDateString(dateStr: string): Date | string | null {
         if (!dateStr) return null;
+        
+        // If already in Hijri Shamsi format (YYYY/MM/DD), return as-is
+        if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) {
+            return dateStr;
+        }
+        
         const calendar = this.calendarService.getSelectedCalendar();
         return this.calendarConversionService.parseInputDate(dateStr, calendar);
     }

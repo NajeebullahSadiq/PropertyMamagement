@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 import { CancellationInfo, CancellationInfoData } from 'src/app/models/CancellationInfo';
 
 @Component({
@@ -16,6 +17,9 @@ export class CancellationinfoComponent {
     cancellationForm!: FormGroup;
     selectedId: number = 0;
     cancellationInfo: CancellationInfo | null = null;
+    
+    // Force Hijri Shamsi calendar for company module
+    readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
 
     @Input() id: number = 0;
     @Output() next = new EventEmitter<void>();
@@ -49,7 +53,8 @@ export class CancellationinfoComponent {
         const companyId = this.comservice.mainTableId || this.id;
         if (companyId === 0) return;
 
-        const currentCalendar = this.calendarService.getSelectedCalendar();
+        // Company module ALWAYS uses Hijri Shamsi
+        const currentCalendar = CalendarType.HIJRI_SHAMSI;
         this.comservice.getCancellationInfoByCompanyId(companyId, currentCalendar)
             .subscribe({
                 next: (info) => {
@@ -90,7 +95,8 @@ export class CancellationinfoComponent {
     }
 
     private formatDateForBackend(dateValue: any): string {
-        const currentCalendar = this.calendarService.getSelectedCalendar();
+        // Company module ALWAYS uses Hijri Shamsi
+        const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
         if (dateValue instanceof Date) {
             const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);

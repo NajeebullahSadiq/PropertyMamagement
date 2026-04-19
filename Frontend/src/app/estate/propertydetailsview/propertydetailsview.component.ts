@@ -5,6 +5,8 @@ import { LocalizationService } from 'src/app/shared/localization.service';
 import { PropertyService } from 'src/app/shared/property.service';
 import { FileService } from 'src/app/shared/file.service';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 
 @Component({
   selector: 'app-propertydetailsview',
@@ -21,7 +23,8 @@ export class PropertydetailsviewComponent {
     private propertyService: PropertyService,
     private localizationService: LocalizationService,
     private dialog: MatDialog,
-    private fileService: FileService
+    private fileService: FileService,
+    private calendarConversionService: CalendarConversionService
   ) {}
 
   ngOnInit(): void {
@@ -181,10 +184,8 @@ export class PropertydetailsviewComponent {
     if (Number.isNaN(d.getTime())) {
       return '---';
     }
-    const y = d.getFullYear();
-    const m = `${d.getMonth() + 1}`.padStart(2, '0');
-    const day = `${d.getDate()}`.padStart(2, '0');
-    return `${y}-${m}-${day}`;
+    // Convert to Hijri Shamsi
+    return this.calendarConversionService.formatDate(d, CalendarType.HIJRI_SHAMSI);
   }
 
   getFileName(filePath: string): string {

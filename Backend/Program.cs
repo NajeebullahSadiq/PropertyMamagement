@@ -92,6 +92,13 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
         // Fix Persian/Dari text encoding - prevent Unicode escaping
         options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+        
+        // GLOBAL DATE CONVERSION: Hijri Shamsi (Frontend) ↔ Gregorian (Database)
+        // All dates automatically converted between Hijri Shamsi (UI) and Gregorian (DB)
+        options.JsonSerializerOptions.Converters.Add(new WebAPIBackend.Converters.HijriShamsiDateTimeConverter());
+        options.JsonSerializerOptions.Converters.Add(new WebAPIBackend.Converters.HijriShamsiNullableDateTimeConverter());
+        options.JsonSerializerOptions.Converters.Add(new WebAPIBackend.Converters.HijriShamsiDateOnlyConverter());
+        options.JsonSerializerOptions.Converters.Add(new WebAPIBackend.Converters.HijriShamsiNullableDateOnlyConverter());
     });
 
 //CorsPolicy Settings - Define allowed origins

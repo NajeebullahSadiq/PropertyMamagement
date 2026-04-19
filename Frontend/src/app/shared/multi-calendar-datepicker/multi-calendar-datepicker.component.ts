@@ -23,6 +23,7 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
   @Input() placeholder: string = '';
+  @Input() forceCalendar?: CalendarType; // Force a specific calendar type (ignores global selection)
 
   currentCalendar: CalendarType = CalendarType.HIJRI_SHAMSI;
   inputValue: string = '';
@@ -45,22 +46,19 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
   ) {}
 
   ngOnInit(): void {
-    this.calendarService.selectedCalendar$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(calendar => {
-        const oldCalendar = this.currentCalendar;
-        this.currentCalendar = calendar;
-        
-        if (this.inputValue && oldCalendar !== calendar) {
-          this.convertInputToNewCalendar(oldCalendar, calendar);
-        }
-        
-        this.updatePlaceholder();
-        this.initializeCalendar();
-      });
+    // SYSTEM USES ONLY HIJRI SHAMSI
+    // Force calendar to Hijri Shamsi regardless of any settings
+    this.currentCalendar = CalendarType.HIJRI_SHAMSI;
+    
+    // If forceCalendar is set, use it (but it should always be HIJRI_SHAMSI anyway)
+    if (this.forceCalendar) {
+      this.currentCalendar = this.forceCalendar;
+    }
     
     this.updatePlaceholder();
     this.initializeCalendar();
+    
+    // No need to subscribe to calendar changes since system only uses Hijri Shamsi
   }
 
   @HostListener('document:click', ['$event'])
@@ -77,10 +75,42 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
 
   writeValue(value: Date | string | null): void {
     if (value) {
-      const date = typeof value === 'string' ? new Date(value) : value;
-      this.inputValue = this.conversionService.formatDateForInput(date, this.currentCalendar);
+      if (typeof value === 'string') {
+        // If it's already a string (from backend in Hijri Shamsi format), use it directly
+        // Check if it matches Hijri Shamsi format (YYYY/MM/DD)
+        if (/^\d{4}\/\d{2}\/\d{2}$/.test(value)) {
+          this.inputValue = value;
+          // Parse the Hijri Shamsi date to set the selected date for the calendar popup
+          const parts = value.split('/');
+          if (parts.length === 3) {
+            this.selectedDate = {
+              year: parseInt(parts[0], 10),
+              month: parseInt(parts[1], 10),
+              day: parseInt(parts[2], 10),
+              calendarType: CalendarType.HIJRI_SHAMSI
+            };
+          }
+        } else {
+          // If it's a Gregorian date string, parse and convert
+          const date = new Date(value);
+          if (!isNaN(date.getTime())) {
+            this.inputValue = this.conversionService.formatDateForInput(date, CalendarType.HIJRI_SHAMSI);
+            const hijriDate = this.conversionService.fromGregorian(date, CalendarType.HIJRI_SHAMSI);
+            this.selectedDate = hijriDate;
+          } else {
+            this.inputValue = '';
+            this.selectedDate = null;
+          }
+        }
+      } else {
+        // It's a Date object, convert to Hijri Shamsi
+        this.inputValue = this.conversionService.formatDateForInput(value, CalendarType.HIJRI_SHAMSI);
+        const hijriDate = this.conversionService.fromGregorian(value, CalendarType.HIJRI_SHAMSI);
+        this.selectedDate = hijriDate;
+      }
     } else {
       this.inputValue = '';
+      this.selectedDate = null;
     }
   }
 
@@ -105,7 +135,8 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
       return;
     }
 
-    const gregorianDate = this.conversionService.parseInputDate(value, this.currentCalendar);
+    // Always parse as Hijri Shamsi
+    const gregorianDate = this.conversionService.parseInputDate(value, CalendarType.HIJRI_SHAMSI);
     this.onChange(gregorianDate);
   }
 
@@ -114,6 +145,11 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
   }
 
   private convertInputToNewCalendar(oldCalendar: CalendarType, newCalendar: CalendarType): void {
+    // If forceCalendar is set, don't convert - always stay in forced calendar
+    if (this.forceCalendar) {
+      return;
+    }
+
     if (!this.inputValue) {
       return;
     }
@@ -144,7 +180,7 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
 
   initializeCalendar(): void {
     const today = new Date();
-    const calendarDate = this.conversionService.fromGregorian(today, this.currentCalendar);
+    const calendarDate = this.conversionService.fromGregorian(today, CalendarType.HIJRI_SHAMSI);
     this.currentYear = calendarDate.year;
     this.currentMonth = calendarDate.month;
     this.generateCalendar();
@@ -153,10 +189,7 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
   toggleCalendarPopup(): void {
     if (this.disabled) return;
     
-    if (this.currentCalendar === CalendarType.GREGORIAN) {
-      return;
-    }
-    
+    // Always use Hijri Shamsi calendar popup (never Gregorian native picker)
     this.showCalendarPopup = !this.showCalendarPopup;
     if (this.showCalendarPopup) {
       if (this.selectedDate) {
@@ -174,7 +207,7 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
       year: this.currentYear,
       month: this.currentMonth,
       day: 1,
-      calendarType: this.currentCalendar
+      calendarType: CalendarType.HIJRI_SHAMSI // Always Hijri Shamsi
     });
     
     const lastDayOfMonth = this.getDaysInMonth(this.currentYear, this.currentMonth);
@@ -204,7 +237,7 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
   }
 
   getDaysInMonth(year: number, month: number): number {
-    return this.conversionService.getDaysInMonth(year, month, this.currentCalendar);
+    return this.conversionService.getDaysInMonth(year, month, CalendarType.HIJRI_SHAMSI);
   }
 
   isLeapYearShamsi(year: number): boolean {
@@ -220,12 +253,28 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
       year: this.currentYear,
       month: this.currentMonth,
       day: day,
-      calendarType: this.currentCalendar
+      calendarType: CalendarType.HIJRI_SHAMSI // Always Hijri Shamsi
     };
     
     const gregorianDate = this.conversionService.toGregorian(this.selectedDate);
-    this.inputValue = this.conversionService.formatDateForInput(gregorianDate, this.currentCalendar);
+    this.inputValue = this.conversionService.formatDateForInput(gregorianDate, CalendarType.HIJRI_SHAMSI);
     this.onChange(gregorianDate);
+    this.showCalendarPopup = false;
+  }
+
+  selectToday(): void {
+    if (this.disabled) return;
+    
+    // Get today's date in Hijri Shamsi
+    const today = new Date();
+    const todayHijri = this.conversionService.fromGregorian(today, CalendarType.HIJRI_SHAMSI);
+    
+    this.selectedDate = todayHijri;
+    this.currentYear = todayHijri.year;
+    this.currentMonth = todayHijri.month;
+    
+    this.inputValue = this.conversionService.formatDateForInput(today, CalendarType.HIJRI_SHAMSI);
+    this.onChange(today);
     this.showCalendarPopup = false;
   }
 
@@ -267,28 +316,26 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
   }
 
   getMonthName(): string {
-    return this.conversionService.getMonthName(this.currentMonth, this.currentCalendar);
+    return this.conversionService.getMonthName(this.currentMonth, CalendarType.HIJRI_SHAMSI);
   }
 
   getWeekDayNames(): string[] {
-    if (this.currentCalendar === CalendarType.HIJRI_QAMARI) {
-      return ['الأحد', 'الاثنین', 'الثلاثاء', 'الأربعاء', 'الخمیس', 'الجمعة', 'السبت'];
-    }
+    // Always use Persian/Dari weekday names for Hijri Shamsi
     return ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
   }
 
   getInputType(): string {
-    return this.currentCalendar === CalendarType.GREGORIAN ? 'date' : 'text';
+    // Always use text input (never native date picker)
+    return 'text';
   }
 
   getPattern(): string {
-    if (this.currentCalendar === CalendarType.GREGORIAN) {
-      return '';
-    }
+    // Always use Hijri Shamsi pattern
     return '\\d{4}/\\d{2}/\\d{2}';
   }
 
   shouldShowCalendarIcon(): boolean {
-    return this.currentCalendar !== CalendarType.GREGORIAN;
+    // Always show calendar icon for Hijri Shamsi
+    return true;
   }
 }

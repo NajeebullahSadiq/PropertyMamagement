@@ -43,8 +43,8 @@
             <td>{{ property.ownerFatherName }}</td>
             <td>{{ property.ownerElectronicNationalIdNumber }}</td>
             <td>{{ property.licenseNumber }}</td>
-            <td>{{ property.licenseIssueDate || '-' }}</td>
-            <td>{{ property.licenseExpiryDate || '-' }}</td>
+            <td>{{ (property.licenseIssueDate | calendarDate) || '-' }}</td>
+            <td>{{ (property.licenseExpiryDate | calendarDate) || '-' }}</td>
             <td>{{ property.granator }}</td>
             <td>
               <div class="d-flex justify-content-center gap-1">

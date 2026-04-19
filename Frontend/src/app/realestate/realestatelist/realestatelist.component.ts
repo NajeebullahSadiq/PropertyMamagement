@@ -10,6 +10,7 @@ import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirm
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { CalendarType } from 'src/app/models/calendar-type';
 
 @Component({
   selector: 'app-realestatelist',
@@ -19,6 +20,10 @@ import { environment } from 'src/environments/environment';
 export class RealestatelistComponent implements OnInit, OnDestroy {
   properties!: companydetailsList[];
   filteredProperties!: companydetailsList[];
+  
+  // Force Hijri Shamsi calendar for company module
+  readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
+  
   searchTerm: string = '';
   page: number = 1;
   count: number = 0;
