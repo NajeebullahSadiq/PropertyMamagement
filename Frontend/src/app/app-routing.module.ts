@@ -28,176 +28,38 @@ const routes: Routes = [
   
   // Public verification portal (with geolocation check)
   { path: 'verify', loadChildren: () => import('./verify/verify.module').then(m => m.VerifyModule), canActivate: [GeolocationGuard] },
-  
-  // Register page with master layout (authenticated + geolocation)
+
+  // Single MasterlayoutComponent parent - all module routes as children
+  // This prevents MasterlayoutComponent from being destroyed/recreated on navigation
   { 
-    path: 'Auth/Register', 
+    path: '',
     component: MasterlayoutComponent,
     canActivate: [GeolocationGuard, AuthGuard],
     children: [
-      { path: '', component: RegisterComponent }
+      { path: 'Auth/Register', component: RegisterComponent, canActivate: [AuthGuard] },
+      { path: 'dashboard', component: DashboardComponent, canActivate: [DashboardGuard] },
+      { path: 'estate', loadChildren: () => import('./estate/estate.module').then(m => m.EstateModule), canActivate: [PropertyModuleGuard] },
+      { path: 'realestate', loadChildren: () => import('./realestate/realestate.module').then(m => m.RealestateModule), canActivate: [CompanyModuleGuard] },
+      { path: 'vehicle', loadChildren: () => import('./vehicle/vehicle.module').then(m => m.VehicleModule), canActivate: [VehicleModuleGuard] },
+      { path: 'report', component: ReportComponent },
+      { path: 'userreport', component: UserReportComponent, canActivate: [AdminGuard] },
+      { path: 'users', loadChildren: () => import('./users/users.module').then(m => m.UsersModule), canActivate: [AdminGuard] },
+      { path: 'securities', loadChildren: () => import('./securities/securities.module').then(m => m.SecuritiesModule), canActivate: [SecuritiesModuleGuard] },
+      { path: 'securities-control', loadChildren: () => import('./securities-control/securities-control.module').then(m => m.SecuritiesControlModule), canActivate: [SecuritiesModuleGuard] },
+      { path: 'petition-writer-securities', loadChildren: () => import('./petition-writer-securities/petition-writer-securities.module').then(m => m.PetitionWriterSecuritiesModule), canActivate: [PetitionWriterModuleGuard] },
+      { path: 'securities-report', loadChildren: () => import('./securities-report/securities-report.module').then(m => m.SecuritiesReportModule), canActivate: [SecuritiesModuleGuard] },
+      { path: 'petition-writer-report', loadChildren: () => import('./petition-writer-report/petition-writer-report.module').then(m => m.PetitionWriterReportModule), canActivate: [PetitionWriterModuleGuard] },
+      { path: 'license-applications', loadChildren: () => import('./license-applications/license-applications.module').then(m => m.LicenseApplicationsModule), canActivate: [CompanyModuleGuard] },
+      { path: 'petition-writer-license', loadChildren: () => import('./petition-writer-license/petition-writer-license.module').then(m => m.PetitionWriterLicenseModule), canActivate: [PetitionWriterModuleGuard] },
+      { path: 'activity-monitoring', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule), canActivate: [ActivityMonitoringGuard] },
+      { path: 'petition-writer-monitoring', loadChildren: () => import('./petition-writer-monitoring/petition-writer-monitoring.module').then(m => m.PetitionWriterMonitoringModule), canActivate: [PetitionWriterMonitoringGuard] },
+      { path: 'audit-log', loadChildren: () => import('./audit-log/audit-log.module').then(m => m.AuditLogModule), canActivate: [AdminGuard] },
+      { path: 'configuration', loadChildren: () => import('./configuration/configuration.module').then(m => m.ConfigurationModule), canActivate: [AdminGuard] },
+      { path: 'district-management', loadChildren: () => import('./district-management/district-management.module').then(m => m.DistrictManagementModule), canActivate: [AdminGuard] },
+      { path: 'petition-writer-activity-location-management', loadChildren: () => import('./petition-writer-activity-location-management/petition-writer-activity-location-management.module').then(m => m.PetitionWriterActivityLocationManagementModule), canActivate: [AdminGuard] },
     ]
   },
-  { 
-    path: 'dashboard', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, DashboardGuard],
-    children: [
-      { path: '', component: DashboardComponent }
-    ]
-  },
-  { 
-    path: 'estate', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, PropertyModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./estate/estate.module').then(m => m.EstateModule) }
-    ]
-  },
-  { 
-    path: 'realestate', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, CompanyModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./realestate/realestate.module').then(m => m.RealestateModule) }
-    ]
-  },
-  { 
-    path: 'vehicle', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, VehicleModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./vehicle/vehicle.module').then(m => m.VehicleModule) }
-    ]
-  },
-  { 
-    path: 'report', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard],
-    children: [
-      { path: '', component: ReportComponent }
-    ]
-  },
-  { 
-    path: 'userreport', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard],
-    children: [
-      { path: '', component: UserReportComponent }
-    ]
-  },
-  { 
-    path: 'users', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
-    children: [
-      { path: '', loadChildren: () => import('./users/users.module').then(m => m.UsersModule) }
-    ]
-  },
-  { 
-    path: 'securities', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, SecuritiesModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./securities/securities.module').then(m => m.SecuritiesModule) }
-    ]
-  },
-  { 
-    path: 'securities-control', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, SecuritiesModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./securities-control/securities-control.module').then(m => m.SecuritiesControlModule) }
-    ]
-  },
-  { 
-    path: 'petition-writer-securities', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./petition-writer-securities/petition-writer-securities.module').then(m => m.PetitionWriterSecuritiesModule) }
-    ]
-  },
-  { 
-    path: 'securities-report', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, SecuritiesModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./securities-report/securities-report.module').then(m => m.SecuritiesReportModule) }
-    ]
-  },
-  { 
-    path: 'petition-writer-report', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./petition-writer-report/petition-writer-report.module').then(m => m.PetitionWriterReportModule) }
-    ]
-  },
-  { 
-    path: 'license-applications', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, CompanyModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./license-applications/license-applications.module').then(m => m.LicenseApplicationsModule) }
-    ]
-  },
-  { 
-    path: 'petition-writer-license', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterModuleGuard],
-    children: [
-      { path: '', loadChildren: () => import('./petition-writer-license/petition-writer-license.module').then(m => m.PetitionWriterLicenseModule) }
-    ]
-  },
-  { 
-    path: 'activity-monitoring', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, ActivityMonitoringGuard],
-    children: [
-      { path: '', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule) }
-    ]
-  },
-  { 
-    path: 'petition-writer-monitoring', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, PetitionWriterMonitoringGuard],
-    children: [
-      { path: '', loadChildren: () => import('./petition-writer-monitoring/petition-writer-monitoring.module').then(m => m.PetitionWriterMonitoringModule) }
-    ]
-  },
-  { 
-    path: 'audit-log', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
-    children: [
-      { path: '', loadChildren: () => import('./audit-log/audit-log.module').then(m => m.AuditLogModule) }
-    ]
-  },
-  { 
-    path: 'configuration', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
-    children: [
-      { path: '', loadChildren: () => import('./configuration/configuration.module').then(m => m.ConfigurationModule) }
-    ]
-  },
-  { 
-    path: 'district-management', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
-    children: [
-      { path: '', loadChildren: () => import('./district-management/district-management.module').then(m => m.DistrictManagementModule) }
-    ]
-  },
-  { 
-    path: 'petition-writer-activity-location-management', 
-    component: MasterlayoutComponent,
-    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
-    children: [
-      { path: '', loadChildren: () => import('./petition-writer-activity-location-management/petition-writer-activity-location-management.module').then(m => m.PetitionWriterActivityLocationManagementModule) }
-    ]
-  },
+
   { path: 'forbidden', component: ForbiddenComponent },
   { path: 'print/:id', component: PrintComponent, canActivate: [GeolocationGuard] },
   { path: 'print', component: PrintComponent, canActivate: [GeolocationGuard] },
