@@ -89,6 +89,17 @@
               </div>
             </div>
 
+            <!-- Duplicate Issue Date (تاریخ صدور مثنی) - Only shown when مثنی is selected -->
+            <div *ngIf="licenseCategory?.value === 'مثنی'">
+              <app-multi-calendar-datepicker
+                formControlName="duplicateIssueDate"
+                label="تاریخ صدور مثنی">
+              </app-multi-calendar-datepicker>
+              <div *ngIf="duplicateIssueDate?.invalid && (duplicateIssueDate?.dirty || duplicateIssueDate?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="duplicateIssueDate?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+
             <div>
               <app-multi-calendar-datepicker
                 formControlName="issueDate"

@@ -181,6 +181,7 @@ sudo -u postgres psql -d PRMIS -f Scripts/add_applicant_name_fields.sql
 sudo -u postgres psql -d PRMIS -f Scripts/add_punittype_dari.sql
 sudo -u postgres psql -d PRMIS -f Scripts/AddApartmentAndDeedFields.sql
 sudo -u postgres psql -d PRMIS -f Scripts/fix_null_status_company_records.sql
+sudo -u postgres psql -d PRMIS -f Scripts/add_duplicate_issue_date.sql
 
 sudo systemctl restart prmis-backend
 echo "Vehicle electronic ID columns fixed!"

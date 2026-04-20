@@ -42,7 +42,7 @@ namespace WebAPIBackend.Controllers.Companies
                 var licenses = await _context.LicenseDetails
                     .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
                                   ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
-                                  ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                                  ""LicenseCategory"", ""RenewalRound"", ""DuplicateIssueDate"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                                   ""CreatedBy"", ""Status"", ""IsComplete"", ""DateType""
                                   FROM org.""LicenseDetails"" WHERE ""CompanyId"" = {0}", id)
@@ -163,6 +163,17 @@ namespace WebAPIBackend.Controllers.Companies
                     penaltyDate = parsedPenaltyDate;
                 }
 
+                // Parse DuplicateIssueDate if provided (تاریخ صدور مثنی)
+                DateOnly? duplicateIssueDate = null;
+                if (!string.IsNullOrWhiteSpace(request.DuplicateIssueDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.DuplicateIssueDate, request.CalendarType, out var parsedDuplicateIssueDate))
+                    {
+                        return BadRequest($"تاریخ صدور مثنی نامعتبر است. / Invalid duplicate issue date format.");
+                    }
+                    duplicateIssueDate = parsedDuplicateIssueDate;
+                }
+
                 // Validate numeric fields
                 if (request.RoyaltyAmount.HasValue && request.RoyaltyAmount < 0)
                 {
@@ -216,6 +227,7 @@ namespace WebAPIBackend.Controllers.Companies
                     LicenseType = request.LicenseType,
                     LicenseCategory = request.LicenseCategory,
                     RenewalRound = request.RenewalRound,
+                    DuplicateIssueDate = duplicateIssueDate,
                     RoyaltyAmount = request.RoyaltyAmount,
                     RoyaltyDate = royaltyDate,
                     TariffNumber = request.TariffNumber,
@@ -298,7 +310,7 @@ namespace WebAPIBackend.Controllers.Companies
                 var existingProperty = await _context.LicenseDetails
                     .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
                                   ""DateType"", ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
-                                  ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
+                                  ""LicenseCategory"", ""RenewalRound"", ""DuplicateIssueDate"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                                   ""CreatedBy"", ""Status"", ""IsComplete""
                                   FROM org.""LicenseDetails"" WHERE ""Id"" = {0}", id)
@@ -352,6 +364,17 @@ namespace WebAPIBackend.Controllers.Companies
                     penaltyDate = parsedPenaltyDate;
                 }
 
+                // Parse DuplicateIssueDate if provided (تاریخ صدور مثنی)
+                DateOnly? duplicateIssueDate = null;
+                if (!string.IsNullOrWhiteSpace(request.DuplicateIssueDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.DuplicateIssueDate, request.CalendarType, out var parsedDuplicateIssueDate))
+                    {
+                        return BadRequest($"تاریخ صدور مثنی نامعتبر است. / Invalid duplicate issue date format.");
+                    }
+                    duplicateIssueDate = parsedDuplicateIssueDate;
+                }
+
                 // Validate numeric fields
                 if (request.RoyaltyAmount.HasValue && request.RoyaltyAmount < 0)
                 {
@@ -394,6 +417,7 @@ namespace WebAPIBackend.Controllers.Companies
                 existingProperty.LicenseType = request.LicenseType;
                 existingProperty.LicenseCategory = request.LicenseCategory;
                 existingProperty.RenewalRound = request.RenewalRound;
+                existingProperty.DuplicateIssueDate = duplicateIssueDate;
                 existingProperty.RoyaltyAmount = request.RoyaltyAmount;
                 existingProperty.RoyaltyDate = royaltyDate;
                 existingProperty.TariffNumber = request.TariffNumber;
@@ -572,6 +596,8 @@ namespace WebAPIBackend.Controllers.Companies
                     LicenseDetailId = licenseDetail?.Id, // Actual LicenseDetail ID for verification
                     data.Title,
                     LicenseType = licenseDetail?.LicenseType, // Get LicenseType from LicenseDetail table
+                    LicenseCategory = data.LicenseCategory, // نوعیت جواز (جدید، تجدید، مثنی)
+                    DuplicateIssueDate = data.DuplicateIssueDate,
                     DateType = licenseDetail?.DateType, // Calendar type used for date entry
                     data.PhoneNumber,
                     data.Tin,
@@ -682,6 +708,10 @@ namespace WebAPIBackend.Controllers.Companies
                             WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'HrLetterDate') THEN
                             ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""HrLetterDate"" DATE NULL;
                         END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'DuplicateIssueDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""DuplicateIssueDate"" DATE NULL;
+                        END IF;
                     END $$;
 
                     -- Recreate the LicenseView
@@ -701,9 +731,11 @@ namespace WebAPIBackend.Controllers.Companies
                         co.""ElectronicNationalIdNumber"" AS ""IndentityCardNumber"",
                         co.""PothoPath"" AS ""OwnerPhoto"",
                         ld.""LicenseNumber"",
+                        ld.""LicenseCategory"",
                         ld.""OfficeAddress"",
                         ld.""IssueDate"",
                         ld.""ExpireDate"",
+                        ld.""DuplicateIssueDate"",
                         pp.""Dari"" AS ""PermanentProvinceName"",
                         pd.""Dari"" AS ""PermanentDistrictName"",
                         co.""PermanentVillage"",

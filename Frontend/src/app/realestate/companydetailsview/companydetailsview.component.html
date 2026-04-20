@@ -117,6 +117,10 @@
             <p class="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">تاریخ انقضا</p>
             <p class="text-gray-900 font-semibold text-lg">{{ viewData.license.expireDate | calendarDate }}</p>
           </div>
+          <div class="p-5 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border border-indigo-200" *ngIf="viewData.license.duplicateIssueDate">
+            <p class="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-2">تاریخ صدور مثنی</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ viewData.license.duplicateIssueDate | calendarDate }}</p>
+          </div>
           <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ساحه</p>
             <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.license.areaName) }}</p>

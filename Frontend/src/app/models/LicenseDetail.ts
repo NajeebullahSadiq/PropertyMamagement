@@ -14,6 +14,8 @@ export interface LicenseDetail{
     licenseCategory?:string;
     // Renewal Round (دور تجدید) - only applicable when licenseCategory is تجدید
     renewalRound?:number;
+    // Duplicate Issue Date (تاریخ صدور مثنی) - only applicable when licenseCategory is مثنی
+    duplicateIssueDate?:string;
     calendarType?:string;
     // Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
     royaltyAmount?:number;      // مبلغ حق‌الامتیاز

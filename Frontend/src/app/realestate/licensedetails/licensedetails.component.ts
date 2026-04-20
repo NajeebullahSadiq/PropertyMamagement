@@ -81,6 +81,7 @@ export class LicensedetailsComponent {
 			licenseType: ['', Validators.required],
 			licenseCategory: [''],
 			renewalRound: [null],
+			duplicateIssueDate: [''],
 			companyId: [''],
 			docPath: [''],
 			// Financial and Administrative Fields (جزئیات مالی و اسناد جواز)
@@ -97,15 +98,24 @@ export class LicensedetailsComponent {
 			this.applyAutoExpireDate(value);
 		});
 
-		// Watch for license category changes to show/hide renewal round field
+		// Watch for license category changes to show/hide renewal round and duplicate issue date fields
 		this.licenseForm.get('licenseCategory')?.valueChanges.subscribe(value => {
 			if (value === 'تجدید') {
 				this.licenseForm.get('renewalRound')?.setValidators([Validators.required]);
+				this.licenseForm.get('duplicateIssueDate')?.clearValidators();
+				this.licenseForm.get('duplicateIssueDate')?.setValue('');
+			} else if (value === 'مثنی') {
+				this.licenseForm.get('duplicateIssueDate')?.setValidators([Validators.required]);
+				this.licenseForm.get('renewalRound')?.clearValidators();
+				this.licenseForm.get('renewalRound')?.setValue(null);
 			} else {
 				this.licenseForm.get('renewalRound')?.clearValidators();
 				this.licenseForm.get('renewalRound')?.setValue(null);
+				this.licenseForm.get('duplicateIssueDate')?.clearValidators();
+				this.licenseForm.get('duplicateIssueDate')?.setValue('');
 			}
 			this.licenseForm.get('renewalRound')?.updateValueAndValidity();
+			this.licenseForm.get('duplicateIssueDate')?.updateValueAndValidity();
 		});
 	}
 
@@ -249,6 +259,7 @@ export class LicensedetailsComponent {
 							licenseType: detail[0].licenseType,
 							licenseCategory: detail[0].licenseCategory || '',
 							renewalRound: detail[0].renewalRound || null,
+							duplicateIssueDate: detail[0].duplicateIssueDate || '',
 							companyId: detail[0].companyId,
 							docPath: detail[0].docPath,
 							// Financial and Administrative Fields
@@ -333,6 +344,12 @@ export class LicensedetailsComponent {
 			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
 		}
 
+		// Format duplicateIssueDate if provided
+		const duplicateIssueDateValue = this.licenseForm.get('duplicateIssueDate')?.value;
+		if (duplicateIssueDateValue) {
+			details.duplicateIssueDate = this.formatDateForBackend(duplicateIssueDateValue);
+		}
+
 		// Convert Persian/Dari numerals to Western numerals for numeric fields
 		if (details.royaltyAmount) {
 			const parsed = this.numeralService.parseNumber(String(details.royaltyAmount));
@@ -397,6 +414,12 @@ export class LicensedetailsComponent {
 		}
 		if (penaltyDateValue) {
 			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
+		}
+
+		// Format duplicateIssueDate if provided
+		const duplicateIssueDateValue = this.licenseForm.get('duplicateIssueDate')?.value;
+		if (duplicateIssueDateValue) {
+			details.duplicateIssueDate = this.formatDateForBackend(duplicateIssueDateValue);
 		}
 
 		// Convert Persian/Dari numerals to Western numerals for numeric fields
@@ -478,6 +501,7 @@ export class LicensedetailsComponent {
 	get licenseType() { return this.licenseForm.get('licenseType'); }
 	get licenseCategory() { return this.licenseForm.get('licenseCategory'); }
 	get renewalRound() { return this.licenseForm.get('renewalRound'); }
+	get duplicateIssueDate() { return this.licenseForm.get('duplicateIssueDate'); }
 	get transferLocation() { return this.licenseForm.get('transferLocation'); }
 	get companyId() { return this.licenseForm.get('companyId'); }
 	get docPath() { return this.licenseForm.get('docPath'); }

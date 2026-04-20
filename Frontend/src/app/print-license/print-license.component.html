@@ -158,14 +158,20 @@
         <div class="title-banner">
           <div class="banner-decoration left"></div>
           <div class="title-content-wrapper">
-            <!-- License Type Badge -->
-            <div class="license-type-badge">
-              <span class="license-type-icon">
-                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'ملکیت'">🏢</ng-container>
-                <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'موټر پلورنه'">🚗</ng-container>
-              </span>
-              <span class="license-type-label">د جوازلیک ډول:</span>
-              <span class="license-type-value">{{getLicenseTypeInPashto(data.licenseType)}}</span>
+            <!-- License Type & Category Badge -->
+            <div class="license-type-badge" style="display: flex; justify-content: center; align-items: center; gap: 30px;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span class="license-type-icon">
+                  <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'ملکیت'">🏢</ng-container>
+                  <ng-container *ngIf="getLicenseTypeInPashto(data.licenseType) === 'موټر پلورنه'">🚗</ng-container>
+                </span>
+                <span class="license-type-label">د جوازلیک ډول:</span>
+                <span class="license-type-value">{{getLicenseTypeInPashto(data.licenseType)}}</span>
+              </div>
+              <div *ngIf="data.licenseCategory" style="display: flex; align-items: center; gap: 5px;">
+                <span class="license-type-label">د جوازلیک نوعیت:</span>
+                <span class="license-type-value">{{data.licenseCategory}}</span>
+              </div>
             </div>
             <h2 class="certificate-title">
               د <span class="title-highlight">({{data.title || '—'}})</span> معاملو د لارښوونې د فعالیت جوازلیک
@@ -417,14 +423,20 @@
         <div class="title-banner">
           <div class="banner-decoration left"></div>
           <div class="title-content-wrapper">
-            <!-- License Type Badge -->
-            <div class="license-type-badge">
-              <span class="license-type-icon">
-                <ng-container *ngIf="getLicenseTypeInDari(data.licenseType) === 'املاک'">🏢</ng-container>
-                <ng-container *ngIf="getLicenseTypeInDari(data.licenseType) === 'فروش موتر'">🚗</ng-container>
-              </span>
-              <span class="license-type-label">نوع جواز:</span>
-              <span class="license-type-value">{{getLicenseTypeInDari(data.licenseType)}}</span>
+            <!-- License Type & Category Badge -->
+            <div class="license-type-badge" style="display: flex; justify-content: center; align-items: center; gap: 30px;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span class="license-type-icon">
+                  <ng-container *ngIf="getLicenseTypeInDari(data.licenseType) === 'املاک'">🏢</ng-container>
+                  <ng-container *ngIf="getLicenseTypeInDari(data.licenseType) === 'فروش موتر'">🚗</ng-container>
+                </span>
+                <span class="license-type-label">نوع جواز:</span>
+                <span class="license-type-value">{{getLicenseTypeInDari(data.licenseType)}}</span>
+              </div>
+              <div *ngIf="data.licenseCategory" style="display: flex; align-items: center; gap: 5px;">
+                <span class="license-type-label">نوعیت جواز:</span>
+                <span class="license-type-value">{{data.licenseCategory}}</span>
+              </div>
             </div>
             <h2 class="certificate-title">
               جوازنامه فعالیت رهنمای معاملات <span class="title-highlight">({{data.title || '—'}})</span>

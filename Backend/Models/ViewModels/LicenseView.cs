@@ -29,11 +29,21 @@ public partial class LicenseView
 
     public string? LicenseNumber { get; set; }
 
+    /// <summary>
+    /// نوعیت جواز - License Category (جدید، تجدید، مثنی)
+    /// </summary>
+    public string? LicenseCategory { get; set; }
+
     public string? OfficeAddress { get; set; }
 
     public DateOnly? IssueDate { get; set; }
 
     public DateOnly? ExpireDate { get; set; }
+
+    /// <summary>
+    /// تاریخ صدور مثنی - Duplicate Issue Date
+    /// </summary>
+    public DateOnly? DuplicateIssueDate { get; set; }
 
     public string? PermanentProvinceName { get; set; }
 

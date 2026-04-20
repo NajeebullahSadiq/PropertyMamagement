@@ -39,6 +39,11 @@
         public int? RenewalRound { get; set; }
 
         /// <summary>
+        /// تاریخ صدور مثنی - Duplicate Issue Date (only applicable when LicenseCategory is مثنی)
+        /// </summary>
+        public string? DuplicateIssueDate { get; set; }
+
+        /// <summary>
         /// مبلغ حق‌الامتیاز - Royalty/License Fee Amount
         /// </summary>
         public decimal? RoyaltyAmount { get; set; }

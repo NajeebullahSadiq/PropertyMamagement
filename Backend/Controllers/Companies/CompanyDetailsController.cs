@@ -297,6 +297,7 @@ namespace WebAPIBackend.Controllers.Companies
                             l.LicenseType,
                             l.LicenseCategory,
                             l.RenewalRound,
+                            l.DuplicateIssueDate,
                             l.IssueDate,
                             l.ExpireDate,
                             l.OfficeAddress,
@@ -1066,7 +1067,9 @@ namespace WebAPIBackend.Controllers.Companies
                     if (DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
                     {
                         parsedStartDate = start;
-                        licensesQuery = licensesQuery.Where(x => x.IssueDate >= start);
+                        // For مثنی licenses use DuplicateIssueDate, for others use IssueDate
+                        licensesQuery = licensesQuery.Where(x =>
+                            (x.LicenseCategory == "مثنی" ? x.DuplicateIssueDate >= start : x.IssueDate >= start));
                     }
                 }
 
@@ -1075,7 +1078,9 @@ namespace WebAPIBackend.Controllers.Companies
                     if (DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
                     {
                         parsedEndDate = end;
-                        licensesQuery = licensesQuery.Where(x => x.IssueDate <= end);
+                        // For مثنی licenses use DuplicateIssueDate, for others use IssueDate
+                        licensesQuery = licensesQuery.Where(x =>
+                            (x.LicenseCategory == "مثنی" ? x.DuplicateIssueDate <= end : x.IssueDate <= end));
                     }
                 }
 
@@ -1324,11 +1329,15 @@ namespace WebAPIBackend.Controllers.Companies
                 
                 if (parsedStartDate.HasValue)
                 {
-                    licensesQuery = licensesQuery.Where(x => x.IssueDate >= parsedStartDate);
+                    // For مثنی licenses use DuplicateIssueDate, for others use IssueDate
+                    licensesQuery = licensesQuery.Where(x =>
+                        (x.LicenseCategory == "مثنی" ? x.DuplicateIssueDate >= parsedStartDate : x.IssueDate >= parsedStartDate));
                 }
                 if (parsedEndDate.HasValue)
                 {
-                    licensesQuery = licensesQuery.Where(x => x.IssueDate <= parsedEndDate);
+                    // For مثنی licenses use DuplicateIssueDate, for others use IssueDate
+                    licensesQuery = licensesQuery.Where(x =>
+                        (x.LicenseCategory == "مثنی" ? x.DuplicateIssueDate <= parsedEndDate : x.IssueDate <= parsedEndDate));
                 }
                 
                 // Get all licenses that match the criteria
