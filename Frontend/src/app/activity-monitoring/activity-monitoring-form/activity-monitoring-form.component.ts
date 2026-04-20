@@ -162,8 +162,8 @@ export class ActivityMonitoringFormComponent implements OnInit {
         });
     }
 
-    loadNextSerialNumber(): void {
-        this.service.getNextSerialNumber().subscribe({
+    loadNextSerialNumber(sectionType?: string): void {
+        this.service.getNextSerialNumber(sectionType).subscribe({
             next: (result) => {
                 this.mainForm.patchValue({ serialNumber: result.serialNumber });
             },
@@ -319,6 +319,11 @@ export class ActivityMonitoringFormComponent implements OnInit {
         
         // Update validators for license fields based on section type
         this.updateLicenseFieldValidators();
+
+        // Reload serial number based on selected section type (only for new records)
+        if (!this.isEditMode && sectionType) {
+            this.loadNextSerialNumber(sectionType);
+        }
     }
     
     updateLicenseFieldValidators(): void {
@@ -529,6 +534,8 @@ export class ActivityMonitoringFormComponent implements OnInit {
         this.showComplaintsSection = false;
         this.showViolationsSection = false;
         this.showInspectionSection = false;
+        // Reload serial number after reset
+        this.loadNextSerialNumber();
     }
 
     // ==================== Deed Items CRUD ====================

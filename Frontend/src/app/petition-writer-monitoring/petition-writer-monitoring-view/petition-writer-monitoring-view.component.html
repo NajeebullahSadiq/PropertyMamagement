@@ -52,7 +52,21 @@
           </h2>
         </div>
         <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+              <span class="text-sm text-red-600 block mb-1">نمبر جواز</span>
+              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterLicenseNumber || '-' }}</span>
+            </div>
+            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+              <span class="text-sm text-red-600 block mb-1">شهرت عریضه نویس</span>
+              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterName || '-' }}</span>
+            </div>
+            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+              <span class="text-sm text-red-600 block mb-1">ناحیه</span>
+              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterDistrict || '-' }}</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div class="bg-red-50 p-4 rounded-xl border border-red-100">
               <span class="text-sm text-red-600 block mb-1">شهرت عارض</span>
               <span class="text-lg font-bold text-gray-800">{{ record.complainantName || '-' }}</span>

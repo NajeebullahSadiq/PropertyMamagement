@@ -178,8 +178,8 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         });
     }
 
-    loadNextSerialNumber(): void {
-        this.service.getNextSerialNumber().subscribe({
+    loadNextSerialNumber(sectionType?: string): void {
+        this.service.getNextSerialNumber(sectionType).subscribe({
             next: (result) => {
                 this.mainForm.patchValue({ serialNumber: result.serialNumber });
             },
@@ -251,6 +251,11 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
 
         // Update validators based on section type
         this.updateValidators();
+
+        // Reload serial number based on selected section type (only for new records)
+        if (!this.isEditMode && sectionType) {
+            this.loadNextSerialNumber(sectionType);
+        }
     }
 
     updateValidators(): void {
@@ -269,6 +274,9 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         if (this.showComplaintsSection) {
             this.mainForm.get('complainantName')?.setValidators([Validators.required]);
             this.mainForm.get('complaintSubject')?.setValidators([Validators.required]);
+            this.mainForm.get('petitionWriterLicenseNumber')?.setValidators([Validators.required]);
+            this.mainForm.get('petitionWriterName')?.setValidators([Validators.required]);
+            this.mainForm.get('petitionWriterDistrict')?.setValidators([Validators.required]);
         } else if (this.showViolationsSection) {
             this.mainForm.get('petitionWriterName')?.setValidators([Validators.required]);
             this.mainForm.get('petitionWriterLicenseNumber')?.setValidators([Validators.required]);
@@ -381,9 +389,10 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         this.showComplaintsSection = false;
         this.showViolationsSection = false;
         this.showMonitoringSection = false;
-        if (!this.isEditMode) {
-            this.loadNextSerialNumber();
-        }
+        this.isEditMode = false;
+        this.editId = null;
+        // Reload serial number after reset
+        this.loadNextSerialNumber();
     }
 
     searchLicense(): void {

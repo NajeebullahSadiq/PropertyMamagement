@@ -86,7 +86,11 @@ export class ActivityMonitoringService {
         this.mainTableId = 0;
     }
 
-    getNextSerialNumber(): Observable<{ serialNumber: string }> {
-        return this.http.get<{ serialNumber: string }>(`${this.baseUrl}/next-serial-number`);
+    getNextSerialNumber(sectionType?: string): Observable<{ serialNumber: string }> {
+        let params = new HttpParams();
+        if (sectionType) {
+            params = params.set('sectionType', sectionType);
+        }
+        return this.http.get<{ serialNumber: string }>(`${this.baseUrl}/next-serial-number`, { params });
     }
 }

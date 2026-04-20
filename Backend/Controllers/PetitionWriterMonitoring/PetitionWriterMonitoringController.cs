@@ -353,19 +353,34 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
         /// Get next serial number for new record
         /// </summary>
         [HttpGet("next-serial-number")]
-        public async Task<IActionResult> GetNextSerialNumber()
+        public async Task<IActionResult> GetNextSerialNumber([FromQuery] string? sectionType = null)
         {
             try
             {
-                var lastRecord = await _context.PetitionWriterMonitoringRecords
-                    .Where(x => x.Status == true)
-                    .OrderByDescending(x => x.Id)
-                    .FirstOrDefaultAsync();
+                var query = _context.PetitionWriterMonitoringRecords
+                    .Where(x => x.Status == true);
+
+                // Filter by section type if provided
+                if (!string.IsNullOrEmpty(sectionType))
+                {
+                    query = query.Where(x => x.SectionType == sectionType);
+                }
+
+                // Get the max serial number for this section type
+                var serialNumbers = await query
+                    .Where(x => x.SerialNumber != null)
+                    .Select(x => x.SerialNumber!)
+                    .ToListAsync();
 
                 int nextNumber = 1;
-                if (lastRecord != null && int.TryParse(lastRecord.SerialNumber, out int lastNumber))
+                var maxSerial = serialNumbers
+                    .Select(s => int.TryParse(s, out int n) ? n : 0)
+                    .DefaultIfEmpty(0)
+                    .Max();
+
+                if (maxSerial > 0)
                 {
-                    nextNumber = lastNumber + 1;
+                    nextNumber = maxSerial + 1;
                 }
 
                 return Ok(new { serialNumber = nextNumber.ToString() });
