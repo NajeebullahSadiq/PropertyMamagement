@@ -125,4 +125,16 @@ export class PetitionWriterLicenseService {
     getProvinces(): Observable<any> {
         return this.http.get(`${this.baseUrl}/provinces`);
     }
+
+    // ==================== Activity Locations (محل فعالیت) ====================
+
+    getActivityLocations(): Observable<any> {
+        return this.http.get(`${this.baseUrl}/activity-locations`);
+    }
+
+    // ==================== Activity Districts (ناحیه) ====================
+
+    getActivityDistricts(provinceId: number): Observable<any> {
+        return this.http.get(`${this.baseUrl}/districts/${provinceId}`);
+    }
 }

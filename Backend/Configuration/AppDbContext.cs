@@ -128,6 +128,7 @@ namespace WebAPIBackend.Configuration
         // Petition Writer License Module
         public virtual DbSet<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterLicenseEntity> PetitionWriterLicenses { get; set; }
         public virtual DbSet<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterRelocation> PetitionWriterRelocations { get; set; }
+        public virtual DbSet<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterActivityLocationEntity> PetitionWriterActivityLocations { get; set; }
         
         // Document Verification Module
         public virtual DbSet<WebAPIBackend.Models.Verification.DocumentVerification> DocumentVerifications { get; set; }
@@ -482,6 +483,21 @@ namespace WebAPIBackend.Configuration
                     .HasForeignKey(d => d.PetitionWriterLicenseId)
                     .HasConstraintName("PetitionWriterRelocations_PetitionWriterLicenseId_fkey")
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<WebAPIBackend.Models.PetitionWriterLicense.PetitionWriterActivityLocationEntity>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PetitionWriterActivityLocations_pkey");
+                entity.ToTable("PetitionWriterActivityLocations", "org");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp without time zone");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(50);
+                entity.Property(e => e.Name).HasMaxLength(500).IsRequired();
+                entity.Property(e => e.DariName).HasMaxLength(500).IsRequired();
+
+                entity.HasIndex(e => e.DariName).IsUnique();
             });
 
             // Document Verification Module Configuration

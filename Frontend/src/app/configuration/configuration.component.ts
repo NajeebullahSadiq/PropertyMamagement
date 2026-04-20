@@ -56,6 +56,14 @@ export class ConfigurationComponent {
       route: '/audit-log',
       color: 'rose',
       gradient: 'from-rose-500 to-pink-600'
+    },
+    {
+      title: 'محل فعالیت عریضه‌نویس',
+      description: 'مدیریت محل فعالیت‌های عریضه‌نویسان',
+      icon: 'gavel',
+      route: '/petition-writer-activity-location-management',
+      color: 'orange',
+      gradient: 'from-orange-500 to-amber-600'
     }
   ];
 

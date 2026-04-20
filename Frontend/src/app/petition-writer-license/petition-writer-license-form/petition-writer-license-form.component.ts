@@ -39,6 +39,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
     provinces: any[] = [];
     permanentDistricts: any[] = [];
     currentDistricts: any[] = [];
+    activityLocations: any[] = [];
+    activityDistricts: any[] = [];
     licenseStatusTypes = LicenseStatusTypes;
     licenseTypes = LicenseTypes;
     competencyTypes = CompetencyTypes;
@@ -79,6 +81,7 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         this.checkPermissions();
         this.initForms();
         this.loadProvinces(); // This will call loadUserProvince after provinces are loaded
+        this.loadActivityLocations();
 
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
@@ -106,6 +109,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                         this.licenseForm.patchValue({ provinceId: this.userProvinceId });
                         // Disable the province field for province-based users
                         this.licenseForm.get('provinceId')?.disable();
+                        // Load activity districts based on user's province
+                        this.loadActivityDistricts(this.userProvinceId);
                     }
                 },
                 error: (error: any) => {
@@ -113,6 +118,25 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                 }
             });
         }
+    }
+
+    loadActivityLocations(): void {
+        this.licenseService.getActivityLocations().subscribe({
+            next: (data: any) => {
+                this.activityLocations = data;
+            },
+            error: (err: any) => console.error('Error loading activity locations', err)
+        });
+    }
+
+    loadActivityDistricts(provinceId: number): void {
+        this.licenseService.getActivityDistricts(provinceId).subscribe({
+            next: (data: any) => {
+                this.activityDistricts = data;
+                this.licenseForm.patchValue({ activityNahia: null });
+            },
+            error: (err: any) => console.error('Error loading activity districts', err)
+        });
     }
 
     initForms(): void {
@@ -252,6 +276,11 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
                         this.currentDistricts = d;
                         this.licenseForm.patchValue({ currentDistrictId: data.currentDistrictId });
                     });
+                }
+
+                // Load activity districts based on license province
+                if (data.provinceId) {
+                    this.loadActivityDistricts(data.provinceId);
                 }
 
                 // Patch financial form - use the same pattern as license details
@@ -519,6 +548,8 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
             // Clear license number so backend can auto-generate it
             // Keep it enabled so it's included in form submission
             this.licenseForm.patchValue({ licenseNumber: '' });
+            // Load activity districts based on selected province
+            this.loadActivityDistricts(provinceId);
         }
     }
 

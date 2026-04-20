@@ -190,6 +190,14 @@ const routes: Routes = [
       { path: '', loadChildren: () => import('./district-management/district-management.module').then(m => m.DistrictManagementModule) }
     ]
   },
+  { 
+    path: 'petition-writer-activity-location-management', 
+    component: MasterlayoutComponent,
+    canActivate: [GeolocationGuard, AuthGuard, AdminGuard],
+    children: [
+      { path: '', loadChildren: () => import('./petition-writer-activity-location-management/petition-writer-activity-location-management.module').then(m => m.PetitionWriterActivityLocationManagementModule) }
+    ]
+  },
   { path: 'forbidden', component: ForbiddenComponent },
   { path: 'print/:id', component: PrintComponent, canActivate: [GeolocationGuard] },
   { path: 'print', component: PrintComponent, canActivate: [GeolocationGuard] },

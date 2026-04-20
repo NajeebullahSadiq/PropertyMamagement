@@ -490,6 +490,60 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             }
         }
 
+        /// <summary>
+        /// Get districts for a specific province (for dropdown - ناحیه)
+        /// </summary>
+        [HttpGet("districts/{provinceId}")]
+        public async Task<IActionResult> GetDistrictsByProvince(int provinceId)
+        {
+            try
+            {
+                var districts = await _context.Locations
+                    .Where(x => x.ParentId == provinceId && x.TypeId == 3 && x.IsActive == 1)
+                    .OrderBy(x => x.Dari)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.Name,
+                        x.Dari
+                    })
+                    .ToListAsync();
+
+                return Ok(districts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در بارگذاری ناحیه‌ها", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get activity locations for dropdown (محل فعالیت عریضه‌نویس)
+        /// </summary>
+        [HttpGet("activity-locations")]
+        public async Task<IActionResult> GetActivityLocations()
+        {
+            try
+            {
+                var items = await _context.PetitionWriterActivityLocations
+                    .Where(x => x.IsActive)
+                    .OrderBy(x => x.DariName)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.Name,
+                        x.DariName
+                    })
+                    .ToListAsync();
+
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در بارگذاری محل فعالیت", error = ex.Message });
+            }
+        }
+
         #endregion
 
         #region Relocation CRUD
