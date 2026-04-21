@@ -86,8 +86,8 @@ namespace WebAPIBackend.Controllers.Vehicles
                     propertyQuery = propertyQuery.Where(p =>
                         (p.PermitNo != null && p.PermitNo.ToLower().Contains(searchLower)) ||
                         (p.PilateNo != null && p.PilateNo.ToLower().Contains(searchLower)) ||
-                        (p.VehiclesSellerDetails.Any(s => s.FirstName.ToLower().Contains(searchLower) || s.ElectronicNationalIdNumber.Contains(searchLower))) ||
-                        (p.VehiclesBuyerDetails.Any(b => b.FirstName.ToLower().Contains(searchLower) || b.ElectronicNationalIdNumber.Contains(searchLower)))
+                        (p.VehiclesSellerDetails.Any(s => (s.FirstName != null && s.FirstName.ToLower().Contains(searchLower)) || (s.ElectronicNationalIdNumber != null && s.ElectronicNationalIdNumber.Contains(searchLower)))) ||
+                        (p.VehiclesBuyerDetails.Any(b => (b.FirstName != null && b.FirstName.ToLower().Contains(searchLower)) || (b.ElectronicNationalIdNumber != null && b.ElectronicNationalIdNumber.Contains(searchLower))))
                     );
                 }
 

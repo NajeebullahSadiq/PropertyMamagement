@@ -122,7 +122,7 @@ export class PetitionWriterLicenseViewComponent extends BaseComponent implements
 
     printItem(): void {
         if (this.item?.id) {
-            this.router.navigate(['/printPetitionWriterLicense', this.item.id]);
+            this.router.navigate(['/print/petition-writer-license', this.item.id]);
         }
     }
 

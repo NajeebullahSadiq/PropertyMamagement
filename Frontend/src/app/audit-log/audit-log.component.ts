@@ -30,6 +30,9 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
   isLoading = false;
   isLoadingStats = false;
 
+  // Error state
+  errorMessage: string | null = null;
+
   // View modes
   viewMode: 'list' | 'statistics' = 'list';
 
@@ -139,9 +142,10 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
       ...filters,
       startDate: filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
       endDate: filters.endDate ? new Date(filters.endDate).toISOString() : undefined
-    }).subscribe({
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response: any) => {
         console.log('Audit logs response:', response);
+        this.errorMessage = null;
         // Backend returns PascalCase, map to camelCase
         this.auditLogs = (response.data || response.Data || []).map((log: any) => ({
           id: log.id || log.Id,
@@ -172,6 +176,11 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load audit logs', err);
         this.isLoading = false;
+        if (err.status === 403) {
+          this.errorMessage = 'شما صلاحیت مشاهده لاگ فعالیت‌ها را ندارید';
+        } else {
+          this.errorMessage = 'خطا در بارگذاری لاگ فعالیت‌ها. لطفاً دوباره تلاش کنید';
+        }
       }
     });
   }
@@ -183,7 +192,7 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
     this.auditLogService.getStatistics(
       filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
       filters.endDate ? new Date(filters.endDate).toISOString() : undefined
-    ).subscribe({
+    ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (stats: any) => {
         console.log('Statistics response:', stats);
         // Map PascalCase to camelCase
@@ -259,7 +268,7 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
   }
 
   viewLogDetail(log: AuditLog): void {
-    this.auditLogService.getAuditLogById(log.id).subscribe({
+    this.auditLogService.getAuditLogById(log.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (detail: any) => {
         console.log('Log detail response:', detail);
         // Map PascalCase to camelCase
@@ -305,7 +314,7 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
       actionType: filters.actionType,
       startDate: filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
       endDate: filters.endDate ? new Date(filters.endDate).toISOString() : undefined
-    }).subscribe({
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');

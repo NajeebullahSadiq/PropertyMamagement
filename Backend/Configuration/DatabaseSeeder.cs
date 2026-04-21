@@ -107,13 +107,32 @@ namespace WebAPIBackend.Configuration
                     if (role != null)
                     {
                         var existingClaims = await roleManager.GetClaimsAsync(role);
+
+                        // Clean up stale uppercase "Permission" claims from old seeding/SQL scripts
+                        // The system now uses lowercase "permission" (CustomClaimTypes.Permission)
+                        var staleClaims = existingClaims
+                            .Where(c => c.Type == "Permission" && c.Value != null)
+                            .ToList();
+                        foreach (var staleClaim in staleClaims)
+                        {
+                            await roleManager.RemoveClaimAsync(role, staleClaim);
+                            // Re-add with correct lowercase type if the value is a valid permission
+                            var requiredPermissions = RolePermissions.GetPermissionsForRole(roleName);
+                            if (requiredPermissions.Contains(staleClaim.Value))
+                            {
+                                await roleManager.AddClaimAsync(role, new Claim(CustomClaimTypes.Permission, staleClaim.Value));
+                            }
+                        }
+
+                        // Refresh claims after cleanup
+                        existingClaims = await roleManager.GetClaimsAsync(role);
                         var existingPermissions = existingClaims
                             .Where(c => c.Type == CustomClaimTypes.Permission)
                             .Select(c => c.Value)
                             .ToList();
-                        var requiredPermissions = RolePermissions.GetPermissionsForRole(roleName);
+                        var requiredPermissions2 = RolePermissions.GetPermissionsForRole(roleName);
 
-                        foreach (var permission in requiredPermissions)
+                        foreach (var permission in requiredPermissions2)
                         {
                             if (!existingPermissions.Contains(permission))
                             {

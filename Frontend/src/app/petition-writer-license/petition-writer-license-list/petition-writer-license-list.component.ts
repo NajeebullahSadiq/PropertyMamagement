@@ -156,6 +156,6 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
     }
 
     printLicense(id: number): void {
-        window.open(`/printPetitionWriterLicense/${id}`, '_blank');
+        window.open(`/print/petition-writer-license/${id}`, '_blank');
     }
 }

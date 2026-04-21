@@ -86,7 +86,7 @@ export class VehiclelistComponent extends BaseComponent {
     );
   }
   onPrint(id:any):void{
-    const url = this.router.createUrlTree(['printvehicledata', id]).toString();
+    const url = this.router.createUrlTree(['/print/vehicle', id]).toString();
     const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
     if (newWindow) {
         newWindow.opener = null;

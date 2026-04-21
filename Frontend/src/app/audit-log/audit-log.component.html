@@ -207,6 +207,15 @@
     </div>
   </div>
 
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+    <mat-icon class="text-red-500">error</mat-icon>
+    <span class="text-red-700">{{ errorMessage }}</span>
+    <button (click)="errorMessage = null; loadAuditLogs()" class="ml-auto px-3 py-1 rounded-lg bg-red-100 text-red-700 text-sm hover:bg-red-200 transition-colors">
+      تلاش مجدد
+    </button>
+  </div>
+
   <!-- List View -->
   <div *ngIf="viewMode === 'list'" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <!-- Loading State -->

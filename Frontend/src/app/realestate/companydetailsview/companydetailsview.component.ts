@@ -49,7 +49,7 @@ export class CompanydetailsviewComponent extends BaseComponent {
 
   printLicense(): void {
     if (this.companyId) {
-      const url = this.router.createUrlTree(['/printLicense', this.companyId]).toString();
+      const url = this.router.createUrlTree(['/print/license', this.companyId]).toString();
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   }

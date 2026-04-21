@@ -234,3 +234,24 @@ export class PetitionWriterMonitoringGuard implements CanActivate {
     return true;
   }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuditLogGuard implements CanActivate {
+  constructor(private router: Router, private rbacService: RbacService) {}
+
+  canActivate(): boolean {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/Auth']);
+      return false;
+    }
+
+    if (!this.rbacService.canAccessModule('auditlog')) {
+      this.router.navigate(['/forbidden']);
+      return false;
+    }
+
+    return true;
+  }
+}

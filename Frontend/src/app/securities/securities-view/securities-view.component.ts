@@ -124,7 +124,7 @@ export class SecuritiesViewComponent extends BaseComponent implements OnInit {
 
     printItem(): void {
         if (this.item?.id) {
-            window.open(`/printSecurities/${this.item.id}`, '_blank');
+            window.open(`/print/securities/${this.item.id}`, '_blank');
         }
     }
 

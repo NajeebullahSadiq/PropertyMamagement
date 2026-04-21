@@ -16,20 +16,26 @@ BEGIN
     
     RAISE NOTICE 'Found ADMIN role with ID: %', admin_role_id;
     
-    -- Add auditlog.view permission
+    -- First, remove any stale uppercase 'Permission' claims for audit log permissions
+    DELETE FROM public."AspNetRoleClaims"
+    WHERE "RoleId" = admin_role_id
+      AND "ClaimType" = 'Permission'
+      AND "ClaimValue" IN ('auditlog.view', 'auditlog.export');
+
+    -- Add auditlog.view permission (lowercase 'permission' to match CustomClaimTypes.Permission)
     INSERT INTO public."AspNetRoleClaims" ("Id", "RoleId", "ClaimType", "ClaimValue")
-    SELECT nextval('public."AspNetRoleClaims_Id_seq"'), admin_role_id, 'Permission', 'auditlog.view'
+    SELECT nextval('public."AspNetRoleClaims_Id_seq"'), admin_role_id, 'permission', 'auditlog.view'
     WHERE NOT EXISTS (
         SELECT 1 FROM public."AspNetRoleClaims" 
-        WHERE "RoleId" = admin_role_id AND "ClaimValue" = 'auditlog.view'
+        WHERE "RoleId" = admin_role_id AND "ClaimType" = 'permission' AND "ClaimValue" = 'auditlog.view'
     );
     
-    -- Add auditlog.export permission
+    -- Add auditlog.export permission (lowercase 'permission' to match CustomClaimTypes.Permission)
     INSERT INTO public."AspNetRoleClaims" ("Id", "RoleId", "ClaimType", "ClaimValue")
-    SELECT nextval('public."AspNetRoleClaims_Id_seq"'), admin_role_id, 'Permission', 'auditlog.export'
+    SELECT nextval('public."AspNetRoleClaims_Id_seq"'), admin_role_id, 'permission', 'auditlog.export'
     WHERE NOT EXISTS (
         SELECT 1 FROM public."AspNetRoleClaims" 
-        WHERE "RoleId" = admin_role_id AND "ClaimValue" = 'auditlog.export'
+        WHERE "RoleId" = admin_role_id AND "ClaimType" = 'permission' AND "ClaimValue" = 'auditlog.export'
     );
     
     RAISE NOTICE '✓ Audit log permissions added to ADMIN role';

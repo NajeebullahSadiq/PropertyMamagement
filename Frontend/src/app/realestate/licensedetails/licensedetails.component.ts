@@ -493,7 +493,7 @@ export class LicensedetailsComponent extends BaseComponent {
 
 	navigateToPrint() {
 		let id = this.comservice.mainTableId;
-		this.router.navigate(['/printLicense', id]);
+		this.router.navigate(['/print/license', id]);
 	}
 
 	get provinceId() { return this.licenseForm.get('provinceId'); }

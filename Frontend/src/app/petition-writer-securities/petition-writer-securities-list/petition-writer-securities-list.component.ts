@@ -141,7 +141,7 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
     }
 
     onPrint(id: number): void {
-        const tree = this.router.createUrlTree(['/printPetitionWriterSecurities', id]);
+        const tree = this.router.createUrlTree(['/print/petition-writer-securities', id]);
         const url = tree.toString();
         const absoluteUrl = `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
         const newWindow = window.open(absoluteUrl, '_blank', 'noopener,noreferrer');

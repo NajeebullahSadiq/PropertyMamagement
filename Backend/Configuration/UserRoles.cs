@@ -240,7 +240,8 @@ namespace WebAPIBackend.Configuration
                     Permissions.SecuritiesView, Permissions.PetitionWriterSecuritiesView,
                     Permissions.PetitionWriterLicenseView, Permissions.ActivityMonitoringView,
                     Permissions.PetitionWriterMonitoringView,
-                    Permissions.ReportsView, Permissions.DashboardView
+                    Permissions.ReportsView, Permissions.DashboardView,
+                    Permissions.AuditLogView
                 },
 
                 UserRoles.CompanyRegistrar => new[]

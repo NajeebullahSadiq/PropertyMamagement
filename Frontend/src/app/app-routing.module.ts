@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/authSetting/auth.guard';
 import { GeolocationGuard } from './auth/authSetting/geolocation.guard';
-import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard, DashboardGuard, SecuritiesModuleGuard, PetitionWriterModuleGuard, ActivityMonitoringGuard, PetitionWriterMonitoringGuard } from './auth/authSetting/role.guard';
+import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard, DashboardGuard, SecuritiesModuleGuard, PetitionWriterModuleGuard, ActivityMonitoringGuard, PetitionWriterMonitoringGuard, AuditLogGuard } from './auth/authSetting/role.guard';
 import { ForbiddenComponent } from './auth/forbidden/forbidden.component';
 import { AccessDeniedComponent } from './auth/access-denied/access-denied.component';
 import { MasterlayoutComponent } from './dashboard/masterlayout/masterlayout.component';
@@ -47,7 +47,7 @@ const routes: Routes = [
       { path: 'petition-writer-license', loadChildren: () => import('./petition-writer-license/petition-writer-license.module').then(m => m.PetitionWriterLicenseModule), canActivate: [PetitionWriterModuleGuard] },
       { path: 'activity-monitoring', loadChildren: () => import('./activity-monitoring/activity-monitoring.module').then(m => m.ActivityMonitoringModule), canActivate: [ActivityMonitoringGuard] },
       { path: 'petition-writer-monitoring', loadChildren: () => import('./petition-writer-monitoring/petition-writer-monitoring.module').then(m => m.PetitionWriterMonitoringModule), canActivate: [PetitionWriterMonitoringGuard] },
-      { path: 'audit-log', loadChildren: () => import('./audit-log/audit-log.module').then(m => m.AuditLogModule), canActivate: [AdminGuard] },
+      { path: 'audit-log', loadChildren: () => import('./audit-log/audit-log.module').then(m => m.AuditLogModule), canActivate: [AuditLogGuard] },
       { path: 'configuration', loadChildren: () => import('./configuration/configuration.module').then(m => m.ConfigurationModule), canActivate: [AdminGuard] },
       { path: 'district-management', loadChildren: () => import('./district-management/district-management.module').then(m => m.DistrictManagementModule), canActivate: [AdminGuard] },
       { path: 'petition-writer-activity-location-management', loadChildren: () => import('./petition-writer-activity-location-management/petition-writer-activity-location-management.module').then(m => m.PetitionWriterActivityLocationManagementModule), canActivate: [AdminGuard] },
@@ -57,12 +57,8 @@ const routes: Routes = [
   { path: 'forbidden', component: ForbiddenComponent },
 
   // Print module lazy-loaded - keeps pdfmake (~500KB) out of initial bundle
+  // All print routes use /print/... child paths so the correct component is resolved
   { path: 'print', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
-  { path: 'printvehicledata', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
-  { path: 'printLicense', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
-  { path: 'printSecurities', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
-  { path: 'printPetitionWriterSecurities', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
-  { path: 'printPetitionWriterLicense', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
 ];
 
 @NgModule({

@@ -131,7 +131,7 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
   }
 
   onPrint(propertyId: number) {
-    const url = this.router.createUrlTree(['/printLicense', propertyId]).toString();
+    const url = this.router.createUrlTree(['/print/license', propertyId]).toString();
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 

@@ -99,7 +99,11 @@ export const Permissions = {
   DashboardView: 'dashboard.view',
 
   // System
-  SystemConfigure: 'system.configure'
+  SystemConfigure: 'system.configure',
+
+  // Audit Log
+  AuditLogView: 'auditlog.view',
+  AuditLogExport: 'auditlog.export'
 } as const;
 
 export interface UserProfile {
@@ -344,6 +348,8 @@ export class RbacService {
         return true; // Public to all authenticated users
       case 'users':
         return this.hasPermission(Permissions.UsersView);
+      case 'auditlog':
+        return this.hasPermission(Permissions.AuditLogView);
       default:
         return false;
     }

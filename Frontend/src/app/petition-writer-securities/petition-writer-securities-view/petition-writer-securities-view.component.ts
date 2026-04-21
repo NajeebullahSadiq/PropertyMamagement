@@ -70,7 +70,7 @@ export class PetitionWriterSecuritiesViewComponent extends BaseComponent impleme
 
     printItem(): void {
         if (this.item?.id) {
-            const tree = this.router.createUrlTree(['/printPetitionWriterSecurities', this.item.id]);
+            const tree = this.router.createUrlTree(['/print/petition-writer-securities', this.item.id]);
             const url = tree.toString();
             const absoluteUrl = `${window.location.origin}${url.startsWith('/') ? url : `/${url}`}`;
             const newWindow = window.open(absoluteUrl, '_blank', 'noopener,noreferrer');

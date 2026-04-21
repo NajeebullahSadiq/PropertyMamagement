@@ -113,7 +113,7 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
     }
 
     printItem(id: number): void {
-        window.open(`/printSecurities/${id}`, '_blank');
+        window.open(`/print/securities/${id}`, '_blank');
     }
 
     deleteItem(id: number): void {

@@ -68,7 +68,7 @@ export class SecuritiesControlViewComponent extends BaseComponent implements OnI
     printItem(): void {
         // Assuming there's a print endpoint for securities control
         if (this.item?.id) {
-            window.open(`/printSecuritiesControl/${this.item.id}`, '_blank');
+            window.open(`/print/securities/${this.item.id}`, '_blank');
         }
     }
 

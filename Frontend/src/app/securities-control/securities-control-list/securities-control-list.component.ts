@@ -117,7 +117,7 @@ export class SecuritiesControlListComponent extends BaseComponent implements OnI
 
     printItem(id: number): void {
         // Assuming there's a print endpoint for securities control
-        window.open(`/printSecuritiesControl/${id}`, '_blank');
+        window.open(`/print/securities/${id}`, '_blank');
     }
 
     deleteItem(id: number): void {
