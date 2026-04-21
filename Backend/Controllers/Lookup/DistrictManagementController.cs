@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models;
+using WebAPIBackend.Services;
 
 namespace WebAPIBackend.Controllers.Lookup
 {
@@ -12,10 +13,12 @@ namespace WebAPIBackend.Controllers.Lookup
     public class DistrictManagementController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILookupCacheService _cache;
 
-        public DistrictManagementController(AppDbContext context)
+        public DistrictManagementController(AppDbContext context, ILookupCacheService cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         /// <summary>
@@ -27,6 +30,7 @@ namespace WebAPIBackend.Controllers.Lookup
             try
             {
                 var districts = await _context.Locations
+                    .AsNoTracking()
                     .Where(x => x.ParentId == provinceId && x.TypeId == 3)
                     .OrderByDescending(x => x.IsActive)
                     .ThenBy(x => x.Dari)
@@ -57,18 +61,15 @@ namespace WebAPIBackend.Controllers.Lookup
         {
             try
             {
-                var provinces = await _context.Locations
-                    .Where(x => x.TypeId == 2 && x.IsActive == 1)
-                    .OrderBy(x => x.Dari)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.Name,
-                        x.Dari
-                    })
-                    .ToListAsync();
+                var provinces = await _cache.GetProvincesAsync();
+                var result = provinces.Select(x => new
+                {
+                    x.Id,
+                    x.Name,
+                    x.Dari
+                }).ToList();
 
-                return Ok(provinces);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -85,6 +86,7 @@ namespace WebAPIBackend.Controllers.Lookup
             try
             {
                 var district = await _context.Locations
+                    .AsNoTracking()
                     .Where(x => x.Id == id && x.TypeId == 3)
                     .Select(x => new
                     {
@@ -129,7 +131,7 @@ namespace WebAPIBackend.Controllers.Lookup
 
                 // Check if district with same name already exists for this province
                 var existingDistrict = await _context.Locations
-                    .AnyAsync(x => x.ParentId == request.ProvinceId && 
+                    .AsNoTracking().AnyAsync(x => x.ParentId == request.ProvinceId && 
                                    x.TypeId == 3 && 
                                    x.Dari == request.Dari);
 
@@ -150,6 +152,10 @@ namespace WebAPIBackend.Controllers.Lookup
 
                 _context.Locations.Add(district);
                 await _context.SaveChangesAsync();
+
+                _cache.InvalidateCache(LookupCacheService.ProvincesKey);
+                _cache.InvalidateCache(LookupCacheService.AllDistrictsKey);
+                _cache.InvalidateCache($"{LookupCacheService.DistrictsByProvinceKeyPrefix}{request.ProvinceId}");
 
                 return Ok(new
                 {
@@ -198,7 +204,7 @@ namespace WebAPIBackend.Controllers.Lookup
 
                 // Check if another district with same name exists for this province
                 var duplicateDistrict = await _context.Locations
-                    .AnyAsync(x => x.ParentId == district.ParentId && 
+                    .AsNoTracking().AnyAsync(x => x.ParentId == district.ParentId && 
                                    x.TypeId == 3 && 
                                    x.Dari == request.Dari &&
                                    x.Id != id);
@@ -213,6 +219,9 @@ namespace WebAPIBackend.Controllers.Lookup
                 district.PathDari = $"{province.Dari}/{request.Dari}";
 
                 await _context.SaveChangesAsync();
+
+                _cache.InvalidateCache(LookupCacheService.AllDistrictsKey);
+                _cache.InvalidateCache($"{LookupCacheService.DistrictsByProvinceKeyPrefix}{district.ParentId}");
 
                 return Ok(new
                 {
@@ -261,6 +270,9 @@ namespace WebAPIBackend.Controllers.Lookup
                 district.IsActive = 0;
                 await _context.SaveChangesAsync();
 
+                _cache.InvalidateCache(LookupCacheService.AllDistrictsKey);
+                _cache.InvalidateCache($"{LookupCacheService.DistrictsByProvinceKeyPrefix}{district.ParentId}");
+
                 return Ok(new { message = "ولسوالی با موفقیت حذف شد" });
             }
             catch (Exception ex)
@@ -289,6 +301,9 @@ namespace WebAPIBackend.Controllers.Lookup
                 district.IsActive = 1;
                 await _context.SaveChangesAsync();
 
+                _cache.InvalidateCache(LookupCacheService.AllDistrictsKey);
+                _cache.InvalidateCache($"{LookupCacheService.DistrictsByProvinceKeyPrefix}{district.ParentId}");
+
                 return Ok(new { message = "ولسوالی با موفقیت فعال شد" });
             }
             catch (Exception ex)
@@ -304,16 +319,16 @@ namespace WebAPIBackend.Controllers.Lookup
         {
             // Check in various tables that reference districts
             var usedInCompanyOwner = await _context.CompanyOwners
-                .AnyAsync(x => x.OwnerDistrictId == districtId || x.PermanentDistrictId == districtId);
+                .AsNoTracking().AnyAsync(x => x.OwnerDistrictId == districtId || x.PermanentDistrictId == districtId);
 
             var usedInGuarantor = await _context.Guarantors
-                .AnyAsync(x => x.PaddressDistrictId == districtId || x.TaddressDistrictId == districtId);
+                .AsNoTracking().AnyAsync(x => x.PaddressDistrictId == districtId || x.TaddressDistrictId == districtId);
 
             var usedInSeller = await _context.SellerDetails
-                .AnyAsync(x => x.PaddressDistrictId == districtId || x.TaddressDistrictId == districtId);
+                .AsNoTracking().AnyAsync(x => x.PaddressDistrictId == districtId || x.TaddressDistrictId == districtId);
 
             var usedInBuyer = await _context.BuyerDetails
-                .AnyAsync(x => x.PaddressDistrictId == districtId || x.TaddressDistrictId == districtId);
+                .AsNoTracking().AnyAsync(x => x.PaddressDistrictId == districtId || x.TaddressDistrictId == districtId);
 
             return usedInCompanyOwner || usedInGuarantor || usedInSeller || usedInBuyer;
         }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterMonitoringService } from 'src/app/shared/petition-writer-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -11,7 +13,7 @@ import { PetitionWriterMonitoringRecord, PetitionWriterMonitoringSectionTypes } 
     templateUrl: './petition-writer-monitoring-view.component.html',
     styleUrls: ['./petition-writer-monitoring-view.component.scss']
 })
-export class PetitionWriterMonitoringViewComponent implements OnInit {
+export class PetitionWriterMonitoringViewComponent extends BaseComponent implements OnInit {
     record: PetitionWriterMonitoringRecord | null = null;
     isLoading = true;
     sectionTypes = PetitionWriterMonitoringSectionTypes;
@@ -25,7 +27,9 @@ export class PetitionWriterMonitoringViewComponent implements OnInit {
         private toastr: ToastrService,
         private calendarService: CalendarService,
         private rbacService: RbacService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();

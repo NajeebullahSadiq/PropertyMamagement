@@ -87,12 +87,12 @@ export class CompnaydetailService {
     return this.http.put<LicenseDetail>(url, propertyDetails);
   }
 
-  getComapaniesList(search?: string): Observable<companydetailsList[]> {
-    let url = this.baseUrl;
+  getComapaniesList(page: number = 1, pageSize: number = 20, search?: string): Observable<any> {
+    let url = `${this.baseUrl}?page=${page}&pageSize=${pageSize}`;
     if (search && search.trim()) {
-      url += `?search=${encodeURIComponent(search.trim())}`;
+      url += `&search=${encodeURIComponent(search.trim())}`;
     }
-    return this.http.get<companydetailsList[]>(url);
+    return this.http.get<any>(url);
   }
   getexpiredList(): Observable<companydetailsList[]> {
     return this.http.get<companydetailsList[]>(this.baseUrl+'/getexpired');

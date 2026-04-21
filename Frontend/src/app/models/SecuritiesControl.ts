@@ -130,6 +130,9 @@ export interface SecuritiesControlData {
 
     // Tab 4: Remarks
     remarks?: string;
+
+    // Calendar type for date conversion
+    calendarType?: string;
 }
 
 /**

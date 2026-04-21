@@ -2,6 +2,8 @@ import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@
 import '@angular/localize/init';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatDialog } from '@angular/material/dialog';
 import { companydetails } from 'src/app/models/companydetails';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
@@ -18,7 +20,7 @@ import { ConfirmationDialogComponent } from 'src/app/shared/confirmation-dialog/
   templateUrl: './companydetails.component.html',
   styleUrls: ['./companydetails.component.scss'],
 })
-export class CompanydetailsComponent {
+export class CompanydetailsComponent extends BaseComponent {
 
   imageName:string=''
   companyForm: FormGroup = new FormGroup({});
@@ -42,6 +44,7 @@ export class CompanydetailsComponent {
 	private propertyDetailsService: PropertyService, private parentComponent: RealestateComponent,
 	private calendarConversionService: CalendarConversionService, private calendarService: CalendarService,
 	private rbacService: RbacService, private dialog: MatDialog){
+	super();
 	this.companyForm = this.fb.group({
 		id: [0],
 		title: ['', Validators.required],

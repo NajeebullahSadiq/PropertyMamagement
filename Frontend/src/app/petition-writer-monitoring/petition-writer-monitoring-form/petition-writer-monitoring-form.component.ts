@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterMonitoringService } from 'src/app/shared/petition-writer-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -21,7 +23,7 @@ import { CalendarType } from 'src/app/models/calendar-type';
     templateUrl: './petition-writer-monitoring-form.component.html',
     styleUrls: ['./petition-writer-monitoring-form.component.scss'],
 })
-export class PetitionWriterMonitoringFormComponent implements OnInit {
+export class PetitionWriterMonitoringFormComponent extends BaseComponent implements OnInit {
 
     mainForm!: FormGroup;
     isEditMode = false;
@@ -54,6 +56,7 @@ export class PetitionWriterMonitoringFormComponent implements OnInit {
         private rbacService: RbacService,
         private authService: AuthService
     ) {
+        super();
         this.initForm();
     }
 

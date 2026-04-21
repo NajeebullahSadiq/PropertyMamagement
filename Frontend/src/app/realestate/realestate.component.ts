@@ -3,7 +3,8 @@ import { Component, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Observable } from 'rxjs';
+import { map, Observable, takeUntil } from 'rxjs';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { CompnaydetailService } from '../shared/compnaydetail.service';
 import { CompanydetailsComponent } from './companydetails/companydetails.component';
 import { CompanyownerComponent } from './companyowner/companyowner.component';
@@ -16,7 +17,7 @@ import { LicensedetailsComponent } from './licensedetails/licensedetails.compone
   templateUrl: './realestate.component.html',
   styleUrls: ['./realestate.component.scss']
 })
-export class RealestateComponent {
+export class RealestateComponent extends BaseComponent {
   PropertyId: number=0;
   @ViewChild('companydetails') companydetails!: CompanydetailsComponent;
   @ViewChild('companyowner') companyowner!: CompanyownerComponent;
@@ -26,10 +27,12 @@ export class RealestateComponent {
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
 
   
-  constructor(private observer: BreakpointObserver,private route: ActivatedRoute, public comservice:CompnaydetailService) {}
+  constructor(private observer: BreakpointObserver,private route: ActivatedRoute, public comservice:CompnaydetailService) {
+    super();
+  }
  
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.PropertyId = params['id'] ? parseInt(params['id'], 10) : 0;
     });
 

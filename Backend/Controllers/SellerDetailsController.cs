@@ -10,6 +10,7 @@ using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.RequestData;
+using WebAPIBackend.Services;
 
 namespace WebAPIBackend.Controllers
 {
@@ -20,9 +21,11 @@ namespace WebAPIBackend.Controllers
     {
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
-        public SellerDetailsController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly ILookupCacheService _cache;
+        public SellerDetailsController(AppDbContext context, UserManager<ApplicationUser> userManager, ILookupCacheService cache)
         {
             _context = context;
+            _cache = cache;
             _userManager = userManager;
         }
         [HttpGet]
@@ -30,7 +33,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var sellers = await _context.SellerDetails.ToListAsync();
+                var sellers = await _context.SellerDetails.AsNoTracking().ToListAsync();
 
                 return Ok(sellers);
             }
@@ -45,7 +48,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var Pro = await _context.SellerDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+                var Pro = await _context.SellerDetails.AsNoTracking().Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
 
                 return Ok(Pro);
             }
@@ -60,7 +63,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var buyers = await _context.BuyerDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+                var buyers = await _context.BuyerDetails.AsNoTracking().Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
 
                 // Map to response format with electronicNationalIdNumber
                 var mappedBuyers = buyers.Select(b => new
@@ -115,7 +118,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var Pro = await _context.WitnessDetails.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+                var Pro = await _context.WitnessDetails.AsNoTracking().Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
 
                 return Ok(Pro);
             }
@@ -130,7 +133,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var Pro = await _context.PropertyAddresses.Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
+                var Pro = await _context.PropertyAddresses.AsNoTracking().Where(x => x.PropertyDetailsId.Equals(id)).ToListAsync();
 
                 return Ok(Pro);
             }
@@ -170,6 +173,7 @@ namespace WebAPIBackend.Controllers
 
                 // Find all active registrations with same owner identity (excluding cancelled ones)
                 var duplicates = await _context.SellerDetails
+                    .AsNoTracking()
                     .Where(s => 
                         (s.FirstName ?? "").Trim() == firstName &&
                         (s.FatherName ?? "").Trim() == fatherName &&
@@ -179,14 +183,19 @@ namespace WebAPIBackend.Controllers
                         restrictedTransactionTypeIds.Contains(s.PropertyDetails.TransactionTypeId.Value) &&
                         !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == s.PropertyDetailsId) &&
                         s.Id != request.SellerId) // Exclude current seller if editing
-                    .Include(s => s.PropertyDetails)
-                    .ThenInclude(p => p!.TransactionType)
+                    .Select(s => new
+                    {
+                        s.Id,
+                        TransactionTypeName = s.PropertyDetails != null && s.PropertyDetails.TransactionType != null
+                            ? s.PropertyDetails.TransactionType.Name
+                            : "Unknown"
+                    })
                     .ToListAsync();
 
                 if (duplicates.Count > 0)
                 {
                     var existingTransaction = duplicates.First();
-                    var transactionTypeName = existingTransaction.PropertyDetails?.TransactionType?.Name ?? "Unknown";
+                    var transactionTypeName = existingTransaction.TransactionTypeName;
                     
                     var message = $"این ملک قبلاً توسط همین مالک برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
                     
@@ -415,6 +424,7 @@ namespace WebAPIBackend.Controllers
 
                 // Find all active registrations with same buyer identity
                 var duplicates = await _context.BuyerDetails
+                    .AsNoTracking()
                     .Where(b => 
                         (b.FirstName ?? "").Trim() == firstName &&
                         (b.FatherName ?? "").Trim() == fatherName &&
@@ -423,14 +433,19 @@ namespace WebAPIBackend.Controllers
                         b.PropertyDetails.TransactionTypeId.HasValue &&
                         restrictedTransactionTypeIds.Contains(b.PropertyDetails.TransactionTypeId.Value) &&
                         b.Id != request.SellerId) // Exclude current buyer if editing
-                    .Include(b => b.PropertyDetails)
-                    .ThenInclude(p => p!.TransactionType)
+                    .Select(b => new
+                    {
+                        b.Id,
+                        TransactionTypeName = b.PropertyDetails != null && b.PropertyDetails.TransactionType != null
+                            ? b.PropertyDetails.TransactionType.Name
+                            : "Unknown"
+                    })
                     .ToListAsync();
 
                 if (duplicates.Count > 0)
                 {
                     var existingTransaction = duplicates.First();
-                    var transactionTypeName = existingTransaction.PropertyDetails?.TransactionType?.Name ?? "Unknown";
+                    var transactionTypeName = existingTransaction.TransactionTypeName;
                     
                     var message = $"این ملک قبلاً توسط همین مشتری برای {GetDariTransactionType(transactionTypeName)} ثبت شده است. تا زمان ختم یا ابطال معامله قبلی، ثبت دوباره اجازه نیست.";
                     
@@ -1186,7 +1201,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.Locations.Where(x=>x.TypeId.Equals(2)).ToListAsync();
+                var locations = await _cache.GetProvincesAsync();
 
                 return Ok(locations);
             }
@@ -1201,7 +1216,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.Locations.Where(x=>x.TypeId.Equals(2)).ToListAsync();
+                var locations = await _cache.GetProvincesAsync();
 
                 return Ok(locations);
             }
@@ -1215,7 +1230,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.Locations.Where(x => x.TypeId.Equals(3)).ToListAsync();
+                var locations = await _cache.GetAllDistrictsAsync();
 
                 return Ok(locations);
             }
@@ -1229,7 +1244,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.Locations.Where(x => x.ParentId.Equals(id)).ToListAsync();
+                var locations = await _cache.GetDistrictsAsync(id);
 
                 return Ok(locations);
             }
@@ -1257,7 +1272,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.EducationLevels.ToListAsync();
+                var locations = await _cache.GetEducationLevelsAsync();
 
                 return Ok(locations);
             }
@@ -1271,7 +1286,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.AddressTypes.ToListAsync();
+                var locations = await _cache.GetAddressTypesAsync();
 
                 return Ok(locations);
             }
@@ -1285,7 +1300,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.Areas.ToListAsync();
+                var locations = await _cache.GetAreasAsync();
 
                 return Ok(locations);
             }
@@ -1300,7 +1315,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var locations = await _context.GuaranteeTypes.ToListAsync();
+                var locations = await _cache.GetGuaranteeTypesAsync();
 
                 return Ok(locations);
             }

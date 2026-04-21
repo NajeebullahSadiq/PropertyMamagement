@@ -36,6 +36,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var query = _context.PetitionWriterSecurities
+                    .AsNoTracking()
                     .Where(x => x.Status == true)
                     .AsQueryable();
 
@@ -121,6 +122,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var item = await _context.PetitionWriterSecurities
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (item == null)
@@ -189,7 +191,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Check for unique registration number
                 var exists = await _context.PetitionWriterSecurities
-                    .AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Status == true);
 
                 if (exists)
                 {
@@ -272,7 +274,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Check for unique registration number (excluding current record)
                 var exists = await _context.PetitionWriterSecurities
-                    .AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Id != id && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Id != id && x.Status == true);
 
                 if (exists)
                 {
@@ -407,6 +409,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Base query - all active petition writer securities
                 var query = _context.PetitionWriterSecurities
+                    .AsNoTracking()
                     .Where(x => x.Status == true)
                     .AsQueryable();
 

@@ -31,11 +31,7 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 var Pro = await _context.CompanyOwners
-                    .Include(o => o.OwnerProvince)
-                    .Include(o => o.OwnerDistrict)
-                    .Include(o => o.PermanentProvince)
-                    .Include(o => o.PermanentDistrict)
-                    .Include(o => o.EducationLevel)
+                    .AsNoTracking()
                     .Where(x => x.CompanyId.Equals(id))
                     .Select(o => new
                     {
@@ -87,6 +83,7 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 var owner = await _context.CompanyOwners
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.CompanyId == companyId);
 
                 if (owner == null)
@@ -95,6 +92,7 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 var history = await _context.CompanyOwnerAddressHistories
+                    .AsNoTracking()
                     .Where(h => h.CompanyOwnerId == owner.Id)
                     .OrderByDescending(h => h.EffectiveFrom)
                     .Select(h => new

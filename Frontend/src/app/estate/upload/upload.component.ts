@@ -2,6 +2,8 @@ import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatDialog } from '@angular/material/dialog';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
 import { FileService } from 'src/app/shared/file.service';
@@ -13,7 +15,7 @@ import {environment } from 'src/environments/environment';
   styleUrls: ['./upload.component.scss'],
   providers: [DatePipe]
 })
-export class UploadComponent implements OnInit, OnChanges {
+export class UploadComponent extends BaseComponent implements OnInit, OnChanges {
 
   progress:number =0;
   message: string='';
@@ -36,7 +38,7 @@ export class UploadComponent implements OnInit, OnChanges {
     private dialog: MatDialog,
     private fileService: FileService
   ) { 
-   
+    super();
   }
 
   ngOnInit() {

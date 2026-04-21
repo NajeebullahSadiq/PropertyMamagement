@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PropertyDetails, PropertyDetailsList } from 'src/app/models/PropertyDetail';
 import { PropertyService } from 'src/app/shared/property.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
@@ -15,14 +17,14 @@ import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirm
   styleUrls: ['./propertydetailslist.component.scss']
 })
 
-export class PropertydetailslistComponent {
+export class PropertydetailslistComponent extends BaseComponent {
   properties!: PropertyDetailsList[];
   filteredProperties!: PropertyDetailsList[];
   searchTerm: string = '';
   page: number = 1;
   count: number = 0;
-  tableSize: number = 10;
-  tableSizes: any = [10,50,100];
+  tableSize: number = 20;
+  tableSizes: any = [10,20,50,100];
   
   // RBAC flags
   isViewOnly = false;
@@ -40,7 +42,9 @@ export class PropertydetailslistComponent {
     private localizationService: LocalizationService,
     private rbacService: RbacService,
     private dialog: MatDialog
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit() {
     // Load RBAC permissions
@@ -53,22 +57,23 @@ export class PropertydetailslistComponent {
     
     this.loadData();
     // Subscribe to property added event to reload list immediately
-    this.propertyService.propertyAdded.subscribe(() => {
+    this.propertyService.propertyAdded.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadData();
     });
   }
 
   loadData(){
-    this.propertyService.getPropertyDetails().subscribe(properties => {
+    this.propertyService.getPropertyDetails(this.page, this.tableSize, this.searchTerm).pipe(takeUntil(this.destroy$)).subscribe(response => {
+      const items: any[] = response?.items || [];
       // Ensure no English is visible in UI for property type and transaction type.
-      const mapped = (properties || []).map(p => ({
+      const mapped = items.map((p: any) => ({
         ...p,
         propertyTypeText: this.getDariPropertyTypeLabel(p.propertyTypeText),
         transactionTypeText: this.getDariTransactionTypeLabel(p.transactionTypeText)
       }));
       this.properties = mapped;
-      this.filteredProperties = this.filterProperties(mapped, this.searchTerm);
-      this.count = this.filteredProperties.length;
+      this.filteredProperties = mapped;
+      this.count = response?.totalCount || 0;
     });
   }
 
@@ -131,9 +136,8 @@ export class PropertydetailslistComponent {
   }
 
   onSearch() {
-    this.filteredProperties = this.filterProperties(this.properties, this.searchTerm);
-    this.count = this.filteredProperties.length;
     this.page = 1;
+    this.loadData();
   }
 
   filterProperties(properties: PropertyDetailsList[], searchTerm: string): PropertyDetailsList[] {

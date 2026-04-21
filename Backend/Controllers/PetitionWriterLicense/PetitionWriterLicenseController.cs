@@ -19,11 +19,13 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
     {
         private readonly AppDbContext _context;
         private readonly ILicenseNumberGenerator _licenseNumberGenerator;
+        private readonly ILookupCacheService _cache;
 
-        public PetitionWriterLicenseController(AppDbContext context, ILicenseNumberGenerator licenseNumberGenerator)
+        public PetitionWriterLicenseController(AppDbContext context, ILicenseNumberGenerator licenseNumberGenerator, ILookupCacheService cache)
         {
             _context = context;
             _licenseNumberGenerator = licenseNumberGenerator;
+            _cache = cache;
         }
 
         #region Main License CRUD
@@ -41,6 +43,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             try
             {
                 var query = _context.PetitionWriterLicenses
+                    .AsNoTracking()
                     .Where(x => x.Status == true)
                     .AsQueryable();
 
@@ -58,11 +61,6 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                     .OrderByDescending(x => x.Id)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
-                    .Include(x => x.Province)
-                    .Include(x => x.PermanentProvince)
-                    .Include(x => x.PermanentDistrict)
-                    .Include(x => x.CurrentProvince)
-                    .Include(x => x.CurrentDistrict)
                     .Select(x => new
                     {
                         x.Id,
@@ -145,13 +143,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 var printCalendar = CalendarType.HijriShamsi;
 
                 var item = await _context.PetitionWriterLicenses
+                    .AsNoTracking()
                     .Where(x => x.Id == id && x.Status == true)
-                    .Include(x => x.Province)
-                    .Include(x => x.PermanentProvince)
-                    .Include(x => x.PermanentDistrict)
-                    .Include(x => x.CurrentProvince)
-                    .Include(x => x.CurrentDistrict)
-                    .Include(x => x.Relocations)
                     .Select(x => new
                     {
                         x.Id,
@@ -254,7 +247,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 // Check for duplicate license number
                 var exists = await _context.PetitionWriterLicenses
-                    .AnyAsync(x => x.LicenseNumber == licenseNumber && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.LicenseNumber == licenseNumber && x.Status == true);
 
                 if (exists)
                 {
@@ -341,7 +334,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 if (licenseNumber != entity.LicenseNumber)
                 {
                     var exists = await _context.PetitionWriterLicenses
-                        .AnyAsync(x => x.LicenseNumber == licenseNumber && x.Id != id && x.Status == true);
+                        .AsNoTracking().AnyAsync(x => x.LicenseNumber == licenseNumber && x.Id != id && x.Status == true);
 
                     if (exists)
                     {
@@ -471,18 +464,15 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
         {
             try
             {
-                var provinces = await _context.Locations
-                    .Where(l => l.TypeId == 2 && l.IsActive == 1)
-                    .OrderBy(l => l.Dari)
-                    .Select(l => new
-                    {
-                        l.Id,
-                        l.Name,
-                        l.Dari
-                    })
-                    .ToListAsync();
+                var provinces = await _cache.GetProvincesAsync();
+                var result = provinces.Select(l => new
+                {
+                    l.Id,
+                    l.Name,
+                    l.Dari
+                }).ToList();
 
-                return Ok(provinces);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -498,18 +488,15 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
         {
             try
             {
-                var districts = await _context.Locations
-                    .Where(x => x.ParentId == provinceId && x.TypeId == 3 && x.IsActive == 1)
-                    .OrderBy(x => x.Dari)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.Name,
-                        x.Dari
-                    })
-                    .ToListAsync();
+                var districts = await _cache.GetDistrictsAsync(provinceId);
+                var result = districts.Select(x => new
+                {
+                    x.Id,
+                    x.Name,
+                    x.Dari
+                }).ToList();
 
-                return Ok(districts);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -525,16 +512,13 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
         {
             try
             {
-                var items = await _context.PetitionWriterActivityLocations
-                    .Where(x => x.IsActive)
-                    .OrderBy(x => x.DariName)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.Name,
-                        x.DariName
-                    })
-                    .ToListAsync();
+                var cachedItems = await _cache.GetActiveActivityLocationsAsync();
+                var items = cachedItems.Select(x => new
+                {
+                    x.Id,
+                    x.Name,
+                    x.DariName
+                }).ToList();
 
                 return Ok(items);
             }
@@ -559,6 +543,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
                 var items = await _context.PetitionWriterRelocations
+                    .AsNoTracking()
                     .Where(x => x.PetitionWriterLicenseId == licenseId)
                     .OrderByDescending(x => x.RelocationDate)
                     .Select(x => new
@@ -598,7 +583,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 }
 
                 var licenseExists = await _context.PetitionWriterLicenses
-                    .AnyAsync(x => x.Id == licenseId && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.Id == licenseId && x.Status == true);
 
                 if (!licenseExists)
                 {

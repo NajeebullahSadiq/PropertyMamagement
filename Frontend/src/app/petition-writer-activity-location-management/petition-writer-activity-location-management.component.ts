@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterActivityLocationService } from 'src/app/shared/petition-writer-activity-location.service';
 import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
@@ -10,7 +12,7 @@ import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirm
   templateUrl: './petition-writer-activity-location-management.component.html',
   styleUrls: ['./petition-writer-activity-location-management.component.scss']
 })
-export class PetitionWriterActivityLocationManagementComponent implements OnInit {
+export class PetitionWriterActivityLocationManagementComponent extends BaseComponent implements OnInit {
   locations: any[] = [];
   locationForm: FormGroup;
   isEditMode: boolean = false;
@@ -24,6 +26,7 @@ export class PetitionWriterActivityLocationManagementComponent implements OnInit
     private toastr: ToastrService,
     private dialog: MatDialog
   ) {
+    super();
     this.locationForm = this.fb.group({
       dariName: ['', Validators.required],
       name: ['']

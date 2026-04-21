@@ -1,6 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { AuthService } from 'src/app/shared/auth.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
@@ -12,7 +14,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent extends BaseComponent implements OnInit {
   filePath: string = 'assets/img/avatar.png';
   baseUrl = environment.apiURL + '/';
   imageName: string = '';
@@ -54,19 +56,21 @@ export class RegisterComponent implements OnInit {
     private rbacService: RbacService,
     private companyService: CompnaydetailService,
     private toastr: ToastrService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.service.formModel.reset();
-    this.service.getCompanies().subscribe(res => {
+    this.service.getCompanies().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.companylist = res;
     });
-    this.service.getRoles().subscribe(res => {
+    this.service.getRoles().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.roles = res;
     });
     
     // Load provinces for license search
-    this.companyService.getProvinces().subscribe(res => {
+    this.companyService.getProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.provinces = res;
     });
     

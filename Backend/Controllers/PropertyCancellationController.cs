@@ -27,7 +27,9 @@ namespace WebAPIBackend.Controllers
         }
 
         [HttpGet("GetActiveTransactions")]
-        public async Task<IActionResult> GetActiveTransactions()
+        public async Task<IActionResult> GetActiveTransactions(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
         {
             try
             {
@@ -49,18 +51,22 @@ namespace WebAPIBackend.Controllers
 
                 if (roles.Contains("ADMIN"))
                 {
-                    propertyQuery = _context.PropertyDetails;
+                    propertyQuery = _context.PropertyDetails.AsNoTracking();
                 }
                 else
                 {
-                    propertyQuery = _context.PropertyDetails.Where(p => p.CreatedBy == userId);
+                    propertyQuery = _context.PropertyDetails.AsNoTracking().Where(p => p.CreatedBy == userId);
                 }
 
-                var activeTransactions = await propertyQuery
-                    .Where(p => !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == p.Id))
-                    .Include(p => p.SellerDetails)
-                    .Include(p => p.BuyerDetails)
-                    .Include(p => p.TransactionType)
+                var activeQuery = propertyQuery
+                    .Where(p => !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == p.Id));
+
+                var totalCount = await activeQuery.CountAsync();
+
+                var activeTransactions = await activeQuery
+                    .OrderByDescending(p => p.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(p => new
                     {
                         p.Id,
@@ -78,7 +84,13 @@ namespace WebAPIBackend.Controllers
                     })
                     .ToListAsync();
 
-                return Ok(activeTransactions);
+                return Ok(new
+                {
+                    items = activeTransactions,
+                    totalCount,
+                    page,
+                    pageSize
+                });
             }
             catch (Exception ex)
             {
@@ -87,7 +99,9 @@ namespace WebAPIBackend.Controllers
         }
 
         [HttpGet("GetCancelledTransactions")]
-        public async Task<IActionResult> GetCancelledTransactions()
+        public async Task<IActionResult> GetCancelledTransactions(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
         {
             try
             {
@@ -109,22 +123,21 @@ namespace WebAPIBackend.Controllers
 
                 if (roles.Contains("ADMIN"))
                 {
-                    cancellationQuery = _context.PropertyCancellations;
+                    cancellationQuery = _context.PropertyCancellations.AsNoTracking();
                 }
                 else
                 {
                     cancellationQuery = _context.PropertyCancellations
+                        .AsNoTracking()
                         .Where(c => c.PropertyDetails != null && c.PropertyDetails.CreatedBy == userId);
                 }
 
+                var totalCount = await cancellationQuery.CountAsync();
+
                 var cancelledTransactions = await cancellationQuery
-                    .Include(c => c.PropertyDetails!)
-                    .ThenInclude(p => p.SellerDetails)
-                    .Include(c => c.PropertyDetails!)
-                    .ThenInclude(p => p.BuyerDetails)
-                    .Include(c => c.PropertyDetails!)
-                    .ThenInclude(p => p.TransactionType)
-                    .Include(c => c.PropertyCancellationDocuments)
+                    .OrderByDescending(c => c.CancellationDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(c => new
                     {
                         c.Id,
@@ -150,10 +163,15 @@ namespace WebAPIBackend.Controllers
                                 d.CreatedAt
                             })
                     })
-                    .OrderByDescending(c => c.CancellationDate)
                     .ToListAsync();
 
-                return Ok(cancelledTransactions);
+                return Ok(new
+                {
+                    items = cancelledTransactions,
+                    totalCount,
+                    page,
+                    pageSize
+                });
             }
             catch (Exception ex)
             {
@@ -279,7 +297,7 @@ namespace WebAPIBackend.Controllers
 
                 var roles = await _userManager.GetRolesAsync(user);
 
-                IQueryable<PropertyCancellation> cancellationQuery = _context.PropertyCancellations;
+                IQueryable<PropertyCancellation> cancellationQuery = _context.PropertyCancellations.AsNoTracking();
 
                 if (!roles.Contains("ADMIN"))
                 {
@@ -287,33 +305,34 @@ namespace WebAPIBackend.Controllers
                 }
 
                 var cancellation = await cancellationQuery
-                    .Include(c => c.PropertyCancellationDocuments)
-                    .FirstOrDefaultAsync(c => c.PropertyDetailsId == propertyDetailsId);
+                    .Where(c => c.PropertyDetailsId == propertyDetailsId)
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.PropertyDetailsId,
+                        c.CancellationDate,
+                        c.CancellationReason,
+                        c.CancelledBy,
+                        c.Status,
+                        c.CreatedAt,
+                        Documents = c.PropertyCancellationDocuments
+                            .OrderByDescending(d => d.CreatedAt)
+                            .Select(d => new
+                            {
+                                d.Id,
+                                FilePath = d.FilePath,
+                                FileName = d.OriginalFileName,
+                                d.CreatedAt
+                            })
+                    })
+                    .FirstOrDefaultAsync();
 
                 if (cancellation == null)
                 {
                     return NotFound(new { error = "Cancellation not found" });
                 }
 
-                return Ok(new
-                {
-                    cancellation.Id,
-                    cancellation.PropertyDetailsId,
-                    cancellation.CancellationDate,
-                    cancellation.CancellationReason,
-                    cancellation.CancelledBy,
-                    cancellation.Status,
-                    cancellation.CreatedAt,
-                    Documents = cancellation.PropertyCancellationDocuments
-                        .OrderByDescending(d => d.CreatedAt)
-                        .Select(d => new
-                        {
-                            d.Id,
-                            FilePath = d.FilePath,
-                            FileName = d.OriginalFileName,
-                            d.CreatedAt
-                        })
-                });
+                return Ok(cancellation);
             }
             catch (Exception ex)
             {
@@ -327,6 +346,7 @@ namespace WebAPIBackend.Controllers
             try
             {
                 var cancellation = await _context.PropertyCancellations
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.PropertyDetailsId == propertyDetailsId);
 
                 return Ok(new { isCancelled = cancellation != null });

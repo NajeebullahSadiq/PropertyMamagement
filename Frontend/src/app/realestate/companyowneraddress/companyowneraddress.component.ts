@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { companyOwnerAddress, companyOwnerAddressData } from 'src/app/models/companyOwnerAddress';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
@@ -10,7 +12,7 @@ import { SellerService } from 'src/app/shared/seller.service';
   templateUrl: './companyowneraddress.component.html',
   styleUrls: ['./companyowneraddress.component.scss']
 })
-export class CompanyowneraddressComponent {
+export class CompanyowneraddressComponent extends BaseComponent {
   owneraddressForm: FormGroup = new FormGroup({});
   province: any;
   district: any;
@@ -23,6 +25,7 @@ export class CompanyowneraddressComponent {
   }
   owneraddressDetails!: companyOwnerAddressData[];
   constructor(private fb: FormBuilder, private toastr: ToastrService, private comservice: CompnaydetailService, private selerService: SellerService) {
+    super();
     this.owneraddressForm = this.fb.group({
       id: [0],
       companyOwnerId: [''],
@@ -35,10 +38,10 @@ export class CompanyowneraddressComponent {
 
   }
   ngOnInit() {
-    this.selerService.getprovince().subscribe(res => {
+    this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.province = res;
     });
-    this.comservice.getAddressType().subscribe(res => {
+    this.comservice.getAddressType().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.addressType = res;
     });
     this.comservice.getOwnerAddressById(this.id)

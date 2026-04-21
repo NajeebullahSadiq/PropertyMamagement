@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { AuditLogService, AuditLog, AuditStatistics, AuditLogDetail } from './audit-log.service';
 
 @Component({
@@ -8,7 +10,7 @@ import { AuditLogService, AuditLog, AuditStatistics, AuditLogDetail } from './au
   templateUrl: './audit-log.component.html',
   styleUrls: ['./audit-log.component.scss']
 })
-export class AuditLogComponent implements OnInit {
+export class AuditLogComponent extends BaseComponent implements OnInit {
   auditLogs: AuditLog[] = [];
   statistics: AuditStatistics | null = null;
   modules: string[] = [];
@@ -90,6 +92,7 @@ export class AuditLogComponent implements OnInit {
     private fb: FormBuilder,
     private dialog: MatDialog
   ) {
+    super();
     this.filterForm = this.fb.group({
       module: [''],
       actionType: [''],
@@ -107,7 +110,7 @@ export class AuditLogComponent implements OnInit {
   }
 
   loadModules(): void {
-    this.auditLogService.getModules().subscribe({
+    this.auditLogService.getModules().pipe(takeUntil(this.destroy$)).subscribe({
       next: (modules: any) => {
         console.log('Modules response:', modules);
         this.modules = modules || [];
@@ -117,7 +120,7 @@ export class AuditLogComponent implements OnInit {
   }
 
   loadActionTypes(): void {
-    this.auditLogService.getActionTypes().subscribe({
+    this.auditLogService.getActionTypes().pipe(takeUntil(this.destroy$)).subscribe({
       next: (types: any) => {
         console.log('Action types response:', types);
         this.actionTypes = types || [];

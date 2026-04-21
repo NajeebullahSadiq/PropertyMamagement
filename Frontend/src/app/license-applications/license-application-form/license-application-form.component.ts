@@ -2,6 +2,8 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatTabGroup } from '@angular/material/tabs';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
@@ -23,7 +25,7 @@ import {
     templateUrl: './license-application-form.component.html',
     styleUrls: ['./license-application-form.component.scss'],
 })
-export class LicenseApplicationFormComponent implements OnInit {
+export class LicenseApplicationFormComponent extends BaseComponent implements OnInit {
 
     @ViewChild('tabGroup') tabGroup!: MatTabGroup;
 
@@ -71,6 +73,7 @@ export class LicenseApplicationFormComponent implements OnInit {
         private sellerService: SellerService,
         private rbacService: RbacService
     ) {
+        super();
         this.initForms();
     }
 
@@ -141,7 +144,7 @@ export class LicenseApplicationFormComponent implements OnInit {
     }
 
     loadDropdowns(): void {
-        this.sellerService.getprovince().subscribe((res: any) => {
+        this.sellerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
             this.provinces = res as any[];
         });
     }

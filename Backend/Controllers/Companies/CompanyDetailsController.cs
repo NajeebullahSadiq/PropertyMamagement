@@ -11,6 +11,7 @@ using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
 using WebAPIBackend.Models.ViewModels;
+using WebAPIBackend.Services;
 
 namespace WebAPIBackend.Controllers.Companies
 {
@@ -24,23 +25,29 @@ namespace WebAPIBackend.Controllers.Companies
         private readonly WebAPIBackend.Services.IProvinceFilterService _provinceFilter;
         private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
         private readonly WebAPIBackend.Services.ICompanyService _companyService;
+        private readonly ILookupCacheService _cache;
 
         public CompanyDetailsController(
             AppDbContext context, 
             UserManager<ApplicationUser> userManager,
             WebAPIBackend.Services.IProvinceFilterService provinceFilter,
             WebAPIBackend.Services.IComprehensiveAuditService auditService,
-            WebAPIBackend.Services.ICompanyService companyService)
+            WebAPIBackend.Services.ICompanyService companyService,
+            ILookupCacheService cache)
         {
             _context = context;
             _userManager = userManager;
             _provinceFilter = provinceFilter;
             _auditService = auditService;
             _companyService = companyService;
+            _cache = cache;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? search = null)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? search = null)
         {
             try
             {
@@ -65,7 +72,7 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 // Apply province filtering
-                var query = _context.CompanyDetails.AsQueryable();
+                var query = _context.CompanyDetails.AsNoTracking().AsQueryable();
                 query = _provinceFilter.ApplyProvinceFilter(query);
 
                 // Apply search filter if provided
@@ -86,14 +93,12 @@ namespace WebAPIBackend.Controllers.Companies
 
                 // Order by CreatedAt descending - most recent first
                 var orderedQuery = query.OrderByDescending(p => p.CreatedAt);
-                
-                // Limit to 100 records if no search is provided
-                if (string.IsNullOrWhiteSpace(search))
-                {
-                    orderedQuery = (IOrderedQueryable<CompanyDetail>)orderedQuery.Take(100);
-                }
+
+                var totalCount = await orderedQuery.CountAsync();
 
                 var result = await orderedQuery
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(p => new CompanyListDto
                     {
                         Id = p.Id,
@@ -114,7 +119,13 @@ namespace WebAPIBackend.Controllers.Companies
                     })
                     .ToListAsync();
 
-                return Ok(result);
+                return Ok(new
+                {
+                    items = result,
+                    totalCount,
+                    page,
+                    pageSize
+                });
             }
             catch (Exception ex)
             {
@@ -151,6 +162,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 // Apply province filtering
                 var query = _context.CompanyDetails
+                    .AsNoTracking()
                     .Where(p => p.LicenseDetails.Any(l => l.ExpireDate < currentDate))
                     .AsQueryable();
                 query = _provinceFilter.ApplyProvinceFilter(query);
@@ -200,7 +212,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Validate province access
                 _provinceFilter.ValidateProvinceAccess(company.ProvinceId);
 
-                var result = await _context.CompanyDetails.Where(x => x.Id.Equals(id)).ToListAsync();
+                var result = await _context.CompanyDetails.AsNoTracking().Where(x => x.Id.Equals(id)).ToListAsync();
                 return Ok(result);
             }
             catch (WebAPIBackend.Models.Common.ForbiddenException)
@@ -618,7 +630,7 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 // Apply province filtering
-                var query = _context.CompanyDetails.AsQueryable();
+                var query = _context.CompanyDetails.AsNoTracking().AsQueryable();
                 query = _provinceFilter.ApplyProvinceFilter(query);
 
                 var com = await query
@@ -649,9 +661,6 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 var query = _context.LicenseDetails
-                    .Include(l => l.Company)
-                        .ThenInclude(c => c!.CompanyOwners)
-                    .Include(l => l.Province)
                     .Where(l => l.LicenseNumber == licenseNumber);
 
                 if (provinceId.HasValue && provinceId.Value > 0)
@@ -983,7 +992,7 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 // Get ALL companies (not filtered by date)
-                var allCompaniesQuery = _context.CompanyDetails.AsQueryable();
+                var allCompaniesQuery = _context.CompanyDetails.AsNoTracking().AsQueryable();
                 allCompaniesQuery = _provinceFilter.ApplyProvinceFilter(allCompaniesQuery);
                 var allCompanyIds = await allCompaniesQuery.Select(c => c.Id).ToListAsync();
                 
@@ -1171,7 +1180,7 @@ namespace WebAPIBackend.Controllers.Companies
                     .ToListAsync();
 
                 // Get guarantee type names
-                var guaranteeTypes = await _context.GuaranteeTypes.ToListAsync();
+                var guaranteeTypes = await _cache.GetGuaranteeTypesAsync();
 
                 var result = guarantorsByType.Select(g => new
                 {
@@ -1250,11 +1259,11 @@ namespace WebAPIBackend.Controllers.Companies
                 var totalCancellations = await cancellationsQuery.CountAsync();
 
                 // Get all-time cancellations count (no date filter)
-                var totalCancellationsAllTime = await _context.CompanyCancellationInfos.Where(x => x.Status != false).CountAsync();
+                var totalCancellationsAllTime = await _context.CompanyCancellationInfos.AsNoTracking().Where(x => x.Status != false).CountAsync();
 
                 // Get companies status based on license expiry date
                 // Note: We check ALL companies' license status, not just those created in date range
-                var allCompaniesQuery = _context.CompanyDetails.AsQueryable();
+                var allCompaniesQuery = _context.CompanyDetails.AsNoTracking().AsQueryable();
                 allCompaniesQuery = _provinceFilter.ApplyProvinceFilter(allCompaniesQuery);
                 
                 // Apply province filter if specified
@@ -1380,7 +1389,7 @@ namespace WebAPIBackend.Controllers.Companies
                     })
                     .ToListAsync();
 
-                var guaranteeTypes = await _context.GuaranteeTypes.ToListAsync();
+                var guaranteeTypes = await _cache.GetGuaranteeTypesAsync();
                 var guarantorsResult = guarantorsByType.Select(g => new
                 {
                     g.guaranteeTypeId,

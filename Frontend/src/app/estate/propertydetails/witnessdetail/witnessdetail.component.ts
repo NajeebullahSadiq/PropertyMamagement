@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { witnessDetail } from 'src/app/models/witnessDetail';
 import { PropertyService } from 'src/app/shared/property.service';
 import { SellerService } from 'src/app/shared/seller.service';
@@ -11,7 +13,7 @@ import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-up
   templateUrl: './witnessdetail.component.html',
   styleUrls: ['./witnessdetail.component.scss']
 })
-export class WitnessdetailComponent {
+export class WitnessdetailComponent extends BaseComponent {
   withnessForm: FormGroup = new FormGroup({});
   selectedId: number=0;
   witnessDetails!: witnessDetail[];
@@ -32,6 +34,7 @@ export class WitnessdetailComponent {
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService)
     {
+      super();
       this.withnessForm = this.fb.group({
         id: [0],
         firstName: ['', Validators.required],

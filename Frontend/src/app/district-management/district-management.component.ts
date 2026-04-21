@@ -4,13 +4,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { DistrictManagementService } from 'src/app/shared/district-management.service';
 import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'app-district-management',
   templateUrl: './district-management.component.html',
   styleUrls: ['./district-management.component.scss']
 })
-export class DistrictManagementComponent implements OnInit {
+export class DistrictManagementComponent extends BaseComponent implements OnInit {
   provinces: any[] = [];
   districts: any[] = [];
   selectedProvinceId: number | null = null;
@@ -26,6 +28,7 @@ export class DistrictManagementComponent implements OnInit {
     private toastr: ToastrService,
     private dialog: MatDialog
   ) {
+    super();
     this.districtForm = this.fb.group({
       dari: ['', Validators.required],
       name: ['']

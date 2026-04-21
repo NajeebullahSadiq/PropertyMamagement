@@ -2,6 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -9,17 +11,19 @@ import { environment } from 'src/environments/environment';
   templateUrl: './role-assign-dialog.component.html',
   styleUrls: ['./role-assign-dialog.component.scss']
 })
-export class RoleAssignDialogComponent implements OnInit {
+export class RoleAssignDialogComponent extends BaseComponent implements OnInit {
   selectedRole: string = '';
   isSubmitting = false;
   private readonly baseUrl = environment.apiUrl;
 
   constructor(
     public dialogRef: MatDialogRef<RoleAssignDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { user: any; roles: any[] },
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private http: HttpClient,
     private toastr: ToastrService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.selectedRole = this.data.user.role;
@@ -38,7 +42,7 @@ export class RoleAssignDialogComponent implements OnInit {
   }
 
   getRoleDari(roleId: string): string {
-    return this.data.roles.find(r => r.id === roleId)?.dari || roleId;
+    return this.data.roles.find((r: any) => r.id === roleId)?.dari || roleId;
   }
 
   getRoleColor(role: string): string {

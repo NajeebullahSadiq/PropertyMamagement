@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { VehiclesDetailsList } from 'src/app/models/PropertyDetail';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { RbacService } from 'src/app/shared/rbac.service';
@@ -11,14 +13,14 @@ import { RbacService } from 'src/app/shared/rbac.service';
   templateUrl: './vehiclelist.component.html',
   styleUrls: ['./vehiclelist.component.scss']
 })
-export class VehiclelistComponent {
+export class VehiclelistComponent extends BaseComponent {
   properties!: VehiclesDetailsList[];
   filteredProperties!: VehiclesDetailsList[];
   searchTerm: string = '';
   page: number = 1;
   count: number = 0;
-  tableSize: number = 10;
-  tableSizes: any = [10,50,100];
+  tableSize: number = 20;
+  tableSizes: any = [10,20,50,100];
   isViewOnly: boolean = false;
   canEdit: boolean = false;
   canPrint: boolean = false;
@@ -30,6 +32,7 @@ export class VehiclelistComponent {
     private router: Router,
     private rbacService: RbacService
   ) {
+    super();
     this.isViewOnly = this.rbacService.isViewOnly();
     this.canEdit = this.rbacService.hasPermission('vehicle.create') || this.rbacService.hasPermission('vehicle.edit');
     this.canPrint = this.rbacService.hasPermission('vehicle.view');
@@ -41,9 +44,10 @@ export class VehiclelistComponent {
   }
 
   loadData(){
-    this.vehicleservice.getPropertyDetails().subscribe(properties => {
-      this.properties = properties;
-      this.filteredProperties = properties;
+    this.vehicleservice.getPropertyDetails(this.page, this.tableSize, this.searchTerm).pipe(takeUntil(this.destroy$)).subscribe(response => {
+      this.properties = response?.items || [];
+      this.filteredProperties = this.properties;
+      this.count = response?.totalCount || 0;
     });
   }
 
@@ -67,9 +71,8 @@ export class VehiclelistComponent {
   }
 
   onSearch() {
-    this.filteredProperties = this.filterProperties(this.properties, this.searchTerm);
-    this.count = this.filteredProperties.length;
     this.page = 1;
+    this.loadData();
   }
 
   filterProperties(properties: VehiclesDetailsList[], searchTerm: string): VehiclesDetailsList[] {

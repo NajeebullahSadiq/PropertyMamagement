@@ -2,6 +2,8 @@ import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import '@angular/localize/init';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { companyowner, companyOwnerAddressHistory } from 'src/app/models/companyowner';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
@@ -16,7 +18,7 @@ import { CalendarType } from 'src/app/models/calendar-type';
 	templateUrl: './companyowner.component.html',
 	styleUrls: ['./companyowner.component.scss']
 })
-export class CompanyownerComponent {
+export class CompanyownerComponent extends BaseComponent {
 	baseUrl: string = environment.apiURL + '/';
 	imagePath: string = 'assets/img/avatar.png';
 	imageName: string = '';
@@ -77,6 +79,7 @@ export class CompanyownerComponent {
 		private calendarConversionService: CalendarConversionService,
 		private calendarService: CalendarService
 	) {
+		super();
 		this.ownerForm = this.fb.group({
 			id: [0],
 			firstName: ['', Validators.required],
@@ -108,10 +111,10 @@ export class CompanyownerComponent {
 		});
 
 		// Add cross-field validation for phone numbers
-		this.ownerForm.get('whatsAppNumber')?.valueChanges.subscribe(() => {
+		this.ownerForm.get('whatsAppNumber')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
 			// Removed duplicate phone validation - users can use same number for both
 		});
-		this.ownerForm.get('phoneNumber')?.valueChanges.subscribe(() => {
+		this.ownerForm.get('phoneNumber')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
 			// Removed duplicate phone validation - users can use same number for both
 		});
 	}
@@ -147,7 +150,7 @@ export class CompanyownerComponent {
 			this.EducationLevel = res;
 		});
 
-		this.selerService.getprovince().subscribe(res => {
+		this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.province = res;
 		});
 

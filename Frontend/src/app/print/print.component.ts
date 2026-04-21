@@ -5,14 +5,15 @@ import { PropertyService } from '../shared/property.service';
 import { LocalizationService } from '../shared/localization.service';
 import { VerificationService } from '../shared/verification.service';
 import { environment } from 'src/environments/environment';
-import { catchError, of } from 'rxjs';
+import { catchError, of, takeUntil } from 'rxjs';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'app-print',
   templateUrl: './print.component.html',
   styleUrls: ['./print.component.scss']
 })
-export class PrintComponent implements OnInit {
+export class PrintComponent extends BaseComponent implements OnInit {
   userDetails: any = {};
   SellerfilePath: string = 'assets/img/avatar2.png';
   BuyerfilePath: string = 'assets/img/avatar2.png';
@@ -54,7 +55,9 @@ export class PrintComponent implements OnInit {
     private verificationService: VerificationService,
     private elementRef: ElementRef,
     private renderer: Renderer2
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     // Check if print mode is specified in URL
@@ -376,7 +379,7 @@ export class PrintComponent implements OnInit {
     }
 
     const propertyData$ = this.pservice.getPropertyPrintData(code);
-    propertyData$.subscribe({
+    propertyData$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (property) => {
         this.documentData = property || {};
 

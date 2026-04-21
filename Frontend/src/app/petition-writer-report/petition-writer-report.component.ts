@@ -1,5 +1,7 @@
 import { Component, OnInit, Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import {
     NgbDateStruct,
     NgbCalendar,
@@ -41,7 +43,7 @@ export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
         { provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
     ],
 })
-export class PetitionWriterReportComponent implements OnInit {
+export class PetitionWriterReportComponent extends BaseComponent implements OnInit {
     // Math reference for template
     Math = Math;
     
@@ -91,7 +93,9 @@ export class PetitionWriterReportComponent implements OnInit {
         private reportService: PetitionWriterReportService,
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.loadConfig();

@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesControlService } from 'src/app/shared/securities-control.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -12,7 +13,7 @@ import { SecuritiesControl } from 'src/app/models/SecuritiesControl';
     templateUrl: './securities-control-list.component.html',
     styleUrls: ['./securities-control-list.component.scss']
 })
-export class SecuritiesControlListComponent implements OnInit, OnDestroy {
+export class SecuritiesControlListComponent extends BaseComponent implements OnInit, OnDestroy {
     items: SecuritiesControl[] = [];
     filteredItems: SecuritiesControl[] = [];
     totalCount = 0;
@@ -27,28 +28,28 @@ export class SecuritiesControlListComponent implements OnInit, OnDestroy {
     canDelete = false;
     isViewOnly = false;
 
-    private dataChangedSub?: Subscription;
-
     constructor(
         private securitiesControlService: SecuritiesControlService,
         private calendarService: CalendarService,
         private rbacService: RbacService,
         private router: Router,
         private toastr: ToastrService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();
         this.loadData();
 
         // Subscribe to data changes
-        this.dataChangedSub = this.securitiesControlService.dataChanged$.subscribe(() => {
+        this.securitiesControlService.dataChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.loadData();
         });
     }
 
-    ngOnDestroy(): void {
-        this.dataChangedSub?.unsubscribe();
+    override ngOnDestroy(): void {
+        super.ngOnDestroy();
     }
 
     checkPermissions(): void {

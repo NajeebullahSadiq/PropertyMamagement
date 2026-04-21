@@ -2,6 +2,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { AuthService } from 'src/app/shared/auth.service';
 
 
@@ -10,13 +12,15 @@ import { AuthService } from 'src/app/shared/auth.service';
   templateUrl: './changepassword.component.html',
   styleUrls: ['./changepassword.component.scss']
 })
-export class ChangepasswordComponent implements OnInit {
+export class ChangepasswordComponent extends BaseComponent implements OnInit {
 
   model: any = {};
   showCurrentPassword = false;
   showNewPassword = false;
 
-  constructor(private service: AuthService,public dialogRef: MatDialogRef<ChangepasswordComponent>,private toastr: ToastrService) { }
+  constructor(private service: AuthService, private toastr: ToastrService, public dialogRef: MatDialogRef<ChangepasswordComponent>) {
+    super();
+  }
 
   changePassword() {
     this.service.changePassword(this.model)

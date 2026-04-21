@@ -150,6 +150,7 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 var guarantors = await _context.Guarantors
+                    .AsNoTracking()
                     .Where(x => x.CompanyId.Equals(id))
                     .OrderByDescending(x => x.IsActive)
                     .ThenByDescending(x => x.CreatedAt)
@@ -178,6 +179,7 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 var activeGuarantor = await _context.Guarantors
+                    .AsNoTracking()
                     .Where(x => x.CompanyId == companyId && x.IsActive)
                     .FirstOrDefaultAsync();
 
@@ -204,6 +206,7 @@ namespace WebAPIBackend.Controllers.Companies
             try
             {
                 var history = await _context.Guarantors
+                    .AsNoTracking()
                     .Where(x => x.CompanyId == companyId)
                     .OrderByDescending(x => x.IsActive)
                     .ThenByDescending(x => x.CreatedAt)

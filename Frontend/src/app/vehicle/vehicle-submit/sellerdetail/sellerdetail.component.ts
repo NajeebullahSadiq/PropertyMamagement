@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { VBuyerDetail } from 'src/app/models/SellerDetail';
 import { SellerService } from 'src/app/shared/seller.service';
 import { VehicleService } from 'src/app/shared/vehicle.service';
@@ -16,7 +18,7 @@ import { VehicleComponent } from '../../vehicle.component';
   templateUrl: './sellerdetail.component.html',
   styleUrls: ['./sellerdetail.component.scss']
 })
-export class SellerdetailComponent {
+export class SellerdetailComponent extends BaseComponent {
   baseUrl:string=environment.apiURL+'/';
   imagePath:string='assets/img/avatar.png';
   imageName:string='';
@@ -74,6 +76,7 @@ export class SellerdetailComponent {
     ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
     private localizationService: LocalizationService, private duplicateCheckService: DuplicateCheckService,
     private parentComponent: VehicleComponent){
+    super();
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.SellerForm = this.fb.group({
@@ -98,7 +101,7 @@ export class SellerdetailComponent {
     });
 
     // Add dynamic validation for authorization letter and heirs letter based on roleType
-    this.SellerForm.get('roleType')?.valueChanges.subscribe(roleType => {
+    this.SellerForm.get('roleType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(roleType => {
       const authLetterControl = this.SellerForm.get('authorizationLetter');
       const heirsLetterControl = this.SellerForm.get('heirsLetter');
       
@@ -137,7 +140,7 @@ export class SellerdetailComponent {
       this.localizationService.roleTypes.heirs        // ورثه - multiple sellers
     ];
     
-    this.selerService.getprovince().subscribe(res => {
+    this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.province = res;
     });
     this.loadSellerDetails();

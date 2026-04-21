@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { environment } from 'src/environments/environment';
 
 export interface PermissionGroup {
@@ -144,7 +146,7 @@ export const PERMISSION_LABELS: Record<string, string> = {
   templateUrl: './role-permissions.component.html',
   styleUrls: ['./role-permissions.component.scss']
 })
-export class RolePermissionsComponent implements OnInit {
+export class RolePermissionsComponent extends BaseComponent implements OnInit {
   roles: any[] = [];
   selectedRole: any = null;
   activePermissions: Record<string, boolean> = {};
@@ -157,7 +159,9 @@ export class RolePermissionsComponent implements OnInit {
 
   private readonly baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {}
+  constructor(private http: HttpClient, private toastr: ToastrService) {
+    super();
+  }
 
   ngOnInit(): void {
     this.loadRoles();

@@ -1,5 +1,7 @@
 import { Component, Injectable } from '@angular/core';
 import { DashboardService } from 'src/app/shared/dashboard.service';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import {
 	NgbDateStruct,
 	NgbCalendar,
@@ -37,7 +39,7 @@ export class NgbDatepickerI18nPersian extends NgbDatepickerI18n {
 		{ provide: NgbDatepickerI18n, useClass: NgbDatepickerI18nPersian },
 	],
 })
-export class ReportComponent {
+export class ReportComponent extends BaseComponent {
   dashboardData: any=[];
   startDate: any;
   endDate:any;
@@ -48,7 +50,7 @@ export class ReportComponent {
     private calendarConversionService: CalendarConversionService,
     private calendarService: CalendarService
   ) { 
-
+    super();
   }
   ngOnInit(): void {
     this.dashboardData.totalRecord=[];

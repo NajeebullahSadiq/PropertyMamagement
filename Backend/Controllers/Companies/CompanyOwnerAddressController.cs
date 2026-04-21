@@ -23,10 +23,10 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var getOwnerId = (from p in _context.CompanyOwners
+                var getOwnerId = (from p in _context.CompanyOwners.AsNoTracking()
                                   where p.CompanyId == id
                                   select p.Id).SingleOrDefault();
-                var query = from p in _context.CompanyOwnerAddresses where p.CompanyOwnerId == getOwnerId
+                var query = from p in _context.CompanyOwnerAddresses.AsNoTracking() where p.CompanyOwnerId == getOwnerId
                             select new
                             {
                                 p.Id,

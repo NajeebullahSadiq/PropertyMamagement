@@ -104,6 +104,7 @@ namespace WebAPIBackend.Controllers
             try
             {
                 var documents = await _context.SetaDocuments
+                    .AsNoTracking()
                     .Where(d => d.SetaNumber == setaNumber)
                     .OrderByDescending(d => d.UploadedAt)
                     .ToListAsync();

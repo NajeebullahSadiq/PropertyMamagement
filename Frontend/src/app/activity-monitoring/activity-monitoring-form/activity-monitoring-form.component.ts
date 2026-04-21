@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { ActivityMonitoringService } from 'src/app/shared/activity-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -19,7 +21,7 @@ import {
     templateUrl: './activity-monitoring-form.component.html',
     styleUrls: ['./activity-monitoring-form.component.scss'],
 })
-export class ActivityMonitoringFormComponent implements OnInit {
+export class ActivityMonitoringFormComponent extends BaseComponent implements OnInit {
 
     // Single Form
     mainForm!: FormGroup;
@@ -77,6 +79,7 @@ export class ActivityMonitoringFormComponent implements OnInit {
         private companyService: CompnaydetailService,
         private authService: AuthService
     ) {
+        super();
         this.initForm();
     }
 

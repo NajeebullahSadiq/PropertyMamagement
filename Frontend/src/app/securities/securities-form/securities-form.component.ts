@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { AuthService } from 'src/app/shared/auth.service';
 import { RbacService } from 'src/app/shared/rbac.service';
@@ -19,7 +22,7 @@ import {
     templateUrl: './securities-form.component.html',
     styleUrls: ['./securities-form.component.scss'],
 })
-export class SecuritiesFormComponent implements OnInit {
+export class SecuritiesFormComponent extends BaseComponent implements OnInit {
     securitiesForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
@@ -43,10 +46,12 @@ export class SecuritiesFormComponent implements OnInit {
         private toastr: ToastrService,
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService,
+        private calendarConversionService: CalendarConversionService,
         private companyService: CompnaydetailService,
         private authService: AuthService,
         private rbacService: RbacService
     ) {
+        super();
         this.initForm();
     }
 
@@ -104,8 +109,9 @@ export class SecuritiesFormComponent implements OnInit {
                     totalDocumentsPrice: data.totalDocumentsPrice,
                     totalSecuritiesPrice: data.totalSecuritiesPrice,
                     bankReceiptNumber: data.bankReceiptNumber,
-                    deliveryDate: data.deliveryDate,
-                    distributionDate: data.distributionDate
+                    // Use formatted (Hijri Shamsi) dates for display in the datepicker
+                    deliveryDate: data.deliveryDateFormatted || null,
+                    distributionDate: data.distributionDateFormatted || null
                 });
 
                 // Load items
@@ -227,18 +233,19 @@ export class SecuritiesFormComponent implements OnInit {
 
         const formValue = this.securitiesForm.value;
         
-        // Convert dates to DateOnly format (YYYY-MM-DD) if they exist
+        // Convert dates to Hijri Shamsi format for backend
         const deliveryDate = formValue.deliveryDate 
-            ? new Date(formValue.deliveryDate).toISOString().split('T')[0]
+            ? this.formatDateForBackend(formValue.deliveryDate)
             : null;
         const distributionDate = formValue.distributionDate 
-            ? new Date(formValue.distributionDate).toISOString().split('T')[0]
+            ? this.formatDateForBackend(formValue.distributionDate)
             : null;
 
         const data: SecuritiesDistributionData = {
             ...formValue,
             deliveryDate,
             distributionDate,
+            calendarType: this.calendarService.getSelectedCalendar(),
             items: this.items
         };
 
@@ -271,6 +278,19 @@ export class SecuritiesFormComponent implements OnInit {
         Object.keys(this.securitiesForm.controls).forEach(key => {
             this.securitiesForm.get(key)?.markAsTouched();
         });
+    }
+
+    private formatDateForBackend(dateValue: any): string {
+        const currentCalendar = this.calendarService.getSelectedCalendar();
+        if (dateValue instanceof Date) {
+            const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+            return `${calendarDate.year}-${String(calendarDate.month).padStart(2, '0')}-${String(calendarDate.day).padStart(2, '0')}`;
+        } else if (typeof dateValue === 'object' && dateValue !== null && dateValue.year) {
+            return `${dateValue.year}-${String(dateValue.month).padStart(2, '0')}-${String(dateValue.day).padStart(2, '0')}`;
+        } else if (typeof dateValue === 'string') {
+            return dateValue.replace(/\//g, '-');
+        }
+        return '';
     }
 
     resetForm(): void {

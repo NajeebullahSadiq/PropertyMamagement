@@ -2,6 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { UserRoles } from 'src/app/shared/rbac.service';
@@ -11,7 +13,7 @@ import { UserRoles } from 'src/app/shared/rbac.service';
   templateUrl: './user-edit-dialog.component.html',
   styleUrls: ['./user-edit-dialog.component.scss']
 })
-export class UserEditDialogComponent implements OnInit {
+export class UserEditDialogComponent extends BaseComponent implements OnInit {
   editForm!: FormGroup;
   isSubmitting = false;
   companies: any[] = [];
@@ -31,7 +33,9 @@ export class UserEditDialogComponent implements OnInit {
     private toastr: ToastrService,
     public dialogRef: MatDialogRef<UserEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { user: any; roles: any[] }
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.initForm();

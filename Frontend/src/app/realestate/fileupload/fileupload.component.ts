@@ -1,6 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatDialog } from '@angular/material/dialog';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
 import { FileService } from 'src/app/shared/file.service';
@@ -12,7 +14,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./fileupload.component.scss'],
   providers: [DatePipe]
 })
-export class FileuploadComponent implements OnInit, OnChanges {
+export class FileuploadComponent extends BaseComponent implements OnInit, OnChanges {
   progress: number = 0;
   message: string = '';
   uploadedFilePath: string = '';
@@ -30,7 +32,9 @@ export class FileuploadComponent implements OnInit, OnChanges {
     private datePipe: DatePipe,
     private dialog: MatDialog,
     private fileService: FileService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.initializeExistingFile();

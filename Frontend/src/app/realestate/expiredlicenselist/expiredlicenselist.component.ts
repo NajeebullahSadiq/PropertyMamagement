@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { companydetailsList } from 'src/app/models/companydetails';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { RbacService } from 'src/app/shared/rbac.service';
@@ -11,7 +13,7 @@ import { RbacService } from 'src/app/shared/rbac.service';
   templateUrl: './expiredlicenselist.component.html',
   styleUrls: ['./expiredlicenselist.component.scss']
 })
-export class ExpiredlicenselistComponent {
+export class ExpiredlicenselistComponent extends BaseComponent {
   properties!: companydetailsList[];
   filteredProperties!: companydetailsList[];
   searchTerm: string = '';
@@ -28,6 +30,7 @@ export class ExpiredlicenselistComponent {
     private router: Router,
     private rbacService: RbacService
   ) {
+    super();
     this.isViewOnly = this.rbacService.isViewOnly();
   }
 

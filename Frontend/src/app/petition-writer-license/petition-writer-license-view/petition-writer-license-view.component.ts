@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -17,7 +19,7 @@ import { environment } from 'src/environments/environment';
     templateUrl: './petition-writer-license-view.component.html',
     styleUrls: ['./petition-writer-license-view.component.scss']
 })
-export class PetitionWriterLicenseViewComponent implements OnInit {
+export class PetitionWriterLicenseViewComponent extends BaseComponent implements OnInit {
     item: PetitionWriterLicense | null = null;
     relocations: PetitionWriterRelocation[] = [];
     isLoading = false;
@@ -40,7 +42,9 @@ export class PetitionWriterLicenseViewComponent implements OnInit {
         private licenseService: PetitionWriterLicenseService,
         private calendarService: CalendarService,
         private rbacService: RbacService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();

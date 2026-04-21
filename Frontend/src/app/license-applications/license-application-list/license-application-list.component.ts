@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -13,7 +14,7 @@ import { LicenseApplication } from 'src/app/models/LicenseApplication';
     templateUrl: './license-application-list.component.html',
     styleUrls: ['./license-application-list.component.scss']
 })
-export class LicenseApplicationListComponent implements OnInit, OnDestroy {
+export class LicenseApplicationListComponent extends BaseComponent implements OnInit, OnDestroy {
     items: LicenseApplication[] = [];
     totalCount = 0;
     page = 1;
@@ -48,7 +49,6 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
     canDelete = false;
     isViewOnly = false;
 
-    private dataChangedSub?: Subscription;
     private searchSubject = new Subject<string>();
 
     constructor(
@@ -58,13 +58,15 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         private router: Router,
         private toastr: ToastrService
     ) {
+        super();
         // Setup debounced search
         this.searchSubject.pipe(
-            debounceTime(500), // Wait 500ms after user stops typing
-            distinctUntilChanged() // Only emit if value is different from previous
+            debounceTime(500),
+            distinctUntilChanged(),
+            takeUntil(this.destroy$)
         ).subscribe(searchTerm => {
             this.searchTerm = searchTerm;
-            this.page = 1; // Reset page when search changes
+            this.page = 1;
             this.loadData();
         });
     }
@@ -73,14 +75,14 @@ export class LicenseApplicationListComponent implements OnInit, OnDestroy {
         this.checkPermissions();
         this.loadData();
 
-        this.dataChangedSub = this.licenseAppService.dataChanged$.subscribe(() => {
+        this.licenseAppService.dataChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.loadData();
         });
     }
 
-    ngOnDestroy(): void {
-        this.dataChangedSub?.unsubscribe();
+    override ngOnDestroy(): void {
         this.searchSubject.complete();
+        super.ngOnDestroy();
     }
 
     checkPermissions(): void {

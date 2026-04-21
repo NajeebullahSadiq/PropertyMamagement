@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -16,7 +18,7 @@ import {
     templateUrl: './license-application-view.component.html',
     styleUrls: ['./license-application-view.component.scss']
 })
-export class LicenseApplicationViewComponent implements OnInit {
+export class LicenseApplicationViewComponent extends BaseComponent implements OnInit {
     item: LicenseApplication | null = null;
     guarantors: LicenseApplicationGuarantor[] = [];
     withdrawal: LicenseApplicationWithdrawal | null = null;
@@ -39,7 +41,9 @@ export class LicenseApplicationViewComponent implements OnInit {
         private calendarService: CalendarService,
         private rbacService: RbacService,
         private toastr: ToastrService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();

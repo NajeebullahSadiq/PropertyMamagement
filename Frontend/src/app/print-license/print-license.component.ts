@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest } from 'rxjs';
+import { combineLatest, takeUntil } from 'rxjs';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { AuthService } from '../shared/auth.service';
 import { PropertyService } from '../shared/property.service';
 import { CompnaydetailService } from '../shared/compnaydetail.service';
@@ -13,7 +14,7 @@ import { AccountInfo } from '../models/AccountInfo';
   templateUrl: './print-license.component.html',
   styleUrls: ['./print-license.component.scss']
 })
-export class PrintLicenseComponent implements OnInit {
+export class PrintLicenseComponent extends BaseComponent implements OnInit {
   filePath: string = 'assets/img/avatar2.png';
   baseUrl = environment.apiURL + '/';
   data: any = {};
@@ -37,12 +38,14 @@ export class PrintLicenseComponent implements OnInit {
     private pservice: PropertyService,
     private companyService: CompnaydetailService,
     private verificationService: VerificationService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     console.log('[PrintLicense] init');
 
-    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([paramMap, queryParamMap]) => {
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).pipe(takeUntil(this.destroy$)).subscribe(([paramMap, queryParamMap]) => {
       this.error = null;
       this.isLoading = true;
 

@@ -50,6 +50,18 @@ public class SecuritiesDistributionData
     [MaxLength(100)]
     public string? BankReceiptNumber { get; set; }
 
-    public DateOnly? DeliveryDate { get; set; }
-    public DateOnly? DistributionDate { get; set; }
+    /// <summary>
+    /// Date string in Hijri Shamsi format (YYYY/MM/DD or YYYY-MM-DD) sent from frontend
+    /// </summary>
+    public string? DeliveryDate { get; set; }
+
+    /// <summary>
+    /// Date string in Hijri Shamsi format (YYYY/MM/DD or YYYY-MM-DD) sent from frontend
+    /// </summary>
+    public string? DistributionDate { get; set; }
+
+    /// <summary>
+    /// Calendar type hint from frontend (always HijriShamsi)
+    /// </summary>
+    public string? CalendarType { get; set; }
 }

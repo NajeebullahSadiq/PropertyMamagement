@@ -67,7 +67,7 @@ namespace WebAPIBackend.Controllers
         [Route("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _userManager.Users.AsNoTracking().ToListAsync();
             return Ok(users);
         }
 

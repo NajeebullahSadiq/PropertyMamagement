@@ -25,6 +25,7 @@ export interface SecuritiesDistributionData {
   bankReceiptNumber?: string;
   deliveryDate?: string;
   distributionDate?: string;
+  calendarType?: string;
   // Formatted dates for display
   deliveryDateFormatted?: string;
   distributionDateFormatted?: string;

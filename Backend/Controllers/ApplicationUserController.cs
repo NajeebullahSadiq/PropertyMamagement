@@ -78,7 +78,7 @@ namespace WebAPI.Controllers
             // Validate province exists if provided
             if (model.ProvinceId.HasValue)
             {
-                var provinceExists = await _context.Locations.AnyAsync(l => l.Id == model.ProvinceId.Value);
+                var provinceExists = await _context.Locations.AsNoTracking().AnyAsync(l => l.Id == model.ProvinceId.Value);
                 if (!provinceExists)
                 {
                     return BadRequest(new { message = "Invalid province" });
@@ -352,7 +352,7 @@ namespace WebAPI.Controllers
         [Route("UserInfo")]
         public async Task<ActionResult<IEnumerable<UserInfo>>> GetUserInfos()
         {
-            var userInfos = await _context.Users
+            var userInfos = await _context.Users.AsNoTracking()
                 .OrderBy(u => u.Id)
                 .Select(u => new UserInfo { UserId = u.Id.ToString(), UserName = u.UserName ?? "" })
                 .ToListAsync();
@@ -398,7 +398,7 @@ namespace WebAPI.Controllers
         {
             var companyRoles = new[] { UserRoles.PropertyOperator, UserRoles.VehicleOperator };
 
-            var query = _userManager.Users.AsQueryable();
+            var query = _userManager.Users.AsNoTracking().AsQueryable();
 
             // User type filter
             if (userType == "company")
@@ -714,7 +714,7 @@ namespace WebAPI.Controllers
             // Validate province exists if provided
             if (model.ProvinceId.HasValue)
             {
-                var provinceExists = await _context.Locations.AnyAsync(l => l.Id == model.ProvinceId.Value);
+                var provinceExists = await _context.Locations.AsNoTracking().AnyAsync(l => l.Id == model.ProvinceId.Value);
                 if (!provinceExists)
                 {
                     return BadRequest(new { message = "Invalid province" });
@@ -794,6 +794,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetUser(string userId)
         {
             var user = await _userManager.Users
+                .AsNoTracking()
                 .Include(u => u.Province)
                 .FirstOrDefaultAsync(u => u.Id == userId);
                 

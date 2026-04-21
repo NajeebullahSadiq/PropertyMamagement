@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatDialog } from '@angular/material/dialog';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { FileService } from 'src/app/shared/file.service';
@@ -12,7 +14,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './vehicledetailsview.component.html',
   styleUrls: ['./vehicledetailsview.component.scss']
 })
-export class VehicledetailsviewComponent implements OnInit {
+export class VehicledetailsviewComponent extends BaseComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   viewData: any = null;
@@ -24,10 +26,12 @@ export class VehicledetailsviewComponent implements OnInit {
     private dialog: MatDialog,
     private fileService: FileService,
     private localizationService: LocalizationService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const idParam = params.get('id');
       const id = idParam ? Number(idParam) : 0;
       if (!id) {

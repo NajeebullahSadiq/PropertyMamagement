@@ -33,7 +33,7 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var Pro = await _context.Gaurantees.Where(x => x.CompanyId.Equals(id)).ToListAsync();
+                var Pro = await _context.Gaurantees.AsNoTracking().Where(x => x.CompanyId.Equals(id)).ToListAsync();
 
                 // Convert dates to the requested calendar type (defaults to HijriShamsi)
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);

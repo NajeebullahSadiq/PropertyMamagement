@@ -41,7 +41,7 @@ namespace WebAPIBackend.Controllers.Audit
             [FromQuery] DateTime? endDate = null,
             [FromQuery] string? searchTerm = null)
         {
-            var query = _context.ComprehensiveAuditLogs.AsQueryable();
+            var query = _context.ComprehensiveAuditLogs.AsNoTracking().AsQueryable();
 
             // Apply filters
             if (!string.IsNullOrEmpty(userId))
@@ -175,7 +175,7 @@ namespace WebAPIBackend.Controllers.Audit
         [Authorize(Policy = "AuditLogViewPolicy")]
         public async Task<ActionResult<object>> GetStatistics([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
         {
-            var query = _context.ComprehensiveAuditLogs.AsQueryable();
+            var query = _context.ComprehensiveAuditLogs.AsNoTracking().AsQueryable();
 
             // Default to last 30 days if no date range specified
             var effectiveStartDate = startDate ?? DateTime.UtcNow.AddDays(-30);
@@ -265,6 +265,7 @@ namespace WebAPIBackend.Controllers.Audit
         public async Task<ActionResult<IEnumerable<string>>> GetModules()
         {
             var modules = await _context.ComprehensiveAuditLogs
+                .AsNoTracking()
                 .Select(l => l.Module)
                 .Distinct()
                 .OrderBy(m => m)
@@ -281,6 +282,7 @@ namespace WebAPIBackend.Controllers.Audit
         public async Task<ActionResult<IEnumerable<string>>> GetActionTypes()
         {
             var actionTypes = await _context.ComprehensiveAuditLogs
+                .AsNoTracking()
                 .Select(l => l.ActionType)
                 .Distinct()
                 .OrderBy(a => a)
@@ -297,6 +299,7 @@ namespace WebAPIBackend.Controllers.Audit
         public async Task<ActionResult<object>> GetEntityAuditHistory(string entityType, string entityId)
         {
             var logs = await _context.ComprehensiveAuditLogs
+                .AsNoTracking()
                 .Where(l => l.EntityType == entityType && l.EntityId == entityId)
                 .OrderByDescending(l => l.Timestamp)
                 .Select(l => new
@@ -333,6 +336,7 @@ namespace WebAPIBackend.Controllers.Audit
             [FromQuery] int pageSize = 20)
         {
             var query = _context.ComprehensiveAuditLogs
+                .AsNoTracking()
                 .Where(l => l.UserId == userId);
 
             var totalCount = await query.CountAsync();
@@ -381,7 +385,7 @@ namespace WebAPIBackend.Controllers.Audit
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            var query = _context.ComprehensiveAuditLogs.AsQueryable();
+            var query = _context.ComprehensiveAuditLogs.AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrEmpty(module))
                 query = query.Where(l => l.Module == module);

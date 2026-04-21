@@ -1,6 +1,8 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { environment } from 'src/environments/environment';
 import { FileService } from '../file.service';
 
@@ -9,7 +11,7 @@ import { FileService } from '../file.service';
   templateUrl: './document-viewer.component.html',
   styleUrls: ['./document-viewer.component.scss']
 })
-export class DocumentViewerComponent implements OnInit, OnDestroy {
+export class DocumentViewerComponent extends BaseComponent implements OnInit, OnDestroy {
   isLoading = true;
   error: string | null = null;
   fileUrl: SafeResourceUrl | null = null;
@@ -23,10 +25,12 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
   constructor(
     public dialogRef: MatDialogRef<DocumentViewerComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { filePath: string; fileName: string },
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private sanitizer: DomSanitizer,
     private fileService: FileService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     console.log('=== DocumentViewer Init ===' , {
@@ -129,10 +133,11 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     if (this.objectUrl) {
       URL.revokeObjectURL(this.objectUrl);
       this.objectUrl = null;
     }
+    super.ngOnDestroy();
   }
 }

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterSecuritiesService } from 'src/app/shared/petition-writer-securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -13,7 +15,7 @@ import { PetitionWriterSecuritiesData } from 'src/app/models/PetitionWriterSecur
     templateUrl: './petition-writer-securities-form.component.html',
     styleUrls: ['./petition-writer-securities-form.component.scss']
 })
-export class PetitionWriterSecuritiesFormComponent implements OnInit {
+export class PetitionWriterSecuritiesFormComponent extends BaseComponent implements OnInit {
     petitionForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
@@ -29,6 +31,7 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
         private calendarConversionService: CalendarConversionService,
         private rbacService: RbacService
     ) {
+        super();
         this.initForm();
     }
 
@@ -50,7 +53,7 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
             this.loadData(this.editId);
         }
         
-        this.route.queryParams.subscribe(params => {
+        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
             if (params['id']) {
                 this.isEditMode = true;
                 this.editId = parseInt(params['id'], 10);
@@ -84,7 +87,7 @@ export class PetitionWriterSecuritiesFormComponent implements OnInit {
         });
 
         // Auto-calculate amount when petitionCount changes
-        this.petitionForm.get('petitionCount')?.valueChanges.subscribe(value => {
+        this.petitionForm.get('petitionCount')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
             if (value && value > 0) {
                 const calculatedAmount = value * 5;
                 this.petitionForm.get('amount')?.setValue(calculatedAmount);

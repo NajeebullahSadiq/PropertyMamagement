@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
+using WebAPIBackend.Services;
 
 namespace WebAPIBackend.Controllers.Report
 {
@@ -16,10 +18,12 @@ namespace WebAPIBackend.Controllers.Report
     {
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
-        public DashboardController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly ILookupCacheService _cache;
+        public DashboardController(AppDbContext context, UserManager<ApplicationUser> userManager, ILookupCacheService cache)
         {
             _context = context;
             _userManager = userManager;
+            _cache = cache;
         }
 
         private static bool TryParseStartEndDates(string startDate, string endDate, string? calendarType, out DateTime start, out DateTime end)
@@ -60,7 +64,7 @@ namespace WebAPIBackend.Controllers.Report
         {
 
 
-            var query = _context.CompanyDetails;
+            var query = _context.CompanyDetails.AsNoTracking();
           //  .Where(b => b.Price.HasValue && b.PropertyTypeId.HasValue);
             var results = new
             {
@@ -82,7 +86,7 @@ namespace WebAPIBackend.Controllers.Report
         {
 
 
-            var query = _context.LicenseDetails
+            var query = _context.LicenseDetails.AsNoTracking()
             .Where(b => b.ExpireDate < DateOnly.FromDateTime(DateTime.UtcNow));
             var results = new
             {
@@ -101,7 +105,7 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetVehicleDashboardData()
         {
             
-                var query = _context.VehiclesPropertyDetails
+                var query = _context.VehiclesPropertyDetails.AsNoTracking()
                 .Where(b=>!string.IsNullOrWhiteSpace(b.Price));
             var results = new
             {
@@ -138,13 +142,13 @@ namespace WebAPIBackend.Controllers.Report
                 return BadRequest("Invalid date range");
             }
 
-            var vquery = _context.VehiclesPropertyDetails
+            var vquery = _context.VehiclesPropertyDetails.AsNoTracking()
                .Where(b => !string.IsNullOrWhiteSpace(b.Price) &&
                            b.CreatedAt.HasValue &&
                            b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date);
 
-            var pquery = _context.PropertyDetails
+            var pquery = _context.PropertyDetails.AsNoTracking()
                 .Where(b => !string.IsNullOrWhiteSpace(b.Price) &&
                             b.CreatedAt.HasValue &&
                             b.CreatedAt.Value.Date >= gregoriansDate.Date &&
@@ -187,7 +191,7 @@ namespace WebAPIBackend.Controllers.Report
         public IActionResult GetDashboardData()
         {
 
-            var query = _context.PropertyDetails
+            var query = _context.PropertyDetails.AsNoTracking()
                 .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price));
 
             var results = new
@@ -330,7 +334,7 @@ namespace WebAPIBackend.Controllers.Report
         [Route("GetTopUsersSummary")]
         public IActionResult GetTopUsersSummary()
         {
-            var topUsersSummary = _context.PropertyDetails
+            var topUsersSummary = _context.PropertyDetails.AsNoTracking()
                 .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price))
                 .Select(b => new { b.CreatedBy, b.Price })
                 .AsEnumerable()
@@ -385,7 +389,7 @@ namespace WebAPIBackend.Controllers.Report
         [Route("GetVehicleTopUsersSummary")]
         public IActionResult GetVehicleTopUsersSummary()
         {
-            var topUsersSummary = _context.VehiclesPropertyDetails
+            var topUsersSummary = _context.VehiclesPropertyDetails.AsNoTracking()
                 .Where( b=> !string.IsNullOrWhiteSpace(b.Price))
                 .AsEnumerable()
                 .GroupBy(b => b.CreatedBy)
@@ -438,9 +442,9 @@ namespace WebAPIBackend.Controllers.Report
 
         [HttpGet]
         [Route("GetPropertyTypesByMonth")]
-        public IActionResult GetPropertyTypesByMonth()
+        public async Task<IActionResult> GetPropertyTypesByMonth()
         {
-            var propertyTypesByMonth = _context.PropertyDetails
+            var propertyTypesByMonth = _context.PropertyDetails.AsNoTracking()
                 .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue)
                 .Select(b => new { b.PropertyTypeId, b.Price, b.CreatedAt })
                 .AsEnumerable()
@@ -458,7 +462,7 @@ namespace WebAPIBackend.Controllers.Report
                 .OrderBy(g => g.Month)
                 .ToList();
 
-            var propertyTypes = _context.PropertyTypes.ToDictionary(pt => pt.Id, pt => pt.Name);
+            var propertyTypes = (await _cache.GetPropertyTypesAsync()).ToDictionary(pt => pt.Id, pt => pt.Name);
 
             var graphData = propertyTypesByMonth
                 .GroupBy(p => p.PropertyTypeId)
@@ -479,9 +483,9 @@ namespace WebAPIBackend.Controllers.Report
 
         [HttpGet]
         [Route("GetTransactionTypesByMonth")]
-        public IActionResult GetTransactionTypesByMonth()
+        public async Task<IActionResult> GetTransactionTypesByMonth()
         {
-            var propertyTypesByMonth = _context.PropertyDetails
+            var propertyTypesByMonth = _context.PropertyDetails.AsNoTracking()
                 .Where(b => b.TransactionTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue)
                 .Select(b => new { b.TransactionTypeId, b.Price, b.CreatedAt })
                 .AsEnumerable()
@@ -499,7 +503,7 @@ namespace WebAPIBackend.Controllers.Report
                 .OrderBy(g => g.Month)
                 .ToList();
 
-            var propertyTypes = _context.TransactionTypes.ToDictionary(pt => pt.Id, pt => pt.Name);
+            var propertyTypes = (await _cache.GetTransactionTypesAsync()).ToDictionary(pt => pt.Id, pt => pt.Name);
 
             var graphData = propertyTypesByMonth
                 .GroupBy(p => p.TransactionTypeId)
@@ -522,7 +526,7 @@ namespace WebAPIBackend.Controllers.Report
         [Route("GetVehicleReportByMonth")]
         public IActionResult GetVehicleReportByMonth()
         {
-            var propertyTypesByMonth = _context.VehiclesPropertyDetails
+            var propertyTypesByMonth = _context.VehiclesPropertyDetails.AsNoTracking()
                 .Where(b => !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue)
                 .Select(b => new { b.Price, b.CreatedAt })
                 .AsEnumerable()
@@ -551,7 +555,7 @@ namespace WebAPIBackend.Controllers.Report
                 return BadRequest("Invalid date range");
             }
 
-            var topUsersSummary = _context.PropertyDetails
+            var topUsersSummary = _context.PropertyDetails.AsNoTracking()
                 .Where(b => b.PropertyTypeId.HasValue && !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue && 
                            b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date)
@@ -614,7 +618,7 @@ namespace WebAPIBackend.Controllers.Report
                 return BadRequest("Invalid date range");
             }
 
-            var topUsersSummary = _context.VehiclesPropertyDetails
+            var topUsersSummary = _context.VehiclesPropertyDetails.AsNoTracking()
                 .Where(b => !string.IsNullOrWhiteSpace(b.Price) && b.CreatedAt.HasValue && 
                            b.CreatedAt.Value.Date >= gregoriansDate.Date &&
                            b.CreatedAt.Value.Date <= gregorianeDate.Date)

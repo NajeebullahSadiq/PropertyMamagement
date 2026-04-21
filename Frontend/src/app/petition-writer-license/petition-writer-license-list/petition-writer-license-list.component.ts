@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -13,7 +14,7 @@ import { PetitionWriterLicense, LicenseStatusEnum, LicenseStatusTypes } from 'sr
     templateUrl: './petition-writer-license-list.component.html',
     styleUrls: ['./petition-writer-license-list.component.scss']
 })
-export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
+export class PetitionWriterLicenseListComponent extends BaseComponent implements OnInit, OnDestroy {
     items: PetitionWriterLicense[] = [];
     filteredItems: PetitionWriterLicense[] = [];
     totalCount = 0;
@@ -28,7 +29,6 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
     canDelete = false;
     isViewOnly = false;
 
-    private dataChangedSub?: Subscription;
     private searchSubject = new Subject<string>();
 
     constructor(
@@ -38,10 +38,11 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
         private router: Router,
         private toastr: ToastrService
     ) {
-        // Setup debounced search
+        super();
         this.searchSubject.pipe(
-            debounceTime(500), // Wait 500ms after user stops typing
-            distinctUntilChanged() // Only emit if value is different from previous
+            debounceTime(500),
+            distinctUntilChanged(),
+            takeUntil(this.destroy$)
         ).subscribe(searchTerm => {
             this.searchTerm = searchTerm;
             this.page = 1;
@@ -53,14 +54,14 @@ export class PetitionWriterLicenseListComponent implements OnInit, OnDestroy {
         this.checkPermissions();
         this.loadData();
 
-        this.dataChangedSub = this.licenseService.dataChanged$.subscribe(() => {
+        this.licenseService.dataChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.loadData();
         });
     }
 
-    ngOnDestroy(): void {
-        this.dataChangedSub?.unsubscribe();
+    override ngOnDestroy(): void {
         this.searchSubject.complete();
+        super.ngOnDestroy();
     }
 
     checkPermissions(): void {

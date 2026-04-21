@@ -5,7 +5,8 @@ import { AuthService } from 'src/app/shared/auth.service';
 import { RoleAssignDialogComponent } from './role-assign-dialog/role-assign-dialog.component';
 import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 export interface UserPermissionData {
   id: string;
@@ -24,7 +25,7 @@ export interface UserPermissionData {
   templateUrl: './permission-management.component.html',
   styleUrls: ['./permission-management.component.scss']
 })
-export class PermissionManagementComponent implements OnInit {
+export class PermissionManagementComponent extends BaseComponent implements OnInit {
   users: UserPermissionData[] = [];
   roles: any[] = [];
   searchTerm = '';
@@ -42,7 +43,9 @@ export class PermissionManagementComponent implements OnInit {
     private authService: AuthService,
     private toastr: ToastrService,
     private dialog: MatDialog
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.authService.getRoles().subscribe({
@@ -50,7 +53,7 @@ export class PermissionManagementComponent implements OnInit {
       error: () => this.toastr.error('خطا در بارگذاری نقش‌ها')
     });
 
-    this.searchSubject.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destroy$)).subscribe(() => {
       this.page = 1;
       this.loadUsers();
     });

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { witnessDetail } from 'src/app/models/witnessDetail';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { VehiclesubService } from 'src/app/shared/vehiclesub.service';
@@ -12,7 +14,7 @@ import { VehicleNationalidUploadComponent } from '../nationalid-upload/nationali
   templateUrl: './witnessdetail.component.html',
   styleUrls: ['./witnessdetail.component.scss']
 })
-export class WitnessdetailComponent {
+export class WitnessdetailComponent extends BaseComponent {
   withnessForm: FormGroup = new FormGroup({});
   selectedId: number=0;
   witnessDetails!: witnessDetail[];
@@ -56,6 +58,7 @@ export class WitnessdetailComponent {
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
     ,private fb: FormBuilder, private vehiclesub:VehiclesubService,private parentComponent: VehicleComponent)
     {
+      super();
       this.withnessForm = this.fb.group({
         id: [0],
         firstName: ['', Validators.required],
@@ -69,7 +72,7 @@ export class WitnessdetailComponent {
       });
 
       // Only log invalid controls after form has been initialized and user has interacted
-      this.withnessForm.statusChanges.subscribe(status => {
+      this.withnessForm.statusChanges.pipe(takeUntil(this.destroy$)).subscribe(status => {
         if (status === 'INVALID' && this.formInitialized) {
           this.logInvalidControls();
         }

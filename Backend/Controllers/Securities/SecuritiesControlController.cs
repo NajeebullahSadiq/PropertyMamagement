@@ -36,6 +36,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var query = _context.SecuritiesControls
+                    .AsNoTracking()
                     .Where(x => x.Status == true)
                     .AsQueryable();
 
@@ -110,6 +111,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var item = await _context.SecuritiesControls
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (item == null)
@@ -191,7 +193,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Check for unique serial number
                 var exists = await _context.SecuritiesControls
-                    .AnyAsync(x => x.SerialNumber == data.SerialNumber && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.SerialNumber == data.SerialNumber && x.Status == true);
 
                 if (exists)
                 {
@@ -207,14 +209,33 @@ namespace WebAPIBackend.Controllers.Securities
 
                 var userName = User.Identity?.Name ?? "System";
 
+                // Parse dates from Hijri Shamsi strings to Gregorian DateOnly
+                var calendar = DateConversionHelper.ParseCalendarType(data.CalendarType);
+                DateOnly? proposalDate = null;
+                DateOnly? deliveryDate = null;
+
+                if (!string.IsNullOrWhiteSpace(data.ProposalDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.ProposalDate, calendar, out DateOnly parsedProposalDate))
+                        return BadRequest(new { message = "تاریخ پیشنهاد نامعتبر است" });
+                    proposalDate = parsedProposalDate;
+                }
+
+                if (!string.IsNullOrWhiteSpace(data.DeliveryDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.DeliveryDate, calendar, out DateOnly parsedDeliveryDate))
+                        return BadRequest(new { message = "تاریخ تسلیمی نامعتبر است" });
+                    deliveryDate = parsedDeliveryDate;
+                }
+
                 var entity = new SecuritiesControl
                 {
                     SerialNumber = data.SerialNumber,
                     SecurityDocumentType = data.SecurityDocumentType,
                     ProposalNumber = data.ProposalNumber,
-                    ProposalDate = data.ProposalDate,
+                    ProposalDate = proposalDate,
                     DistributionTicketNumber = data.DistributionTicketNumber,
-                    DeliveryDate = data.DeliveryDate,
+                    DeliveryDate = deliveryDate,
                     SecuritiesType = data.SecuritiesType,
                     PropertySaleCount = data.PropertySaleCount,
                     PropertySaleSerialStart = data.PropertySaleSerialStart,
@@ -279,7 +300,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Check for unique serial number (excluding current record)
                 var exists = await _context.SecuritiesControls
-                    .AnyAsync(x => x.SerialNumber == data.SerialNumber && x.Id != id && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.SerialNumber == data.SerialNumber && x.Id != id && x.Status == true);
 
                 if (exists)
                 {
@@ -295,12 +316,31 @@ namespace WebAPIBackend.Controllers.Securities
 
                 var userName = User.Identity?.Name ?? "System";
 
+                // Parse dates from Hijri Shamsi strings to Gregorian DateOnly
+                var calendar = DateConversionHelper.ParseCalendarType(data.CalendarType);
+                DateOnly? proposalDate = null;
+                DateOnly? deliveryDate = null;
+
+                if (!string.IsNullOrWhiteSpace(data.ProposalDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.ProposalDate, calendar, out DateOnly parsedProposalDate))
+                        return BadRequest(new { message = "تاریخ پیشنهاد نامعتبر است" });
+                    proposalDate = parsedProposalDate;
+                }
+
+                if (!string.IsNullOrWhiteSpace(data.DeliveryDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.DeliveryDate, calendar, out DateOnly parsedDeliveryDate))
+                        return BadRequest(new { message = "تاریخ تسلیمی نامعتبر است" });
+                    deliveryDate = parsedDeliveryDate;
+                }
+
                 entity.SerialNumber = data.SerialNumber;
                 entity.SecurityDocumentType = data.SecurityDocumentType;
                 entity.ProposalNumber = data.ProposalNumber;
-                entity.ProposalDate = data.ProposalDate;
+                entity.ProposalDate = proposalDate;
                 entity.DistributionTicketNumber = data.DistributionTicketNumber;
-                entity.DeliveryDate = data.DeliveryDate;
+                entity.DeliveryDate = deliveryDate;
                 entity.SecuritiesType = data.SecuritiesType;
                 entity.PropertySaleCount = data.PropertySaleCount;
                 entity.PropertySaleSerialStart = data.PropertySaleSerialStart;
@@ -378,6 +418,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var lastRecord = await _context.SecuritiesControls
+                    .AsNoTracking()
                     .Where(x => x.Status == true)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefaultAsync();

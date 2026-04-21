@@ -41,6 +41,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
             try
             {
                 var query = _context.ActivityMonitoringRecords
+                    .AsNoTracking()
                     .Where(x => x.Status == true)
                     .AsQueryable();
 
@@ -144,6 +145,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
                 var item = await _context.ActivityMonitoringRecords
+                    .AsNoTracking()
                     .Where(x => x.Id == id && x.Status == true)
                     .Select(x => new
                     {
@@ -410,6 +412,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
             try
             {
                 var query = _context.ActivityMonitoringRecords
+                    .AsNoTracking()
                     .Where(x => x.Status == true);
 
                 // Filter by section type if provided

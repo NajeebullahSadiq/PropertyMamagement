@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatDialog } from '@angular/material/dialog';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { PropertyService } from 'src/app/shared/property.service';
@@ -13,7 +15,7 @@ import { CalendarType } from 'src/app/models/calendar-type';
   templateUrl: './propertydetailsview.component.html',
   styleUrls: ['./propertydetailsview.component.scss']
 })
-export class PropertydetailsviewComponent {
+export class PropertydetailsviewComponent extends BaseComponent {
   isLoading = true;
   error: string | null = null;
   viewData: any = null;
@@ -25,10 +27,12 @@ export class PropertydetailsviewComponent {
     private dialog: MatDialog,
     private fileService: FileService,
     private calendarConversionService: CalendarConversionService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const idParam = params.get('id');
       const id = idParam ? Number(idParam) : 0;
       if (!id) {

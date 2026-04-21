@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesControlService } from 'src/app/shared/securities-control.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { SecuritiesControl } from 'src/app/models/SecuritiesControl';
@@ -10,7 +12,7 @@ import { SecuritiesControl } from 'src/app/models/SecuritiesControl';
     templateUrl: './securities-control-view.component.html',
     styleUrls: ['./securities-control-view.component.scss']
 })
-export class SecuritiesControlViewComponent implements OnInit {
+export class SecuritiesControlViewComponent extends BaseComponent implements OnInit {
     item: SecuritiesControl | null = null;
     isLoading = true;
     error: string | null = null;
@@ -21,7 +23,9 @@ export class SecuritiesControlViewComponent implements OnInit {
         private securitiesControlService: SecuritiesControlService,
         private calendarService: CalendarService,
         private toastr: ToastrService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');

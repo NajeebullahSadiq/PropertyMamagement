@@ -1,6 +1,8 @@
 import { AfterViewInit, ChangeDetectorRef, Component, QueryList, ViewChild, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatSidenav } from '@angular/material/sidenav';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -19,7 +21,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./masterlayout.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class MasterlayoutComponent implements AfterViewInit {
+export class MasterlayoutComponent extends BaseComponent implements AfterViewInit {
   filePath: string = 'assets/img/avatar.png';
   userDetails: any = [];
   baseUrl = environment.apiURL + '/';
@@ -60,7 +62,7 @@ export class MasterlayoutComponent implements AfterViewInit {
   isLangMenuOpen = false;
 
   ngAfterViewInit() {
-    this.observer.observe(['(max-width: 800px)']).subscribe((res) => {
+    this.observer.observe(['(max-width: 800px)']).pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res.matches) {
         this.sidenav.mode = 'over';
         this.sidenav.close();
@@ -82,6 +84,7 @@ export class MasterlayoutComponent implements AfterViewInit {
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService
   ) {
+    super();
     translate.addLangs(['English', 'دری']);
     translate.setDefaultLang('دری');
   }

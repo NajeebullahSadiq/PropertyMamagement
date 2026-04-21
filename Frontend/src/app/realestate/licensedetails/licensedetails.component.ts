@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
 import { LicenseDetail } from 'src/app/models/LicenseDetail';
@@ -19,7 +21,7 @@ import { AuthService } from 'src/app/shared/auth.service';
 	templateUrl: './licensedetails.component.html',
 	styleUrls: ['./licensedetails.component.scss'],
 })
-export class LicensedetailsComponent {
+export class LicensedetailsComponent extends BaseComponent {
 
 	licenseForm: FormGroup = new FormGroup({});
 	selectedId: number = 0;
@@ -69,6 +71,7 @@ export class LicensedetailsComponent {
 		private rbacService: RbacService,
 		private authService: AuthService
 	) {
+		super();
 		this.licenseForm = this.fb.group({
 			id: [0],
 			provinceId: ['', Validators.required],  // Add provinceId field
@@ -94,12 +97,12 @@ export class LicensedetailsComponent {
 			hrLetterDate: [''],
 		});
 
-		this.licenseForm.get('issueDate')?.valueChanges.subscribe((value) => {
+		this.licenseForm.get('issueDate')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
 			this.applyAutoExpireDate(value);
 		});
 
 		// Watch for license category changes to show/hide renewal round and duplicate issue date fields
-		this.licenseForm.get('licenseCategory')?.valueChanges.subscribe(value => {
+		this.licenseForm.get('licenseCategory')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
 			if (value === 'تجدید') {
 				this.licenseForm.get('renewalRound')?.setValidators([Validators.required]);
 				this.licenseForm.get('duplicateIssueDate')?.clearValidators();

@@ -491,6 +491,7 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 // First check if license exists and validate province access
                 var licenseDetail = await _context.LicenseDetails
+                    .AsNoTracking()
                     .Where(l => l.CompanyId == id)
                     .OrderByDescending(l => l.IssueDate)
                     .FirstOrDefaultAsync();
@@ -507,6 +508,7 @@ namespace WebAPIBackend.Controllers.Companies
                 await EnsureLicenseViewExists();
                 
                 var data = await _context.LicenseView
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.CompanyId == id);
                 if (data == null)
                 {
@@ -515,6 +517,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 // Get address data from CompanyOwner and Location tables
                 var owner = await _context.CompanyOwners
+                    .AsNoTracking()
                     .Where(o => o.CompanyId == id)
                     .FirstOrDefaultAsync();
 
@@ -534,6 +537,7 @@ namespace WebAPIBackend.Controllers.Companies
                     if (owner.OwnerProvinceId.HasValue)
                     {
                         var ownerProvince = await _context.Locations
+                            .AsNoTracking()
                             .Where(l => l.Id == owner.OwnerProvinceId.Value)
                             .FirstOrDefaultAsync();
                         ownerProvinceName = ownerProvince?.Dari;
@@ -542,6 +546,7 @@ namespace WebAPIBackend.Controllers.Companies
                     if (owner.OwnerDistrictId.HasValue)
                     {
                         var ownerDistrict = await _context.Locations
+                            .AsNoTracking()
                             .Where(l => l.Id == owner.OwnerDistrictId.Value)
                             .FirstOrDefaultAsync();
                         ownerDistrictName = ownerDistrict?.Dari;
@@ -551,6 +556,7 @@ namespace WebAPIBackend.Controllers.Companies
                     if (owner.PermanentProvinceId.HasValue)
                     {
                         var permanentProvince = await _context.Locations
+                            .AsNoTracking()
                             .Where(l => l.Id == owner.PermanentProvinceId.Value)
                             .FirstOrDefaultAsync();
                         permanentProvinceName = permanentProvince?.Dari;
@@ -559,6 +565,7 @@ namespace WebAPIBackend.Controllers.Companies
                     if (owner.PermanentDistrictId.HasValue)
                     {
                         var permanentDistrict = await _context.Locations
+                            .AsNoTracking()
                             .Where(l => l.Id == owner.PermanentDistrictId.Value)
                             .FirstOrDefaultAsync();
                         permanentDistrictName = permanentDistrict?.Dari;

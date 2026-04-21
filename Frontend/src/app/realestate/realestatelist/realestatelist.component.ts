@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { companydetailsList } from 'src/app/models/companydetails';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { RbacService } from 'src/app/shared/rbac.service';
@@ -18,7 +20,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
   templateUrl: './realestatelist.component.html',
   styleUrls: ['./realestatelist.component.scss']
 })
-export class RealestatelistComponent implements OnInit, OnDestroy {
+export class RealestatelistComponent extends BaseComponent implements OnInit, OnDestroy {
   properties!: companydetailsList[];
   filteredProperties!: companydetailsList[];
   
@@ -28,8 +30,8 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   page: number = 1;
   count: number = 0;
-  tableSize: number = 10;
-  tableSizes: any = [10,50,100];
+  tableSize: number = 20;
+  tableSizes: any = [10,20,50,100];
   isViewOnly: boolean = false;
   isAdmin: boolean = false;
   canEdit: boolean = false;
@@ -58,6 +60,7 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private calendarConversion: CalendarConversionService
   ) {
+    super();
     this.isViewOnly = this.rbacService.isViewOnly();
     this.isAdmin = this.rbacService.isAdmin();
     this.canEdit = this.rbacService.hasPermission('company.create') || this.rbacService.hasPermission('company.edit');
@@ -65,11 +68,12 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     
     // Setup debounced search
     this.searchSubject.pipe(
-      debounceTime(500), // Wait 500ms after user stops typing
-      distinctUntilChanged() // Only emit if value is different from previous
+      debounceTime(500),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
     ).subscribe(searchTerm => {
       this.searchTerm = searchTerm;
-      this.page = 1; // Reset page when search changes
+      this.page = 1;
       this.loadData();
     });
   }
@@ -79,20 +83,21 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
     this.loadProvinces();
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy() {
     this.searchSubject.complete();
+    super.ngOnDestroy();
   }
 
   loadData(){
-    this.comservice.getComapaniesList(this.searchTerm).subscribe(properties => {
-      this.properties = properties;
-      this.filteredProperties = properties;
-      this.count = properties.length;
+    this.comservice.getComapaniesList(this.page, this.tableSize, this.searchTerm).pipe(takeUntil(this.destroy$)).subscribe(response => {
+      this.properties = response?.items || [];
+      this.filteredProperties = this.properties;
+      this.count = response?.totalCount || 0;
     });
   }
 
   loadProvinces(): void {
-    this.comservice.getProvinces().subscribe((res: any) => {
+    this.comservice.getProvinces().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       this.provinces = res as any[];
     });
   }
@@ -132,11 +137,13 @@ export class RealestatelistComponent implements OnInit, OnDestroy {
 
   onTableDataChange(event: any) {
     this.page = event;
+    this.loadData();
   }
 
   onTableSizeChange(event: any): void {
     this.tableSize = event.target.value;
     this.page = 1;
+    this.loadData();
   }
 
   onSearch() {

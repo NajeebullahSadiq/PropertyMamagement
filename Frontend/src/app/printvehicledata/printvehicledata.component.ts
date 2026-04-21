@@ -5,14 +5,15 @@ import { PropertyService } from '../shared/property.service';
 import { VehicleService } from '../shared/vehicle.service';
 import { VerificationService } from '../shared/verification.service';
 import { environment } from 'src/environments/environment';
-import { catchError, of } from 'rxjs';
+import { catchError, of, takeUntil } from 'rxjs';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 @Component({
   selector: 'app-printvehicledata',
   templateUrl: './printvehicledata.component.html',
   styleUrls: ['./printvehicledata.component.scss']
 })
-export class PrintvehicledataComponent implements OnInit {
+export class PrintvehicledataComponent extends BaseComponent implements OnInit {
   userDetails: any = {};
   SellerfilePath: string = 'assets/img/avatar2.png';
   BuyerfilePath: string = 'assets/img/avatar2.png';
@@ -50,7 +51,7 @@ export class PrintvehicledataComponent implements OnInit {
     private elementRef: ElementRef,
     private renderer: Renderer2
   ) { 
-  
+    super();
   }
 
   ngOnInit(): void {
@@ -150,7 +151,7 @@ export class PrintvehicledataComponent implements OnInit {
     }
 
     const vehicleData$ = this.pservice.getVehiclePropertyPrintData(code);
-    vehicleData$.subscribe({
+    vehicleData$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (vehicle) => {
         this.documentData = vehicle || {};
 

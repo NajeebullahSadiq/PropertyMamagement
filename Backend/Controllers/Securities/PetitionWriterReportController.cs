@@ -50,6 +50,7 @@ public class PetitionWriterReportController : ControllerBase
         {
             var calendar = DateConversionHelper.ParseCalendarType(request.CalendarType);
             var query = _context.PetitionWriterSecurities
+                .AsNoTracking()
                 .Where(x => x.Status == true)
                 .AsQueryable();
 
@@ -87,6 +88,7 @@ public class PetitionWriterReportController : ControllerBase
     {
         var calendar = DateConversionHelper.ParseCalendarType(calendarType);
         var query = _context.PetitionWriterSecurities
+            .AsNoTracking()
             .Where(x => x.Status == true)
             .AsQueryable();
 
@@ -111,6 +113,7 @@ public class PetitionWriterReportController : ControllerBase
     {
         var calendar = DateConversionHelper.ParseCalendarType(calendarType);
         var query = _context.PetitionWriterSecurities
+            .AsNoTracking()
             .Where(x => x.Status == true)
             .AsQueryable();
 
@@ -146,6 +149,7 @@ public class PetitionWriterReportController : ControllerBase
     {
         var calendar = DateConversionHelper.ParseCalendarType(calendarType);
         var query = _context.PetitionWriterSecurities
+            .AsNoTracking()
             .Where(x => x.Status == true)
             .AsQueryable();
 
@@ -181,6 +185,7 @@ public class PetitionWriterReportController : ControllerBase
     {
         var calendar = DateConversionHelper.ParseCalendarType(calendarType);
         var query = _context.PetitionWriterSecurities
+            .AsNoTracking()
             .Where(x => x.Status == true)
             .AsQueryable();
 
@@ -219,6 +224,7 @@ public class PetitionWriterReportController : ControllerBase
     {
         var calendar = DateConversionHelper.ParseCalendarType(calendarType);
         var query = _context.PetitionWriterSecurities
+            .AsNoTracking()
             .Where(x => x.Status == true)
             .AsQueryable();
 
@@ -253,6 +259,7 @@ public class PetitionWriterReportController : ControllerBase
     {
         var calendar = DateConversionHelper.ParseCalendarType(calendarType);
         var query = _context.PetitionWriterSecurities
+            .AsNoTracking()
             .Where(x => x.Status == true)
             .AsQueryable();
 
@@ -301,6 +308,7 @@ public class PetitionWriterReportController : ControllerBase
     {
         var calendar = DateConversionHelper.ParseCalendarType(calendarType);
         var query = _context.PetitionWriterSecurities
+            .AsNoTracking()
             .Where(x => x.Status == true)
             .AsQueryable();
 
@@ -359,6 +367,7 @@ public class PetitionWriterReportController : ControllerBase
         {
             var calendar = DateConversionHelper.ParseCalendarType(request.CalendarType);
             var query = _context.PetitionWriterSecurities
+                .AsNoTracking()
                 .Where(x => x.Status == true)
                 .AsQueryable();
 

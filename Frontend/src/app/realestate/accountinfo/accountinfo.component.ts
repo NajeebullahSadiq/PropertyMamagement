@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Injectable, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
@@ -13,7 +15,7 @@ import { AccountInfo, AccountInfoData } from 'src/app/models/AccountInfo';
     templateUrl: './accountinfo.component.html',
     styleUrls: ['./accountinfo.component.scss'],
 })
-export class AccountinfoComponent {
+export class AccountinfoComponent extends BaseComponent {
 
     accountForm!: FormGroup;
     selectedId: number = 0;
@@ -37,6 +39,7 @@ export class AccountinfoComponent {
         private calendarService: CalendarService,
         private numeralService: NumeralService
     ) {
+        super();
         this.accountForm = this.fb.group({
             id: [0],
             companyId: [''],

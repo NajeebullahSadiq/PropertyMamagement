@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { VerificationService, DocumentVerificationDto } from '../shared/verification.service';
 import { environment } from 'src/environments/environment';
 import jsQR from 'jsqr';
@@ -9,7 +11,7 @@ import jsQR from 'jsqr';
   templateUrl: './verify.component.html',
   styleUrls: ['./verify.component.scss']
 })
-export class VerifyComponent implements OnInit, OnDestroy {
+export class VerifyComponent extends BaseComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
 
@@ -32,11 +34,13 @@ export class VerifyComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private verificationService: VerificationService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     // Check if code is provided in URL
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const code = params.get('code');
       if (code) {
         // Extract just the verification code if a full URL was somehow passed
@@ -47,8 +51,9 @@ export class VerifyComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.stopScanner();
+    super.ngOnDestroy();
   }
 
   switchToManual(): void {

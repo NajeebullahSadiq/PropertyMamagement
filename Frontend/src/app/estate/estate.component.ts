@@ -3,6 +3,8 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 
 import { PropertyService } from '../shared/property.service';
 import { SellerService } from '../shared/seller.service';
@@ -16,7 +18,7 @@ import { WitnessdetailComponent } from './propertydetails/witnessdetail/witnessd
   templateUrl: './estate.component.html',
   styleUrls: ['./estate.component.scss']
 })
-export class EstateComponent {
+export class EstateComponent extends BaseComponent {
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
   PropertyId: number=0;
   @ViewChild('propertyDetails') propertyDetails!:PropertydetailsComponent;
@@ -26,11 +28,12 @@ export class EstateComponent {
  
  
   constructor(public propertyService: PropertyService,public sellerService:SellerService,private toastr: ToastrService,private route: ActivatedRoute){
+    super();
     console.log(propertyService.mainTableId, sellerService.sellerId,sellerService.buyerId, sellerService.withnessId);
    
   }
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.PropertyId = params['id'] ? parseInt(params['id'], 10) : 0;
      
     });

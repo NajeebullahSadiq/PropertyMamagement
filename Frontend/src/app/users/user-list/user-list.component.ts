@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { AuthService } from 'src/app/shared/auth.service';
 import { UserEditDialogComponent } from '../user-edit-dialog/user-edit-dialog.component';
 import { environment } from 'src/environments/environment';
@@ -31,7 +33,7 @@ export interface UserData {
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss']
 })
-export class UserListComponent implements OnInit {
+export class UserListComponent extends BaseComponent implements OnInit {
   users: UserData[] = [];
   roles: any[] = [];
   systemRoles: any[] = [];
@@ -60,12 +62,14 @@ export class UserListComponent implements OnInit {
     private toastr: ToastrService,
     private dialog: MatDialog,
     private calendarConversionService: CalendarConversionService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.loadRoles();
     // Debounce search input
-    this.searchSubject.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destroy$)).subscribe(() => {
       this.page = 1;
       this.loadUsers();
     });

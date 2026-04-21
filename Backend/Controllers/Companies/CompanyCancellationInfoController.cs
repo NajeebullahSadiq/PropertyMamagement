@@ -31,7 +31,7 @@ namespace WebAPIBackend.Controllers.Companies
         {
             try
             {
-                var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == companyId);
+                var companyExists = await _context.CompanyDetails.AsNoTracking().AnyAsync(c => c.Id == companyId);
                 if (!companyExists)
                 {
                     return NotFound(new { message = "Company not found" });
@@ -41,6 +41,7 @@ namespace WebAPIBackend.Controllers.Companies
                 try
                 {
                     cancellationInfo = await _context.CompanyCancellationInfos
+                        .AsNoTracking()
                         .Where(x => x.CompanyId == companyId)
                         .FirstOrDefaultAsync();
                 }
@@ -94,14 +95,14 @@ namespace WebAPIBackend.Controllers.Companies
                 return Unauthorized();
             }
 
-            var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == request.CompanyId);
+            var companyExists = await _context.CompanyDetails.AsNoTracking().AnyAsync(c => c.Id == request.CompanyId);
             if (!companyExists)
             {
                 return NotFound(new { message = "Company not found" });
             }
 
             var existingInfo = await _context.CompanyCancellationInfos
-                .AnyAsync(x => x.CompanyId == request.CompanyId);
+                .AsNoTracking().AnyAsync(x => x.CompanyId == request.CompanyId);
             if (existingInfo)
             {
                 return BadRequest(new { message = "Cancellation info already exists for this company. Use PUT to update." });

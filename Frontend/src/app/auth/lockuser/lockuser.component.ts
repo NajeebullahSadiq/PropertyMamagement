@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { AuthService } from 'src/app/shared/auth.service';
 
 @Component({
@@ -8,13 +10,15 @@ import { AuthService } from 'src/app/shared/auth.service';
   templateUrl: './lockuser.component.html',
   styleUrls: ['./lockuser.component.scss']
 })
-export class LockuserComponent {
+export class LockuserComponent extends BaseComponent {
   userName: string='';
   isLocked: boolean=true;
   users:any;
-  constructor(private service:AuthService,private toastr: ToastrService,public dialogRef: MatDialogRef<LockuserComponent>) {}
+  constructor(private service:AuthService,private toastr: ToastrService,public dialogRef: MatDialogRef<LockuserComponent>) {
+    super();
+  }
   ngOnInit(): void {
-    this.service.getUsers().subscribe(res => {
+    this.service.getUsers().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.users = res;
      });
   }

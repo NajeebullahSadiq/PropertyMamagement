@@ -1,7 +1,8 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterSecuritiesService } from 'src/app/shared/petition-writer-securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -12,7 +13,7 @@ import { PetitionWriterSecurities } from 'src/app/models/PetitionWriterSecuritie
     templateUrl: './petition-writer-securities-list.component.html',
     styleUrls: ['./petition-writer-securities-list.component.scss']
 })
-export class PetitionWriterSecuritiesListComponent implements OnInit, OnDestroy {
+export class PetitionWriterSecuritiesListComponent extends BaseComponent implements OnInit, OnDestroy {
     @Input() embeddedMode = false;
     
     items: PetitionWriterSecurities[] = [];
@@ -40,28 +41,28 @@ export class PetitionWriterSecuritiesListComponent implements OnInit, OnDestroy 
     reportData: any = null;
     isLoadingReport = false;
 
-    private dataChangedSubscription?: Subscription;
-
     constructor(
         private petitionService: PetitionWriterSecuritiesService,
         private calendarService: CalendarService,
         private rbacService: RbacService,
         private router: Router,
         private toastr: ToastrService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();
         this.loadData();
         
         // Subscribe to data changes from service
-        this.dataChangedSubscription = this.petitionService.dataChanged.subscribe(() => {
+        this.petitionService.dataChanged.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.loadData();
         });
     }
 
-    ngOnDestroy(): void {
-        this.dataChangedSubscription?.unsubscribe();
+    override ngOnDestroy(): void {
+        super.ngOnDestroy();
     }
 
     checkPermissions(): void {

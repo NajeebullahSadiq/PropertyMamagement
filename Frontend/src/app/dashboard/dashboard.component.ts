@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
 import { AuthService } from '../shared/auth.service';
 import { DashboardService } from '../shared/dashboard.service';
@@ -35,7 +37,7 @@ interface BackendData {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {
+export class DashboardComponent extends BaseComponent {
   chart!: Chart<any>;
   chartData: any[] = [];
   userDetails:any=[];
@@ -45,7 +47,9 @@ export class DashboardComponent {
   TransactionTypesByMonthData:any=[];
   totalCompany:any=[];
   totalexpiredLicense:any=[];
-  constructor(private router: Router, private service: AuthService,private dashService:DashboardService,private http: HttpClient) { }
+  constructor(private router: Router, private service: AuthService,private dashService:DashboardService,private http: HttpClient) {
+    super();
+  }
   ngOnInit(): void {
     // Check if user has access to dashboard
     const userRole = localStorage.getItem('token');
@@ -71,19 +75,19 @@ export class DashboardComponent {
     this.dashboardData.totalRecord=[];
     this.vehicleDashboardData.totalRecord=[];
     this.totalCompany.totalCompanyRegisterd=0;
-    this.dashService.getDashboardData().subscribe(data => {
+    this.dashService.getDashboardData().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.dashboardData = data;
       this.createPieChart();
       this.createColumnChart();
      
     });
-    this.dashService.GetCompanyDashboardData().subscribe(data => {
+    this.dashService.GetCompanyDashboardData().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.totalCompany = data;
     });
-    this.dashService.GetExpiredLicenseDashboardData().subscribe(data => {
+    this.dashService.GetExpiredLicenseDashboardData().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.totalexpiredLicense = data;
     });
-    this.dashService.getVehicleDashboardData().subscribe(data => {
+    this.dashService.getVehicleDashboardData().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.vehicleDashboardData = data;
     
     });
@@ -340,6 +344,7 @@ export class DashboardComponent {
   getDataFromAPI() {
     this.http
       .get<any[]>(environment.apiURL + '/Dashboard/GetVehicleReportByMonth') // Replace with your API endpoint
+      .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.chartData = data;
         this.createVehicleReportChart();
@@ -348,13 +353,13 @@ export class DashboardComponent {
   }
   loadChartData(): void {
     // Make an HTTP GET request to your ASP.NET Core Web API endpoint
-    this.http.get<BackendData[]>(environment.apiURL + '/Dashboard/GetPropertyTypesByMonth').subscribe((data: BackendData[]) => {
+    this.http.get<BackendData[]>(environment.apiURL + '/Dashboard/GetPropertyTypesByMonth').pipe(takeUntil(this.destroy$)).subscribe((data: BackendData[]) => {
       this.displayChart(data);
     });
   }
   loadTransactionChartData(): void {
     // Make an HTTP GET request to your ASP.NET Core Web API endpoint
-    this.http.get<BackendData[]>(environment.apiURL + '/Dashboard/GetTransactionTypesByMonth').subscribe((data: BackendData[]) => {
+    this.http.get<BackendData[]>(environment.apiURL + '/Dashboard/GetTransactionTypesByMonth').pipe(takeUntil(this.destroy$)).subscribe((data: BackendData[]) => {
       this.displayTransactionChart(data);
     });
   }

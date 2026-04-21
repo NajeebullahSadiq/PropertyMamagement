@@ -22,12 +22,18 @@ public class SecuritiesControlData
     [MaxLength(100)]
     public string? ProposalNumber { get; set; }
 
-    public DateOnly? ProposalDate { get; set; }
+    /// <summary>
+    /// Date string in Hijri Shamsi format (YYYY/MM/DD or YYYY-MM-DD) sent from frontend
+    /// </summary>
+    public string? ProposalDate { get; set; }
 
     [MaxLength(100)]
     public string? DistributionTicketNumber { get; set; }
 
-    public DateOnly? DeliveryDate { get; set; }
+    /// <summary>
+    /// Date string in Hijri Shamsi format (YYYY/MM/DD or YYYY-MM-DD) sent from frontend
+    /// </summary>
+    public string? DeliveryDate { get; set; }
 
     // Tab 2: مشخصات اسناد بهادار و تعداد آنها
     public int? SecuritiesType { get; set; }
@@ -115,4 +121,9 @@ public class SecuritiesControlData
     // Tab 4: ملاحظات و توضیحات
     [MaxLength(2000)]
     public string? Remarks { get; set; }
+
+    /// <summary>
+    /// Calendar type hint from frontend (always HijriShamsi)
+    /// </summary>
+    public string? CalendarType { get; set; }
 }

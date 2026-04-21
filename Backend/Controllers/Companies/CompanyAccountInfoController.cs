@@ -50,7 +50,7 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 // Check if company exists
-                var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == companyId);
+                var companyExists = await _context.CompanyDetails.AsNoTracking().AnyAsync(c => c.Id == companyId);
                 if (!companyExists)
                 {
                     return NotFound(new { message = "Company not found" });
@@ -60,6 +60,7 @@ namespace WebAPIBackend.Controllers.Companies
                 try
                 {
                     accountInfo = await _context.CompanyAccountInfos
+                        .AsNoTracking()
                         .Where(x => x.CompanyId == companyId)
                         .FirstOrDefaultAsync();
                 }
@@ -120,7 +121,7 @@ namespace WebAPIBackend.Controllers.Companies
             }
 
             // Check if company exists
-            var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == request.CompanyId);
+            var companyExists = await _context.CompanyDetails.AsNoTracking().AnyAsync(c => c.Id == request.CompanyId);
             if (!companyExists)
             {
                 return NotFound(new { message = "Company not found" });
@@ -128,7 +129,7 @@ namespace WebAPIBackend.Controllers.Companies
 
             // Check if account info already exists for this company
             var existingInfo = await _context.CompanyAccountInfos
-                .AnyAsync(x => x.CompanyId == request.CompanyId);
+                .AsNoTracking().AnyAsync(x => x.CompanyId == request.CompanyId);
             if (existingInfo)
             {
                 return BadRequest(new { message = "Account info already exists for this company. Use PUT to update." });

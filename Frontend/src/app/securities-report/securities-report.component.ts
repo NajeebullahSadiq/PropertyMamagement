@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import {
@@ -16,7 +18,7 @@ import {
     templateUrl: './securities-report.component.html',
     styleUrls: ['./securities-report.component.scss'],
 })
-export class SecuritiesReportComponent implements OnInit {
+export class SecuritiesReportComponent extends BaseComponent implements OnInit {
     // Filter form
     isFilterPanelOpen = true;
     isLoading = false;
@@ -59,7 +61,9 @@ export class SecuritiesReportComponent implements OnInit {
         private reportService: SecuritiesReportService,
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.loadConfig();

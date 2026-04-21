@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -12,7 +13,7 @@ import { SecuritiesDistribution } from 'src/app/models/SecuritiesDistribution';
     templateUrl: './securities-list.component.html',
     styleUrls: ['./securities-list.component.scss']
 })
-export class SecuritiesListComponent implements OnInit, OnDestroy {
+export class SecuritiesListComponent extends BaseComponent implements OnInit, OnDestroy {
     items: SecuritiesDistribution[] = [];
     totalCount = 0;
     page = 1;
@@ -36,28 +37,28 @@ export class SecuritiesListComponent implements OnInit, OnDestroy {
     reportData: any = null;
     isLoadingReport = false;
 
-    private dataChangedSub?: Subscription;
-
     constructor(
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService,
         private rbacService: RbacService,
         private router: Router,
         private toastr: ToastrService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();
         this.loadData();
 
         // Subscribe to data changes
-        this.dataChangedSub = this.securitiesService.dataChanged$.subscribe(() => {
+        this.securitiesService.dataChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.loadData();
         });
     }
 
-    ngOnDestroy(): void {
-        this.dataChangedSub?.unsubscribe();
+    override ngOnDestroy(): void {
+        super.ngOnDestroy();
     }
 
     checkPermissions(): void {

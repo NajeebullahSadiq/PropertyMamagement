@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterSecuritiesService } from 'src/app/shared/petition-writer-securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { PetitionWriterSecurities } from 'src/app/models/PetitionWriterSecurities';
@@ -9,7 +11,7 @@ import { PetitionWriterSecurities } from 'src/app/models/PetitionWriterSecuritie
     templateUrl: './print-petition-writer-securities.component.html',
     styleUrls: ['./print-petition-writer-securities.component.scss']
 })
-export class PrintPetitionWriterSecuritiesComponent implements OnInit {
+export class PrintPetitionWriterSecuritiesComponent extends BaseComponent implements OnInit {
     item: PetitionWriterSecurities | null = null;
     isLoading = true;
     error: string | null = null;
@@ -20,7 +22,9 @@ export class PrintPetitionWriterSecuritiesComponent implements OnInit {
         private router: Router,
         private petitionService: PetitionWriterSecuritiesService,
         private calendarService: CalendarService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.setPrintDate();

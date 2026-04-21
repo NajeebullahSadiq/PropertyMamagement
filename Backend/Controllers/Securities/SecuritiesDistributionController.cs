@@ -37,6 +37,7 @@ namespace WebAPIBackend.Controllers.Securities
             try
             {
                 var query = _context.SecuritiesDistributions
+                    .AsNoTracking()
                     .Include(x => x.Items)
                     .Where(x => x.Status == true)
                     .AsQueryable();
@@ -235,52 +236,54 @@ namespace WebAPIBackend.Controllers.Securities
         {
             try
             {
+                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
+
                 var item = await _context.SecuritiesDistributions
-                    .Include(x => x.Items)
-                    .FirstOrDefaultAsync(x => x.Id == id);
+                    .AsNoTracking()
+                    .Where(x => x.Id == id)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.RegistrationNumber,
+                        x.LicenseOwnerName,
+                        x.LicenseOwnerFatherName,
+                        x.TransactionGuideName,
+                        x.LicenseNumber,
+                        Items = x.Items.Select(i => new
+                        {
+                            i.Id,
+                            i.DocumentType,
+                            i.SerialStart,
+                            i.SerialEnd,
+                            i.Count,
+                            i.Price
+                        }).ToList(),
+                        x.PricePerDocument,
+                        x.TotalDocumentsPrice,
+                        x.TotalSecuritiesPrice,
+                        x.BankReceiptNumber,
+                        x.DeliveryDate,
+                        DeliveryDateFormatted = x.DeliveryDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
+                            : "",
+                        x.DistributionDate,
+                        DistributionDateFormatted = x.DistributionDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
+                            : "",
+                        x.CreatedAt,
+                        x.CreatedBy,
+                        x.UpdatedAt,
+                        x.UpdatedBy,
+                        x.Status
+                    })
+                    .FirstOrDefaultAsync();
 
                 if (item == null)
                 {
                     return NotFound(new { message = "رکورد یافت نشد" });
                 }
 
-                var calendar = DateConversionHelper.ParseCalendarType(calendarType);
-
-                return Ok(new
-                {
-                    item.Id,
-                    item.RegistrationNumber,
-                    item.LicenseOwnerName,
-                    item.LicenseOwnerFatherName,
-                    item.TransactionGuideName,
-                    item.LicenseNumber,
-                    Items = item.Items.Select(i => new
-                    {
-                        i.Id,
-                        i.DocumentType,
-                        i.SerialStart,
-                        i.SerialEnd,
-                        i.Count,
-                        i.Price
-                    }).ToList(),
-                    item.PricePerDocument,
-                    item.TotalDocumentsPrice,
-                    item.TotalSecuritiesPrice,
-                    item.BankReceiptNumber,
-                    item.DeliveryDate,
-                    DeliveryDateFormatted = item.DeliveryDate.HasValue
-                        ? DateConversionHelper.FormatDateOnly(item.DeliveryDate, calendar)
-                        : "",
-                    item.DistributionDate,
-                    DistributionDateFormatted = item.DistributionDate.HasValue
-                        ? DateConversionHelper.FormatDateOnly(item.DistributionDate, calendar)
-                        : "",
-                    item.CreatedAt,
-                    item.CreatedBy,
-                    item.UpdatedAt,
-                    item.UpdatedBy,
-                    item.Status
-                });
+                return Ok(item);
             }
             catch (Exception ex)
             {
@@ -304,7 +307,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Check for unique registration number
                 var exists = await _context.SecuritiesDistributions
-                    .AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Status == true);
 
                 if (exists)
                 {
@@ -320,6 +323,25 @@ namespace WebAPIBackend.Controllers.Securities
 
                 var userName = User.Identity?.Name ?? "System";
 
+                // Parse dates from Hijri Shamsi strings to Gregorian DateOnly
+                var calendar = DateConversionHelper.ParseCalendarType(data.CalendarType);
+                DateOnly? deliveryDate = null;
+                DateOnly? distributionDate = null;
+
+                if (!string.IsNullOrWhiteSpace(data.DeliveryDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.DeliveryDate, calendar, out DateOnly parsedDeliveryDate))
+                        return BadRequest(new { message = "تاریخ تحویلی نامعتبر است" });
+                    deliveryDate = parsedDeliveryDate;
+                }
+
+                if (!string.IsNullOrWhiteSpace(data.DistributionDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.DistributionDate, calendar, out DateOnly parsedDistributionDate))
+                        return BadRequest(new { message = "تاریخ توزیع نامعتبر است" });
+                    distributionDate = parsedDistributionDate;
+                }
+
                 var entity = new SecuritiesDistribution
                 {
                     RegistrationNumber = data.RegistrationNumber,
@@ -331,8 +353,8 @@ namespace WebAPIBackend.Controllers.Securities
                     TotalDocumentsPrice = data.TotalDocumentsPrice,
                     TotalSecuritiesPrice = data.TotalSecuritiesPrice,
                     BankReceiptNumber = data.BankReceiptNumber,
-                    DeliveryDate = data.DeliveryDate,
-                    DistributionDate = data.DistributionDate,
+                    DeliveryDate = deliveryDate,
+                    DistributionDate = distributionDate,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = userName,
                     Status = true
@@ -389,7 +411,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Check for unique registration number (excluding current record)
                 var exists = await _context.SecuritiesDistributions
-                    .AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Id != id && x.Status == true);
+                    .AsNoTracking().AnyAsync(x => x.RegistrationNumber == data.RegistrationNumber && x.Id != id && x.Status == true);
 
                 if (exists)
                 {
@@ -405,6 +427,25 @@ namespace WebAPIBackend.Controllers.Securities
 
                 var userName = User.Identity?.Name ?? "System";
 
+                // Parse dates from Hijri Shamsi strings to Gregorian DateOnly
+                var calendar = DateConversionHelper.ParseCalendarType(data.CalendarType);
+                DateOnly? deliveryDate = null;
+                DateOnly? distributionDate = null;
+
+                if (!string.IsNullOrWhiteSpace(data.DeliveryDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.DeliveryDate, calendar, out DateOnly parsedDeliveryDate))
+                        return BadRequest(new { message = "تاریخ تحویلی نامعتبر است" });
+                    deliveryDate = parsedDeliveryDate;
+                }
+
+                if (!string.IsNullOrWhiteSpace(data.DistributionDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnly(data.DistributionDate, calendar, out DateOnly parsedDistributionDate))
+                        return BadRequest(new { message = "تاریخ توزیع نامعتبر است" });
+                    distributionDate = parsedDistributionDate;
+                }
+
                 entity.RegistrationNumber = data.RegistrationNumber;
                 entity.LicenseOwnerName = data.LicenseOwnerName;
                 entity.LicenseOwnerFatherName = data.LicenseOwnerFatherName;
@@ -414,8 +455,8 @@ namespace WebAPIBackend.Controllers.Securities
                 entity.TotalDocumentsPrice = data.TotalDocumentsPrice;
                 entity.TotalSecuritiesPrice = data.TotalSecuritiesPrice;
                 entity.BankReceiptNumber = data.BankReceiptNumber;
-                entity.DeliveryDate = data.DeliveryDate;
-                entity.DistributionDate = data.DistributionDate;
+                entity.DeliveryDate = deliveryDate;
+                entity.DistributionDate = distributionDate;
                 entity.UpdatedAt = DateTime.UtcNow;
                 entity.UpdatedBy = userName;
 
@@ -563,6 +604,7 @@ namespace WebAPIBackend.Controllers.Securities
 
                 // Base query - all active securities distributions
                 var query = _context.SecuritiesDistributions
+                    .AsNoTracking()
                     .Include(x => x.Items)
                     .Where(x => x.Status == true)
                     .AsQueryable();

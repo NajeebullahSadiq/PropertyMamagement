@@ -2,6 +2,8 @@ import { Component, EventEmitter, Injectable, Input, Output, ViewChild } from '@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { Guarantor, GuaranteeTypeEnum } from 'src/app/models/Guarantor';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { SellerService } from 'src/app/shared/seller.service';
@@ -19,7 +21,7 @@ import '@angular/localize/init';
   templateUrl: './guaranators.component.html',
   styleUrls: ['./guaranators.component.scss'],
 })
-export class GuaranatorsComponent {
+export class GuaranatorsComponent extends BaseComponent {
 
   baseUrl: string = environment.apiURL + '/';
   guaranteeDocName: string = '';
@@ -63,6 +65,7 @@ export class GuaranatorsComponent {
     private calendarService: CalendarService,
     private dialog: MatDialog
   ) {
+    super();
     this.guaranatorForm = this.fb.group({
       id: [0],
       firstName: ['', Validators.required],
@@ -104,7 +107,7 @@ export class GuaranatorsComponent {
   }
 
   ngOnInit() {
-    this.selerService.getprovince().subscribe(res => {
+    this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.province = res;
     });
     this.comservice.getGuaranteeType().subscribe(res => {

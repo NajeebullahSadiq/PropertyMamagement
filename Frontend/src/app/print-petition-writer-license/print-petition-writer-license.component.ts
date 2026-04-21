@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest } from 'rxjs';
+import { combineLatest, takeUntil } from 'rxjs';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterLicenseService } from '../shared/petition-writer-license.service';
 import { CalendarService } from '../shared/calendar.service';
 import { VerificationService } from '../shared/verification.service';
@@ -12,7 +13,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./print-petition-writer-license.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class PrintPetitionWriterLicenseComponent implements OnInit {
+export class PrintPetitionWriterLicenseComponent extends BaseComponent implements OnInit {
   baseUrl = environment.apiURL + '/';
   data: any = {};
   isLoading: boolean = true;
@@ -29,12 +30,14 @@ export class PrintPetitionWriterLicenseComponent implements OnInit {
     private licenseService: PetitionWriterLicenseService,
     private calendarService: CalendarService,
     private verificationService: VerificationService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     console.log('[PrintPetitionWriterLicense] init');
 
-    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([paramMap, queryParamMap]) => {
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).pipe(takeUntil(this.destroy$)).subscribe(([paramMap, queryParamMap]) => {
       this.error = null;
       this.isLoading = true;
 

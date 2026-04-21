@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models.PetitionWriterLicense;
+using WebAPIBackend.Services;
 
 namespace WebAPIBackend.Controllers.PetitionWriterLicense
 {
@@ -16,10 +17,12 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
     public class PetitionWriterActivityLocationController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILookupCacheService _cache;
 
-        public PetitionWriterActivityLocationController(AppDbContext context)
+        public PetitionWriterActivityLocationController(AppDbContext context, ILookupCacheService cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         /// <summary>
@@ -30,17 +33,14 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
         {
             try
             {
-                var items = await _context.PetitionWriterActivityLocations
-                    .Where(x => x.IsActive)
-                    .OrderBy(x => x.DariName)
-                    .Select(x => new
-                    {
-                        x.Id,
-                        x.Name,
-                        x.DariName,
-                        x.IsActive
-                    })
-                    .ToListAsync();
+                var cachedItems = await _cache.GetActiveActivityLocationsAsync();
+                var items = cachedItems.Select(x => new
+                {
+                    x.Id,
+                    x.Name,
+                    x.DariName,
+                    x.IsActive
+                }).ToList();
 
                 return Ok(items);
             }
@@ -60,6 +60,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             try
             {
                 var items = await _context.PetitionWriterActivityLocations
+                    .AsNoTracking()
                     .OrderByDescending(x => x.IsActive)
                     .ThenBy(x => x.DariName)
                     .Select(x => new
@@ -93,7 +94,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             try
             {
                 var existing = await _context.PetitionWriterActivityLocations
-                    .AnyAsync(x => x.DariName == request.DariName);
+                    .AsNoTracking().AnyAsync(x => x.DariName == request.DariName);
 
                 if (existing)
                 {
@@ -112,6 +113,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 _context.PetitionWriterActivityLocations.Add(entity);
                 await _context.SaveChangesAsync();
+
+                _cache.InvalidateCache(LookupCacheService.ActivityLocationsKey);
 
                 return Ok(new
                 {
@@ -143,7 +146,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 }
 
                 var duplicate = await _context.PetitionWriterActivityLocations
-                    .AnyAsync(x => x.DariName == request.DariName && x.Id != id);
+                    .AsNoTracking().AnyAsync(x => x.DariName == request.DariName && x.Id != id);
 
                 if (duplicate)
                 {
@@ -157,6 +160,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.UpdatedBy = username;
 
                 await _context.SaveChangesAsync();
+
+                _cache.InvalidateCache(LookupCacheService.ActivityLocationsKey);
 
                 return Ok(new { id = entity.Id, message = "محل فعالیت با موفقیت تغییر یافت" });
             }
@@ -189,6 +194,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 await _context.SaveChangesAsync();
 
+                _cache.InvalidateCache(LookupCacheService.ActivityLocationsKey);
+
                 return Ok(new { message = "محل فعالیت با موفقیت حذف شد" });
             }
             catch (Exception ex)
@@ -219,6 +226,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 entity.UpdatedBy = User.Identity?.Name ?? "system";
 
                 await _context.SaveChangesAsync();
+
+                _cache.InvalidateCache(LookupCacheService.ActivityLocationsKey);
 
                 return Ok(new { message = "محل فعالیت با موفقیت فعال شد" });
             }

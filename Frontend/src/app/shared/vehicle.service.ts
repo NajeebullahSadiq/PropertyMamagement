@@ -23,8 +23,12 @@ export class VehicleService {
     const url = `${this.baseUrl}/${propertyDetails.id}`;
     return this.http.put<VehicleDetails>(url, propertyDetails);
   }
-  getPropertyDetails(): Observable<VehiclesDetailsList[]> {
-    return this.http.get<VehiclesDetailsList[]>(this.baseUrl);
+  getPropertyDetails(page: number = 1, pageSize: number = 20, search?: string): Observable<any> {
+    let url = `${this.baseUrl}?page=${page}&pageSize=${pageSize}`;
+    if (search && search.trim()) {
+      url += `&search=${encodeURIComponent(search.trim())}`;
+    }
+    return this.http.get<any>(url);
   }
   getPropertyDetailsById(id: number): Observable<VehicleDetails[]> {
     return this.http.get<VehicleDetails[]>(this.baseUrl +'/'+ id);

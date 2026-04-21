@@ -40,6 +40,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
             try
             {
                 var query = _context.PetitionWriterMonitoringRecords
+                    .AsNoTracking()
                     .Where(x => x.Status == true)
                     .AsQueryable();
 
@@ -130,6 +131,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
                 var item = await _context.PetitionWriterMonitoringRecords
+                    .AsNoTracking()
                     .Where(x => x.Id == id && x.Status == true)
                     .Select(x => new
                     {
@@ -358,6 +360,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
             try
             {
                 var query = _context.PetitionWriterMonitoringRecords
+                    .AsNoTracking()
                     .Where(x => x.Status == true);
 
                 // Filter by section type if provided
@@ -406,6 +409,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 }
 
                 var license = await _context.PetitionWriterLicenses
+                    .AsNoTracking()
                     .Where(x => x.LicenseNumber == licenseNumber && x.Status == true)
                     .Select(x => new
                     {

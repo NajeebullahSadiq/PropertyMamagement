@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -14,7 +16,7 @@ import {
     templateUrl: './securities-view.component.html',
     styleUrls: ['./securities-view.component.scss']
 })
-export class SecuritiesViewComponent implements OnInit {
+export class SecuritiesViewComponent extends BaseComponent implements OnInit {
     item: SecuritiesDistribution | null = null;
     isLoading = true;
     canEdit = false;
@@ -35,7 +37,9 @@ export class SecuritiesViewComponent implements OnInit {
         private calendarService: CalendarService,
         private rbacService: RbacService,
         private toastr: ToastrService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();

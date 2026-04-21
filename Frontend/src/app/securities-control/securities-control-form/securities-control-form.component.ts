@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesControlService } from 'src/app/shared/securities-control.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -16,7 +18,7 @@ import {
     templateUrl: './securities-control-form.component.html',
     styleUrls: ['./securities-control-form.component.scss']
 })
-export class SecuritiesControlFormComponent implements OnInit {
+export class SecuritiesControlFormComponent extends BaseComponent implements OnInit {
     securitiesControlForm!: FormGroup;
     isEditMode = false;
     editId: number | null = null;
@@ -54,6 +56,7 @@ export class SecuritiesControlFormComponent implements OnInit {
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService
     ) {
+        super();
         this.initForm();
     }
 

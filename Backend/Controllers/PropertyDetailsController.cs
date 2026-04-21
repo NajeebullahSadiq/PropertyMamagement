@@ -8,6 +8,7 @@ using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models;
 using WebAPIBackend.Helpers;
+using WebAPIBackend.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,12 +22,14 @@ namespace WebAPIBackend.Controllers
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
         private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
+        private readonly ILookupCacheService _cache;
 
-        public PropertyDetailsController ( AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService)
+        public PropertyDetailsController ( AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService, ILookupCacheService cache)
         {
             _context = context;
             _userManager = userManager;
             _auditService = auditService;
+            _cache = cache;
         }
 
         private static readonly HashSet<string> AllowedPropertyTypeNames = new(StringComparer.OrdinalIgnoreCase)
@@ -109,7 +112,10 @@ namespace WebAPIBackend.Controllers
         }
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? search = null)
         {
             string userId = User.Claims.First(c => c.Type == "UserID").Value;
             var user = await _userManager.FindByIdAsync(userId);
@@ -133,8 +139,7 @@ namespace WebAPIBackend.Controllers
             {
                 // Admin and Authority can see ALL records (including those with NULL CompanyId)
                 propertyQuery = _context.PropertyDetails
-                    .Include(p => p.Company)
-                    .Include(p => p.BuyerDetails);
+                    .AsNoTracking();
             }
             else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
             {
@@ -145,21 +150,32 @@ namespace WebAPIBackend.Controllers
                 }
                 // Only show properties that belong to this company OR have NULL CompanyId (legacy records)
                 propertyQuery = _context.PropertyDetails
-                    .Include(p => p.Company)
-                    .Include(p => p.BuyerDetails)
+                    .AsNoTracking()
                     .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
             }
             else
             {
                 // Fallback: Filter by user ID (show user's own records regardless of CompanyId)
                 propertyQuery = _context.PropertyDetails
-                    .Include(p => p.Company)
-                    .Include(p => p.BuyerDetails)
+                    .AsNoTracking()
                     .Where(p => p.CreatedBy == userId);
             }
 
-            var query = (from p in propertyQuery
-                        
+            // Apply search filter if provided
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var searchLower = search.ToLower().Trim();
+                propertyQuery = propertyQuery.Where(p =>
+                    (p.Pnumber != null && p.Pnumber.ToLower().Contains(searchLower)) ||
+                    (p.SellerDetails.Any(s => s.FirstName.ToLower().Contains(searchLower) || s.ElectronicNationalIdNumber.Contains(searchLower))) ||
+                    (p.BuyerDetails.Any(b => b.FirstName.ToLower().Contains(searchLower) || b.ElectronicNationalIdNumber.Contains(searchLower)))
+                );
+            }
+
+            var totalCount = await propertyQuery.CountAsync();
+
+            var query = await (from p in propertyQuery
+                         orderby p.Id descending
                          select new
                          {
                              p.Id,
@@ -179,7 +195,6 @@ namespace WebAPIBackend.Controllers
                                 ? p.CustomPropertyType
                                 : p.PropertyType != null ? p.PropertyType.Name : null,
                              UnitTypeText = p.PunitType != null ? p.PunitType.Name : null,
-                             // Get transaction type from PropertyDetails if available, otherwise from first BuyerDetails
                              TransactionTypeText = p.TransactionType != null 
                                 ? p.TransactionType.Name 
                                 : (p.BuyerDetails != null && p.BuyerDetails.Any() && p.BuyerDetails.First().TransactionType != null)
@@ -193,9 +208,18 @@ namespace WebAPIBackend.Controllers
                              p.CreatedBy,
                              p.CompanyId,
                              CompanyTitle = p.Company != null ? p.Company.Title : null
-                         }).ToList();
+                         })
+                         .Skip((page - 1) * pageSize)
+                         .Take(pageSize)
+                         .ToListAsync();
 
-            return Ok(query);
+            return Ok(new
+            {
+                items = query,
+                totalCount,
+                page,
+                pageSize
+            });
         }
         [Authorize]
         [HttpGet("{id}")]
@@ -223,7 +247,7 @@ namespace WebAPIBackend.Controllers
                 if (RbacHelper.CanViewAllRecords(roles, "property"))
                 {
                     // Admin and Authority can see ALL records (including those with NULL CompanyId)
-                    propertyQuery = _context.PropertyDetails;
+                    propertyQuery = _context.PropertyDetails.AsNoTracking();
                 }
                 else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
                 {
@@ -234,18 +258,57 @@ namespace WebAPIBackend.Controllers
                     }
                     // Show properties that belong to this company OR have NULL CompanyId (legacy records)
                     propertyQuery = _context.PropertyDetails
+                        .AsNoTracking()
                         .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
                 }
                 else
                 {
                     // Filter by user ID for regular users (show user's own records regardless of CompanyId)
                     propertyQuery = _context.PropertyDetails
+                        .AsNoTracking()
                         .Where(p => p.CreatedBy == userId);
                 }
 
                 var property = await propertyQuery
-                    .Include(p => p.PropertyAddresses)
                     .Where(x => x.Id == id)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Pnumber,
+                        p.Parea,
+                        p.PunitTypeId,
+                        p.NumofFloor,
+                        p.NumofRooms,
+                        p.PropertyTypeId,
+                        p.CustomPropertyType,
+                        p.TransactionTypeId,
+                        p.Price,
+                        p.PriceText,
+                        p.RoyaltyAmount,
+                        p.Des,
+                        p.iscomplete,
+                        p.West,
+                        p.East,
+                        p.North,
+                        p.South,
+                        p.DocumentType,
+                        p.IssuanceNumber,
+                        p.IssuanceDate,
+                        p.SerialNumber,
+                        p.TransactionDate,
+                        p.FilePath,
+                        p.PreviousDocumentsPath,
+                        p.ExistingDocumentsPath,
+                        p.CompanyId,
+                        PropertyAddresses = p.PropertyAddresses.Select(a => new
+                        {
+                            a.Id,
+                            a.PropertyDetailsId,
+                            a.ProvinceId,
+                            a.DistrictId,
+                            a.Village
+                        })
+                    })
                     .ToListAsync();
 
                 if (property == null || !property.Any())
@@ -287,8 +350,7 @@ namespace WebAPIBackend.Controllers
             if (RbacHelper.CanViewAllRecords(roles, "property"))
             {
                 // Admin and Authority can see ALL records (including those with NULL CompanyId)
-                propertyQuery = _context.PropertyDetails
-                    .Include(p => p.Company);
+                propertyQuery = _context.PropertyDetails;
             }
             else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
             {
@@ -299,14 +361,12 @@ namespace WebAPIBackend.Controllers
                 }
                 // Only show properties that belong to this company OR have NULL CompanyId (legacy records)
                 propertyQuery = _context.PropertyDetails
-                    .Include(p => p.Company)
                     .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
             }
             else
             {
                 // Fallback: Filter by user ID (show user's own records regardless of CompanyId)
                 propertyQuery = _context.PropertyDetails
-                    .Include(p => p.Company)
                     .Where(p => p.CreatedBy == userId);
             }
 
@@ -576,7 +636,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var users = await _context.PropertyTypes.ToListAsync();
+                var users = await _cache.GetPropertyTypesAsync();
 
                 return Ok(users);
             }
@@ -592,7 +652,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var users = await _context.TransactionTypes.ToListAsync();
+                var users = await _cache.GetTransactionTypesAsync();
 
                 return Ok(users);
             }
@@ -608,7 +668,7 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                var users = await _context.PunitTypes.ToListAsync();
+                var users = await _cache.GetPunitTypesAsync();
 
                 return Ok(users);
             }
@@ -734,16 +794,103 @@ namespace WebAPIBackend.Controllers
         {
             try
             {
-                // Get property details with all sellers and buyers
+                // Get property details with all related data in a single server-side projection
                 var property = await _context.PropertyDetails
-                    .Include(p => p.SellerDetails)
-                    .Include(p => p.BuyerDetails)
-                    .Include(p => p.WitnessDetails)
-                    .Include(p => p.PropertyAddresses)
-                    .Include(p => p.PropertyType)
-                    .Include(p => p.PunitType)
-                    .Include(p => p.TransactionType)
-                    .FirstOrDefaultAsync(x => x.Id == id);
+                    .AsNoTracking()
+                    .Where(x => x.Id == id)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.DocumentType,
+                        p.CustomDocumentType,
+                        p.IssuanceNumber,
+                        p.IssuanceDate,
+                        p.SerialNumber,
+                        p.TransactionDate,
+                        p.Pnumber,
+                        p.Parea,
+                        p.NumofRooms,
+                        p.NumofFloor,
+                        p.North,
+                        p.South,
+                        p.West,
+                        p.East,
+                        p.Price,
+                        p.PriceText,
+                        p.RoyaltyAmount,
+                        p.CustomPropertyType,
+                        p.CreatedAt,
+                        PropertyTypeName = p.PropertyType != null ? p.PropertyType.Name : null,
+                        UnitTypeName = p.PunitType != null ? p.PunitType.Name : null,
+                        UnitTypeDari = p.PunitType != null ? p.PunitType.Dari : null,
+                        TransactionTypeName = p.TransactionType != null ? p.TransactionType.Name : null,
+                        p.FilePath,
+                        p.PreviousDocumentsPath,
+                        p.ExistingDocumentsPath,
+                        // Address
+                        Address = p.PropertyAddresses.Select(a => new
+                        {
+                            a.Village,
+                            ProvinceName = a.ProvinceId.HasValue ? _context.Locations.Where(l => l.Id == a.ProvinceId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            ProvinceDari = a.ProvinceId.HasValue ? _context.Locations.Where(l => l.Id == a.ProvinceId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            DistrictName = a.DistrictId.HasValue ? _context.Locations.Where(l => l.Id == a.DistrictId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            DistrictDari = a.DistrictId.HasValue ? _context.Locations.Where(l => l.Id == a.DistrictId.Value).Select(l => l.Dari).FirstOrDefault() : null
+                        }).FirstOrDefault(),
+                        // Sellers with location data
+                        Sellers = p.SellerDetails.Select(s => new
+                        {
+                            s.FirstName,
+                            s.FatherName,
+                            s.GrandFather,
+                            s.PhoneNumber,
+                            s.ElectronicNationalIdNumber,
+                            s.Photo,
+                            PaddressProvince = s.PaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == s.PaddressProvinceId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            PaddressProvinceDari = s.PaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == s.PaddressProvinceId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            PaddressDistrict = s.PaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == s.PaddressDistrictId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            PaddressDistrictDari = s.PaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == s.PaddressDistrictId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            s.PaddressVillage,
+                            TaddressProvince = s.TaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == s.TaddressProvinceId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            TaddressProvinceDari = s.TaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == s.TaddressProvinceId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            TaddressDistrict = s.TaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == s.TaddressDistrictId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            TaddressDistrictDari = s.TaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == s.TaddressDistrictId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            s.TaddressVillage
+                        }).ToList(),
+                        // Buyers with location data
+                        Buyers = p.BuyerDetails.Select(b => new
+                        {
+                            b.FirstName,
+                            b.FatherName,
+                            b.GrandFather,
+                            b.PhoneNumber,
+                            b.ElectronicNationalIdNumber,
+                            b.Photo,
+                            b.TransactionType,
+                            b.Price,
+                            b.PriceText,
+                            b.RoyaltyAmount,
+                            b.HalfPrice,
+                            PaddressProvince = b.PaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == b.PaddressProvinceId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            PaddressProvinceDari = b.PaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == b.PaddressProvinceId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            PaddressDistrict = b.PaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == b.PaddressDistrictId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            PaddressDistrictDari = b.PaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == b.PaddressDistrictId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            b.PaddressVillage,
+                            TaddressProvince = b.TaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == b.TaddressProvinceId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            TaddressProvinceDari = b.TaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == b.TaddressProvinceId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            TaddressDistrict = b.TaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == b.TaddressDistrictId.Value).Select(l => l.Name).FirstOrDefault() : null,
+                            TaddressDistrictDari = b.TaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == b.TaddressDistrictId.Value).Select(l => l.Dari).FirstOrDefault() : null,
+                            b.TaddressVillage
+                        }).ToList(),
+                        // Witnesses
+                        Witnesses = p.WitnessDetails.Select(w => new
+                        {
+                            w.FirstName,
+                            w.FatherName,
+                            w.PhoneNumber,
+                            w.ElectronicNationalIdNumber
+                        }).ToList()
+                    })
+                    .FirstOrDefaultAsync();
 
                 if (property == null)
                 {
@@ -758,179 +905,87 @@ namespace WebAPIBackend.Controllers
                     shamsiDate = Helpers.DateConversionHelper.FormatDate(property.CreatedAt.Value, calendar);
                 }
 
-                // Get property address
-                var address = property.PropertyAddresses.FirstOrDefault();
-                var provinceData = address?.ProvinceId.HasValue == true 
-                    ? await _context.Locations.FindAsync(address.ProvinceId.Value) 
-                    : null;
-                var districtData = address?.DistrictId.HasValue == true 
-                    ? await _context.Locations.FindAsync(address.DistrictId.Value) 
-                    : null;
+                var firstBuyer = property.Buyers.FirstOrDefault();
+                var firstSeller = property.Sellers.FirstOrDefault();
+                var witnesses = property.Witnesses;
 
-                // Get all sellers with their location data
-                var sellers = new List<object>();
-                foreach (var seller in property.SellerDetails)
-                {
-                    var sellerPProvince = seller.PaddressProvinceId.HasValue 
-                        ? await _context.Locations.FindAsync(seller.PaddressProvinceId.Value) 
-                        : null;
-                    var sellerPDistrict = seller.PaddressDistrictId.HasValue 
-                        ? await _context.Locations.FindAsync(seller.PaddressDistrictId.Value) 
-                        : null;
-                    var sellerTProvince = seller.TaddressProvinceId.HasValue 
-                        ? await _context.Locations.FindAsync(seller.TaddressProvinceId.Value) 
-                        : null;
-                    var sellerTDistrict = seller.TaddressDistrictId.HasValue 
-                        ? await _context.Locations.FindAsync(seller.TaddressDistrictId.Value) 
-                        : null;
-
-                    sellers.Add(new
-                    {
-                        FirstName = seller.FirstName,
-                        FatherName = seller.FatherName,
-                        GrandFather = seller.GrandFather,
-                        PhoneNumber = seller.PhoneNumber,
-                        ElectronicNationalIdNumber = seller.ElectronicNationalIdNumber,
-                        Photo = seller.Photo,
-                        PaddressProvince = sellerPProvince?.Name,
-                        PaddressProvinceDari = sellerPProvince?.Dari,
-                        PaddressDistrict = sellerPDistrict?.Name,
-                        PaddressDistrictDari = sellerPDistrict?.Dari,
-                        PaddressVillage = seller.PaddressVillage,
-                        TaddressProvince = sellerTProvince?.Name,
-                        TaddressProvinceDari = sellerTProvince?.Dari,
-                        TaddressDistrict = sellerTDistrict?.Name,
-                        TaddressDistrictDari = sellerTDistrict?.Dari,
-                        TaddressVillage = seller.TaddressVillage
-                    });
-                }
-
-                // Get all buyers with their location data
-                var buyers = new List<object>();
-                foreach (var buyer in property.BuyerDetails)
-                {
-                    var buyerPProvince = buyer.PaddressProvinceId.HasValue 
-                        ? await _context.Locations.FindAsync(buyer.PaddressProvinceId.Value) 
-                        : null;
-                    var buyerPDistrict = buyer.PaddressDistrictId.HasValue 
-                        ? await _context.Locations.FindAsync(buyer.PaddressDistrictId.Value) 
-                        : null;
-                    var buyerTProvince = buyer.TaddressProvinceId.HasValue 
-                        ? await _context.Locations.FindAsync(buyer.TaddressProvinceId.Value) 
-                        : null;
-                    var buyerTDistrict = buyer.TaddressDistrictId.HasValue 
-                        ? await _context.Locations.FindAsync(buyer.TaddressDistrictId.Value) 
-                        : null;
-
-                    buyers.Add(new
-                    {
-                        FirstName = buyer.FirstName,
-                        FatherName = buyer.FatherName,
-                        GrandFather = buyer.GrandFather,
-                        PhoneNumber = buyer.PhoneNumber,
-                        ElectronicNationalIdNumber = buyer.ElectronicNationalIdNumber,
-                        Photo = buyer.Photo,
-                        TransactionType = buyer.TransactionType,
-                        PaddressProvince = buyerPProvince?.Name,
-                        PaddressProvinceDari = buyerPProvince?.Dari,
-                        PaddressDistrict = buyerPDistrict?.Name,
-                        PaddressDistrictDari = buyerPDistrict?.Dari,
-                        PaddressVillage = buyer.PaddressVillage,
-                        TaddressProvince = buyerTProvince?.Name,
-                        TaddressProvinceDari = buyerTProvince?.Dari,
-                        TaddressDistrict = buyerTDistrict?.Name,
-                        TaddressDistrictDari = buyerTDistrict?.Dari,
-                        TaddressVillage = buyer.TaddressVillage
-                    });
-                }
-
-                // Get witnesses
-                var witnesses = property.WitnessDetails.Select(w => new
-                {
-                    FirstName = w.FirstName,
-                    FatherName = w.FatherName,
-                    PhoneNumber = w.PhoneNumber,
-                    ElectronicNationalIdNumber = w.ElectronicNationalIdNumber
-                }).ToList();
-
-                // Create result with all sellers and buyers
-                var firstBuyer = property.BuyerDetails.FirstOrDefault();
                 var result = new
                 {
-                    Id = property.Id,
-                    DocumentType = property.DocumentType,
-                    CustomDocumentType = property.CustomDocumentType,
-                    IssuanceNumber = property.IssuanceNumber,
-                    IssuanceDate = property.IssuanceDate,
-                    SerialNumber = property.SerialNumber,
-                    TransactionDate = property.TransactionDate,
+                    property.Id,
+                    property.DocumentType,
+                    property.CustomDocumentType,
+                    property.IssuanceNumber,
+                    property.IssuanceDate,
+                    property.SerialNumber,
+                    property.TransactionDate,
                     PNumber = property.Pnumber,
                     PArea = property.Parea,
-                    NumofRooms = property.NumofRooms,
+                    property.NumofRooms,
                     NumofHouses = property.NumofFloor,
-                    North = property.North,
-                    South = property.South,
-                    West = property.West,
-                    East = property.East,
+                    property.North,
+                    property.South,
+                    property.West,
+                    property.East,
                     Price = firstBuyer?.Price ?? property.Price,
                     PriceText = firstBuyer?.PriceText ?? property.PriceText ?? string.Empty,
                     RoyaltyAmount = firstBuyer?.RoyaltyAmount ?? property.RoyaltyAmount,
                     HalfPrice = firstBuyer?.HalfPrice,
-                    PropertypeType = property.PropertyType?.Name,
-                    CustomPropertyType = property.CustomPropertyType,
-                    CreatedAt = property.CreatedAt,
+                    PropertypeType = property.PropertyTypeName,
+                    property.CustomPropertyType,
+                    property.CreatedAt,
                     CreatedAtFormatted = shamsiDate,
                     
                     // Location
-                    Province = provinceData?.Name,
-                    ProvinceDari = provinceData?.Dari,
-                    District = districtData?.Name,
-                    DistrictDari = districtData?.Dari,
-                    Village = address?.Village,
+                    Province = property.Address?.ProvinceName,
+                    ProvinceDari = property.Address?.ProvinceDari,
+                    District = property.Address?.DistrictName,
+                    DistrictDari = property.Address?.DistrictDari,
+                    Village = property.Address?.Village,
                     
                     // All Sellers
-                    Sellers = sellers,
+                    Sellers = property.Sellers,
                     
                     // All Buyers
-                    Buyers = buyers,
+                    Buyers = property.Buyers,
                     
                     // Witnesses
-                    Witnesses = witnesses,
+                    Witnesses = property.Witnesses,
                     
-                    // Backward compatibility - first seller/buyer
-                    SellerFirstName = property.SellerDetails.FirstOrDefault()?.FirstName,
-                    SellerFatherName = property.SellerDetails.FirstOrDefault()?.FatherName,
-                    SellerGrandFather = property.SellerDetails.FirstOrDefault()?.GrandFather,
-                    SellerPhoneNumber = property.SellerDetails.FirstOrDefault()?.PhoneNumber,
-                    SellerIndentityCardNumber = property.SellerDetails.FirstOrDefault()?.ElectronicNationalIdNumber,
-                    SellerPhoto = property.SellerDetails.FirstOrDefault()?.Photo,
-                    SellerProvince = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.PaddressProvinceId),
-                    SellerProvinceDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.PaddressProvinceId),
-                    SellerDistrict = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.PaddressDistrictId),
-                    SellerDistrictDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.PaddressDistrictId),
-                    SellerVillage = property.SellerDetails.FirstOrDefault()?.PaddressVillage,
-                    TSellerProvince = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.TaddressProvinceId),
-                    TSellerProvinceDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.TaddressProvinceId),
-                    TSellerDistrict = await GetLocationNameAsync(property.SellerDetails.FirstOrDefault()?.TaddressDistrictId),
-                    TSellerDistrictDari = await GetLocationDariAsync(property.SellerDetails.FirstOrDefault()?.TaddressDistrictId),
-                    TSellerVillage = property.SellerDetails.FirstOrDefault()?.TaddressVillage,
+                    // Backward compatibility - first seller
+                    SellerFirstName = firstSeller?.FirstName,
+                    SellerFatherName = firstSeller?.FatherName,
+                    SellerGrandFather = firstSeller?.GrandFather,
+                    SellerPhoneNumber = firstSeller?.PhoneNumber,
+                    SellerIndentityCardNumber = firstSeller?.ElectronicNationalIdNumber,
+                    SellerPhoto = firstSeller?.Photo,
+                    SellerProvince = firstSeller?.PaddressProvince,
+                    SellerProvinceDari = firstSeller?.PaddressProvinceDari,
+                    SellerDistrict = firstSeller?.PaddressDistrict,
+                    SellerDistrictDari = firstSeller?.PaddressDistrictDari,
+                    SellerVillage = firstSeller?.PaddressVillage,
+                    TSellerProvince = firstSeller?.TaddressProvince,
+                    TSellerProvinceDari = firstSeller?.TaddressProvinceDari,
+                    TSellerDistrict = firstSeller?.TaddressDistrict,
+                    TSellerDistrictDari = firstSeller?.TaddressDistrictDari,
+                    TSellerVillage = firstSeller?.TaddressVillage,
                     
-                    BuyerFirstName = property.BuyerDetails.FirstOrDefault()?.FirstName,
-                    BuyerFatherName = property.BuyerDetails.FirstOrDefault()?.FatherName,
-                    BuyerGrandFather = property.BuyerDetails.FirstOrDefault()?.GrandFather,
-                    BuyerPhoneNumber = property.BuyerDetails.FirstOrDefault()?.PhoneNumber,
-                    BuyerIndentityCardNumber = property.BuyerDetails.FirstOrDefault()?.ElectronicNationalIdNumber,
-                    BuyerPhoto = property.BuyerDetails.FirstOrDefault()?.Photo,
-                    BuyerProvince = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.PaddressProvinceId),
-                    BuyerProvinceDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.PaddressProvinceId),
-                    BuyerDistrict = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.PaddressDistrictId),
-                    BuyerDistrictDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.PaddressDistrictId),
-                    BuyerVillage = property.BuyerDetails.FirstOrDefault()?.PaddressVillage,
-                    TBuyerProvince = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.TaddressProvinceId),
-                    TBuyerProvinceDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.TaddressProvinceId),
-                    TBuyerDistrict = await GetLocationNameAsync(property.BuyerDetails.FirstOrDefault()?.TaddressDistrictId),
-                    TBuyerDistrictDari = await GetLocationDariAsync(property.BuyerDetails.FirstOrDefault()?.TaddressDistrictId),
-                    TBuyerVillage = property.BuyerDetails.FirstOrDefault()?.TaddressVillage,
+                    // Backward compatibility - first buyer
+                    BuyerFirstName = firstBuyer?.FirstName,
+                    BuyerFatherName = firstBuyer?.FatherName,
+                    BuyerGrandFather = firstBuyer?.GrandFather,
+                    BuyerPhoneNumber = firstBuyer?.PhoneNumber,
+                    BuyerIndentityCardNumber = firstBuyer?.ElectronicNationalIdNumber,
+                    BuyerPhoto = firstBuyer?.Photo,
+                    BuyerProvince = firstBuyer?.PaddressProvince,
+                    BuyerProvinceDari = firstBuyer?.PaddressProvinceDari,
+                    BuyerDistrict = firstBuyer?.PaddressDistrict,
+                    BuyerDistrictDari = firstBuyer?.PaddressDistrictDari,
+                    BuyerVillage = firstBuyer?.PaddressVillage,
+                    TBuyerProvince = firstBuyer?.TaddressProvince,
+                    TBuyerProvinceDari = firstBuyer?.TaddressProvinceDari,
+                    TBuyerDistrict = firstBuyer?.TaddressDistrict,
+                    TBuyerDistrictDari = firstBuyer?.TaddressDistrictDari,
+                    TBuyerVillage = firstBuyer?.TaddressVillage,
                     
                     WitnessOneFirstName = witnesses.ElementAtOrDefault(0)?.FirstName,
                     WitnessOneFatherName = witnesses.ElementAtOrDefault(0)?.FatherName,
@@ -942,14 +997,14 @@ namespace WebAPIBackend.Controllers
                     WitnessTwoIndentityCardNumber = witnesses.ElementAtOrDefault(1)?.ElectronicNationalIdNumber,
                     
                     // Property Unit Type and Transaction Type
-                    UnitType = property.PunitType?.Name,
-                    UnitTypeDari = property.PunitType?.Dari,
-                    TransactionType = firstBuyer?.TransactionType ?? property.TransactionType?.Name,
+                    UnitType = property.UnitTypeName,
+                    UnitTypeDari = property.UnitTypeDari,
+                    TransactionType = firstBuyer?.TransactionType ?? property.TransactionTypeName,
                     
                     // Property Documents and Images
-                    FilePath = property.FilePath,
-                    PreviousDocumentsPath = property.PreviousDocumentsPath,
-                    ExistingDocumentsPath = property.ExistingDocumentsPath
+                    property.FilePath,
+                    property.PreviousDocumentsPath,
+                    property.ExistingDocumentsPath
                 };
 
                 return Ok(result);

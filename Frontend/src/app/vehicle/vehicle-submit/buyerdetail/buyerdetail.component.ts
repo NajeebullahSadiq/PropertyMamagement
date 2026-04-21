@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { VBuyerDetail } from 'src/app/models/SellerDetail';
 import { SellerService } from 'src/app/shared/seller.service';
 import { VehicleService } from 'src/app/shared/vehicle.service';
@@ -17,7 +19,7 @@ import { VehicleComponent } from '../../vehicle.component';
   templateUrl: './buyerdetail.component.html',
   styleUrls: ['./buyerdetail.component.scss']
 })
-export class BuyerdetailComponent {
+export class BuyerdetailComponent extends BaseComponent {
   baseUrl:string=environment.apiURL+'/';
   imagePath:string='assets/img/avatar.png';
   imageName:string='';
@@ -73,6 +75,7 @@ export class BuyerdetailComponent {
     ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
     private localizationService: LocalizationService, private propertyDetailsService: PropertyService,
     private duplicateCheckService: DuplicateCheckService, private parentComponent: VehicleComponent){
+    super();
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
     this.buyerForm = this.fb.group({
@@ -106,7 +109,7 @@ export class BuyerdetailComponent {
     });
 
     // Add dynamic validation for authorization letter based on agent roles
-    this.buyerForm.get('roleType')?.valueChanges.subscribe(roleType => {
+    this.buyerForm.get('roleType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(roleType => {
       const authLetterControl = this.buyerForm.get('authorizationLetter');
       const rentStartDateControl = this.buyerForm.get('rentStartDate');
       const rentEndDateControl = this.buyerForm.get('rentEndDate');
@@ -135,7 +138,7 @@ export class BuyerdetailComponent {
     });
 
     // Add dynamic validation for transaction type description when "Other" is selected
-    this.buyerForm.get('transactionType')?.valueChanges.subscribe(transactionType => {
+    this.buyerForm.get('transactionType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(transactionType => {
       const descriptionControl = this.buyerForm.get('transactionTypeDescription');
       
       if (transactionType === 'Other') {
@@ -148,7 +151,7 @@ export class BuyerdetailComponent {
     });
 
     // Add dynamic validation for custom property type when "Other" is selected
-    this.buyerForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
+    this.buyerForm.get('propertyTypeId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(propertyTypeId => {
       const customPropertyTypeControl = this.buyerForm.get('customPropertyType');
       
       // Find if the selected property type is "Other"
@@ -167,7 +170,7 @@ export class BuyerdetailComponent {
     // Initialize role types - Vehicle module restricted to 3 approved buyer types only
     this.roleTypes = this.localizationService.vehicleBuyerRoleTypes;
     
-    this.selerService.getprovince().subscribe(res => {
+    this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.province = res;
     });
     
@@ -179,11 +182,11 @@ export class BuyerdetailComponent {
       this.localizedPropertyTypes = this.mapPropertyTypesToLocalized(res as any[]);
     });
     // Add price change listener for half-price calculation
-    this.buyerForm.get('price')?.valueChanges.subscribe(() => {
+    this.buyerForm.get('price')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.calculateDerivedAmounts();
     });
 
-    this.buyerForm.get('transactionType')?.valueChanges.subscribe(() => {
+    this.buyerForm.get('transactionType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.calculateDerivedAmounts();
     });
     this.loadBuyerDetails();

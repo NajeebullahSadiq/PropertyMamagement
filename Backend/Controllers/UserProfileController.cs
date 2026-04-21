@@ -175,7 +175,7 @@ namespace WebAPI.Controllers
         [Route("Role")]
         public async Task<ActionResult<IEnumerable<object>>> GetRoles()
         {
-            var roles = await _context.Roles.OrderBy(r => r.Id).ToListAsync();
+            var roles = await _context.Roles.AsNoTracking().OrderBy(r => r.Id).ToListAsync();
             return roles.Select(r => new
             {
                 r.Id,

@@ -2,6 +2,8 @@ import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
@@ -24,7 +26,7 @@ import {
     templateUrl: './petition-writer-license-form.component.html',
     styleUrls: ['./petition-writer-license-form.component.scss'],
 })
-export class PetitionWriterLicenseFormComponent implements OnInit {
+export class PetitionWriterLicenseFormComponent extends BaseComponent implements OnInit {
 
     // Forms
     licenseForm!: FormGroup;
@@ -75,7 +77,9 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         private sellerService: SellerService,
         private rbacService: RbacService,
         private authService: AuthService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         this.checkPermissions();
@@ -187,18 +191,18 @@ export class PetitionWriterLicenseFormComponent implements OnInit {
         });
 
         // Subscribe to license type changes
-        this.financialForm.get('licenseType')?.valueChanges.subscribe(() => {
+        this.financialForm.get('licenseType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.onLicenseTypeChange();
         });
 
         // Subscribe to license issue date changes
-        this.financialForm.get('licenseIssueDate')?.valueChanges.subscribe(() => {
+        this.financialForm.get('licenseIssueDate')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.onLicenseIssueDateChange();
         });
     }
 
     loadProvinces(): void {
-        this.licenseService.getProvinces().subscribe({
+        this.licenseService.getProvinces().pipe(takeUntil(this.destroy$)).subscribe({
             next: (data: any) => {
                 this.provinces = data;
                 // After provinces are loaded, set user province if user has province-based access and not in edit mode

@@ -1,5 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { VehicleService } from '../shared/vehicle.service';
 import { VehiclesubService } from '../shared/vehiclesub.service';
 import { BuyerdetailComponent } from './vehicle-submit/buyerdetail/buyerdetail.component';
@@ -12,7 +14,7 @@ import { WitnessdetailComponent } from './vehicle-submit/witnessdetail/witnessde
   templateUrl: './vehicle.component.html',
   styleUrls: ['./vehicle.component.scss']
 })
-export class VehicleComponent {
+export class VehicleComponent extends BaseComponent {
   PropertyId: number=0;
   currentTab: number = 0;
   @ViewChild('propertyDetails') propertyDetails!: VehicleSubmitComponent;
@@ -20,9 +22,10 @@ export class VehicleComponent {
   @ViewChild('propertyBuyer') propertyBuyer!: BuyerdetailComponent;
   @ViewChild('propertyWitness') propertyWitness!:WitnessdetailComponent;
   constructor(private route: ActivatedRoute,public vehicleService: VehicleService, public vehicleSubservice:VehiclesubService){ 
+    super();
   }
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.PropertyId = params['id'];
      
     });

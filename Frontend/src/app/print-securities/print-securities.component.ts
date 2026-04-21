@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from '../shared/securities.service';
 import { CalendarService } from '../shared/calendar.service';
 import { 
@@ -12,7 +14,7 @@ import {
     templateUrl: './print-securities.component.html',
     styleUrls: ['./print-securities.component.scss']
 })
-export class PrintSecuritiesComponent implements OnInit {
+export class PrintSecuritiesComponent extends BaseComponent implements OnInit {
     item: SecuritiesDistribution | null = null;
     isLoading = true;
     currentDate = new Date();
@@ -21,7 +23,9 @@ export class PrintSecuritiesComponent implements OnInit {
         private route: ActivatedRoute,
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');

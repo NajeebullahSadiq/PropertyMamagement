@@ -2,6 +2,8 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { propertyAddress } from 'src/app/models/propertyAddress';
 import { PropertyService } from 'src/app/shared/property.service';
 import { SellerService } from 'src/app/shared/seller.service';
@@ -15,7 +17,7 @@ import { WitnessdetailComponent } from '../witnessdetail/witnessdetail.component
   templateUrl: './propertyaddress.component.html',
   styleUrls: ['./propertyaddress.component.scss']
 })
-export class PropertyaddressComponent {
+export class PropertyaddressComponent extends BaseComponent {
   @ViewChild('propertySeller') propertySeller!: SellerdetailComponent;
   @ViewChild('propertyBuyer') propertyBuyer!: BuyerdetailComponent;
   @ViewChild('propertyWitness') propertyWitness!:WitnessdetailComponent;
@@ -29,6 +31,7 @@ export class PropertyaddressComponent {
     ,private fb: FormBuilder, private selerService:SellerService,private parentComponent: EstateComponent,
     private router: Router)
     {
+      super();
       this.propertyAddressForm = this.fb.group({
         id: [0],
         provinceId: ['', Validators.required],
@@ -37,7 +40,7 @@ export class PropertyaddressComponent {
       });
     }
     ngOnInit() {
-      this.selerService.getprovince().subscribe(res => {
+      this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
         this.province = res;
       });
 

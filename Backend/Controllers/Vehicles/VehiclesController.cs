@@ -30,7 +30,10 @@ namespace WebAPIBackend.Controllers.Vehicles
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? search = null)
         {
             var userIdClaim = HttpContext.User.FindFirst("UserID");
             if (userIdClaim == null || string.IsNullOrWhiteSpace(userIdClaim.Value))
@@ -76,8 +79,25 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
             try
             {
+                // Apply search filter if provided
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    var searchLower = search.ToLower().Trim();
+                    propertyQuery = propertyQuery.Where(p =>
+                        (p.PermitNo != null && p.PermitNo.ToLower().Contains(searchLower)) ||
+                        (p.PilateNo != null && p.PilateNo.ToLower().Contains(searchLower)) ||
+                        (p.VehiclesSellerDetails.Any(s => s.FirstName.ToLower().Contains(searchLower) || s.ElectronicNationalIdNumber.Contains(searchLower))) ||
+                        (p.VehiclesBuyerDetails.Any(b => b.FirstName.ToLower().Contains(searchLower) || b.ElectronicNationalIdNumber.Contains(searchLower)))
+                    );
+                }
+
+                var totalCount = await propertyQuery.CountAsync();
+
                 var result = await propertyQuery
                     .AsNoTracking()
+                    .OrderByDescending(p => p.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(p => new
                     {
                         p.Id,
@@ -101,7 +121,13 @@ namespace WebAPIBackend.Controllers.Vehicles
                     })
                     .ToListAsync();
 
-                return Ok(result);
+                return Ok(new
+                {
+                    items = result,
+                    totalCount,
+                    page,
+                    pageSize
+                });
             }
             catch (Exception ex)
             {
@@ -114,7 +140,7 @@ namespace WebAPIBackend.Controllers.Vehicles
         {
             try
             {
-                var Pro = await _context.VehiclesPropertyDetails.Where(x => x.Id.Equals(id)).ToListAsync();
+                var Pro = await _context.VehiclesPropertyDetails.AsNoTracking().Where(x => x.Id.Equals(id)).ToListAsync();
 
                 return Ok(Pro);
             }
@@ -156,8 +182,32 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Get vehicle details with all related data
                 var vehicle = await _context.VehiclesPropertyDetails
                     .AsNoTracking()
-                    .Include(v => v.TransactionType)
-                    .FirstOrDefaultAsync(v => v.Id == id);
+                    .Where(v => v.Id == id)
+                    .Select(v => new
+                    {
+                        v.Id,
+                        v.CompanyId,
+                        v.CreatedBy,
+                        v.PermitNo,
+                        v.PilateNo,
+                        v.TypeOfVehicle,
+                        v.Model,
+                        v.EnginNo,
+                        v.ShasiNo,
+                        v.Color,
+                        v.VehicleHand,
+                        TransactionTypeName = v.TransactionType != null ? v.TransactionType.Name : null,
+                        v.Price,
+                        v.PriceText,
+                        v.HalfPrice,
+                        v.RoyaltyAmount,
+                        v.Des,
+                        v.FilePath,
+                        v.iscomplete,
+                        v.iseditable,
+                        v.CreatedAt
+                    })
+                    .FirstOrDefaultAsync();
 
                 if (vehicle == null)
                 {
@@ -258,18 +308,18 @@ namespace WebAPIBackend.Controllers.Vehicles
                     vehicle.ShasiNo,
                     vehicle.Color,
                     vehicle.VehicleHand,
-                    
+
                     // Transaction Info
-                    TransactionTypeName = vehicle.TransactionType?.Name,
+                    vehicle.TransactionTypeName,
                     vehicle.Price,
                     vehicle.PriceText,
                     vehicle.HalfPrice,
                     vehicle.RoyaltyAmount,
                     vehicle.Des,
-                    
+
                     // Documents
                     vehicle.FilePath,
-                    
+
                     // Status
                     vehicle.iscomplete,
                     vehicle.iseditable,
@@ -318,7 +368,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Validate that the company exists if CompanyId is provided
                 if (companyId.HasValue && companyId.Value > 0)
                 {
-                    var companyExists = await _context.CompanyDetails.AnyAsync(c => c.Id == companyId.Value);
+                    var companyExists = await _context.CompanyDetails.AsNoTracking().AnyAsync(c => c.Id == companyId.Value);
                     if (!companyExists)
                     {
                         return BadRequest(new { message = $"رهنما با شناسه {companyId.Value} وجود ندارد" });
@@ -464,6 +514,7 @@ namespace WebAPIBackend.Controllers.Vehicles
         {
             // Call the DbContext to retrieve the data by ID
             var data = await _context.getVehiclePrintData
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (data == null)
             {

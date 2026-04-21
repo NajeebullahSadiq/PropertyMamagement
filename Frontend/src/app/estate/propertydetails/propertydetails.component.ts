@@ -3,6 +3,8 @@ import { Component, ViewChild, AfterViewInit, Input, Output, EventEmitter, OnCha
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PropertyDetails } from 'src/app/models/PropertyDetail';
 import { PunitType } from 'src/app/models/PunitType';
 import { propertyAddress } from 'src/app/models/propertyAddress';
@@ -22,7 +24,7 @@ import { RbacService, Permissions } from 'src/app/shared/rbac.service';
   templateUrl: './propertydetails.component.html',
   styleUrls: ['./propertydetails.component.scss']
 })
-export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
+export class PropertydetailsComponent extends BaseComponent implements AfterViewInit, OnChanges {
   propertyForm: FormGroup = new FormGroup({});
   propertyDetails!: PropertyDetails[];
   unittypes!: PunitType[];
@@ -98,6 +100,7 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     private calendarService: CalendarService,
     private numeralService: NumeralService,
     public rbacService: RbacService) {
+      super();
       this.propertyForm = this.fb.group({
         id: [0],
         propertyTypeId: ['', Validators.required],
@@ -142,7 +145,7 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
   ngOnInit() {
     this.loadPropertyDetails();
       
-  this.propertyDetailsService.getPropertyType().subscribe(res => {
+  this.propertyDetailsService.getPropertyType().pipe(takeUntil(this.destroy$)).subscribe(res => {
     this.propertypetype = res;
     this.localizedPropertyTypes = this.mapPropertyTypesToStandardizedDari(res as any[]);
 
@@ -150,13 +153,13 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
     this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
   });
 
-  this.propertyForm.get('propertyTypeId')?.valueChanges.subscribe(propertyTypeId => {
+  this.propertyForm.get('propertyTypeId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(propertyTypeId => {
     this.onPropertyTypeChange();
     this.applyCustomPropertyTypeValidation(propertyTypeId);
     this.applyApartmentFieldValidation(propertyTypeId);
   });
 
-  this.propertyForm.get('documentType')?.valueChanges.subscribe(documentType => {
+  this.propertyForm.get('documentType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(documentType => {
     this.applyPrivateDeedNumberValidation(documentType);
   });
 
@@ -172,7 +175,7 @@ export class PropertydetailsComponent  implements AfterViewInit, OnChanges {
   loadPropertyDetails() {
     this.selectedPropertyId = this.id;
 
-    this.selerService.getprovince().subscribe(res => {
+    this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.province = res;
     });
 

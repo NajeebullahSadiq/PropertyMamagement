@@ -11,12 +11,12 @@ export class PropertyCancellationService {
 
   constructor(private http: HttpClient) { }
 
-  getActiveTransactions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/GetActiveTransactions`);
+  getActiveTransactions(page: number = 1, pageSize: number = 20): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/GetActiveTransactions?page=${page}&pageSize=${pageSize}`);
   }
 
-  getCancelledTransactions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/GetCancelledTransactions`);
+  getCancelledTransactions(page: number = 1, pageSize: number = 20): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/GetCancelledTransactions?page=${page}&pageSize=${pageSize}`);
   }
 
   cancelTransaction(

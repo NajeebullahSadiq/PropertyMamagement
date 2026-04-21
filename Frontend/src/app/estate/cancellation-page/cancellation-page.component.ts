@@ -1,6 +1,8 @@
 import { HttpEventType } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { PropertyCancellationService } from 'src/app/shared/property-cancellation.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
@@ -13,7 +15,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
   templateUrl: './cancellation-page.component.html',
   styleUrls: ['./cancellation-page.component.scss']
 })
-export class CancellationPageComponent implements OnInit {
+export class CancellationPageComponent extends BaseComponent implements OnInit {
   activeTransactions: any[] = [];
   cancelledTransactions: any[] = [];
   selectedTab: string = 'active';
@@ -42,7 +44,9 @@ export class CancellationPageComponent implements OnInit {
     private dialog: MatDialog,
     private calendarService: CalendarService,
     private calendarConversionService: CalendarConversionService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.loadTransactionTypes();
@@ -61,9 +65,9 @@ export class CancellationPageComponent implements OnInit {
 
   loadActiveTransactions(): void {
     this.loading = true;
-    this.cancellationService.getActiveTransactions().subscribe(
-      (data) => {
-        this.activeTransactions = data;
+    this.cancellationService.getActiveTransactions().pipe(takeUntil(this.destroy$)).subscribe(
+      (response) => {
+        this.activeTransactions = response?.items || [];
         this.loading = false;
       },
       (error) => {
@@ -75,9 +79,9 @@ export class CancellationPageComponent implements OnInit {
 
   loadCancelledTransactions(): void {
     this.loading = true;
-    this.cancellationService.getCancelledTransactions().subscribe(
-      (data) => {
-        this.cancelledTransactions = data;
+    this.cancellationService.getCancelledTransactions().pipe(takeUntil(this.destroy$)).subscribe(
+      (response) => {
+        this.cancelledTransactions = response?.items || [];
         this.loading = false;
       },
       (error) => {

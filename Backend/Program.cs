@@ -141,11 +141,14 @@ builder.Services.AddScoped<WebAPIBackend.Services.ILicenseNumberGenerator, WebAP
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<WebAPIBackend.Services.IProvinceFilterService, WebAPIBackend.Services.ProvinceFilterService>();
 
+// Register Memory Cache for lookup/static data
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<WebAPIBackend.Services.ILookupCacheService, WebAPIBackend.Services.LookupCacheService>();
+
 // Register Company and License Services
 builder.Services.AddScoped<WebAPIBackend.Services.ICompanyService, WebAPIBackend.Services.CompanyService>();
 builder.Services.AddScoped<WebAPIBackend.Services.ILicenseService, WebAPIBackend.Services.LicenseService>();
 
-// Register Security Audit Logger
 builder.Services.AddScoped<WebAPIBackend.Services.ISecurityAuditLogger, WebAPIBackend.Services.SecurityAuditLogger>();
 
 // Register Comprehensive Audit Service

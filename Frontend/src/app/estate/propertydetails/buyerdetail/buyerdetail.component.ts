@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { SellerDetail } from 'src/app/models/SellerDetail';
 import { PropertyService } from 'src/app/shared/property.service';
 import { SellerService } from 'src/app/shared/seller.service';
@@ -17,7 +19,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './buyerdetail.component.html',
   styleUrls: ['./buyerdetail.component.scss']
 })
-export class BuyerdetailComponent {
+export class BuyerdetailComponent extends BaseComponent {
   baseUrl:string=environment.apiURL+'/';
   imagePath:string='assets/img/avatar.png';
   imageName:string='';
@@ -80,7 +82,7 @@ export class BuyerdetailComponent {
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
     private duplicateCheckService: DuplicateCheckService, private numeralService: NumeralService){
-    // console.log(propertyService.mainTableId);
+    super();
     // this.mainTableId=propertyService.mainTableId;
     this.sellerForm = this.fb.group({
       id: [0],
@@ -115,7 +117,7 @@ export class BuyerdetailComponent {
     });
 
     // Add dynamic validation for authorization letter based on agent roles
-    this.sellerForm.get('roleType')?.valueChanges.subscribe(roleType => {
+    this.sellerForm.get('roleType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(roleType => {
       const authLetterControl = this.sellerForm.get('authorizationLetter');
       const rentStartDateControl = this.sellerForm.get('rentStartDate');
       const rentEndDateControl = this.sellerForm.get('rentEndDate');
@@ -155,7 +157,7 @@ export class BuyerdetailComponent {
     });
 
     // Add dynamic validation for transaction type description when "Other" is selected
-    this.sellerForm.get('transactionType')?.valueChanges.subscribe(transactionType => {
+    this.sellerForm.get('transactionType')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(transactionType => {
       const descriptionControl = this.sellerForm.get('transactionTypeDescription');
       const priceControl = this.sellerForm.get('price');
       const priceTextControl = this.sellerForm.get('priceText');
@@ -226,7 +228,7 @@ export class BuyerdetailComponent {
       this.localizationService.roleTypes.leaseReceiverAgent
     ];
     
-    this.selerService.getprovince().subscribe(res => {
+    this.selerService.getprovince().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.province = res;
     });
     
@@ -234,7 +236,7 @@ export class BuyerdetailComponent {
     this.transactionTypes = this.localizationService.transactionTypes;
 
     // Recalculate derived amounts whenever the numeric price changes
-    this.sellerForm.get('price')?.valueChanges.subscribe(() => {
+    this.sellerForm.get('price')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.calculateDerivedAmounts();
     });
 

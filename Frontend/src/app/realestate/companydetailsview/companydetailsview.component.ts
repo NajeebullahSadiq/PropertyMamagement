@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { MatDialog } from '@angular/material/dialog';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { FileService } from 'src/app/shared/file.service';
@@ -12,7 +14,7 @@ import { RbacService } from 'src/app/shared/rbac.service';
   templateUrl: './companydetailsview.component.html',
   styleUrls: ['./companydetailsview.component.scss']
 })
-export class CompanydetailsviewComponent {
+export class CompanydetailsviewComponent extends BaseComponent {
   isLoading = true;
   error: string | null = null;
   viewData: any = null;
@@ -27,11 +29,12 @@ export class CompanydetailsviewComponent {
     private fileService: FileService,
     private rbacService: RbacService
   ) {
-    this.canPrint = this.rbacService.canCreateCompany();
+    super();
   }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.canPrint = this.rbacService.canCreateCompany();
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const idParam = params.get('id');
       const id = idParam ? Number(idParam) : 0;
       if (!id) {

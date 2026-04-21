@@ -30,8 +30,12 @@ export class PropertyService {
   getUnitTpe(){
     return this.http.get(this.baseUrl+'/getunitType');
   }
-  getPropertyDetails(): Observable<PropertyDetailsList[]> {
-    return this.http.get<PropertyDetailsList[]>(this.baseUrl);
+  getPropertyDetails(page: number = 1, pageSize: number = 20, search?: string): Observable<any> {
+    let url = `${this.baseUrl}?page=${page}&pageSize=${pageSize}`;
+    if (search && search.trim()) {
+      url += `&search=${encodeURIComponent(search.trim())}`;
+    }
+    return this.http.get<any>(url);
   }
 
   addPropertyDetails(propertyDetails: PropertyDetails): Observable<PropertyDetails> {

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { ActivityMonitoringService } from 'src/app/shared/activity-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { ActivityMonitoringRecord } from 'src/app/models/ActivityMonitoring';
@@ -10,7 +12,7 @@ import { ActivityMonitoringRecord } from 'src/app/models/ActivityMonitoring';
     templateUrl: './activity-monitoring-view.component.html',
     styleUrls: ['./activity-monitoring-view.component.scss']
 })
-export class ActivityMonitoringViewComponent implements OnInit {
+export class ActivityMonitoringViewComponent extends BaseComponent implements OnInit {
     record: ActivityMonitoringRecord | null = null;
     recordId: number = 0;
     isLoading = false;
@@ -30,7 +32,9 @@ export class ActivityMonitoringViewComponent implements OnInit {
         private service: ActivityMonitoringService,
         private toastr: ToastrService,
         private calendarService: CalendarService
-    ) { }
+    ) {
+        super();
+    }
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');

@@ -2,6 +2,8 @@ import { AfterViewInit, Component, EventEmitter, Input, Output, ViewChild } from
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { UploadComponent } from 'src/app/estate/upload/upload.component';
 import { VehicleDetails } from 'src/app/models/vehicle';
 import { VehicleService } from 'src/app/shared/vehicle.service';
@@ -18,7 +20,7 @@ import { AuthService } from 'src/app/shared/auth.service';
   templateUrl: './vehicle-submit.component.html',
   styleUrls: ['./vehicle-submit.component.scss']
 })
-export class VehicleSubmitComponent implements AfterViewInit{
+export class VehicleSubmitComponent extends BaseComponent implements AfterViewInit{
   onePercent:number=0;
   halfPriceValue:number=0;
   imageName:string='';
@@ -48,6 +50,7 @@ export class VehicleSubmitComponent implements AfterViewInit{
     private parentComponent: VehicleComponent,private router: Router,private vehiclesubservice:VehiclesubService,
     private localizationService: LocalizationService, private numeralService: NumeralService,
     public rbacService: RbacService, private companyService: CompnaydetailService, private authService: AuthService){
+    super();
     this.vehicleForm = this.fb.group({
       id: [0],
       permitNo: ['', Validators.required],
@@ -155,9 +158,9 @@ export class VehicleSubmitComponent implements AfterViewInit{
 }
 
   loadCompanies(): void {
-    this.companyService.getComapaniesList().subscribe({
-      next: (companies: any) => {
-        this.companies = companies;
+    this.companyService.getComapaniesList(1, 1000).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response: any) => {
+        this.companies = response?.items || response || [];
       },
       error: (err: any) => {
         console.error('Error loading companies:', err);

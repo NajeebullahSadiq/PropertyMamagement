@@ -1,10 +1,13 @@
 import { Component, EventEmitter, Injectable, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from 'src/app/shared/base-component';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
+import { NumeralService } from 'src/app/shared/numeral.service';
 import { CancellationInfo, CancellationInfoData } from 'src/app/models/CancellationInfo';
 
 @Component({
@@ -12,7 +15,7 @@ import { CancellationInfo, CancellationInfoData } from 'src/app/models/Cancellat
     templateUrl: './cancellationinfo.component.html',
     styleUrls: ['./cancellationinfo.component.scss'],
 })
-export class CancellationinfoComponent {
+export class CancellationinfoComponent extends BaseComponent {
 
     cancellationForm!: FormGroup;
     selectedId: number = 0;
@@ -33,8 +36,9 @@ export class CancellationinfoComponent {
         private toastr: ToastrService,
         private comservice: CompnaydetailService,
         private calendarConversionService: CalendarConversionService,
-        private calendarService: CalendarService
+        private numeralService: NumeralService
     ) {
+        super();
         this.cancellationForm = this.fb.group({
             id: [0],
             companyId: [''],
