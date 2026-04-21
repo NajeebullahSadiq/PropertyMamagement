@@ -137,7 +137,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-green-500"></i>تاریخ پرداخت آویز</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.bankReceiptDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (item.bankReceiptDate | calendarDate) || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-file-alt text-green-500"></i>نوعیت جواز</span>
@@ -145,11 +145,11 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar-plus text-blue-500"></i>تاریخ صدور جواز</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.licenseIssueDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (item.licenseIssueDate | calendarDate) || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar-times text-blue-500"></i>تاریخ ختم جواز</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.licenseExpiryDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (item.licenseExpiryDate | calendarDate) || '-' }}</p>
             </div>
           </div>
         </div>
@@ -176,7 +176,7 @@
               <h3 class="font-bold text-amber-800 mb-3">نقل مکان {{ i + 1 }}</h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <p><span class="text-gray-600">محل فعالیت جدید:</span> <span class="font-semibold">{{ r.newActivityLocation }}</span></p>
-                <p><span class="text-gray-600">تاریخ نقل مکان:</span> <span class="font-semibold">{{ r.relocationDateFormatted || '-' }}</span></p>
+                <p><span class="text-gray-600">تاریخ نقل مکان:</span> <span class="font-semibold">{{ (r.relocationDate | calendarDate) || '-' }}</span></p>
                 <p><span class="text-gray-600">ملاحظات:</span> <span class="font-semibold">{{ r.remarks || '-' }}</span></p>
               </div>
             </div>
@@ -203,7 +203,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-red-500"></i>تاریخ لغو / انصراف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.cancellationDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (item.cancellationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
         </div>

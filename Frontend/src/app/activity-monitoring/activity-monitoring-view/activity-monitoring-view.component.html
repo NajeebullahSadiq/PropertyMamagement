@@ -73,7 +73,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-purple-500"></i>تاریخ ثبت</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.reportRegistrationDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
 
@@ -169,7 +169,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-red-500"></i>تاریخ ثبت</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.reportRegistrationDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
 
@@ -234,7 +234,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-orange-500"></i>تاریخ ثبت</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.reportRegistrationDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
 
@@ -253,11 +253,11 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-orange-500"></i>تاریخ تخلف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.violationDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (record.violationDate | calendarDate) || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar-times text-orange-500"></i>تاریخ توقف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.closureDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (record.closureDate | calendarDate) || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-comment text-orange-500"></i>دلیل توقف</span>
@@ -295,7 +295,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-green-500"></i>تاریخ ثبت</span>
-              <p class="font-bold text-gray-800 mt-1">{{ record.reportRegistrationDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
 

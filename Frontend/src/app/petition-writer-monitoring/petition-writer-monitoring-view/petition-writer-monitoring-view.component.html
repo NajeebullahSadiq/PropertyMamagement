@@ -37,7 +37,7 @@
             </div>
             <div class="bg-gray-50 p-4 rounded-xl">
               <span class="text-sm text-gray-500 block mb-1">تاریخ ثبت</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.registrationDateFormatted || '-' }}</span>
+              <span class="text-lg font-bold text-gray-800">{{ (record.registrationDate | calendarDate) || '-' }}</span>
             </div>
           </div>
         </div>

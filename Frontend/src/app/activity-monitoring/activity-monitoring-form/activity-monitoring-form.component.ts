@@ -198,9 +198,9 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             this.companyFound = true;
         }
 
-        // Parse dates - convert formatted dates to Date objects
-        if (data.reportRegistrationDateFormatted) {
-            const date = this.parseDateString(data.reportRegistrationDateFormatted);
+        // Parse dates - raw dates are already Hijri Shamsi strings from backend
+        if (data.reportRegistrationDate) {
+            const date = this.parseDateString(data.reportRegistrationDate);
             if (date) {
                 this.mainForm.patchValue({ reportRegistrationDate: date });
             }
@@ -238,14 +238,14 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
                 violationActionsTaken: violation.actionsTaken,
                 violationRemarks: violation.remarks,
             });
-            if (violation.violationDateFormatted) {
-                const date = this.parseDateString(violation.violationDateFormatted);
+            if (violation.violationDate) {
+                const date = this.parseDateString(violation.violationDate);
                 if (date) {
                     this.mainForm.patchValue({ violationDate: date });
                 }
             }
-            if (violation.closureDateFormatted) {
-                const date = this.parseDateString(violation.closureDateFormatted);
+            if (violation.closureDate) {
+                const date = this.parseDateString(violation.closureDate);
                 if (date) {
                     this.mainForm.patchValue({ closureDate: date });
                 }

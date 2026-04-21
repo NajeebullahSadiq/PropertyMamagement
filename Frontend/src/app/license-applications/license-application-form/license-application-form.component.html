@@ -379,7 +379,7 @@
                 </div>
                 <div>
                   <span class="text-sm text-gray-600">تاریخ انصراف:</span>
-                  <p class="font-semibold text-gray-800">{{ withdrawalData.withdrawalDateFormatted || '-' }}</p>
+                  <p class="font-semibold text-gray-800">{{ (withdrawalData.withdrawalDate | calendarDate) || '-' }}</p>
                 </div>
               </div>
             </div>

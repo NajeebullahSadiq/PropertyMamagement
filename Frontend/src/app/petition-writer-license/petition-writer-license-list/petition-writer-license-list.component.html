@@ -61,8 +61,8 @@
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.applicantName }} {{ item.applicantFatherName ? 'ولد ' + item.applicantFatherName : '' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.activityLocation || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseType === 'new' ? 'جدید' : item.licenseType === 'renewal' ? 'تجدید' : '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseIssueDateFormatted || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseExpiryDateFormatted || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ (item.licenseIssueDate | calendarDate) || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ (item.licenseExpiryDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3">
                 <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="getStatusClass(item)">
                   {{ getStatusText(item) }}

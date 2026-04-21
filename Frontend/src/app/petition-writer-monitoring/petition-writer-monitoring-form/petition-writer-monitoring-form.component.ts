@@ -214,9 +214,9 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
             monitoringRemarks: data.monitoringRemarks,
         });
 
-        // Parse dates
-        if (data.registrationDateFormatted) {
-            const date = this.parseDateString(data.registrationDateFormatted);
+        // Parse dates - raw dates are already Hijri Shamsi strings from backend
+        if (data.registrationDate) {
+            const date = this.parseDateString(data.registrationDate);
             if (date) {
                 this.mainForm.patchValue({ registrationDate: date });
             }

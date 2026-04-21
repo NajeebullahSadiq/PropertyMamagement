@@ -78,7 +78,7 @@
           <div class="watermark-line">{{data.licenseNumber || '—'}}</div>
           <div class="watermark-line">{{data.applicantName || '—'}}</div>
           <div class="watermark-line">{{data.applicantFatherName || '—'}}</div>
-          <div class="watermark-line">{{data.licenseIssueDateFormatted || (data.licenseIssueDate | calendarDate) || '—'}}</div>
+          <div class="watermark-line">{{(data.licenseIssueDate | calendarDate) || '—'}}</div>
           <div class="watermark-line">{{data.electronicNationalIdNumber || '—'}}</div>
         </div>
       </div>
@@ -149,7 +149,7 @@
               </div>
               <div class="meta-item">
                 <span class="meta-label">تاریخ صدور:</span>
-                <span class="meta-value">{{ data.licenseIssueDateFormatted || (data.licenseIssueDate | calendarDate) || '-' }}</span>
+                <span class="meta-value">{{ (data.licenseIssueDate | calendarDate) || '-' }}</span>
               </div>
             </div>
           </div>
@@ -257,11 +257,11 @@
                 <td class="bottom-cell">
                   <div class="info-row">
                     <span>اعتبار از تاریخ:</span>
-                    <span class="info-value">{{ data.licenseIssueDateFormatted || (data.licenseIssueDate | calendarDate) || '-' }}</span>
+                    <span class="info-value">{{ (data.licenseIssueDate | calendarDate) || '-' }}</span>
                   </div>
                   <div class="info-row">
                     <span>الی:</span>
-                    <span class="info-value">{{ data.licenseExpiryDateFormatted || (data.licenseExpiryDate | calendarDate) || '-' }}</span>
+                    <span class="info-value">{{ (data.licenseExpiryDate | calendarDate) || '-' }}</span>
                   </div>
                 </td>
                 <td class="bottom-cell">

@@ -289,7 +289,7 @@
                 <tbody class="divide-y divide-gray-200">
                   <tr *ngFor="let r of relocationsList" class="text-center hover:bg-amber-50 transition-colors">
                     <td class="px-4 py-3 text-sm text-gray-700">{{ r.newActivityLocation }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ r.relocationDateFormatted || '-' }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ (r.relocationDate | calendarDate) || '-' }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ r.remarks || '-' }}</td>
                     <td class="px-4 py-3">
                       <div class="flex justify-center gap-2">

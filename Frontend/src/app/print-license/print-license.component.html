@@ -46,7 +46,7 @@
           <div class="watermark-line">{{data.licenseNumber || '—'}}</div>
           <div class="watermark-line">{{data.firstName || '—'}}</div>
           <div class="watermark-line">{{data.fatherName || '—'}}</div>
-          <div class="watermark-line">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</div>
+          <div class="watermark-line">{{(data.issueDate | calendarDate) || '—'}}</div>
           <div class="watermark-line">{{data.indentityCardNumber || '—'}}</div>
         </div>
       </div>
@@ -117,11 +117,11 @@
               </div>
               <div class="meta-item">
                 <span class="meta-label">د صدور نېټه:</span>
-                <span class="meta-value">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</span>
+                <span class="meta-value">{{(data.issueDate | calendarDate) || '—'}}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">د پای نېټه:</span>
-                <span class="meta-value">{{data.expireDateFormatted || (data.expireDate | calendarDate) || '—'}}</span>
+                <span class="meta-value">{{(data.expireDate | calendarDate) || '—'}}</span>
               </div>
             </div>
           </div>
@@ -189,8 +189,7 @@
               ښاغلی <span class="highlight-value">{{data.firstName || '—'}}</span>
               د <span class="highlight-value">{{data.fatherName || '—'}}</span>
               زوی د <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
-              لمسی د <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
-                || '—'}}</span>
+              لمسی د <span class="highlight-value">{{(data.dateofBirth | calendarDate) || '—'}}</span>
               کال کی زېږېدلی د برښنایې تذکرې شمېره <span class="highlight-value">{{data.indentityCardNumber ||
                 '—'}}</span>
 
@@ -312,7 +311,7 @@
           <div class="watermark-line">{{data.licenseNumber || '—'}}</div>
           <div class="watermark-line">{{data.firstName || '—'}}</div>
           <div class="watermark-line">{{data.fatherName || '—'}}</div>
-          <div class="watermark-line">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</div>
+          <div class="watermark-line">{{(data.issueDate | calendarDate) || '—'}}</div>
           <div class="watermark-line">{{data.indentityCardNumber || '—'}}</div>
         </div>
       </div>
@@ -383,11 +382,11 @@
               </div>
               <div class="meta-item">
                 <span class="meta-label">تاریخ صدور:</span>
-                <span class="meta-value">{{data.issueDateFormatted || (data.issueDate | calendarDate) || '—'}}</span>
+                <span class="meta-value">{{(data.issueDate | calendarDate) || '—'}}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">تاریخ ختم:</span>
-                <span class="meta-value">{{data.expireDateFormatted || (data.expireDate | calendarDate) || '—'}}</span>
+                <span class="meta-value">{{(data.expireDate | calendarDate) || '—'}}</span>
               </div>
             </div>
           </div>
@@ -454,8 +453,7 @@
               ولد <span class="highlight-value">{{data.fatherName || '—'}}</span>
               ولدیت <span class="highlight-value">{{data.grandFatherName || '—'}}</span>
 
-              که به تاریخ <span class="highlight-value">{{data.dateOfBirthFormatted || (data.dateofBirth | calendarDate)
-                || '—'}}</span>
+              که به تاریخ <span class="highlight-value">{{(data.dateofBirth | calendarDate) || '—'}}</span>
               تولد شده؛ شماره تذکره الکترونیکی وی؛ <span class="highlight-value">{{data.indentityCardNumber ||
                 '—'}}</span>
 

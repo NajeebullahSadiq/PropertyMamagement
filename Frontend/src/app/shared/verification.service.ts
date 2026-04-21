@@ -251,7 +251,7 @@ export class VerificationService {
     
     // Footer
     lines.push('───────────────────────────────');
-    lines.push(`تاریخ: ${documentData.createdAtFormatted || documentData.createdAt || '-'}`);
+    lines.push(`تاریخ: ${documentData.createdAt || '-'}`);
     lines.push('');
     lines.push(`لینک تصدیق: ${verificationUrl}`);
     lines.push('═══════════════════════════════');

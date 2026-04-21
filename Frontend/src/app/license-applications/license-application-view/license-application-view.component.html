@@ -64,7 +64,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-blue-500"></i>تاریخ درخواست</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.requestDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (item.requestDate | calendarDate) || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>نام متقاضی</span>
@@ -134,7 +134,7 @@
                 <p><span class="text-gray-600">نوعیت ضمانت:</span> <span class="font-semibold">{{ getGuaranteeTypeName(g.guaranteeTypeId) }}</span></p>
                 <p *ngIf="g.cashAmount"><span class="text-gray-600">مبلغ:</span> <span class="font-semibold">{{ g.cashAmount | number }}</span></p>
                 <p *ngIf="g.shariaDeedNumber"><span class="text-gray-600">نمبر قباله شرعی:</span> <span class="font-semibold">{{ g.shariaDeedNumber }}</span></p>
-                <p *ngIf="g.shariaDeedDateFormatted"><span class="text-gray-600">تاریخ قباله:</span> <span class="font-semibold">{{ g.shariaDeedDateFormatted }}</span></p>
+                <p *ngIf="g.shariaDeedDate"><span class="text-gray-600">تاریخ قباله:</span> <span class="font-semibold">{{ g.shariaDeedDate | calendarDate }}</span></p>
                 <p *ngIf="g.customaryDeedSerialNumber"><span class="text-gray-600">سریال قباله عرفی:</span> <span class="font-semibold">{{ g.customaryDeedSerialNumber }}</span></p>
               </div>
             </div>
@@ -161,7 +161,7 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-red-500"></i>تاریخ انصراف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ withdrawal.withdrawalDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (withdrawal.withdrawalDate | calendarDate) || '-' }}</p>
             </div>
           </div>
         </div>

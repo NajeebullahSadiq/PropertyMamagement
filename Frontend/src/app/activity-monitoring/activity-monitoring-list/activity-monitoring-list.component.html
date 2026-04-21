@@ -117,7 +117,7 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.companyTitle || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.district || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
                     <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
@@ -140,7 +140,7 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.complainantName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintSubject || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintActionsTaken || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
@@ -164,7 +164,7 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.district || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.closureReason || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationType || '-' }}</td>
                 <td class="px-4 py-3">
@@ -215,7 +215,7 @@
                     {{ getSectionTypeLabel(item.sectionType!) }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.reportRegistrationDateFormatted || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseHolderName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.companyTitle || '-' }}</td>
