@@ -5,6 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { SecuritiesDistribution } from 'src/app/models/SecuritiesDistribution';
 
@@ -40,6 +41,7 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
     constructor(
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService,
+        private calendarConversionService: CalendarConversionService,
         private rbacService: RbacService,
         private router: Router,
         private toastr: ToastrService
@@ -191,23 +193,17 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
 
         this.isLoadingReport = true;
 
-        // Format dates
-        let startDate = this.reportStartDate;
-        let endDate = this.reportEndDate;
-
-        if (typeof this.reportStartDate === 'object' && this.reportStartDate !== null) {
-            startDate = this.reportStartDate.toISOString ? this.reportStartDate.toISOString().split('T')[0] : String(this.reportStartDate);
-        }
-        if (typeof this.reportEndDate === 'object' && this.reportEndDate !== null) {
-            endDate = this.reportEndDate.toISOString ? this.reportEndDate.toISOString().split('T')[0] : String(this.reportEndDate);
-        }
+        // Format dates in Hijri Shamsi
+        const calendar = this.calendarService.getSelectedCalendar();
+        const startDate = this.formatDateForBackend(this.reportStartDate);
+        const endDate = this.formatDateForBackend(this.reportEndDate);
 
         const licenseNumber = this.reportType === 'single' ? this.reportLicenseNumber : undefined;
 
         this.securitiesService.getComprehensiveReport(
             startDate,
             endDate,
-            'gregorian',
+            calendar,
             licenseNumber
         ).subscribe({
             next: (data) => {
@@ -272,5 +268,25 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
         document.body.removeChild(link);
         
         this.toastr.success('گزارش با موفقیت صادر شد');
+    }
+
+    private formatDateForBackend(dateValue: any): string {
+        const currentCalendar = this.calendarService.getSelectedCalendar();
+
+        if (dateValue instanceof Date) {
+            const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+            const year = calendarDate.year;
+            const month = String(calendarDate.month).padStart(2, '0');
+            const day = String(calendarDate.day).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        } else if (typeof dateValue === 'object' && dateValue?.year) {
+            const year = dateValue.year;
+            const month = String(dateValue.month).padStart(2, '0');
+            const day = String(dateValue.day).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        } else if (typeof dateValue === 'string') {
+            return dateValue.replace(/\//g, '-');
+        }
+        return '';
     }
 }
