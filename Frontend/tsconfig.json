@@ -16,18 +16,16 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "ES2020",
-    "module": "ES2020",
+    "target": "ES2022",
+    "module": "ES2022",
     "useDefineForClassFields": false,
     "lib": [
-      "ES2020",
+      "ES2022",
       "dom"
     ],
-    "types": [
-      "jquery",
-      "select2"
-    ],
-    "skipLibCheck": true
+    "types": [],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

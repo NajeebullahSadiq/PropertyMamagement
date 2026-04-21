@@ -12,8 +12,26 @@ import { UserRoles } from './rbac.service';
 export class AuthService {
   readonly BaseURI = environment.apiUrl;
   photoPath='';
+  private cachedTokenPayload: any = null;
 
   constructor(private fb: FormBuilder, private http: HttpClient) { }
+
+  private getTokenPayload(): any {
+    if (this.cachedTokenPayload) return this.cachedTokenPayload;
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        this.cachedTokenPayload = JSON.parse(window.atob(token.split('.')[1]));
+      } catch {
+        this.cachedTokenPayload = null;
+      }
+    }
+    return this.cachedTokenPayload;
+  }
+
+  clearTokenCache(): void {
+    this.cachedTokenPayload = null;
+  }
   
   formModel = this.fb.group({
     FirstName: ['',Validators.required],
@@ -100,9 +118,8 @@ export class AuthService {
 
   roleMatch(allowedRoles: any[]): boolean {
     var isMatch = false;
-    var token = localStorage.getItem('token');
-    if (token) {
-      var payLoad = JSON.parse(window.atob(token.split('.')[1]));
+    var payLoad = this.getTokenPayload();
+    if (payLoad) {
       var userRole = payLoad.role || payLoad.userRole;
       allowedRoles.forEach(element => {
         if (userRole == element) {
@@ -163,42 +180,27 @@ export class AuthService {
 
   // Province-based access control methods
   getUserProvinceId(): number | null {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payLoad = JSON.parse(window.atob(token.split('.')[1]));
-        return payLoad.province_id ? parseInt(payLoad.province_id) : null;
-      } catch {
-        return null;
-      }
+    const payLoad = this.getTokenPayload();
+    if (payLoad) {
+      return payLoad.province_id ? parseInt(payLoad.province_id) : null;
     }
     return null;
   }
 
   isCompanyRegistrar(): boolean {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payLoad = JSON.parse(window.atob(token.split('.')[1]));
-        const userRole = payLoad.role || payLoad.userRole;
-        return userRole === UserRoles.CompanyRegistrar;
-      } catch {
-        return false;
-      }
+    const payLoad = this.getTokenPayload();
+    if (payLoad) {
+      const userRole = payLoad.role || payLoad.userRole;
+      return userRole === UserRoles.CompanyRegistrar;
     }
     return false;
   }
 
   isAdministrator(): boolean {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payLoad = JSON.parse(window.atob(token.split('.')[1]));
-        const userRole = payLoad.role || payLoad.userRole;
-        return userRole === UserRoles.Admin;
-      } catch {
-        return false;
-      }
+    const payLoad = this.getTokenPayload();
+    if (payLoad) {
+      const userRole = payLoad.role || payLoad.userRole;
+      return userRole === UserRoles.Admin;
     }
     return false;
   }

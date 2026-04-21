@@ -5,12 +5,6 @@ import { GeolocationGuard } from './auth/authSetting/geolocation.guard';
 import { RoleGuard, AdminGuard, PropertyModuleGuard, VehicleModuleGuard, CompanyModuleGuard, DashboardGuard, SecuritiesModuleGuard, PetitionWriterModuleGuard, ActivityMonitoringGuard, PetitionWriterMonitoringGuard } from './auth/authSetting/role.guard';
 import { ForbiddenComponent } from './auth/forbidden/forbidden.component';
 import { AccessDeniedComponent } from './auth/access-denied/access-denied.component';
-import { PrintComponent } from './print/print.component';
-import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
-import { PrintLicenseComponent } from './print-license/print-license.component';
-import { PrintSecuritiesComponent } from './print-securities/print-securities.component';
-import { PrintPetitionWriterSecuritiesComponent } from './print-petition-writer-securities/print-petition-writer-securities.component';
-import { PrintPetitionWriterLicenseComponent } from './print-petition-writer-license/print-petition-writer-license.component';
 import { MasterlayoutComponent } from './dashboard/masterlayout/masterlayout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ReportComponent } from './dashboard/report/report.component';
@@ -61,18 +55,14 @@ const routes: Routes = [
   },
 
   { path: 'forbidden', component: ForbiddenComponent },
-  { path: 'print/:id', component: PrintComponent, canActivate: [GeolocationGuard] },
-  { path: 'print', component: PrintComponent, canActivate: [GeolocationGuard] },
-  { path: 'printvehicledata/:id', component: PrintvehicledataComponent, canActivate: [GeolocationGuard] },
-  { path: 'printvehicledata', component: PrintvehicledataComponent, canActivate: [GeolocationGuard] },
-  { path: 'printLicense/:id', component: PrintLicenseComponent, canActivate: [GeolocationGuard] },
-  { path: 'printLicense', component: PrintLicenseComponent, canActivate: [GeolocationGuard] },
-  { path: 'printSecurities/:id', component: PrintSecuritiesComponent, canActivate: [GeolocationGuard] },
-  { path: 'printSecurities', component: PrintSecuritiesComponent, canActivate: [GeolocationGuard] },
-  { path: 'printPetitionWriterSecurities/:id', component: PrintPetitionWriterSecuritiesComponent, canActivate: [GeolocationGuard] },
-  { path: 'printPetitionWriterSecurities', component: PrintPetitionWriterSecuritiesComponent, canActivate: [GeolocationGuard] },
-  { path: 'printPetitionWriterLicense/:id', component: PrintPetitionWriterLicenseComponent, canActivate: [GeolocationGuard] },
-  { path: 'printPetitionWriterLicense', component: PrintPetitionWriterLicenseComponent, canActivate: [GeolocationGuard] },
+
+  // Print module lazy-loaded - keeps pdfmake (~500KB) out of initial bundle
+  { path: 'print', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
+  { path: 'printvehicledata', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
+  { path: 'printLicense', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
+  { path: 'printSecurities', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
+  { path: 'printPetitionWriterSecurities', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
+  { path: 'printPetitionWriterLicense', loadChildren: () => import('./print/print.module').then(m => m.PrintModule) },
 ];
 
 @NgModule({

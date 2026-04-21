@@ -1050,6 +1050,7 @@ namespace WebAPIBackend.Controllers
                     .Include(p => p.BuyerDetails)
                     .Include(p => p.WitnessDetails)
                     .Include(p => p.PropertyAddresses)
+                    .AsSplitQuery()
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (property == null)

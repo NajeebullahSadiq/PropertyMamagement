@@ -8,8 +8,6 @@ import { UserEditDialogComponent } from '../user-edit-dialog/user-edit-dialog.co
 import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
-import { CalendarType } from 'src/app/models/calendar-type';
 
 export interface UserData {
   id: string;
@@ -61,7 +59,6 @@ export class UserListComponent extends BaseComponent implements OnInit {
     private authService: AuthService,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private calendarConversionService: CalendarConversionService
   ) {
     super();
   }
@@ -213,13 +210,6 @@ export class UserListComponent extends BaseComponent implements OnInit {
       case 'carSale': return 'موتر فروشی';
       default: return '—';
     }
-  }
-
-  formatDate(dateStr: string): string {
-    if (!dateStr) return '—';
-    // Convert to Hijri Shamsi using calendar conversion service
-    const date = new Date(dateStr);
-    return this.calendarConversionService.formatDate(date, CalendarType.HIJRI_SHAMSI);
   }
 
   getRoleColor(role: string): string {

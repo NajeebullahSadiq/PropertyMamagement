@@ -139,24 +139,33 @@ export class RbacService {
   private readonly BaseURI = environment.apiUrl;
   private userProfile$ = new BehaviorSubject<UserProfile | null>(null);
   private permissions$ = new BehaviorSubject<string[]>([]);
+  private cachedTokenPayload: any = null;
 
   constructor(private http: HttpClient) {
     this.loadUserFromToken();
   }
 
-  // Load user info from JWT token
-  loadUserFromToken(): void {
+  private getTokenPayload(): any {
+    if (this.cachedTokenPayload) return this.cachedTokenPayload;
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const permissions = Array.isArray(payload.permission) 
-          ? payload.permission 
-          : payload.permission ? [payload.permission] : [];
-        this.permissions$.next(permissions);
-      } catch (e) {
-        console.error('Error parsing token', e);
+        this.cachedTokenPayload = JSON.parse(atob(token.split('.')[1]));
+      } catch {
+        this.cachedTokenPayload = null;
       }
+    }
+    return this.cachedTokenPayload;
+  }
+
+  // Load user info from JWT token
+  loadUserFromToken(): void {
+    const payload = this.getTokenPayload();
+    if (payload) {
+      const permissions = Array.isArray(payload.permission) 
+        ? payload.permission 
+        : payload.permission ? [payload.permission] : [];
+      this.permissions$.next(permissions);
     }
   }
 
@@ -182,56 +191,36 @@ export class RbacService {
 
   // Get current user role from token
   getCurrentRole(): string {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.userRole || payload.role || '';
-      } catch (e) {
-        return '';
-      }
+    const payload = this.getTokenPayload();
+    if (payload) {
+      return payload.userRole || payload.role || '';
     }
     return '';
   }
 
   // Get current user ID from token
   getCurrentUserId(): string {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.UserID || '';
-      } catch (e) {
-        return '';
-      }
+    const payload = this.getTokenPayload();
+    if (payload) {
+      return payload.UserID || '';
     }
     return '';
   }
 
   // Get company ID from token
   getCompanyId(): number {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return parseInt(payload.companyId) || 0;
-      } catch (e) {
-        return 0;
-      }
+    const payload = this.getTokenPayload();
+    if (payload) {
+      return parseInt(payload.companyId) || 0;
     }
     return 0;
   }
 
   // Get license type from token
   getLicenseType(): string {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.licenseType || '';
-      } catch (e) {
-        return '';
-      }
+    const payload = this.getTokenPayload();
+    if (payload) {
+      return payload.licenseType || '';
     }
     return '';
   }
@@ -401,6 +390,7 @@ export class RbacService {
   clearUser(): void {
     this.userProfile$.next(null);
     this.permissions$.next([]);
+    this.cachedTokenPayload = null;
   }
 
   // Refresh permissions from server and update token
@@ -410,6 +400,7 @@ export class RbacService {
         next: (response) => {
           // Update token in localStorage
           localStorage.setItem('token', response.token);
+          this.cachedTokenPayload = null; // Clear cache so next call parses new token
           
           // Reload permissions from new token
           this.loadUserFromToken();

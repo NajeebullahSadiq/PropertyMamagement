@@ -144,7 +144,7 @@
                   {{ user.isLocked ? 'غیرفعال' : 'فعال' }}
                 </span>
               </td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(user.createdAt) }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500">{{ user.createdAt | calendarDate }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1.5">
                   <button (click)="onEdit(user)"

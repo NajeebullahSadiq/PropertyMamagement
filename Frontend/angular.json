@@ -58,12 +58,10 @@
           
             ],
             "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/select2/dist/js/select2.full.min.js"
             ],
             "allowedCommonJsDependencies": [
-              "jsqr"
+              "jsqr",
+              "src/app/shared/calendar-conversion.service"
             ]
           },
           "configurations": {
@@ -77,13 +75,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2500kb",
-                  "maximumError": "3mb"
+                  "maximumWarning": "1800kb",
+                  "maximumError": "2200kb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "300kb",
-                  "maximumError": "500kb"
+                  "maximumWarning": "100kb",
+                  "maximumError": "200kb"
                 }
               ],
               "outputHashing": "all"

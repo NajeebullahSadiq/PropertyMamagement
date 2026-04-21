@@ -502,6 +502,7 @@ namespace WebAPIBackend.Services.Verification
                 .Include(l => l.CurrentProvince)
                 .Include(l => l.CurrentDistrict)
                 .Include(l => l.Relocations)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(l => l.Id == licenseId);
 
             if (license == null) return null;
@@ -560,6 +561,7 @@ namespace WebAPIBackend.Services.Verification
                 .Include(p => p.PropertyAddresses)
                 .Include(p => p.PropertyType)
                 .Include(p => p.PunitType)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == propertyId);
 
             if (property == null) return null;

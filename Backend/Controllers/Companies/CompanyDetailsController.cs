@@ -722,6 +722,7 @@ namespace WebAPIBackend.Controllers.Companies
                     .Include(c => c.Gaurantees)
                     .Include(c => c.CompanyAccountInfos)
                     .Include(c => c.CompanyCancellationInfos)
+                    .AsSplitQuery()
                     .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (company == null)

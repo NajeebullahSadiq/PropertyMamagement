@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 import { UserListComponent } from './user-list/user-list.component';
 import { UserEditDialogComponent } from './user-edit-dialog/user-edit-dialog.component';
@@ -37,6 +38,7 @@ const routes: Routes = [
     NgxPaginationModule,
     MatDialogModule,
     MatIconModule,
+    SharedModule,
     RouterModule.forChild(routes)
   ]
 })

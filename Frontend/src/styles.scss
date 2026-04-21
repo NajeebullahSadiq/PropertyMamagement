@@ -5,7 +5,6 @@
 
 /* You can add global styles to this file, and also import other style files */
 @import "~@ng-select/ng-select/themes/default.theme.css";
-@import "~select2/dist/css/select2.css";
 
 /* Compact Enterprise Form Styles */
 @import "./styles/compact-forms.scss";
@@ -346,26 +345,6 @@ tbody td {
 .ng-dropdown-panel .ng-option:hover {
   background-color: #f8fafc !important;
   color: #1e293b !important;
-}
-
-.select2-container .select2-selection--single {
-  height: 38px;
-  font-family: 'NotoSansArabic', 'Gulzar', sans-serif;
-}
-
-.select2-container .select2-selection--single .select2-selection__rendered {
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.7;
-  letter-spacing: 0.15px;
-  color: #334155;
-}
-
-.select2-dropdown .select2-results__option {
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.7;
-  letter-spacing: 0.15px;
 }
 
 /* ============================================
@@ -884,27 +863,6 @@ ng-dropdown-panel {
 /* Remove scrolling from any wrapper divs inside the panel */
 .ng-dropdown-panel > div:not(.ng-dropdown-panel-items) {
   overflow: visible !important;
-}
-
-/* Fix for select2 dropdowns - prevent double scrollbars */
-.select2-container--open {
-  z-index: 10001 !important;
-}
-
-.select2-dropdown {
-  z-index: 10001 !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
-  overflow: visible !important;  /* Wrapper should not scroll */
-}
-
-.select2-results {
-  max-height: 300px !important;
-  overflow-y: auto !important;  /* Only results container scrolls */
-  overflow-x: hidden !important;
-}
-
-.select2-container {
-  z-index: 10001 !important;
 }
 
 /* Global fix: Prevent any nested scrolling in dropdown panels */

@@ -1,17 +1,17 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using System.IO.Compression;
 using System.Text;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Middleware;
 using WebAPIBackend.Services.Verification;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,9 +22,9 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 //Get Connection String
 builder.Services.AddDbContext<AppDbContext>(opts =>
-               opts.UseNpgsql(builder.Configuration["connection:connectionString"], 
-                   npgsqlOpts => npgsqlOpts.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-               .ConfigureWarnings(warnings => 
+               opts.UseNpgsql(builder.Configuration["connection:connectionString"], npgsqlOpts =>
+                   npgsqlOpts.MaxBatchSize(100))
+               .ConfigureWarnings(warnings =>
                    warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 //Get data from appsettings.json and store to ApplicationSettings model than we use in our classes and Controller like Login Controller
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
@@ -87,7 +87,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        // TODO: Remove ReferenceHandler once all controllers use DTOs/projections instead of returning entities directly
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
         // Fix Persian/Dari text encoding - prevent Unicode escaping
@@ -124,9 +125,9 @@ builder.Services.AddCors(options =>
 //Memory Managment for File Upload
 builder.Services.Configure<FormOptions>(o =>
 {
-    o.ValueLengthLimit = int.MaxValue;
-    o.MultipartBodyLengthLimit = int.MaxValue;
-    o.MemoryBufferThreshold = int.MaxValue;
+    o.ValueLengthLimit = 100 * 1024 * 1024;           // 100MB max form value
+    o.MultipartBodyLengthLimit = 100 * 1024 * 1024;   // 100MB max multipart body
+    o.MemoryBufferThreshold = 50 * 1024 * 1024;       // 50MB - buffer to disk above this
 });
 
 // Register Verification Services
@@ -154,134 +155,33 @@ builder.Services.AddScoped<WebAPIBackend.Services.ISecurityAuditLogger, WebAPIBa
 // Register Comprehensive Audit Service
 builder.Services.AddScoped<WebAPIBackend.Services.IComprehensiveAuditService, WebAPIBackend.Services.ComprehensiveAuditService>();
 
+// Response Compression (Brotli + Gzip) for API responses
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/json", "text/json" });
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
 // Register Exception Handler
 builder.Services.AddExceptionHandler<WebAPIBackend.Middleware.GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-
-
-
 var app = builder.Build();
 
-try
-{
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    await db.Database.ExecuteSqlRawAsync(
-        "ALTER TABLE IF EXISTS org.\"CompanyOwner\" ADD COLUMN IF NOT EXISTS \"ElectronicNationalIdNumber\" VARCHAR(50) NULL;");
-
-    await db.Database.ExecuteSqlRawAsync(
-        "ALTER TABLE IF EXISTS org.\"Guarantors\" ADD COLUMN IF NOT EXISTS \"ElectronicNationalIdNumber\" VARCHAR(50) NULL;");
-
-    await db.Database.ExecuteSqlRawAsync(
-        "ALTER TABLE IF EXISTS org.\"LicenseDetails\" ADD COLUMN IF NOT EXISTS \"RenewalRound\" INTEGER NULL;");
-
-    await db.Database.ExecuteSqlRawAsync(
-        "ALTER TABLE IF EXISTS org.\"LicenseDetails\" ADD COLUMN IF NOT EXISTS \"TariffNumber\" VARCHAR(100) NULL;");
-
-    await db.Database.ExecuteSqlRawAsync(
-        "ALTER TABLE IF EXISTS org.\"PetitionWriterLicenses\" ADD COLUMN IF NOT EXISTS \"PicturePath\" VARCHAR(500) NULL;");
-
-    // Add ProvinceId columns for province-based access control
-    await db.Database.ExecuteSqlRawAsync(
-        "ALTER TABLE IF EXISTS public.\"AspNetUsers\" ADD COLUMN IF NOT EXISTS \"ProvinceId\" INTEGER NULL;");
-
-    await db.Database.ExecuteSqlRawAsync(
-        "ALTER TABLE IF EXISTS org.\"CompanyDetails\" ADD COLUMN IF NOT EXISTS \"ProvinceId\" INTEGER NULL;");
-
-    // Add foreign key constraints if they don't exist
-    await db.Database.ExecuteSqlRawAsync(@"
-        DO $$
-        BEGIN
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.table_constraints 
-                WHERE constraint_name = 'FK_AspNetUsers_Location_ProvinceId'
-            ) THEN
-                ALTER TABLE public.""AspNetUsers""
-                ADD CONSTRAINT ""FK_AspNetUsers_Location_ProvinceId""
-                FOREIGN KEY (""ProvinceId"") REFERENCES look.""Location""(""ID"")
-                ON DELETE RESTRICT;
-            END IF;
-        END $$;
-    ");
-
-    await db.Database.ExecuteSqlRawAsync(@"
-        DO $$
-        BEGIN
-            IF NOT EXISTS (
-                SELECT 1 FROM information_schema.table_constraints 
-                WHERE constraint_name = 'FK_CompanyDetails_Location_ProvinceId'
-            ) THEN
-                ALTER TABLE org.""CompanyDetails""
-                ADD CONSTRAINT ""FK_CompanyDetails_Location_ProvinceId""
-                FOREIGN KEY (""ProvinceId"") REFERENCES look.""Location""(""ID"")
-                ON DELETE RESTRICT;
-            END IF;
-        END $$;
-    ");
-
-    // Add indexes for performance
-    await db.Database.ExecuteSqlRawAsync(@"
-        CREATE INDEX IF NOT EXISTS ""IX_AspNetUsers_ProvinceId"" 
-        ON public.""AspNetUsers""(""ProvinceId"");
-    ");
-
-    await db.Database.ExecuteSqlRawAsync(@"
-        CREATE INDEX IF NOT EXISTS ""IX_CompanyDetails_ProvinceId"" 
-        ON org.""CompanyDetails""(""ProvinceId"");
-    ");
-
-    // Rename ElectronicIdNumber to ElectronicNationalIdNumber if the old column exists
-    await db.Database.ExecuteSqlRawAsync(@"
-        DO $$
-        BEGIN
-            IF EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_schema='org' AND table_name='PetitionWriterLicenses' AND column_name='ElectronicIdNumber'
-            ) THEN
-                ALTER TABLE org.""PetitionWriterLicenses""
-                RENAME COLUMN ""ElectronicIdNumber"" TO ""ElectronicNationalIdNumber"";
-            END IF;
-        END $$;
-    ");
-
-    await db.Database.ExecuteSqlRawAsync(@"
-        DO $$
-        BEGIN
-            IF EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_schema='org' AND table_name='CompanyOwner' AND column_name='IndentityCardNumber'
-            ) THEN
-                UPDATE org.""CompanyOwner""
-                SET ""ElectronicNationalIdNumber"" = ""IndentityCardNumber""::text
-                WHERE ""ElectronicNationalIdNumber"" IS NULL;
-            END IF;
-
-            IF EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_schema='org' AND table_name='Guarantors' AND column_name='NationalIdNumber'
-            ) THEN
-                UPDATE org.""Guarantors""
-                SET ""ElectronicNationalIdNumber"" = ""NationalIdNumber""
-                WHERE ""ElectronicNationalIdNumber"" IS NULL;
-            END IF;
-
-            IF EXISTS (
-                SELECT 1 FROM information_schema.columns
-                WHERE table_schema='org' AND table_name='Guarantors' AND column_name='IndentityCardNumber'
-            ) THEN
-                UPDATE org.""Guarantors""
-                SET ""ElectronicNationalIdNumber"" = ""IndentityCardNumber""::text
-                WHERE ""ElectronicNationalIdNumber"" IS NULL;
-            END IF;
-        END $$;
-    ");
-}
-catch (Exception ex)
-{
-    app.Logger.LogError(ex, "Schema guard failed. The application will continue starting, but some Company module queries may fail until the database schema is updated.");
-}
+// NOTE: Schema migrations have been moved to a one-time SQL script.
+// Run: Backend/Scripts/schema_migrations.sql against the database once.
+// This removes 2-5 seconds of startup time previously spent on 15+ ALTER/CREATE INDEX statements.
 
 // Seed database and create admin user
 try
@@ -296,6 +196,11 @@ catch (Exception ex)
 // Configure the HTTP request pipeline.
 // Use exception handler
 app.UseExceptionHandler();
+
+// NOTE: Response compression is handled by Nginx (brotli + gzip) at the edge.
+// Do NOT enable app.UseResponseCompression() here - it breaks Angular HttpClient
+// deserialization because the Kestrel-compressed body isn't decompressed by the
+// browser before Angular reads it.
 
 // Use CORS (must be before UseAuthentication and UseAuthorization)
 app.UseCors();

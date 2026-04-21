@@ -303,7 +303,6 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
       this.unittypes = unittypes;
       // Map unit types to localized versions with Dari labels
       this.localizedUnitTypes = this.mapUnitTypesToLocalized(unittypes);
-      //$('#unittype').select2();
     });
   }
 

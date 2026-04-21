@@ -23,26 +23,14 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './shared/auth.service';
 import { AuthInterceptor } from './auth/authSetting/auth.interceptor';
+import { ReferenceHandlerInterceptor } from './shared/reference-handler.interceptor';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { PrintComponent } from './print/print.component';
-import { PrintvehicledataComponent } from './printvehicledata/printvehicledata.component';
-import { PrintLicenseComponent } from './print-license/print-license.component';
-import { PrintSecuritiesComponent } from './print-securities/print-securities.component';
-import { PrintPetitionWriterSecuritiesComponent } from './print-petition-writer-securities/print-petition-writer-securities.component';
-import { PrintPetitionWriterLicenseComponent } from './print-petition-writer-license/print-petition-writer-license.component';
 import { SharedModule } from './shared/shared.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PrintComponent,
-    PrintvehicledataComponent,
-    PrintLicenseComponent,
-    PrintSecuritiesComponent,
-    PrintPetitionWriterSecuritiesComponent,
-    PrintPetitionWriterLicenseComponent,
-    
   ],
   imports: [
     BrowserModule,
@@ -78,6 +66,10 @@ import { DashboardModule } from './dashboard/dashboard.module';
   providers: [AuthService, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
+    multi: true
+  }, {
+    provide: HTTP_INTERCEPTORS,
+    useClass: ReferenceHandlerInterceptor,
     multi: true
   }],
   bootstrap: [AppComponent]

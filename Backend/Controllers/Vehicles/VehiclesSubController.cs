@@ -634,6 +634,7 @@ namespace WebAPIBackend.Controllers.Vehicles
                 .Include(v => v.VehiclesSellerDetails)
                 .Include(v => v.VehiclesBuyerDetails)
                 .Include(v => v.VehiclesWitnessDetails)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(v => v.Id == vehicleDetailsId);
 
             if (vehicleDetails == null)

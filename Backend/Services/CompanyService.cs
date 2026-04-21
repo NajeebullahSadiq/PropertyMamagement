@@ -117,6 +117,7 @@ namespace WebAPIBackend.Services
             var company = await _context.CompanyDetails
                 .Include(c => c.CompanyOwners)
                 .Include(c => c.Guarantors)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.Id == companyId);
 
             if (company == null)

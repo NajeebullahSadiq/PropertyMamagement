@@ -7,8 +7,6 @@ import { LocalizationService } from 'src/app/shared/localization.service';
 import { PropertyService } from 'src/app/shared/property.service';
 import { FileService } from 'src/app/shared/file.service';
 import { DocumentViewerComponent } from 'src/app/shared/document-viewer/document-viewer.component';
-import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
-import { CalendarType } from 'src/app/models/calendar-type';
 
 @Component({
   selector: 'app-propertydetailsview',
@@ -26,7 +24,6 @@ export class PropertydetailsviewComponent extends BaseComponent {
     private localizationService: LocalizationService,
     private dialog: MatDialog,
     private fileService: FileService,
-    private calendarConversionService: CalendarConversionService
   ) {
     super();
   }
@@ -178,18 +175,6 @@ export class PropertydetailsviewComponent extends BaseComponent {
       return this.viewData.customDocumentType;
     }
     return this.safeValue(docType);
-  }
-
-  formatDate(value: any): string {
-    if (!value) {
-      return '---';
-    }
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) {
-      return '---';
-    }
-    // Convert to Hijri Shamsi
-    return this.calendarConversionService.formatDate(d, CalendarType.HIJRI_SHAMSI);
   }
 
   getFileName(filePath: string): string {
