@@ -65,14 +65,8 @@ namespace WebAPIBackend.Controllers.Securities
                         SecurityDocumentTypeName = GetSecurityDocumentTypeName(x.SecurityDocumentType),
                         x.ProposalNumber,
                         x.ProposalDate,
-                        ProposalDateFormatted = x.ProposalDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ProposalDate, calendar)
-                            : "",
                         x.DistributionTicketNumber,
                         x.DeliveryDate,
-                        DeliveryDateFormatted = x.DeliveryDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
-                            : "",
                         x.SecuritiesType,
                         SecuritiesTypeName = GetSecuritiesTypeName(x.SecuritiesType),
                         TotalDocumentsCount = CalculateTotalDocuments(x),
@@ -129,14 +123,8 @@ namespace WebAPIBackend.Controllers.Securities
                     SecurityDocumentTypeName = GetSecurityDocumentTypeName(item.SecurityDocumentType),
                     item.ProposalNumber,
                     item.ProposalDate,
-                    ProposalDateFormatted = item.ProposalDate.HasValue
-                        ? DateConversionHelper.FormatDateOnly(item.ProposalDate, calendar)
-                        : "",
                     item.DistributionTicketNumber,
                     item.DeliveryDate,
-                    DeliveryDateFormatted = item.DeliveryDate.HasValue
-                        ? DateConversionHelper.FormatDateOnly(item.DeliveryDate, calendar)
-                        : "",
                     item.SecuritiesType,
                     SecuritiesTypeName = GetSecuritiesTypeName(item.SecuritiesType),
                     item.PropertySaleCount,

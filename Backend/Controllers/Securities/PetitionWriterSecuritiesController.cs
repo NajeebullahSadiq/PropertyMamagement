@@ -91,9 +91,7 @@ namespace WebAPIBackend.Controllers.Securities
                     x.SerialNumberStart,
                     x.SerialNumberEnd,
                     x.DistributionDate,
-                    DistributionDateFormatted = DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar),
                     x.DeliveryDate,
-                    DeliveryDateFormatted = DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar),
                     x.CreatedAt,
                     x.CreatedBy
                 }).ToList();
@@ -145,9 +143,7 @@ namespace WebAPIBackend.Controllers.Securities
                     item.SerialNumberStart,
                     item.SerialNumberEnd,
                     item.DistributionDate,
-                    DistributionDateFormatted = DateConversionHelper.FormatDateOnly(item.DistributionDate, calendar),
                     item.DeliveryDate,
-                    DeliveryDateFormatted = DateConversionHelper.FormatDateOnly(item.DeliveryDate, calendar),
                     item.CreatedAt,
                     item.CreatedBy,
                     item.UpdatedAt,

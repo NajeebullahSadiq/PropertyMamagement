@@ -106,13 +106,7 @@ namespace WebAPIBackend.Controllers.Securities
                                 x.TotalSecuritiesPrice,
                                 x.BankReceiptNumber,
                                 x.DeliveryDate,
-                                DeliveryDateFormatted = x.DeliveryDate.HasValue
-                                    ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
-                                    : "",
                                 x.DistributionDate,
-                                DistributionDateFormatted = x.DistributionDate.HasValue
-                                    ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
-                                    : "",
                                 x.CreatedAt,
                                 x.CreatedBy
                             })
@@ -156,13 +150,7 @@ namespace WebAPIBackend.Controllers.Securities
                                 x.TotalSecuritiesPrice,
                                 x.BankReceiptNumber,
                                 x.DeliveryDate,
-                                DeliveryDateFormatted = x.DeliveryDate.HasValue
-                                    ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
-                                    : "",
                                 x.DistributionDate,
-                                DistributionDateFormatted = x.DistributionDate.HasValue
-                                    ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
-                                    : "",
                                 x.CreatedAt,
                                 x.CreatedBy
                             })
@@ -200,13 +188,7 @@ namespace WebAPIBackend.Controllers.Securities
                             x.TotalSecuritiesPrice,
                             x.BankReceiptNumber,
                             x.DeliveryDate,
-                            DeliveryDateFormatted = x.DeliveryDate.HasValue
-                                ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
-                                : "",
                             x.DistributionDate,
-                            DistributionDateFormatted = x.DistributionDate.HasValue
-                                ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
-                                : "",
                             x.CreatedAt,
                             x.CreatedBy
                         })
@@ -263,13 +245,7 @@ namespace WebAPIBackend.Controllers.Securities
                         x.TotalSecuritiesPrice,
                         x.BankReceiptNumber,
                         x.DeliveryDate,
-                        DeliveryDateFormatted = x.DeliveryDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.DeliveryDate, calendar)
-                            : "",
                         x.DistributionDate,
-                        DistributionDateFormatted = x.DistributionDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.DistributionDate, calendar)
-                            : "",
                         x.CreatedAt,
                         x.CreatedBy,
                         x.UpdatedAt,
