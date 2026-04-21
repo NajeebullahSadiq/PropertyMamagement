@@ -293,13 +293,12 @@ export class SecuritiesReportComponent extends BaseComponent implements OnInit {
             }
         });
     }
-
     private downloadAsExcel(data: any[]): void {
         // Convert to CSV format
         const headers = [
             'نمبر ثبت', 'نام صاحب امتیاز', 'نام رهنمای معاملات', 'نمبر جواز',
             'نوع سند', 'تعداد سته خرید و فروش جایداد', 'تعداد سته بیع وفا', 'تعداد سته کرایی',
-            'تعداد سته وسایط', 'تعداد سته تبادله', 'تعداد کتاب ثبت', 'تعداد کتاب ثبت مثنی',
+            'تعداد سته وسایط', 'تعداد کتاب ثبت', 'تعداد کتاب ثبت مثنی',
             'مبلغ سته‌ها', 'مبلغ کتاب ثبت', 'مبلغ مجموع', 'تاریخ توزیع'
         ];
 
@@ -315,7 +314,6 @@ export class SecuritiesReportComponent extends BaseComponent implements OnInit {
                 row.bayWafaCount || 0,
                 row.rentCount || 0,
                 row.vehicleSaleCount || 0,
-                row.vehicleExchangeCount || 0,
                 row.registrationBookCount || 0,
                 row.duplicateBookCount || 0,
                 row.totalDocumentsPrice || 0,
@@ -367,7 +365,7 @@ export class SecuritiesReportComponent extends BaseComponent implements OnInit {
             switch (field) {
                 case 'recordCount': return sum + (row.recordCount || 0);
                 case 'propertyDocs': return sum + (row.propertySaleCount || 0) + (row.bayWafaCount || 0) + (row.rentCount || 0);
-                case 'vehicleDocs': return sum + (row.vehicleSaleCount || 0) + (row.vehicleExchangeCount || 0);
+                case 'vehicleDocs': return sum + (row.vehicleSaleCount || 0);
                 case 'books': return sum + (row.registrationBookCount || 0) + (row.duplicateBookCount || 0);
                 case 'totalPrice': return sum + (row.totalSecuritiesPrice || 0);
                 default: return sum;

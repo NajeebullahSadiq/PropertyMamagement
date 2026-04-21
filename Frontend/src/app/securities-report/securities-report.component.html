@@ -206,10 +206,6 @@
             <div class="text-2xl font-dari-bold text-cyan-700">{{ formatNumber(summary.vehicleSaleCount) }}</div>
             <div class="text-xs text-cyan-600">سته خرید و فروش وسایط</div>
           </div>
-          <div class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-4 border border-pink-200">
-            <div class="text-2xl font-dari-bold text-pink-700">{{ formatNumber(summary.vehicleExchangeCount) }}</div>
-            <div class="text-xs text-pink-600">سته تبادله</div>
-          </div>
           <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 border border-indigo-200">
             <div class="text-2xl font-dari-bold text-indigo-700">{{ formatNumber(summary.registrationBookCount) }}</div>
             <div class="text-xs text-indigo-600">کتاب ثبت</div>
@@ -280,7 +276,7 @@
                 <span class="text-blue-600">{{ row.propertySaleCount + row.bayWafaCount + row.rentCount }}</span>
               </td>
               <td class="px-3 py-2 text-center">
-                <span class="text-purple-600">{{ row.vehicleSaleCount + row.vehicleExchangeCount }}</span>
+                <span class="text-purple-600">{{ row.vehicleSaleCount }}</span>
               </td>
               <td class="px-3 py-2 text-center">
                 <span class="text-amber-600">{{ row.registrationBookCount + row.duplicateBookCount }}</span>

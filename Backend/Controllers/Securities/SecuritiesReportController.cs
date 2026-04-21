@@ -37,7 +37,6 @@ public class SecuritiesReportController : ControllerBase
                 new { id = "bayWafaCount",         name = "تعداد سته بیع وفا",            category = "quantitative" },
                 new { id = "rentCount",            name = "تعداد سته کرایی",              category = "quantitative" },
                 new { id = "vehicleSaleCount",     name = "تعداد سته وسایط نقلیه",        category = "quantitative" },
-                new { id = "vehicleExchangeCount", name = "تعداد سته تبادله",             category = "quantitative" },
                 new { id = "registrationBookCount",name = "تعداد کتاب ثبت",              category = "quantitative" },
                 new { id = "duplicateBookCount",   name = "تعداد کتاب ثبت مثنی",         category = "quantitative" },
                 new { id = "totalDocumentsPrice",  name = "مبلغ سته‌ها",                  category = "financial" },
@@ -116,8 +115,8 @@ public class SecuritiesReportController : ControllerBase
                     vehicleSaleCount        = g.SelectMany(d => d.Items).Where(i => i.DocumentType == 4).Sum(i => i.Count),
                     registrationBookCount   = g.SelectMany(d => d.Items).Where(i => i.DocumentType == 5).Sum(i => i.Count),
                     duplicateBookCount      = g.SelectMany(d => d.Items).Where(i => i.DocumentType == 6).Sum(i => i.Count),
-                    totalDocumentsPrice     = g.Sum(d => d.TotalDocumentsPrice ?? 0),
-                    totalSecuritiesPrice    = g.Sum(d => d.TotalSecuritiesPrice ?? 0)
+                    totalDocumentsPrice     = g.SelectMany(d => d.Items).Where(i => i.DocumentType >= 1 && i.DocumentType <= 4).Sum(i => i.Price * i.Count),
+                    totalSecuritiesPrice    = g.SelectMany(d => d.Items).Sum(i => i.Price * i.Count)
                 })
                 .OrderByDescending(x => x.totalSecuritiesPrice)
                 .ToList();
@@ -272,7 +271,7 @@ public class SecuritiesReportController : ControllerBase
                     recordCount    = g.Count(),
                     totalDocuments = g.SelectMany(d => d.Distribution.Items).Where(i => i.DocumentType >= 1 && i.DocumentType <= 4).Sum(i => i.Count),
                     totalBooks     = g.SelectMany(d => d.Distribution.Items).Where(i => i.DocumentType == 5 || i.DocumentType == 6).Sum(i => i.Count),
-                    totalAmount    = g.Sum(d => d.Distribution.TotalSecuritiesPrice ?? 0)
+                    totalAmount    = g.SelectMany(d => d.Distribution.Items).Sum(i => i.Price * i.Count)
                 })
                 .OrderBy(x => x.year).ThenBy(x => x.month)
                 .ToList();
@@ -358,7 +357,21 @@ public class SecuritiesReportController : ControllerBase
             if (!string.IsNullOrEmpty(request.RegistrationNumber))
                 query = query.Where(x => x.RegistrationNumber.Contains(request.RegistrationNumber));
 
+            // Apply amount range filters
+            if (request.MinAmount.HasValue)
+                query = query.Where(x => x.TotalSecuritiesPrice >= request.MinAmount.Value);
+            if (request.MaxAmount.HasValue)
+                query = query.Where(x => x.TotalSecuritiesPrice <= request.MaxAmount.Value);
+
             var distributions = await query.Include(x => x.Items).ToListAsync();
+
+            // Apply document type filter (filter distributions that have items of the specified type)
+            if (request.DocumentType.HasValue)
+                distributions = distributions.Where(d => d.Items.Any(i => i.DocumentType == request.DocumentType.Value)).ToList();
+
+            // Apply registration book type filter (5 = کتاب ثبت, 6 = کتاب ثبت مثنی)
+            if (request.RegistrationBookType.HasValue)
+                distributions = distributions.Where(d => d.Items.Any(i => i.DocumentType == request.RegistrationBookType.Value)).ToList();
 
             var data = distributions.Select(d => new
             {
@@ -370,8 +383,8 @@ public class SecuritiesReportController : ControllerBase
                 d.LicenseNumber,
                 d.BankReceiptNumber,
                 d.PricePerDocument,
-                d.TotalDocumentsPrice,
-                d.TotalSecuritiesPrice,
+                totalDocumentsPrice   = d.Items.Where(i => i.DocumentType >= 1 && i.DocumentType <= 4).Sum(i => i.Price * i.Count),
+                totalSecuritiesPrice  = d.Items.Sum(i => i.Price * i.Count),
                 distributionDate     = DateConversionHelper.FormatDateOnly(d.DistributionDate, calendar),
                 deliveryDate         = DateConversionHelper.FormatDateOnly(d.DeliveryDate, calendar),
                 propertySaleCount    = d.Items.Where(i => i.DocumentType == 1).Sum(i => i.Count),
@@ -468,17 +481,16 @@ public class SecuritiesReportController : ControllerBase
             bayWafaCount,
             rentCount,
             vehicleSaleCount,
-            vehicleExchangeCount  = 0,   // kept for frontend compatibility
             registrationBookCount,
             duplicateBookCount,
             totalPropertyDocuments= propertySaleCount + bayWafaCount + rentCount,
             totalVehicleDocuments = vehicleSaleCount,
             totalDocuments        = propertySaleCount + bayWafaCount + rentCount + vehicleSaleCount,
             totalBookCount        = registrationBookCount + duplicateBookCount,
-            totalDocumentsPrice   = distributions.Sum(d => d.TotalDocumentsPrice ?? 0),
+            totalDocumentsPrice   = allItems.Where(i => i.DocumentType >= 1 && i.DocumentType <= 4).Sum(i => i.Price * i.Count),
             totalRegistrationBookPrice = allItems.Where(i => i.DocumentType == 5 || i.DocumentType == 6)
                                                  .Sum(i => i.Price * i.Count),
-            totalSecuritiesPrice  = distributions.Sum(d => d.TotalSecuritiesPrice ?? 0)
+            totalSecuritiesPrice  = allItems.Sum(i => i.Price * i.Count)
         };
     }
 
@@ -509,6 +521,9 @@ public class SecuritiesReportController : ControllerBase
         if (!string.IsNullOrEmpty(request.TransactionGuideName)) filters.Add($"رهنمای معاملات: {request.TransactionGuideName}");
         if (!string.IsNullOrEmpty(request.LicenseNumber))     filters.Add($"نمبر جواز: {request.LicenseNumber}");
         if (!string.IsNullOrEmpty(request.RegistrationNumber))filters.Add($"نمبر ثبت: {request.RegistrationNumber}");
+        if (request.DocumentType.HasValue) filters.Add($"نوع سند: {request.DocumentType.Value}");
+        if (request.MinAmount.HasValue)    filters.Add($"حداقل مبلغ: {request.MinAmount.Value}");
+        if (request.MaxAmount.HasValue)    filters.Add($"حداکثر مبلغ: {request.MaxAmount.Value}");
         return filters;
     }
 

@@ -34,7 +34,6 @@ export interface SecuritiesReportSummary {
     bayWafaCount: number;
     rentCount: number;
     vehicleSaleCount: number;
-    vehicleExchangeCount: number;
     registrationBookCount: number;
     duplicateBookCount: number;
     totalBookCount: number;
@@ -59,7 +58,6 @@ export interface SecuritiesReportRow {
     bayWafaCount: number;
     rentCount: number;
     vehicleSaleCount: number;
-    vehicleExchangeCount: number;
     registrationBookCount: number;
     duplicateBookCount: number;
     totalDocuments: number;
@@ -71,7 +69,6 @@ export interface SecuritiesReportRow {
     bayWafaSerialRange?: string;
     rentSerialRange?: string;
     vehicleSaleSerialRange?: string;
-    vehicleExchangeSerialRange?: string;
     distributionDate?: string;
     deliveryDate?: string;
 }
@@ -95,7 +92,6 @@ export interface ReportConfig {
     groupByOptions: { id: string; name: string }[];
     documentTypes: { id: number; name: string }[];
     propertySubTypes: { id: number; name: string }[];
-    vehicleSubTypes: { id: number; name: string }[];
     bookTypes: { id: number; name: string }[];
 }
 
