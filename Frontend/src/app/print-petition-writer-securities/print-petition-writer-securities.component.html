@@ -20,7 +20,7 @@
   
   <div class="header-info">
     <p><strong>نمبر ثبت تعرفه:</strong> {{ item.registrationNumber }}</p>
-    <p><strong>تاریخ توزیع:</strong> {{ item.distributionDateFormatted || '-' }}</p>
+    <p><strong>تاریخ توزیع:</strong> {{ (item.distributionDate | calendarDate) || '-' }}</p>
   </div>
 
   <!-- Section 1: مشخصات عریضه‌نویس -->
@@ -62,7 +62,7 @@
         <td class="label">آویز نمبر بانکی:</td>
         <td class="value">{{ item.bankReceiptNumber }}</td>
         <td class="label">تاریخ توزیع عریضه:</td>
-        <td class="value">{{ item.distributionDateFormatted || '-' }}</td>
+        <td class="value">{{ (item.distributionDate | calendarDate) || '-' }}</td>
       </tr>
       <tr>
         <td class="label">آغاز سریال نمبر عریضه:</td>

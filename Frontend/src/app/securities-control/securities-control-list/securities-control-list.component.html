@@ -91,7 +91,7 @@
               <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ (page - 1) * pageSize + i + 1 }}</td>
               <td class="px-4 py-3 text-sm text-gray-700 font-semibold">{{ item.serialNumber }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.proposalNumber || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.proposalDateFormatted || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ (item.proposalDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.distributionTicketNumber || '-' }}</td>
               <td class="px-4 py-3 text-sm">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
@@ -103,7 +103,7 @@
                   {{ getTotalDocumentCount(item) }} جلد
                 </span>
               </td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.deliveryDateFormatted || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ (item.deliveryDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialRangeStart || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialRangeEnd || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.distributionStartNumber || '-' }}</td>

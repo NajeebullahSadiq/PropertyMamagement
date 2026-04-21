@@ -109,9 +109,9 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
                     totalDocumentsPrice: data.totalDocumentsPrice,
                     totalSecuritiesPrice: data.totalSecuritiesPrice,
                     bankReceiptNumber: data.bankReceiptNumber,
-                    // Use formatted (Hijri Shamsi) dates for display in the datepicker
-                    deliveryDate: data.deliveryDateFormatted || null,
-                    distributionDate: data.distributionDateFormatted || null
+                    // Use raw date fields - global JSON converter already converts DateOnly? to Hijri Shamsi strings
+                    deliveryDate: data.deliveryDate || null,
+                    distributionDate: data.distributionDate || null
                 });
 
                 // Load items

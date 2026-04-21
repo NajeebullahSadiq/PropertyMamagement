@@ -20,7 +20,7 @@
   
   <div class="header-info">
     <p>نمبر ثبت: {{ item.registrationNumber }}</p>
-    <p>تاریخ توزیع: {{ item.distributionDateFormatted || '-' }}</p>
+    <p>تاریخ توزیع: {{ (item.distributionDate | calendarDate) || '-' }}</p>
   </div>
 
   <!-- Section 1: مشخصات رهنمای معاملات -->
@@ -97,11 +97,11 @@
         <td class="label">آویز نمبر بانکی:</td>
         <td class="value">{{ item.bankReceiptNumber || '-' }}</td>
         <td class="label">تاریخ تحویلی:</td>
-        <td class="value">{{ item.deliveryDateFormatted || '-' }}</td>
+        <td class="value">{{ (item.deliveryDate | calendarDate) || '-' }}</td>
       </tr>
       <tr>
         <td class="label">تاریخ توزیع:</td>
-        <td class="value" colspan="3">{{ item.distributionDateFormatted || '-' }}</td>
+        <td class="value" colspan="3">{{ (item.distributionDate | calendarDate) || '-' }}</td>
       </tr>
     </table>
   </div>

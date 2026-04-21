@@ -338,7 +338,7 @@
                 </span>
               </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.bankReceiptNumber || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.distributionDateFormatted || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700">{{ (item.distributionDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3">
                 <button (click)="viewDetails(item.id!)" 
                   class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" 

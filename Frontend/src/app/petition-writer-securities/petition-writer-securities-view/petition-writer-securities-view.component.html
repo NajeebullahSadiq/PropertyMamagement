@@ -114,6 +114,6 @@
           </div>
           <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ توزیع عریضه</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ item.distributionDateFormatted || '-' }}</p>
+            <p class="text-gray-900 font-semibold text-lg">{{ (item.distributionDate | calendarDate) || '-' }}</p>
           </div>
  

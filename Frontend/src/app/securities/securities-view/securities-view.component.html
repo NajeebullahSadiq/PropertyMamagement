@@ -182,11 +182,11 @@
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100 text-center">
               <span class="text-sm text-gray-500 flex items-center justify-center gap-2"><i class="fas fa-calendar text-purple-500"></i>تاریخ تحویلی</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.deliveryDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (item.deliveryDate | calendarDate) || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100 text-center">
               <span class="text-sm text-gray-500 flex items-center justify-center gap-2"><i class="fas fa-calendar-check text-purple-500"></i>تاریخ توزیع اسناد بهادار</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.distributionDateFormatted || '-' }}</p>
+              <p class="font-bold text-gray-800 mt-1">{{ (item.distributionDate | calendarDate) || '-' }}</p>
             </div>
           </div>
         </div>

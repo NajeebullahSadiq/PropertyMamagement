@@ -72,7 +72,7 @@
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">تاریخ پیشنهاد:</span>
-                    <span class="font-semibold text-gray-800">{{ item.proposalDateFormatted || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ (item.proposalDate | calendarDate) || '-' }}</span>
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">نمبر تکت توزیع:</span>
@@ -80,7 +80,7 @@
                   </div>
                   <div class="flex justify-between border-b pb-2">
                     <span class="text-gray-600">تاریخ تسلیمی:</span>
-                    <span class="font-semibold text-gray-800">{{ item.deliveryDateFormatted || '-' }}</span>
+                    <span class="font-semibold text-gray-800">{{ (item.deliveryDate | calendarDate) || '-' }}</span>
                   </div>
                 </div>
               </div>
