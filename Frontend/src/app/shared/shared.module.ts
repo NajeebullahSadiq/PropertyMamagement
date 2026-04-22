@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
 import { ImageCropperModule } from 'ngx-image-cropper';
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -13,6 +15,9 @@ import { CalendarSelectorComponent } from './calendar-selector/calendar-selector
 import { CalendarDatePipe } from './calendar-date.pipe';
 import { DeleteConfirmationDialogComponent } from './delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
+import { LoadingSkeletonComponent } from './loading-skeleton/loading-skeleton.component';
+import { EmptyStateComponent } from './empty-state/empty-state.component';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 
 // RBAC Directives
 import {
@@ -44,6 +49,9 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     CalendarDatePipe,
     DeleteConfirmationDialogComponent,
     ConfirmationDialogComponent,
+    LoadingSkeletonComponent,
+    EmptyStateComponent,
+    BreadcrumbComponent,
     // RBAC Directives
     HasPermissionDirective,
     HasRoleDirective,
@@ -65,6 +73,8 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     FormsModule,
     ReactiveFormsModule,
     MatDialogModule,
+    MatIconModule,
+    RouterModule,
     ImageCropperModule,
     NgSelectModule
   ],
@@ -76,6 +86,9 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     CalendarDatePipe,
     DeleteConfirmationDialogComponent,
     ConfirmationDialogComponent,
+    LoadingSkeletonComponent,
+    EmptyStateComponent,
+    BreadcrumbComponent,
     // RBAC Directives
     HasPermissionDirective,
     HasRoleDirective,

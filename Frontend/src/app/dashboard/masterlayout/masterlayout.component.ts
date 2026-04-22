@@ -61,6 +61,9 @@ export class MasterlayoutComponent extends BaseComponent implements AfterViewIni
   isUserMenuOpen = false;
   isLangMenuOpen = false;
 
+  // Sidebar section collapse states
+  sectionCollapsed: { [key: string]: boolean } = {};
+
   ngAfterViewInit() {
     this.observer.observe(['(max-width: 800px)']).pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res.matches) {
@@ -179,6 +182,14 @@ export class MasterlayoutComponent extends BaseComponent implements AfterViewIni
   closeAllMenus() {
     this.isUserMenuOpen = false;
     this.isLangMenuOpen = false;
+  }
+
+  toggleSection(section: string): void {
+    this.sectionCollapsed[section] = !this.sectionCollapsed[section];
+  }
+
+  isSectionCollapsed(section: string): boolean {
+    return this.sectionCollapsed[section] || false;
   }
 
   handleImageError() {

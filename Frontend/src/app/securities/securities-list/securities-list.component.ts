@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from 'src/app/shared/securities.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
+import { NotificationService } from 'src/app/shared/notification.service';
 import { SecuritiesDistribution } from 'src/app/models/SecuritiesDistribution';
 
 @Component({
@@ -38,13 +38,15 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
     reportData: any = null;
     isLoadingReport = false;
 
+    errorMessage: string | null = null;
+
     constructor(
         private securitiesService: SecuritiesService,
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService,
         private rbacService: RbacService,
         private router: Router,
-        private toastr: ToastrService
+        private notification: NotificationService
     ) {
         super();
     }
@@ -72,8 +74,9 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
 
     loadData(): void {
         this.isLoading = true;
+        this.errorMessage = null;
         const calendar = this.calendarService.getSelectedCalendar();
-        
+
         // Call API with search parameter - backend will handle serial number range search
         this.securitiesService.getAll(this.page, this.pageSize, this.searchTerm, calendar).subscribe({
             next: (response) => {
@@ -82,9 +85,9 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
                 this.isLoading = false;
             },
             error: (err) => {
-                this.toastr.error('خطا در بارگذاری اطلاعات');
                 this.isLoading = false;
-                console.error(err);
+                this.errorMessage = 'خطا در بارگذاری اطلاعات اسناد بهادار. لطفاً دوباره تلاش کنید';
+                this.notification.showHttpError(err);
             }
         });
     }
@@ -120,11 +123,11 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
         if (confirm('آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟')) {
             this.securitiesService.delete(id).subscribe({
                 next: (res) => {
-                    this.toastr.success(res.message || 'رکورد با موفقیت حذف شد');
+                    this.notification.showDeleteSuccess();
                     this.loadData();
                 },
                 error: (err) => {
-                    this.toastr.error(err.error?.message || 'خطا در حذف رکورد');
+                    this.notification.showHttpError(err);
                 }
             });
         }
@@ -177,17 +180,17 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
 
     generateReport(): void {
         if (!this.reportStartDate || !this.reportEndDate) {
-            this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+            this.notification.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
             return;
         }
 
         if (this.reportStartDate === '' || this.reportEndDate === '') {
-            this.toastr.warning('لطفاً تاریخ شروع و پایان را انتخاب کنید');
+            this.notification.warning('لطفاً تاریخ شروع و پایان را انتخاب کنید');
             return;
         }
 
         if (this.reportType === 'single' && !this.reportLicenseNumber) {
-            this.toastr.warning('لطفاً نمبر جواز را وارد کنید');
+            this.notification.warning('لطفاً نمبر جواز را وارد کنید');
             return;
         }
 
@@ -211,7 +214,7 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
                 this.isLoadingReport = false;
             },
             error: (err) => {
-                this.toastr.error('خطا در تولید گزارش');
+                this.notification.error('خطا در تولید گزارش');
                 this.isLoadingReport = false;
                 console.error('Report error:', err);
             }
@@ -220,7 +223,7 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
 
     exportToExcel(): void {
         if (!this.reportData) {
-            this.toastr.warning('ابتدا گزارش را تولید کنید');
+            this.notification.warning('ابتدا گزارش را تولید کنید');
             return;
         }
 
@@ -267,7 +270,7 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
         link.click();
         document.body.removeChild(link);
         
-        this.toastr.success('گزارش با موفقیت صادر شد');
+        this.notification.success('گزارش با موفقیت صادر شد');
     }
 
     private formatDateForBackend(dateValue: any): string {

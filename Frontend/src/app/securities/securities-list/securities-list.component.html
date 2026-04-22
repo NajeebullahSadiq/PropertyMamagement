@@ -289,17 +289,34 @@
       </div>
     </div>
 
-    <!-- Loading Indicator -->
-    <div *ngIf="isLoading" class="text-center py-8">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+    <!-- Error Banner -->
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+      <mat-icon class="text-red-500">error</mat-icon>
+      <span class="text-red-700">{{ errorMessage }}</span>
+      <button (click)="errorMessage = null; loadData()" class="mr-auto px-3 py-1 rounded-lg bg-red-100 text-red-700 text-sm hover:bg-red-200 transition-colors">
+        تلاش مجدد
+      </button>
     </div>
 
+    <!-- Loading Skeleton -->
+    <app-loading-skeleton *ngIf="isLoading" type="table" [rows]="5" [columns]="['','','','','','','','','','']" [columnWidths]="[5,10,15,10,12,10,12,10,10,8]"></app-loading-skeleton>
+
+    <!-- Empty State -->
+    <app-empty-state *ngIf="!isLoading && !errorMessage && (!items || items.length === 0)"
+                     icon="receipt_long"
+                     title="هیچ سند بهادار یافت نشد"
+                     description="در حال حاضر هیچ سند بهادار ثبت شده‌ای وجود ندارد"
+                     [showAction]="true"
+                     actionLabel="بارگذاری مجدد"
+                     actionIcon="refresh"
+                     (action)="loadData()">
+    </app-empty-state>
+
     <!-- Data Table -->
-    <div *ngIf="!isLoading" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+    <div *ngIf="!isLoading && items && items.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
       <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fas fa-table"></i>
+          <mat-icon class="text-white">table_chart</mat-icon>
           <span>لیست اسناد بهادار</span>
         </h2>
       </div>
@@ -320,7 +337,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }; let i = index" 
+            <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }; let i = index"
                 class="text-center hover:bg-blue-50 transition-colors">
               <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ (page - 1) * pageSize + i + 1 }}</td>
               <td class="px-4 py-3 text-sm text-gray-700 font-semibold">{{ item.registrationNumber }}</td>
@@ -340,36 +357,30 @@
               <td class="px-4 py-3 text-sm text-gray-700">{{ item.bankReceiptNumber || '-' }}</td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ (item.distributionDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3">
-                <button (click)="viewDetails(item.id!)" 
-                  class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" 
+                <button (click)="viewDetails(item.id!)"
+                  class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto"
                   title="مشاهده">
-                  <i class="fas fa-eye"></i>
+                  <mat-icon class="text-sm">visibility</mat-icon>
                   <span>مشاهده</span>
                 </button>
               </td>
               <td class="px-4 py-3">
-                <button *ngIf="canEdit" (click)="editItem(item.id!)" 
-                  class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" 
+                <button *ngIf="canEdit" (click)="editItem(item.id!)"
+                  class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto"
                   title="ویرایش">
-                  <i class="fas fa-edit"></i>
+                  <mat-icon class="text-sm">edit</mat-icon>
                   <span>ویرایش</span>
                 </button>
                 <span *ngIf="!canEdit" class="text-gray-400 text-sm">-</span>
               </td>
               <td class="px-4 py-3">
-                <button *ngIf="canPrint" (click)="printItem(item.id!)" 
-                  class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" 
+                <button *ngIf="canPrint" (click)="printItem(item.id!)"
+                  class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto"
                   title="چاپ">
-                  <i class="fas fa-print"></i>
+                  <mat-icon class="text-sm">print</mat-icon>
                   <span>چاپ</span>
                 </button>
                 <span *ngIf="!canPrint" class="text-gray-400 text-sm">-</span>
-              </td>
-            </tr>
-            <tr *ngIf="items.length === 0">
-              <td colspan="12" class="px-4 py-8 text-center text-gray-500">
-                <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
-                <p>هیچ رکوردی یافت نشد</p>
               </td>
             </tr>
           </tbody>

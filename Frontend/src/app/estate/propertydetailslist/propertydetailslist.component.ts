@@ -2,13 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { PropertyDetails, PropertyDetailsList } from 'src/app/models/PropertyDetail';
 import { PropertyService } from 'src/app/shared/property.service';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { RbacService } from 'src/app/shared/rbac.service';
+import { NotificationService } from 'src/app/shared/notification.service';
 import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
@@ -26,6 +26,9 @@ export class PropertydetailslistComponent extends BaseComponent {
   tableSize: number = 20;
   tableSizes: any = [10,20,50,100];
   
+  isLoading = false;
+  errorMessage: string | null = null;
+
   // RBAC flags
   isViewOnly = false;
   canCreate = false;
@@ -37,7 +40,7 @@ export class PropertydetailslistComponent extends BaseComponent {
   constructor(
     private http: HttpClient,
     private propertyService: PropertyService,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private router: Router,
     private localizationService: LocalizationService,
     private rbacService: RbacService,
@@ -63,17 +66,27 @@ export class PropertydetailslistComponent extends BaseComponent {
   }
 
   loadData(){
-    this.propertyService.getPropertyDetails(this.page, this.tableSize, this.searchTerm).pipe(takeUntil(this.destroy$)).subscribe(response => {
-      const items: any[] = response?.items || [];
-      // Ensure no English is visible in UI for property type and transaction type.
-      const mapped = items.map((p: any) => ({
-        ...p,
-        propertyTypeText: this.getDariPropertyTypeLabel(p.propertyTypeText),
-        transactionTypeText: this.getDariTransactionTypeLabel(p.transactionTypeText)
-      }));
-      this.properties = mapped;
-      this.filteredProperties = mapped;
-      this.count = response?.totalCount || 0;
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.propertyService.getPropertyDetails(this.page, this.tableSize, this.searchTerm).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        const items: any[] = response?.items || [];
+        // Ensure no English is visible in UI for property type and transaction type.
+        const mapped = items.map((p: any) => ({
+          ...p,
+          propertyTypeText: this.getDariPropertyTypeLabel(p.propertyTypeText),
+          transactionTypeText: this.getDariTransactionTypeLabel(p.transactionTypeText)
+        }));
+        this.properties = mapped;
+        this.filteredProperties = mapped;
+        this.count = response?.totalCount || 0;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = 'خطا در بارگذاری اطلاعات املاک. لطفاً دوباره تلاش کنید';
+        this.notification.showHttpError(err);
+      }
     });
   }
 
@@ -199,15 +212,15 @@ export class PropertydetailslistComponent extends BaseComponent {
       if (result) {
         this.propertyService.deleteProperty(propertyId).subscribe({
           next: (response) => {
-            this.toastr.success('سند ملکیت با موفقیت حذف شد', 'موفق');
+            this.notification.success('سند ملکیت با موفقیت حذف شد');
             this.loadData();
           },
           error: (error) => {
             console.error('Error deleting property:', error);
             if (error.status === 403) {
-              this.toastr.error('شما اجازه حذف سند ملکیت را ندارید', 'خطا');
+              this.notification.error('شما اجازه حذف سند ملکیت را ندارید');
             } else {
-              this.toastr.error('خطا در حذف سند ملکیت', 'خطا');
+              this.notification.error('خطا در حذف سند ملکیت');
             }
           }
         });

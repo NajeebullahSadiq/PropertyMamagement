@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
+import { NotificationService } from 'src/app/shared/notification.service';
 import { AuditLogService, AuditLog, AuditStatistics, AuditLogDetail } from './audit-log.service';
 
 @Component({
@@ -93,7 +94,8 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
   constructor(
     private auditLogService: AuditLogService,
     private fb: FormBuilder,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private notification: NotificationService
   ) {
     super();
     this.filterForm = this.fb.group({
@@ -118,7 +120,10 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
         console.log('Modules response:', modules);
         this.modules = modules || [];
       },
-      error: (err) => console.error('Failed to load modules', err)
+      error: (err) => {
+        console.error('Failed to load modules', err);
+        this.notification.showHttpError(err);
+      }
     });
   }
 
@@ -128,7 +133,10 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
         console.log('Action types response:', types);
         this.actionTypes = types || [];
       },
-      error: (err) => console.error('Failed to load action types', err)
+      error: (err) => {
+        console.error('Failed to load action types', err);
+        this.notification.showHttpError(err);
+      }
     });
   }
 
@@ -176,6 +184,7 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
       error: (err) => {
         console.error('Failed to load audit logs', err);
         this.isLoading = false;
+        this.notification.showHttpError(err);
         if (err.status === 403) {
           this.errorMessage = 'شما صلاحیت مشاهده لاگ فعالیت‌ها را ندارید';
         } else {

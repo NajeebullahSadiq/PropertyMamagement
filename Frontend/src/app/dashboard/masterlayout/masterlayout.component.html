@@ -80,6 +80,9 @@
   </button>
 </div>
 
+<!-- Breadcrumb -->
+<app-breadcrumb></app-breadcrumb>
+
 <!-- Sidenav Container -->
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav="matSidenav" class="sidenav-modern">
@@ -96,15 +99,20 @@
         [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>dashboard</mat-icon><span>{{ "dashboard" | translate }}</span>
       </a>
-      <div *ngIf="canAccessLicenseApplications" class="section-label">درخواست جواز رهنمای معاملات</div>
-      <a *ngIf="canAccessLicenseApplications && canManageLicenseApplications" routerLink="/license-applications"
-        routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-        <mat-icon>assignment</mat-icon><span>ثبت درخواست متقاضیان</span>
-      </a>
-      <a *ngIf="canAccessLicenseApplications" routerLink="/license-applications/list" routerLinkActive="active-nav"
-        class="nav-link">
-        <mat-icon>list_alt</mat-icon><span>جدول ثبت درخواست متقاضیان</span>
-      </a>
+      <div *ngIf="canAccessLicenseApplications" (click)="toggleSection('license')" class="section-label cursor-pointer flex items-center justify-between select-none hover:bg-slate-100 rounded-lg px-2 py-1 transition-colors">
+        <span>درخواست جواز رهنمای معاملات</span>
+        <mat-icon class="text-xs text-slate-400 transition-transform" [class.rotate-90]="!isSectionCollapsed('license')">chevron_left</mat-icon>
+      </div>
+      <div *ngIf="canAccessLicenseApplications && !isSectionCollapsed('license')" class="space-y-0.5">
+        <a *ngIf="canAccessLicenseApplications && canManageLicenseApplications" routerLink="/license-applications"
+          routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+          <mat-icon>assignment</mat-icon><span>ثبت درخواست متقاضیان</span>
+        </a>
+        <a *ngIf="canAccessLicenseApplications" routerLink="/license-applications/list" routerLinkActive="active-nav"
+          class="nav-link">
+          <mat-icon>list_alt</mat-icon><span>جدول ثبت درخواست متقاضیان</span>
+        </a>
+      </div>
       <div *ngIf="canAccessCompany" class="section-label">رهنما ها</div>
       <a *ngIf="canAccessCompany && canCreateCompany" routerLink="/realestate" routerLinkActive="active-nav"
         [routerLinkActiveOptions]="{exact: true}" class="nav-link">

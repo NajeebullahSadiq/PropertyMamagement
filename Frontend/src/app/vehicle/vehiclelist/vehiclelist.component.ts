@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { VehiclesDetailsList } from 'src/app/models/PropertyDetail';
 import { VehicleService } from 'src/app/shared/vehicle.service';
 import { RbacService } from 'src/app/shared/rbac.service';
+import { NotificationService } from 'src/app/shared/notification.service';
 
 @Component({
   selector: 'app-vehiclelist',
@@ -21,14 +21,16 @@ export class VehiclelistComponent extends BaseComponent {
   count: number = 0;
   tableSize: number = 20;
   tableSizes: any = [10,20,50,100];
+  isLoading = false;
+  errorMessage: string | null = null;
   isViewOnly: boolean = false;
   canEdit: boolean = false;
   canPrint: boolean = false;
 
   constructor(
-    private http: HttpClient, 
-    private vehicleservice: VehicleService, 
-    private toastr: ToastrService, 
+    private http: HttpClient,
+    private vehicleservice: VehicleService,
+    private notification: NotificationService,
     private router: Router,
     private rbacService: RbacService
   ) {
@@ -44,10 +46,20 @@ export class VehiclelistComponent extends BaseComponent {
   }
 
   loadData(){
-    this.vehicleservice.getPropertyDetails(this.page, this.tableSize, this.searchTerm).pipe(takeUntil(this.destroy$)).subscribe(response => {
-      this.properties = response?.items || [];
-      this.filteredProperties = this.properties;
-      this.count = response?.totalCount || 0;
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.vehicleservice.getPropertyDetails(this.page, this.tableSize, this.searchTerm).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        this.properties = response?.items || [];
+        this.filteredProperties = this.properties;
+        this.count = response?.totalCount || 0;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = 'خطا در بارگذاری اطلاعات وسایط نقلیه. لطفاً دوباره تلاش کنید';
+        this.notification.showHttpError(err);
+      }
     });
   }
 

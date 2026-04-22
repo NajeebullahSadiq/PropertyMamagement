@@ -8,6 +8,67 @@
     <p class="text-gray-500">نمای کلی از عملکرد سیستم و آمار معاملات</p>
   </div>
 
+  <!-- KPI Stat Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <!-- Total Properties -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">تعداد معاملات جایداد</p>
+          <h3 class="text-2xl font-bold text-gray-800">{{ dashboardData?.totalRecord?.totalTransaction || 0 }}</h3>
+          <p class="text-xs text-green-600 mt-1">
+            <span>{{ dashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</span> تکمیل شده
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+          <i class="fas fa-home text-emerald-600 text-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Vehicles -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">تعداد معاملات وسایط</p>
+          <h3 class="text-2xl font-bold text-gray-800">{{ vehicleDashboardData?.totalRecord?.totalTransaction || 0 }}</h3>
+          <p class="text-xs text-green-600 mt-1">
+            <span>{{ vehicleDashboardData?.totalRecord?.totalTransactionCompleted || 0 }}</span> تکمیل شده
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+          <i class="fas fa-car text-blue-600 text-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Companies -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">تعداد رهنمایان</p>
+          <h3 class="text-2xl font-bold text-gray-800">{{ totalCompany?.totalCompanyRegisterd?.totalTransaction || 0 }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+          <i class="fas fa-building text-purple-600 text-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expired Licenses -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">جوازهای منقضی شده</p>
+          <h3 class="text-2xl font-bold text-gray-800">{{ totalexpiredLicense?.totalLicenseExpired?.totalTransaction || 0 }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+          <i class="fas fa-exclamation-triangle text-amber-600 text-lg"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Charts Section -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">

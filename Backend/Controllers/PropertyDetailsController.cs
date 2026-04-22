@@ -148,10 +148,10 @@ namespace WebAPIBackend.Controllers
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
-                // Only show properties that belong to this company OR have NULL CompanyId (legacy records)
+                // Only show properties that belong to this company (records without a company are admin-only)
                 propertyQuery = _context.PropertyDetails
                     .AsNoTracking()
-                    .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
+                    .Where(p => p.CompanyId == user.CompanyId);
             }
             else
             {
@@ -256,10 +256,10 @@ namespace WebAPIBackend.Controllers
                     {
                         return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                     }
-                    // Show properties that belong to this company OR have NULL CompanyId (legacy records)
+                    // Only show properties that belong to this company (records without a company are admin-only)
                     propertyQuery = _context.PropertyDetails
                         .AsNoTracking()
-                        .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
+                        .Where(p => p.CompanyId == user.CompanyId);
                 }
                 else
                 {
@@ -359,9 +359,9 @@ namespace WebAPIBackend.Controllers
                 {
                     return StatusCode(403, new { message = "شما به هیچ رهنمای متصل نیستید" });
                 }
-                // Only show properties that belong to this company OR have NULL CompanyId (legacy records)
+                // Only show properties that belong to this company (records without a company are admin-only)
                 propertyQuery = _context.PropertyDetails
-                    .Where(p => p.CompanyId == user.CompanyId || p.CompanyId == null);
+                    .Where(p => p.CompanyId == user.CompanyId);
             }
             else
             {

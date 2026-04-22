@@ -30,14 +30,38 @@
       </div>
     </div>
 
+    <!-- Error Banner -->
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+      <mat-icon class="text-red-500">error</mat-icon>
+      <span class="text-red-700">{{ errorMessage }}</span>
+      <button (click)="errorMessage = null; loadData()" class="mr-auto px-3 py-1 rounded-lg bg-red-100 text-red-700 text-sm hover:bg-red-200 transition-colors">
+        تلاش مجدد
+      </button>
+    </div>
+
     <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
       <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
         <h2 class="text-xl font-bold text-white flex items-center gap-2">
-          <i class="fas fa-table"></i>
+          <mat-icon class="text-white">table_chart</mat-icon>
           <span>لیست وسایط نقلیه</span>
         </h2>
       </div>
-      <div class="overflow-x-auto">
+
+      <!-- Loading State -->
+      <app-loading-skeleton *ngIf="isLoading" type="table" [rows]="5" [columns]="['','','','','','','','']" [columnWidths]="[8,15,12,12,12,15,15,12]"></app-loading-skeleton>
+
+      <!-- Empty State -->
+      <app-empty-state *ngIf="!isLoading && !errorMessage && (!filteredProperties || filteredProperties.length === 0)"
+                       icon="directions_car"
+                       title="هیچ وسیله نقلیه یافت نشد"
+                       description="در حال حاضر هیچ وسیله نقلیه ثبت شده‌ای وجود ندارد"
+                       [showAction]="true"
+                       actionLabel="بارگذاری مجدد"
+                       actionIcon="refresh"
+                       (action)="loadData()">
+      </app-empty-state>
+
+      <div class="overflow-x-auto" *ngIf="!isLoading && filteredProperties && filteredProperties.length > 0">
         <table class="w-full">
           <thead class="bg-gray-50 border-b-2 border-gray-200">
             <tr class="text-center">
