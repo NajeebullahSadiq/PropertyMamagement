@@ -42,9 +42,13 @@ export class CancellationinfoComponent extends BaseComponent {
         this.cancellationForm = this.fb.group({
             id: [0],
             companyId: [''],
+            cancellationType: ['فسخ'],
             licenseCancellationLetterNumber: ['', [Validators.maxLength(100)]],
             revenueCancellationLetterNumber: ['', [Validators.maxLength(100)]],
             licenseCancellationLetterDate: [''],
+            revocationLetterNumber: ['', [Validators.maxLength(100)]],
+            revocationRevenueLetterNumber: ['', [Validators.maxLength(100)]],
+            revocationLetterDate: [''],
             remarks: ['', [Validators.maxLength(1000)]],
         });
     }
@@ -79,12 +83,30 @@ export class CancellationinfoComponent extends BaseComponent {
                             }
                         }
                         
+                        // Parse revocationLetterDate properly for the multi-calendar datepicker
+                        let revocationLetterDateValue: Date | null = null;
+                        if (info.revocationLetterDate) {
+                            const dateString: any = info.revocationLetterDate;
+                            if (typeof dateString === 'string') {
+                                revocationLetterDateValue = new Date(dateString);
+                                if (isNaN(revocationLetterDateValue.getTime())) {
+                                    revocationLetterDateValue = null;
+                                }
+                            } else if (dateString instanceof Date) {
+                                revocationLetterDateValue = dateString;
+                            }
+                        }
+                        
                         this.cancellationForm.setValue({
                             id: info.id || 0,
                             companyId: info.companyId,
+                            cancellationType: info.cancellationType || 'فسخ',
                             licenseCancellationLetterNumber: info.licenseCancellationLetterNumber || '',
                             revenueCancellationLetterNumber: info.revenueCancellationLetterNumber || '',
                             licenseCancellationLetterDate: licenseCancellationLetterDateValue,
+                            revocationLetterNumber: info.revocationLetterNumber || '',
+                            revocationRevenueLetterNumber: info.revocationRevenueLetterNumber || '',
+                            revocationLetterDate: revocationLetterDateValue,
                             remarks: info.remarks || '',
                         });
                         this.selectedId = info.id || 0;
@@ -127,13 +149,18 @@ export class CancellationinfoComponent extends BaseComponent {
 
         const formValue = this.cancellationForm.value;
         const licenseCancellationLetterDateValue = this.cancellationForm.get('licenseCancellationLetterDate')?.value;
+        const revocationLetterDateValue = this.cancellationForm.get('revocationLetterDate')?.value;
 
         const data: CancellationInfoData = {
             id: this.selectedId,
             companyId: this.comservice.mainTableId,
-            licenseCancellationLetterNumber: formValue.licenseCancellationLetterNumber || undefined,
-            revenueCancellationLetterNumber: formValue.revenueCancellationLetterNumber || undefined,
-            licenseCancellationLetterDate: licenseCancellationLetterDateValue ? this.formatDateForBackend(licenseCancellationLetterDateValue) : undefined,
+            cancellationType: formValue.cancellationType || 'فسخ',
+            licenseCancellationLetterNumber: formValue.cancellationType === 'فسخ' ? (formValue.licenseCancellationLetterNumber || undefined) : undefined,
+            revenueCancellationLetterNumber: formValue.cancellationType === 'فسخ' ? (formValue.revenueCancellationLetterNumber || undefined) : undefined,
+            licenseCancellationLetterDate: formValue.cancellationType === 'فسخ' && licenseCancellationLetterDateValue ? this.formatDateForBackend(licenseCancellationLetterDateValue) : undefined,
+            revocationLetterNumber: formValue.cancellationType === 'لغوه' ? (formValue.revocationLetterNumber || undefined) : undefined,
+            revocationRevenueLetterNumber: formValue.cancellationType === 'لغوه' ? (formValue.revocationRevenueLetterNumber || undefined) : undefined,
+            revocationLetterDate: formValue.cancellationType === 'لغوه' && revocationLetterDateValue ? this.formatDateForBackend(revocationLetterDateValue) : undefined,
             remarks: formValue.remarks || undefined,
         };
 
@@ -159,12 +186,17 @@ export class CancellationinfoComponent extends BaseComponent {
 
         const formValue = this.cancellationForm.value;
         const licenseCancellationLetterDateValue = this.cancellationForm.get('licenseCancellationLetterDate')?.value;
+        const revocationLetterDateValue = this.cancellationForm.get('revocationLetterDate')?.value;
 
         const data: CancellationInfoData = {
             companyId: this.comservice.mainTableId,
-            licenseCancellationLetterNumber: formValue.licenseCancellationLetterNumber || undefined,
-            revenueCancellationLetterNumber: formValue.revenueCancellationLetterNumber || undefined,
-            licenseCancellationLetterDate: licenseCancellationLetterDateValue ? this.formatDateForBackend(licenseCancellationLetterDateValue) : undefined,
+            cancellationType: formValue.cancellationType || 'فسخ',
+            licenseCancellationLetterNumber: formValue.cancellationType === 'فسخ' ? (formValue.licenseCancellationLetterNumber || undefined) : undefined,
+            revenueCancellationLetterNumber: formValue.cancellationType === 'فسخ' ? (formValue.revenueCancellationLetterNumber || undefined) : undefined,
+            licenseCancellationLetterDate: formValue.cancellationType === 'فسخ' && licenseCancellationLetterDateValue ? this.formatDateForBackend(licenseCancellationLetterDateValue) : undefined,
+            revocationLetterNumber: formValue.cancellationType === 'لغوه' ? (formValue.revocationLetterNumber || undefined) : undefined,
+            revocationRevenueLetterNumber: formValue.cancellationType === 'لغوه' ? (formValue.revocationRevenueLetterNumber || undefined) : undefined,
+            revocationLetterDate: formValue.cancellationType === 'لغوه' && revocationLetterDateValue ? this.formatDateForBackend(revocationLetterDateValue) : undefined,
             remarks: formValue.remarks || undefined,
         };
 
@@ -193,8 +225,20 @@ export class CancellationinfoComponent extends BaseComponent {
     }
 
     // Form control getters
+    get cancellationType() { return this.cancellationForm.get('cancellationType'); }
     get licenseCancellationLetterNumber() { return this.cancellationForm.get('licenseCancellationLetterNumber'); }
     get revenueCancellationLetterNumber() { return this.cancellationForm.get('revenueCancellationLetterNumber'); }
     get licenseCancellationLetterDate() { return this.cancellationForm.get('licenseCancellationLetterDate'); }
+    get revocationLetterNumber() { return this.cancellationForm.get('revocationLetterNumber'); }
+    get revocationRevenueLetterNumber() { return this.cancellationForm.get('revocationRevenueLetterNumber'); }
+    get revocationLetterDate() { return this.cancellationForm.get('revocationLetterDate'); }
     get remarks() { return this.cancellationForm.get('remarks'); }
+
+    // Helper for template
+    get isFaskh(): boolean {
+        return this.cancellationForm.get('cancellationType')?.value === 'فسخ';
+    }
+    get isLaghwa(): boolean {
+        return this.cancellationForm.get('cancellationType')?.value === 'لغوه';
+    }
 }

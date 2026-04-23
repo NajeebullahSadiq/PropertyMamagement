@@ -11,8 +11,36 @@
         <input type="hidden" formControlName="companyId">
       </div>
 
-      <!-- License Cancellation Information Section -->
+      <!-- Cancellation Type Selection -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-file-contract"></i>
+            <span>نوعیت ختم جواز</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Cancellation Type Dropdown -->
+            <div>
+              <label for="cancellationType" class="block text-sm font-semibold text-gray-700 mb-2"> نوعیت ختم جواز</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-list-alt"></i>
+                </span>
+                <select id="cancellationType" formControlName="cancellationType"
+                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all appearance-none bg-white">
+                  <option value="فسخ">فسخ</option>
+                  <option value="لغوه">لغوه</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- فسخ Fields (shown when cancellationType is فسخ) -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" *ngIf="isFaskh">
         <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
             <i class="fas fa-file-contract"></i>
@@ -58,6 +86,59 @@
               <app-multi-calendar-datepicker
                 formControlName="licenseCancellationLetterDate"
                 label="تاریخ مکتوب فسخ جواز">
+              </app-multi-calendar-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- لغوه Fields (shown when cancellationType is لغوه) -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" *ngIf="isLaghwa">
+        <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-ban"></i>
+            <span>معلومات لغوه جواز</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Revocation Letter Number (نمبر مکتوب لغوه جواز) -->
+            <div>
+              <label for="revocationLetterNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر مکتوب لغوه جواز</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-alt"></i>
+                </span>
+                <input type="text" id="revocationLetterNumber" formControlName="revocationLetterNumber"
+                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="نمبر مکتوب لغوه جواز را وارد کنید" maxlength="100">
+              </div>
+              <div *ngIf="revocationLetterNumber?.invalid && (revocationLetterNumber?.dirty || revocationLetterNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="revocationLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
+              </div>
+            </div>
+
+            <!-- Revocation Revenue Letter Number (نمبر مکتوب لغوه عواید) -->
+            <div>
+              <label for="revocationRevenueLetterNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر مکتوب لغوه عواید</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-file-invoice"></i>
+                </span>
+                <input type="text" id="revocationRevenueLetterNumber" formControlName="revocationRevenueLetterNumber"
+                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="نمبر مکتوب لغوه عواید را وارد کنید" maxlength="100">
+              </div>
+              <div *ngIf="revocationRevenueLetterNumber?.invalid && (revocationRevenueLetterNumber?.dirty || revocationRevenueLetterNumber?.touched)">
+                <small class="text-red-600 text-xs mt-1 block" *ngIf="revocationRevenueLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
+              </div>
+            </div>
+
+            <!-- Revocation Letter Date (تاریخ مکتوب لغوه جواز) -->
+            <div>
+              <app-multi-calendar-datepicker
+                formControlName="revocationLetterDate"
+                label="تاریخ مکتوب لغوه جواز">
               </app-multi-calendar-datepicker>
             </div>
           </div>

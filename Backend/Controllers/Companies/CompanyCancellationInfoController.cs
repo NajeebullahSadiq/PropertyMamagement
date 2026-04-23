@@ -60,15 +60,23 @@ namespace WebAPIBackend.Controllers.Companies
                 var licenseCancellationLetterDateFormatted = cancellationInfo.LicenseCancellationLetterDate.HasValue
                     ? DateConversionHelper.FormatDateOnly(cancellationInfo.LicenseCancellationLetterDate, calendar)
                     : "";
+                var revocationLetterDateFormatted = cancellationInfo.RevocationLetterDate.HasValue
+                    ? DateConversionHelper.FormatDateOnly(cancellationInfo.RevocationLetterDate, calendar)
+                    : "";
 
                 var result = new
                 {
                     cancellationInfo.Id,
                     cancellationInfo.CompanyId,
+                    cancellationInfo.CancellationType,
                     cancellationInfo.LicenseCancellationLetterNumber,
                     cancellationInfo.RevenueCancellationLetterNumber,
                     cancellationInfo.LicenseCancellationLetterDate,
                     licenseCancellationLetterDateFormatted,
+                    cancellationInfo.RevocationLetterNumber,
+                    cancellationInfo.RevocationRevenueLetterNumber,
+                    cancellationInfo.RevocationLetterDate,
+                    revocationLetterDateFormatted,
                     cancellationInfo.Remarks,
                     cancellationInfo.CreatedAt,
                     cancellationInfo.CreatedBy,
@@ -108,6 +116,10 @@ namespace WebAPIBackend.Controllers.Companies
                 return BadRequest(new { message = "Cancellation info already exists for this company. Use PUT to update." });
             }
 
+            if (!string.IsNullOrEmpty(request.CancellationType) && request.CancellationType.Length > 20)
+            {
+                return BadRequest(new { errors = new { cancellationType = new[] { "Cancellation type cannot exceed 20 characters" } } });
+            }
             if (!string.IsNullOrEmpty(request.LicenseCancellationLetterNumber) && request.LicenseCancellationLetterNumber.Length > 100)
             {
                 return BadRequest(new { errors = new { licenseCancellationLetterNumber = new[] { "License cancellation letter number cannot exceed 100 characters" } } });
@@ -115,6 +127,14 @@ namespace WebAPIBackend.Controllers.Companies
             if (!string.IsNullOrEmpty(request.RevenueCancellationLetterNumber) && request.RevenueCancellationLetterNumber.Length > 100)
             {
                 return BadRequest(new { errors = new { revenueCancellationLetterNumber = new[] { "Revenue cancellation letter number cannot exceed 100 characters" } } });
+            }
+            if (!string.IsNullOrEmpty(request.RevocationLetterNumber) && request.RevocationLetterNumber.Length > 100)
+            {
+                return BadRequest(new { errors = new { revocationLetterNumber = new[] { "Revocation letter number cannot exceed 100 characters" } } });
+            }
+            if (!string.IsNullOrEmpty(request.RevocationRevenueLetterNumber) && request.RevocationRevenueLetterNumber.Length > 100)
+            {
+                return BadRequest(new { errors = new { revocationRevenueLetterNumber = new[] { "Revocation revenue letter number cannot exceed 100 characters" } } });
             }
             if (!string.IsNullOrEmpty(request.Remarks) && request.Remarks.Length > 1000)
             {
@@ -126,9 +146,13 @@ namespace WebAPIBackend.Controllers.Companies
             var cancellationInfo = new CompanyCancellationInfo
             {
                 CompanyId = request.CompanyId,
+                CancellationType = request.CancellationType,
                 LicenseCancellationLetterNumber = request.LicenseCancellationLetterNumber,
                 RevenueCancellationLetterNumber = request.RevenueCancellationLetterNumber,
                 LicenseCancellationLetterDate = request.LicenseCancellationLetterDate,
+                RevocationLetterNumber = request.RevocationLetterNumber,
+                RevocationRevenueLetterNumber = request.RevocationRevenueLetterNumber,
+                RevocationLetterDate = request.RevocationLetterDate,
                 Remarks = request.Remarks,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = userId,
@@ -164,6 +188,10 @@ namespace WebAPIBackend.Controllers.Companies
                 return NotFound(new { message = "Cancellation info not found" });
             }
 
+            if (!string.IsNullOrEmpty(request.CancellationType) && request.CancellationType.Length > 20)
+            {
+                return BadRequest(new { errors = new { cancellationType = new[] { "Cancellation type cannot exceed 20 characters" } } });
+            }
             if (!string.IsNullOrEmpty(request.LicenseCancellationLetterNumber) && request.LicenseCancellationLetterNumber.Length > 100)
             {
                 return BadRequest(new { errors = new { licenseCancellationLetterNumber = new[] { "License cancellation letter number cannot exceed 100 characters" } } });
@@ -171,6 +199,14 @@ namespace WebAPIBackend.Controllers.Companies
             if (!string.IsNullOrEmpty(request.RevenueCancellationLetterNumber) && request.RevenueCancellationLetterNumber.Length > 100)
             {
                 return BadRequest(new { errors = new { revenueCancellationLetterNumber = new[] { "Revenue cancellation letter number cannot exceed 100 characters" } } });
+            }
+            if (!string.IsNullOrEmpty(request.RevocationLetterNumber) && request.RevocationLetterNumber.Length > 100)
+            {
+                return BadRequest(new { errors = new { revocationLetterNumber = new[] { "Revocation letter number cannot exceed 100 characters" } } });
+            }
+            if (!string.IsNullOrEmpty(request.RevocationRevenueLetterNumber) && request.RevocationRevenueLetterNumber.Length > 100)
+            {
+                return BadRequest(new { errors = new { revocationRevenueLetterNumber = new[] { "Revocation revenue letter number cannot exceed 100 characters" } } });
             }
             if (!string.IsNullOrEmpty(request.Remarks) && request.Remarks.Length > 1000)
             {
@@ -180,9 +216,13 @@ namespace WebAPIBackend.Controllers.Companies
             var createdBy = existingInfo.CreatedBy;
             var createdAt = existingInfo.CreatedAt;
 
+            existingInfo.CancellationType = request.CancellationType;
             existingInfo.LicenseCancellationLetterNumber = request.LicenseCancellationLetterNumber;
             existingInfo.RevenueCancellationLetterNumber = request.RevenueCancellationLetterNumber;
             existingInfo.LicenseCancellationLetterDate = request.LicenseCancellationLetterDate;
+            existingInfo.RevocationLetterNumber = request.RevocationLetterNumber;
+            existingInfo.RevocationRevenueLetterNumber = request.RevocationRevenueLetterNumber;
+            existingInfo.RevocationLetterDate = request.RevocationLetterDate;
             existingInfo.Remarks = request.Remarks;
 
             existingInfo.CreatedBy = createdBy;

@@ -413,22 +413,52 @@
             <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
               <i class="fas fa-ban text-white text-lg"></i>
             </div>
-            <h2 class="text-xl font-bold text-white">معلومات فسخ / لغوه</h2>
+            <h2 class="text-xl font-bold text-white">معلومات {{ viewData.cancellationInfo.cancellationType === 'لغوه' ? 'لغوه' : 'فسخ' }} جواز</h2>
           </div>
         </div>
         <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="p-5 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
-            <p class="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">نمبر مکتوب فسخ جواز</p>
-            <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.cancellationInfo.licenseCancellationLetterNumber) }}</p>
-          </div>
+          <!-- Cancellation Type -->
           <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ مکتوب فسخ جواز</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ viewData.cancellationInfo.licenseCancellationLetterDate | calendarDate }}</p>
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نوعیت</p>
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold shadow-lg"
+              [ngClass]="viewData.cancellationInfo.cancellationType === 'لغوه' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' : 'bg-gradient-to-r from-red-500 to-rose-500 text-white'">
+              <i class="fas" [ngClass]="viewData.cancellationInfo.cancellationType === 'لغوه' ? 'fa-ban' : 'fa-file-contract'"></i>
+              {{ viewData.cancellationInfo.cancellationType === 'لغوه' ? 'لغوه' : 'فسخ' }}
+            </span>
           </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر مکتوب فسخ عواید</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.cancellationInfo.revenueCancellationLetterNumber) }}</p>
-          </div>
+
+          <!-- فسخ fields -->
+          <ng-container *ngIf="viewData.cancellationInfo.cancellationType !== 'لغوه'">
+            <div class="p-5 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
+              <p class="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">نمبر مکتوب فسخ جواز</p>
+              <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.cancellationInfo.licenseCancellationLetterNumber) }}</p>
+            </div>
+            <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر مکتوب فسخ عواید</p>
+              <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.cancellationInfo.revenueCancellationLetterNumber) }}</p>
+            </div>
+            <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ مکتوب فسخ جواز</p>
+              <p class="text-gray-900 font-semibold text-lg">{{ viewData.cancellationInfo.licenseCancellationLetterDate | calendarDate }}</p>
+            </div>
+          </ng-container>
+
+          <!-- لغوه fields -->
+          <ng-container *ngIf="viewData.cancellationInfo.cancellationType === 'لغوه'">
+            <div class="p-5 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
+              <p class="text-xs font-bold text-orange-700 uppercase tracking-wide mb-2">نمبر مکتوب لغوه جواز</p>
+              <p class="text-gray-900 font-bold text-lg">{{ safeValue(viewData.cancellationInfo.revocationLetterNumber) }}</p>
+            </div>
+            <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر مکتوب لغوه عواید</p>
+              <p class="text-gray-900 font-semibold text-lg">{{ safeValue(viewData.cancellationInfo.revocationRevenueLetterNumber) }}</p>
+            </div>
+            <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ مکتوب لغوه جواز</p>
+              <p class="text-gray-900 font-semibold text-lg">{{ viewData.cancellationInfo.revocationLetterDate | calendarDate }}</p>
+            </div>
+          </ng-container>
+
           <div class="md:col-span-2 p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
             <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ملاحظات</p>
             <p class="text-gray-900 font-semibold text-lg whitespace-pre-line">{{ safeValue(viewData.cancellationInfo.remarks) }}</p>

@@ -379,9 +379,13 @@ namespace WebAPIBackend.Controllers.Companies
                         CancellationInfo = c.CompanyCancellationInfos.Select(ci => new
                         {
                             ci.Id,
+                            ci.CancellationType,
                             ci.LicenseCancellationLetterNumber,
                             ci.RevenueCancellationLetterNumber,
                             ci.LicenseCancellationLetterDate,
+                            ci.RevocationLetterNumber,
+                            ci.RevocationRevenueLetterNumber,
+                            ci.RevocationLetterDate,
                             ci.Remarks
                         }).FirstOrDefault()
                     })
@@ -435,24 +439,33 @@ namespace WebAPIBackend.Controllers.Companies
                 
                 if (existingCompany != null)
                 {
-                    // Check if the existing company has cancellation info (فسخ)
+                    // Check if the existing company has cancellation info (فسخ or لغوه)
                     var cancellationInfo = await _context.CompanyCancellationInfos
                         .FirstOrDefaultAsync(c => c.CompanyId == existingCompany.Id);
                     
-                    // If cancellation info exists and all three fields are filled
-                    bool isRevoked = cancellationInfo != null && 
+                    // Check if cancelled via فسخ (all three فسخ fields filled)
+                    bool isFaskh = cancellationInfo != null && 
                         !string.IsNullOrWhiteSpace(cancellationInfo.LicenseCancellationLetterNumber) &&
                         !string.IsNullOrWhiteSpace(cancellationInfo.RevenueCancellationLetterNumber) &&
                         cancellationInfo.LicenseCancellationLetterDate.HasValue;
+                    
+                    // Check if cancelled via لغوه (all three لغوه fields filled)
+                    bool isLaghwa = cancellationInfo != null && 
+                        !string.IsNullOrWhiteSpace(cancellationInfo.RevocationLetterNumber) &&
+                        !string.IsNullOrWhiteSpace(cancellationInfo.RevocationRevenueLetterNumber) &&
+                        cancellationInfo.RevocationLetterDate.HasValue;
+                    
+                    bool isRevoked = isFaskh || isLaghwa;
                     
                     if (isRevoked)
                     {
                         // If user hasn't confirmed, return a warning response
                         if (request.ConfirmRevokedDuplicate != true)
                         {
+                            var cancelType = isLaghwa ? "لغوه" : "فسخ";
                             return BadRequest(new { 
                                 requiresConfirmation = true,
-                                message = "این عنوان رهنمایی معاملات قبلاً ثبت شده است اما جواز آن فسخ شده است. آیا میخواهید ادامه دهید؟" 
+                                message = $"این عنوان رهنمایی معاملات قبلاً ثبت شده است اما جواز آن {cancelType} شده است. آیا میخواهید ادامه دهید؟" 
                             });
                         }
                         // If confirmed, allow creation (continue with the rest of the code)
@@ -550,24 +563,33 @@ namespace WebAPIBackend.Controllers.Companies
                 
                 if (duplicateCompany != null)
                 {
-                    // Check if the duplicate company has cancellation info (فسخ)
+                    // Check if the duplicate company has cancellation info (فسخ or لغوه)
                     var cancellationInfo = await _context.CompanyCancellationInfos
                         .FirstOrDefaultAsync(c => c.CompanyId == duplicateCompany.Id);
                     
-                    // If cancellation info exists and all three fields are filled
-                    bool isRevoked = cancellationInfo != null && 
+                    // Check if cancelled via فسخ (all three فسخ fields filled)
+                    bool isFaskh = cancellationInfo != null && 
                         !string.IsNullOrWhiteSpace(cancellationInfo.LicenseCancellationLetterNumber) &&
                         !string.IsNullOrWhiteSpace(cancellationInfo.RevenueCancellationLetterNumber) &&
                         cancellationInfo.LicenseCancellationLetterDate.HasValue;
+                    
+                    // Check if cancelled via لغوه (all three لغوه fields filled)
+                    bool isLaghwa = cancellationInfo != null && 
+                        !string.IsNullOrWhiteSpace(cancellationInfo.RevocationLetterNumber) &&
+                        !string.IsNullOrWhiteSpace(cancellationInfo.RevocationRevenueLetterNumber) &&
+                        cancellationInfo.RevocationLetterDate.HasValue;
+                    
+                    bool isRevoked = isFaskh || isLaghwa;
                     
                     if (isRevoked)
                     {
                         // If user hasn't confirmed, return a warning response
                         if (request.ConfirmRevokedDuplicate != true)
                         {
+                            var cancelType = isLaghwa ? "لغوه" : "فسخ";
                             return BadRequest(new { 
                                 requiresConfirmation = true,
-                                message = "این عنوان رهنمایی معاملات قبلاً ثبت شده است اما جواز آن فسخ شده است. آیا میخواهید ادامه دهید؟" 
+                                message = $"این عنوان رهنمایی معاملات قبلاً ثبت شده است اما جواز آن {cancelType} شده است. آیا میخواهید ادامه دهید؟" 
                             });
                         }
                         // If confirmed, allow update (continue with the rest of the code)

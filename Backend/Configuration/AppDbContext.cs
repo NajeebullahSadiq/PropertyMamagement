@@ -251,8 +251,11 @@ namespace WebAPIBackend.Configuration
 
                 entity.Property(e => e.CreatedAt).HasColumnType("timestamp without time zone");
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
+                entity.Property(e => e.CancellationType).HasMaxLength(20);
                 entity.Property(e => e.LicenseCancellationLetterNumber).HasMaxLength(100);
                 entity.Property(e => e.RevenueCancellationLetterNumber).HasMaxLength(100);
+                entity.Property(e => e.RevocationLetterNumber).HasMaxLength(100);
+                entity.Property(e => e.RevocationRevenueLetterNumber).HasMaxLength(100);
                 entity.Property(e => e.Remarks).HasMaxLength(1000);
 
                 entity.HasOne(d => d.Company).WithMany(p => p.CompanyCancellationInfos)
