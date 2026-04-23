@@ -1,5 +1,60 @@
 <div class="container p-6">
   <div class="max-w-7xl mx-auto">
+    <!-- Search License Application Section -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
+      <div class="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fas fa-search"></i>
+          <span>جستجو از درخواست جواز</span>
+        </h3>
+      </div>
+      <div class="px-6 py-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div class="md:col-span-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر عریضه</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                <i class="fas fa-hashtag"></i>
+              </span>
+              <input type="text" [(ngModel)]="serialNumberSearch" [ngModelOptions]="{standalone: true}" (keyup.enter)="searchBySerialNumber()" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all" placeholder="نمبر عریضه درخواست جواز را وارد کنید">
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <button type="button" (click)="searchBySerialNumber()" [disabled]="isSearching" class="w-full px-6 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+              <i class="fas" [ngClass]="isSearching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+              <span>جستجو</span>
+            </button>
+          </div>
+          <div class="md:col-span-6">
+            <p class="text-sm text-gray-500 mt-1">با جستجوی نمبر عریضه، معلومات متقاضی از درخواست جواز دریافت و فیلدهای زیر خودکار پر می‌شود: اسم، ولد، ولدیت، الیکټرونیکی تذکره نمبر، آدرس اصلی مالک، سکونت فعلی</p>
+          </div>
+        </div>
+        <!-- Search Results Dropdown -->
+        <div *ngIf="showSearchResults && searchResults.length > 0" class="mt-4 relative">
+          <div class="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+            <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+              <span class="text-sm font-semibold text-gray-700">{{ searchResults.length }} نتیجه یافت شد</span>
+              <button type="button" (click)="closeSearchResults()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div *ngFor="let item of searchResults" (click)="onSearchResultSelected(item)" class="px-4 py-3 hover:bg-amber-50 cursor-pointer border-b border-gray-100 transition-colors">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="font-semibold text-gray-800">{{ item.applicantName }}</span>
+                  <span *ngIf="item.applicantFatherName" class="text-gray-600 mx-1">ولد {{ item.applicantFatherName }}</span>
+                </div>
+                <span class="text-sm text-amber-600 font-mono bg-amber-50 px-2 py-1 rounded">{{ item.requestSerialNumber }}</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                <span *ngIf="item.applicantElectronicNumber">تذکره: {{ item.applicantElectronicNumber }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
       <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3">
         <h3 class="text-lg font-bold text-white flex items-center gap-2">

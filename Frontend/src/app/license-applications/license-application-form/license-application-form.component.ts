@@ -548,6 +548,44 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
         this.setGuaranteeTypeVisibility(guarantor.guaranteeTypeId);
     }
 
+    // Copy applicant info to guarantor (when owner is also the guarantor)
+    // Mapping: applicantName -> guarantorName, applicantFatherName -> guarantorFatherName
+    // permanent address -> permanent address, current address -> current address
+    copyApplicantToGuarantor(): void {
+        const appValue = this.applicationForm.value;
+
+        if (!appValue.applicantName) {
+            this.toastr.warning('لطفا ابتدا معلومات متقاضی را در تب اول وارد کنید');
+            return;
+        }
+
+        this.guarantorForm.patchValue({
+            guarantorName: appValue.applicantName || '',
+            guarantorFatherName: appValue.applicantFatherName || '',
+            permanentProvinceId: appValue.permanentProvinceId || '',
+            permanentDistrictId: appValue.permanentDistrictId || '',
+            permanentVillage: appValue.permanentVillage || '',
+            currentProvinceId: appValue.currentProvinceId || '',
+            currentDistrictId: appValue.currentDistrictId || '',
+            currentVillage: appValue.currentVillage || ''
+        });
+
+        // Load districts for guarantor permanent address
+        if (appValue.permanentProvinceId) {
+            this.sellerService.getdistrict(appValue.permanentProvinceId).subscribe((res: any) => {
+                this.guarantorPermanentDistricts = res as any[];
+            });
+        }
+        // Load districts for guarantor current address
+        if (appValue.currentProvinceId) {
+            this.sellerService.getdistrict(appValue.currentProvinceId).subscribe((res: any) => {
+                this.guarantorCurrentDistricts = res as any[];
+            });
+        }
+
+        this.toastr.success('معلومات متقاضی به تضمین‌کننده منتقل شد');
+    }
+
     resetGuarantorForm(): void {
         this.selectedGuarantorId = 0;
         this.guarantorForm.reset();

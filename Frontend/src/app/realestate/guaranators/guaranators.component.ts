@@ -14,6 +14,7 @@ import { LocalizationService } from 'src/app/shared/localization.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
+import { LicenseApplicationService } from 'src/app/shared/license-application.service';
 import '@angular/localize/init';
 
 @Component({
@@ -48,6 +49,14 @@ export class GuaranatorsComponent extends BaseComponent {
   showCustomaryDeedFields = false;
   showCashFields = false;
 
+  // License application search
+  serialNumberSearch: string = '';
+  isSearching: boolean = false;
+  licenseAppSearchResults: any[] = [];
+  showLicenseAppSearchResults: boolean = false;
+  licenseAppGuarantors: any[] = [];
+  showGuarantorSelection: boolean = false;
+
   @Input() id: number = 0;
   @Output() next = new EventEmitter<void>();
   onNextClick() {
@@ -63,7 +72,8 @@ export class GuaranatorsComponent extends BaseComponent {
     private localizationService: LocalizationService,
     private calendarConversionService: CalendarConversionService,
     private calendarService: CalendarService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private licenseAppService: LicenseApplicationService
   ) {
     super();
     this.guaranatorForm = this.fb.group({
@@ -598,6 +608,139 @@ export class GuaranatorsComponent extends BaseComponent {
     }
     const type = this.localizedGuaranteeTypes.find((t: any) => t.id === guaranteeTypeId);
     return type ? type.name : '-';
+  }
+
+  // Search license application by serial number (نمبر عریضه)
+  searchBySerialNumber(): void {
+    if (!this.serialNumberSearch || this.serialNumberSearch.trim() === '') {
+      this.toastr.warning('لطفا نمبر عریضه را وارد کنید');
+      return;
+    }
+
+    this.isSearching = true;
+    this.showGuarantorSelection = false;
+    this.licenseAppGuarantors = [];
+    const calendar = this.calendarService.getSelectedCalendar();
+    this.licenseAppService.search(
+      this.serialNumberSearch.trim(),
+      undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
+      1, 50, calendar
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        this.isSearching = false;
+        if (response.items && response.items.length > 0) {
+          if (response.items.length === 1 && response.items[0].id) {
+            this.loadGuarantorsFromApplication(response.items[0].id);
+          } else {
+            this.licenseAppSearchResults = response.items;
+            this.showLicenseAppSearchResults = true;
+          }
+        } else {
+          this.toastr.info('هیچ درخواستی با این نمبر عریضه یافت نشد');
+        }
+      },
+      error: (error) => {
+        this.isSearching = false;
+        console.error('Error searching license application:', error);
+        this.toastr.error('خطا در جستجوی درخواست');
+      }
+    });
+  }
+
+  // When multiple applications found, select one
+  onLicenseAppSelected(app: any): void {
+    this.showLicenseAppSearchResults = false;
+    this.loadGuarantorsFromApplication(app.id);
+  }
+
+  // Load guarantors from a license application
+  loadGuarantorsFromApplication(applicationId: number): void {
+    const calendar = this.calendarService.getSelectedCalendar();
+    this.licenseAppService.getGuarantors(applicationId, calendar).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (guarantors) => {
+        if (guarantors && guarantors.length > 0) {
+          this.licenseAppGuarantors = guarantors;
+          this.showGuarantorSelection = true;
+          if (guarantors.length === 1) {
+            this.fillGuarantorFromLicenseApplication(guarantors[0]);
+          }
+        } else {
+          this.toastr.info('هیچ تضمین‌کننده‌ای برای این درخواست یافت نشد');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading guarantors:', error);
+        this.toastr.error('خطا در دریافت معلومات تضمین‌کنندگان');
+      }
+    });
+  }
+
+  // Map license application guarantor to company guarantor form
+  // Mapping:
+  // guarantorName (شهرت تضمین‌کننده) -> firstName (اسم)
+  // guarantorFatherName (ولد) -> fatherName (ولد)
+  // guaranteeTypeId (نوعیت ضمانت) -> guaranteeTypeId (نوعیت تضمین)
+  //   + ShariaDeed: shariaDeedNumber -> collateralNumber
+  //   + CustomaryDeed: customaryDeedSerialNumber -> setSerialNumber
+  // permanentProvinceId/DistrictId/Village (سکونت اصلی) -> paddressProvinceId/DistrictId/Village
+  // currentProvinceId/DistrictId/Village (سکونت فعلی) -> taddressProvinceId/DistrictId/Village
+  fillGuarantorFromLicenseApplication(data: any): void {
+    this.showGuarantorSelection = false;
+
+    const patchData: any = {
+      firstName: data.guarantorName || '',
+      fatherName: data.guarantorFatherName || '',
+      guaranteeTypeId: data.guaranteeTypeId || '',
+      paddressProvinceId: data.permanentProvinceId || '',
+      paddressDistrictId: data.permanentDistrictId || '',
+      paddressVillage: data.permanentVillage || '',
+      taddressProvinceId: data.currentProvinceId || '',
+      taddressDistrictId: data.currentDistrictId || '',
+      taddressVillage: data.currentVillage || ''
+    };
+
+    // Map conditional fields based on guarantee type
+    const guaranteeTypeId = Number(data.guaranteeTypeId);
+    if (guaranteeTypeId === GuaranteeTypeEnum.ShariaDeed) {
+      patchData.collateralNumber = data.shariaDeedNumber || '';
+    } else if (guaranteeTypeId === GuaranteeTypeEnum.CustomaryDeed) {
+      patchData.setSerialNumber = data.customaryDeedSerialNumber || '';
+    }
+
+    this.guaranatorForm.patchValue(patchData);
+
+    // Trigger guarantee type change to show conditional fields
+    this.onGuaranteeTypeChange();
+    // Re-patch conditional values since onGuaranteeTypeChange clears them
+    if (guaranteeTypeId === GuaranteeTypeEnum.ShariaDeed) {
+      this.guaranatorForm.patchValue({ collateralNumber: data.shariaDeedNumber || '' });
+    } else if (guaranteeTypeId === GuaranteeTypeEnum.CustomaryDeed) {
+      this.guaranatorForm.patchValue({ setSerialNumber: data.customaryDeedSerialNumber || '' });
+    }
+
+    // Load districts for permanent address
+    if (data.permanentProvinceId) {
+      this.selerService.getdistrict(data.permanentProvinceId).pipe(takeUntil(this.destroy$)).subscribe(res => {
+        this.district = res;
+      });
+    }
+    // Load districts for current address
+    if (data.currentProvinceId) {
+      this.selerService.getdistrict(data.currentProvinceId).pipe(takeUntil(this.destroy$)).subscribe(res => {
+        this.district2 = res;
+      });
+    }
+
+    this.toastr.success('معلومات تضمین‌کننده از درخواست جواز دریافت شد');
+  }
+
+  closeLicenseAppSearchResults(): void {
+    this.showLicenseAppSearchResults = false;
+  }
+
+  closeGuarantorSelection(): void {
+    this.showGuarantorSelection = false;
   }
 
   get firstName() { return this.guaranatorForm.get('firstName'); }

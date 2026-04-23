@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
+import { LicenseApplicationService } from 'src/app/shared/license-application.service';
 
 @Component({
 	selector: 'app-companyowner',
@@ -42,6 +43,12 @@ export class CompanyownerComponent extends BaseComponent {
 	isAddressChangeMode: boolean = false;
 	addressHistory: companyOwnerAddressHistory[] = [];
 	showAddressHistory: boolean = false;
+
+	// License application search
+	serialNumberSearch: string = '';
+	isSearching: boolean = false;
+	searchResults: any[] = [];
+	showSearchResults: boolean = false;
 
 	// Store current address for display during change mode
 	currentAddressDisplay: {
@@ -77,7 +84,8 @@ export class CompanyownerComponent extends BaseComponent {
 		private comservice: CompnaydetailService,
 		private selerService: SellerService,
 		private calendarConversionService: CalendarConversionService,
-		private calendarService: CalendarService
+		private calendarService: CalendarService,
+		private licenseAppService: LicenseApplicationService
 	) {
 		super();
 		this.ownerForm = this.fb.group({
@@ -548,6 +556,91 @@ export class CompanyownerComponent extends BaseComponent {
 	get permanentProvinceId() { return this.ownerForm.get('permanentProvinceId'); }
 	get permanentDistrictId() { return this.ownerForm.get('permanentDistrictId'); }
 	get permanentVillage() { return this.ownerForm.get('permanentVillage'); }
+
+	// Search license application by serial number (نمبر عریضه)
+	searchBySerialNumber(): void {
+		if (!this.serialNumberSearch || this.serialNumberSearch.trim() === '') {
+			this.toastr.warning('لطفا نمبر عریضه را وارد کنید');
+			return;
+		}
+
+		this.isSearching = true;
+		const calendar = this.calendarService.getSelectedCalendar();
+		this.licenseAppService.search(
+			this.serialNumberSearch.trim(),
+			undefined, undefined, undefined, undefined,
+			undefined, undefined, undefined,
+			1, 50, calendar
+		).pipe(takeUntil(this.destroy$)).subscribe({
+			next: (response) => {
+				this.isSearching = false;
+				if (response.items && response.items.length > 0) {
+					if (response.items.length === 1) {
+						this.fillOwnerFromLicenseApplication(response.items[0]);
+					} else {
+						this.searchResults = response.items;
+						this.showSearchResults = true;
+					}
+				} else {
+					this.toastr.info('هیچ درخواستی با این نمبر عریضه یافت نشد');
+				}
+			},
+			error: (error) => {
+				this.isSearching = false;
+				console.error('Error searching license application:', error);
+				this.toastr.error('خطا در جستجوی درخواست');
+			}
+		});
+	}
+
+	// Select a search result from dropdown
+	onSearchResultSelected(item: any): void {
+		this.showSearchResults = false;
+		this.fillOwnerFromLicenseApplication(item);
+	}
+
+	// Fill owner form from license application data
+	// Mapping:
+	// applicantName -> firstName (اسم)
+	// applicantFatherName -> fatherName (ولد)
+	// applicantGrandfatherName -> grandFatherName (ولدیت)
+	// applicantElectronicNumber -> electronicNationalIdNumber (الیکټرونیکی تذکره نمبر)
+	// permanentProvinceId/DistrictId/Village -> ownerProvinceId/DistrictId/Village (آدرس اصلی مالک)
+	// currentProvinceId/DistrictId/Village -> permanentProvinceId/DistrictId/Village (سکونت فعلی)
+	fillOwnerFromLicenseApplication(data: any): void {
+		this.ownerForm.patchValue({
+			firstName: data.applicantName || '',
+			fatherName: data.applicantFatherName || '',
+			grandFatherName: data.applicantGrandfatherName || '',
+			electronicNationalIdNumber: data.applicantElectronicNumber || '',
+			ownerProvinceId: data.permanentProvinceId || '',
+			ownerDistrictId: data.permanentDistrictId || '',
+			ownerVillage: data.permanentVillage || '',
+			permanentProvinceId: data.currentProvinceId || '',
+			permanentDistrictId: data.currentDistrictId || '',
+			permanentVillage: data.currentVillage || ''
+		});
+
+		// Load districts for owner address (from license permanent address)
+		if (data.permanentProvinceId) {
+			this.selerService.getdistrict(data.permanentProvinceId).pipe(takeUntil(this.destroy$)).subscribe(res => {
+				this.ownerDistrict = res;
+			});
+		}
+		// Load districts for permanent address (from license current address)
+		if (data.currentProvinceId) {
+			this.selerService.getdistrict(data.currentProvinceId).pipe(takeUntil(this.destroy$)).subscribe(res => {
+				this.permanentDistrict = res;
+			});
+		}
+
+		this.toastr.success('معلومات متقاضی از درخواست جواز دریافت شد');
+	}
+
+	// Close search results dropdown
+	closeSearchResults(): void {
+		this.showSearchResults = false;
+	}
 
 	// Debug helper to check form validity
 	checkFormValidity(): void {

@@ -10,6 +10,90 @@
         <input type="hidden" formControlName="id">
       </div>
 
+      <!-- Search License Application Section -->
+      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-search"></i>
+            <span>جستجو از درخواست جواز</span>
+          </h2>
+        </div>
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            <div class="md:col-span-4">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر عریضه</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-hashtag"></i>
+                </span>
+                <input type="text" [(ngModel)]="serialNumberSearch" [ngModelOptions]="{standalone: true}" (keyup.enter)="searchBySerialNumber()" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all" placeholder="نمبر عریضه درخواست جواز را وارد کنید">
+              </div>
+            </div>
+            <div class="md:col-span-2">
+              <button type="button" (click)="searchBySerialNumber()" [disabled]="isSearching" class="w-full px-6 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <i class="fas" [ngClass]="isSearching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                <span>جستجو</span>
+              </button>
+            </div>
+            <div class="md:col-span-6">
+              <p class="text-sm text-gray-500 mt-1">با جستجوی نمبر عریضه، معلومات تضمین‌کننده از درخواست جواز دریافت و فیلدهای زیر خودکار پر می‌شود: اسم، ولد، نوعیت تضمین، سکونت اصلی، سکونت فعلی</p>
+            </div>
+          </div>
+
+          <!-- Application Search Results Dropdown -->
+          <div *ngIf="showLicenseAppSearchResults && licenseAppSearchResults.length > 0" class="mt-4 relative">
+            <div class="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+              <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+                <span class="text-sm font-semibold text-gray-700">{{ licenseAppSearchResults.length }} درخواست یافت شد</span>
+                <button type="button" (click)="closeLicenseAppSearchResults()" class="text-gray-500 hover:text-gray-700">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div *ngFor="let app of licenseAppSearchResults" (click)="onLicenseAppSelected(app)" class="px-4 py-3 hover:bg-amber-50 cursor-pointer border-b border-gray-100 transition-colors">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="font-semibold text-gray-800">{{ app.applicantName }}</span>
+                    <span *ngIf="app.applicantFatherName" class="text-gray-600 mx-1">ولد {{ app.applicantFatherName }}</span>
+                  </div>
+                  <span class="text-sm text-amber-600 font-mono bg-amber-50 px-2 py-1 rounded">{{ app.requestSerialNumber }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guarantor Selection (when multiple guarantors found) -->
+          <div *ngIf="showGuarantorSelection && licenseAppGuarantors.length > 1" class="mt-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-semibold text-blue-700 flex items-center gap-2">
+                  <i class="fas fa-users"></i>
+                  <span>{{ licenseAppGuarantors.length }} تضمین‌کننده یافت شد - لطفاً یکی را انتخاب کنید</span>
+                </h3>
+                <button type="button" (click)="closeGuarantorSelection()" class="text-gray-500 hover:text-gray-700">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div *ngFor="let g of licenseAppGuarantors; let i = index" (click)="fillGuarantorFromLicenseApplication(g)" class="bg-white border border-blue-300 rounded-lg p-4 hover:border-amber-400 hover:bg-amber-50 cursor-pointer transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                      {{ i + 1 }}
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-800">{{ g.guarantorName }}</p>
+                      <p *ngIf="g.guarantorFatherName" class="text-sm text-gray-600">ولد {{ g.guarantorFatherName }}</p>
+                      <p class="text-xs text-gray-500 mt-1">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-amber-100 text-amber-700">{{ getGuaranteeTypeName(g.guaranteeTypeId) }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Personal Information Section -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
