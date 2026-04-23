@@ -43,7 +43,16 @@
         
         <div class="month-year-display">
           <span class="month-name">{{ getMonthName() }}</span>
-          <span class="year-number">{{ currentYear }}</span>
+          <input
+            type="text"
+            class="year-input"
+            [value]="currentYear"
+            (change)="onYearInputChange($event)"
+            (keydown.enter)="onYearInputChange($event, true)"
+            (blur)="onYearInputChange($event)"
+            (click)="$event.stopPropagation()"
+            [attr.maxlength]="4"
+          />
         </div>
         
         <button type="button" class="nav-btn" (click)="nextMonth()">

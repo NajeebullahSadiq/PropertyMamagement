@@ -305,6 +305,20 @@ export class MultiCalendarDatepickerComponent implements OnInit, OnDestroy, Cont
     this.generateCalendar();
   }
 
+  onYearInputChange(event: any, blurAfter: boolean = false): void {
+    const value = parseInt(event.target.value, 10);
+    if (!isNaN(value) && value >= 1 && value <= 9999) {
+      this.currentYear = value;
+      this.generateCalendar();
+    } else {
+      // Reset to current year if invalid
+      event.target.value = this.currentYear;
+    }
+    if (blurAfter) {
+      (event.target as HTMLElement).blur();
+    }
+  }
+
   previousYear(): void {
     this.currentYear--;
     this.generateCalendar();

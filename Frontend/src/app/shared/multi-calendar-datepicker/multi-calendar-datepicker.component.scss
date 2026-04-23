@@ -129,9 +129,30 @@
       color: #1f2937;
     }
 
-    .year-number {
+    .year-input {
       font-size: 0.875rem;
       color: #6b7280;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      text-align: center;
+      width: 60px;
+      padding: 1px 4px;
+      outline: none;
+      font-family: inherit;
+      direction: ltr;
+
+      &:hover {
+        border-color: #d1d5db;
+        background-color: #f9fafb;
+      }
+
+      &:focus {
+        border-color: #3b82f6;
+        background-color: #fff;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        color: #1f2937;
+      }
     }
   }
 
