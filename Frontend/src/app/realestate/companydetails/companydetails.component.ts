@@ -167,9 +167,48 @@ export class CompanydetailsComponent extends BaseComponent {
 		  },
 		  error => {
 		    console.error('Error updating company:', error);
-		    // Check if error has a specific message from backend
-		    const errorMessage = error.error?.message || error.message || 'نامعلوم';
-		    this.toastr.error(errorMessage);
+		    
+		    // Check if this is a revoked license duplicate that requires confirmation
+		    if (error.error?.requiresConfirmation) {
+		      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+		        width: '500px',
+		        data: {
+		          title: 'تایید تغیر رهنمایی معاملات',
+		          message: error.error.message,
+		          confirmText: 'بله، ادامه دهید',
+		          cancelText: 'انصراف',
+		          icon: 'fa-exclamation-circle',
+		          confirmButtonClass: 'btn-confirm'
+		        }
+		      });
+
+		      dialogRef.afterClosed().subscribe(confirmed => {
+		        if (confirmed) {
+		          // User confirmed, retry with confirmation flag
+		          const confirmedDetail = { ...companyDetail, confirmRevokedDuplicate: true };
+		          this.comservice.updatecompanies(confirmedDetail).subscribe(
+		            result => {
+		              console.log('Company updated successfully after confirmation:', result);
+		              if(result.id!==0) {
+		                this.comservice.updateMainTableId(result.id);
+		                this.selectedId=result.id;
+		                this.toastr.info("معلومات موفقانه تغیر یافت ");
+		                this.onNextClick();
+		              }
+		            },
+		            error => {
+		              console.error('Error updating company after confirmation:', error);
+		              const errorMessage = error.error?.message || error.message || 'نامعلوم';
+		              this.toastr.error(errorMessage);
+		            }
+		          );
+		        }
+		      });
+		    } else {
+		      // Regular error, show error message
+		      const errorMessage = error.error?.message || error.message || 'نامعلوم';
+		      this.toastr.error(errorMessage);
+		    }
 		  }
 		);
 	  
