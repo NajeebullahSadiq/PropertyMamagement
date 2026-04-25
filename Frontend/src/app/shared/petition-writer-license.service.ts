@@ -137,4 +137,28 @@ export class PetitionWriterLicenseService {
     getActivityDistricts(provinceId: number): Observable<any> {
         return this.http.get(`${this.baseUrl}/districts/${provinceId}`);
     }
+
+    // ==================== Report ====================
+
+    getReport(
+        startDate?: string,
+        endDate?: string,
+        calendarType?: string,
+        activityLocation?: string,
+        provinceId?: number,
+        districtId?: number
+    ): Observable<any> {
+        let params = new HttpParams();
+        if (startDate) params = params.set('startDate', startDate);
+        if (endDate) params = params.set('endDate', endDate);
+        if (calendarType) params = params.set('calendarType', calendarType);
+        if (activityLocation) params = params.set('activityLocation', activityLocation);
+        if (provinceId && provinceId > 0) params = params.set('provinceId', provinceId.toString());
+        if (districtId && districtId > 0) params = params.set('districtId', districtId.toString());
+        return this.http.get<any>(`${this.baseUrl}/report`, { params });
+    }
+
+    getReportDistricts(provinceId: number): Observable<any[]> {
+        return this.http.get<any[]>(`${this.baseUrl}/report/districts/${provinceId}`);
+    }
 }

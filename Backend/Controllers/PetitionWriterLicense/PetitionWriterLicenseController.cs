@@ -679,5 +679,233 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
         }
 
         #endregion
+
+        #region Report
+
+        /// <summary>
+        /// Get comprehensive report for petition writer licenses
+        /// گزارش جامع جوازهای عریضه‌نویسان
+        /// </summary>
+        [HttpGet("report")]
+        public async Task<IActionResult> GetReport(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null,
+            [FromQuery] string? activityLocation = null,
+            [FromQuery] int? provinceId = null,
+            [FromQuery] int? districtId = null)
+        {
+            try
+            {
+                var calendar = CalendarType.HijriShamsi;
+
+                DateOnly? parsedStart = null;
+                DateOnly? parsedEnd = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate) && DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    parsedStart = start;
+
+                if (!string.IsNullOrWhiteSpace(endDate) && DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    parsedEnd = end;
+
+                // Base query - all active licenses
+                var baseQuery = _context.PetitionWriterLicenses
+                    .AsNoTracking()
+                    .Where(x => x.Status == true);
+
+                // Apply province filter (ProvinceId = license province)
+                if (provinceId.HasValue && provinceId.Value > 0)
+                    baseQuery = baseQuery.Where(x => x.ProvinceId == provinceId.Value);
+
+                // Apply district filter (CurrentDistrictId = current address district)
+                if (districtId.HasValue && districtId.Value > 0)
+                    baseQuery = baseQuery.Where(x => x.CurrentDistrictId == districtId.Value);
+
+                // Apply activity location filter
+                if (!string.IsNullOrWhiteSpace(activityLocation))
+                    baseQuery = baseQuery.Where(x => x.ActivityLocation == activityLocation);
+
+                // Fetch all matching for in-memory grouping
+                var allLicenses = await baseQuery
+                    .Include(x => x.Province)
+                    .Include(x => x.CurrentDistrict)
+                    .ToListAsync();
+
+                // Date-filtered licenses (by IssueDate)
+                var dateFiltered = allLicenses.AsEnumerable();
+                if (parsedStart.HasValue)
+                    dateFiltered = dateFiltered.Where(x => x.LicenseIssueDate.HasValue && x.LicenseIssueDate >= parsedStart);
+                if (parsedEnd.HasValue)
+                    dateFiltered = dateFiltered.Where(x => x.LicenseIssueDate.HasValue && x.LicenseIssueDate <= parsedEnd);
+
+                var filteredList = dateFiltered.ToList();
+
+                // Helper: map LicenseType code to display name
+                static string MapLicenseType(string? t) => t switch
+                {
+                    "new" => "جدید",
+                    "renewal" => "تجدید",
+                    "duplicate" => "مثنی",
+                    null or "" => "نامشخص",
+                    _ => t
+                };
+
+                // --- Filtered stats ---
+                var byLicenseType = filteredList
+                    .GroupBy(x => MapLicenseType(x.LicenseType))
+                    .Select(g => new { licenseType = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                var activeCount   = filteredList.Count(x => x.LicenseStatus == 1);
+                var cancelledCount = filteredList.Count(x => x.LicenseStatus == 2);
+                var withdrawnCount = filteredList.Count(x => x.LicenseStatus == 3);
+
+                // Relocations in date range (scoped to filtered license IDs)
+                var filteredIds = filteredList.Select(x => x.Id).ToHashSet();
+                var relocQuery = _context.PetitionWriterRelocations.AsNoTracking()
+                    .Where(x => filteredIds.Contains(x.PetitionWriterLicenseId));
+                if (parsedStart.HasValue)
+                    relocQuery = relocQuery.Where(x => x.RelocationDate.HasValue && x.RelocationDate >= parsedStart);
+                if (parsedEnd.HasValue)
+                    relocQuery = relocQuery.Where(x => x.RelocationDate.HasValue && x.RelocationDate <= parsedEnd);
+                var relocationCount = await relocQuery.CountAsync();
+
+                var byActivityLocation = filteredList
+                    .GroupBy(x => string.IsNullOrWhiteSpace(x.ActivityLocation) ? "نامشخص" : x.ActivityLocation)
+                    .Select(g => new { activityLocation = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                var byProvince = filteredList
+                    .GroupBy(x => x.Province?.Dari ?? "نامشخص")
+                    .Select(g => new { province = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                var byDistrict = filteredList
+                    .GroupBy(x => x.CurrentDistrict?.Dari ?? "نامشخص")
+                    .Select(g => new { district = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                // --- Overall (all-time, same province/district/location filters) ---
+                var overallAll = allLicenses; // already filtered by province/district/location
+                var overallTotal     = overallAll.Count;
+                var overallActive    = overallAll.Count(x => x.LicenseStatus == 1);
+                var overallCancelled = overallAll.Count(x => x.LicenseStatus == 2);
+                var overallWithdrawn = overallAll.Count(x => x.LicenseStatus == 3);
+
+                var overallIds = overallAll.Select(x => x.Id).ToHashSet();
+                var overallRelocations = await _context.PetitionWriterRelocations.AsNoTracking()
+                    .Where(x => overallIds.Contains(x.PetitionWriterLicenseId))
+                    .CountAsync();
+
+                var overallByType = overallAll
+                    .GroupBy(x => MapLicenseType(x.LicenseType))
+                    .Select(g => new { licenseType = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                var overallByLocation = overallAll
+                    .GroupBy(x => string.IsNullOrWhiteSpace(x.ActivityLocation) ? "نامشخص" : x.ActivityLocation)
+                    .Select(g => new { activityLocation = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                var overallByProvince = overallAll
+                    .GroupBy(x => x.Province?.Dari ?? "نامشخص")
+                    .Select(g => new { province = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                var overallByDistrict = overallAll
+                    .GroupBy(x => x.CurrentDistrict?.Dari ?? "نامشخص")
+                    .Select(g => new { district = g.Key, count = g.Count() })
+                    .OrderByDescending(x => x.count).ToList();
+
+                // --- Dropdown data (always from full unfiltered set) ---
+                var allForDropdowns = await _context.PetitionWriterLicenses
+                    .AsNoTracking()
+                    .Where(x => x.Status == true)
+                    .Include(x => x.Province)
+                    .Include(x => x.CurrentDistrict)
+                    .ToListAsync();
+
+                var activityLocations = allForDropdowns
+                    .Where(x => !string.IsNullOrWhiteSpace(x.ActivityLocation))
+                    .Select(x => x.ActivityLocation!).Distinct().OrderBy(x => x).ToList();
+
+                var provinces = await _cache.GetProvincesAsync();
+                var provinceList = provinces.Select(p => new { p.Id, name = p.Dari }).ToList();
+
+                // Districts: if a province is selected return its districts, else return all districts
+                // that appear in the data
+                List<object> districtList;
+                if (provinceId.HasValue && provinceId.Value > 0)
+                {
+                    var districts = await _cache.GetDistrictsAsync(provinceId.Value);
+                    districtList = districts.Select(d => (object)new { d.Id, name = d.Dari }).ToList();
+                }
+                else
+                {
+                    districtList = new List<object>();
+                }
+
+                return Ok(new
+                {
+                    startDate        = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : null,
+                    endDate          = parsedEnd.HasValue   ? DateConversionHelper.FormatDateOnly(parsedEnd,   calendar) : null,
+                    reportGeneratedAt = DateConversionHelper.FormatDateOnly(DateOnly.FromDateTime(DateTime.Today), calendar),
+
+                    filtered = new
+                    {
+                        totalLicenses  = filteredList.Count,
+                        activeCount,
+                        cancelledCount,
+                        withdrawnCount,
+                        relocationCount,
+                        byLicenseType,
+                        byActivityLocation,
+                        byProvince,
+                        byDistrict
+                    },
+
+                    overall = new
+                    {
+                        totalLicenses  = overallTotal,
+                        activeCount    = overallActive,
+                        cancelledCount = overallCancelled,
+                        withdrawnCount = overallWithdrawn,
+                        relocationCount = overallRelocations,
+                        byLicenseType  = overallByType,
+                        byActivityLocation = overallByLocation,
+                        byProvince     = overallByProvince,
+                        byDistrict     = overallByDistrict
+                    },
+
+                    // Dropdown data
+                    activityLocations,
+                    provinces = provinceList,
+                    districts = districtList
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در تولید گزارش", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get districts for a province (used by report province dropdown)
+        /// </summary>
+        [HttpGet("report/districts/{provinceId}")]
+        public async Task<IActionResult> GetReportDistricts(int provinceId)
+        {
+            try
+            {
+                var districts = await _cache.GetDistrictsAsync(provinceId);
+                return Ok(districts.Select(d => new { d.Id, name = d.Dari }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در بارگذاری ولسوالی‌ها", error = ex.Message });
+            }
+        }
+
+        #endregion
     }
 }
