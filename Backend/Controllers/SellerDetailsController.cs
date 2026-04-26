@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.RequestData;
 using WebAPIBackend.Services;
@@ -562,28 +563,47 @@ namespace WebAPIBackend.Controllers
 
             //var user = await _userManager.GetUserAsync(User);
            
-            // Convert rental dates to UTC if they exist
-            var rentStartDate = request.RentStartDate;
-            var rentEndDate = request.RentEndDate;
-            if (rentStartDate.HasValue)
+            // Parse calendar type and convert date strings from frontend
+            var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
+
+            DateTime? rentStartDate = null;
+            if (!string.IsNullOrWhiteSpace(request.RentStartDateStr))
             {
-                rentStartDate = rentStartDate.Value.ToUniversalTime();
+                rentStartDate = DateConversionHelper.ParseDateString(request.RentStartDateStr, calendarType);
             }
-            if (rentEndDate.HasValue)
+            else if (request.RentStartDate.HasValue)
             {
-                rentEndDate = rentEndDate.Value.ToUniversalTime();
+                rentStartDate = request.RentStartDate;
             }
 
-            // Convert contract dates to UTC if they exist
-            var contractStartDate = request.ContractStartDate;
-            var contractEndDate = request.ContractEndDate;
-            if (contractStartDate.HasValue)
+            DateTime? rentEndDate = null;
+            if (!string.IsNullOrWhiteSpace(request.RentEndDateStr))
             {
-                contractStartDate = contractStartDate.Value.ToUniversalTime();
+                rentEndDate = DateConversionHelper.ParseDateString(request.RentEndDateStr, calendarType);
             }
-            if (contractEndDate.HasValue)
+            else if (request.RentEndDate.HasValue)
             {
-                contractEndDate = contractEndDate.Value.ToUniversalTime();
+                rentEndDate = request.RentEndDate;
+            }
+
+            DateTime? contractStartDate = null;
+            if (!string.IsNullOrWhiteSpace(request.ContractStartDateStr))
+            {
+                contractStartDate = DateConversionHelper.ParseDateString(request.ContractStartDateStr, calendarType);
+            }
+            else if (request.ContractStartDate.HasValue)
+            {
+                contractStartDate = request.ContractStartDate;
+            }
+
+            DateTime? contractEndDate = null;
+            if (!string.IsNullOrWhiteSpace(request.ContractEndDateStr))
+            {
+                contractEndDate = DateConversionHelper.ParseDateString(request.ContractEndDateStr, calendarType);
+            }
+            else if (request.ContractEndDate.HasValue)
+            {
+                contractEndDate = request.ContractEndDate;
             }
 
             // Validate contract dates for Rent transaction type
@@ -678,10 +698,7 @@ namespace WebAPIBackend.Controllers
             var lesseeBuyerRoles = new[] { "Lessee", "Lessees", "Agent for lessee" };
             if (lesseeBuyerRoles.Contains(roleType))
             {
-                if (!request.RentStartDate.HasValue || !request.RentEndDate.HasValue)
-                {
-                    return StatusCode(400, "Rental dates are required for lessee roles");
-                }
+                // Will validate after date parsing below
             }
 
             // Transaction / price rules
@@ -744,32 +761,64 @@ namespace WebAPIBackend.Controllers
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
 
-            // Convert rental dates to UTC if they exist
-            if (request.RentStartDate.HasValue)
+            // Parse calendar type and convert date strings from frontend
+            var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
+
+            DateTime? rentStartDate = null;
+            if (!string.IsNullOrWhiteSpace(request.RentStartDateStr))
             {
-                request.RentStartDate = request.RentStartDate.Value.ToUniversalTime();
+                rentStartDate = DateConversionHelper.ParseDateString(request.RentStartDateStr, calendarType);
             }
-            if (request.RentEndDate.HasValue)
+            else if (request.RentStartDate.HasValue)
             {
-                request.RentEndDate = request.RentEndDate.Value.ToUniversalTime();
+                rentStartDate = request.RentStartDate;
             }
 
-            // Convert contract dates to UTC if they exist
-            if (request.ContractStartDate.HasValue)
+            DateTime? rentEndDate = null;
+            if (!string.IsNullOrWhiteSpace(request.RentEndDateStr))
             {
-                request.ContractStartDate = request.ContractStartDate.Value.ToUniversalTime();
+                rentEndDate = DateConversionHelper.ParseDateString(request.RentEndDateStr, calendarType);
             }
-            if (request.ContractEndDate.HasValue)
+            else if (request.RentEndDate.HasValue)
             {
-                request.ContractEndDate = request.ContractEndDate.Value.ToUniversalTime();
+                rentEndDate = request.RentEndDate;
+            }
+
+            DateTime? contractStartDate = null;
+            if (!string.IsNullOrWhiteSpace(request.ContractStartDateStr))
+            {
+                contractStartDate = DateConversionHelper.ParseDateString(request.ContractStartDateStr, calendarType);
+            }
+            else if (request.ContractStartDate.HasValue)
+            {
+                contractStartDate = request.ContractStartDate;
+            }
+
+            DateTime? contractEndDate = null;
+            if (!string.IsNullOrWhiteSpace(request.ContractEndDateStr))
+            {
+                contractEndDate = DateConversionHelper.ParseDateString(request.ContractEndDateStr, calendarType);
+            }
+            else if (request.ContractEndDate.HasValue)
+            {
+                contractEndDate = request.ContractEndDate;
             }
 
             // Validate contract dates for Rent transaction type
             if (request.TransactionType == "Rent")
             {
-                if (!request.ContractStartDate.HasValue || !request.ContractEndDate.HasValue)
+                if (!contractStartDate.HasValue || !contractEndDate.HasValue)
                 {
                     return StatusCode(400, "تاریخ اغاز و ختم قرار داد برای کرایه الزامی است");
+                }
+            }
+
+            // Validate rental dates for lessee roles
+            if (lesseeBuyerRoles.Contains(roleType))
+            {
+                if (!rentStartDate.HasValue || !rentEndDate.HasValue)
+                {
+                    return StatusCode(400, "Rental dates are required for lessee roles");
                 }
             }
 
@@ -800,10 +849,10 @@ namespace WebAPIBackend.Controllers
             existingProperty.HalfPrice = request.HalfPrice;
             existingProperty.TransactionType = request.TransactionType;
             existingProperty.TransactionTypeDescription = request.TransactionTypeDescription;
-            existingProperty.RentStartDate = request.RentStartDate;
-            existingProperty.RentEndDate = request.RentEndDate;
-            existingProperty.ContractStartDate = request.ContractStartDate;
-            existingProperty.ContractEndDate = request.ContractEndDate;
+            existingProperty.RentStartDate = rentStartDate;
+            existingProperty.RentEndDate = rentEndDate;
+            existingProperty.ContractStartDate = contractStartDate;
+            existingProperty.ContractEndDate = contractEndDate;
 
             // Restore the original values of the CreatedBy and CreatedOn properties
             existingProperty.CreatedBy = createdBy;

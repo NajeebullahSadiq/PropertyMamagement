@@ -12,6 +12,8 @@ import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-up
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { LocalizationService } from 'src/app/shared/localization.service';
 import { NumeralService } from 'src/app/shared/numeral.service';
+import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
+import { CalendarType } from 'src/app/models/calendar-type';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -81,7 +83,8 @@ export class BuyerdetailComponent extends BaseComponent {
 
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
-    private duplicateCheckService: DuplicateCheckService, private numeralService: NumeralService){
+    private duplicateCheckService: DuplicateCheckService, private numeralService: NumeralService,
+    private calendarConversionService: CalendarConversionService){
     super();
     // this.mainTableId=propertyService.mainTableId;
     this.sellerForm = this.fb.group({
@@ -333,6 +336,19 @@ export class BuyerdetailComponent extends BaseComponent {
       sellerDetails.id = 0;
     }
 
+    // Format dates as Hijri Shamsi strings for backend (following company module pattern)
+    const currentCalendar = CalendarType.HIJRI_SHAMSI;
+    sellerDetails.calendarType = currentCalendar;
+    sellerDetails.contractStartDateStr = this.formatDateForBackend(this.sellerForm.get('contractStartDate')?.value);
+    sellerDetails.contractEndDateStr = this.formatDateForBackend(this.sellerForm.get('contractEndDate')?.value);
+    sellerDetails.rentStartDateStr = this.formatDateForBackend(this.sellerForm.get('rentStartDate')?.value);
+    sellerDetails.rentEndDateStr = this.formatDateForBackend(this.sellerForm.get('rentEndDate')?.value);
+    // Clear the Date objects so backend uses the string fields instead
+    (sellerDetails as any).contractStartDate = null;
+    (sellerDetails as any).contractEndDate = null;
+    (sellerDetails as any).rentStartDate = null;
+    (sellerDetails as any).rentEndDate = null;
+
     // Check for duplicate property registration
     this.isDuplicateCheckLoading = true;
     this.duplicateError = '';
@@ -403,6 +419,19 @@ updateBuyerDetails(): void {
   if ((!sellerDetails.id || sellerDetails.id === 0) && this.selectedSellerId) {
     sellerDetails.id = this.selectedSellerId;
   }
+
+  // Format dates as Hijri Shamsi strings for backend (following company module pattern)
+  const currentCalendar = CalendarType.HIJRI_SHAMSI;
+  sellerDetails.calendarType = currentCalendar;
+  sellerDetails.contractStartDateStr = this.formatDateForBackend(this.sellerForm.get('contractStartDate')?.value);
+  sellerDetails.contractEndDateStr = this.formatDateForBackend(this.sellerForm.get('contractEndDate')?.value);
+  sellerDetails.rentStartDateStr = this.formatDateForBackend(this.sellerForm.get('rentStartDate')?.value);
+  sellerDetails.rentEndDateStr = this.formatDateForBackend(this.sellerForm.get('rentEndDate')?.value);
+  // Clear the Date objects so backend uses the string fields instead
+  (sellerDetails as any).contractStartDate = null;
+  (sellerDetails as any).contractEndDate = null;
+  (sellerDetails as any).rentStartDate = null;
+  (sellerDetails as any).rentEndDate = null;
 
   this.selerService.updateBuyerdetails(sellerDetails).subscribe({
     next: (result: any) => {
@@ -746,6 +775,27 @@ isAuthorizedAgent(): boolean {
   getRoleTypeLabel(roleType: string): string {
     const role = this.roleTypes.find((r: any) => r.value === roleType);
     return role ? role.label : roleType;
+  }
+
+  private formatDateForBackend(dateValue: any): string {
+    // Property module ALWAYS uses Hijri Shamsi
+    const currentCalendar = CalendarType.HIJRI_SHAMSI;
+
+    if (dateValue instanceof Date) {
+      const calendarDate = this.calendarConversionService.fromGregorian(dateValue, currentCalendar);
+      const year = calendarDate.year;
+      const month = String(calendarDate.month).padStart(2, '0');
+      const day = String(calendarDate.day).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } else if (typeof dateValue === 'object' && dateValue.year) {
+      const year = dateValue.year;
+      const month = String(dateValue.month).padStart(2, '0');
+      const day = String(dateValue.day).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } else if (typeof dateValue === 'string') {
+      return dateValue.replace(/\//g, '-');
+    }
+    return '';
   }
 
   private constructImageUrl(path: string): string {

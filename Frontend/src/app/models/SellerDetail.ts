@@ -24,10 +24,15 @@ export interface SellerDetail {
     priceText?:string;
     royaltyAmount?:number;
     halfPrice?:number;
-    rentStartDate?:Date; // Rental start date for lessee roles
-    rentEndDate?:Date; // Rental end date for lessee roles
-    contractStartDate?:Date; // Contract start date for rental transactions
-    contractEndDate?:Date; // Contract end date for rental transactions
+    rentStartDate?:string; // Rental start date as Hijri Shamsi string
+    rentEndDate?:string; // Rental end date as Hijri Shamsi string
+    contractStartDate?:string; // Contract start date as Hijri Shamsi string
+    contractEndDate?:string; // Contract end date as Hijri Shamsi string
+    rentStartDateStr?:string; // Rent start date string for backend
+    rentEndDateStr?:string; // Rent end date string for backend
+    contractStartDateStr?:string; // Contract start date string for backend
+    contractEndDateStr?:string; // Contract end date string for backend
+    calendarType?:string; // Calendar type for date conversion
     transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
     transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
     taxIdentificationNumber?:string;
@@ -62,10 +67,15 @@ export interface VBuyerDetail {
     priceText?:string;
     royaltyAmount?:number;
     halfPrice?:number;
-    rentStartDate?:Date; // Rental start date for lessee roles
-    rentEndDate?:Date; // Rental end date for lessee roles
-    contractStartDate?:Date; // Contract start date for rental transactions
-    contractEndDate?:Date; // Contract end date for rental transactions
+    rentStartDate?:string; // Rental start date as Hijri Shamsi string
+    rentEndDate?:string; // Rental end date as Hijri Shamsi string
+    contractStartDate?:string; // Contract start date as Hijri Shamsi string
+    contractEndDate?:string; // Contract end date as Hijri Shamsi string
+    rentStartDateStr?:string; // Rent start date string for backend
+    rentEndDateStr?:string; // Rent end date string for backend
+    contractStartDateStr?:string; // Contract start date string for backend
+    contractEndDateStr?:string; // Contract end date string for backend
+    calendarType?:string; // Calendar type for date conversion
     transactionType?:string; // Transaction type (Purchase, Rent, Revocable Sale, Other)
     transactionTypeDescription?:string; // Custom description when transactionType is 'Other'
     sharePercentage?:number;
