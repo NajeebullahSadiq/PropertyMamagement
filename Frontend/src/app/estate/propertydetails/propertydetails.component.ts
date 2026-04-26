@@ -350,9 +350,13 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
     }
     if (!propertyDetails.numofFloor || (propertyDetails.numofFloor as any) === '') {
       propertyDetails.numofFloor = null as any;
+    } else {
+      propertyDetails.numofFloor = Number(propertyDetails.numofFloor) as any;
     }
     if (!propertyDetails.numofRooms || (propertyDetails.numofRooms as any) === '') {
       propertyDetails.numofRooms = null as any;
+    } else {
+      propertyDetails.numofRooms = Number(propertyDetails.numofRooms) as any;
     }
     
     // Format dates for backend using calendar service
@@ -419,9 +423,13 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
     }
     if (!propertyDetails.numofFloor || (propertyDetails.numofFloor as any) === '') {
       propertyDetails.numofFloor = null as any;
+    } else {
+      propertyDetails.numofFloor = Number(propertyDetails.numofFloor) as any;
     }
     if (!propertyDetails.numofRooms || (propertyDetails.numofRooms as any) === '') {
       propertyDetails.numofRooms = null as any;
+    } else {
+      propertyDetails.numofRooms = Number(propertyDetails.numofRooms) as any;
     }
     
     // Format dates for backend using calendar service

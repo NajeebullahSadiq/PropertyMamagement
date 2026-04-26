@@ -148,8 +148,8 @@ namespace WebAPIBackend.Helpers
                         throw new ArgumentException("Unknown calendar type", nameof(calendarType));
                 }
                 
-                // Convert to UTC for PostgreSQL compatibility
-                return DateTime.SpecifyKind(localDate, DateTimeKind.Utc);
+                // Use Unspecified kind for timestamp without time zone PostgreSQL columns
+                return DateTime.SpecifyKind(localDate, DateTimeKind.Unspecified);
             }
             catch (Exception ex)
             {

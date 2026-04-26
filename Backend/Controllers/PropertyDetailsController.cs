@@ -518,116 +518,129 @@ namespace WebAPIBackend.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> SaveProperty([FromBody] PropertyDetail request)
         {
-            var userIdClaim = HttpContext.User.FindFirst("UserID");
-            if (userIdClaim == null)
+            try
             {
-                return Unauthorized();
-            }
+                var userIdClaim = HttpContext.User.FindFirst("UserID");
+                if (userIdClaim == null)
+                {
+                    return Unauthorized();
+                }
 
-            var userId = userIdClaim.Value;
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return Unauthorized();
-            }
+                var userId = userIdClaim.Value;
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
 
-            var roles = await _userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
 
-            // Check if user can create property records
-            if (!RbacHelper.CanCreateRecords(roles, "property"))
-            {
-                return StatusCode(403, new { message = "شما اجازه ایجاد سند ملکیت را ندارید" });
-            }
+                // Check if user can create property records
+                if (!RbacHelper.CanCreateRecords(roles, "property"))
+                {
+                    return StatusCode(403, new { message = "شما اجازه ایجاد سند ملکیت را ندارید" });
+                }
 
-            var (isValid, errorMessage, normalizedCustomPropertyType) = await ValidateAndNormalizePropertyTypeAsync(request.PropertyTypeId, request.CustomPropertyType);
-            if (!isValid)
-            {
-                return StatusCode(400, errorMessage);
-            }
+                var (isValid, errorMessage, normalizedCustomPropertyType) = await ValidateAndNormalizePropertyTypeAsync(request.PropertyTypeId, request.CustomPropertyType);
+                if (!isValid)
+                {
+                    return StatusCode(400, errorMessage);
+                }
 
-            // Parse calendar type and convert dates
-            var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
-            
-            DateTime? issuanceDate = null;
-            if (!string.IsNullOrWhiteSpace(request.IssuanceDateStr))
-            {
-                issuanceDate = DateConversionHelper.ParseDateString(request.IssuanceDateStr, calendarType);
-            }
-            else if (request.IssuanceDate.HasValue)
-            {
-                issuanceDate = request.IssuanceDate;
-            }
-
-            DateTime? transactionDate = null;
-            if (!string.IsNullOrWhiteSpace(request.TransactionDateStr))
-            {
-                transactionDate = DateConversionHelper.ParseDateString(request.TransactionDateStr, calendarType);
-            }
-            else if (request.TransactionDate.HasValue)
-            {
-                transactionDate = request.TransactionDate;
-            }
-
-            // Generate property number if not provided
-            string propertyNumber;
-            if (string.IsNullOrWhiteSpace(request.Pnumber) || request.Pnumber == "0")
-            {
-                // Generate a unique property number based on timestamp
-                propertyNumber = $"PROP-{DateTime.UtcNow:yyyyMMddHHmmss}";
-            }
-            else
-            {
-                propertyNumber = request.Pnumber;
-            }
-
-            var property = new PropertyDetail
-            {
-                Pnumber = propertyNumber,
-                Parea = request.Parea,
-                PunitTypeId = request.PunitTypeId,
-                NumofFloor=request.NumofFloor,
-                NumofRooms=request.NumofRooms,
-                PropertyTypeId=request.PropertyTypeId,
-                CustomPropertyType = normalizedCustomPropertyType,
-                Price=request.Price,
-                PriceText=request.PriceText,
-                RoyaltyAmount= (double.TryParse(request.Price, out var priceVal) ? priceVal * 0.01 : 0).ToString(),
-                TransactionTypeId=request.TransactionTypeId,
-                Des=request.Des,
-                CreatedAt=DateTime.UtcNow,
-                CreatedBy= userId,
-                CompanyId=user.CompanyId, // Set company ID for data isolation
-                FilePath=request.FilePath,
-                PreviousDocumentsPath = request.PreviousDocumentsPath,
-                ExistingDocumentsPath = request.ExistingDocumentsPath,
-                West=request.West,
-                East=request.East,
-                North=request.North,
-                South=request.South,
-                DocumentType=request.DocumentType,
-                IssuanceNumber=request.IssuanceNumber,
-                IssuanceDate=issuanceDate,
-                SerialNumber=request.SerialNumber,
-                TransactionDate=transactionDate,
-                iscomplete = false,
-                iseditable = false
+                // Parse calendar type and convert dates
+                var calendarType = DateConversionHelper.ParseCalendarType(request.CalendarType);
                 
-            };
-            _context.Add(property);
-            await _context.SaveChangesAsync();
+                DateTime? issuanceDate = null;
+                if (!string.IsNullOrWhiteSpace(request.IssuanceDateStr))
+                {
+                    issuanceDate = DateConversionHelper.ParseDateString(request.IssuanceDateStr, calendarType);
+                }
+                else if (request.IssuanceDate.HasValue)
+                {
+                    issuanceDate = request.IssuanceDate;
+                }
 
-            await UpsertPropertyAddressAsync(property.Id, userId, request);
+                DateTime? transactionDate = null;
+                if (!string.IsNullOrWhiteSpace(request.TransactionDateStr))
+                {
+                    transactionDate = DateConversionHelper.ParseDateString(request.TransactionDateStr, calendarType);
+                }
+                else if (request.TransactionDate.HasValue)
+                {
+                    transactionDate = request.TransactionDate;
+                }
 
-            // Log the creation to comprehensive audit
-            await _auditService.LogCreateAsync(
-                WebAPIBackend.Models.Audit.AuditModules.Property,
-                "Property",
-                property.Id.ToString(),
-                newValues: new { property.Id, property.Pnumber, property.IssuanceNumber, property.SerialNumber, property.PropertyTypeId },
-                descriptionDari: $"ثبت سند ملکیت با شماره {property.Pnumber}");
+                // Generate property number if not provided
+                string propertyNumber;
+                if (string.IsNullOrWhiteSpace(request.Pnumber) || request.Pnumber == "0")
+                {
+                    // Generate a unique property number based on timestamp
+                    propertyNumber = $"PROP-{DateTime.UtcNow:yyyyMMddHHmmss}";
+                }
+                else
+                {
+                    propertyNumber = request.Pnumber;
+                }
 
-            var result = new { Id = property.Id, PropertyTypeId = property.PropertyTypeId };
-            return Ok(result);
+                // CompanyId: use null when user has no company (CompanyId=0) to avoid FK violation
+                int? companyId = user.CompanyId != 0 ? user.CompanyId : (int?)null;
+
+                var property = new PropertyDetail
+                {
+                    Pnumber = propertyNumber,
+                    Parea = request.Parea,
+                    PunitTypeId = request.PunitTypeId,
+                    NumofFloor=request.NumofFloor,
+                    NumofRooms=request.NumofRooms,
+                    PropertyTypeId=request.PropertyTypeId,
+                    CustomPropertyType = normalizedCustomPropertyType,
+                    Price=request.Price,
+                    PriceText=request.PriceText,
+                    RoyaltyAmount= (double.TryParse(request.Price, out var priceVal) ? priceVal * 0.01 : 0).ToString(),
+                    TransactionTypeId=request.TransactionTypeId,
+                    Des=request.Des,
+                    CreatedAt=DateTime.UtcNow,
+                    CreatedBy= userId,
+                    CompanyId=companyId,
+                    FilePath=request.FilePath,
+                    PreviousDocumentsPath = request.PreviousDocumentsPath,
+                    ExistingDocumentsPath = request.ExistingDocumentsPath,
+                    West=request.West,
+                    East=request.East,
+                    North=request.North,
+                    South=request.South,
+                    DocumentType=request.DocumentType,
+                    IssuanceNumber=request.IssuanceNumber,
+                    IssuanceDate=issuanceDate,
+                    SerialNumber=request.SerialNumber,
+                    TransactionDate=transactionDate,
+                    iscomplete = false,
+                    iseditable = false
+                    
+                };
+                _context.Add(property);
+                await _context.SaveChangesAsync();
+
+                await UpsertPropertyAddressAsync(property.Id, userId, request);
+
+                // Log the creation to comprehensive audit
+                await _auditService.LogCreateAsync(
+                    WebAPIBackend.Models.Audit.AuditModules.Property,
+                    "Property",
+                    property.Id.ToString(),
+                    newValues: new { property.Id, property.Pnumber, property.IssuanceNumber, property.SerialNumber, property.PropertyTypeId },
+                    descriptionDari: $"ثبت سند ملکیت با شماره {property.Pnumber}");
+
+                var result = new { Id = property.Id, PropertyTypeId = property.PropertyTypeId };
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in SaveProperty: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { message = "خطای داخلی سرور", error = ex.Message, innerError = ex.InnerException?.Message });
+            }
         }
 
         [Authorize]
