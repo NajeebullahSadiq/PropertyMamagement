@@ -416,31 +416,6 @@
                                 </div>
                             </div>
 
-                            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6" *ngIf="isRentTransaction()">
-                                <div>
-                                    <label for="contractStartDate" class="block text-sm font-semibold text-gray-700 mb-2">تاریخ اغاز قرار داد</label>
-                                    <app-multi-calendar-datepicker
-                                      formControlName="contractStartDate"
-                                      label=""
-                                      [required]="true">
-                                    </app-multi-calendar-datepicker>
-                                    <div *ngIf="contractStartDate?.invalid && (contractStartDate?.dirty || contractStartDate?.touched)">
-                                        <small class="text-red-600 text-xs mt-1 block" *ngIf="contractStartDate?.errors?.['required']">تاریخ اغاز قرار داد الزامی است</small>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label for="contractEndDate" class="block text-sm font-semibold text-gray-700 mb-2">تاریخ ختم قرار داد</label>
-                                    <app-multi-calendar-datepicker
-                                      formControlName="contractEndDate"
-                                      label=""
-                                      [required]="true">
-                                    </app-multi-calendar-datepicker>
-                                    <div *ngIf="contractEndDate?.invalid && (contractEndDate?.dirty || contractEndDate?.touched)">
-                                        <small class="text-red-600 text-xs mt-1 block" *ngIf="contractEndDate?.errors?.['required']">تاریخ ختم قرار داد الزامی است</small>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label for="halfPrice" class="block text-sm font-semibold text-gray-700 mb-2">مناصفه قیمت</label>

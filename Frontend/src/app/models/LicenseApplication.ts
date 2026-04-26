@@ -57,6 +57,7 @@ export interface LicenseApplicationGuarantor {
     
     // Guarantee Type
     guaranteeTypeId: number;
+    guaranteeTypeName?: string;
     
     // Conditional Fields - Cash (پول نقد)
     cashAmount?: number;

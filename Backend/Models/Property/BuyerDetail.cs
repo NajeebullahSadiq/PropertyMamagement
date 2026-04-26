@@ -68,27 +68,11 @@ public partial class BuyerDetail
 
     public DateTime? RentEndDate { get; set; }
 
-    public DateTime? ContractStartDate { get; set; }
-
-    public DateTime? ContractEndDate { get; set; }
-
     /// <summary>
     /// Calendar type for date conversion (not mapped to database)
     /// </summary>
     [NotMapped]
     public string? CalendarType { get; set; }
-
-    /// <summary>
-    /// Contract start date as string from frontend (not mapped to database)
-    /// </summary>
-    [NotMapped]
-    public string? ContractStartDateStr { get; set; }
-
-    /// <summary>
-    /// Contract end date as string from frontend (not mapped to database)
-    /// </summary>
-    [NotMapped]
-    public string? ContractEndDateStr { get; set; }
 
     /// <summary>
     /// Rent start date as string from frontend (not mapped to database)

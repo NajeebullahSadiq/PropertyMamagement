@@ -567,10 +567,10 @@ export class CompanyownerComponent extends BaseComponent {
 		this.isSearching = true;
 		const calendar = this.calendarService.getSelectedCalendar();
 		this.licenseAppService.search(
-			this.serialNumberSearch.trim(),
-			undefined, undefined, undefined, undefined,
-			undefined, undefined, undefined,
-			1, 50, calendar
+			      this.serialNumberSearch.trim(),
+      undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined, undefined,
+      1, 50, calendar
 		).pipe(takeUntil(this.destroy$)).subscribe({
 			next: (response) => {
 				this.isSearching = false;

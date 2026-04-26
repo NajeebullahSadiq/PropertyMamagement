@@ -62,6 +62,7 @@ export class LicenseApplicationService {
         shariaDeedNumber?: string,
         customaryDeedSerial?: string,
         guarantorName?: string,
+        guarantorFatherName?: string,
         page: number = 1,
         pageSize: number = 10,
         calendarType?: string
@@ -93,6 +94,9 @@ export class LicenseApplicationService {
         }
         if (guarantorName) {
             params = params.set('guarantorName', guarantorName);
+        }
+        if (guarantorFatherName) {
+            params = params.set('guarantorFatherName', guarantorFatherName);
         }
         if (calendarType) {
             params = params.set('calendarType', calendarType);

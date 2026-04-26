@@ -64,7 +64,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 var totalCount = await query.CountAsync();
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-                var result = await query
+                var items = await query
                     .OrderByDescending(x => x.CreatedAt)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -72,9 +72,6 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     {
                         x.Id,
                         x.RequestDate,
-                        RequestDateFormatted = x.RequestDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.RequestDate, calendar)
-                            : "",
                         x.RequestSerialNumber,
                         x.ApplicantName,
                         x.ApplicantFatherName,
@@ -96,6 +93,62 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         x.CreatedAt,
                         x.CreatedBy
                     }).ToListAsync();
+
+                // Get guarantors for each application
+                var applicationIds = items.Select(x => x.Id).ToList();
+                var guarantors = await _context.LicenseApplicationGuarantors
+                    .AsNoTracking()
+                    .Where(g => applicationIds.Contains(g.LicenseApplicationId))
+                    .Select(g => new
+                    {
+                        g.Id,
+                        g.LicenseApplicationId,
+                        g.GuarantorName,
+                        g.GuarantorFatherName,
+                        g.GuaranteeTypeId,
+                        GuaranteeTypeName = g.GuaranteeType != null ? g.GuaranteeType.Name : ""
+                    })
+                    .ToListAsync();
+
+                var result = items.Select(x => new
+                {
+                    x.Id,
+                    x.RequestDate,
+                    RequestDateFormatted = x.RequestDate.HasValue
+                        ? DateConversionHelper.FormatDateOnly(x.RequestDate, calendar)
+                        : "",
+                    x.RequestSerialNumber,
+                    x.ApplicantName,
+                    x.ApplicantFatherName,
+                    x.ApplicantGrandfatherName,
+                    x.ApplicantElectronicNumber,
+                    x.ProposedGuideName,
+                    x.PermanentProvinceId,
+                    x.PermanentProvinceName,
+                    x.PermanentDistrictId,
+                    x.PermanentDistrictName,
+                    x.PermanentVillage,
+                    x.CurrentProvinceId,
+                    x.CurrentProvinceName,
+                    x.CurrentDistrictId,
+                    x.CurrentDistrictName,
+                    x.CurrentVillage,
+                    x.IsWithdrawn,
+                    x.Status,
+                    x.CreatedAt,
+                    x.CreatedBy,
+                    Guarantors = guarantors
+                        .Where(g => g.LicenseApplicationId == x.Id)
+                        .Select(g => new
+                        {
+                            g.Id,
+                            g.GuarantorName,
+                            g.GuarantorFatherName,
+                            g.GuaranteeTypeId,
+                            g.GuaranteeTypeName
+                        })
+                        .ToList()
+                }).ToList();
 
                 return Ok(new
                 {
@@ -125,6 +178,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             [FromQuery] string? shariaDeedNumber = null,
             [FromQuery] string? customaryDeedSerial = null,
             [FromQuery] string? guarantorName = null,
+            [FromQuery] string? guarantorFatherName = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? calendarType = null)
@@ -172,11 +226,12 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     query = query.Where(x => x.ApplicantElectronicNumber != null && x.ApplicantElectronicNumber.Contains(electronicNumber));
                 }
 
-                // Filter by Sharia deed number or Customary deed serial or Guarantor name
+                // Filter by Sharia deed number or Customary deed serial or Guarantor name or Guarantor father name
                 // These require joining with guarantors table
                 if (!string.IsNullOrWhiteSpace(shariaDeedNumber) || 
                     !string.IsNullOrWhiteSpace(customaryDeedSerial) || 
-                    !string.IsNullOrWhiteSpace(guarantorName))
+                    !string.IsNullOrWhiteSpace(guarantorName) ||
+                    !string.IsNullOrWhiteSpace(guarantorFatherName))
                 {
                     var guarantorQuery = _context.LicenseApplicationGuarantors.AsNoTracking().AsQueryable();
 
@@ -199,6 +254,13 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     {
                         guarantorQuery = guarantorQuery.Where(g => 
                             g.GuarantorName.Contains(guarantorName));
+                    }
+
+                    // Filter by Guarantor father name (نام پدر تضمین‌کننده)
+                    if (!string.IsNullOrWhiteSpace(guarantorFatherName))
+                    {
+                        guarantorQuery = guarantorQuery.Where(g => 
+                            g.GuarantorFatherName != null && g.GuarantorFatherName.Contains(guarantorFatherName));
                     }
 
                     var applicationIdsWithGuarantors = await guarantorQuery
@@ -253,6 +315,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         g.GuarantorName,
                         g.GuarantorFatherName,
                         g.GuaranteeTypeId,
+                        GuaranteeTypeName = g.GuaranteeType != null ? g.GuaranteeType.Name : "",
                         g.CashAmount,
                         g.ShariaDeedNumber,
                         g.ShariaDeedDate,
@@ -295,6 +358,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                             g.GuarantorName,
                             g.GuarantorFatherName,
                             g.GuaranteeTypeId,
+                            g.GuaranteeTypeName,
                             g.CashAmount,
                             g.ShariaDeedNumber,
                             g.ShariaDeedDate,
@@ -321,7 +385,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         electronicNumber,
                         shariaDeedNumber,
                         customaryDeedSerial,
-                        guarantorName
+                        guarantorName,
+                        guarantorFatherName
                     }
                 });
             }

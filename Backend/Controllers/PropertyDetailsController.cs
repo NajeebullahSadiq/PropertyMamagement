@@ -478,8 +478,6 @@ namespace WebAPIBackend.Controllers
                             b.TransactionTypeDescription,
                             b.RentStartDate,
                             b.RentEndDate,
-                            b.ContractStartDate,
-                            b.ContractEndDate,
                             b.PaddressProvinceId,
                             b.PaddressDistrictId,
                             b.PaddressVillage,

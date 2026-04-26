@@ -111,8 +111,6 @@ export class BuyerdetailComponent extends BaseComponent {
       halfPrice: [''],
       rentStartDate: [''],
       rentEndDate: [''],
-      contractStartDate: [''],
-      contractEndDate: [''],
       transactionType: ['', Validators.required],
       transactionTypeDescription: [''],
       taxIdentificationNumber: [''],
@@ -164,9 +162,6 @@ export class BuyerdetailComponent extends BaseComponent {
       const descriptionControl = this.sellerForm.get('transactionTypeDescription');
       const priceControl = this.sellerForm.get('price');
       const priceTextControl = this.sellerForm.get('priceText');
-      const contractStartDateControl = this.sellerForm.get('contractStartDate');
-      const contractEndDateControl = this.sellerForm.get('contractEndDate');
-
       const supportedTypes = ['Purchase', 'Rent', 'Revocable Sale'];
       const shouldResetPricePair =
         !this.suppressTransactionTypeHandling &&
@@ -182,20 +177,6 @@ export class BuyerdetailComponent extends BaseComponent {
       }
 
       this.updatePriceValidators(transactionType);
-      
-      // Set contract date validation for Rent transaction type
-      if (transactionType === 'Rent') {
-        contractStartDateControl?.setValidators([Validators.required]);
-        contractEndDateControl?.setValidators([Validators.required]);
-      } else {
-        contractStartDateControl?.clearValidators();
-        contractEndDateControl?.clearValidators();
-        contractStartDateControl?.reset();
-        contractEndDateControl?.reset();
-      }
-      contractStartDateControl?.updateValueAndValidity();
-      contractEndDateControl?.updateValueAndValidity();
-      
       if (transactionType === 'Other') {
         descriptionControl?.setValidators([Validators.required]);
 
@@ -284,8 +265,6 @@ export class BuyerdetailComponent extends BaseComponent {
           halfPrice: firstBuyer.halfPrice || '',
           rentStartDate: firstBuyer.rentStartDate || '',
           rentEndDate: firstBuyer.rentEndDate || '',
-          contractStartDate: firstBuyer.contractStartDate || '',
-          contractEndDate: firstBuyer.contractEndDate || '',
           transactionType: firstBuyer.transactionType || '',
           transactionTypeDescription: firstBuyer.transactionTypeDescription || '',
           taxIdentificationNumber: (firstBuyer as any).taxIdentificationNumber || '',
@@ -339,13 +318,9 @@ export class BuyerdetailComponent extends BaseComponent {
     // Format dates as Hijri Shamsi strings for backend (following company module pattern)
     const currentCalendar = CalendarType.HIJRI_SHAMSI;
     sellerDetails.calendarType = currentCalendar;
-    sellerDetails.contractStartDateStr = this.formatDateForBackend(this.sellerForm.get('contractStartDate')?.value);
-    sellerDetails.contractEndDateStr = this.formatDateForBackend(this.sellerForm.get('contractEndDate')?.value);
     sellerDetails.rentStartDateStr = this.formatDateForBackend(this.sellerForm.get('rentStartDate')?.value);
     sellerDetails.rentEndDateStr = this.formatDateForBackend(this.sellerForm.get('rentEndDate')?.value);
     // Clear the Date objects so backend uses the string fields instead
-    (sellerDetails as any).contractStartDate = null;
-    (sellerDetails as any).contractEndDate = null;
     (sellerDetails as any).rentStartDate = null;
     (sellerDetails as any).rentEndDate = null;
 
@@ -423,13 +398,9 @@ updateBuyerDetails(): void {
   // Format dates as Hijri Shamsi strings for backend (following company module pattern)
   const currentCalendar = CalendarType.HIJRI_SHAMSI;
   sellerDetails.calendarType = currentCalendar;
-  sellerDetails.contractStartDateStr = this.formatDateForBackend(this.sellerForm.get('contractStartDate')?.value);
-  sellerDetails.contractEndDateStr = this.formatDateForBackend(this.sellerForm.get('contractEndDate')?.value);
   sellerDetails.rentStartDateStr = this.formatDateForBackend(this.sellerForm.get('rentStartDate')?.value);
   sellerDetails.rentEndDateStr = this.formatDateForBackend(this.sellerForm.get('rentEndDate')?.value);
   // Clear the Date objects so backend uses the string fields instead
-  (sellerDetails as any).contractStartDate = null;
-  (sellerDetails as any).contractEndDate = null;
   (sellerDetails as any).rentStartDate = null;
   (sellerDetails as any).rentEndDate = null;
 
@@ -483,8 +454,6 @@ updateBuyerDetails(): void {
       halfPrice: selectedBuyer.halfPrice || '',
       rentStartDate: selectedBuyer.rentStartDate || '',
       rentEndDate: selectedBuyer.rentEndDate || '',
-      contractStartDate: selectedBuyer.contractStartDate || '',
-      contractEndDate: selectedBuyer.contractEndDate || '',
       transactionType: selectedBuyer.transactionType || '',
       transactionTypeDescription: selectedBuyer.transactionTypeDescription || '',
       taxIdentificationNumber: (selectedBuyer as any).taxIdentificationNumber || '',
@@ -743,8 +712,6 @@ isAuthorizedAgent(): boolean {
   get halfPrice() { return this.sellerForm.get('halfPrice'); }
   get rentStartDate() { return this.sellerForm.get('rentStartDate'); }
   get rentEndDate() { return this.sellerForm.get('rentEndDate'); }
-  get contractStartDate() { return this.sellerForm.get('contractStartDate'); }
-  get contractEndDate() { return this.sellerForm.get('contractEndDate'); }
   get transactionType() { return this.sellerForm.get('transactionType'); }
   get transactionTypeDescription() { return this.sellerForm.get('transactionTypeDescription'); }
 
@@ -756,10 +723,6 @@ isAuthorizedAgent(): boolean {
     const roleType = this.sellerForm.get('roleType')?.value;
     const lesseeRoles = ['Lessee', 'Lessees', 'Agent for lessee'];
     return roleType && lesseeRoles.includes(roleType);
-  }
-
-  isRentTransaction(): boolean {
-    return this.sellerForm.get('transactionType')?.value === 'Rent';
   }
 
   allowsMultipleBuyers(): boolean {

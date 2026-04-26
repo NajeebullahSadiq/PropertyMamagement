@@ -37,6 +37,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
     searchShariaDeedNumber = '';
     searchCustomaryDeedSerial = '';
     searchGuarantorName = '';
+    searchGuarantorFatherName = '';
 
     // Report fields
     showReports = false;
@@ -144,6 +145,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
             this.searchShariaDeedNumber || undefined,
             this.searchCustomaryDeedSerial || undefined,
             this.searchGuarantorName || undefined,
+            this.searchGuarantorFatherName || undefined,
             this.page,
             this.pageSize,
             calendar
@@ -174,6 +176,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
         this.searchShariaDeedNumber = '';
         this.searchCustomaryDeedSerial = '';
         this.searchGuarantorName = '';
+        this.searchGuarantorFatherName = '';
         this.searchTerm = '';
         this.page = 1;
         this.loadData();
@@ -206,8 +209,32 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
             this.searchElectronicNumber ||
             this.searchShariaDeedNumber ||
             this.searchCustomaryDeedSerial ||
-            this.searchGuarantorName
+            this.searchGuarantorName ||
+            this.searchGuarantorFatherName
         );
+    }
+
+    totalPages(): number {
+        return Math.ceil(this.totalCount / this.pageSize);
+    }
+
+    isLastPage(): boolean {
+        return this.page >= this.totalPages();
+    }
+
+    getGuarantorNames(item: LicenseApplication): string {
+        if (!item.guarantors || item.guarantors.length == 0) return '-';
+        return item.guarantors.map(g => g.guarantorName).join('، ');
+    }
+
+    getGuarantorFatherNames(item: LicenseApplication): string {
+        if (!item.guarantors || item.guarantors.length == 0) return '-';
+        return item.guarantors.map(g => g.guarantorFatherName || '-').join('، ');
+    }
+
+    getGuarantorTypeNames(item: LicenseApplication): string {
+        if (!item.guarantors || item.guarantors.length == 0) return '-';
+        return item.guarantors.map(g => g.guaranteeTypeName || '-').join('، ');
     }
 
     getStatusText(item: LicenseApplication): string {

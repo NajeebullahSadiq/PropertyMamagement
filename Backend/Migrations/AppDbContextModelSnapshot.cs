@@ -751,12 +751,6 @@ namespace WebAPIBackend.Migrations
                     b.Property<string>("AuthorizationLetter")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("ContractEndDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime?>("ContractStartDate")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
