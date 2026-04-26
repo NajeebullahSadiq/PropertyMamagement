@@ -496,15 +496,6 @@ namespace WebAPIBackend.Controllers
                 return StatusCode(400, "Authorization letter is required for agent roles");
             }
 
-            var lesseeBuyerRoles = new[] { "Lessee", "Lessees", "Agent for lessee" };
-            if (lesseeBuyerRoles.Contains(roleType))
-            {
-                if (!request.RentStartDate.HasValue || !request.RentEndDate.HasValue)
-                {
-                    return StatusCode(400, "Rental dates are required for lessee roles");
-                }
-            }
-
             // Transaction / price rules
             var supportedTransactionTypes = new[] { "Purchase", "Rent", "Revocable Sale", "Other" };
             if (!string.IsNullOrWhiteSpace(request.TransactionType) && !supportedTransactionTypes.Contains(request.TransactionType))
@@ -584,6 +575,16 @@ namespace WebAPIBackend.Controllers
             else if (request.RentEndDate.HasValue)
             {
                 rentEndDate = request.RentEndDate;
+            }
+
+            // Validate rental dates for lessee roles (after parsing from string fields)
+            var lesseeBuyerRoles = new[] { "Lessee", "Lessees", "Agent for lessee" };
+            if (lesseeBuyerRoles.Contains(roleType))
+            {
+                if (!rentStartDate.HasValue || !rentEndDate.HasValue)
+                {
+                    return StatusCode(400, "Rental dates are required for lessee roles");
+                }
             }
 
             var buyer = new BuyerDetail
