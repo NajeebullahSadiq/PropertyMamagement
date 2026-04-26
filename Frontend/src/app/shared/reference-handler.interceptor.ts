@@ -15,9 +15,18 @@ import { map } from 'rxjs/operators';
 export class ReferenceHandlerInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Skip processing for blob responses (file downloads/views)
+    if (req.responseType === 'blob') {
+      return next.handle(req);
+    }
+
     return next.handle(req).pipe(
       map((event: HttpEvent<any>) => {
         if (event instanceof HttpResponse && event.body) {
+          // Also skip if the body is a Blob (safety check)
+          if (event.body instanceof Blob) {
+            return event;
+          }
           return event.clone({ body: this.unwrapPreserve(event.body) });
         }
         return event;

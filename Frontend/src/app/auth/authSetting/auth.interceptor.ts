@@ -33,7 +33,10 @@ export class AuthInterceptor implements HttpInterceptor {
                             this.router.navigateByUrl('/Auth');
                         }
                         else if (err.status == 403) {
-                            this.router.navigateByUrl('/forbidden');
+                            // Don't redirect for blob requests (file view/download) - let the component handle the error
+                            if (req.responseType !== 'blob') {
+                                this.router.navigateByUrl('/forbidden');
+                            }
                         }
                     }
                 )

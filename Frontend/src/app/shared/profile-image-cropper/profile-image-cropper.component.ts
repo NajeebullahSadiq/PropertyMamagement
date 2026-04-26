@@ -184,11 +184,16 @@ export class ProfileImageCropperComponent implements OnChanges {
       return path;
     }
     
-    // If path starts with Resources/, it's a full path from DB - use static file serving
-    // The backend serves these files at /api/Resources/...
+    // If path starts with /api/ or api/, it's already a fully constructed API URL
+    // (e.g., from a parent component's constructImageUrl method)
+    if (path.startsWith('/api/') || path.startsWith('api/')) {
+      return path.startsWith('/') ? path : '/' + path;
+    }
+    
+    // If path starts with Resources/, use Upload/view endpoint
     if (path.startsWith('Resources/') || path.startsWith('/Resources/')) {
       const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-      return `${environment.apiURL}/${cleanPath}`;
+      return `${environment.apiURL}/Upload/view/${cleanPath}`;
     }
     
     // Otherwise, use Upload/view endpoint
