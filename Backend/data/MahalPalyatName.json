@@ -1,0 +1,802 @@
+[
+  {
+    "Dari name": "جوار ستره محکمه",
+    "English name": "Adjacent to ستره Court"
+  },
+  {
+    "Dari name": "جوارریاست حقوق کابل",
+    "English name": "Adjacent to Directorate of Kabul Justice Rights"
+  },
+  {
+    "Dari name": "جوارشاروالی کابل",
+    "English name": "Adjacent to Kabul Municipality"
+  },
+  {
+    "Dari name": "جوارریاست معارف شهر",
+    "English name": "Adjacent to Directorate of Education شهر"
+  },
+  {
+    "Dari name": "جوارریاست کارکنان معارف",
+    "English name": "Adjacent to Directorate of کارکنان Education"
+  },
+  {
+    "Dari name": "جوارولایت کابل",
+    "English name": "Adjacent to Kabul Province"
+  },
+  {
+    "Dari name": "جوارریاست برق کابل",
+    "English name": "Adjacent to Directorate of Kabul Electricity"
+  },
+  {
+    "Dari name": "جوارریاست تحقیقات جنایی",
+    "English name": "Adjacent to Directorate of Criminal Investigations"
+  },
+  {
+    "Dari name": "جوارریاست قضایای امارت ولایت کابل",
+    "English name": "Adjacent to Directorate of Emirate Cases Kabul Province"
+  },
+  {
+    "Dari name": "جوارریاست عمومی قضایای امارت",
+    "English name": "Adjacent to Directorate of عمومی Emirate Cases"
+  },
+  {
+    "Dari name": "جوارریاست احصایه ومعلومات",
+    "English name": "Adjacent to Directorate of Statistics and Information"
+  },
+  {
+    "Dari name": "جوارریاست خدمات تذکره الکترونیکی",
+    "English name": "Adjacent to Directorate of E-Tazkira Services"
+  },
+  {
+    "Dari name": "جوارمحکمه وثایق حوزه 1",
+    "English name": "Adjacent to Court Documents District 1"
+  },
+  {
+    "Dari name": "جوارمحکمه وثایق حوزه 2",
+    "English name": "Adjacent to Court Documents District 2"
+  },
+  {
+    "Dari name": "جوارمحکمه وثایق حوزه 3",
+    "English name": "Adjacent to Court Documents District 3"
+  },
+  {
+    "Dari name": "جوارمحکمه وثایق حوزه 4",
+    "English name": "Adjacent to Court Documents District 4"
+  },
+  {
+    "Dari name": "جوارمحکمه وثایق حوزه 5",
+    "English name": "Adjacent to Court Documents District 5"
+  },
+  {
+    "Dari name": "جوارمحکمه وثایق حوزه 6",
+    "English name": "Adjacent to Court Documents District 6"
+  },
+  {
+    "Dari name": "جوارریاست شورای طبی",
+    "English name": "Adjacent to Directorate of Medical Council"
+  },
+  {
+    "Dari name": "جوارریاست ثبت مرکزی",
+    "English name": "Adjacent to Directorate of Central Registration"
+  },
+  {
+    "Dari name": "جوارمحکمه شهری حوزه 1",
+    "English name": "Adjacent to Court Urban District 1"
+  },
+  {
+    "Dari name": "جوارمحکمه شهری حوزه 2",
+    "English name": "Adjacent to Court Urban District 2"
+  },
+  {
+    "Dari name": "جوارمحکمه شهری حوزه 3",
+    "English name": "Adjacent to Court Urban District 3"
+  },
+  {
+    "Dari name": "جوارمحکمه شهری حوزه 4",
+    "English name": "Adjacent to Court Urban District 4"
+  },
+  {
+    "Dari name": "جوارریاست پاسپورت",
+    "English name": "Adjacent to Directorate of Passport"
+  },
+  {
+    "Dari name": "جوارریاست معارف ولایت کابل",
+    "English name": "Adjacent to Directorate of Education Kabul Province"
+  },
+  {
+    "Dari name": "جوارریاست ترافیک",
+    "English name": "Adjacent to Directorate of Traffic"
+  },
+  {
+    "Dari name": "جوارریاست تنظیم ترانسپورت",
+    "English name": "Adjacent to Directorate of Transport Regulation"
+  },
+  {
+    "Dari name": "جوارمعینیت مبارزه بامواد مخدر",
+    "English name": "Adjacent to معینیت Counter Narcotics Deputy"
+  },
+  {
+    "Dari name": "جوارریاست برق کابل",
+    "English name": "Adjacent to Directorate of Kabul Electricity"
+  },
+  {
+    "Dari name": "جوار ریاست نتایج وشهادت نامه ها",
+    "English name": "Adjacent to Directorate of Results and Certificates"
+  },
+  {
+    "Dari name": "جوار قوماندانی امنیه کابل",
+    "English name": "Adjacent to Kabul Police Command"
+  },
+  {
+    "Dari name": "جوارریاست آبرسانی",
+    "English name": "Adjacent to Directorate of Water Supply"
+  },
+  {
+    "Dari name": "جوار احصایه ومعلومات سایت برچی",
+    "English name": "Adjacent to Statistics and Information سایت برچی"
+  },
+  {
+    "Dari name": "جوار گمرک کابل",
+    "English name": "Adjacent to Kabul Customs"
+  },
+  {
+    "Dari name": "جوار افغان اعلانات",
+    "English name": "Adjacent to Afghan Announcements"
+  },
+  {
+    "Dari name": "جوارریاست سمع شکایات امربالمعروف",
+    "English name": "Adjacent to Directorate of Complaints Hearing of Vice and Virtue"
+  },
+  {
+    "Dari name": "جوار محکمه نظامی",
+    "English name": "Adjacent to Court Military"
+  },
+  {
+    "Dari name": "جوار معینیت غذا وادویه",
+    "English name": "Adjacent to معینیت Food and Medicine"
+  },
+  {
+    "Dari name": "جوارریاست امورمهاجرین عودت کننده گان",
+    "English name": "Adjacent to Directorate of Returnee Migrants Affairs"
+  },
+  {
+    "Dari name": "جوار ریاست صحت حیوانی",
+    "English name": "Adjacent to Directorate of Animal Health"
+  },
+  {
+    "Dari name": "جوار ریاست صحت عامه کابل",
+    "English name": "Adjacent to Directorate of Kabul Public Health"
+  },
+  {
+    "Dari name": "جوار معینیت زمین داری واراضی",
+    "English name": "Adjacent to معینیت Land and Properties"
+  },
+  {
+    "Dari name": "جوار ریاست خزینه تقاعد",
+    "English name": "Adjacent to Directorate of Pension Treasury"
+  },
+  {
+    "Dari name": "جوار ریاست تعلیمات خصوصی",
+    "English name": "Adjacent to Directorate of Private Education"
+  },
+  {
+    "Dari name": "جوار ریاست تخصصات دینی",
+    "English name": "Adjacent to Directorate of Religious Specializations"
+  },
+  {
+    "Dari name": "جوار ریاست آبرسانی زون کابل",
+    "English name": "Adjacent to Directorate of Water Supply زون کابل"
+  },
+  {
+    "Dari name": "جوارمعینیت خدمات شهری شاروالی",
+    "English name": "Adjacent to معینیت خدمات Urban Municipality"
+  },
+  {
+    "Dari name": "احصایه ومعلومات سایت جاده میوند",
+    "English name": "Statistics and Information سایت جاده میوند"
+  },
+  {
+    "Dari name": "جوارریاست سرسبزی شاروالی",
+    "English name": "Adjacent to Directorate of سرسبزی Municipality"
+  },
+  {
+    "Dari name": "جواراحصایه ومعلومات سایت مکرویان",
+    "English name": "Adjacent to Statistics and Information سایت مکرویان"
+  },
+  {
+    "Dari name": "جوار شفاخانه ابن سینا",
+    "English name": "Adjacent to شفاخانه ابن سینا"
+  },
+  {
+    "Dari name": "جوار انستیتوت انرژی وآب",
+    "English name": "Adjacent to انستیتوت انرژی وآب"
+  },
+  {
+    "Dari name": "جوار ولسوالی سروبی",
+    "English name": "Adjacent to ولسوالی سروبی"
+  },
+  {
+    "Dari name": "جواراحصایه ومعلومات سایت برچی",
+    "English name": "Adjacent to Statistics and Information سایت برچی"
+  },
+  {
+    "Dari name": "جوارولسوالی گلدره",
+    "English name": "Adjacent to ولسوالی گلدره"
+  },
+  {
+    "Dari name": "جواراداره عمومی احصایه ومعلومات",
+    "English name": "Adjacent to اداره عمومی Statistics and Information"
+  },
+  {
+    "Dari name": "جوارلوی ریااست نظارت وتعقیب فرامین واحکام",
+    "English name": "Adjacent to لوی ریااست نظارت وتعقیب فرامین واحکام"
+  },
+  {
+    "Dari name": "جوارریاست امورشرکت های امارتی",
+    "English name": "Adjacent to Directorate of امورشرکت های امارتی"
+  },
+  {
+    "Dari name": "جوار اداره تنظیم امورزندان ها",
+    "English name": "Adjacent to اداره تنظیم امورزندان ها"
+  },
+  {
+    "Dari name": "جوارریاست عمومی شرکت های امارتی",
+    "English name": "Adjacent to Directorate of عمومی شرکت های امارتی"
+  },
+  {
+    "Dari name": "جواراداره تعلیمات تحنیکی ومسلکی",
+    "English name": "Adjacent to اداره تعلیمات تحنیکی ومسلکی"
+  },
+  {
+    "Dari name": "جواراکادمی علوم",
+    "English name": "Adjacent to اکادمی علوم"
+  },
+  {
+    "Dari name": "جوارریاست عمومی رادیوتلویزیون",
+    "English name": "Adjacent to Directorate of عمومی رادیوتلویزیون"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 1 امنیتی",
+    "English name": "Adjacent to آمریت District 1 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 2 امنیتی",
+    "English name": "Adjacent to آمریت District 2 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 3 امنیتی",
+    "English name": "Adjacent to آمریت District 3 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 4 امنیتی",
+    "English name": "Adjacent to آمریت District 4 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 5 امنیتی",
+    "English name": "Adjacent to آمریت District 5 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 6 امنیتی",
+    "English name": "Adjacent to آمریت District 6 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 7 امنیتی",
+    "English name": "Adjacent to آمریت District 7 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 8 امنیتی",
+    "English name": "Adjacent to آمریت District 8 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 9 امنیتی",
+    "English name": "Adjacent to آمریت District 9 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 10 امنیتی",
+    "English name": "Adjacent to آمریت District 10 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 11 امنیتی",
+    "English name": "Adjacent to آمریت District 11 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 12 امنیتی",
+    "English name": "Adjacent to آمریت District 12 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 13 امنیتی",
+    "English name": "Adjacent to آمریت District 13 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 14 امنیتی",
+    "English name": "Adjacent to آمریت District 14 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 15 امنیتی",
+    "English name": "Adjacent to آمریت District 15 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 16 امنیتی",
+    "English name": "Adjacent to آمریت District 16 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 17 امنیتی",
+    "English name": "Adjacent to آمریت District 17 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 18 امنیتی",
+    "English name": "Adjacent to آمریت District 18 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 19 امنیتی",
+    "English name": "Adjacent to آمریت District 19 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 20 امنیتی",
+    "English name": "Adjacent to آمریت District 20 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 21 امنیتی",
+    "English name": "Adjacent to آمریت District 21 امنیتی"
+  },
+  {
+    "Dari name": "جوارآمریت حوزه 22 امنیتی",
+    "English name": "Adjacent to آمریت District 22 امنیتی"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 1 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 1 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 2 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 2 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 3 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 3 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 4 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 4 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 5 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 5 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 6 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 6 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 7 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 7 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 8 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 8 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 8 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 8 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 10 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 10 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 11 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 11 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 12 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 12 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 13 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 13 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 14 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 14 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 15 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 15 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 16 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 16 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 17 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 17 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 18 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 18 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 19 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 19 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 20 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 20 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 21 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 21 Municipality"
+  },
+  {
+    "Dari name": "جوارریاست ناحیه 22 شاروالی",
+    "English name": "Adjacent to Directorate of ناحیه 22 Municipality"
+  },
+  {
+    "Dari name": "جوار محکمه استناف ولایت کابل",
+    "English name": "Adjacent to Court استناف Kabul Province"
+  },
+  {
+    "Dari name": "جوار پوسته خانه ناحیه 8",
+    "English name": "Adjacent to پوسته خانه ناحیه 8"
+  },
+  {
+    "Dari name": "جوارپوهنتون کابل",
+    "English name": "Adjacent to پوهنتون کابل"
+  },
+  {
+    "Dari name": "جوارریاست عمومی المپیک",
+    "English name": "Adjacent to Directorate of عمومی المپیک"
+  },
+  {
+    "Dari name": "جوارمدیریت ترافیک کابل",
+    "English name": "Adjacent to مدیریت Traffic کابل"
+  },
+  {
+    "Dari name": "جوارریاست معارف ولایت  کابل",
+    "English name": "Adjacent to Directorate of Education ولایت کابل"
+  },
+  {
+    "Dari name": "جوارریاست احصایه ومعلومات",
+    "English name": "Adjacent to Directorate of Statistics and Information"
+  },
+  {
+    "Dari name": "جواراحصایه ومعلومات سایت دارالامان",
+    "English name": "Adjacent to Statistics and Information سایت دارالامان"
+  },
+  {
+    "Dari name": "جواراحصایه ومعلوامات سایت جاده میوند",
+    "English name": "Adjacent to احصایه ومعلوامات سایت جاده میوند"
+  },
+  {
+    "Dari name": "جوارمحکمه استناف کابل",
+    "English name": "Adjacent to Court استناف کابل"
+  },
+  {
+    "Dari name": "جوار حوزه 1 تعلیمی",
+    "English name": "Adjacent to District 1 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 2 تعلیمی",
+    "English name": "Adjacent to District 2 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 3 تعلیمی",
+    "English name": "Adjacent to District 3 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 4 تعلیمی",
+    "English name": "Adjacent to District 4 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 5 تعلیمی",
+    "English name": "Adjacent to District 5 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 6 تعلیمی",
+    "English name": "Adjacent to District 6 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 7 تعلیمی",
+    "English name": "Adjacent to District 7 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 8 تعلیمی",
+    "English name": "Adjacent to District 8 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 9 تعلیمی",
+    "English name": "Adjacent to District 9 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 10 تعلیمی",
+    "English name": "Adjacent to District 10 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 11 تعلیمی",
+    "English name": "Adjacent to District 11 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 12 تعلیمی",
+    "English name": "Adjacent to District 12 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 13 تعلیمی",
+    "English name": "Adjacent to District 13 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 14 تعلیمی",
+    "English name": "Adjacent to District 14 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 15 تعلیمی",
+    "English name": "Adjacent to District 15 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 16 تعلیمی",
+    "English name": "Adjacent to District 16 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 17 تعلیمی",
+    "English name": "Adjacent to District 17 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 18 تعلیمی",
+    "English name": "Adjacent to District 18 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 19 تعلیمی",
+    "English name": "Adjacent to District 19 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 20 تعلیمی",
+    "English name": "Adjacent to District 20 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 21 تعلیمی",
+    "English name": "Adjacent to District 21 تعلیمی"
+  },
+  {
+    "Dari name": "جوارحوزه 22 تعلیمی",
+    "English name": "Adjacent to District 22 تعلیمی"
+  },
+  {
+    "Dari name": "جوارریاست قوای بشری",
+    "English name": "Adjacent to Directorate of قوای بشری"
+  },
+  {
+    "Dari name": "جوار ولسوالی پغمان",
+    "English name": "Adjacent to ولسوالی پغمان"
+  },
+  {
+    "Dari name": "جوار ولسوالی سروبی",
+    "English name": "Adjacent to ولسوالی سروبی"
+  },
+  {
+    "Dari name": "جوار ولسوالی موسهی",
+    "English name": "Adjacent to ولسوالی موسهی"
+  },
+  {
+    "Dari name": "جوار ولسوالی بگرامی",
+    "English name": "Adjacent to ولسوالی بگرامی"
+  },
+  {
+    "Dari name": "جوارولسوالی قره باغ",
+    "English name": "Adjacent to ولسوالی قره باغ"
+  },
+  {
+    "Dari name": "جوارولسوالی چهارآسیاب",
+    "English name": "Adjacent to ولسوالی چهارآسیاب"
+  },
+  {
+    "Dari name": "جواروالسوالی میربچه کوت",
+    "English name": "Adjacent to والسوالی میربچه کوت"
+  },
+  {
+    "Dari name": "جوارولسوالی شکردره",
+    "English name": "Adjacent to ولسوالی شکردره"
+  },
+  {
+    "Dari name": "جوارولسوالی استالف",
+    "English name": "Adjacent to ولسوالی استالف"
+  },
+  {
+    "Dari name": "جوارولسوالی ده سبز",
+    "English name": "Adjacent to ولسوالی ده سبز"
+  },
+  {
+    "Dari name": "جوار ولسوالی کلکان",
+    "English name": "Adjacent to ولسوالی کلکان"
+  },
+  {
+    "Dari name": "جوارولسوالی خاکجبار",
+    "English name": "Adjacent to ولسوالی خاکجبار"
+  },
+  {
+    "Dari name": "جوارولسوالی فرزه",
+    "English name": "Adjacent to ولسوالی فرزه"
+  },
+  {
+    "Dari name": "جوارولسوالی گلدره",
+    "English name": "Adjacent to ولسوالی گلدره"
+  },
+  {
+    "Dari name": "جوارریاست تعلیمات اسلامی",
+    "English name": "Adjacent to Directorate of تعلیمات اسلامی"
+  },
+  {
+    "Dari name": "جوارریاست تخصصات دینی",
+    "English name": "Adjacent to Directorate of Religious Specializations"
+  },
+  {
+    "Dari name": "جوارمعینیت شهری شاروالی کابل",
+    "English name": "Adjacent to معینیت Urban Kabul Municipality"
+  },
+  {
+    "Dari name": "جوارریاست سره میاشت",
+    "English name": "Adjacent to Directorate of سره میاشت"
+  },
+  {
+    "Dari name": "جوارریاست افغانتور",
+    "English name": "Adjacent to Directorate of افغانتور"
+  },
+  {
+    "Dari name": "جواریاست امورمهاجرین وعودت کننده گان",
+    "English name": "Adjacent to یاست امورمهاجرین وعودت کننده گان"
+  },
+  {
+    "Dari name": "جوارریاست امور شهداومعلولین",
+    "English name": "Adjacent to Directorate of امور شهداومعلولین"
+  },
+  {
+    "Dari name": "جوارشفاخانه آغوش 5000 بستر",
+    "English name": "Adjacent to شفاخانه آغوش 5000 بستر"
+  },
+  {
+    "Dari name": "جوارریاست برشنا",
+    "English name": "Adjacent to Directorate of برشنا"
+  },
+  {
+    "Dari name": "جوارریاست ارشاد،حج اوقاف",
+    "English name": "Adjacent to Directorate of ارشاد،حج اوقاف"
+  },
+  {
+    "Dari name": "جوارانستیتوت انرژی وآب",
+    "English name": "Adjacent to انستیتوت انرژی وآب"
+  },
+  {
+    "Dari name": "جوارریاست عمومی اداره امور",
+    "English name": "Adjacent to Directorate of عمومی اداره امور"
+  },
+  {
+    "Dari name": "جواراداره عمومی امتحانات",
+    "English name": "Adjacent to اداره عمومی امتحانات"
+  },
+  {
+    "Dari name": "جواراداره عمومی حفاظت محیط زیست",
+    "English name": "Adjacent to اداره عمومی حفاظت محیط زیست"
+  },
+  {
+    "Dari name": "جواراداره آماده گی مبارزه باحوادث",
+    "English name": "Adjacent to اداره آماده گی مبارزه باحوادث"
+  },
+  {
+    "Dari name": "جواراداره معیاروکیفیت",
+    "English name": "Adjacent to اداره معیاروکیفیت"
+  },
+  {
+    "Dari name": "جواروزارت معادن وپطرولیم",
+    "English name": "Adjacent to وزارت معادن وپطرولیم"
+  },
+  {
+    "Dari name": "جواروزارت مالیه",
+    "English name": "Adjacent to وزارت مالیه"
+  },
+  {
+    "Dari name": "جواروزارت معارف",
+    "English name": "Adjacent to وزارت Education"
+  },
+  {
+    "Dari name": "جواروزارت صحت عامه",
+    "English name": "Adjacent to وزارت صحت عامه"
+  },
+  {
+    "Dari name": "جواروزارت امورشهدا ومعلولین",
+    "English name": "Adjacent to وزارت امورشهدا ومعلولین"
+  },
+  {
+    "Dari name": "جوار وزارت عدلیه",
+    "English name": "Adjacent to وزارت عدلیه"
+  },
+  {
+    "Dari name": "جواروزارت امورداخله",
+    "English name": "Adjacent to وزارت امورداخله"
+  },
+  {
+    "Dari name": "جواروزارت زراعت آبیاری ومالداری",
+    "English name": "Adjacent to وزارت زراعت آبیاری ومالداری"
+  },
+  {
+    "Dari name": "جواروزارت امورخارجه",
+    "English name": "Adjacent to وزارت امورخارجه"
+  },
+  {
+    "Dari name": "جواروزارت فواید عامه",
+    "English name": "Adjacent to وزارت فواید عامه"
+  },
+  {
+    "Dari name": "جواروزارت شهرسازی ومسکن",
+    "English name": "Adjacent to وزارت شهرسازی ومسکن"
+  },
+  {
+    "Dari name": "جوار وزارت مخابرات وتکنالوژی معلوماتی",
+    "English name": "Adjacent to وزارت مخابرات وتکنالوژی معلوماتی"
+  },
+  {
+    "Dari name": "جواروزارت دفاع",
+    "English name": "Adjacent to وزارت دفاع"
+  },
+  {
+    "Dari name": "جواروزارت ارشاد،حج اوقاف",
+    "English name": "Adjacent to وزارت ارشاد،حج اوقاف"
+  },
+  {
+    "Dari name": "جواروزارت صنعت وتجارت",
+    "English name": "Adjacent to وزارت صنعت وتجارت"
+  },
+  {
+    "Dari name": "جواروزارت اقتصاد",
+    "English name": "Adjacent to وزارت اقتصاد"
+  },
+  {
+    "Dari name": "جواروزارت احیاءوانکشاف دهات",
+    "English name": "Adjacent to وزارت احیاءوانکشاف دهات"
+  },
+  {
+    "Dari name": "جواروزارت انرژی وآب",
+    "English name": "Adjacent to وزارت انرژی وآب"
+  },
+  {
+    "Dari name": "جواروزارت امربالمعروف،نهی عن المنکر",
+    "English name": "Adjacent to وزارت امربالمعروف،نهی عن المنکر"
+  },
+  {
+    "Dari name": "جواروزارت کارواموراجتماعی",
+    "English name": "Adjacent to وزارت کارواموراجتماعی"
+  },
+  {
+    "Dari name": "جواروزارت ترانسپورت وهوانوردی",
+    "English name": "Adjacent to وزارت ترانسپورت وهوانوردی"
+  },
+  {
+    "Dari name": "جواروزارت امورمهاجرین وعودت کننده گان",
+    "English name": "Adjacent to وزارت امورمهاجرین وعودت کننده گان"
+  },
+  {
+    "Dari name": "جواروزارت اطلاعات وفرهنک",
+    "English name": "Adjacent to وزارت اطلاعات وفرهنک"
+  },
+  {
+    "Dari name": "جواروزارت امور اراضی واستردادزمین های غصب شده امارتی",
+    "English name": "Adjacent to وزارت امور اراضی واستردادزمین های غصب شده امارتی"
+  },
+  {
+    "Dari name": "جواروزارت تحصیلات عالی",
+    "English name": "Adjacent to وزارت تحصیلات عالی"
+  },
+  {
+    "Dari name": "جواروزارت سرحدات،اقوام وقبایل",
+    "English name": "Adjacent to وزارت سرحدات،اقوام وقبایل"
+  },
+  {
+    "Dari name": "جوارریاست مساعدت های حقوقی",
+    "English name": "Adjacent to Directorate of مساعدت های حقوقی"
+  },
+  {
+    "Dari name": "جوارریاست نتایج وشهات نامه ها",
+    "English name": "Adjacent to Directorate of نتایج وشهات نامه ها"
+  },
+  {
+    "Dari name": "جوارریاست تدریسات ثانوی",
+    "English name": "Adjacent to Directorate of تدریسات ثانوی"
+  }
+]
