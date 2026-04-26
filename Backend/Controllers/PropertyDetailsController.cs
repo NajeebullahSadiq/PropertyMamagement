@@ -890,7 +890,9 @@ namespace WebAPIBackend.Controllers
                             TaddressProvinceDari = b.TaddressProvinceId.HasValue ? _context.Locations.Where(l => l.Id == b.TaddressProvinceId.Value).Select(l => l.Dari).FirstOrDefault() : null,
                             TaddressDistrict = b.TaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == b.TaddressDistrictId.Value).Select(l => l.Name).FirstOrDefault() : null,
                             TaddressDistrictDari = b.TaddressDistrictId.HasValue ? _context.Locations.Where(l => l.Id == b.TaddressDistrictId.Value).Select(l => l.Dari).FirstOrDefault() : null,
-                            b.TaddressVillage
+                            b.TaddressVillage,
+                            b.RentStartDate,
+                            b.RentEndDate
                         }).ToList(),
                         // Witnesses
                         Witnesses = p.WitnessDetails.Select(w => new
@@ -997,6 +999,8 @@ namespace WebAPIBackend.Controllers
                     TBuyerDistrict = firstBuyer?.TaddressDistrict,
                     TBuyerDistrictDari = firstBuyer?.TaddressDistrictDari,
                     TBuyerVillage = firstBuyer?.TaddressVillage,
+                    RentStartDate = firstBuyer?.RentStartDate != null ? Helpers.DateConversionHelper.FormatDate(firstBuyer.RentStartDate.Value, calendar) : null,
+                    RentEndDate = firstBuyer?.RentEndDate != null ? Helpers.DateConversionHelper.FormatDate(firstBuyer.RentEndDate.Value, calendar) : null,
                     
                     WitnessOneFirstName = witnesses.ElementAtOrDefault(0)?.FirstName,
                     WitnessOneFatherName = witnesses.ElementAtOrDefault(0)?.FatherName,
