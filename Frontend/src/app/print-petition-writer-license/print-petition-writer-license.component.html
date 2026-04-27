@@ -14,60 +14,6 @@
   <p>{{ error }}</p>
 </div>
 
-<!-- Force table column widths -->
-<style>
-  .data-table {
-    table-layout: auto !important;
-  }
-
-  .table-header {
-    font-size: 17px !important;
-  }
-
-  .table-label {
-    width: 10% !important;
-    min-width: 80px !important;
-    max-width: 120px !important;
-    white-space: nowrap !important;
-    font-size: 15px !important;
-  }
-
-  .table-value {
-    width: 23.33% !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
-    font-size: 15px !important;
-  }
-
-  .bottom-header {
-    font-size: 15px !important;
-  }
-
-  .bottom-text-center {
-    font-size: 14px !important;
-  }
-
-  .bottom-text-justify {
-    font-size: 13px !important;
-  }
-
-  .info-row {
-    font-size: 13px !important;
-  }
-
-  .info-value {
-    font-size: 13px !important;
-  }
-
-  .meta-label {
-    font-size: 15px !important;
-  }
-
-  .meta-value {
-    font-size: 16px !important;
-  }
-</style>
-
 <!-- Main License Page -->
 <div class="certificate-page" *ngIf="!isLoading && !error">
   <div class="certificate-wrapper">
@@ -183,6 +129,14 @@
         <main class="certificate-body">
           <!-- Main Data Table -->
           <table class="data-table">
+            <colgroup>
+              <col style="width: 8%">
+              <col style="width: 22%">
+              <col style="width: 8%">
+              <col style="width: 22%">
+              <col style="width: 12%">
+              <col style="width: 28%">
+            </colgroup>
             <thead>
               <tr>
                 <th colspan="2" class="table-header">شهرت و سکونت اصلی</th>

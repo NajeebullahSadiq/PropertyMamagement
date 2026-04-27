@@ -265,8 +265,9 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
         rows.push(['نقل مکان', f.relocationCount]);
         rows.push([]);
 
-        rows.push(['نوعیت جواز', 'تعداد']);
-        (f.byLicenseType || []).forEach((x: any) => rows.push([x.licenseType, x.count]));
+        rows.push(['نوعیت جواز', 'تعداد', 'مجموع عواید (افغانی)']);
+        (f.byLicenseType || []).forEach((x: any) => rows.push([x.licenseType, x.count, x.totalCost]));
+        rows.push(['مجموع کل', f.totalLicenses, f.totalCost]);
         rows.push([]);
 
         rows.push(['محل فعالیت', 'تعداد']);
@@ -290,8 +291,9 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
         rows.push(['نقل مکان', o.relocationCount]);
         rows.push([]);
 
-        rows.push(['نوعیت جواز', 'تعداد']);
-        (o.byLicenseType || []).forEach((x: any) => rows.push([x.licenseType, x.count]));
+        rows.push(['نوعیت جواز', 'تعداد', 'مجموع عواید (افغانی)']);
+        (o.byLicenseType || []).forEach((x: any) => rows.push([x.licenseType, x.count, x.totalCost]));
+        rows.push(['مجموع کل', o.totalLicenses, o.totalCost]);
         rows.push([]);
 
         rows.push(['محل فعالیت', 'تعداد']);

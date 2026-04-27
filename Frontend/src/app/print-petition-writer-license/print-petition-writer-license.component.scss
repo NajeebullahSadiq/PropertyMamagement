@@ -647,7 +647,7 @@
 .table-header {
   background: linear-gradient(180deg, #1976d2 0%, #1565c0 100%);
   color: #fff;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
   font-family: var(--font-heading);
   text-align: center;
@@ -660,15 +660,12 @@
 .table-label {
   background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   color: #0d47a1;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   font-family: var(--font-heading);
   padding: 6px 8px;
   border: 2px solid #1976d2;
-  text-align: right;
-  width: 10% !important;
-  min-width: 80px;
-  max-width: 120px;
+  text-align: center;
   vertical-align: middle;
   letter-spacing: 0.3px;
   white-space: nowrap;
@@ -677,13 +674,12 @@
 .table-value {
   background: #fff;
   color: #1a1a2e;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   font-family: var(--font-body);
   padding: 6px 10px;
   border: 2px solid #1976d2;
-  text-align: right;
-  width: 23.33% !important;
+  text-align: center;
   vertical-align: middle;
   letter-spacing: 0.2px;
   word-wrap: break-word;
@@ -705,7 +701,7 @@
 .bottom-header {
   background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   color: #0d47a1;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   font-family: var(--font-heading);
   text-align: center;
@@ -728,13 +724,13 @@
   font-family: var(--font-heading);
   color: #0d47a1;
   margin: 3px 0;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 0.3px;
 }
 
 .bottom-text-justify {
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.6;
   text-align: justify;
   color: #2d2d44;
   font-weight: 600;
@@ -751,7 +747,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 3px 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   border-bottom: 1px dashed #90caf9;
   color: #2d2d44;
@@ -771,7 +767,7 @@
   border-radius: 2px;
   border: 1px solid #90caf9;
   letter-spacing: 0.2px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* Footer Section */
@@ -982,25 +978,22 @@
 
   .table-header {
     padding: 6px 8px !important;
-    font-size: 12px !important;
-    width: 33.33% !important;
+    font-size: 14px !important;
   }
 
   .table-label {
     padding: 5px 8px !important;
-    font-size: 11px !important;
-    width: 16.66% !important;
+    font-size: 12px !important;
   }
 
   .table-value {
     padding: 5px 8px !important;
-    font-size: 11px !important;
-    width: 16.67% !important;
+    font-size: 12px !important;
   }
 
   .bottom-header {
     padding: 5px 6px !important;
-    font-size: 11px !important;
+    font-size: 12px !important;
   }
 
   .bottom-cell {
@@ -1010,11 +1003,11 @@
 
   .bottom-text-center {
     margin: 2px 0 !important;
-    font-size: 10px !important;
+    font-size: 12px !important;
   }
 
   .bottom-text-justify {
-    font-size: 9px !important;
+    font-size: 11px !important;
     line-height: 1.4 !important;
     margin-bottom: 3px !important;
   }
@@ -1025,12 +1018,12 @@
 
   .info-row {
     padding: 2px 0 !important;
-    font-size: 9px !important;
+    font-size: 11px !important;
   }
 
   .info-value {
     padding: 2px 5px !important;
-    font-size: 9px !important;
+    font-size: 11px !important;
   }
 
   .certificate-footer {

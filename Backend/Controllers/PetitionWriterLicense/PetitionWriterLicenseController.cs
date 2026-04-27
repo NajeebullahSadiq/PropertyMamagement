@@ -753,8 +753,15 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                 // --- Filtered stats ---
                 var byLicenseType = filteredList
                     .GroupBy(x => MapLicenseType(x.LicenseType))
-                    .Select(g => new { licenseType = g.Key, count = g.Count() })
+                    .Select(g => new {
+                        licenseType = g.Key,
+                        count = g.Count(),
+                        totalCost = g.Sum(x => x.LicenseCost ?? 0),
+                        totalPrice = g.Sum(x => x.LicensePrice ?? 0)
+                    })
                     .OrderByDescending(x => x.count).ToList();
+
+                var totalFilteredCost = filteredList.Sum(x => x.LicenseCost ?? 0);
 
                 var activeCount   = filteredList.Count(x => x.LicenseStatus == 1);
                 var cancelledCount = filteredList.Count(x => x.LicenseStatus == 2);
@@ -799,8 +806,15 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
 
                 var overallByType = overallAll
                     .GroupBy(x => MapLicenseType(x.LicenseType))
-                    .Select(g => new { licenseType = g.Key, count = g.Count() })
+                    .Select(g => new {
+                        licenseType = g.Key,
+                        count = g.Count(),
+                        totalCost = g.Sum(x => x.LicenseCost ?? 0),
+                        totalPrice = g.Sum(x => x.LicensePrice ?? 0)
+                    })
                     .OrderByDescending(x => x.count).ToList();
+
+                var totalOverallCost = overallAll.Sum(x => x.LicenseCost ?? 0);
 
                 var overallByLocation = overallAll
                     .GroupBy(x => string.IsNullOrWhiteSpace(x.ActivityLocation) ? "نامشخص" : x.ActivityLocation)
@@ -858,6 +872,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         cancelledCount,
                         withdrawnCount,
                         relocationCount,
+                        totalCost = totalFilteredCost,
                         byLicenseType,
                         byActivityLocation,
                         byProvince,
@@ -871,6 +886,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
                         cancelledCount = overallCancelled,
                         withdrawnCount = overallWithdrawn,
                         relocationCount = overallRelocations,
+                        totalCost = totalOverallCost,
                         byLicenseType  = overallByType,
                         byActivityLocation = overallByLocation,
                         byProvince     = overallByProvince,
