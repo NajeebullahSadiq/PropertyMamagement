@@ -12,6 +12,7 @@ namespace WebAPIBackend.Services
         Task<string> GenerateNextLicenseNumber(int provinceId);
         Task<string> GenerateNextPetitionWriterLicenseNumber(int provinceId);
         string GetProvinceCode(int provinceId);
+        string GetProvinceCodeFromName(string provinceName);
     }
 
     public class LicenseNumberGenerator : ILicenseNumberGenerator
@@ -77,7 +78,7 @@ namespace WebAPIBackend.Services
                 throw new ArgumentException($"Province with ID {provinceId} not found");
             }
 
-            var provinceCode = GetProvinceCode(provinceId);
+            var provinceCode = GetProvinceCodeFromName(province.Name ?? "");
 
             // Use PostgreSQL advisory lock to prevent concurrent generation for same province
             // Lock key is based on province ID to allow concurrent generation for different provinces
@@ -138,7 +139,7 @@ namespace WebAPIBackend.Services
                 throw new ArgumentException($"Province with ID {provinceId} not found");
             }
 
-            var provinceCode = GetProvinceCode(provinceId);
+            var provinceCode = GetProvinceCodeFromName(province.Name ?? "");
 
             // Use PostgreSQL advisory lock to prevent concurrent generation for same province
             // Lock key is based on province ID + offset to separate from company licenses
@@ -185,7 +186,7 @@ namespace WebAPIBackend.Services
         }
 
         /// <summary>
-        /// Get the province code for a given province ID
+        /// Get the province code for a given province ID (makes a synchronous DB call - prefer GetProvinceCodeFromName when province is already loaded)
         /// </summary>
         public string GetProvinceCode(int provinceId)
         {
@@ -197,15 +198,23 @@ namespace WebAPIBackend.Services
                 throw new ArgumentException($"Province with ID {provinceId} not found");
             }
 
-            if (province.Name != null && ProvinceCodeMap.TryGetValue(province.Name, out var code))
+            return GetProvinceCodeFromName(province.Name ?? "");
+        }
+
+        /// <summary>
+        /// Get the province code from a province name string (no DB call required)
+        /// </summary>
+        public string GetProvinceCodeFromName(string provinceName)
+        {
+            if (!string.IsNullOrWhiteSpace(provinceName) && ProvinceCodeMap.TryGetValue(provinceName, out var code))
             {
                 return code;
             }
 
             // Fallback: use first 3 letters of province name in uppercase
-            return (province.Name?.Length >= 3) 
-                ? province.Name.Substring(0, 3).ToUpper() 
-                : (province.Name ?? "UNK").ToUpper();
+            return (provinceName?.Length >= 3)
+                ? provinceName.Substring(0, 3).ToUpper()
+                : (provinceName ?? "UNK").ToUpper();
         }
     }
 }
