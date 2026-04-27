@@ -237,6 +237,14 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
         return item.guarantors.map(g => g.guaranteeTypeName || '-').join('، ');
     }
 
+    getGuarantorLocations(item: LicenseApplication): string {
+        if (!item.guarantors || item.guarantors.length == 0) return '-';
+        const locations = item.guarantors
+            .map(g => g.guaranteeLocation || '')
+            .filter(l => l.length > 0);
+        return locations.length > 0 ? locations.join('، ') : '-';
+    }
+
     getStatusText(item: LicenseApplication): string {
         return item.isWithdrawn ? 'منصرف‌شده' : 'فعال';
     }

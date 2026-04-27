@@ -216,13 +216,17 @@
                     <i class="fas fa-gavel text-amber-600"></i>
                     <span>معلومات قباله شرعی</span>
                   </h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر قباله شرعی</label>
                       <input type="text" formControlName="shariaDeedNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
                     </div>
                     <div>
                       <app-multi-calendar-datepicker formControlName="shariaDeedDate" label="تاریخ قباله شرعی"></app-multi-calendar-datepicker>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">محل ضمانت</label>
+                      <input type="text" formControlName="guaranteeLocation" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
                     </div>
                   </div>
                 </div>
@@ -237,6 +241,10 @@
                     <div>
                       <label class="block text-sm font-semibold text-gray-700 mb-2">سریال نمبر سته قباله عرفی</label>
                       <input type="text" formControlName="customaryDeedSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">محل ضمانت</label>
+                      <input type="text" formControlName="guaranteeLocation" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                     </div>
                   </div>
                 </div>
@@ -322,6 +330,7 @@
                     <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت</th>
                     <th class="px-4 py-4 text-sm font-bold text-gray-700">ولد</th>
                     <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت ضمانت</th>
+                    <th class="px-4 py-4 text-sm font-bold text-gray-700">محل ضمانت</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -329,9 +338,10 @@
                     <td class="px-4 py-3 text-sm text-gray-700">{{ g.guarantorName }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ g.guarantorFatherName || '-' }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ getGuaranteeTypeName(g.guaranteeTypeId) }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ g.guaranteeLocation || '-' }}</td>
                   </tr>
                   <tr *ngIf="guarantorsList.length === 0">
-                    <td colspan="3" class="px-4 py-8 text-center text-gray-500">هیچ تضمین‌کننده‌ای ثبت نشده است</td>
+                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">هیچ تضمین‌کننده‌ای ثبت نشده است</td>
                   </tr>
                 </tbody>
               </table>

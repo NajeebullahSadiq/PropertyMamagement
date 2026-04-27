@@ -79,6 +79,10 @@ namespace WebAPIBackend.Models.RequestData.LicenseApplication
         [MaxLength(100)]
         public string? CustomaryDeedSerialNumber { get; set; }
 
+        // محل ضمانت - Location of Guarantee (for Sharia Deed and Customary Deed only)
+        [MaxLength(500)]
+        public string? GuaranteeLocation { get; set; }
+
         // Addresses
         public int? PermanentProvinceId { get; set; }
         public int? PermanentDistrictId { get; set; }

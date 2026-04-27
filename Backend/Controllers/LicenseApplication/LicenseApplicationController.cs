@@ -106,7 +106,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         g.GuarantorName,
                         g.GuarantorFatherName,
                         g.GuaranteeTypeId,
-                        GuaranteeTypeName = g.GuaranteeType != null ? g.GuaranteeType.Name : ""
+                        GuaranteeTypeName = g.GuaranteeType != null ? g.GuaranteeType.Name : "",
+                        g.GuaranteeLocation
                     })
                     .ToListAsync();
 
@@ -145,7 +146,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                             g.GuarantorName,
                             g.GuarantorFatherName,
                             g.GuaranteeTypeId,
-                            g.GuaranteeTypeName
+                            g.GuaranteeTypeName,
+                            g.GuaranteeLocation
                         })
                         .ToList()
                 }).ToList();
@@ -319,7 +321,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         g.CashAmount,
                         g.ShariaDeedNumber,
                         g.ShariaDeedDate,
-                        g.CustomaryDeedSerialNumber
+                        g.CustomaryDeedSerialNumber,
+                        g.GuaranteeLocation
                     })
                     .ToListAsync();
 
@@ -365,7 +368,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                             ShariaDeedDateFormatted = g.ShariaDeedDate.HasValue
                                 ? DateConversionHelper.FormatDateOnly(g.ShariaDeedDate, calendar)
                                 : "",
-                            g.CustomaryDeedSerialNumber
+                            g.CustomaryDeedSerialNumber,
+                            g.GuaranteeLocation
                         })
                         .ToList()
                 }).ToList();
@@ -639,6 +643,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                             ? DateConversionHelper.FormatDateOnly(x.ShariaDeedDate, calendar)
                             : "",
                         x.CustomaryDeedSerialNumber,
+                        x.GuaranteeLocation,
                         x.PermanentProvinceId,
                         PermanentProvinceName = x.PermanentProvince != null ? x.PermanentProvince.Dari : "",
                         x.PermanentDistrictId,
@@ -705,6 +710,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     ShariaDeedNumber = request.GuaranteeTypeId == GuaranteeType_ShariaDeed ? request.ShariaDeedNumber : null,
                     ShariaDeedDate = request.GuaranteeTypeId == GuaranteeType_ShariaDeed ? shariaDeedDate : null,
                     CustomaryDeedSerialNumber = request.GuaranteeTypeId == GuaranteeType_CustomaryDeed ? request.CustomaryDeedSerialNumber : null,
+                    GuaranteeLocation = request.GuaranteeTypeId != GuaranteeType_Cash ? request.GuaranteeLocation : null,
                     PermanentProvinceId = request.PermanentProvinceId,
                     PermanentDistrictId = request.PermanentDistrictId,
                     PermanentVillage = request.PermanentVillage,
@@ -753,6 +759,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 guarantor.ShariaDeedNumber = request.GuaranteeTypeId == GuaranteeType_ShariaDeed ? request.ShariaDeedNumber : null;
                 guarantor.ShariaDeedDate = request.GuaranteeTypeId == GuaranteeType_ShariaDeed ? shariaDeedDate : null;
                 guarantor.CustomaryDeedSerialNumber = request.GuaranteeTypeId == GuaranteeType_CustomaryDeed ? request.CustomaryDeedSerialNumber : null;
+                guarantor.GuaranteeLocation = request.GuaranteeTypeId != GuaranteeType_Cash ? request.GuaranteeLocation : null;
                 guarantor.PermanentProvinceId = request.PermanentProvinceId;
                 guarantor.PermanentDistrictId = request.PermanentDistrictId;
                 guarantor.PermanentVillage = request.PermanentVillage;

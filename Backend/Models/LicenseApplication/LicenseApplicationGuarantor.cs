@@ -42,6 +42,14 @@ namespace WebAPIBackend.Models.LicenseApplication
         [MaxLength(100)]
         public string? CustomaryDeedSerialNumber { get; set; }
 
+        /// <summary>
+        /// محل ضمانت - Location of Guarantee
+        /// Visible for Sharia Deed (قباله شرعی) and Customary Deed (قباله عرفی) only
+        /// Hidden for Cash (پول نقد)
+        /// </summary>
+        [MaxLength(500)]
+        public string? GuaranteeLocation { get; set; }
+
         // Permanent Address (سکونت اصلی)
         public int? PermanentProvinceId { get; set; }
         public int? PermanentDistrictId { get; set; }

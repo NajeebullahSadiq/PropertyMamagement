@@ -70,6 +70,9 @@ export interface LicenseApplicationGuarantor {
     // Conditional Fields - Customary Deed (قباله عرفی)
     customaryDeedSerialNumber?: string;
     
+    // محل ضمانت - Location of Guarantee (for Sharia Deed and Customary Deed)
+    guaranteeLocation?: string;
+    
     // Permanent Address (سکونت اصلی)
     permanentProvinceId?: number;
     permanentDistrictId?: number;
@@ -139,6 +142,7 @@ export interface LicenseApplicationGuarantorData {
     shariaDeedNumber?: string;
     shariaDeedDate?: string;
     customaryDeedSerialNumber?: string;
+    guaranteeLocation?: string;
     permanentProvinceId?: number;
     permanentDistrictId?: number;
     permanentVillage?: string;

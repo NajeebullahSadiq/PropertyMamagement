@@ -127,6 +127,7 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
             shariaDeedNumber: [''],
             shariaDeedDate: [''],
             customaryDeedSerialNumber: [''],
+            guaranteeLocation: [''],
             permanentProvinceId: ['', Validators.required],
             permanentDistrictId: ['', Validators.required],
             permanentVillage: ['', Validators.required],
@@ -329,6 +330,7 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
             shariaDeedNumber: '',
             shariaDeedDate: '',
             customaryDeedSerialNumber: '',
+            guaranteeLocation: '',
         });
     }
 
@@ -461,6 +463,7 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
             shariaDeedNumber: formValue.shariaDeedNumber,
             shariaDeedDate: this.formatDateForBackend(formValue.shariaDeedDate),
             customaryDeedSerialNumber: formValue.customaryDeedSerialNumber,
+            guaranteeLocation: formValue.guaranteeLocation,
             permanentProvinceId: formValue.permanentProvinceId,
             permanentDistrictId: formValue.permanentDistrictId,
             permanentVillage: formValue.permanentVillage,
@@ -537,6 +540,7 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
             shariaDeedNumber: guarantor.shariaDeedNumber,
             shariaDeedDate: shariaDeedDate,
             customaryDeedSerialNumber: guarantor.customaryDeedSerialNumber,
+            guaranteeLocation: guarantor.guaranteeLocation,
             permanentProvinceId: guarantor.permanentProvinceId,
             permanentDistrictId: guarantor.permanentDistrictId,
             permanentVillage: guarantor.permanentVillage,
