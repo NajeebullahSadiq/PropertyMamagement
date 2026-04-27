@@ -80,28 +80,54 @@
 
         <!-- Report Results -->
         <div *ngIf="reportData" class="mt-6 space-y-4">
-          <!-- Summary Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <!-- Cancellations Card -->
-            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200">
+
+          <!-- Date Range Info -->
+          <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+            <p class="text-sm text-gray-700 text-center">
+              <i class="fas fa-calendar-alt text-purple-600 ml-2"></i>
+              گزارش از تاریخ <span class="font-bold text-purple-900">{{ reportData.startDate }}</span>
+              تا تاریخ <span class="font-bold text-purple-900">{{ reportData.endDate }}</span>
+            </p>
+          </div>
+
+          <!-- Summary Cards Row 1 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <!-- فسخ Card -->
+            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-5 border border-red-200">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm text-red-600 font-medium mb-1">تعداد فسخ/لغوه</p>
-                  <p class="text-3xl font-bold text-red-900">{{ reportData.totalCancellations }}</p>
-                  <p class="text-xs text-red-500 mt-1">کل فسخ/لغوه: {{ reportData.totalCancellationsAllTime }}</p>
+                  <p class="text-sm text-red-600 font-medium mb-1">تعداد فسخ</p>
+                  <p class="text-3xl font-bold text-red-900">{{ reportData.totalFaskh }}</p>
+                  <p class="text-xs text-red-400 mt-1">در بازه تاریخی انتخاب شده</p>
                 </div>
                 <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-file-circle-xmark text-white text-xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- لغوه Card -->
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-5 border border-orange-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-orange-600 font-medium mb-1">تعداد لغوه</p>
+                  <p class="text-3xl font-bold text-orange-900">{{ reportData.totalLaghwa }}</p>
+                  <p class="text-xs text-orange-400 mt-1">در بازه تاریخی انتخاب شده</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
                   <i class="fas fa-ban text-white text-xl"></i>
                 </div>
               </div>
             </div>
 
             <!-- Active Companies Card -->
-            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-green-600 font-medium mb-1">دفتر‌های فعال</p>
                   <p class="text-3xl font-bold text-green-900">{{ reportData.activeCompanies }}</p>
+                  <p class="text-xs text-green-400 mt-1">مجموع: {{ reportData.totalCompanies }}</p>
                 </div>
                 <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <i class="fas fa-check-circle text-white text-xl"></i>
@@ -109,49 +135,136 @@
               </div>
             </div>
 
-            <!-- Inactive Companies Card -->
-            <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+            <!-- Inactive Companies Card (date-range based) -->
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-gray-600 font-medium mb-1">دفتر‌های غیرفعال</p>
-                  <p class="text-3xl font-bold text-gray-900">{{ reportData.inactiveCompanies }}</p>
+                  <p class="text-3xl font-bold text-gray-900">{{ reportData.inactiveInDateRange }}</p>
+                  <p class="text-xs text-gray-400 mt-1">منقضی در بازه تاریخی | کل: {{ reportData.inactiveCompanies }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gray-500 rounded-xl flex items-center justify-center">
                   <i class="fas fa-times-circle text-white text-xl"></i>
                 </div>
               </div>
             </div>
+          </div>
 
+          <!-- Summary Cards Row 2 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Total Licenses Card -->
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-blue-600 font-medium mb-1">مجموع جواز‌ها</p>
                   <p class="text-3xl font-bold text-blue-900">{{ reportData.totalLicenses }}</p>
+                  <p class="text-xs text-blue-400 mt-1">در بازه تاریخی انتخاب شده</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <i class="fas fa-certificate text-white text-xl"></i>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Revenue Card -->
-          <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-xl p-6 border border-amber-200">
-            <div class="flex items-center justify-between mb-4">
-              <div>
-                <p class="text-sm text-amber-600 font-medium mb-1">مجموع عواید جواز‌ها</p>
-                <p class="text-4xl font-bold text-amber-900">{{ reportData.totalRevenue?.toLocaleString() }} <span class="text-2xl">افغانی</span></p>
-              </div>
-              <div class="w-16 h-16 bg-amber-500 rounded-xl flex items-center justify-center">
-                <i class="fas fa-money-bill-wave text-white text-2xl"></i>
+            <!-- Transfer Location Card -->
+            <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-5 border border-teal-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-teal-600 font-medium mb-1">تعداد محل انتقال</p>
+                  <p class="text-3xl font-bold text-teal-900">{{ reportData.transferLocationCount }}</p>
+                  <p class="text-xs text-teal-400 mt-1">جوازهایی که محل انتقال دارند</p>
+                </div>
+                <div class="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-location-arrow text-white text-xl"></i>
+                </div>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-amber-200">
-              <div *ngFor="let item of reportData.licenseRevenueByType" class="text-center">
-                <p class="text-xs text-amber-700 mb-1">{{ item.licenseType }}</p>
-                <p class="text-lg font-bold text-amber-900">{{ item.count }} × {{ item.pricePerLicense.toLocaleString() }} = {{ item.totalRevenue.toLocaleString() }} افغانی</p>
+          </div>
+
+          <!-- جزئیات مالی و اسناد جواز - Revenue Section -->
+          <div class="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border border-amber-200 overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-amber-100 to-yellow-100 border-b border-amber-200">
+              <div class="flex items-center justify-between">
+                <h4 class="text-lg font-bold text-amber-900 flex items-center gap-2">
+                  <i class="fas fa-money-bill-wave text-amber-600"></i>
+                  جزئیات مالی و اسناد جواز
+                </h4>
+                <div class="text-right">
+                  <p class="text-xs text-amber-600">مجموع عواید جواز‌ها</p>
+                  <p class="text-2xl font-bold text-amber-900">{{ reportData.totalRevenue | number }} <span class="text-base">افغانی</span></p>
+                </div>
               </div>
+            </div>
+            <div class="p-6 space-y-6">
+
+              <!-- موټر فروشی Section -->
+              <div>
+                <h5 class="text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+                  <i class="fas fa-car text-blue-600"></i>
+                  موټر فروشی
+                  <span class="text-sm font-normal text-gray-500">(مجموع: {{ reportData.licenseRevenueByType[0]?.count }} جواز)</span>
+                </h5>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Without Penalty -->
+                  <div class="bg-white rounded-lg p-4 border border-blue-100">
+                    <p class="text-xs text-gray-500 mb-1">بدون مبلغ جریمه</p>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-700">تعداد: <strong>{{ reportData.licenseRevenueByType[0]?.countWithoutPenalty }}</strong></span>
+                      <span class="text-base font-bold text-blue-700">{{ reportData.licenseRevenueByType[0]?.revenueWithoutPenalty | number }} افغانی</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">(مبلغ حق‌الامتیاز)</p>
+                  </div>
+                  <!-- With Penalty -->
+                  <div class="bg-white rounded-lg p-4 border border-red-100">
+                    <p class="text-xs text-gray-500 mb-1">با مبلغ جریمه</p>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-700">تعداد: <strong>{{ reportData.licenseRevenueByType[0]?.countWithPenalty }}</strong></span>
+                      <span class="text-base font-bold text-red-700">{{ reportData.licenseRevenueByType[0]?.revenueWithPenalty | number }} افغانی</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">(مبلغ حق‌الامتیاز + مبلغ جریمه)</p>
+                  </div>
+                </div>
+                <div class="mt-2 text-left">
+                  <span class="text-sm font-bold text-gray-700">مجموع عواید موټر فروشی: </span>
+                  <span class="text-base font-bold text-blue-800">{{ reportData.licenseRevenueByType[0]?.totalRevenue | number }} افغانی</span>
+                </div>
+              </div>
+
+              <hr class="border-amber-200">
+
+              <!-- املاک Section -->
+              <div>
+                <h5 class="text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+                  <i class="fas fa-building text-emerald-600"></i>
+                  املاک
+                  <span class="text-sm font-normal text-gray-500">(مجموع: {{ reportData.licenseRevenueByType[1]?.count }} جواز)</span>
+                </h5>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Without Penalty -->
+                  <div class="bg-white rounded-lg p-4 border border-emerald-100">
+                    <p class="text-xs text-gray-500 mb-1">بدون مبلغ جریمه</p>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-700">تعداد: <strong>{{ reportData.licenseRevenueByType[1]?.countWithoutPenalty }}</strong></span>
+                      <span class="text-base font-bold text-emerald-700">{{ reportData.licenseRevenueByType[1]?.revenueWithoutPenalty | number }} افغانی</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">(مبلغ حق‌الامتیاز)</p>
+                  </div>
+                  <!-- With Penalty -->
+                  <div class="bg-white rounded-lg p-4 border border-red-100">
+                    <p class="text-xs text-gray-500 mb-1">با مبلغ جریمه</p>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-700">تعداد: <strong>{{ reportData.licenseRevenueByType[1]?.countWithPenalty }}</strong></span>
+                      <span class="text-base font-bold text-red-700">{{ reportData.licenseRevenueByType[1]?.revenueWithPenalty | number }} افغانی</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">(مبلغ حق‌الامتیاز + مبلغ جریمه)</p>
+                  </div>
+                </div>
+                <div class="mt-2 text-left">
+                  <span class="text-sm font-bold text-gray-700">مجموع عواید املاک: </span>
+                  <span class="text-base font-bold text-emerald-800">{{ reportData.licenseRevenueByType[1]?.totalRevenue | number }} افغانی</span>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -225,14 +338,6 @@
             </div>
           </div>
 
-          <!-- Date Range Info -->
-          <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
-            <p class="text-sm text-gray-700 text-center">
-              <i class="fas fa-calendar-alt text-purple-600 ml-2"></i>
-              گزارش از تاریخ <span class="font-bold text-purple-900">{{ reportData.startDate }}</span> 
-              تا تاریخ <span class="font-bold text-purple-900">{{ reportData.endDate }}</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>

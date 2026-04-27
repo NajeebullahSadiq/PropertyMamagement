@@ -295,16 +295,23 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
     excelData.push([`از تاریخ: ${this.reportData.startDate} تا تاریخ: ${this.reportData.endDate}`]);
     excelData.push([]);
     
-    // Cancellations
-    excelData.push(['تعداد فسخ/لغوه', this.reportData.totalCancellations]);
+    // Cancellations - split by type
+    excelData.push(['تعداد فسخ', this.reportData.totalFaskh]);
+    excelData.push(['تعداد لغوه', this.reportData.totalLaghwa]);
+    excelData.push(['مجموع فسخ/لغوه', this.reportData.totalCancellations]);
     excelData.push(['کل فسخ/لغوه (همه زمان)', this.reportData.totalCancellationsAllTime]);
     excelData.push([]);
     
     // Companies status
     excelData.push(['وضعیت دفتر‌ها']);
     excelData.push(['دفتر‌های فعال', this.reportData.activeCompanies]);
-    excelData.push(['دفتر‌های غیرفعال', this.reportData.inactiveCompanies]);
+    excelData.push(['دفتر‌های غیرفعال (منقضی در بازه تاریخی)', this.reportData.inactiveInDateRange]);
+    excelData.push(['دفتر‌های غیرفعال (کل)', this.reportData.inactiveCompanies]);
     excelData.push(['مجموع دفتر‌ها', this.reportData.totalCompanies]);
+    excelData.push([]);
+
+    // Transfer Location
+    excelData.push(['تعداد محل انتقال', this.reportData.transferLocationCount]);
     excelData.push([]);
     
     // Licenses by category
@@ -325,13 +332,21 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
     excelData.push(['مجموع تضمین‌کنندگان', this.reportData.totalGuarantors]);
     excelData.push([]);
     
-    // Revenue by license type
-    excelData.push(['عواید بر اساس نوع جواز']);
-    excelData.push(['نوع جواز', 'تعداد', 'قیمت فی جواز', 'مجموع عواید']);
+    // Revenue by license type - detailed
+    excelData.push(['جزئیات مالی و اسناد جواز']);
+    excelData.push(['نوع جواز', 'تعداد کل', 'تعداد بدون جریمه', 'عواید بدون جریمه', 'تعداد با جریمه', 'عواید با جریمه', 'مجموع عواید']);
     this.reportData.licenseRevenueByType.forEach((item: any) => {
-      excelData.push([item.licenseType, item.count, item.pricePerLicense, item.totalRevenue]);
+      excelData.push([
+        item.licenseType,
+        item.count,
+        item.countWithoutPenalty,
+        item.revenueWithoutPenalty,
+        item.countWithPenalty,
+        item.revenueWithPenalty,
+        item.totalRevenue
+      ]);
     });
-    excelData.push(['مجموع عواید', '', '', this.reportData.totalRevenue]);
+    excelData.push(['مجموع عواید', '', '', '', '', '', this.reportData.totalRevenue]);
     
     // Convert to CSV
     const csv = excelData.map(row => row.join(',')).join('\n');

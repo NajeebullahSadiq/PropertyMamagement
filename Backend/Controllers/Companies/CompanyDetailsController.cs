@@ -1295,23 +1295,31 @@ namespace WebAPIBackend.Controllers.Companies
                     }
                 }
 
-                // Get cancellations count (date range)
-                var cancellationsQuery = _context.CompanyCancellationInfos.Where(x => x.Status != false);
+                // Get cancellations count (date range) - split by type
+                // فسخ uses LicenseCancellationLetterDate
+                var faskhQuery = _context.CompanyCancellationInfos
+                    .Where(x => x.Status != false && x.CancellationType == "فسخ");
                 if (parsedStartDate.HasValue)
-                {
-                    cancellationsQuery = cancellationsQuery.Where(x => x.LicenseCancellationLetterDate >= parsedStartDate);
-                }
+                    faskhQuery = faskhQuery.Where(x => x.LicenseCancellationLetterDate >= parsedStartDate);
                 if (parsedEndDate.HasValue)
-                {
-                    cancellationsQuery = cancellationsQuery.Where(x => x.LicenseCancellationLetterDate <= parsedEndDate);
-                }
-                var totalCancellations = await cancellationsQuery.CountAsync();
+                    faskhQuery = faskhQuery.Where(x => x.LicenseCancellationLetterDate <= parsedEndDate);
+                var totalFaskh = await faskhQuery.CountAsync();
+
+                // لغوه uses RevocationLetterDate
+                var laghwaQuery = _context.CompanyCancellationInfos
+                    .Where(x => x.Status != false && x.CancellationType == "لغوه");
+                if (parsedStartDate.HasValue)
+                    laghwaQuery = laghwaQuery.Where(x => x.RevocationLetterDate >= parsedStartDate);
+                if (parsedEndDate.HasValue)
+                    laghwaQuery = laghwaQuery.Where(x => x.RevocationLetterDate <= parsedEndDate);
+                var totalLaghwa = await laghwaQuery.CountAsync();
+
+                var totalCancellations = totalFaskh + totalLaghwa;
 
                 // Get all-time cancellations count (no date filter)
                 var totalCancellationsAllTime = await _context.CompanyCancellationInfos.AsNoTracking().Where(x => x.Status != false).CountAsync();
 
                 // Get companies status based on license expiry date
-                // Note: We check ALL companies' license status, not just those created in date range
                 var allCompaniesQuery = _context.CompanyDetails.AsNoTracking().AsQueryable();
                 allCompaniesQuery = _provinceFilter.ApplyProvinceFilter(allCompaniesQuery);
                 
@@ -1321,7 +1329,7 @@ namespace WebAPIBackend.Controllers.Companies
                     allCompaniesQuery = allCompaniesQuery.Where(c => c.ProvinceId == provinceId.Value);
                 }
                 
-                // Get all company IDs (not filtered by date, but filtered by province if specified)
+                // Get all company IDs (filtered by province if specified)
                 var allCompanyIds = await allCompaniesQuery.Select(c => c.Id).ToListAsync();
                 
                 // Get licenses for these companies to check expiry dates and apply district filter
@@ -1332,7 +1340,6 @@ namespace WebAPIBackend.Controllers.Companies
                 // Apply district filter if specified
                 if (districtId.HasValue && districtId.Value > 0)
                 {
-                    // Filter by license province (which represents district in the license context)
                     licensesForStatusQuery = licensesForStatusQuery.Where(l => l.ProvinceId == districtId.Value);
                 }
                 
@@ -1351,7 +1358,7 @@ namespace WebAPIBackend.Controllers.Companies
                     })
                     .ToList();
                 
-                // Count active and inactive companies based on license expiry
+                // Count active and inactive companies based on license expiry (all-time)
                 var activeCompanies = companyExpiryStatus.Count(c => c.IsActive);
                 var inactiveCompanies = companyExpiryStatus.Count(c => !c.IsActive);
                 
@@ -1360,6 +1367,14 @@ namespace WebAPIBackend.Controllers.Companies
                 inactiveCompanies += companiesWithoutLicenses;
                 
                 var totalCompanies = activeCompanies + inactiveCompanies;
+
+                // Count inactive companies whose license expired within the date range
+                // (دفتر‌های غیرفعال based on date range)
+                var inactiveInDateRange = companyExpiryStatus
+                    .Count(c => !c.IsActive
+                        && c.LatestExpireDate.HasValue
+                        && (!parsedStartDate.HasValue || c.LatestExpireDate >= parsedStartDate)
+                        && (!parsedEndDate.HasValue || c.LatestExpireDate <= parsedEndDate));
 
                 // Get licenses by category
                 var allowedCompanyIds = await _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
@@ -1458,47 +1473,92 @@ namespace WebAPIBackend.Controllers.Companies
                     })
                     .ToList();
 
-                // Calculate revenue based on license type
-                // املاک (realEstate) = 20,000 AFN per license
-                // موټر فروشی (carSale) = 25,000 AFN per license
+                // Calculate revenue based on license type, including penalty amounts
+                // RoyaltyAmount + PenaltyAmount (if not null/zero) = total per license
                 // The database stores English values: 'realEstate' and 'carSale'
-                var amlakCount = licensesByType.FirstOrDefault(l => 
-                    l.licenseType != null && 
-                    (l.licenseType.Equals("realEstate", StringComparison.OrdinalIgnoreCase) || 
-                     l.licenseType == "املاک"))?.count ?? 0;
-                var motorCount = licensesByType.FirstOrDefault(l => 
-                    l.licenseType != null && 
-                    (l.licenseType.Equals("carSale", StringComparison.OrdinalIgnoreCase) || 
-                     l.licenseType == "موټر فروشی"))?.count ?? 0;
-                
-                var amlakRevenue = amlakCount * 20000;
-                var motorRevenue = motorCount * 25000;
-                var totalRevenue = amlakRevenue + motorRevenue;
+                var amlakLicenses = allLicenses
+                    .Where(l => string.IsNullOrWhiteSpace(l.LicenseType) ||
+                                l.LicenseType.Equals("realEstate", StringComparison.OrdinalIgnoreCase) ||
+                                l.LicenseType == "املاک")
+                    .ToList();
+
+                var motorLicenses = allLicenses
+                    .Where(l => l.LicenseType != null &&
+                                (l.LicenseType.Equals("carSale", StringComparison.OrdinalIgnoreCase) ||
+                                 l.LicenseType == "موټر فروشی"))
+                    .ToList();
+
+                // موټر فروشی: without penalty
+                var motorWithoutPenalty = motorLicenses
+                    .Where(l => !l.PenaltyAmount.HasValue || l.PenaltyAmount == 0)
+                    .ToList();
+                var motorWithoutPenaltyCount = motorWithoutPenalty.Count;
+                var motorWithoutPenaltyRevenue = motorWithoutPenalty.Sum(l => l.RoyaltyAmount ?? 0);
+
+                // موټر فروشی: with penalty
+                var motorWithPenalty = motorLicenses
+                    .Where(l => l.PenaltyAmount.HasValue && l.PenaltyAmount > 0)
+                    .ToList();
+                var motorWithPenaltyCount = motorWithPenalty.Count;
+                var motorWithPenaltyRevenue = motorWithPenalty.Sum(l => (l.RoyaltyAmount ?? 0) + (l.PenaltyAmount ?? 0));
+
+                // املاک: without penalty
+                var amlakWithoutPenalty = amlakLicenses
+                    .Where(l => !l.PenaltyAmount.HasValue || l.PenaltyAmount == 0)
+                    .ToList();
+                var amlakWithoutPenaltyCount = amlakWithoutPenalty.Count;
+                var amlakWithoutPenaltyRevenue = amlakWithoutPenalty.Sum(l => l.RoyaltyAmount ?? 0);
+
+                // املاک: with penalty
+                var amlakWithPenalty = amlakLicenses
+                    .Where(l => l.PenaltyAmount.HasValue && l.PenaltyAmount > 0)
+                    .ToList();
+                var amlakWithPenaltyCount = amlakWithPenalty.Count;
+                var amlakWithPenaltyRevenue = amlakWithPenalty.Sum(l => (l.RoyaltyAmount ?? 0) + (l.PenaltyAmount ?? 0));
+
+                var amlakCount = amlakLicenses.Count;
+                var motorCount = motorLicenses.Count;
+                var amlakTotalRevenue = amlakWithoutPenaltyRevenue + amlakWithPenaltyRevenue;
+                var motorTotalRevenue = motorWithoutPenaltyRevenue + motorWithPenaltyRevenue;
+                var totalRevenue = amlakTotalRevenue + motorTotalRevenue;
 
                 var licenseRevenueByType = new[]
                 {
                     new
                     {
-                        licenseType = "املاک",
-                        count = amlakCount,
-                        pricePerLicense = 20000,
-                        totalRevenue = amlakRevenue
+                        licenseType = "موټر فروشی",
+                        count = motorCount,
+                        countWithoutPenalty = motorWithoutPenaltyCount,
+                        countWithPenalty = motorWithPenaltyCount,
+                        revenueWithoutPenalty = motorWithoutPenaltyRevenue,
+                        revenueWithPenalty = motorWithPenaltyRevenue,
+                        totalRevenue = motorTotalRevenue
                     },
                     new
                     {
-                        licenseType = "موټر فروشی",
-                        count = motorCount,
-                        pricePerLicense = 25000,
-                        totalRevenue = motorRevenue
+                        licenseType = "املاک",
+                        count = amlakCount,
+                        countWithoutPenalty = amlakWithoutPenaltyCount,
+                        countWithPenalty = amlakWithPenaltyCount,
+                        revenueWithoutPenalty = amlakWithoutPenaltyRevenue,
+                        revenueWithPenalty = amlakWithPenaltyRevenue,
+                        totalRevenue = amlakTotalRevenue
                     }
                 };
+
+                // Count licenses with TransferLocation (محل انتقال) not null/empty within date range
+                var transferLocationCount = allLicenses
+                    .Count(l => !string.IsNullOrWhiteSpace(l.TransferLocation));
 
                 return Ok(new
                 {
                     totalCancellations,
+                    totalFaskh,
+                    totalLaghwa,
                     totalCancellationsAllTime,
                     activeCompanies,
                     inactiveCompanies,
+                    inactiveInDateRange,
                     totalCompanies,
                     licensesByCategory,
                     totalLicenses,
@@ -1506,6 +1566,7 @@ namespace WebAPIBackend.Controllers.Companies
                     totalGuarantors,
                     licenseRevenueByType,
                     totalRevenue,
+                    transferLocationCount,
                     startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
                     endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
                     reportGeneratedAt = DateTime.UtcNow

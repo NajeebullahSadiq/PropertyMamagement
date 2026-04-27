@@ -32,6 +32,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
     searchSerialNumber = '';
     searchRequestDate = '';
     searchApplicantName = '';
+    searchApplicantFatherName = '';
     searchProposedGuideName = '';
     searchElectronicNumber = '';
     searchShariaDeedNumber = '';
@@ -140,6 +141,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
             this.searchSerialNumber || undefined,
             this.searchRequestDate || undefined,
             this.searchApplicantName || undefined,
+            this.searchApplicantFatherName || undefined,
             this.searchProposedGuideName || undefined,
             this.searchElectronicNumber || undefined,
             this.searchShariaDeedNumber || undefined,
@@ -171,6 +173,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
         this.searchSerialNumber = '';
         this.searchRequestDate = '';
         this.searchApplicantName = '';
+        this.searchApplicantFatherName = '';
         this.searchProposedGuideName = '';
         this.searchElectronicNumber = '';
         this.searchShariaDeedNumber = '';
@@ -205,6 +208,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
             this.searchSerialNumber ||
             this.searchRequestDate ||
             this.searchApplicantName ||
+            this.searchApplicantFatherName ||
             this.searchProposedGuideName ||
             this.searchElectronicNumber ||
             this.searchShariaDeedNumber ||

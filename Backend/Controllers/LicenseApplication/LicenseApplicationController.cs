@@ -175,6 +175,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             [FromQuery] string? serialNumber = null,
             [FromQuery] string? requestDate = null,
             [FromQuery] string? applicantName = null,
+            [FromQuery] string? applicantFatherName = null,
             [FromQuery] string? proposedGuideName = null,
             [FromQuery] string? electronicNumber = null,
             [FromQuery] string? shariaDeedNumber = null,
@@ -214,6 +215,12 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 if (!string.IsNullOrWhiteSpace(applicantName))
                 {
                     query = query.Where(x => x.ApplicantName.Contains(applicantName));
+                }
+
+                // Filter by applicant father name (نام پدر متقاضی)
+                if (!string.IsNullOrWhiteSpace(applicantFatherName))
+                {
+                    query = query.Where(x => x.ApplicantFatherName != null && x.ApplicantFatherName.Contains(applicantFatherName));
                 }
 
                 // Filter by proposed guide name (نام پیشنهادی رهنما)
@@ -385,6 +392,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                         serialNumber,
                         requestDate,
                         applicantName,
+                        applicantFatherName,
                         proposedGuideName,
                         electronicNumber,
                         shariaDeedNumber,

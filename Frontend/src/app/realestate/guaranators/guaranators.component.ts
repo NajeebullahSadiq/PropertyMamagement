@@ -625,7 +625,7 @@ export class GuaranatorsComponent extends BaseComponent {
       this.serialNumberSearch.trim(),
       undefined, undefined, undefined, undefined,
       undefined, undefined, undefined, undefined,
-      1, 50, calendar
+      undefined, 1, 50, calendar
     ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         this.isSearching = false;

@@ -57,6 +57,7 @@ export class LicenseApplicationService {
         serialNumber?: string,
         requestDate?: string,
         applicantName?: string,
+        applicantFatherName?: string,
         proposedGuideName?: string,
         electronicNumber?: string,
         shariaDeedNumber?: string,
@@ -79,6 +80,9 @@ export class LicenseApplicationService {
         }
         if (applicantName) {
             params = params.set('applicantName', applicantName);
+        }
+        if (applicantFatherName) {
+            params = params.set('applicantFatherName', applicantFatherName);
         }
         if (proposedGuideName) {
             params = params.set('proposedGuideName', proposedGuideName);
