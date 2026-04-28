@@ -227,4 +227,32 @@ export class CompnaydetailService {
     
     return this.http.get(url);
   }
+
+  getFaskhList(startDate?: string, endDate?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/faskh-list?`;
+    if (startDate) url += `startDate=${encodeURIComponent(startDate)}&`;
+    if (endDate) url += `endDate=${encodeURIComponent(endDate)}`;
+    return this.http.get(url);
+  }
+
+  getLaghwaList(startDate?: string, endDate?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/laghwa-list?`;
+    if (startDate) url += `startDate=${encodeURIComponent(startDate)}&`;
+    if (endDate) url += `endDate=${encodeURIComponent(endDate)}`;
+    return this.http.get(url);
+  }
+
+  getTransferLocationList(startDate?: string, endDate?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/transfer-location-list?`;
+    if (startDate) url += `startDate=${encodeURIComponent(startDate)}&`;
+    if (endDate) url += `endDate=${encodeURIComponent(endDate)}`;
+    return this.http.get(url);
+  }
+
+  getInactiveCompaniesList(startDate?: string, endDate?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/inactive-companies-list?`;
+    if (startDate) url += `startDate=${encodeURIComponent(startDate)}&`;
+    if (endDate) url += `endDate=${encodeURIComponent(endDate)}`;
+    return this.http.get(url);
+  }
 }

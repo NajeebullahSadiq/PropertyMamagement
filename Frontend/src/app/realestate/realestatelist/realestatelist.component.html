@@ -41,42 +41,61 @@
       <div *ngIf="showReports" class="mt-6 pt-6 border-t border-gray-200">
         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
           <i class="fas fa-chart-bar text-purple-600"></i>
-          گزارشات آماری
+          گزارشات و فلتر‌های آماری
         </h3>
-        
-        <!-- Date Range Selection -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-          <div>
-            <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" label="از تاریخ" [required]="false">
-            </app-multi-calendar-datepicker>
-          </div>
-          <div>
-            <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" label="تا تاریخ" [required]="false">
-            </app-multi-calendar-datepicker>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">ولایت</label>
-            <ng-select [(ngModel)]="reportProvinceId" [items]="provinces" bindLabel="dari" bindValue="id" (change)="onReportProvinceChange(reportProvinceId)" placeholder="همه ولایات" [clearable]="true" class="custom-ng-select">
-              <ng-option [value]="0">همه ولایات</ng-option>
-            </ng-select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">ولسوالی</label>
-            <ng-select [(ngModel)]="reportDistrictId" [items]="reportDistricts" bindLabel="dari" bindValue="id" placeholder="همه ولسوالی‌ها" [clearable]="true" [disabled]="!reportProvinceId || reportProvinceId === 0" class="custom-ng-select">
-              <ng-option [value]="0">همه ولسوالی‌ها</ng-option>
-            </ng-select>
-          </div>
-          <div class="flex items-end gap-2">
-            <button (click)="generateReport()" [disabled]="isLoadingReport" class="flex-1 px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50">
-              <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingReport"></i>
-              تولید گزارش
-            </button>
-            <button *ngIf="reportData" (click)="exportToExcel()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-              <i class="fas fa-file-excel"></i>
-              صادرات Excel
-            </button>
-          </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3">
+          <button (click)="setFilterTab('summary')"
+            [class]="isTab('summary') ? 'px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium' : 'px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium'">
+            <i class="fas fa-chart-pie ml-1"></i> خلاصه آماری
+          </button>
+          <button (click)="setFilterTab('faskh')"
+            [class]="isTab('faskh') ? 'px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium' : 'px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium'">
+            <i class="fas fa-file-circle-xmark ml-1"></i> لیست فسخ
+          </button>
+          <button (click)="setFilterTab('laghwa')"
+            [class]="isTab('laghwa') ? 'px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium' : 'px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium'">
+            <i class="fas fa-ban ml-1"></i> لیست لغوه
+          </button>
+          <button (click)="setFilterTab('transfer')"
+            [class]="isTab('transfer') ? 'px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium' : 'px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium'">
+            <i class="fas fa-location-arrow ml-1"></i> لیست محل انتقال
+          </button>
+          <button (click)="setFilterTab('inactive')"
+            [class]="isTab('inactive') ? 'px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium' : 'px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium'">
+            <i class="fas fa-times-circle ml-1"></i> دفتر‌های غیرفعال
+          </button>
         </div>
+
+        <!-- ===== TAB: Summary ===== -->
+        <div *ngIf="isTab('summary')">
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+            <div>
+              <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" label="از تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <div>
+              <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" label="تا تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ولایت</label>
+              <ng-select [(ngModel)]="reportProvinceId" [items]="provinces" bindLabel="dari" bindValue="id" (change)="onReportProvinceChange(reportProvinceId)" placeholder="همه ولایات" [clearable]="true" class="custom-ng-select">
+                <ng-option [value]="0">همه ولایات</ng-option>
+              </ng-select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ولسوالی</label>
+              <ng-select [(ngModel)]="reportDistrictId" [items]="reportDistricts" bindLabel="dari" bindValue="id" placeholder="همه ولسوالی‌ها" [clearable]="true" [disabled]="!reportProvinceId || reportProvinceId === 0" class="custom-ng-select">
+                <ng-option [value]="0">همه ولسوالی‌ها</ng-option>
+              </ng-select>
+            </div>
+            <div class="flex items-end">
+              <button (click)="generateReport()" [disabled]="isLoadingReport" class="w-full px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
+                <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingReport"></i>
+                تولید گزارش
+              </button>
+            </div>
+          </div>
 
         <!-- Report Results -->
         <div *ngIf="reportData" class="mt-6 space-y-4">
@@ -338,7 +357,253 @@
             </div>
           </div>
 
+        </div><!-- end summary tab -->
+        </div><!-- end summary tab wrapper *ngIf="isTab('summary')" -->
+
+        <!-- ===== TAB: فسخ List ===== -->
+        <div *ngIf="isTab('faskh')">
+          <div class="flex flex-wrap gap-3 items-end mb-4">
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="faskhStartDate" label="از تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="faskhEndDate" label="تا تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <button (click)="loadFaskhList()" [disabled]="isLoadingFaskh" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl flex items-center gap-2 disabled:opacity-50">
+              <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingFaskh"></i> جستجو
+            </button>
+            <button *ngIf="faskhList.length" (click)="exportFaskhToExcel()" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl flex items-center gap-2">
+              <i class="fas fa-file-excel"></i> صادرات Excel
+            </button>
+          </div>
+          <div class="bg-white rounded-xl border border-red-200 overflow-hidden">
+            <div class="px-5 py-3 bg-red-50 border-b border-red-200 flex items-center justify-between">
+              <h4 class="font-bold text-red-800 flex items-center gap-2"><i class="fas fa-file-circle-xmark"></i> لیست فسخ</h4>
+              <span class="text-sm text-red-600">تعداد: {{ faskhList.length }}</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                  <tr class="text-center">
+                    <th class="px-3 py-3 font-bold text-gray-700">#</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">عنوان رهنمایی معاملات</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام پدر مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ صدور جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تضمین کننده</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر مکتوب فسخ جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر مکتوب فسخ عواید</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ مکتوب فسخ</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">ملاحظات</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr *ngFor="let r of faskhList; let i=index" class="text-center hover:bg-red-50">
+                    <td class="px-3 py-2 text-gray-500">{{ i+1 }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ r.companyTitle }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFullName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFatherName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.issueDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.guarantor || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseCancellationLetterNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.revenueCancellationLetterNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseCancellationLetterDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-500 text-xs">{{ r.remarks || '-' }}</td>
+                  </tr>
+                  <tr *ngIf="!faskhList.length">
+                    <td colspan="11" class="px-4 py-8 text-center text-gray-400">داده‌ای یافت نشد</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
+
+        <!-- ===== TAB: لغوه List ===== -->
+        <div *ngIf="isTab('laghwa')">
+          <div class="flex flex-wrap gap-3 items-end mb-4">
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="laghwaStartDate" label="از تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="laghwaEndDate" label="تا تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <button (click)="loadLaghwaList()" [disabled]="isLoadingLaghwa" class="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-xl flex items-center gap-2 disabled:opacity-50">
+              <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingLaghwa"></i> جستجو
+            </button>
+            <button *ngIf="laghwaList.length" (click)="exportLaghwaToExcel()" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl flex items-center gap-2">
+              <i class="fas fa-file-excel"></i> صادرات Excel
+            </button>
+          </div>
+          <div class="bg-white rounded-xl border border-orange-200 overflow-hidden">
+            <div class="px-5 py-3 bg-orange-50 border-b border-orange-200 flex items-center justify-between">
+              <h4 class="font-bold text-orange-800 flex items-center gap-2"><i class="fas fa-ban"></i> لیست لغوه</h4>
+              <span class="text-sm text-orange-600">تعداد: {{ laghwaList.length }}</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                  <tr class="text-center">
+                    <th class="px-3 py-3 font-bold text-gray-700">#</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">عنوان رهنمایی معاملات</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام پدر مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ صدور جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تضمین کننده</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر مکتوب لغوه جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر مکتوب لغوه عواید</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ مکتوب لغوه</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">ملاحظات</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr *ngFor="let r of laghwaList; let i=index" class="text-center hover:bg-orange-50">
+                    <td class="px-3 py-2 text-gray-500">{{ i+1 }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ r.companyTitle }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFullName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFatherName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.issueDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.guarantor || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.revocationLetterNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.revocationRevenueLetterNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.revocationLetterDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-500 text-xs">{{ r.remarks || '-' }}</td>
+                  </tr>
+                  <tr *ngIf="!laghwaList.length">
+                    <td colspan="11" class="px-4 py-8 text-center text-gray-400">داده‌ای یافت نشد</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: محل انتقال List ===== -->
+        <div *ngIf="isTab('transfer')">
+          <div class="flex flex-wrap gap-3 items-end mb-4">
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="transferStartDate" label="از تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="transferEndDate" label="تا تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <button (click)="loadTransferList()" [disabled]="isLoadingTransfer" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl flex items-center gap-2 disabled:opacity-50">
+              <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingTransfer"></i> جستجو
+            </button>
+            <button *ngIf="transferList.length" (click)="exportTransferToExcel()" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl flex items-center gap-2">
+              <i class="fas fa-file-excel"></i> صادرات Excel
+            </button>
+          </div>
+          <div class="bg-white rounded-xl border border-teal-200 overflow-hidden">
+            <div class="px-5 py-3 bg-teal-50 border-b border-teal-200 flex items-center justify-between">
+              <h4 class="font-bold text-teal-800 flex items-center gap-2"><i class="fas fa-location-arrow"></i> لیست محل انتقال</h4>
+              <span class="text-sm text-teal-600">تعداد: {{ transferList.length }}</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                  <tr class="text-center">
+                    <th class="px-3 py-3 font-bold text-gray-700">#</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">عنوان رهنمایی معاملات</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام پدر مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ صدور جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تضمین کننده</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نوع جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نوعیت</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ ختم</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">محل انتقال</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">حق‌الامتیاز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">جریمه</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr *ngFor="let r of transferList; let i=index" class="text-center hover:bg-teal-50">
+                    <td class="px-3 py-2 text-gray-500">{{ i+1 }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ r.companyTitle }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFullName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFatherName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.issueDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.guarantor || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseType || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseCategory || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.expireDate || '-' }}</td>
+                    <td class="px-3 py-2 font-medium text-teal-700">{{ r.transferLocation }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.royaltyAmount | number }}</td>
+                    <td class="px-3 py-2 text-red-600">{{ r.penaltyAmount ? (r.penaltyAmount | number) : '-' }}</td>
+                  </tr>
+                  <tr *ngIf="!transferList.length">
+                    <td colspan="13" class="px-4 py-8 text-center text-gray-400">داده‌ای یافت نشد</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: دفتر‌های غیرفعال List ===== -->
+        <div *ngIf="isTab('inactive')">
+          <div class="flex flex-wrap gap-3 items-end mb-4">
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="inactiveStartDate" label="از تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <div class="min-w-[180px]">
+              <app-multi-calendar-datepicker [(ngModel)]="inactiveEndDate" label="تا تاریخ" [required]="false"></app-multi-calendar-datepicker>
+            </div>
+            <button (click)="loadInactiveList()" [disabled]="isLoadingInactive" class="px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-xl flex items-center gap-2 disabled:opacity-50">
+              <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingInactive"></i> جستجو
+            </button>
+            <button *ngIf="inactiveList.length" (click)="exportInactiveToExcel()" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl flex items-center gap-2">
+              <i class="fas fa-file-excel"></i> صادرات Excel
+            </button>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-300 overflow-hidden">
+            <div class="px-5 py-3 bg-gray-100 border-b border-gray-200 flex items-center justify-between">
+              <h4 class="font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-times-circle text-gray-600"></i> لیست دفتر‌های غیرفعال</h4>
+              <span class="text-sm text-gray-600">تعداد: {{ inactiveList.length }}</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                  <tr class="text-center">
+                    <th class="px-3 py-3 font-bold text-gray-700">#</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">عنوان رهنمایی معاملات</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نام پدر مالک</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نمبر جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ صدور جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تضمین کننده</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">نوع جواز</th>
+                    <th class="px-3 py-3 font-bold text-gray-700">تاریخ ختم جواز</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr *ngFor="let r of inactiveList; let i=index" class="text-center hover:bg-gray-50">
+                    <td class="px-3 py-2 text-gray-500">{{ i+1 }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ r.title }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFullName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.ownerFatherName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.issueDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.guarantor || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ r.licenseType || '-' }}</td>
+                    <td class="px-3 py-2 font-medium text-red-600">{{ r.expireDate }}</td>
+                  </tr>
+                  <tr *ngIf="!inactiveList.length">
+                    <td colspan="9" class="px-4 py-8 text-center text-gray-400">داده‌ای یافت نشد</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 

@@ -1578,6 +1578,327 @@ namespace WebAPIBackend.Controllers.Companies
             }
         }
 
+        /// <summary>
+        /// Get list of فسخ (cancellation) records within date range
+        /// </summary>
+        [HttpGet("reports/faskh-list")]
+        public async Task<IActionResult> GetFaskhList(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null)
+        {
+            try
+            {
+                var calendar = CalendarType.HijriShamsi;
+                DateOnly? parsedStart = null;
+                DateOnly? parsedEnd = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate) && DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var s))
+                    parsedStart = s;
+                if (!string.IsNullOrWhiteSpace(endDate) && DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var e))
+                    parsedEnd = e;
+
+                var allowedCompanyIds = await _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
+                    .Select(c => c.Id).ToListAsync();
+
+                var query = _context.CompanyCancellationInfos
+                    .Include(x => x.Company)
+                        .ThenInclude(c => c!.CompanyOwners)
+                    .Include(x => x.Company)
+                        .ThenInclude(c => c!.LicenseDetails)
+                    .Include(x => x.Company)
+                        .ThenInclude(c => c!.Guarantors)
+                    .Where(x => x.Status != false
+                        && x.CancellationType == "فسخ"
+                        && x.Company != null
+                        && allowedCompanyIds.Contains(x.CompanyId));
+
+                if (parsedStart.HasValue)
+                    query = query.Where(x => x.LicenseCancellationLetterDate >= parsedStart);
+                if (parsedEnd.HasValue)
+                    query = query.Where(x => x.LicenseCancellationLetterDate <= parsedEnd);
+
+                var result = await query
+                    .OrderBy(x => x.LicenseCancellationLetterDate)
+                    .Select(x => new
+                    {
+                        companyId = x.CompanyId,
+                        companyTitle = x.Company!.Title,
+                        ownerFullName = x.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
+                        ownerFatherName = x.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
+                        licenseNumber = x.Company.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        issueDate = x.Company.LicenseDetails.OrderBy(l => l.Id)
+                            .Where(l => l.IssueDate.HasValue)
+                            .Select(l => l.IssueDate).FirstOrDefault(),
+                        guarantor = x.Company.Guarantors.OrderBy(g => g.Id)
+                            .Select(g => (g.FirstName ?? "") + " " + (g.FatherName ?? "")).FirstOrDefault(),
+                        cancellationType = x.CancellationType,
+                        licenseCancellationLetterNumber = x.LicenseCancellationLetterNumber,
+                        revenueCancellationLetterNumber = x.RevenueCancellationLetterNumber,
+                        licenseCancellationLetterDate = x.LicenseCancellationLetterDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(x.LicenseCancellationLetterDate, calendar) : "",
+                        remarks = x.Remarks
+                    })
+                    .ToListAsync();
+
+                // Format issueDate in memory
+                var resultFormatted = result.Select(x => new
+                {
+                    x.companyId, x.companyTitle, x.ownerFullName, x.ownerFatherName,
+                    x.licenseNumber,
+                    issueDate = x.issueDate.HasValue ? DateConversionHelper.FormatDateOnly(x.issueDate, calendar) : "",
+                    x.guarantor, x.cancellationType, x.licenseCancellationLetterNumber,
+                    x.revenueCancellationLetterNumber, x.licenseCancellationLetterDate, x.remarks
+                }).ToList();
+
+                return Ok(new
+                {
+                    items = resultFormatted,
+                    totalCount = resultFormatted.Count,
+                    startDate = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : "",
+                    endDate = parsedEnd.HasValue ? DateConversionHelper.FormatDateOnly(parsedEnd, calendar) : ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get list of لغوه (revocation) records within date range
+        /// </summary>
+        [HttpGet("reports/laghwa-list")]
+        public async Task<IActionResult> GetLaghwaList(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null)
+        {
+            try
+            {
+                var calendar = CalendarType.HijriShamsi;
+                DateOnly? parsedStart = null;
+                DateOnly? parsedEnd = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate) && DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var s))
+                    parsedStart = s;
+                if (!string.IsNullOrWhiteSpace(endDate) && DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var e))
+                    parsedEnd = e;
+
+                var allowedCompanyIds = await _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
+                    .Select(c => c.Id).ToListAsync();
+
+                var query = _context.CompanyCancellationInfos
+                    .Include(x => x.Company)
+                        .ThenInclude(c => c!.CompanyOwners)
+                    .Include(x => x.Company)
+                        .ThenInclude(c => c!.LicenseDetails)
+                    .Include(x => x.Company)
+                        .ThenInclude(c => c!.Guarantors)
+                    .Where(x => x.Status != false
+                        && x.CancellationType == "لغوه"
+                        && x.Company != null
+                        && allowedCompanyIds.Contains(x.CompanyId));
+
+                if (parsedStart.HasValue)
+                    query = query.Where(x => x.RevocationLetterDate >= parsedStart);
+                if (parsedEnd.HasValue)
+                    query = query.Where(x => x.RevocationLetterDate <= parsedEnd);
+
+                var result = await query
+                    .OrderBy(x => x.RevocationLetterDate)
+                    .Select(x => new
+                    {
+                        companyId = x.CompanyId,
+                        companyTitle = x.Company!.Title,
+                        ownerFullName = x.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
+                        ownerFatherName = x.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
+                        licenseNumber = x.Company.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        issueDate = x.Company.LicenseDetails.OrderBy(l => l.Id)
+                            .Where(l => l.IssueDate.HasValue)
+                            .Select(l => l.IssueDate).FirstOrDefault(),
+                        guarantor = x.Company.Guarantors.OrderBy(g => g.Id)
+                            .Select(g => (g.FirstName ?? "") + " " + (g.FatherName ?? "")).FirstOrDefault(),
+                        cancellationType = x.CancellationType,
+                        revocationLetterNumber = x.RevocationLetterNumber,
+                        revocationRevenueLetterNumber = x.RevocationRevenueLetterNumber,
+                        revocationLetterDate = x.RevocationLetterDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(x.RevocationLetterDate, calendar) : "",
+                        remarks = x.Remarks
+                    })
+                    .ToListAsync();
+
+                var resultFormatted = result.Select(x => new
+                {
+                    x.companyId, x.companyTitle, x.ownerFullName, x.ownerFatherName,
+                    x.licenseNumber,
+                    issueDate = x.issueDate.HasValue ? DateConversionHelper.FormatDateOnly(x.issueDate, calendar) : "",
+                    x.guarantor, x.cancellationType, x.revocationLetterNumber,
+                    x.revocationRevenueLetterNumber, x.revocationLetterDate, x.remarks
+                }).ToList();
+
+                return Ok(new
+                {
+                    items = resultFormatted,
+                    totalCount = resultFormatted.Count,
+                    startDate = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : "",
+                    endDate = parsedEnd.HasValue ? DateConversionHelper.FormatDateOnly(parsedEnd, calendar) : ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get list of licenses with محل انتقال (TransferLocation) within date range
+        /// </summary>
+        [HttpGet("reports/transfer-location-list")]
+        public async Task<IActionResult> GetTransferLocationList(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null)
+        {
+            try
+            {
+                var calendar = CalendarType.HijriShamsi;
+                DateOnly? parsedStart = null;
+                DateOnly? parsedEnd = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate) && DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var s))
+                    parsedStart = s;
+                if (!string.IsNullOrWhiteSpace(endDate) && DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var e))
+                    parsedEnd = e;
+
+                var allowedCompanyIds = await _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
+                    .Select(c => c.Id).ToListAsync();
+
+                var query = _context.LicenseDetails
+                    .Include(l => l.Company)
+                        .ThenInclude(c => c!.CompanyOwners)
+                    .Include(l => l.Company)
+                        .ThenInclude(c => c!.Guarantors)
+                    .Where(l => l.CompanyId.HasValue
+                        && allowedCompanyIds.Contains(l.CompanyId.Value)
+                        && !string.IsNullOrWhiteSpace(l.TransferLocation));
+
+                if (parsedStart.HasValue)
+                    query = query.Where(l => l.IssueDate >= parsedStart);
+                if (parsedEnd.HasValue)
+                    query = query.Where(l => l.IssueDate <= parsedEnd);
+
+                var result = await query
+                    .OrderBy(l => l.IssueDate)
+                    .Select(l => new
+                    {
+                        companyId = l.CompanyId,
+                        companyTitle = l.Company != null ? l.Company.Title : "",
+                        ownerFullName = l.Company != null ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault() : null,
+                        ownerFatherName = l.Company != null ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault() : null,
+                        guarantor = l.Company != null ? l.Company.Guarantors.OrderBy(g => g.Id)
+                            .Select(g => (g.FirstName ?? "") + " " + (g.FatherName ?? "")).FirstOrDefault() : null,
+                        licenseNumber = l.LicenseNumber,
+                        licenseType = l.LicenseType,
+                        licenseCategory = l.LicenseCategory,
+                        issueDate = l.IssueDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(l.IssueDate, calendar) : "",
+                        expireDate = l.ExpireDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(l.ExpireDate, calendar) : "",
+                        transferLocation = l.TransferLocation,
+                        royaltyAmount = l.RoyaltyAmount,
+                        penaltyAmount = l.PenaltyAmount
+                    })
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    items = result,
+                    totalCount = result.Count,
+                    startDate = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : "",
+                    endDate = parsedEnd.HasValue ? DateConversionHelper.FormatDateOnly(parsedEnd, calendar) : ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get list of inactive companies (license expired within date range)
+        /// </summary>
+        [HttpGet("reports/inactive-companies-list")]
+        public async Task<IActionResult> GetInactiveCompaniesList(
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null)
+        {
+            try
+            {
+                var calendar = CalendarType.HijriShamsi;
+                DateOnly? parsedStart = null;
+                DateOnly? parsedEnd = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate) && DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var s))
+                    parsedStart = s;
+                if (!string.IsNullOrWhiteSpace(endDate) && DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var e))
+                    parsedEnd = e;
+
+                var today = DateOnly.FromDateTime(DateTime.Today);
+
+                var companiesQuery = _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails.AsNoTracking());
+
+                // Get companies whose latest license expired within the date range
+                var result = await companiesQuery
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.Title,
+                        OwnerFullName = c.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
+                        OwnerFatherName = c.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
+                        OwnerNationalId = c.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
+                        LicenseNumber = c.LicenseDetails.OrderByDescending(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
+                        LicenseType = c.LicenseDetails.OrderByDescending(l => l.Id).Select(l => l.LicenseType).FirstOrDefault(),
+                        IssueDate = c.LicenseDetails.OrderByDescending(l => l.Id).Select(l => l.IssueDate).FirstOrDefault(),
+                        Guarantor = c.Guarantors.OrderBy(g => g.Id)
+                            .Select(g => (g.FirstName ?? "") + " " + (g.FatherName ?? "")).FirstOrDefault(),
+                        ExpireDate = c.LicenseDetails.OrderByDescending(l => l.ExpireDate).Select(l => l.ExpireDate).FirstOrDefault()
+                    })
+                    .ToListAsync();
+
+                // Filter in memory: expired (< today) and expiry within date range
+                var filtered = result
+                    .Where(c => c.ExpireDate.HasValue
+                        && c.ExpireDate < today
+                        && (!parsedStart.HasValue || c.ExpireDate >= parsedStart)
+                        && (!parsedEnd.HasValue || c.ExpireDate <= parsedEnd))
+                    .OrderBy(c => c.ExpireDate)
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.Title,
+                        c.OwnerFullName,
+                        c.OwnerFatherName,
+                        c.OwnerNationalId,
+                        c.LicenseNumber,
+                        licenseType = c.LicenseType,
+                        issueDate = c.IssueDate.HasValue ? DateConversionHelper.FormatDateOnly(c.IssueDate, calendar) : "",
+                        guarantor = c.Guarantor,
+                        expireDate = DateConversionHelper.FormatDateOnly(c.ExpireDate, calendar)
+                    })
+                    .ToList();
+
+                return Ok(new
+                {
+                    items = filtered,
+                    totalCount = filtered.Count,
+                    startDate = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : "",
+                    endDate = parsedEnd.HasValue ? DateConversionHelper.FormatDateOnly(parsedEnd, calendar) : ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         #endregion
     }
 }

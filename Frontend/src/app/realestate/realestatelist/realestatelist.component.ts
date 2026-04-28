@@ -46,7 +46,30 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
   reportDistrictId: number = 0;
   reportData: any = null;
   isLoadingReport = false;
-  
+
+  // Filter lists
+  activeFilterTab: string = 'summary';
+
+  faskhStartDate: any = '';
+  faskhEndDate: any = '';
+  faskhList: any[] = [];
+  isLoadingFaskh = false;
+
+  laghwaStartDate: any = '';
+  laghwaEndDate: any = '';
+  laghwaList: any[] = [];
+  isLoadingLaghwa = false;
+
+  transferStartDate: any = '';
+  transferEndDate: any = '';
+  transferList: any[] = [];
+  isLoadingTransfer = false;
+
+  inactiveStartDate: any = '';
+  inactiveEndDate: any = '';
+  inactiveList: any[] = [];
+  isLoadingInactive = false;
+
   // Dropdowns for reports
   provinces: any[] = [];
   reportDistricts: any[] = [];
@@ -192,175 +215,179 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
     }
   }
 
+  setFilterTab(tab: string): void {
+    this.activeFilterTab = tab;
+  }
+
+  isTab(tab: string): boolean {
+    return this.activeFilterTab === tab;
+  }
+
   /**
    * Convert Gregorian Date object to Hijri Shamsi string format (YYYY/MM/DD)
    */
   private convertGregorianToHijriShamsiString(gregorianDate: Date): string {
-    console.log('[Report] Converting Gregorian to Hijri Shamsi:');
-    console.log('[Report]   Input Gregorian Date:', gregorianDate);
-    console.log('[Report]   Date details:', {
-      year: gregorianDate.getFullYear(),
-      month: gregorianDate.getMonth() + 1,
-      day: gregorianDate.getDate()
-    });
-    
     const hijriDate = this.calendarConversion.fromGregorian(gregorianDate, CalendarType.HIJRI_SHAMSI);
-    console.log('[Report]   Converted Hijri Date:', hijriDate);
-    
     const yearStr = hijriDate.year.toString().padStart(4, '0');
     const monthStr = hijriDate.month.toString().padStart(2, '0');
     const dayStr = hijriDate.day.toString().padStart(2, '0');
-    const result = `${yearStr}/${monthStr}/${dayStr}`;
-    
-    console.log('[Report]   Final string:', result);
-    return result;
+    return `${yearStr}/${monthStr}/${dayStr}`;
+  }
+
+  private toHijriString(dateValue: any): string {
+    if (!dateValue || dateValue === '') return '';
+    if (dateValue instanceof Date) return this.convertGregorianToHijriShamsiString(dateValue);
+    return String(dateValue).replace(/\//g, '/');
   }
 
   generateReport(): void {
-    console.log('=== Generate Report Called ===');
-    console.log('reportStartDate:', this.reportStartDate);
-    console.log('reportEndDate:', this.reportEndDate);
-    console.log('reportStartDate type:', typeof this.reportStartDate);
-    console.log('reportEndDate type:', typeof this.reportEndDate);
-    
-    if (!this.reportStartDate || !this.reportEndDate) {
+    if (!this.reportStartDate || !this.reportEndDate ||
+        this.reportStartDate === '' || this.reportEndDate === '') {
       this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
       return;
     }
 
-    // Check if dates are empty strings
-    if (this.reportStartDate === '' || this.reportEndDate === '') {
-      this.toastr.warning('لطفاً تاریخ شروع و پایان را انتخاب کنید');
-      return;
-    }
-
     this.isLoadingReport = true;
+    const startDate = this.toHijriString(this.reportStartDate);
+    const endDate = this.toHijriString(this.reportEndDate);
 
-    // The date picker returns Gregorian Date objects
-    // We need to convert them to Hijri Shamsi string format for the backend
-    let startDate: string;
-    let endDate: string;
-
-    if (typeof this.reportStartDate === 'object' && this.reportStartDate !== null && this.reportStartDate instanceof Date) {
-      // Convert Gregorian Date to Hijri Shamsi string
-      startDate = this.convertGregorianToHijriShamsiString(this.reportStartDate);
-    } else {
-      // If it's already a string, use it as is
-      startDate = String(this.reportStartDate);
-    }
-
-    if (typeof this.reportEndDate === 'object' && this.reportEndDate !== null && this.reportEndDate instanceof Date) {
-      // Convert Gregorian Date to Hijri Shamsi string
-      endDate = this.convertGregorianToHijriShamsiString(this.reportEndDate);
-    } else {
-      // If it's already a string, use it as is
-      endDate = String(this.reportEndDate);
-    }
-
-    console.log('Sending startDate (Hijri Shamsi):', startDate);
-    console.log('Sending endDate (Hijri Shamsi):', endDate);
-
-    // Company module always uses Hijri Shamsi calendar
     this.comservice.getComprehensiveReport(
-      startDate,
-      endDate,
-      'hijriShamsi', // Company module always uses Hijri Shamsi
+      startDate, endDate, 'hijriShamsi',
       this.reportProvinceId > 0 ? this.reportProvinceId : undefined,
       this.reportDistrictId > 0 ? this.reportDistrictId : undefined
     ).subscribe({
-      next: (data) => {
-        console.log('Report data received:', data);
-        this.reportData = data;
-        this.isLoadingReport = false;
-      },
-      error: (err) => {
-        this.toastr.error('خطا در تولید گزارش');
-        this.isLoadingReport = false;
-        console.error('Report error:', err);
-      }
+      next: (data) => { this.reportData = data; this.isLoadingReport = false; },
+      error: (err) => { this.toastr.error('خطا در تولید گزارش'); this.isLoadingReport = false; }
     });
   }
 
-  exportToExcel(): void {
-    if (!this.reportData) {
-      this.toastr.warning('ابتدا گزارش را تولید کنید');
+  // ---- فسخ list ----
+  loadFaskhList(): void {
+    if (!this.faskhStartDate || !this.faskhEndDate) {
+      this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
       return;
     }
+    this.isLoadingFaskh = true;
+    this.comservice.getFaskhList(this.toHijriString(this.faskhStartDate), this.toHijriString(this.faskhEndDate))
+      .subscribe({
+        next: (data) => { this.faskhList = data.items || []; this.isLoadingFaskh = false; },
+        error: () => { this.toastr.error('خطا در بارگذاری لیست فسخ'); this.isLoadingFaskh = false; }
+      });
+  }
 
-    // Create Excel data
-    const excelData: any[] = [];
-    
-    // Header
-    excelData.push(['گزارش دفتر‌های رهنمایی معاملات']);
-    excelData.push([`از تاریخ: ${this.reportData.startDate} تا تاریخ: ${this.reportData.endDate}`]);
-    excelData.push([]);
-    
-    // Cancellations - split by type
-    excelData.push(['تعداد فسخ', this.reportData.totalFaskh]);
-    excelData.push(['تعداد لغوه', this.reportData.totalLaghwa]);
-    excelData.push(['مجموع فسخ/لغوه', this.reportData.totalCancellations]);
-    excelData.push(['کل فسخ/لغوه (همه زمان)', this.reportData.totalCancellationsAllTime]);
-    excelData.push([]);
-    
-    // Companies status
-    excelData.push(['وضعیت دفتر‌ها']);
-    excelData.push(['دفتر‌های فعال', this.reportData.activeCompanies]);
-    excelData.push(['دفتر‌های غیرفعال (منقضی در بازه تاریخی)', this.reportData.inactiveInDateRange]);
-    excelData.push(['دفتر‌های غیرفعال (کل)', this.reportData.inactiveCompanies]);
-    excelData.push(['مجموع دفتر‌ها', this.reportData.totalCompanies]);
-    excelData.push([]);
+  exportFaskhToExcel(): void {
+    if (!this.faskhList.length) { this.toastr.warning('داده‌ای برای صادرات وجود ندارد'); return; }
+    const rows: any[] = [
+      ['لیست فسخ'],
+      ['#', 'عنوان رهنمایی معاملات', 'نام مالک', 'نام پدر مالک', 'نمبر جواز', 'تاریخ صدور جواز', 'تضمین کننده', 'نمبر مکتوب فسخ جواز', 'نمبر مکتوب فسخ عواید', 'تاریخ مکتوب فسخ', 'ملاحظات']
+    ];
+    this.faskhList.forEach((r, i) => rows.push([
+      i + 1, r.companyTitle, r.ownerFullName, r.ownerFatherName,
+      r.licenseNumber, r.issueDate, r.guarantor,
+      r.licenseCancellationLetterNumber, r.revenueCancellationLetterNumber,
+      r.licenseCancellationLetterDate, r.remarks
+    ]));
+    this.downloadCsv(rows, 'faskh-list');
+  }
 
-    // Transfer Location
-    excelData.push(['تعداد محل انتقال', this.reportData.transferLocationCount]);
-    excelData.push([]);
-    
-    // Licenses by category
-    excelData.push(['جواز‌ها بر اساس نوعیت']);
-    excelData.push(['نوعیت جواز', 'تعداد']);
-    this.reportData.licensesByCategory.forEach((item: any) => {
-      excelData.push([item.category, item.count]);
-    });
-    excelData.push(['مجموع جواز‌ها', this.reportData.totalLicenses]);
-    excelData.push([]);
-    
-    // Guarantors by type
-    excelData.push(['تضمین‌کنندگان بر اساس نوع']);
-    excelData.push(['نوع تضمین', 'تعداد']);
-    this.reportData.guarantorsByType.forEach((item: any) => {
-      excelData.push([item.guaranteeTypeName, item.count]);
-    });
-    excelData.push(['مجموع تضمین‌کنندگان', this.reportData.totalGuarantors]);
-    excelData.push([]);
-    
-    // Revenue by license type - detailed
-    excelData.push(['جزئیات مالی و اسناد جواز']);
-    excelData.push(['نوع جواز', 'تعداد کل', 'تعداد بدون جریمه', 'عواید بدون جریمه', 'تعداد با جریمه', 'عواید با جریمه', 'مجموع عواید']);
-    this.reportData.licenseRevenueByType.forEach((item: any) => {
-      excelData.push([
-        item.licenseType,
-        item.count,
-        item.countWithoutPenalty,
-        item.revenueWithoutPenalty,
-        item.countWithPenalty,
-        item.revenueWithPenalty,
-        item.totalRevenue
-      ]);
-    });
-    excelData.push(['مجموع عواید', '', '', '', '', '', this.reportData.totalRevenue]);
-    
-    // Convert to CSV
-    const csv = excelData.map(row => row.join(',')).join('\n');
+  // ---- لغوه list ----
+  loadLaghwaList(): void {
+    if (!this.laghwaStartDate || !this.laghwaEndDate) {
+      this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+      return;
+    }
+    this.isLoadingLaghwa = true;
+    this.comservice.getLaghwaList(this.toHijriString(this.laghwaStartDate), this.toHijriString(this.laghwaEndDate))
+      .subscribe({
+        next: (data) => { this.laghwaList = data.items || []; this.isLoadingLaghwa = false; },
+        error: () => { this.toastr.error('خطا در بارگذاری لیست لغوه'); this.isLoadingLaghwa = false; }
+      });
+  }
+
+  exportLaghwaToExcel(): void {
+    if (!this.laghwaList.length) { this.toastr.warning('داده‌ای برای صادرات وجود ندارد'); return; }
+    const rows: any[] = [
+      ['لیست لغوه'],
+      ['#', 'عنوان رهنمایی معاملات', 'نام مالک', 'نام پدر مالک', 'نمبر جواز', 'تاریخ صدور جواز', 'تضمین کننده', 'نمبر مکتوب لغوه جواز', 'نمبر مکتوب لغوه عواید', 'تاریخ مکتوب لغوه', 'ملاحظات']
+    ];
+    this.laghwaList.forEach((r, i) => rows.push([
+      i + 1, r.companyTitle, r.ownerFullName, r.ownerFatherName,
+      r.licenseNumber, r.issueDate, r.guarantor,
+      r.revocationLetterNumber, r.revocationRevenueLetterNumber,
+      r.revocationLetterDate, r.remarks
+    ]));
+    this.downloadCsv(rows, 'laghwa-list');
+  }
+
+  // ---- محل انتقال list ----
+  loadTransferList(): void {
+    if (!this.transferStartDate || !this.transferEndDate) {
+      this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+      return;
+    }
+    this.isLoadingTransfer = true;
+    this.comservice.getTransferLocationList(this.toHijriString(this.transferStartDate), this.toHijriString(this.transferEndDate))
+      .subscribe({
+        next: (data) => { this.transferList = data.items || []; this.isLoadingTransfer = false; },
+        error: () => { this.toastr.error('خطا در بارگذاری لیست محل انتقال'); this.isLoadingTransfer = false; }
+      });
+  }
+
+  exportTransferToExcel(): void {
+    if (!this.transferList.length) { this.toastr.warning('داده‌ای برای صادرات وجود ندارد'); return; }
+    const rows: any[] = [
+      ['لیست محل انتقال'],
+      ['#', 'عنوان رهنمایی معاملات', 'نام مالک', 'نام پدر مالک', 'نمبر جواز', 'تاریخ صدور جواز', 'تضمین کننده', 'نوع جواز', 'نوعیت جواز', 'تاریخ ختم', 'محل انتقال', 'مبلغ حق‌الامتیاز', 'مبلغ جریمه']
+    ];
+    this.transferList.forEach((r, i) => rows.push([
+      i + 1, r.companyTitle, r.ownerFullName, r.ownerFatherName,
+      r.licenseNumber, r.issueDate, r.guarantor,
+      r.licenseType, r.licenseCategory, r.expireDate,
+      r.transferLocation, r.royaltyAmount, r.penaltyAmount
+    ]));
+    this.downloadCsv(rows, 'transfer-location-list');
+  }
+
+  // ---- دفتر‌های غیرفعال list ----
+  loadInactiveList(): void {
+    if (!this.inactiveStartDate || !this.inactiveEndDate) {
+      this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+      return;
+    }
+    this.isLoadingInactive = true;
+    this.comservice.getInactiveCompaniesList(this.toHijriString(this.inactiveStartDate), this.toHijriString(this.inactiveEndDate))
+      .subscribe({
+        next: (data) => { this.inactiveList = data.items || []; this.isLoadingInactive = false; },
+        error: () => { this.toastr.error('خطا در بارگذاری لیست دفتر‌های غیرفعال'); this.isLoadingInactive = false; }
+      });
+  }
+
+  exportInactiveToExcel(): void {
+    if (!this.inactiveList.length) { this.toastr.warning('داده‌ای برای صادرات وجود ندارد'); return; }
+    const rows: any[] = [
+      ['لیست دفتر‌های غیرفعال'],
+      ['#', 'عنوان رهنمایی معاملات', 'نام مالک', 'نام پدر مالک', 'نمبر جواز', 'تاریخ صدور جواز', 'تضمین کننده', 'نوع جواز', 'تاریخ ختم جواز']
+    ];
+    this.inactiveList.forEach((r, i) => rows.push([
+      i + 1, r.title, r.ownerFullName, r.ownerFatherName,
+      r.licenseNumber, r.issueDate, r.guarantor,
+      r.licenseType, r.expireDate
+    ]));
+    this.downloadCsv(rows, 'inactive-companies-list');
+  }
+
+  // ---- shared CSV helper ----
+  private downloadCsv(rows: any[][], filename: string): void {
+    const csv = rows.map(r => r.map(c => `"${(c ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `companies-report-${Date.now()}.csv`);
+    link.setAttribute('href', URL.createObjectURL(blob));
+    link.setAttribute('download', `${filename}-${Date.now()}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
     this.toastr.success('گزارش با موفقیت صادر شد');
   }
+
 }
