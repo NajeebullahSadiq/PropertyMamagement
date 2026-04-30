@@ -138,8 +138,6 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             // Section 3: Violations fields (conditionally required)
             violationStatus: [''],
             violationType: [''],
-            violationDate: [''],
-            closureDate: [''],
             closureReason: [''],
             violationActionsTaken: [''],
             violationRemarks: [''],
@@ -238,18 +236,6 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
                 violationActionsTaken: violation.actionsTaken,
                 violationRemarks: violation.remarks,
             });
-            if (violation.violationDate) {
-                const date = this.parseDateString(violation.violationDate);
-                if (date) {
-                    this.mainForm.patchValue({ violationDate: date });
-                }
-            }
-            if (violation.closureDate) {
-                const date = this.parseDateString(violation.closureDate);
-                if (date) {
-                    this.mainForm.patchValue({ closureDate: date });
-                }
-            }
             this.onViolationStatusChange();
         } else if (data.sectionType === 'inspection') {
             this.mainForm.patchValue({
@@ -354,8 +340,6 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
         // Violation fields
         this.mainForm.get('violationStatus')?.clearValidators();
         this.mainForm.get('violationType')?.clearValidators();
-        this.mainForm.get('violationDate')?.clearValidators();
-        this.mainForm.get('closureDate')?.clearValidators();
         this.mainForm.get('closureReason')?.clearValidators();
         
         // Inspection fields
@@ -368,8 +352,6 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
         this.mainForm.get('complainantName')?.updateValueAndValidity();
         this.mainForm.get('violationStatus')?.updateValueAndValidity();
         this.mainForm.get('violationType')?.updateValueAndValidity();
-        this.mainForm.get('violationDate')?.updateValueAndValidity();
-        this.mainForm.get('closureDate')?.updateValueAndValidity();
         this.mainForm.get('closureReason')?.updateValueAndValidity();
         this.mainForm.get('year')?.updateValueAndValidity();
         this.mainForm.get('month')?.updateValueAndValidity();
@@ -408,26 +390,18 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
         
         if (status === 'منجر به مسدودی') {
             // Leading to Closure - require closure fields
-            this.mainForm.get('closureDate')?.setValidators([Validators.required]);
             this.mainForm.get('closureReason')?.setValidators([Validators.required, Validators.maxLength(500)]);
             this.mainForm.get('violationType')?.clearValidators();
-            this.mainForm.get('violationDate')?.clearValidators();
         } else if (status === 'عادی') {
             // Normal - require violation fields
             this.mainForm.get('violationType')?.setValidators([Validators.required, Validators.maxLength(500)]);
-            this.mainForm.get('violationDate')?.setValidators([Validators.required]);
-            this.mainForm.get('closureDate')?.clearValidators();
             this.mainForm.get('closureReason')?.clearValidators();
         } else {
             this.mainForm.get('violationType')?.clearValidators();
-            this.mainForm.get('violationDate')?.clearValidators();
-            this.mainForm.get('closureDate')?.clearValidators();
             this.mainForm.get('closureReason')?.clearValidators();
         }
 
         this.mainForm.get('violationType')?.updateValueAndValidity();
-        this.mainForm.get('violationDate')?.updateValueAndValidity();
-        this.mainForm.get('closureDate')?.updateValueAndValidity();
         this.mainForm.get('closureReason')?.updateValueAndValidity();
     }
 
@@ -470,8 +444,6 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             // Violations fields (directly on data)
             violationStatus: formValue.violationStatus,
             violationType: formValue.violationType,
-            violationDate: this.formatDateForBackend(formValue.violationDate),
-            closureDate: this.formatDateForBackend(formValue.closureDate),
             closureReason: formValue.closureReason,
             violationActionsTaken: formValue.violationActionsTaken,
             violationRemarks: formValue.violationRemarks,

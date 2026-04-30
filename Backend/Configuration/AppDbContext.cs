@@ -575,8 +575,6 @@ namespace WebAPIBackend.Configuration
                 // Violations fields
                 entity.Property(e => e.ViolationStatus).HasMaxLength(100).HasColumnName("ViolationStatus");
                 entity.Property(e => e.ViolationType).HasMaxLength(500).HasColumnName("ViolationType");
-                entity.Property(e => e.ViolationDate).HasColumnName("ViolationDate");
-                entity.Property(e => e.ClosureDate).HasColumnName("ClosureDate");
                 entity.Property(e => e.ClosureReason).HasMaxLength(500).HasColumnName("ClosureReason");
                 entity.Property(e => e.ViolationActionsTaken).HasMaxLength(1000).HasColumnName("ViolationActionsTaken");
                 entity.Property(e => e.ViolationRemarks).HasMaxLength(1000).HasColumnName("ViolationRemarks");

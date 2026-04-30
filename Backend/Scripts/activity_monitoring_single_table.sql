@@ -38,25 +38,24 @@ CREATE TABLE org."ActivityMonitoringRecords" (
     "Id" SERIAL PRIMARY KEY,
     
     -- Common Fields (Section 1: Annual Report - گزارش سالانه)
-    "SerialNumber" VARCHAR(50) NOT NULL,
-    "LicenseNumber" VARCHAR(50) NOT NULL,
-    "LicenseHolderName" VARCHAR(200) NOT NULL,
+    "SerialNumber" VARCHAR(50),
+    "LicenseNumber" VARCHAR(50),
+    "LicenseHolderName" VARCHAR(200),
+    "CompanyTitle" VARCHAR(300),
     "District" VARCHAR(200),
     "ReportRegistrationDate" DATE,
-    "SectionType" VARCHAR(50) NOT NULL,  -- complaints, violations, inspection
+    "SectionType" VARCHAR(50),
     
     -- Deed Counts (for Annual Report)
-    "SaleDeedsCount" INTEGER DEFAULT 0,
-    "RentalDeedsCount" INTEGER DEFAULT 0,
-    "BaiUlWafaDeedsCount" INTEGER DEFAULT 0,
-    "VehicleTransactionDeedsCount" INTEGER DEFAULT 0,
-    "AnnualReportRemarks" VARCHAR(1000),
+    "SaleDeedsCount" INTEGER,
+    "RentalDeedsCount" INTEGER,
+    "BaiUlWafaDeedsCount" INTEGER,
+    "VehicleTransactionDeedsCount" INTEGER,
     
     -- Deed Items (JSON array for flexibility)
-    "DeedItems" JSONB,  -- Stores array: [{"deedType":1,"serialStart":"100","serialEnd":"200","count":100}]
+    "DeedItems" JSONB,
     
     -- Section 2: Complaints (ثبت شکایات)
-    "ComplaintRegistrationDate" DATE,
     "ComplaintSubject" VARCHAR(500),
     "ComplainantName" VARCHAR(200),
     "ComplaintActionsTaken" VARCHAR(1000),
@@ -65,21 +64,23 @@ CREATE TABLE org."ActivityMonitoringRecords" (
     -- Section 3: Real Estate Violations (تخلفات دفاتر رهنمای معاملات)
     "ViolationStatus" VARCHAR(100),
     "ViolationType" VARCHAR(500),
-    "ViolationDate" DATE,
-    "ClosureDate" DATE,
     "ClosureReason" VARCHAR(500),
     "ViolationActionsTaken" VARCHAR(1000),
     "ViolationRemarks" VARCHAR(1000),
     
     -- Section 4: Inspections (نظارت و بازرسی)
-    "MonitoringType" VARCHAR(100),
+    "Year" VARCHAR(20),
     "Month" VARCHAR(50),
     "MonitoringCount" INTEGER,
+    "MonitoringRemarks" VARCHAR(1000),
     
     -- Audit fields
     "Status" BOOLEAN DEFAULT true,
     "CreatedAt" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "CreatedBy" VARCHAR(50),
+    "UpdatedAt" TIMESTAMP WITHOUT TIME ZONE,
+    "UpdatedBy" VARCHAR(50)
+);
     "UpdatedAt" TIMESTAMP WITHOUT TIME ZONE,
     "UpdatedBy" VARCHAR(50)
 );
@@ -114,8 +115,6 @@ CREATE INDEX "IX_ActivityMonitoringRecords_ReportRegistrationDate"
     ON org."ActivityMonitoringRecords"("ReportRegistrationDate");
 CREATE INDEX "IX_ActivityMonitoringRecords_ComplaintRegistrationDate" 
     ON org."ActivityMonitoringRecords"("ComplaintRegistrationDate");
-CREATE INDEX "IX_ActivityMonitoringRecords_ViolationDate" 
-    ON org."ActivityMonitoringRecords"("ViolationDate");
 
 -- JSONB index for deed items
 CREATE INDEX "IX_ActivityMonitoringRecords_DeedItems" 
@@ -155,8 +154,7 @@ COMMENT ON COLUMN org."ActivityMonitoringRecords"."ComplainantName" IS 'شهرت
 -- Violations fields
 COMMENT ON COLUMN org."ActivityMonitoringRecords"."ViolationStatus" IS 'وضعیت تخلف - Violation status';
 COMMENT ON COLUMN org."ActivityMonitoringRecords"."ViolationType" IS 'نوعیت تخلف - Violation type';
-COMMENT ON COLUMN org."ActivityMonitoringRecords"."ViolationDate" IS 'تاریخ ثبت تخلف - Violation date';
-COMMENT ON COLUMN org."ActivityMonitoringRecords"."ClosureDate" IS 'تاریخ توقف - Closure date';
+COMMENT ON COLUMN org."ActivityMonitoringRecords"."ClosureReason" IS 'علت مسدودی - Closure reason';
 
 -- Inspection fields
 COMMENT ON COLUMN org."ActivityMonitoringRecords"."MonitoringType" IS 'نوعیت نظارت - Monitoring type';

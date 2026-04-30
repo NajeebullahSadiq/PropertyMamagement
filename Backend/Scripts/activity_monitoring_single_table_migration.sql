@@ -79,8 +79,6 @@ CREATE TABLE org."ActivityMonitoringRecords" (
     -- ============ Section 3: Violations (تخلفات دفاتر رهنمای معاملات) ============
     "ViolationStatus" VARCHAR(100),
     "ViolationType" VARCHAR(500),
-    "ViolationDate" DATE,
-    "ClosureDate" DATE,
     "ClosureReason" VARCHAR(500),
     "ViolationActionsTaken" VARCHAR(1000),
     "ViolationRemarks" VARCHAR(1000),
@@ -129,8 +127,6 @@ CREATE INDEX "IX_ActivityMonitoringRecords_CreatedAt"
 -- Violations section indexes
 CREATE INDEX "IX_ActivityMonitoringRecords_ViolationStatus" 
     ON org."ActivityMonitoringRecords"("ViolationStatus");
-CREATE INDEX "IX_ActivityMonitoringRecords_ViolationDate" 
-    ON org."ActivityMonitoringRecords"("ViolationDate");
 
 -- Inspection section indexes
 CREATE INDEX "IX_ActivityMonitoringRecords_Year" 

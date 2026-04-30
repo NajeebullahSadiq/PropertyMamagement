@@ -61,10 +61,6 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         [MaxLength(500)]
         public string? ViolationType { get; set; }
 
-        public string? ViolationDate { get; set; }
-
-        public string? ClosureDate { get; set; }
-
         [MaxLength(500)]
         public string? ClosureReason { get; set; }
 

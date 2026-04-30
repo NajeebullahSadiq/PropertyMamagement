@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
 using WebAPIBackend.Models.ActivityMonitoring;
@@ -9,20 +11,50 @@ using WebAPIBackend.Models.RequestData.ActivityMonitoring;
 
 namespace WebAPIBackend.Controllers.ActivityMonitoring
 {
-    /// <summary>
-    /// Controller for Activity Monitoring (نظارت بر فعالیت دفاتر رهنمای معاملات و عریضه نویسان)
-    /// Single Table Design - All sections in one entity
-    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ActivityMonitoringController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ActivityMonitoringController(AppDbContext context)
+        public ActivityMonitoringController(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
+        }
+
+        /// <summary>
+        /// Resolves a display name from a user ID or returns the value as-is if it's already a name.
+        /// </summary>
+        private async Task<string> ResolveDisplayName(string? userIdOrName)
+        {
+            if (string.IsNullOrEmpty(userIdOrName)) return "-";
+            // If it looks like a GUID, look up the actual user
+            if (Guid.TryParse(userIdOrName, out _))
+            {
+                var user = await _userManager.FindByIdAsync(userIdOrName);
+                if (user != null)
+                {
+                    var fullName = $"{user.FirstName} {user.LastName}".Trim();
+                    return string.IsNullOrEmpty(fullName) ? (user.UserName ?? userIdOrName) : fullName;
+                }
+            }
+            return userIdOrName;
+        }
+
+        /// <summary>
+        /// Gets the display name of the currently authenticated user.
+        /// </summary>
+        private async Task<string> GetCurrentUserDisplayName()
+        {
+            var userIdClaim = HttpContext.User.FindFirst("UserID");
+            if (userIdClaim == null) return User.Identity?.Name ?? "Unknown";
+            var user = await _userManager.FindByIdAsync(userIdClaim.Value);
+            if (user == null) return User.Identity?.Name ?? userIdClaim.Value;
+            var fullName = $"{user.FirstName} {user.LastName}".Trim();
+            return string.IsNullOrEmpty(fullName) ? (user.UserName ?? userIdClaim.Value) : fullName;
         }
 
         #region Main Record CRUD
@@ -64,7 +96,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 var totalCount = await query.CountAsync();
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
 
-                var items = await query
+                var rawItems = await query
                     .OrderByDescending(x => x.CreatedAt)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -96,14 +128,6 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         // Violations
                         x.ViolationStatus,
                         x.ViolationType,
-                        x.ViolationDate,
-                        ViolationDateFormatted = x.ViolationDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ViolationDate, calendar)
-                            : "",
-                        x.ClosureDate,
-                        ClosureDateFormatted = x.ClosureDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ClosureDate, calendar)
-                            : "",
                         x.ClosureReason,
                         x.ViolationActionsTaken,
                         x.ViolationRemarks,
@@ -119,6 +143,64 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.CreatedBy
                     })
                     .ToListAsync();
+
+                // Resolve any GUID-based CreatedBy values to display names
+                // Done sequentially to avoid concurrent DbContext access
+                var userNameCache = new Dictionary<string, string>();
+                var resolvedItems = new List<object>();
+                foreach (var x in rawItems)
+                {
+                    string resolvedName;
+                    if (string.IsNullOrEmpty(x.CreatedBy))
+                    {
+                        resolvedName = "-";
+                    }
+                    else if (userNameCache.TryGetValue(x.CreatedBy, out var cached))
+                    {
+                        resolvedName = cached;
+                    }
+                    else
+                    {
+                        resolvedName = await ResolveDisplayName(x.CreatedBy);
+                        userNameCache[x.CreatedBy] = resolvedName;
+                    }
+
+                    resolvedItems.Add(new
+                    {
+                        x.Id,
+                        x.SerialNumber,
+                        x.LicenseNumber,
+                        x.LicenseHolderName,
+                        x.CompanyTitle,
+                        x.District,
+                        x.SectionType,
+                        x.ReportRegistrationDate,
+                        x.ReportRegistrationDateFormatted,
+                        x.SaleDeedsCount,
+                        x.RentalDeedsCount,
+                        x.BaiUlWafaDeedsCount,
+                        x.VehicleTransactionDeedsCount,
+                        x.DeedItems,
+                        x.ComplaintSubject,
+                        x.ComplainantName,
+                        x.ComplaintActionsTaken,
+                        x.ComplaintRemarks,
+                        x.ViolationStatus,
+                        x.ViolationType,
+                        x.ClosureReason,
+                        x.ViolationActionsTaken,
+                        x.ViolationRemarks,
+                        x.Year,
+                        x.Month,
+                        x.MonitoringCount,
+                        x.MonitoringRemarks,
+                        x.Status,
+                        x.CreatedAt,
+                        CreatedBy = resolvedName
+                    });
+                }
+
+                var items = resolvedItems;
 
                 return Ok(new
                 {
@@ -175,14 +257,6 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         // Violations
                         x.ViolationStatus,
                         x.ViolationType,
-                        x.ViolationDate,
-                        ViolationDateFormatted = x.ViolationDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ViolationDate, calendar)
-                            : "",
-                        x.ClosureDate,
-                        ClosureDateFormatted = x.ClosureDate.HasValue
-                            ? DateConversionHelper.FormatDateOnly(x.ClosureDate, calendar)
-                            : "",
                         x.ClosureReason,
                         x.ViolationActionsTaken,
                         x.ViolationRemarks,
@@ -204,7 +278,39 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     return NotFound("رکورد یافت نشد");
                 }
 
-                return Ok(item);
+                return Ok(new
+                {
+                    item.Id,
+                    item.SerialNumber,
+                    item.LicenseNumber,
+                    item.LicenseHolderName,
+                    item.CompanyTitle,
+                    item.District,
+                    item.SectionType,
+                    item.ReportRegistrationDate,
+                    item.ReportRegistrationDateFormatted,
+                    item.SaleDeedsCount,
+                    item.RentalDeedsCount,
+                    item.BaiUlWafaDeedsCount,
+                    item.VehicleTransactionDeedsCount,
+                    item.DeedItems,
+                    item.ComplaintSubject,
+                    item.ComplainantName,
+                    item.ComplaintActionsTaken,
+                    item.ComplaintRemarks,
+                    item.ViolationStatus,
+                    item.ViolationType,
+                    item.ClosureReason,
+                    item.ViolationActionsTaken,
+                    item.ViolationRemarks,
+                    item.Year,
+                    item.Month,
+                    item.MonitoringCount,
+                    item.MonitoringRemarks,
+                    item.Status,
+                    item.CreatedAt,
+                    CreatedBy = await ResolveDisplayName(item.CreatedBy)
+                });
             }
             catch (Exception ex)
             {
@@ -226,12 +332,10 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     return Unauthorized();
                 }
 
-                var userId = userIdClaim.Value;
+                var userName = await GetCurrentUserDisplayName();
 
                 // Parse dates
                 DateConversionHelper.TryParseToDateOnly(request.ReportRegistrationDate, request.CalendarType, out var reportRegistrationDate);
-                DateConversionHelper.TryParseToDateOnly(request.ViolationDate, request.CalendarType, out var violationDate);
-                DateConversionHelper.TryParseToDateOnly(request.ClosureDate, request.CalendarType, out var closureDate);
 
                 // Serialize deed items to JSON
                 string? deedItemsJson = null;
@@ -264,8 +368,6 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     // Violations
                     ViolationStatus = request.ViolationStatus,
                     ViolationType = request.ViolationType,
-                    ViolationDate = violationDate,
-                    ClosureDate = closureDate,
                     ClosureReason = request.ClosureReason,
                     ViolationActionsTaken = request.ViolationActionsTaken,
                     ViolationRemarks = request.ViolationRemarks,
@@ -278,7 +380,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     
                     Status = true,
                     CreatedAt = DateTime.UtcNow,
-                    CreatedBy = userId
+                    CreatedBy = userName
                 };
 
                 _context.ActivityMonitoringRecords.Add(entity);
@@ -306,7 +408,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     return Unauthorized();
                 }
 
-                var userId = userIdClaim.Value;
+                var userName = await GetCurrentUserDisplayName();
 
                 var entity = await _context.ActivityMonitoringRecords.FindAsync(id);
                 if (entity == null || entity.Status == false)
@@ -316,8 +418,6 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
 
                 // Parse dates
                 DateConversionHelper.TryParseToDateOnly(request.ReportRegistrationDate, request.CalendarType, out var reportRegistrationDate);
-                DateConversionHelper.TryParseToDateOnly(request.ViolationDate, request.CalendarType, out var violationDate);
-                DateConversionHelper.TryParseToDateOnly(request.ClosureDate, request.CalendarType, out var closureDate);
 
                 // Serialize deed items to JSON
                 string? deedItemsJson = null;
@@ -348,8 +448,6 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 // Violations
                 entity.ViolationStatus = request.ViolationStatus;
                 entity.ViolationType = request.ViolationType;
-                entity.ViolationDate = violationDate;
-                entity.ClosureDate = closureDate;
                 entity.ClosureReason = request.ClosureReason;
                 entity.ViolationActionsTaken = request.ViolationActionsTaken;
                 entity.ViolationRemarks = request.ViolationRemarks;
@@ -361,7 +459,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 entity.MonitoringRemarks = request.MonitoringRemarks;
                 
                 entity.UpdatedAt = DateTime.UtcNow;
-                entity.UpdatedBy = userId;
+                entity.UpdatedBy = userName;
 
                 await _context.SaveChangesAsync();
 

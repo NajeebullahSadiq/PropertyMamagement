@@ -138,15 +138,15 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
     getColspan(): number {
         switch (this.selectedSectionType) {
             case 'annualReport':
-                return 6;
+                return 7;
             case 'complaints':
-                return 6;
+                return 11;
             case 'violations':
-                return 7;
+                return 8;
             case 'inspection':
-                return 5;
+                return 6;
             default:
-                return 7;
+                return 8;
         }
     }
 }

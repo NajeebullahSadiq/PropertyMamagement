@@ -30,12 +30,9 @@ export interface ActivityMonitoringRecord {
     complaintRemarks?: string;
     
     // ============ Section 3: Violations ============
+    // ============ Section 3: Violations ============
     violationStatus?: string;
     violationType?: string;
-    violationDate?: Date | string;
-    violationDateFormatted?: string;
-    closureDate?: Date | string;
-    closureDateFormatted?: string;
     closureReason?: string;
     violationActionsTaken?: string;
     violationRemarks?: string;
@@ -85,8 +82,6 @@ export interface ActivityMonitoringData {
     // Violations
     violationStatus?: string;
     violationType?: string;
-    violationDate?: string;
-    closureDate?: string;
     closureReason?: string;
     violationActionsTaken?: string;
     violationRemarks?: string;

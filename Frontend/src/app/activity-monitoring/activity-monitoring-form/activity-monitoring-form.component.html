@@ -264,10 +264,6 @@
             <div *ngIf="mainForm.get('violationStatus')?.value === 'منجر به مسدودی'"
               class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div>
-                <app-multi-calendar-datepicker formControlName="closureDate" label="تاریخ مسدودی" [required]="true">
-                </app-multi-calendar-datepicker>
-              </div>
-              <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">علت مسدودی <span
                     class="text-red-500">*</span></label>
                 <input type="text" formControlName="closureReason"
@@ -281,10 +277,6 @@
             <!-- Conditional Fields for عادی -->
             <div *ngIf="mainForm.get('violationStatus')?.value === 'عادی'"
               class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <app-multi-calendar-datepicker formControlName="violationDate" label="تاریخ ثبت تخلف" [required]="true">
-                </app-multi-calendar-datepicker>
-              </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تخلف <span
                     class="text-red-500">*</span></label>

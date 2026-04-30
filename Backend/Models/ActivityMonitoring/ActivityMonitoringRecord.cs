@@ -88,12 +88,6 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         [Column("ViolationType")]
         public string? ViolationType { get; set; }
 
-        [Column("ViolationDate")]
-        public DateOnly? ViolationDate { get; set; }
-
-        [Column("ClosureDate")]
-        public DateOnly? ClosureDate { get; set; }
-
         [MaxLength(500)]
         [Column("ClosureReason")]
         public string? ClosureReason { get; set; }

@@ -252,15 +252,7 @@
               <p class="font-bold text-gray-800 mt-1">{{ record.violationType || '-' }}</p>
             </div>
             <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-orange-500"></i>تاریخ تخلف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ (record.violationDate | calendarDate) || '-' }}</p>
-            </div>
-            <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar-times text-orange-500"></i>تاریخ توقف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ (record.closureDate | calendarDate) || '-' }}</p>
-            </div>
-            <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-comment text-orange-500"></i>دلیل توقف</span>
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-comment text-orange-500"></i>علت مسدودی</span>
               <p class="font-bold text-gray-800 mt-1">{{ record.closureReason || '-' }}</p>
             </div>
           </div>
