@@ -161,6 +161,14 @@
                 <p class="text-sm mt-1">از بخش بالا نوعیت اسناد را انتخاب کرده و افزودن کنید</p>
               </div>
 
+              <!-- Tax Amount Field -->
+              <div class="mt-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">مقدار مالیات</label>
+                <input type="number" formControlName="taxAmount"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="مقدار مالیات را وارد کنید">
+              </div>
+
               <!-- Summary -->
               <div *ngIf="deedItems.length > 0" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white p-3 rounded-lg border border-gray-200">
@@ -253,6 +261,7 @@
                   <option value="">انتخاب کنید</option>
                   <option value="منجر به مسدودی">منجر به مسدودی</option>
                   <option value="عادی">عادی</option>
+                  <option value="رفع مهرلاک">رفع مهرلاک</option>
                 </select>
                 <div *ngIf="mainForm.get('violationStatus')?.invalid && mainForm.get('violationStatus')?.touched">
                   <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
@@ -269,6 +278,20 @@
                 <input type="text" formControlName="closureReason"
                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                 <div *ngIf="mainForm.get('closureReason')?.invalid && mainForm.get('closureReason')?.touched">
+                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conditional Fields for رفع مهرلاک -->
+            <div *ngIf="mainForm.get('violationStatus')?.value === 'رفع مهرلاک'"
+              class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">علت رفع مهرلاک <span
+                    class="text-red-500">*</span></label>
+                <input type="text" formControlName="sealRemovalReason"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                <div *ngIf="mainForm.get('sealRemovalReason')?.invalid && mainForm.get('sealRemovalReason')?.touched">
                   <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
                 </div>
               </div>

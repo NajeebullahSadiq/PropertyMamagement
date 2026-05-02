@@ -62,6 +62,10 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         [Column("DeedItems", TypeName = "jsonb")]
         public string? DeedItems { get; set; }
 
+        // ============ Tax Amount (for Annual Report) ============
+        [Column("TaxAmount")]
+        public decimal? TaxAmount { get; set; }
+
         // ============ Section 2: Complaints (ثبت شکایات) ============
         [MaxLength(500)]
         [Column("ComplaintSubject")]
@@ -91,6 +95,10 @@ namespace WebAPIBackend.Models.ActivityMonitoring
         [MaxLength(500)]
         [Column("ClosureReason")]
         public string? ClosureReason { get; set; }
+
+        [MaxLength(500)]
+        [Column("SealRemovalReason")]
+        public string? SealRemovalReason { get; set; }
 
         [MaxLength(1000)]
         [Column("ViolationActionsTaken")]

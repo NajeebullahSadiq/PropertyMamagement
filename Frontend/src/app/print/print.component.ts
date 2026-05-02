@@ -32,8 +32,8 @@ export class PrintComponent extends BaseComponent implements OnInit {
   qrCodeUrl: string = '';
   verificationError: string | null = null;
 
-  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms, 'new-design' = modern table layout, 'old-design' = traditional form overlay, 'upload-docts' = upload documents
-  printMode: 'full' | 'data-only' | 'new-design' | 'old-design' | 'upload-docts' = 'full';
+  // Print mode: 'full' = with design, 'data-only' = only data for pre-printed forms, 'new-design' = modern table layout, 'old-design' = traditional form overlay, 'before-1404-design' = before 1404 traditional form, 'upload-docts' = upload documents
+  printMode: 'full' | 'data-only' | 'new-design' | 'old-design' | 'before-1404-design' | 'upload-docts' = 'full';
   window = window; // Make window available in template
 
   // Upload document properties
@@ -62,17 +62,17 @@ export class PrintComponent extends BaseComponent implements OnInit {
   ngOnInit(): void {
     // Check if print mode is specified in URL
     const mode = this.route.snapshot.queryParamMap.get('mode');
-    if (mode === 'data-only' || mode === 'full' || mode === 'new-design' || mode === 'old-design' || mode === 'upload-docts') {
-      this.printMode = mode as 'full' | 'data-only' | 'new-design' | 'old-design' | 'upload-docts';
+    if (mode === 'data-only' || mode === 'full' || mode === 'new-design' || mode === 'old-design' || mode === 'before-1404-design' || mode === 'upload-docts') {
+      this.printMode = mode as 'full' | 'data-only' | 'new-design' | 'old-design' | 'before-1404-design' | 'upload-docts';
     }
     this.loadPrintData();
   }
 
-  setPrintMode(mode: 'full' | 'data-only' | 'new-design' | 'old-design' | 'upload-docts'): void {
+  setPrintMode(mode: 'full' | 'data-only' | 'new-design' | 'old-design' | 'before-1404-design' | 'upload-docts'): void {
     this.printMode = mode;
     
-    // Reset data visibility when switching to old design
-    if (mode === 'old-design') {
+    // Reset data visibility when switching to old design or before 1404 design
+    if (mode === 'old-design' || mode === 'before-1404-design') {
       this.showOldDesignData = true;
       this.showOldDesignBackground = true;
     }

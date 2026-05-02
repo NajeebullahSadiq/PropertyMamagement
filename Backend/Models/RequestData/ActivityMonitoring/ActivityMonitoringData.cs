@@ -41,6 +41,9 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
         // Deed items with serial numbers (stored as JSON)
         public List<DeedItemData>? DeedItems { get; set; }
 
+        // ============ Tax Amount (for Annual Report) ============
+        public decimal? TaxAmount { get; set; }
+
         // ============ Section 2: Complaints ============
         [MaxLength(500)]
         public string? ComplaintSubject { get; set; }
@@ -63,6 +66,9 @@ namespace WebAPIBackend.Models.RequestData.ActivityMonitoring
 
         [MaxLength(500)]
         public string? ClosureReason { get; set; }
+
+        [MaxLength(500)]
+        public string? SealRemovalReason { get; set; }
 
         [MaxLength(1000)]
         public string? ViolationActionsTaken { get; set; }

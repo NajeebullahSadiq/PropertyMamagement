@@ -75,6 +75,10 @@
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-purple-500"></i>تاریخ ثبت</span>
               <p class="font-bold text-gray-800 mt-1">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
+            <div class="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-money-bill text-purple-500"></i>مقدار مالیات</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.taxAmount || '-' }}</p>
+            </div>
           </div>
 
           <!-- Deed Items with Serial Numbers -->
@@ -254,6 +258,10 @@
             <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">
               <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-comment text-orange-500"></i>علت مسدودی</span>
               <p class="font-bold text-gray-800 mt-1">{{ record.closureReason || '-' }}</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200" *ngIf="record.violationStatus === 'رفع مهرلاک'">
+              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-unlock text-orange-500"></i>علت رفع مهرلاک</span>
+              <p class="font-bold text-gray-800 mt-1">{{ record.sealRemovalReason || '-' }}</p>
             </div>
           </div>
           <div *ngIf="record.violationActionsTaken" class="mt-4 p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200">

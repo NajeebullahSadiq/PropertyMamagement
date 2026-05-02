@@ -118,6 +118,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.BaiUlWafaDeedsCount,
                         x.VehicleTransactionDeedsCount,
                         x.DeedItems,
+                        x.TaxAmount,
                         
                         // Complaints
                         x.ComplaintSubject,
@@ -129,6 +130,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.ViolationStatus,
                         x.ViolationType,
                         x.ClosureReason,
+                        x.SealRemovalReason,
                         x.ViolationActionsTaken,
                         x.ViolationRemarks,
                         
@@ -181,6 +183,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.BaiUlWafaDeedsCount,
                         x.VehicleTransactionDeedsCount,
                         x.DeedItems,
+                        x.TaxAmount,
                         x.ComplaintSubject,
                         x.ComplainantName,
                         x.ComplaintActionsTaken,
@@ -188,6 +191,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.ViolationStatus,
                         x.ViolationType,
                         x.ClosureReason,
+                        x.SealRemovalReason,
                         x.ViolationActionsTaken,
                         x.ViolationRemarks,
                         x.Year,
@@ -247,6 +251,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.BaiUlWafaDeedsCount,
                         x.VehicleTransactionDeedsCount,
                         x.DeedItems,
+                        x.TaxAmount,
                         
                         // Complaints
                         x.ComplaintSubject,
@@ -258,6 +263,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.ViolationStatus,
                         x.ViolationType,
                         x.ClosureReason,
+                        x.SealRemovalReason,
                         x.ViolationActionsTaken,
                         x.ViolationRemarks,
                         
@@ -294,6 +300,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     item.BaiUlWafaDeedsCount,
                     item.VehicleTransactionDeedsCount,
                     item.DeedItems,
+                    item.TaxAmount,
                     item.ComplaintSubject,
                     item.ComplainantName,
                     item.ComplaintActionsTaken,
@@ -301,6 +308,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     item.ViolationStatus,
                     item.ViolationType,
                     item.ClosureReason,
+                    item.SealRemovalReason,
                     item.ViolationActionsTaken,
                     item.ViolationRemarks,
                     item.Year,
@@ -358,6 +366,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     BaiUlWafaDeedsCount = request.BaiUlWafaDeedsCount,
                     VehicleTransactionDeedsCount = request.VehicleTransactionDeedsCount,
                     DeedItems = deedItemsJson,
+                    TaxAmount = request.TaxAmount,
                     
                     // Complaints
                     ComplaintSubject = request.ComplaintSubject,
@@ -369,6 +378,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     ViolationStatus = request.ViolationStatus,
                     ViolationType = request.ViolationType,
                     ClosureReason = request.ClosureReason,
+                    SealRemovalReason = request.SealRemovalReason,
                     ViolationActionsTaken = request.ViolationActionsTaken,
                     ViolationRemarks = request.ViolationRemarks,
                     
@@ -438,6 +448,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 entity.BaiUlWafaDeedsCount = request.BaiUlWafaDeedsCount;
                 entity.VehicleTransactionDeedsCount = request.VehicleTransactionDeedsCount;
                 entity.DeedItems = deedItemsJson;
+                entity.TaxAmount = request.TaxAmount;
                 
                 // Complaints
                 entity.ComplaintSubject = request.ComplaintSubject;
@@ -449,6 +460,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 entity.ViolationStatus = request.ViolationStatus;
                 entity.ViolationType = request.ViolationType;
                 entity.ClosureReason = request.ClosureReason;
+                entity.SealRemovalReason = request.SealRemovalReason;
                 entity.ViolationActionsTaken = request.ViolationActionsTaken;
                 entity.ViolationRemarks = request.ViolationRemarks;
                 

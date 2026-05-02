@@ -23,6 +23,9 @@ export interface ActivityMonitoringRecord {
     vehicleTransactionDeedsCount?: number;
     deedItems?: string;  // JSON string
     
+    // ============ Tax Amount (for Annual Report) ============
+    taxAmount?: number;
+    
     // ============ Section 2: Complaints ============
     complaintSubject?: string;
     complainantName?: string;
@@ -34,6 +37,7 @@ export interface ActivityMonitoringRecord {
     violationStatus?: string;
     violationType?: string;
     closureReason?: string;
+    sealRemovalReason?: string;
     violationActionsTaken?: string;
     violationRemarks?: string;
     
@@ -73,6 +77,9 @@ export interface ActivityMonitoringData {
     vehicleTransactionDeedsCount?: number;
     deedItems?: DeedItem[];
     
+    // Tax Amount (for Annual Report)
+    taxAmount?: number;
+    
     // Complaints
     complaintSubject?: string;
     complainantName?: string;
@@ -83,6 +90,7 @@ export interface ActivityMonitoringData {
     violationStatus?: string;
     violationType?: string;
     closureReason?: string;
+    sealRemovalReason?: string;
     violationActionsTaken?: string;
     violationRemarks?: string;
     

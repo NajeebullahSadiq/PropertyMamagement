@@ -139,6 +139,7 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             violationStatus: [''],
             violationType: [''],
             closureReason: [''],
+            sealRemovalReason: [''],
             violationActionsTaken: [''],
             violationRemarks: [''],
             
@@ -147,6 +148,9 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             month: [''],
             monitoringCount: [''],
             monitoringRemarks: [''],
+            
+            // Tax Amount (for annualReport)
+            taxAmount: [''],
         });
     }
 
@@ -219,6 +223,9 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
         // Load section-specific data based on sectionType
         if (data.sectionType === 'annualReport') {
             // Annual report data is already loaded in deed items above
+            this.mainForm.patchValue({
+                taxAmount: data.taxAmount,
+            });
         } else if (data.sectionType === 'complaints' && data.complaints && data.complaints.length > 0) {
             const complaint = data.complaints[0];
             this.mainForm.patchValue({
@@ -233,6 +240,7 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
                 violationStatus: violation.violationStatus,
                 violationType: violation.violationType,
                 closureReason: violation.closureReason,
+                sealRemovalReason: violation.sealRemovalReason,
                 violationActionsTaken: violation.actionsTaken,
                 violationRemarks: violation.remarks,
             });
@@ -396,6 +404,11 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             // Normal - require violation fields
             this.mainForm.get('violationType')?.setValidators([Validators.required, Validators.maxLength(500)]);
             this.mainForm.get('closureReason')?.clearValidators();
+        } else if (status === 'رفع مهرلاک') {
+            // Lifting Seal - require seal removal reason fields
+            this.mainForm.get('sealRemovalReason')?.setValidators([Validators.required, Validators.maxLength(500)]);
+            this.mainForm.get('violationType')?.clearValidators();
+            this.mainForm.get('closureReason')?.clearValidators();
         } else {
             this.mainForm.get('violationType')?.clearValidators();
             this.mainForm.get('closureReason')?.clearValidators();
@@ -403,6 +416,7 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
 
         this.mainForm.get('violationType')?.updateValueAndValidity();
         this.mainForm.get('closureReason')?.updateValueAndValidity();
+        this.mainForm.get('sealRemovalReason')?.updateValueAndValidity();
     }
 
     // ==================== Single Save Function ====================
@@ -445,6 +459,7 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             violationStatus: formValue.violationStatus,
             violationType: formValue.violationType,
             closureReason: formValue.closureReason,
+            sealRemovalReason: formValue.sealRemovalReason,
             violationActionsTaken: formValue.violationActionsTaken,
             violationRemarks: formValue.violationRemarks,
             
@@ -452,7 +467,10 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             year: formValue.year,
             month: formValue.month,
             monitoringCount: formValue.monitoringCount ? Number(formValue.monitoringCount) : undefined,
-            monitoringRemarks: formValue.monitoringRemarks
+            monitoringRemarks: formValue.monitoringRemarks,
+            
+            // Tax Amount (for annualReport)
+            taxAmount: formValue.taxAmount ? Number(formValue.taxAmount) : undefined,
         };
 
         if (this.isEditMode && this.editId) {
