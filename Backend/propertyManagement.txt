@@ -185,7 +185,8 @@ sudo -u postgres psql -d PRMIS -f Scripts/add_duplicate_issue_date.sql
 sudo -u postgres psql -d PRMIS -f Scripts/updateSecurityRecored.sql
 sudo -u postgres psql -d PRMIS -f Scripts/AddGuaranteeLocationToLicenseApplicationGuarantors.sql
 sudo -u postgres psql -d PRMIS -f Scripts/activity_monitoring_single_table.sql
-sudo -u postgres psql -d PRMIS -f Scripts/activity_monitoring_single_table_migration.sql
+sudo -u postgres psql -d PRMIS -f Scripts/activity_monitoring_single_table.sql
+
 
 
 sudo systemctl restart prmis-backend

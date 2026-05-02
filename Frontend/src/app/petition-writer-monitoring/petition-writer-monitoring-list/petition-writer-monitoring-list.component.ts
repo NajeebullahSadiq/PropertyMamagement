@@ -136,13 +136,13 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
     getColspan(): number {
         switch (this.selectedSectionType) {
             case 'complaints':
-                return 6;
+                return 9;
             case 'violations':
                 return 7;
             case 'monitoring':
                 return 5;
             default:
-                return 7;
+                return 8;
         }
     }
 }
