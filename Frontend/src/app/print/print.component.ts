@@ -561,6 +561,14 @@ export class PrintComponent extends BaseComponent implements OnInit {
   }
 
   /**
+   * Check if current transaction is Revocable Sale (بیع جایزی)
+   */
+  isRevocableSaleTransaction(): boolean {
+    const transactionType = this.getTransactionType();
+    return transactionType === 'Revocable Sale' || transactionType === 'بیع جایزی';
+  }
+
+  /**
    * Get position value based on transaction type
    * @param buyAndSellValue - Position for خرید و فروش (Purchase)
    * @param rentValue - Position for کرایه (Rent)
