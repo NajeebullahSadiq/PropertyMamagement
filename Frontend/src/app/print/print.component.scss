@@ -444,7 +444,8 @@
   }
   
   /* Old Design Mode Print */
-  .old-design-container {
+  .old-design-container,
+  .before-1404-design-container {
     width: 100vw !important;
     max-width: 100vw !important;
     height: 100vh !important;
@@ -567,7 +568,8 @@
   }
   
   /* Old Design Mode Print - Fix all text sizes */
-  .old-design-container {
+  .old-design-container,
+  .before-1404-design-container {
     width: 100vw !important;
     max-width: 100vw !important;
     height: 100vh !important;
@@ -605,7 +607,8 @@
   }
   
   /* Old Design Second Page */
-  .old-design-container-page2 {
+  .old-design-container-page2,
+  .before-1404-design-container-page2 {
     width: 100vw !important;
     max-width: 100vw !important;
     height: 100vh !important;

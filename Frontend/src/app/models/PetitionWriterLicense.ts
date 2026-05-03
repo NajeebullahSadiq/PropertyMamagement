@@ -124,7 +124,7 @@ export const CompetencyTypes = [
 export interface PetitionWriterLicenseData {
     id?: number;
     provinceId?: number;
-    licenseNumber: string;
+    licenseNumber?: string;
     applicantName: string;
     applicantFatherName?: string;
     applicantGrandFatherName?: string;

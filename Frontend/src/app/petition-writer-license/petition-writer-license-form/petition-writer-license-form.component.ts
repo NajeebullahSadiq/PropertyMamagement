@@ -396,11 +396,15 @@ export class PetitionWriterLicenseFormComponent extends BaseComponent implements
             });
         } else {
             this.licenseService.create(data).subscribe({
-                next: (result) => {
+                next: (result: any) => {
                     this.toastr.success('معلومات با موفقیت ثبت شد');
                     this.isEditMode = true;
-                    this.editId = result.id!;
-                    this.licenseService.mainTableId = this.editId;
+                    this.editId = result.id;
+                    this.licenseService.mainTableId = result.id;
+                    // Patch the auto-generated license number back into the form
+                    if (result.licenseNumber) {
+                        this.licenseForm.patchValue({ licenseNumber: result.licenseNumber });
+                    }
                 },
                 error: (err) => {
                     this.toastr.error('خطا در ثبت معلومات');

@@ -7,7 +7,8 @@
         style="padding: 10px 20px; border: 2px solid #3498db; border-radius: 6px; cursor: pointer; font-weight: bold;">
         <i class="fas fa-file-alt"></i> سټه سابقه
     </button>
-    <button (click)="setPrintMode('before-1404-design')" [style.background]="printMode === 'before-1404-design' ? '#e67e22' : 'white'"
+    <button (click)="setPrintMode('before-1404-design')"
+        [style.background]="printMode === 'before-1404-design' ? '#e67e22' : 'white'"
         [style.color]="printMode === 'before-1404-design' ? 'white' : '#e67e22'"
         style="padding: 10px 20px; border: 2px solid #e67e22; border-radius: 6px; cursor: pointer; font-weight: bold;">
         <i class="fas fa-file-alt"></i> قبل ۱۴۰۴
@@ -603,14 +604,14 @@
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
 
         <!-- Company Name and Phone - Top Center -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('32mm', '37mm', '28mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('32mm', '35mm', '28mm')"
             [style.left]="getPositionByDocType('42%', '42%', '42%')"
             style="transform: translateX(-50%); text-align: center; width: 100mm;">
             <div style="font-size: 11pt; font-weight: bold; margin-bottom: 1mm;">
                 {{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || ''}}
             </div>
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('42mm', '47mm', '40mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('42mm', '45mm', '40mm')"
             [style.left]="getPositionByDocType('42%', '42%', '42%')"
             style="transform: translateX(-50%); text-align: center; width: 100mm;">
             ( {{userDetails.phoneNumber}})
@@ -629,241 +630,241 @@
             style="width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
 
         <!-- Row 1: Document Type, Number, Property Type -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('82mm', '90mm', '82mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('82mm', '85mm', '82mm')"
             [style.left]="getPositionByDocType('70mm', '66mm', '66mm')" style="font-size: 11pt; font-weight: bold;">
             {{ getDocumentTypeDisplay() }}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '99mm', '92mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '92mm', '92mm')"
             [style.left]="getPositionByDocType('100mm', '71mm', '100mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.issuanceNumber || documentData.pNumber}}
         </div>
 
 
         <!-- Row 2: Property Area, Rooms, Houses -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('100mm', '108mm', '100mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('100mm', '102mm', '100mm')"
             [style.left]="getPositionByDocType('90mm', '90mm', '90mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.pArea}} {{documentData.unitTypeDari || documentData.unitType}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('128mm', '136mm', '128mm')"
-            [style.left]="getPositionByDocType('64mm', '64mm', '64mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('128mm', '128mm', '128mm')"
+            [style.left]="getPositionByDocType('64mm', '66mm', '64mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.propertypeType}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('138mm', '146mm', '138mm')"
-            [style.right]="getPositionByDocType('83mm', '81mm', '83mm')" style="font-size: 7pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('138mm', '138mm', '138mm')"
+            [style.right]="getPositionByDocType('83mm', '83mm', '83mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.numofRooms}}
         </div>
 
 
         <!-- Row 3: Province, District, Village -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('109mm', '117mm', '109mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('109mm', '112mm', '109mm')"
             [style.right]="getPositionByDocType('105mm', '105mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.provinceDari || documentData.province}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('110mm', '117mm', '110mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('110mm', '110mm', '110mm')"
             [style.right]="getPositionByDocType('136mm', '136mm', '136mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.districtDari || documentData.district}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('118mm', '128mm', '118mm')"
-            [style.right]="getPositionByDocType('125mm', '125mm', '125mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('118mm', '118mm', '118mm')"
+            [style.right]="getPositionByDocType('125mm', '129mm', '125mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.village}}
         </div>
 
         <!-- Boundaries (حدود اربعه) - Center Column -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('145mm', '155mm', '145mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('145mm', '145mm', '145mm')"
             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.east}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('155mm', '165mm', '155mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('155mm', '155mm', '155mm')"
             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.west}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('165mm', '175mm', '165mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('165mm', '165mm', '165mm')"
             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.south}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('175mm', '185mm', '175mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('175mm', '175mm', '175mm')"
             [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.north}}
         </div>
 
         <!-- Rent Dates (Only for کرایه) - Above Price -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'195mm'"
-            [style.right]="'95mm'" style="font-size: 10pt; font-weight: bold;">
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'183mm'" [style.right]="'95mm'"
+            style="font-size: 10pt; font-weight: bold;">
             {{documentData.rentStartDate}}
         </div>
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'203mm'"
-            [style.right]="'95mm'" style="font-size: 10pt; font-weight: bold;">
-           {{documentData.rentEndDate}}
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'191mm'" [style.right]="'95mm'"
+            style="font-size: 10pt; font-weight: bold;">
+            {{documentData.rentEndDate}}
         </div>
 
         <!-- Price Information - Center Column -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('182mm', '217mm', '182mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('182mm', '205mm', '182mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')"
             style="font-size: 10pt; max-width: 80mm; font-weight: bold;">
             {{documentData.priceText}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('193mm', '209mm', '188mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('193mm', '198mm', '188mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.price}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('206mm', '225mm', '196mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('206mm', '212mm', '196mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.price ? (documentData.price/2) : ''}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('215mm', '234mm', '210mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('215mm', '220mm', '210mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.royaltyAmount}}
         </div>
 
         <!-- SELLER INFORMATION (Left Column) -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '94mm', '92mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '89mm', '92mm')"
             [style.right]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerFirstName}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('119mm', '112mm', '119mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('119mm', '107mm', '119mm')"
             [style.right]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerFatherName}}
         </div>
 
         <!-- Seller Grandfather Name (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'132mm'" [style.right]="'22mm'"
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'120mm'" [style.right]="'22mm'"
             style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerGrandFather}}
         </div>
 
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('151mm', '153mm', '151mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('151mm', '141mm', '151mm')"
             [style.right]="getPositionByDocType('22mm', '28mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerIndentityCardNumber}}
         </div>
 
         <!-- Seller Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'171mm'" [style.right]="'28mm'"
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'160mm'" [style.right]="'28mm'"
             style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerPhoneNumber || documentData.sellerPhone}}
         </div>
 
         <!-- Seller Permanent Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '98mm', '110mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '110mm', '110mm')"
             [style.right]="getPositionByDocType('26mm', '26mm', '26mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerProvinceDari || documentData.sellerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '81mm', '93mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '93mm', '93mm')"
             [style.right]="getPositionByDocType('37mm', '37mm', '37mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerDistrictDari || documentData.sellerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '63mm', '77mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '77mm', '77mm')"
             [style.right]="getPositionByDocType('29mm', '29mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerVillage}}
         </div>
 
         <!-- Seller Current Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '42mm', '57mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '57mm', '57mm')"
             [style.right]="getPositionByDocType('26mm', '26mm', '26mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerProvinceDari || documentData.tSellerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('39mm', '24mm', '39mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('39mm', '39mm', '39mm')"
             [style.right]="getPositionByDocType('40mm', '37mm', '40mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerDistrictDari || documentData.tSellerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '6mm', '24mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '24mm', '24mm')"
             [style.right]="getPositionByDocType('29mm', '31mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerVillage}}
         </div>
 
         <!-- BUYER INFORMATION (Right Column) -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('91mm', '93mm', '90mm')"
-            [style.left]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('91mm', '89mm', '90mm')"
+            [style.left]="getPositionByDocType('22mm', '30mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerFirstName}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('116mm', '112mm', '116mm')"
-            [style.left]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('116mm', '105mm', '116mm')"
+            [style.left]="getPositionByDocType('22mm', '30mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerFatherName}}
         </div>
 
         <!-- Buyer Grandfather Name (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'131mm'" [style.left]="'22mm'"
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'125mm'" [style.left]="'30mm'"
             style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerGrandFather}}
         </div>
 
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('150mm', '151mm', '150mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('150mm', '142mm', '150mm')"
             [style.left]="getPositionByDocType('22mm', '12mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerIndentityCardNumber}}
         </div>
 
         <!-- Buyer Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'170mm'" [style.left]="'19mm'"
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'160mm'" [style.left]="'19mm'"
             style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerPhoneNumber || documentData.buyerPhone}}
         </div>
 
         <!-- Buyer Permanent Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '98mm', '110mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '110mm', '110mm')"
             [style.left]="getPositionByDocType('35mm', '38mm', '43mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerProvinceDari || documentData.buyerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '81mm', '93mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '93mm', '93mm')"
             [style.left]="getPositionByDocType('21mm', '22mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerDistrictDari || documentData.buyerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '63mm', '77mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '77mm', '77mm')"
             [style.left]="getPositionByDocType('23mm', '25mm', '32mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerVillage}}
         </div>
 
         <!-- Buyer Current Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '42mm', '57mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '57mm', '57mm')"
             [style.left]="getPositionByDocType('33mm', '38mm', '43mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerProvinceDari || documentData.tBuyerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('40mm', '25mm', '40mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('40mm', '40mm', '40mm')"
             [style.left]="getPositionByDocType('19mm', '24mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerDistrictDari || documentData.tBuyerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '6mm', '24mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '24mm', '24mm')"
             [style.left]="getPositionByDocType('22mm', '28mm', '32mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerVillage}}
         </div>
 
         <!-- WITNESSES INFORMATION (Bottom Section) -->
         <!-- Witness One First Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '32mm', '36mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '47mm', '36mm')"
             [style.right]="getPositionByDocType('80mm', '95mm', '80mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessOneFirstName}}
         </div>
         <!-- Witness One Father Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '23mm', '36mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '38mm', '36mm')"
             [style.right]="getPositionByDocType('105mm', '95mm', '103mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessOneFatherName}}
         </div>
         <!-- Witness One ID Number -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '14mm', '36mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '29mm', '36mm')"
             [style.right]="getPositionByDocType('126mm', '99mm', '124mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessOneIndentityCardNumber}}
         </div>
         <!-- Witness One Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.bottom]="'5mm'" [style.right]="'95mm'"
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.bottom]="'20mm'" [style.right]="'95mm'"
             style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessOnePhoneNumber}}
         </div>
 
         <!-- Witness Two First Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '32mm', '24mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '47mm', '24mm')"
             [style.right]="getPositionByDocType('80mm', '125mm', '80mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessTwoFirstName}}
         </div>
         <!-- Witness Two Father Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '23mm', '24mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '38mm', '24mm')"
             [style.right]="getPositionByDocType('105mm', '125mm', '103mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessTwoFatherName}}
         </div>
         <!-- Witness Two ID Number -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('21mm', '14mm', '22mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('21mm', '29mm', '22mm')"
             [style.right]="getPositionByDocType('126mm', '125mm', '127mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessTwoIndentityCardNumber}}
         </div>
         <!-- Witness Two Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.bottom]="'5mm'" [style.right]="'125mm'"
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.bottom]="'20mm'" [style.right]="'125mm'"
             style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessTwoPhoneNumber}}
         </div>
@@ -898,25 +899,32 @@
 </div>
 
 <!-- ==================== BEFORE 1404 DESIGN TEMPLATE (Traditional Form - Before 1404) ==================== -->
-<div class="container before-1404-design-container" *ngIf="!isLoading && !loadError && printMode === 'before-1404-design'" dir="rtl"
+<div class="container before-1404-design-container"
+    *ngIf="!isLoading && !loadError && printMode === 'before-1404-design'" dir="rtl"
     style="font-family: 'B Nazanin', Arial, sans-serif; width: 210mm; height: 297mm; margin: 20px auto; padding: 0; position: relative; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden;">
 
     <!-- Background image of the form -->
     <!-- <img *ngIf="showOldDesignBackground" src="assets/img/Sitas/Dari/Sita_Frosh_Front 01.webp" alt="Form Background"
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 1;"> -->
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 1;">
+        Implemented in print.component.ts as: selects rent, revocable sale, or purchase value.
+Used by inline styles in print.component.html for precise absolute positioning.
+Determines position values via buyAndSellValue, rentValue, saleValue parameters.
+        
+        
+        -->
 
     <!-- Overlay content with exact positioning - DATA WILL BE ADDED HERE LATER -->
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
 
         <!-- Company Name and Phone - Top Center -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('32mm', '37mm', '28mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('32mm', '33mm', '28mm')"
             [style.left]="getPositionByDocType('42%', '42%', '42%')"
             style="transform: translateX(-50%); text-align: center; width: 100mm;">
             <div style="font-size: 11pt; font-weight: bold; margin-bottom: 1mm;">
                 {{userDetails.companyName || (userDetails.firstName + ' ' + userDetails.lastName) || ''}}
             </div>
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('42mm', '47mm', '40mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('42mm', '42mm', '40mm')"
             [style.left]="getPositionByDocType('42%', '42%', '42%')"
             style="transform: translateX(-50%); text-align: center; width: 100mm;">
             ( {{userDetails.phoneNumber}})
@@ -935,243 +943,210 @@
             style="width: 25mm !important; height: 30mm !important; object-fit: cover; border: 1px solid #333; max-width: 25mm; max-height: 30mm; min-width: 25mm; min-height: 30mm;">
 
         <!-- Row 1: Document Type, Number, Property Type -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('82mm', '90mm', '82mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('82mm', '85mm', '82mm')"
             [style.left]="getPositionByDocType('70mm', '66mm', '66mm')" style="font-size: 11pt; font-weight: bold;">
             {{ getDocumentTypeDisplay() }}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '99mm', '92mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '94mm', '92mm')"
             [style.left]="getPositionByDocType('100mm', '71mm', '100mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.issuanceNumber || documentData.pNumber}}
         </div>
 
 
         <!-- Row 2: Property Area, Rooms, Houses -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('100mm', '108mm', '100mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('100mm', '103mm', '100mm')"
             [style.left]="getPositionByDocType('90mm', '90mm', '90mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.pArea}} {{documentData.unitTypeDari || documentData.unitType}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('128mm', '136mm', '128mm')"
-            [style.left]="getPositionByDocType('64mm', '64mm', '64mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('128mm', '130mm', '128mm')"
+            [style.left]="getPositionByDocType('64mm', '65mm', '64mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.propertypeType}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('138mm', '146mm', '138mm')"
-            [style.right]="getPositionByDocType('83mm', '81mm', '83mm')" style="font-size: 7pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('138mm', '139mm', '138mm')"
+            [style.right]="getPositionByDocType('83mm', '84mm', '83mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.numofRooms}}
         </div>
 
 
         <!-- Row 3: Province, District, Village -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('109mm', '117mm', '109mm')"
-            [style.right]="getPositionByDocType('105mm', '105mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('109mm', '113mm', '109mm')"
+            [style.right]="getPositionByDocType('105mm', '106mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.provinceDari || documentData.province}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('110mm', '117mm', '110mm')"
-            [style.right]="getPositionByDocType('136mm', '136mm', '136mm')" style="font-size: 7pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('110mm', '113mm', '110mm')"
+            [style.right]="getPositionByDocType('136mm', '137mm', '136mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.districtDari || documentData.district}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('118mm', '128mm', '118mm')"
-            [style.right]="getPositionByDocType('125mm', '125mm', '125mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('118mm', '120mm', '118mm')"
+            [style.right]="getPositionByDocType('125mm', '126mm', '125mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.village}}
         </div>
 
         <!-- Boundaries (حدود اربعه) - Center Column -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('145mm', '155mm', '145mm')"
-            [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('145mm', '147mm', '145mm')"
+            [style.right]="getPositionByDocType('87mm', '91mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.east}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('155mm', '165mm', '155mm')"
-            [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('155mm', '157mm', '155mm')"
+            [style.right]="getPositionByDocType('87mm', '91mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.west}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('165mm', '175mm', '165mm')"
-            [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('165mm', '165mm', '165mm')"
+            [style.right]="getPositionByDocType('87mm', '91mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.south}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('175mm', '185mm', '175mm')"
-            [style.right]="getPositionByDocType('87mm', '87mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('175mm', '175mm', '175mm')"
+            [style.right]="getPositionByDocType('87mm', '91mm', '87mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.north}}
         </div>
 
         <!-- Rent Dates (Only for کرایه) - Above Price -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'195mm'"
-            [style.right]="'95mm'" style="font-size: 10pt; font-weight: bold;">
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'184mm'" [style.right]="'95mm'"
+            style="font-size: 10pt; font-weight: bold;">
             {{documentData.rentStartDate}}
         </div>
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'203mm'"
-            [style.right]="'95mm'" style="font-size: 10pt; font-weight: bold;">
-           {{documentData.rentEndDate}}
+        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'190mm'" [style.right]="'95mm'"
+            style="font-size: 10pt; font-weight: bold;">
+            {{documentData.rentEndDate}}
         </div>
 
         <!-- Price Information - Center Column -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('182mm', '217mm', '182mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('182mm', '205mm', '182mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')"
             style="font-size: 10pt; max-width: 80mm; font-weight: bold;">
             {{documentData.priceText}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('193mm', '209mm', '188mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('193mm', '198mm', '188mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.price}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('206mm', '225mm', '196mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('206mm', '213mm', '196mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.price ? (documentData.price/2) : ''}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('215mm', '234mm', '210mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('215mm', '221mm', '210mm')"
             [style.right]="getPositionByDocType('95mm', '95mm', '105mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.royaltyAmount}}
         </div>
 
         <!-- SELLER INFORMATION (Left Column) -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '94mm', '92mm')"
-            [style.right]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('92mm', '92mm', '92mm')"
+            [style.right]="getPositionByDocType('22mm', '28mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerFirstName}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('119mm', '112mm', '119mm')"
-            [style.right]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('119mm', '119mm', '119mm')"
+            [style.right]="getPositionByDocType('22mm', '28mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerFatherName}}
         </div>
 
-        <!-- Seller Grandfather Name (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'132mm'" [style.right]="'22mm'"
-            style="font-size: 11pt; font-weight: bold;">
-            {{documentData.sellerGrandFather}}
-        </div>
 
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('151mm', '153mm', '151mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('151mm', '151mm', '151mm')"
             [style.right]="getPositionByDocType('22mm', '28mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.sellerIndentityCardNumber}}
         </div>
 
-        <!-- Seller Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'171mm'" [style.right]="'28mm'"
-            style="font-size: 11pt; font-weight: bold;">
-            {{documentData.sellerPhoneNumber || documentData.sellerPhone}}
-        </div>
-
         <!-- Seller Permanent Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '98mm', '110mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '108mm', '110mm')"
             [style.right]="getPositionByDocType('26mm', '26mm', '26mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerProvinceDari || documentData.sellerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '81mm', '93mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '93mm', '93mm')"
             [style.right]="getPositionByDocType('37mm', '37mm', '37mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerDistrictDari || documentData.sellerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '63mm', '77mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '75mm', '77mm')"
             [style.right]="getPositionByDocType('29mm', '29mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.sellerVillage}}
         </div>
 
         <!-- Seller Current Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '42mm', '57mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '55mm', '57mm')"
             [style.right]="getPositionByDocType('26mm', '26mm', '26mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerProvinceDari || documentData.tSellerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('39mm', '24mm', '39mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('39mm', '39mm', '39mm')"
             [style.right]="getPositionByDocType('40mm', '37mm', '40mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerDistrictDari || documentData.tSellerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '6mm', '24mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '22mm', '24mm')"
             [style.right]="getPositionByDocType('29mm', '31mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tSellerVillage}}
         </div>
 
         <!-- BUYER INFORMATION (Right Column) -->
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('91mm', '93mm', '90mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('91mm', '91mm', '90mm')"
             [style.left]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerFirstName}}
         </div>
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('116mm', '112mm', '116mm')"
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('116mm', '116mm', '116mm')"
             [style.left]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerFatherName}}
         </div>
 
-        <!-- Buyer Grandfather Name (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'131mm'" [style.left]="'22mm'"
-            style="font-size: 11pt; font-weight: bold;">
-            {{documentData.buyerGrandFather}}
-        </div>
-
-        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('150mm', '151mm', '150mm')"
-            [style.left]="getPositionByDocType('22mm', '12mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.top]="getPositionByDocType('150mm', '150mm', '150mm')"
+            [style.left]="getPositionByDocType('22mm', '22mm', '22mm')" style="font-size: 11pt; font-weight: bold;">
             {{documentData.buyerIndentityCardNumber}}
         </div>
 
-        <!-- Buyer Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.top]="'170mm'" [style.left]="'19mm'"
-            style="font-size: 11pt; font-weight: bold;">
-            {{documentData.buyerPhoneNumber || documentData.buyerPhone}}
-        </div>
-
         <!-- Buyer Permanent Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '98mm', '110mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('110mm', '108mm', '110mm')"
             [style.left]="getPositionByDocType('35mm', '38mm', '43mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerProvinceDari || documentData.buyerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '81mm', '93mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('93mm', '91mm', '93mm')"
             [style.left]="getPositionByDocType('21mm', '22mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerDistrictDari || documentData.buyerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '63mm', '77mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('77mm', '75mm', '77mm')"
             [style.left]="getPositionByDocType('23mm', '25mm', '32mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.buyerVillage}}
         </div>
 
         <!-- Buyer Current Address -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '42mm', '57mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('57mm', '55mm', '57mm')"
             [style.left]="getPositionByDocType('33mm', '38mm', '43mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerProvinceDari || documentData.tBuyerProvince}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('40mm', '25mm', '40mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('40mm', '38mm', '40mm')"
             [style.left]="getPositionByDocType('19mm', '24mm', '29mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerDistrictDari || documentData.tBuyerDistrict}}
         </div>
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '6mm', '24mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '22mm', '24mm')"
             [style.left]="getPositionByDocType('22mm', '28mm', '32mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.tBuyerVillage}}
         </div>
 
         <!-- WITNESSES INFORMATION (Bottom Section) -->
         <!-- Witness One First Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '32mm', '36mm')"
-            [style.right]="getPositionByDocType('80mm', '95mm', '80mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '34mm', '36mm')"
+            [style.right]="getPositionByDocType('80mm', '80mm', '80mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessOneFirstName}}
         </div>
         <!-- Witness One Father Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '23mm', '36mm')"
-            [style.right]="getPositionByDocType('105mm', '95mm', '103mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '34mm', '36mm')"
+            [style.right]="getPositionByDocType('105mm', '105mm', '103mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessOneFatherName}}
         </div>
         <!-- Witness One ID Number -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '14mm', '36mm')"
-            [style.right]="getPositionByDocType('126mm', '99mm', '124mm')" style="font-size: 7pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('36mm', '34mm', '36mm')"
+            [style.right]="getPositionByDocType('126mm', '125mm', '124mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessOneIndentityCardNumber}}
-        </div>
-        <!-- Witness One Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.bottom]="'5mm'" [style.right]="'95mm'"
-            style="font-size: 7pt; font-weight: bold;">
-            {{documentData.witnessOnePhoneNumber}}
         </div>
 
         <!-- Witness Two First Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '32mm', '24mm')"
-            [style.right]="getPositionByDocType('80mm', '125mm', '80mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '22mm', '24mm')"
+            [style.right]="getPositionByDocType('80mm', '80mm', '80mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessTwoFirstName}}
         </div>
         <!-- Witness Two Father Name -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '23mm', '24mm')"
-            [style.right]="getPositionByDocType('105mm', '125mm', '103mm')" style="font-size: 10pt; font-weight: bold;">
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('24mm', '22mm', '24mm')"
+            [style.right]="getPositionByDocType('105mm', '104mm', '103mm')" style="font-size: 10pt; font-weight: bold;">
             {{documentData.witnessTwoFatherName}}
         </div>
         <!-- Witness Two ID Number -->
-        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('21mm', '14mm', '22mm')"
+        <div [style.position]="'absolute'" [style.bottom]="getPositionByDocType('21mm', '22mm', '22mm')"
             [style.right]="getPositionByDocType('126mm', '125mm', '127mm')" style="font-size: 7pt; font-weight: bold;">
             {{documentData.witnessTwoIndentityCardNumber}}
-        </div>
-        <!-- Witness Two Phone Number (Only for کرایه) -->
-        <div *ngIf="isRentTransaction()" [style.position]="'absolute'" [style.bottom]="'5mm'" [style.right]="'125mm'"
-            style="font-size: 7pt; font-weight: bold;">
-            {{documentData.witnessTwoPhoneNumber}}
         </div>
 
 
@@ -1179,8 +1154,8 @@
 </div>
 
 <!-- ==================== BEFORE 1404 DESIGN - SECOND PAGE (Back Side) ==================== -->
-<div class="container before-1404-design-container-page2" *ngIf="!isLoading && !loadError && printMode === 'before-1404-design'"
-    dir="rtl"
+<div class="container before-1404-design-container-page2"
+    *ngIf="!isLoading && !loadError && printMode === 'before-1404-design'" dir="rtl"
     style="font-family: 'B Nazanin', Arial, sans-serif; width: 210mm; height: 297mm; margin: 20px auto; padding: 0; position: relative; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden; page-break-before: always;">
 
 
