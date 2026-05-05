@@ -51,6 +51,12 @@ namespace WebAPIBackend.Models.RequestData.PetitionWriterMonitoring
         [MaxLength(1000)]
         public string? ViolationRemarks { get; set; }
 
+        [MaxLength(50)]
+        public string? ActivityStatus { get; set; }  // activity_prevention, activity_permission
+
+        [MaxLength(500)]
+        public string? ActivityPermissionReason { get; set; }
+
         // ============ Section 3: Monitoring Activities ============
         [MaxLength(20)]
         public string? MonitoringYear { get; set; }

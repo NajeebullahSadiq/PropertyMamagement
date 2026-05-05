@@ -93,6 +93,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                         x.ViolationType,
                         x.ViolationActionsTaken,
                         x.ViolationRemarks,
+                        x.ActivityStatus,
+                        x.ActivityPermissionReason,
                         
                         // Monitoring
                         x.MonitoringYear,
@@ -156,6 +158,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                         x.ViolationType,
                         x.ViolationActionsTaken,
                         x.ViolationRemarks,
+                        x.ActivityStatus,
+                        x.ActivityPermissionReason,
                         
                         // Monitoring
                         x.MonitoringYear,
@@ -228,6 +232,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                     ViolationType = request.ViolationType,
                     ViolationActionsTaken = request.ViolationActionsTaken,
                     ViolationRemarks = request.ViolationRemarks,
+                    ActivityStatus = request.ActivityStatus,
+                    ActivityPermissionReason = request.ActivityPermissionReason,
                     
                     // Monitoring
                     MonitoringYear = request.MonitoringYear,
@@ -301,6 +307,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 entity.ViolationType = request.ViolationType;
                 entity.ViolationActionsTaken = request.ViolationActionsTaken;
                 entity.ViolationRemarks = request.ViolationRemarks;
+                entity.ActivityStatus = request.ActivityStatus;
+                entity.ActivityPermissionReason = request.ActivityPermissionReason;
                 
                 // Monitoring
                 entity.MonitoringYear = request.MonitoringYear;
@@ -426,6 +434,81 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 }
 
                 return Ok(license);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Check for duplicate complainant name in complaints section
+        /// Returns count of existing records with the same ComplainantName
+        /// </summary>
+        [HttpGet("check-duplicate-complainant")]
+        public async Task<IActionResult> CheckDuplicateComplainant([FromQuery] string complainantName, [FromQuery] int? excludeId = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(complainantName))
+                {
+                    return Ok(new { count = 0 });
+                }
+
+                var query = _context.PetitionWriterMonitoringRecords
+                    .AsNoTracking()
+                    .Where(x => x.Status == true && x.SectionType == "complaints" && x.ComplainantName == complainantName);
+
+                if (excludeId.HasValue)
+                {
+                    query = query.Where(x => x.Id != excludeId.Value);
+                }
+
+                var count = await query.CountAsync();
+
+                return Ok(new { count });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Check for duplicate license number
+        /// Returns count of existing records with the same PetitionWriterLicenseNumber
+        /// Optional: sectionType filter (defaults to "complaints"), status filter for violations
+        /// </summary>
+        [HttpGet("check-duplicate-license")]
+        public async Task<IActionResult> CheckDuplicateLicense([FromQuery] string licenseNumber, [FromQuery] int? excludeId = null, [FromQuery] string? sectionType = null, [FromQuery] string? status = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(licenseNumber))
+                {
+                    return Ok(new { count = 0 });
+                }
+
+                var effectiveSectionType = sectionType ?? "complaints";
+
+                var query = _context.PetitionWriterMonitoringRecords
+                    .AsNoTracking()
+                    .Where(x => x.Status == true && x.SectionType == effectiveSectionType && x.PetitionWriterLicenseNumber == licenseNumber);
+
+                // For violations section, filter by ActivityStatus if provided
+                if (!string.IsNullOrWhiteSpace(status) && effectiveSectionType == "violations")
+                {
+                    query = query.Where(x => x.ActivityStatus == status);
+                }
+
+                if (excludeId.HasValue)
+                {
+                    query = query.Where(x => x.Id != excludeId.Value);
+                }
+
+                var count = await query.CountAsync();
+
+                return Ok(new { count });
             }
             catch (Exception ex)
             {

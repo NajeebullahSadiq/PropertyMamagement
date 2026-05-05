@@ -113,8 +113,16 @@
             </div>
           </div>
           <div class="mt-6 bg-orange-50 p-4 rounded-xl border border-orange-100">
+            <span class="text-sm text-orange-600 block mb-1">وضعیت</span>
+            <span class="text-lg font-bold text-gray-800">{{ getActivityStatusLabel(record.activityStatus!) }}</span>
+          </div>
+          <div *ngIf="record.activityStatus === 'activity_prevention'" class="mt-4 bg-orange-50 p-4 rounded-xl border border-orange-100">
             <span class="text-sm text-orange-600 block mb-1">نوعیت تخلف</span>
             <span class="text-lg font-bold text-gray-800">{{ record.violationType || '-' }}</span>
+          </div>
+          <div *ngIf="record.activityStatus === 'activity_permission'" class="mt-4 bg-orange-50 p-4 rounded-xl border border-orange-100">
+            <span class="text-sm text-orange-600 block mb-1">علت اجازه فعالیت</span>
+            <span class="text-lg font-bold text-gray-800">{{ record.activityPermissionReason || '-' }}</span>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div class="bg-gray-50 p-4 rounded-xl">

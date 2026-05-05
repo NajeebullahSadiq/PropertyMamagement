@@ -70,7 +70,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عریضه نویس</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت تخلف</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">وضعیت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">اجراآت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
@@ -96,6 +96,7 @@
               <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عریضه نویس</th>
+              <th class="px-4 py-4 text-sm font-bold text-gray-700">وضعیت</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عارض</th>
               <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
             </tr>
@@ -136,7 +137,7 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterLicenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterDistrict || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationType || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ getActivityStatusLabel(item.activityStatus!) }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationActionsTaken || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
@@ -190,6 +191,12 @@
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterLicenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterDistrict || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName || '-' }}</td>
+                <td class="px-4 py-3 text-sm">
+                  <span *ngIf="item.activityStatus" [ngClass]="getActivityStatusClass(item.activityStatus!)" class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{ getActivityStatusLabel(item.activityStatus!) }}
+                  </span>
+                  <span *ngIf="!item.activityStatus">-</span>
+                </td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ item.complainantName || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">

@@ -70,6 +70,14 @@ namespace WebAPIBackend.Models.PetitionWriterMonitoring
         [Column("ViolationRemarks")]
         public string? ViolationRemarks { get; set; }
 
+        [MaxLength(50)]
+        [Column("ActivityStatus")]
+        public string? ActivityStatus { get; set; }  // activity_prevention, activity_permission
+
+        [MaxLength(500)]
+        [Column("ActivityPermissionReason")]
+        public string? ActivityPermissionReason { get; set; }
+
         // ============ Section 3: Monitoring Activities (نظارت فعالیت عریضه نویسان) ============
         [MaxLength(20)]
         [Column("MonitoringYear")]

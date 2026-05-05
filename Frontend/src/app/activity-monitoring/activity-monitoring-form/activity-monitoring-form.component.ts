@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -10,6 +11,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
 import { AuthService } from 'src/app/shared/auth.service';
+import { ConfirmationDialogComponent, ConfirmationDialogData } from 'src/app/shared/confirmation-dialog/confirmation-dialog.component';
 import {
     ActivityMonitoringData,
     DeedDocumentTypes,
@@ -71,6 +73,7 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
         private fb: FormBuilder,
         private router: Router,
         private route: ActivatedRoute,
+        private dialog: MatDialog,
         private toastr: ToastrService,
         public service: ActivityMonitoringService,
         private calendarService: CalendarService,
@@ -431,7 +434,112 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
         const formValue = this.mainForm.value;
         const currentCalendar = this.calendarService.getSelectedCalendar();
         const sectionType = formValue.sectionType;
+        const excludeId = this.isEditMode ? this.editId : undefined;
 
+        // Check for duplicate license number + status in violations section
+        if (sectionType === 'violations' && formValue.licenseNumber && formValue.violationStatus) {
+            this.service.checkDuplicateLicense(formValue.licenseNumber, excludeId ?? undefined, 'violations', formValue.violationStatus).subscribe({
+                next: (licenseResult) => {
+                    if (licenseResult.count > 0) {
+                        const dialogData: ConfirmationDialogData = {
+                            title: 'هشدار',
+                            message: `نمبر جواز "${formValue.licenseNumber}" با وضعیت "${formValue.violationStatus}" قبلاً ${licenseResult.count} بار ثبت شده است. آیا می‌خواهید ادامه دهید؟`,
+                            icon: 'fa-exclamation-triangle',
+                            confirmText: 'بله، ادامه دهید',
+                            cancelText: 'انصراف'
+                        };
+                        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+                            data: dialogData,
+                            disableClose: true
+                        });
+                        dialogRef.afterClosed().subscribe(confirmed => {
+                            if (confirmed) {
+                                this.proceedSave(formValue, currentCalendar, sectionType);
+                            }
+                        });
+                    } else {
+                        this.proceedSave(formValue, currentCalendar, sectionType);
+                    }
+                },
+                error: () => {
+                    this.proceedSave(formValue, currentCalendar, sectionType);
+                }
+            });
+            return;
+        }
+
+        // Check for duplicate license number (complaints section only)
+        if (sectionType === 'complaints' && formValue.licenseNumber) {
+            this.service.checkDuplicateLicense(formValue.licenseNumber, excludeId ?? undefined).subscribe({
+                next: (licenseResult) => {
+                    if (licenseResult.count > 0) {
+                        const dialogData: ConfirmationDialogData = {
+                            title: 'هشدار',
+                            message: `نمبر جواز "${formValue.licenseNumber}" قبلاً ${licenseResult.count} بار ثبت شده است. آیا می‌خواهید ادامه دهید؟`,
+                            icon: 'fa-exclamation-triangle',
+                            confirmText: 'بله، ادامه دهید',
+                            cancelText: 'انصراف'
+                        };
+                        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+                            data: dialogData,
+                            disableClose: true
+                        });
+                        dialogRef.afterClosed().subscribe(confirmed => {
+                            if (confirmed) {
+                                this.checkComplainantDuplicate(formValue, currentCalendar, sectionType, excludeId);
+                            }
+                        });
+                    } else {
+                        this.checkComplainantDuplicate(formValue, currentCalendar, sectionType, excludeId);
+                    }
+                },
+                error: () => {
+                    this.checkComplainantDuplicate(formValue, currentCalendar, sectionType, excludeId);
+                }
+            });
+            return;
+        }
+
+        this.checkComplainantDuplicate(formValue, currentCalendar, sectionType, excludeId);
+    }
+
+    private checkComplainantDuplicate(formValue: any, currentCalendar: string, sectionType: string, excludeId: number | null | undefined): void {
+        // Check for duplicate complainant name in complaints section
+        if (sectionType === 'complaints' && formValue.complainantName) {
+            this.service.checkDuplicateComplainant(formValue.complainantName, excludeId ?? undefined).subscribe({
+                next: (result) => {
+                    if (result.count > 0) {
+                        const dialogData: ConfirmationDialogData = {
+                            title: 'هشدار',
+                            message: `شهرت عارض "${formValue.complainantName}" قبلاً ${result.count} بار ثبت شده است. آیا می‌خواهید ادامه دهید؟`,
+                            icon: 'fa-exclamation-triangle',
+                            confirmText: 'بله، ادامه دهید',
+                            cancelText: 'انصراف'
+                        };
+                        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+                            data: dialogData,
+                            disableClose: true
+                        });
+                        dialogRef.afterClosed().subscribe(confirmed => {
+                            if (confirmed) {
+                                this.proceedSave(formValue, currentCalendar, sectionType);
+                            }
+                        });
+                    } else {
+                        this.proceedSave(formValue, currentCalendar, sectionType);
+                    }
+                },
+                error: () => {
+                    this.proceedSave(formValue, currentCalendar, sectionType);
+                }
+            });
+            return;
+        }
+
+        this.proceedSave(formValue, currentCalendar, sectionType);
+    }
+
+    private proceedSave(formValue: any, currentCalendar: string, sectionType: string): void {
         // Build data for single table design - all fields in one object
         const data: ActivityMonitoringData = {
             id: formValue.id,

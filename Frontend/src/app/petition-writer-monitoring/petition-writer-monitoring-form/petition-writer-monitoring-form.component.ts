@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -9,9 +10,11 @@ import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { AuthService } from 'src/app/shared/auth.service';
+import { ConfirmationDialogComponent, ConfirmationDialogData } from 'src/app/shared/confirmation-dialog/confirmation-dialog.component';
 import {
     PetitionWriterMonitoringData,
     PetitionWriterMonitoringSectionTypes,
+    ActivityStatusOptions,
     ShamsiMonths,
     QamariMonths,
     GregorianMonths
@@ -36,8 +39,13 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
 
     // Dropdown data
     sectionTypes = PetitionWriterMonitoringSectionTypes;
+    activityStatusOptions = ActivityStatusOptions;
     monitoringMonths: { value: string; label: string }[] = [];  // Dynamic months based on calendar type
     monitoringYears: string[] = [];  // Dynamic years
+    
+    // Activity status visibility
+    showViolationTypeField = false;
+    showActivityPermissionReasonField = false;
     
     // RBAC
     canEdit = false;
@@ -49,6 +57,7 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
         private fb: FormBuilder,
         private router: Router,
         private route: ActivatedRoute,
+        private dialog: MatDialog,
         private toastr: ToastrService,
         public service: PetitionWriterMonitoringService,
         private calendarService: CalendarService,
@@ -159,6 +168,8 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
             violationType: [''],
             violationActionsTaken: [''],
             violationRemarks: [''],
+            activityStatus: [''],
+            activityPermissionReason: [''],
             
             // Monitoring fields
             monitoringYear: [''],
@@ -208,6 +219,8 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
             violationType: data.violationType,
             violationActionsTaken: data.violationActionsTaken,
             violationRemarks: data.violationRemarks,
+            activityStatus: data.activityStatus,
+            activityPermissionReason: data.activityPermissionReason,
             monitoringYear: data.monitoringYear,
             monitoringMonth: data.monitoringMonth,
             monitoringCount: data.monitoringCount,
@@ -224,6 +237,9 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
 
         // Trigger section visibility
         this.onSectionTypeChange();
+
+        // Trigger activity status visibility
+        this.onActivityStatusChange();
     }
 
     parseDateString(dateStr: string): Date | string | null {
@@ -261,6 +277,22 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
         }
     }
 
+    onActivityStatusChange(): void {
+        const activityStatus = this.mainForm.get('activityStatus')?.value;
+        this.showViolationTypeField = activityStatus === 'activity_prevention';
+        this.showActivityPermissionReasonField = activityStatus === 'activity_permission';
+
+        // Clear values when switching
+        if (activityStatus !== 'activity_prevention') {
+            this.mainForm.patchValue({ violationType: '' });
+        }
+        if (activityStatus !== 'activity_permission') {
+            this.mainForm.patchValue({ activityPermissionReason: '' });
+        }
+
+        this.updateValidators();
+    }
+
     updateValidators(): void {
         // Reset all validators
         this.mainForm.get('complainantName')?.clearValidators();
@@ -269,6 +301,8 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
         this.mainForm.get('petitionWriterLicenseNumber')?.clearValidators();
         this.mainForm.get('petitionWriterDistrict')?.clearValidators();
         this.mainForm.get('violationType')?.clearValidators();
+        this.mainForm.get('activityStatus')?.clearValidators();
+        this.mainForm.get('activityPermissionReason')?.clearValidators();
         this.mainForm.get('monitoringYear')?.clearValidators();
         this.mainForm.get('monitoringMonth')?.clearValidators();
         this.mainForm.get('monitoringCount')?.clearValidators();
@@ -284,7 +318,13 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
             this.mainForm.get('petitionWriterName')?.setValidators([Validators.required]);
             this.mainForm.get('petitionWriterLicenseNumber')?.setValidators([Validators.required]);
             this.mainForm.get('petitionWriterDistrict')?.setValidators([Validators.required]);
-            this.mainForm.get('violationType')?.setValidators([Validators.required]);
+            this.mainForm.get('activityStatus')?.setValidators([Validators.required]);
+            if (this.showViolationTypeField) {
+                this.mainForm.get('violationType')?.setValidators([Validators.required]);
+            }
+            if (this.showActivityPermissionReasonField) {
+                this.mainForm.get('activityPermissionReason')?.setValidators([Validators.required]);
+            }
         } else if (this.showMonitoringSection) {
             this.mainForm.get('monitoringYear')?.setValidators([Validators.required]);
             this.mainForm.get('monitoringMonth')?.setValidators([Validators.required]);
@@ -298,6 +338,8 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
         this.mainForm.get('petitionWriterLicenseNumber')?.updateValueAndValidity();
         this.mainForm.get('petitionWriterDistrict')?.updateValueAndValidity();
         this.mainForm.get('violationType')?.updateValueAndValidity();
+        this.mainForm.get('activityStatus')?.updateValueAndValidity();
+        this.mainForm.get('activityPermissionReason')?.updateValueAndValidity();
         this.mainForm.get('monitoringYear')?.updateValueAndValidity();
         this.mainForm.get('monitoringMonth')?.updateValueAndValidity();
         this.mainForm.get('monitoringCount')?.updateValueAndValidity();
@@ -312,7 +354,113 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
 
         const formValue = this.mainForm.getRawValue();
         const calendar = this.calendarService.getSelectedCalendar();
+        const excludeId = this.isEditMode ? this.editId : undefined;
 
+        // Check for duplicate license number + status in violations section
+        if (formValue.sectionType === 'violations' && formValue.petitionWriterLicenseNumber && formValue.activityStatus) {
+            const statusLabel = formValue.activityStatus === 'activity_prevention' ? 'جلوګیری فعالیت' : 'اجازه فعالیت';
+            this.service.checkDuplicateLicense(formValue.petitionWriterLicenseNumber, excludeId ?? undefined, 'violations', formValue.activityStatus).subscribe({
+                next: (licenseResult) => {
+                    if (licenseResult.count > 0) {
+                        const dialogData: ConfirmationDialogData = {
+                            title: 'هشدار',
+                            message: `نمبر جواز "${formValue.petitionWriterLicenseNumber}" با وضعیت "${statusLabel}" قبلاً ${licenseResult.count} بار ثبت شده است. آیا می‌خواهید ادامه دهید؟`,
+                            icon: 'fa-exclamation-triangle',
+                            confirmText: 'بله، ادامه دهید',
+                            cancelText: 'انصراف'
+                        };
+                        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+                            data: dialogData,
+                            disableClose: true
+                        });
+                        dialogRef.afterClosed().subscribe(confirmed => {
+                            if (confirmed) {
+                                this.proceedSave(formValue, calendar);
+                            }
+                        });
+                    } else {
+                        this.proceedSave(formValue, calendar);
+                    }
+                },
+                error: () => {
+                    this.proceedSave(formValue, calendar);
+                }
+            });
+            return;
+        }
+
+        // Check for duplicate license number (complaints section only)
+        if (formValue.sectionType === 'complaints' && formValue.petitionWriterLicenseNumber) {
+            this.service.checkDuplicateLicense(formValue.petitionWriterLicenseNumber, excludeId ?? undefined).subscribe({
+                next: (licenseResult) => {
+                    if (licenseResult.count > 0) {
+                        const dialogData: ConfirmationDialogData = {
+                            title: 'هشدار',
+                            message: `نمبر جواز "${formValue.petitionWriterLicenseNumber}" قبلاً ${licenseResult.count} بار ثبت شده است. آیا می‌خواهید ادامه دهید؟`,
+                            icon: 'fa-exclamation-triangle',
+                            confirmText: 'بله، ادامه دهید',
+                            cancelText: 'انصراف'
+                        };
+                        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+                            data: dialogData,
+                            disableClose: true
+                        });
+                        dialogRef.afterClosed().subscribe(confirmed => {
+                            if (confirmed) {
+                                this.checkComplainantDuplicate(formValue, calendar, excludeId);
+                            }
+                        });
+                    } else {
+                        this.checkComplainantDuplicate(formValue, calendar, excludeId);
+                    }
+                },
+                error: () => {
+                    this.checkComplainantDuplicate(formValue, calendar, excludeId);
+                }
+            });
+            return;
+        }
+
+        this.checkComplainantDuplicate(formValue, calendar, excludeId);
+    }
+
+    private checkComplainantDuplicate(formValue: any, calendar: string, excludeId: number | null | undefined): void {
+        // Check for duplicate complainant name in complaints section
+        if (formValue.sectionType === 'complaints' && formValue.complainantName) {
+            this.service.checkDuplicateComplainant(formValue.complainantName, excludeId ?? undefined).subscribe({
+                next: (result) => {
+                    if (result.count > 0) {
+                        const dialogData: ConfirmationDialogData = {
+                            title: 'هشدار',
+                            message: `شهرت عارض "${formValue.complainantName}" قبلاً ${result.count} بار ثبت شده است. آیا می‌خواهید ادامه دهید؟`,
+                            icon: 'fa-exclamation-triangle',
+                            confirmText: 'بله، ادامه دهید',
+                            cancelText: 'انصراف'
+                        };
+                        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+                            data: dialogData,
+                            disableClose: true
+                        });
+                        dialogRef.afterClosed().subscribe(confirmed => {
+                            if (confirmed) {
+                                this.proceedSave(formValue, calendar);
+                            }
+                        });
+                    } else {
+                        this.proceedSave(formValue, calendar);
+                    }
+                },
+                error: () => {
+                    this.proceedSave(formValue, calendar);
+                }
+            });
+            return;
+        }
+
+        this.proceedSave(formValue, calendar);
+    }
+
+    private proceedSave(formValue: any, calendar: string): void {
         const data: PetitionWriterMonitoringData = {
             id: formValue.id,
             serialNumber: formValue.serialNumber,
@@ -333,6 +481,8 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
             violationType: formValue.violationType,
             violationActionsTaken: formValue.violationActionsTaken,
             violationRemarks: formValue.violationRemarks,
+            activityStatus: formValue.activityStatus,
+            activityPermissionReason: formValue.activityPermissionReason,
             
             // Monitoring
             monitoringYear: formValue.monitoringYear || undefined,
@@ -392,6 +542,8 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
         this.showComplaintsSection = false;
         this.showViolationsSection = false;
         this.showMonitoringSection = false;
+        this.showViolationTypeField = false;
+        this.showActivityPermissionReasonField = false;
         this.isEditMode = false;
         this.editId = null;
         // Reload serial number after reset

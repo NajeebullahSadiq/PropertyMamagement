@@ -6,7 +6,7 @@ import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterMonitoringService } from 'src/app/shared/petition-writer-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
-import { PetitionWriterMonitoringRecord, PetitionWriterMonitoringSectionTypes } from 'src/app/models/PetitionWriterMonitoring';
+import { PetitionWriterMonitoringRecord, PetitionWriterMonitoringSectionTypes, ActivityStatusOptions } from 'src/app/models/PetitionWriterMonitoring';
 
 @Component({
     selector: 'app-petition-writer-monitoring-view',
@@ -17,6 +17,7 @@ export class PetitionWriterMonitoringViewComponent extends BaseComponent impleme
     record: PetitionWriterMonitoringRecord | null = null;
     isLoading = true;
     sectionTypes = PetitionWriterMonitoringSectionTypes;
+    activityStatusOptions = ActivityStatusOptions;
 
     canEdit = false;
 
@@ -66,6 +67,11 @@ export class PetitionWriterMonitoringViewComponent extends BaseComponent impleme
 
     getSectionTypeLabel(sectionType: string): string {
         const found = this.sectionTypes.find(s => s.value === sectionType);
+        return found ? found.label : '-';
+    }
+
+    getActivityStatusLabel(activityStatus: string): string {
+        const found = this.activityStatusOptions.find(s => s.value === activityStatus);
         return found ? found.label : '-';
     }
 

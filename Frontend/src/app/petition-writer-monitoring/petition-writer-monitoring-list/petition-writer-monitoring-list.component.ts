@@ -6,7 +6,7 @@ import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterMonitoringService } from 'src/app/shared/petition-writer-monitoring.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
-import { PetitionWriterMonitoringRecord, PetitionWriterMonitoringSectionTypes } from 'src/app/models/PetitionWriterMonitoring';
+import { PetitionWriterMonitoringRecord, PetitionWriterMonitoringSectionTypes, ActivityStatusOptions } from 'src/app/models/PetitionWriterMonitoring';
 
 @Component({
     selector: 'app-petition-writer-monitoring-list',
@@ -22,6 +22,7 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
     searchText = '';
     selectedSectionType = '';
     sectionTypes = PetitionWriterMonitoringSectionTypes;
+    activityStatusOptions = ActivityStatusOptions;
     isLoading = false;
 
     canCreate = false;
@@ -120,6 +121,22 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
         return found ? found.label : '-';
     }
 
+    getActivityStatusLabel(activityStatus: string): string {
+        const found = this.activityStatusOptions.find(s => s.value === activityStatus);
+        return found ? found.label : '-';
+    }
+
+    getActivityStatusClass(activityStatus: string): string {
+        switch (activityStatus) {
+            case 'activity_prevention':
+                return 'bg-red-100 text-red-700';
+            case 'activity_permission':
+                return 'bg-green-100 text-green-700';
+            default:
+                return 'bg-gray-100 text-gray-700';
+        }
+    }
+
     getSectionTypeClass(sectionType: string): string {
         switch (sectionType) {
             case 'complaints':
@@ -142,7 +159,7 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
             case 'monitoring':
                 return 5;
             default:
-                return 8;
+                return 9;
         }
     }
 }

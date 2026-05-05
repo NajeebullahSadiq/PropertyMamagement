@@ -29,6 +29,8 @@ export interface PetitionWriterMonitoringRecord {
     violationType?: string;
     violationActionsTaken?: string;
     violationRemarks?: string;
+    activityStatus?: string;  // activity_prevention, activity_permission
+    activityPermissionReason?: string;
     
     // ============ Section 3: Monitoring Activities ============
     monitoringYear?: string;
@@ -68,6 +70,8 @@ export interface PetitionWriterMonitoringData {
     violationType?: string;
     violationActionsTaken?: string;
     violationRemarks?: string;
+    activityStatus?: string;
+    activityPermissionReason?: string;
     
     // Monitoring
     monitoringYear?: string;
@@ -92,6 +96,11 @@ export interface PetitionWriterMonitoringListResponse {
 /**
  * Section types for dropdown
  */
+export const ActivityStatusOptions = [
+    { value: 'activity_prevention', label: 'جلوګیری فعالیت', labelEn: 'Activity Prevention' },
+    { value: 'activity_permission', label: 'اجازه فعالیت', labelEn: 'Activity Permission' }
+];
+
 export const PetitionWriterMonitoringSectionTypes = [
     { value: 'complaints', label: 'ثبت شکایات', labelEn: 'Complaints Registration' },
     { value: 'violations', label: 'تخلفات عریضه نویسان', labelEn: 'Petition Writer Violations' },

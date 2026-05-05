@@ -93,4 +93,28 @@ export class ActivityMonitoringService {
         }
         return this.http.get<{ serialNumber: string }>(`${this.baseUrl}/next-serial-number`, { params });
     }
+
+    // Check for duplicate complainant name in complaints section
+    checkDuplicateComplainant(complainantName: string, excludeId?: number): Observable<{ count: number }> {
+        let params = new HttpParams().set('complainantName', complainantName);
+        if (excludeId) {
+            params = params.set('excludeId', excludeId.toString());
+        }
+        return this.http.get<{ count: number }>(`${this.baseUrl}/check-duplicate-complainant`, { params });
+    }
+
+    // Check for duplicate license number
+    checkDuplicateLicense(licenseNumber: string, excludeId?: number, sectionType?: string, status?: string): Observable<{ count: number }> {
+        let params = new HttpParams().set('licenseNumber', licenseNumber);
+        if (excludeId) {
+            params = params.set('excludeId', excludeId.toString());
+        }
+        if (sectionType) {
+            params = params.set('sectionType', sectionType);
+        }
+        if (status) {
+            params = params.set('status', status);
+        }
+        return this.http.get<{ count: number }>(`${this.baseUrl}/check-duplicate-license`, { params });
+    }
 }
