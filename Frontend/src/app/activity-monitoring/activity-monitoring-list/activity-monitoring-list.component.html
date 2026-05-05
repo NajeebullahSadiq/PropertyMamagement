@@ -28,7 +28,11 @@
             </select>
           </div>
           <div class="flex gap-3">
-            <button *ngIf="canCreate" (click)="goToForm()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+            <button (click)="toggleReport()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+              <i class="fas" [class.fa-chart-bar]="!showReport" [class.fa-list]="showReport"></i>
+              {{ showReport ? 'لیست رکوردها' : 'گزارش‌گیری' }}
+            </button>
+            <button *ngIf="canCreate && !showReport" (click)="goToForm()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
               <i class="fas fa-plus"></i>
               ثبت جدید
             </button>
@@ -37,6 +41,8 @@
       </div>
     </div>
 
+    <!-- ============ LIST VIEW ============ -->
+    <ng-container *ngIf="!showReport">
     <!-- Loading -->
     <div *ngIf="isLoading" class="text-center py-8">
       <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-purple-500 border-t-transparent"></div>
@@ -275,5 +281,433 @@
         <pagination-controls (pageChange)="onPageChange($event)" previousLabel="قبلی" nextLabel="بعدی" class="custom-pagination"></pagination-controls>
       </div>
     </div>
+    </ng-container>
+
+    <!-- ============ REPORT PANEL ============ -->
+    <ng-container *ngIf="showReport">
+      <!-- Report Filters -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+        <div class="p-5 border-b border-gray-100">
+          <div class="flex items-center gap-2 mb-4">
+            <i class="fas fa-filter text-indigo-500"></i>
+            <span class="font-bold text-gray-700">فیلترهای گزارش</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">از تاریخ</label>
+              <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" class="block"></app-multi-calendar-datepicker>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">الی تاریخ</label>
+              <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" class="block"></app-multi-calendar-datepicker>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">ثبت کننده</label>
+              <select [(ngModel)]="reportCreatedBy" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">همه کاربران</option>
+                <option *ngFor="let user of reportUsers" [value]="user.id">{{ user.name }}</option>
+              </select>
+            </div>
+            <div class="flex items-end gap-2">
+              <button (click)="applyReportFilters()" class="flex-1 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-search"></i>
+                اعمال فیلتر
+              </button>
+              <button (click)="resetReportFilters()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-undo"></i>
+              </button>
+              <button (click)="exportToExcel()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-file-excel"></i>
+                Excel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Loading -->
+      <div *ngIf="reportLoading" class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+        <p class="mt-2 text-gray-600">در حال بارگذاری گزارش...</p>
+      </div>
+
+      <!-- Report Content -->
+      <div *ngIf="!reportLoading && reportSummary">
+        <!-- Report Tabs -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div class="flex border-b border-gray-200 overflow-x-auto">
+            <button (click)="onReportTabChange('overall')"
+                    [class.border-indigo-500]="reportActiveTab === 'overall'"
+                    [class.text-indigo-600]="reportActiveTab === 'overall'"
+                    [class.border-transparent]="reportActiveTab !== 'overall'"
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-indigo-600 flex items-center gap-2">
+              <i class="fas fa-chart-pie"></i>
+              گزارش کلی
+            </button>
+            <button (click)="onReportTabChange('annualReport')"
+                    [class.border-purple-500]="reportActiveTab === 'annualReport'"
+                    [class.text-purple-600]="reportActiveTab === 'annualReport'"
+                    [class.border-transparent]="reportActiveTab !== 'annualReport'"
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-purple-600 flex items-center gap-2">
+              <i class="fas fa-file-alt"></i>
+              ۱. گزارش سالانه
+            </button>
+            <button (click)="onReportTabChange('complaints')"
+                    [class.border-red-500]="reportActiveTab === 'complaints'"
+                    [class.text-red-600]="reportActiveTab === 'complaints'"
+                    [class.border-transparent]="reportActiveTab !== 'complaints'"
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-red-600 flex items-center gap-2">
+              <i class="fas fa-exclamation-circle"></i>
+              ۲. ثبت شکایات
+            </button>
+            <button (click)="onReportTabChange('violations')"
+                    [class.border-orange-500]="reportActiveTab === 'violations'"
+                    [class.text-orange-600]="reportActiveTab === 'violations'"
+                    [class.border-transparent]="reportActiveTab !== 'violations'"
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-orange-600 flex items-center gap-2">
+              <i class="fas fa-gavel"></i>
+              ۳. تخلفات
+            </button>
+            <button (click)="onReportTabChange('inspection')"
+                    [class.border-green-500]="reportActiveTab === 'inspection'"
+                    [class.text-green-600]="reportActiveTab === 'inspection'"
+                    [class.border-transparent]="reportActiveTab !== 'inspection'"
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-green-600 flex items-center gap-2">
+              <i class="fas fa-search"></i>
+              ۴. نظارت وبررسی
+            </button>
+          </div>
+
+          <!-- OVERALL TAB -->
+          <div *ngIf="reportActiveTab === 'overall'" class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">گزارش کلی نظارت بر فعالیت دفاتر رهنمای معاملات</h2>
+            <div class="mb-6">
+              <div class="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-5 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-sm opacity-90">مجموع رکوردها</div>
+                    <div class="text-4xl font-bold">{{ formatNumber(reportSummary.totalRecords) }}</div>
+                  </div>
+                  <i class="fas fa-database text-4xl opacity-50"></i>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Annual Report Card -->
+              <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-5 border border-purple-200">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-file-alt text-white"></i>
+                  </div>
+                  <div class="font-bold text-purple-800">گزارش سالانه</div>
+                </div>
+                <div class="text-3xl font-bold text-purple-700">{{ formatNumber(reportSummary.annualReport.totalRecords) }}</div>
+                <div class="text-sm text-purple-600 mt-1">تعداد رکوردها</div>
+                <div class="mt-3 pt-3 border-t border-purple-200 space-y-1">
+                  <div class="flex justify-between text-xs"><span class="text-purple-600">سته فروش:</span><span class="font-bold text-purple-800">{{ formatNumber(reportSummary.annualReport.saleDeedsCount) }}</span></div>
+                  <div class="flex justify-between text-xs"><span class="text-purple-600">سته کرایی:</span><span class="font-bold text-purple-800">{{ formatNumber(reportSummary.annualReport.rentalDeedsCount) }}</span></div>
+                  <div class="flex justify-between text-xs"><span class="text-purple-600">سته بیع الوفا:</span><span class="font-bold text-purple-800">{{ formatNumber(reportSummary.annualReport.baiUlWafaDeedsCount) }}</span></div>
+                  <div class="flex justify-between text-xs"><span class="text-purple-600">سته وسایط نقلیه:</span><span class="font-bold text-purple-800">{{ formatNumber(reportSummary.annualReport.vehicleTransactionDeedsCount) }}</span></div>
+                  <div class="flex justify-between text-xs pt-1 border-t border-purple-100"><span class="text-purple-600">مجموع سته‌ها:</span><span class="font-bold text-purple-800">{{ formatNumber(reportSummary.annualReport.totalDeedsCount) }}</span></div>
+                  <div class="flex justify-between text-xs"><span class="text-purple-600">مقدار مالیات:</span><span class="font-bold text-purple-800">{{ formatCurrency(reportSummary.annualReport.totalTaxAmount) }}</span></div>
+                </div>
+              </div>
+              <!-- Complaints Card -->
+              <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-5 border border-red-200">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-exclamation-circle text-white"></i>
+                  </div>
+                  <div class="font-bold text-red-800">ثبت شکایات</div>
+                </div>
+                <div class="text-3xl font-bold text-red-700">{{ formatNumber(reportSummary.complaints.totalRecords) }}</div>
+                <div class="text-sm text-red-600 mt-1">تعداد شکایات ثبت شده</div>
+              </div>
+              <!-- Violations Card -->
+              <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-5 border border-orange-200">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-gavel text-white"></i>
+                  </div>
+                  <div class="font-bold text-orange-800">تخلفات</div>
+                </div>
+                <div class="text-3xl font-bold text-orange-700">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
+                <div class="text-sm text-orange-600 mt-1">تعداد تخلفات</div>
+                <div class="mt-3 pt-3 border-t border-orange-200 space-y-1">
+                  <div class="flex justify-between text-xs"><span class="text-orange-600">منجر به مسدودی:</span><span class="font-bold text-red-700">{{ formatNumber(reportSummary.violations.blockedCount) }}</span></div>
+                  <div class="flex justify-between text-xs"><span class="text-orange-600">عادی:</span><span class="font-bold text-yellow-700">{{ formatNumber(reportSummary.violations.normalCount) }}</span></div>
+                  <div class="flex justify-between text-xs"><span class="text-orange-600">رفع مهرلاک:</span><span class="font-bold text-green-700">{{ formatNumber(reportSummary.violations.sealRemovedCount) }}</span></div>
+                </div>
+              </div>
+              <!-- Inspection Card -->
+              <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-search text-white"></i>
+                  </div>
+                  <div class="font-bold text-green-800">نظارت وبررسی</div>
+                </div>
+                <div class="text-3xl font-bold text-green-700">{{ formatNumber(reportSummary.inspection.totalRecords) }}</div>
+                <div class="text-sm text-green-600 mt-1">تعداد نظارت</div>
+                <div class="mt-3 pt-3 border-t border-green-200">
+                  <div class="flex justify-between text-xs"><span class="text-green-600">مجموع تعداد نظارت:</span><span class="font-bold text-green-800">{{ formatNumber(reportSummary.inspection.totalMonitoringCount) }}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ANNUAL REPORT TAB -->
+          <div *ngIf="reportActiveTab === 'annualReport'" class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">گزارش سالانه</h2>
+            <div *ngIf="reportSummary" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+              <div class="bg-purple-50 rounded-xl p-4 border border-purple-200 text-center">
+                <div class="text-2xl font-bold text-purple-700">{{ formatNumber(reportSummary.annualReport.totalRecords) }}</div>
+                <div class="text-xs text-purple-600">تعداد رکوردها</div>
+              </div>
+              <div class="bg-blue-50 rounded-xl p-4 border border-blue-200 text-center">
+                <div class="text-2xl font-bold text-blue-700">{{ formatNumber(reportSummary.annualReport.saleDeedsCount) }}</div>
+                <div class="text-xs text-blue-600">سته‌های فروش</div>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-4 border border-amber-200 text-center">
+                <div class="text-2xl font-bold text-amber-700">{{ formatNumber(reportSummary.annualReport.rentalDeedsCount) }}</div>
+                <div class="text-xs text-amber-600">سته‌های کرایی</div>
+              </div>
+              <div class="bg-teal-50 rounded-xl p-4 border border-teal-200 text-center">
+                <div class="text-2xl font-bold text-teal-700">{{ formatNumber(reportSummary.annualReport.baiUlWafaDeedsCount) }}</div>
+                <div class="text-xs text-teal-600">سته‌های بیع الوفا</div>
+              </div>
+              <div class="bg-cyan-50 rounded-xl p-4 border border-cyan-200 text-center">
+                <div class="text-2xl font-bold text-cyan-700">{{ formatNumber(reportSummary.annualReport.vehicleTransactionDeedsCount) }}</div>
+                <div class="text-xs text-cyan-600">سته‌های وسایط نقلیه</div>
+              </div>
+              <div class="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
+                <div class="text-2xl font-bold text-green-700">{{ formatCurrency(reportSummary.annualReport.totalTaxAmount) }}</div>
+                <div class="text-xs text-green-600">مقدار مالیات</div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-purple-50">
+                  <tr>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر مسلسل</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">شهرت دارنده جواز</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">عنوان رهنمایی</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ناحیه</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تاریخ ثبت</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">سته فروش</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">سته کرایی</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">سته بیع الوفا</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">سته وسایط</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">مجموع سته‌ها</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">مالیات</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ثبت کننده</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of annualReportDetails" class="hover:bg-purple-50 border-b border-gray-100">
+                    <td class="px-3 py-2 text-gray-700">{{ row.serialNumber || '-' }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ row.licenseHolderName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.companyTitle || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.district || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-gray-700">{{ row.reportRegistrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-blue-600 font-bold">{{ row.saleDeedsCount }}</td>
+                    <td class="px-3 py-2 text-center text-amber-600 font-bold">{{ row.rentalDeedsCount }}</td>
+                    <td class="px-3 py-2 text-center text-teal-600 font-bold">{{ row.baiUlWafaDeedsCount }}</td>
+                    <td class="px-3 py-2 text-center text-cyan-600 font-bold">{{ row.vehicleTransactionDeedsCount }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-purple-700">{{ row.totalDeedsCount }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-green-700">{{ formatNumber(row.taxAmount) }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.createdBy }}</td>
+                  </tr>
+                </tbody>
+                <tfoot *ngIf="annualReportDetails.length > 0" class="bg-purple-100">
+                  <tr>
+                    <td colspan="5" class="px-3 py-2 font-bold text-gray-800">مجموع</td>
+                    <td class="px-3 py-2 text-center font-bold text-blue-700">{{ formatNumber(reportSummary.annualReport.saleDeedsCount || 0) }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-amber-700">{{ formatNumber(reportSummary.annualReport.rentalDeedsCount || 0) }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-teal-700">{{ formatNumber(reportSummary.annualReport.baiUlWafaDeedsCount || 0) }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-cyan-700">{{ formatNumber(reportSummary.annualReport.vehicleTransactionDeedsCount || 0) }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-purple-700">{{ formatNumber(reportSummary.annualReport.totalDeedsCount || 0) }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-green-700">{{ formatNumber(reportSummary.annualReport.totalTaxAmount || 0) }}</td>
+                    <td class="px-3 py-2"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <div *ngIf="annualReportDetails.length === 0" class="text-center py-8 text-gray-500">
+              <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+              <p>داده‌ای یافت نشد</p>
+            </div>
+          </div>
+
+          <!-- COMPLAINTS TAB -->
+          <div *ngIf="reportActiveTab === 'complaints'" class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">ثبت شکایات</h2>
+            <div *ngIf="reportSummary" class="mb-6">
+              <div class="bg-gradient-to-r from-red-500 to-rose-600 rounded-xl p-5 text-white inline-block">
+                <div class="text-sm opacity-90">تعداد شکایات ثبت شده</div>
+                <div class="text-4xl font-bold">{{ formatNumber(reportSummary.complaints.totalRecords) }}</div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-red-50">
+                  <tr>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر مسلسل</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر جواز</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">شهرت دارنده جواز</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">عنوان رهنمایی</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ناحیه</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">شهرت عارض</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">موضوع شکایت</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تاریخ ثبت</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">اجراآت</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ثبت کننده</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of complaintDetails" class="hover:bg-red-50 border-b border-gray-100">
+                    <td class="px-3 py-2 text-gray-700">{{ row.serialNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.licenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ row.licenseHolderName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.companyTitle || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.district || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.complainantName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.complaintSubject || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-gray-700">{{ row.reportRegistrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.complaintActionsTaken || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.createdBy }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div *ngIf="complaintDetails.length === 0" class="text-center py-8 text-gray-500">
+              <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+              <p>داده‌ای یافت نشد</p>
+            </div>
+          </div>
+
+          <!-- VIOLATIONS TAB -->
+          <div *ngIf="reportActiveTab === 'violations'" class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">تخلفات دفاتر رهنمای معاملات</h2>
+            <div *ngIf="reportSummary" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div class="bg-orange-50 rounded-xl p-4 border border-orange-200 text-center">
+                <div class="text-2xl font-bold text-orange-700">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
+                <div class="text-xs text-orange-600">مجموع تخلفات</div>
+              </div>
+              <div class="bg-red-50 rounded-xl p-4 border border-red-200 text-center">
+                <div class="text-2xl font-bold text-red-700">{{ formatNumber(reportSummary.violations.blockedCount) }}</div>
+                <div class="text-xs text-red-600">منجر به مسدودی</div>
+              </div>
+              <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-200 text-center">
+                <div class="text-2xl font-bold text-yellow-700">{{ formatNumber(reportSummary.violations.normalCount) }}</div>
+                <div class="text-xs text-yellow-600">عادی</div>
+              </div>
+              <div class="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
+                <div class="text-2xl font-bold text-green-700">{{ formatNumber(reportSummary.violations.sealRemovedCount) }}</div>
+                <div class="text-xs text-green-600">رفع مهرلاک</div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-orange-50">
+                  <tr>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر مسلسل</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر جواز</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">شهرت دارنده جواز</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ناحیه</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تاریخ ثبت</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">وضعیت</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نوعیت تخلف</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">علت مسدودی</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">علت رفع مهرلاک</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">اجراآت</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ثبت کننده</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of violationDetails" class="hover:bg-orange-50 border-b border-gray-100">
+                    <td class="px-3 py-2 text-gray-700">{{ row.serialNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.licenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ row.licenseHolderName || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.district || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-gray-700">{{ row.reportRegistrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-center">
+                      <span [ngClass]="getViolationStatusClass(row.violationStatus)" class="px-2 py-1 rounded-full text-xs font-medium">
+                        {{ getViolationStatusLabel(row.violationStatus) }}
+                      </span>
+                    </td>
+                    <td class="px-3 py-2 text-gray-700">{{ row.violationType || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.closureReason || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.sealRemovalReason || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.violationActionsTaken || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.createdBy }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div *ngIf="violationDetails.length === 0" class="text-center py-8 text-gray-500">
+              <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+              <p>داده‌ای یافت نشد</p>
+            </div>
+          </div>
+
+          <!-- INSPECTION TAB -->
+          <div *ngIf="reportActiveTab === 'inspection'" class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">نظارت وبررسی فعالیت دفاتر رهنمای معاملات</h2>
+            <div *ngIf="reportSummary" class="grid grid-cols-2 gap-4 mb-6">
+              <div class="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
+                <div class="text-2xl font-bold text-green-700">{{ formatNumber(reportSummary.inspection.totalRecords) }}</div>
+                <div class="text-xs text-green-600">تعداد نظارت</div>
+              </div>
+              <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 text-center">
+                <div class="text-2xl font-bold text-emerald-700">{{ formatNumber(reportSummary.inspection.totalMonitoringCount) }}</div>
+                <div class="text-xs text-emerald-600">مجموع تعداد نظارت</div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-green-50">
+                  <tr>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">سال</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">ماه</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تعداد نظارت</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ملاحظات</th>
+                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تاریخ ثبت</th>
+                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ثبت کننده</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of inspectionDetails" class="hover:bg-green-50 border-b border-gray-100">
+                    <td class="px-3 py-2 text-center text-gray-700">{{ row.year || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-gray-700">{{ row.month || '-' }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-green-700">{{ row.monitoringCount }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.monitoringRemarks || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-gray-700">{{ row.reportRegistrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ row.createdBy }}</td>
+                  </tr>
+                </tbody>
+                <tfoot *ngIf="inspectionDetails.length > 0" class="bg-green-100">
+                  <tr>
+                    <td colspan="2" class="px-3 py-2 font-bold text-gray-800">مجموع</td>
+                    <td class="px-3 py-2 text-center font-bold text-green-700">{{ formatNumber(reportSummary.inspection.totalMonitoringCount || 0) }}</td>
+                    <td colspan="3" class="px-3 py-2"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <div *ngIf="inspectionDetails.length === 0" class="text-center py-8 text-gray-500">
+              <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+              <p>داده‌ای یافت نشد</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Data -->
+      <div *ngIf="!reportLoading && !reportSummary" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center text-gray-500">
+        <i class="fas fa-chart-bar text-4xl text-gray-300 mb-2"></i>
+        <p>گزارشی موجود نیست. لطفاً فیلترها را اعمال کنید.</p>
+      </div>
+    </ng-container>
   </div>
 </section>
