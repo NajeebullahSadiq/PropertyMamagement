@@ -186,7 +186,7 @@ sudo -u postgres psql -d PRMIS -f Scripts/updateSecurityRecored.sql
 sudo -u postgres psql -d PRMIS -f Scripts/AddGuaranteeLocationToLicenseApplicationGuarantors.sql
 sudo -u postgres psql -d PRMIS -f Scripts/activity_monitoring_single_table.sql
 sudo -u postgres psql -d PRMIS -f Scripts/ActivityMonitoring_Add_TaxAmount.sql
-sudo -u postgres psql -d PRMIS -f Scripts/add-activity-status-columns.sql
+sudo -u postgres psql -d PRMIS -f Scripts/20260506_UpdatePetitionWriterLicenseUniqueIndex.sql
 
 
 
