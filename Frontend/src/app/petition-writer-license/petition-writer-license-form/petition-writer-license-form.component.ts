@@ -133,11 +133,15 @@ export class PetitionWriterLicenseFormComponent extends BaseComponent implements
         });
     }
 
-    loadActivityDistricts(provinceId: number): void {
+    loadActivityDistricts(provinceId: number, selectedNahia?: string): void {
         this.licenseService.getActivityDistricts(provinceId).subscribe({
             next: (data: any) => {
                 this.activityDistricts = data;
-                this.licenseForm.patchValue({ activityNahia: null });
+                if (selectedNahia) {
+                    this.licenseForm.patchValue({ activityNahia: selectedNahia });
+                } else {
+                    this.licenseForm.patchValue({ activityNahia: null });
+                }
             },
             error: (err: any) => console.error('Error loading activity districts', err)
         });
@@ -282,9 +286,9 @@ export class PetitionWriterLicenseFormComponent extends BaseComponent implements
                     });
                 }
 
-                // Load activity districts based on license province
+                // Load activity districts based on license province and re-patch selected nahia
                 if (data.provinceId) {
-                    this.loadActivityDistricts(data.provinceId);
+                    this.loadActivityDistricts(data.provinceId, data.activityNahia);
                 }
 
                 // Patch financial form - use the same pattern as license details
