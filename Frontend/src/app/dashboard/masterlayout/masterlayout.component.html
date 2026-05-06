@@ -196,14 +196,6 @@
         class="nav-link">
         <mat-icon>list_alt</mat-icon><span>جدول نظارت بر فعالیت عریضه نویسان</span>
       </a>
-      <div *ngIf="canAccessReports" class="section-label">گزارشات</div>
-      <a *ngIf="canAccessReports" routerLink="/report" routerLinkActive="active-nav" class="nav-link">
-        <mat-icon>assessment</mat-icon><span>{{ "report" | translate }}</span>
-      </a>
-      <a *ngIf="canAccessReports && canAccessUsers" routerLink="/userreport" routerLinkActive="active-nav"
-        class="nav-link">
-        <mat-icon>summarize</mat-icon><span>{{ "reportbycompany" | translate }}</span>
-      </a>
       <div *ngIf="canAccessUsers" class="section-label">تنظیمات سیستم</div>
       <a *ngIf="canAccessUsers" routerLink="/configuration" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
         <mat-icon>settings</mat-icon><span>تنظیمات</span>

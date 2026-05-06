@@ -342,6 +342,39 @@ namespace WebAPIBackend.Controllers.Securities
         }
 
         /// <summary>
+        /// Get next registration number (نمبر ثبت تعرفه)
+        /// </summary>
+        [HttpGet("next-registration-number")]
+        public async Task<IActionResult> GetNextRegistrationNumber()
+        {
+            try
+            {
+                // Get all active records and find the max numeric RegistrationNumber
+                var registrationNumbers = await _context.PetitionWriterSecurities
+                    .AsNoTracking()
+                    .Where(x => x.Status == true)
+                    .Select(x => x.RegistrationNumber)
+                    .ToListAsync();
+
+                int maxNumber = 0;
+                foreach (var rn in registrationNumbers)
+                {
+                    if (int.TryParse(rn, out int num) && num > maxNumber)
+                    {
+                        maxNumber = num;
+                    }
+                }
+
+                int nextNumber = maxNumber + 1;
+                return Ok(new { registrationNumber = nextNumber.ToString() });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در تولید نمبر ثبت تعرفه", error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Validate that serial start is less than or equal to serial end
         /// </summary>
         private bool ValidateSerialNumbers(string start, string end, out string? errorMessage)

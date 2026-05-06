@@ -75,6 +75,13 @@ export class PetitionWriterSecuritiesService {
     }
 
     /**
+     * Get next registration number (auto-increment)
+     */
+    getNextRegistrationNumber(): Observable<{ registrationNumber: string }> {
+        return this.http.get<{ registrationNumber: string }>(`${this.baseUrl}/next-registration-number`);
+    }
+
+    /**
      * Get comprehensive petition writer securities report
      */
     getComprehensiveReport(

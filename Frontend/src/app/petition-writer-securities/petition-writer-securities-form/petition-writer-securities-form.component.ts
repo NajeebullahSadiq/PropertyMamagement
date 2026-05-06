@@ -53,6 +53,10 @@ export class PetitionWriterSecuritiesFormComponent extends BaseComponent impleme
             this.loadData(this.editId);
         }
         
+        if (!this.isEditMode) {
+            this.generateNextRegistrationNumber();
+        }
+
         this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
             if (params['id']) {
                 this.isEditMode = true;
@@ -73,7 +77,7 @@ export class PetitionWriterSecuritiesFormComponent extends BaseComponent impleme
     initForm(): void {
         this.petitionForm = this.fb.group({
             id: [null],
-            registrationNumber: ['', [Validators.required, Validators.maxLength(50)]],
+            registrationNumber: ['', [Validators.maxLength(50)]],
             petitionWriterName: ['', [Validators.required, Validators.maxLength(200)]],
             petitionWriterFatherName: ['', [Validators.required, Validators.maxLength(200)]],
             licenseNumber: ['', [Validators.required, Validators.maxLength(50)]],
@@ -222,10 +226,22 @@ export class PetitionWriterSecuritiesFormComponent extends BaseComponent impleme
         });
     }
 
+    generateNextRegistrationNumber(): void {
+        this.petitionService.getNextRegistrationNumber().subscribe({
+            next: (response) => {
+                this.petitionForm.patchValue({ registrationNumber: response.registrationNumber });
+            },
+            error: (err) => {
+                console.error('Error fetching next registration number', err);
+            }
+        });
+    }
+
     resetForm(): void {
         this.petitionForm.reset();
         this.isEditMode = false;
         this.editId = null;
+        this.generateNextRegistrationNumber();
         this.router.navigate(['/petition-writer-securities']);
     }
 
