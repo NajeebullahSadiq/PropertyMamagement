@@ -382,7 +382,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "خطا در تغییر جواز", error = ex.Message });
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = "خطا در تغییر جواز", error = innerMessage });
             }
         }
 

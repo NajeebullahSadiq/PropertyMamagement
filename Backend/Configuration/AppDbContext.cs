@@ -449,24 +449,33 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.BankReceiptNumber).HasMaxLength(100);
                 entity.Property(e => e.LicenseType).HasMaxLength(50);
 
-                entity.HasIndex(e => e.LicenseNumber).IsUnique();
+                entity.HasIndex(e => e.LicenseNumber).IsUnique().HasFilter("\"Status\" = true");
                 entity.HasIndex(e => e.ApplicantName);
                 entity.HasIndex(e => e.LicenseStatus);
 
+                entity.HasOne(d => d.Province).WithMany()
+                    .HasForeignKey(d => d.ProvinceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("PetitionWriterLicenses_ProvinceId_fkey");
+
                 entity.HasOne(d => d.PermanentProvince).WithMany()
                     .HasForeignKey(d => d.PermanentProvinceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("PetitionWriterLicenses_PermanentProvinceId_fkey");
 
                 entity.HasOne(d => d.PermanentDistrict).WithMany()
                     .HasForeignKey(d => d.PermanentDistrictId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("PetitionWriterLicenses_PermanentDistrictId_fkey");
 
                 entity.HasOne(d => d.CurrentProvince).WithMany()
                     .HasForeignKey(d => d.CurrentProvinceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("PetitionWriterLicenses_CurrentProvinceId_fkey");
 
                 entity.HasOne(d => d.CurrentDistrict).WithMany()
                     .HasForeignKey(d => d.CurrentDistrictId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("PetitionWriterLicenses_CurrentDistrictId_fkey");
             });
 
