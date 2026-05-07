@@ -6,6 +6,7 @@ import {
     LicenseApplication,
     LicenseApplicationData,
     LicenseApplicationListResponse,
+    LicenseApplicationReportUser,
     LicenseApplicationGuarantor,
     LicenseApplicationGuarantorData,
     LicenseApplicationWithdrawal,
@@ -196,6 +197,43 @@ export class LicenseApplicationService {
         );
     }
 
+    // ==================== Duplicate Check ====================
+
+    checkProposedGuideName(proposedGuideName: string, excludeId?: number): Observable<{ isDuplicate: boolean }> {
+        let params = new HttpParams().set('proposedGuideName', proposedGuideName);
+        if (excludeId) {
+            params = params.set('excludeId', excludeId.toString());
+        }
+        return this.http.get<{ isDuplicate: boolean }>(`${this.baseUrl}/check-proposed-guide-name`, { params });
+    }
+
+    checkGuarantor(guarantorName: string, guarantorFatherName?: string, excludeGuarantorId?: number): Observable<{ isDuplicate: boolean }> {
+        let params = new HttpParams().set('guarantorName', guarantorName);
+        if (guarantorFatherName) {
+            params = params.set('guarantorFatherName', guarantorFatherName);
+        }
+        if (excludeGuarantorId) {
+            params = params.set('excludeGuarantorId', excludeGuarantorId.toString());
+        }
+        return this.http.get<{ isDuplicate: boolean }>(`${this.baseUrl}/check-guarantor`, { params });
+    }
+
+    checkShariaDeedNumber(shariaDeedNumber: string, excludeGuarantorId?: number): Observable<{ isDuplicate: boolean }> {
+        let params = new HttpParams().set('shariaDeedNumber', shariaDeedNumber);
+        if (excludeGuarantorId) {
+            params = params.set('excludeGuarantorId', excludeGuarantorId.toString());
+        }
+        return this.http.get<{ isDuplicate: boolean }>(`${this.baseUrl}/check-sharia-deed-number`, { params });
+    }
+
+    checkCustomaryDeedSerial(customaryDeedSerialNumber: string, excludeGuarantorId?: number): Observable<{ isDuplicate: boolean }> {
+        let params = new HttpParams().set('customaryDeedSerialNumber', customaryDeedSerialNumber);
+        if (excludeGuarantorId) {
+            params = params.set('excludeGuarantorId', excludeGuarantorId.toString());
+        }
+        return this.http.get<{ isDuplicate: boolean }>(`${this.baseUrl}/check-customary-deed-serial`, { params });
+    }
+
     // ==================== Utility ====================
 
     resetMainTableId(): void {
@@ -218,13 +256,20 @@ export class LicenseApplicationService {
         return this.http.get(`${this.baseUrl}/reports/applicants-count`, { params });
     }
 
-    getGuarantorsByTypeReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    getReportUsers(): Observable<LicenseApplicationReportUser[]> {
+        return this.http.get<LicenseApplicationReportUser[]>(`${this.baseUrl}/reports/users`);
+    }
+
+    getGuarantorsByTypeReport(startDate?: string, endDate?: string, createdBy?: string, calendarType?: string): Observable<any> {
         let params = new HttpParams();
         if (startDate) {
             params = params.set('startDate', startDate);
         }
         if (endDate) {
             params = params.set('endDate', endDate);
+        }
+        if (createdBy) {
+            params = params.set('createdBy', createdBy);
         }
         if (calendarType) {
             params = params.set('calendarType', calendarType);
@@ -232,13 +277,16 @@ export class LicenseApplicationService {
         return this.http.get(`${this.baseUrl}/reports/guarantors-by-type`, { params });
     }
 
-    getWithdrawalsCountReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    getWithdrawalsCountReport(startDate?: string, endDate?: string, createdBy?: string, calendarType?: string): Observable<any> {
         let params = new HttpParams();
         if (startDate) {
             params = params.set('startDate', startDate);
         }
         if (endDate) {
             params = params.set('endDate', endDate);
+        }
+        if (createdBy) {
+            params = params.set('createdBy', createdBy);
         }
         if (calendarType) {
             params = params.set('calendarType', calendarType);
@@ -246,13 +294,16 @@ export class LicenseApplicationService {
         return this.http.get(`${this.baseUrl}/reports/withdrawals-count`, { params });
     }
 
-    getComprehensiveReport(startDate?: string, endDate?: string, calendarType?: string): Observable<any> {
+    getComprehensiveReport(startDate?: string, endDate?: string, createdBy?: string, calendarType?: string): Observable<any> {
         let params = new HttpParams();
         if (startDate) {
             params = params.set('startDate', startDate);
         }
         if (endDate) {
             params = params.set('endDate', endDate);
+        }
+        if (createdBy) {
+            params = params.set('createdBy', createdBy);
         }
         if (calendarType) {
             params = params.set('calendarType', calendarType);

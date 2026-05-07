@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
 using WebAPIBackend.Models.LicenseApplication;
@@ -19,17 +21,241 @@ namespace WebAPIBackend.Controllers.LicenseApplication
     {
         private readonly AppDbContext _context;
         private readonly ILookupCacheService _cache;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         // Guarantee Type Constants
         private const int GuaranteeType_Cash = 1;
         private const int GuaranteeType_ShariaDeed = 2;
         private const int GuaranteeType_CustomaryDeed = 3;
 
-        public LicenseApplicationController(AppDbContext context, ILookupCacheService cache)
+        public LicenseApplicationController(
+            AppDbContext context,
+            ILookupCacheService cache,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _cache = cache;
+            _userManager = userManager;
         }
+
+        private async Task<string> ResolveDisplayName(string? userIdOrName)
+        {
+            if (string.IsNullOrWhiteSpace(userIdOrName))
+            {
+                return "-";
+            }
+
+            if (Guid.TryParse(userIdOrName, out _))
+            {
+                var user = await _userManager.FindByIdAsync(userIdOrName);
+                if (user != null)
+                {
+                    var fullName = $"{user.FirstName} {user.LastName}".Trim();
+                    return string.IsNullOrWhiteSpace(fullName) ? (user.UserName ?? userIdOrName) : fullName;
+                }
+            }
+
+            return userIdOrName;
+        }
+
+        private async Task<Dictionary<string, string>> BuildCreatedByLookup(IEnumerable<string?> createdByValues)
+        {
+            var lookup = new Dictionary<string, string>();
+            var distinctValues = createdByValues
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x!)
+                .Distinct()
+                .ToList();
+
+            foreach (var createdBy in distinctValues)
+            {
+                lookup[createdBy] = await ResolveDisplayName(createdBy);
+            }
+
+            return lookup;
+        }
+
+        private static string NormalizeApplicantField(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
+        }
+
+        private async Task<bool> HasDuplicateApplicantAsync(LicenseApplicationData request, int? excludeId = null)
+        {
+            var applicantName = NormalizeApplicantField(request.ApplicantName);
+            var applicantFatherName = NormalizeApplicantField(request.ApplicantFatherName);
+            var applicantGrandfatherName = NormalizeApplicantField(request.ApplicantGrandfatherName);
+            var applicantElectronicNumber = NormalizeApplicantField(request.ApplicantElectronicNumber);
+
+            var query = _context.LicenseApplications
+                .AsNoTracking()
+                .Where(x => x.Status == true);
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(x => x.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync(x =>
+                x.ApplicantName == applicantName &&
+                (x.ApplicantFatherName ?? string.Empty) == applicantFatherName &&
+                (x.ApplicantGrandfatherName ?? string.Empty) == applicantGrandfatherName &&
+                (x.ApplicantElectronicNumber ?? string.Empty) == applicantElectronicNumber);
+        }
+
+        private async Task<bool> HasDuplicateProposedGuideNameAsync(string proposedGuideName, int? excludeId = null)
+        {
+            var normalizedName = NormalizeApplicantField(proposedGuideName);
+            if (string.IsNullOrWhiteSpace(normalizedName)) return false;
+
+            var query = _context.LicenseApplications
+                .AsNoTracking()
+                .Where(x => x.Status == true);
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(x => x.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync(x => x.ProposedGuideName == normalizedName);
+        }
+
+        private async Task<bool> HasDuplicateGuarantorAsync(string guarantorName, string? guarantorFatherName, int? excludeGuarantorId = null)
+        {
+            var normalizedName = NormalizeApplicantField(guarantorName);
+            var normalizedFatherName = NormalizeApplicantField(guarantorFatherName);
+            if (string.IsNullOrWhiteSpace(normalizedName)) return false;
+
+            var query = _context.LicenseApplicationGuarantors
+                .AsNoTracking()
+                .Where(g => _context.LicenseApplications.Any(a => a.Id == g.LicenseApplicationId && a.Status == true));
+
+            if (excludeGuarantorId.HasValue)
+            {
+                query = query.Where(g => g.Id != excludeGuarantorId.Value);
+            }
+
+            return await query.AnyAsync(g =>
+                g.GuarantorName == normalizedName &&
+                (g.GuarantorFatherName ?? string.Empty) == normalizedFatherName);
+        }
+
+        private async Task<bool> HasDuplicateShariaDeedNumberAsync(string shariaDeedNumber, int? excludeGuarantorId = null)
+        {
+            var normalizedNumber = NormalizeApplicantField(shariaDeedNumber);
+            if (string.IsNullOrWhiteSpace(normalizedNumber)) return false;
+
+            var query = _context.LicenseApplicationGuarantors
+                .AsNoTracking()
+                .Where(g => _context.LicenseApplications.Any(a => a.Id == g.LicenseApplicationId && a.Status == true))
+                .Where(g => g.ShariaDeedNumber != null);
+
+            if (excludeGuarantorId.HasValue)
+            {
+                query = query.Where(g => g.Id != excludeGuarantorId.Value);
+            }
+
+            return await query.AnyAsync(g => g.ShariaDeedNumber == normalizedNumber);
+        }
+
+        private async Task<bool> HasDuplicateCustomaryDeedSerialAsync(string customaryDeedSerialNumber, int? excludeGuarantorId = null)
+        {
+            var normalizedNumber = NormalizeApplicantField(customaryDeedSerialNumber);
+            if (string.IsNullOrWhiteSpace(normalizedNumber)) return false;
+
+            var query = _context.LicenseApplicationGuarantors
+                .AsNoTracking()
+                .Where(g => _context.LicenseApplications.Any(a => a.Id == g.LicenseApplicationId && a.Status == true))
+                .Where(g => g.CustomaryDeedSerialNumber != null);
+
+            if (excludeGuarantorId.HasValue)
+            {
+                query = query.Where(g => g.Id != excludeGuarantorId.Value);
+            }
+
+            return await query.AnyAsync(g => g.CustomaryDeedSerialNumber == normalizedNumber);
+        }
+
+        #region Duplicate Check
+
+        /// <summary>
+        /// Check if a proposed guide name already exists
+        /// </summary>
+        [HttpGet("check-proposed-guide-name")]
+        public async Task<IActionResult> CheckProposedGuideName(
+            [FromQuery] string proposedGuideName,
+            [FromQuery] int? excludeId = null)
+        {
+            try
+            {
+                var isDuplicate = await HasDuplicateProposedGuideNameAsync(proposedGuideName, excludeId);
+                return Ok(new { isDuplicate });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Check if a guarantor with the same name and father name already exists
+        /// </summary>
+        [HttpGet("check-guarantor")]
+        public async Task<IActionResult> CheckGuarantor(
+            [FromQuery] string guarantorName,
+            [FromQuery] string? guarantorFatherName = null,
+            [FromQuery] int? excludeGuarantorId = null)
+        {
+            try
+            {
+                var isDuplicate = await HasDuplicateGuarantorAsync(guarantorName, guarantorFatherName, excludeGuarantorId);
+                return Ok(new { isDuplicate });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Check if a sharia deed number already exists
+        /// </summary>
+        [HttpGet("check-sharia-deed-number")]
+        public async Task<IActionResult> CheckShariaDeedNumber(
+            [FromQuery] string shariaDeedNumber,
+            [FromQuery] int? excludeGuarantorId = null)
+        {
+            try
+            {
+                var isDuplicate = await HasDuplicateShariaDeedNumberAsync(shariaDeedNumber, excludeGuarantorId);
+                return Ok(new { isDuplicate });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Check if a customary deed serial number already exists
+        /// </summary>
+        [HttpGet("check-customary-deed-serial")]
+        public async Task<IActionResult> CheckCustomaryDeedSerial(
+            [FromQuery] string customaryDeedSerialNumber,
+            [FromQuery] int? excludeGuarantorId = null)
+        {
+            try
+            {
+                var isDuplicate = await HasDuplicateCustomaryDeedSerialAsync(customaryDeedSerialNumber, excludeGuarantorId);
+                return Ok(new { isDuplicate });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        #endregion
 
         #region Main Application CRUD
 
@@ -111,6 +337,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     })
                     .ToListAsync();
 
+                var createdByLookup = await BuildCreatedByLookup(items.Select(x => x.CreatedBy));
+
                 var result = items.Select(x => new
                 {
                     x.Id,
@@ -137,7 +365,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     x.IsWithdrawn,
                     x.Status,
                     x.CreatedAt,
-                    x.CreatedBy,
+                    CreatedBy = !string.IsNullOrWhiteSpace(x.CreatedBy) && createdByLookup.TryGetValue(x.CreatedBy, out var createdByName)
+                        ? createdByName
+                        : "-",
                     Guarantors = guarantors
                         .Where(g => g.LicenseApplicationId == x.Id)
                         .Select(g => new
@@ -333,6 +563,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     })
                     .ToListAsync();
 
+                var createdByLookup = await BuildCreatedByLookup(items.Select(x => x.CreatedBy));
+
                 var result = items.Select(x => new
                 {
                     x.Id,
@@ -359,7 +591,9 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     x.IsWithdrawn,
                     x.Status,
                     x.CreatedAt,
-                    x.CreatedBy,
+                    CreatedBy = !string.IsNullOrWhiteSpace(x.CreatedBy) && createdByLookup.TryGetValue(x.CreatedBy, out var createdByName)
+                        ? createdByName
+                        : "-",
                     Guarantors = guarantors
                         .Where(g => g.LicenseApplicationId == x.Id)
                         .Select(g => new
@@ -481,16 +715,14 @@ namespace WebAPIBackend.Controllers.LicenseApplication
 
                 var userId = userIdClaim.Value;
 
-                // Check for duplicate electronic number
-                if (!string.IsNullOrWhiteSpace(request.ApplicantElectronicNumber))
+                if (await HasDuplicateApplicantAsync(request))
                 {
-                    var existingWithSameElectronicNumber = await _context.LicenseApplications
-                        .AsNoTracking().AnyAsync(x => x.ApplicantElectronicNumber == request.ApplicantElectronicNumber && x.Status == true);
-                    
-                    if (existingWithSameElectronicNumber)
-                    {
-                        return BadRequest($"نمبر الکترونیکی {request.ApplicantElectronicNumber} قبلاً ثبت شده است. لطفاً نمبر دیگری را وارد کنید.");
-                    }
+                    return BadRequest("متقاضی با این مشخصات قبلاً در سیستم ثبت شده است.");
+                }
+
+                if (await HasDuplicateProposedGuideNameAsync(request.ProposedGuideName))
+                {
+                    return BadRequest("نام پیشنهادی رهنما قبلاً در سیستم ثبت شده است. لطفاً نام دیگری وارد کنید.");
                 }
 
                 // Parse date
@@ -551,18 +783,14 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     return NotFound("درخواست یافت نشد");
                 }
 
-                // Check for duplicate electronic number (excluding current record)
-                if (!string.IsNullOrWhiteSpace(request.ApplicantElectronicNumber))
+                if (await HasDuplicateApplicantAsync(request, id))
                 {
-                    var existingWithSameElectronicNumber = await _context.LicenseApplications
-                        .AsNoTracking().AnyAsync(x => x.ApplicantElectronicNumber == request.ApplicantElectronicNumber 
-                                    && x.Id != id 
-                                    && x.Status == true);
-                    
-                    if (existingWithSameElectronicNumber)
-                    {
-                        return BadRequest($"نمبر الکترونیکی {request.ApplicantElectronicNumber} قبلاً ثبت شده است. لطفاً نمبر دیگری را وارد کنید.");
-                    }
+                    return BadRequest("متقاضی با این مشخصات قبلاً در سیستم ثبت شده است.");
+                }
+
+                if (await HasDuplicateProposedGuideNameAsync(request.ProposedGuideName, id))
+                {
+                    return BadRequest("نام پیشنهادی رهنما قبلاً در سیستم ثبت شده است. لطفاً نام دیگری وارد کنید.");
                 }
 
                 // Parse date
@@ -697,12 +925,21 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     return NotFound("درخواست یافت نشد");
                 }
 
-                // Check guarantor count (max 2)
-                var guarantorCount = await _context.LicenseApplicationGuarantors
-                    .CountAsync(x => x.LicenseApplicationId == applicationId);
-                if (guarantorCount >= 2)
+                if (await HasDuplicateGuarantorAsync(request.GuarantorName, request.GuarantorFatherName))
                 {
-                    return BadRequest("شما نمی‌توانید بیشتر از دو تضمین‌کننده ثبت کنید");
+                    return BadRequest("تضمین‌کننده با این شهرت و ولد قبلاً در سیستم ثبت شده است.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.ShariaDeedNumber) &&
+                    await HasDuplicateShariaDeedNumberAsync(request.ShariaDeedNumber))
+                {
+                    return BadRequest("نمبر قباله شرعی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.CustomaryDeedSerialNumber) &&
+                    await HasDuplicateCustomaryDeedSerialAsync(request.CustomaryDeedSerialNumber))
+                {
+                    return BadRequest("سریال نمبر سته قباله عرفی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
                 }
 
                 // Parse date
@@ -755,6 +992,23 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 if (guarantor == null)
                 {
                     return NotFound("تضمین‌کننده یافت نشد");
+                }
+
+                if (await HasDuplicateGuarantorAsync(request.GuarantorName, request.GuarantorFatherName, guarantorId))
+                {
+                    return BadRequest("تضمین‌کننده با این شهرت و ولد قبلاً در سیستم ثبت شده است.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.ShariaDeedNumber) &&
+                    await HasDuplicateShariaDeedNumberAsync(request.ShariaDeedNumber, guarantorId))
+                {
+                    return BadRequest("نمبر قباله شرعی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.CustomaryDeedSerialNumber) &&
+                    await HasDuplicateCustomaryDeedSerialAsync(request.CustomaryDeedSerialNumber, guarantorId))
+                {
+                    return BadRequest("سریال نمبر سته قباله عرفی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
                 }
 
                 // Parse date
@@ -961,18 +1215,57 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         #region Reports
 
         /// <summary>
+        /// Get all users who have created license application records
+        /// </summary>
+        [HttpGet("reports/users")]
+        public async Task<IActionResult> GetReportUsers()
+        {
+            try
+            {
+                var createdByValues = await _context.LicenseApplications
+                    .AsNoTracking()
+                    .Where(x => x.Status == true && x.CreatedBy != null)
+                    .Select(x => x.CreatedBy!)
+                    .Distinct()
+                    .ToListAsync();
+
+                var users = new List<object>();
+                foreach (var userId in createdByValues)
+                {
+                    users.Add(new
+                    {
+                        id = userId,
+                        name = await ResolveDisplayName(userId)
+                    });
+                }
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Get report: Count of applicants saved in DB within date range
         /// </summary>
         [HttpGet("reports/applicants-count")]
         public async Task<IActionResult> GetApplicantsCountReport(
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
+            [FromQuery] string? createdBy = null,
             [FromQuery] string? calendarType = null)
         {
             try
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 var query = _context.LicenseApplications.Where(x => x.Status == true);
+
+                if (!string.IsNullOrWhiteSpace(createdBy))
+                {
+                    query = query.Where(x => x.CreatedBy == createdBy);
+                }
 
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;
@@ -1018,6 +1311,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         public async Task<IActionResult> GetGuarantorsByTypeReport(
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
+            [FromQuery] string? createdBy = null,
             [FromQuery] string? calendarType = null)
         {
             try
@@ -1026,6 +1320,11 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 
                 // Get applications within date range
                 var applicationsQuery = _context.LicenseApplications.Where(x => x.Status == true);
+
+                if (!string.IsNullOrWhiteSpace(createdBy))
+                {
+                    applicationsQuery = applicationsQuery.Where(x => x.CreatedBy == createdBy);
+                }
 
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;
@@ -1097,12 +1396,24 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         public async Task<IActionResult> GetWithdrawalsCountReport(
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
+            [FromQuery] string? createdBy = null,
             [FromQuery] string? calendarType = null)
         {
             try
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 var query = _context.LicenseApplicationWithdrawals.AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(createdBy))
+                {
+                    var applicationIds = await _context.LicenseApplications
+                        .AsNoTracking()
+                        .Where(x => x.Status == true && x.CreatedBy == createdBy)
+                        .Select(x => x.Id)
+                        .ToListAsync();
+
+                    query = query.Where(x => applicationIds.Contains(x.LicenseApplicationId));
+                }
 
                 DateOnly? parsedStartDate = null;
                 DateOnly? parsedEndDate = null;
@@ -1148,6 +1459,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         public async Task<IActionResult> GetComprehensiveReport(
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
+            [FromQuery] string? createdBy = null,
             [FromQuery] string? calendarType = null)
         {
             try
@@ -1175,6 +1487,10 @@ namespace WebAPIBackend.Controllers.LicenseApplication
 
                 // Get applicants count
                 var applicationsQuery = _context.LicenseApplications.Where(x => x.Status == true);
+                if (!string.IsNullOrWhiteSpace(createdBy))
+                {
+                    applicationsQuery = applicationsQuery.Where(x => x.CreatedBy == createdBy);
+                }
                 if (parsedStartDate.HasValue)
                 {
                     applicationsQuery = applicationsQuery.Where(x => x.RequestDate >= parsedStartDate);

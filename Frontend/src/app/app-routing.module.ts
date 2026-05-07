@@ -7,8 +7,6 @@ import { ForbiddenComponent } from './auth/forbidden/forbidden.component';
 import { AccessDeniedComponent } from './auth/access-denied/access-denied.component';
 import { MasterlayoutComponent } from './dashboard/masterlayout/masterlayout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ReportComponent } from './dashboard/report/report.component';
-import { UserReportComponent } from './dashboard/user-report/user-report.component';
 import { RegisterComponent } from './auth/register/register.component';
 
 const routes: Routes = [
@@ -35,8 +33,6 @@ const routes: Routes = [
       { path: 'estate', loadChildren: () => import('./estate/estate.module').then(m => m.EstateModule), canActivate: [PropertyModuleGuard] },
       { path: 'realestate', loadChildren: () => import('./realestate/realestate.module').then(m => m.RealestateModule), canActivate: [CompanyModuleGuard] },
       { path: 'vehicle', loadChildren: () => import('./vehicle/vehicle.module').then(m => m.VehicleModule), canActivate: [VehicleModuleGuard] },
-      { path: 'report', component: ReportComponent },
-      { path: 'userreport', component: UserReportComponent, canActivate: [AdminGuard] },
       { path: 'users', loadChildren: () => import('./users/users.module').then(m => m.UsersModule), canActivate: [AdminGuard] },
       { path: 'securities', loadChildren: () => import('./securities/securities.module').then(m => m.SecuritiesModule), canActivate: [SecuritiesModuleGuard] },
       { path: 'securities-control', loadChildren: () => import('./securities-control/securities-control.module').then(m => m.SecuritiesControlModule), canActivate: [SecuritiesModuleGuard] },

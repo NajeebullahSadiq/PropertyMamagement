@@ -39,9 +39,13 @@
                   </div>
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">نام پیشنهادی رهنما <span class="text-red-500">*</span></label>
-                    <input type="text" formControlName="proposedGuideName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <input type="text" formControlName="proposedGuideName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" [class.border-red-500]="proposedGuideName?.errors?.['duplicateProposedGuideName']">
                     <div *ngIf="proposedGuideName?.invalid && (proposedGuideName?.dirty || proposedGuideName?.touched)">
                       <small class="text-red-600 text-xs mt-1 block" *ngIf="proposedGuideName?.errors?.['required']">این فیلد الزامی است</small>
+                      <small class="text-red-600 text-xs mt-1 block" *ngIf="proposedGuideName?.errors?.['duplicateProposedGuideName']">این نام پیشنهادی رهنما قبلاً ثبت شده است. لطفاً نام دیگری وارد کنید</small>
+                    </div>
+                    <div *ngIf="proposedGuideName?.pending">
+                      <small class="text-blue-600 text-xs mt-1 block">در حال بررسی...</small>
                     </div>
                   </div>
                 </div>
@@ -184,11 +188,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت تضمین‌کننده <span class="text-red-500">*</span></label>
-                    <input type="text" formControlName="guarantorName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <input type="text" formControlName="guarantorName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" [class.border-red-500]="guarantorForm.get('guarantorName')?.errors?.['duplicateGuarantor']">
+                    <div *ngIf="guarantorForm.get('guarantorName')?.errors?.['duplicateGuarantor'] && (guarantorForm.get('guarantorName')?.dirty || guarantorForm.get('guarantorName')?.touched)">
+                      <small class="text-red-600 text-xs mt-1 block">تضمین‌کننده با این شهرت و ولد قبلاً ثبت شده است</small>
+                    </div>
+                    <div *ngIf="guarantorForm.get('guarantorName')?.pending">
+                      <small class="text-blue-600 text-xs mt-1 block">در حال بررسی...</small>
+                    </div>
                   </div>
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">ولد</label>
                     <input type="text" formControlName="guarantorFatherName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <div *ngIf="guarantorForm.get('guarantorFatherName')?.errors?.['duplicateGuarantor'] && (guarantorForm.get('guarantorFatherName')?.dirty || guarantorForm.get('guarantorFatherName')?.touched)">
+                      <small class="text-red-600 text-xs mt-1 block">تضمین‌کننده با این شهرت و ولد قبلاً ثبت شده است</small>
+                    </div>
                   </div>
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ضمانت <span class="text-red-500">*</span></label>
@@ -219,7 +232,13 @@
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر قباله شرعی</label>
-                      <input type="text" formControlName="shariaDeedNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                      <input type="text" formControlName="shariaDeedNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent" [class.border-red-500]="guarantorForm.get('shariaDeedNumber')?.errors?.['duplicateShariaDeedNumber']">
+                      <div *ngIf="guarantorForm.get('shariaDeedNumber')?.errors?.['duplicateShariaDeedNumber'] && (guarantorForm.get('shariaDeedNumber')?.dirty || guarantorForm.get('shariaDeedNumber')?.touched)">
+                        <small class="text-red-600 text-xs mt-1 block">نمبر قباله شرعی قبلاً ثبت شده است. لطفاً نمبر دیگری وارد کنید</small>
+                      </div>
+                      <div *ngIf="guarantorForm.get('shariaDeedNumber')?.pending">
+                        <small class="text-blue-600 text-xs mt-1 block">در حال بررسی...</small>
+                      </div>
                     </div>
                     <div>
                       <app-multi-calendar-datepicker formControlName="shariaDeedDate" label="تاریخ قباله شرعی"></app-multi-calendar-datepicker>
@@ -240,7 +259,13 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label class="block text-sm font-semibold text-gray-700 mb-2">سریال نمبر سته قباله عرفی</label>
-                      <input type="text" formControlName="customaryDeedSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                      <input type="text" formControlName="customaryDeedSerialNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" [class.border-red-500]="guarantorForm.get('customaryDeedSerialNumber')?.errors?.['duplicateCustomaryDeedSerial']">
+                      <div *ngIf="guarantorForm.get('customaryDeedSerialNumber')?.errors?.['duplicateCustomaryDeedSerial'] && (guarantorForm.get('customaryDeedSerialNumber')?.dirty || guarantorForm.get('customaryDeedSerialNumber')?.touched)">
+                        <small class="text-red-600 text-xs mt-1 block">سریال نمبر سته قباله عرفی قبلاً ثبت شده است. لطفاً نمبر دیگری وارد کنید</small>
+                      </div>
+                      <div *ngIf="guarantorForm.get('customaryDeedSerialNumber')?.pending">
+                        <small class="text-blue-600 text-xs mt-1 block">در حال بررسی...</small>
+                      </div>
                     </div>
                     <div>
                       <label class="block text-sm font-semibold text-gray-700 mb-2">محل ضمانت</label>

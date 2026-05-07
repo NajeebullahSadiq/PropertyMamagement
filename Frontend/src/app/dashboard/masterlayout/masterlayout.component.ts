@@ -35,7 +35,6 @@ export class MasterlayoutComponent extends BaseComponent implements AfterViewIni
   canAccessCompany = false;
   canAccessProperty = false;
   canAccessVehicle = false;
-  canAccessReports = false;
   canAccessUsers = false;
   canAccessSecurities = false;
   canAccessPetitionWriter = false;
@@ -119,7 +118,6 @@ export class MasterlayoutComponent extends BaseComponent implements AfterViewIni
     this.canAccessCompany = this.rbacService.canAccessModule('company');
     this.canAccessProperty = this.rbacService.canAccessModule('property');
     this.canAccessVehicle = this.rbacService.canAccessModule('vehicle');
-    this.canAccessReports = this.rbacService.canAccessModule('reports');
     this.canAccessUsers = this.rbacService.isAdmin();
     this.canAccessSecurities = this.rbacService.canAccessModule('securities');
     this.canAccessPetitionWriter = this.rbacService.canAccessModule('petitionWriter');

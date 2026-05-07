@@ -173,6 +173,11 @@ export interface LicenseApplicationListResponse {
     pageSize: number;
 }
 
+export interface LicenseApplicationReportUser {
+    id: string;
+    name: string;
+}
+
 /**
  * Guarantee Type Constants
  */

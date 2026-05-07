@@ -1,8 +1,9 @@
 import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { takeUntil } from 'rxjs/operators';
+import { of, Observable } from 'rxjs';
+import { debounceTime, map, switchMap, takeUntil, first } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { MatTabGroup } from '@angular/material/tabs';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
@@ -108,7 +109,10 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
             applicantFatherName: ['', Validators.maxLength(200)],
             applicantGrandfatherName: ['', Validators.maxLength(200)],
             applicantElectronicNumber: ['', Validators.maxLength(50)],
-            proposedGuideName: ['', [Validators.required, Validators.maxLength(200)]],
+            proposedGuideName: ['',
+                [Validators.required, Validators.maxLength(200)],
+                [this.proposedGuideNameAsyncValidator()]
+            ],
             permanentProvinceId: ['', Validators.required],
             permanentDistrictId: ['', Validators.required],
             permanentVillage: ['', Validators.required],
@@ -120,7 +124,7 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
         // Tab 2: Guarantor Form
         this.guarantorForm = this.fb.group({
             id: [0],
-            guarantorName: ['', Validators.required],
+            guarantorName: [''],
             guarantorFatherName: [''],
             guaranteeTypeId: ['', Validators.required],
             cashAmount: [''],
@@ -134,6 +138,22 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
             currentProvinceId: ['', Validators.required],
             currentDistrictId: ['', Validators.required],
             currentVillage: ['', Validators.required],
+        });
+
+        // Set async validators after form creation so they can reference guarantorForm fields
+        this.guarantorForm.get('guarantorName')?.setAsyncValidators([this.guarantorAsyncValidator()]);
+        this.guarantorForm.get('guarantorFatherName')?.setAsyncValidators([this.guarantorAsyncValidator()]);
+        this.guarantorForm.get('shariaDeedNumber')?.setAsyncValidators([this.shariaDeedNumberAsyncValidator()]);
+        this.guarantorForm.get('customaryDeedSerialNumber')?.setAsyncValidators([this.customaryDeedSerialAsyncValidator()]);
+
+        // When father name changes, re-trigger validation on guarantorName (cross-field)
+        this.guarantorForm.get('guarantorFatherName')?.valueChanges.pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(() => {
+            const nameControl = this.guarantorForm.get('guarantorName');
+            if (nameControl?.value && nameControl.value.trim() !== '') {
+                nameControl.updateValueAndValidity();
+            }
         });
 
         // Tab 3: Withdrawal Form
@@ -416,7 +436,12 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
                     this.toastr.success('معلومات موفقانه تغییر یافت');
                 },
                 error: (err) => {
-                    this.toastr.error('خطا در ذخیره معلومات');
+                    const backendMessage = err?.error;
+                    this.toastr.error(
+                        typeof backendMessage === 'string' && backendMessage.trim()
+                            ? backendMessage
+                            : 'خطا در ذخیره معلومات'
+                    );
                     console.error(err);
                 }
             });
@@ -430,7 +455,12 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
                     this.nextTab();
                 },
                 error: (err) => {
-                    this.toastr.error('خطا در ذخیره معلومات');
+                    const backendMessage = err?.error;
+                    this.toastr.error(
+                        typeof backendMessage === 'string' && backendMessage.trim()
+                            ? backendMessage
+                            : 'خطا در ذخیره معلومات'
+                    );
                     console.error(err);
                 }
             });
@@ -482,7 +512,12 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
                     this.resetGuarantorForm();
                 },
                 error: (err) => {
-                    this.toastr.error('خطا در تغییر معلومات');
+                    const backendMessage = err?.error;
+                    this.toastr.error(
+                        typeof backendMessage === 'string' && backendMessage.trim()
+                            ? backendMessage
+                            : 'خطا در تغییر معلومات'
+                    );
                     console.error(err);
                 }
             });
@@ -495,7 +530,12 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
                 },
                 error: (err) => {
                     if (err.status === 400) {
-                        this.toastr.error('شما نمی‌توانید بیشتر از دو تضمین‌کننده ثبت کنید');
+                        const backendMessage = err?.error;
+                        this.toastr.error(
+                            typeof backendMessage === 'string' && backendMessage.trim()
+                                ? backendMessage
+                                : 'شما نمی‌توانید بیشتر از دو تضمین‌کننده ثبت کنید'
+                        );
                     } else {
                         this.toastr.error('خطا در ثبت معلومات');
                     }
@@ -686,6 +726,83 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
         this.showCashFields = false;
         this.showShariaDeedFields = false;
         this.showCustomaryDeedFields = false;
+    }
+
+    proposedGuideNameAsyncValidator(): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors | null> => {
+            if (!control.value || control.value.trim() === '') {
+                return of(null);
+            }
+            return of(control.value).pipe(
+                debounceTime(500),
+                switchMap((value: string) =>
+                    this.licenseAppService.checkProposedGuideName(value.trim(), this.editId ?? undefined)
+                        .pipe(
+                            map((result) => result.isDuplicate ? { duplicateProposedGuideName: true } : null)
+                        )
+                ),
+                first()
+            );
+        };
+    }
+
+    guarantorAsyncValidator(): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors | null> => {
+            const guarantorName = this.guarantorForm?.get('guarantorName')?.value;
+            const guarantorFatherName = this.guarantorForm?.get('guarantorFatherName')?.value;
+            if (!guarantorName || guarantorName.trim() === '') {
+                return of(null);
+            }
+            return of({ guarantorName, guarantorFatherName }).pipe(
+                debounceTime(500),
+                switchMap((vals) =>
+                    this.licenseAppService.checkGuarantor(
+                        vals.guarantorName.trim(),
+                        vals.guarantorFatherName?.trim() || undefined,
+                        this.selectedGuarantorId || undefined
+                    ).pipe(
+                        map((result) => result.isDuplicate ? { duplicateGuarantor: true } : null)
+                    )
+                ),
+                first()
+            );
+        };
+    }
+
+    shariaDeedNumberAsyncValidator(): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors | null> => {
+            if (!control.value || control.value.trim() === '') {
+                return of(null);
+            }
+            return of(control.value).pipe(
+                debounceTime(500),
+                switchMap((value: string) =>
+                    this.licenseAppService.checkShariaDeedNumber(value.trim(), this.selectedGuarantorId || undefined)
+                        .pipe(
+                            map((result) => result.isDuplicate ? { duplicateShariaDeedNumber: true } : null)
+                        )
+                ),
+                first()
+            );
+        };
+    }
+
+    customaryDeedSerialAsyncValidator(): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors | null> => {
+            if (!control.value || control.value.trim() === '') {
+                return of(null);
+            }
+            return of(control.value).pipe(
+                debounceTime(500),
+                switchMap((value: string) =>
+                    this.licenseAppService.checkCustomaryDeedSerial(value.trim(), this.selectedGuarantorId || undefined)
+                        .pipe(
+                            map((result) => result.isDuplicate ? { duplicateCustomaryDeedSerial: true } : null)
+                        )
+                ),
+                first()
+            );
+        };
     }
 
     // Form getters for validation

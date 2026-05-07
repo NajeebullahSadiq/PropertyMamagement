@@ -91,10 +91,6 @@ export const Permissions = {
   PetitionWriterMonitoringEdit: 'petitionwritermonitoring.edit',
   PetitionWriterMonitoringDelete: 'petitionwritermonitoring.delete',
 
-  // Reports
-  ReportsView: 'reports.view',
-  ReportsExport: 'reports.export',
-
   // Dashboard
   DashboardView: 'dashboard.view',
 
@@ -124,7 +120,6 @@ export interface UserProfile {
   canAccessCompany: boolean;
   canAccessProperty: boolean;
   canAccessVehicle: boolean;
-  canAccessReports: boolean;
   canAccessDashboard: boolean;
   canAccessUsers: boolean;
 }
@@ -342,8 +337,6 @@ export class RbacService {
         return this.hasPermission(Permissions.PetitionWriterMonitoringView);
       case 'licenseapplications':
         return this.hasPermission(Permissions.LicenseApplicationView);
-      case 'reports':
-        return this.hasPermission(Permissions.ReportsView);
       case 'verification':
         return true; // Public to all authenticated users
       case 'users':

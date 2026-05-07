@@ -8,7 +8,7 @@ import { LicenseApplicationService } from 'src/app/shared/license-application.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
-import { LicenseApplication } from 'src/app/models/LicenseApplication';
+import { LicenseApplication, LicenseApplicationReportUser } from 'src/app/models/LicenseApplication';
 
 @Component({
     selector: 'app-license-application-list',
@@ -46,6 +46,8 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
     reportEndDate: any = '';
     reportData: any = null;
     isLoadingReport = false;
+    reportUsers: LicenseApplicationReportUser[] = [];
+    reportCreatedBy = '';
 
     // RBAC
     canEdit = false;
@@ -293,9 +295,22 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
 
     toggleReports(): void {
         this.showReports = !this.showReports;
-        if (!this.showReports) {
+        if (this.showReports) {
+            this.loadReportUsers();
+        } else {
             this.reportData = null;
         }
+    }
+
+    loadReportUsers(): void {
+        this.licenseAppService.getReportUsers().subscribe({
+            next: (users) => {
+                this.reportUsers = users;
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
     }
 
     generateReport(): void {
@@ -314,6 +329,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
         this.licenseAppService.getComprehensiveReport(
             startDate,
             endDate,
+            this.reportCreatedBy || undefined,
             calendar,
         ).subscribe({
             next: (data) => {
@@ -341,6 +357,7 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
         excelData.push(['گزارش درخواست‌های جواز رهنمای معاملات']);
         excelData.push([`از تاریخ: ${this.reportData.startDate} تا تاریخ: ${this.reportData.endDate}`]);
         excelData.push([]);
+        excelData.push(['Creator: ' + this.getSelectedReportUserName()]);
         
         // Applicants count
         excelData.push(['تعداد متقاضیان', this.reportData.totalApplicants]);
@@ -372,6 +389,15 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
         document.body.removeChild(link);
         
         this.toastr.success('گزارش با موفقیت صادر شد');
+    }
+
+    getSelectedReportUserName(): string {
+        if (!this.reportCreatedBy) {
+            return 'All';
+        }
+
+        const selectedUser = this.reportUsers.find(user => user.id === this.reportCreatedBy);
+        return selectedUser?.name || this.reportCreatedBy;
     }
 
     private formatDateForBackend(dateValue: any): string {

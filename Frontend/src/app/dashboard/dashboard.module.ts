@@ -20,16 +20,11 @@ import { HttpLoaderFactory } from '../app.module';
 import { HttpClient } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PropertydetailsComponent } from '../estate/propertydetails/propertydetails.component';
-import { ReportComponent } from './report/report.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { UserReportComponent } from './user-report/user-report.component';
 import { SharedModule } from '../shared/shared.module';
 @NgModule({
   declarations: [
     DashboardComponent,
-    MasterlayoutComponent,
-    ReportComponent,
-    UserReportComponent
+    MasterlayoutComponent
   ],
   imports: [
     CommonModule,
@@ -47,7 +42,6 @@ import { SharedModule } from '../shared/shared.module';
     MatInputModule,
     MatDividerModule,
     MatDialogModule,
-    NgbModule,
     SharedModule,
     TranslateModule.forRoot({
       loader: {
