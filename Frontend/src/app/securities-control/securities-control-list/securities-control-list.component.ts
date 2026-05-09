@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -7,6 +8,7 @@ import { SecuritiesControlService } from 'src/app/shared/securities-control.serv
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { SecuritiesControl } from 'src/app/models/SecuritiesControl';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
     selector: 'app-securities-control-list',
@@ -33,7 +35,8 @@ export class SecuritiesControlListComponent extends BaseComponent implements OnI
         private calendarService: CalendarService,
         private rbacService: RbacService,
         private router: Router,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private dialog: MatDialog
     ) {
         super();
     }
@@ -121,17 +124,26 @@ export class SecuritiesControlListComponent extends BaseComponent implements OnI
     }
 
     deleteItem(id: number): void {
-        if (confirm('آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟')) {
-            this.securitiesControlService.delete(id).subscribe({
-                next: (res) => {
-                    this.toastr.success(res.message || 'رکورد با موفقیت حذف شد');
-                    this.loadData();
-                },
-                error: (err) => {
-                    this.toastr.error(err.error?.message || 'خطا در حذف رکورد');
-                }
-            });
-        }
+        const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+            data: {
+                title: 'حذف رکورد',
+                message: 'آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟'
+            },
+            disableClose: true
+        });
+        dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed) {
+                this.securitiesControlService.delete(id).subscribe({
+                    next: (res) => {
+                        this.toastr.success(res.message || 'رکورد با موفقیت حذف شد');
+                        this.loadData();
+                    },
+                    error: (err) => {
+                        this.toastr.error(err.error?.message || 'خطا در حذف رکورد');
+                    }
+                });
+            }
+        });
     }
 
     createNew(): void {

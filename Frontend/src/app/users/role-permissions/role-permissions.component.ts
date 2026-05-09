@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { environment } from 'src/environments/environment';
+import { ConfirmationDialogComponent } from 'src/app/shared/confirmation-dialog/confirmation-dialog.component';
 
 export interface PermissionGroup {
   label: string;
@@ -159,7 +161,7 @@ export class RolePermissionsComponent extends BaseComponent implements OnInit {
 
   private readonly baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {
+  constructor(private http: HttpClient, private toastr: ToastrService, private dialog: MatDialog) {
     super();
   }
 
@@ -188,7 +190,24 @@ export class RolePermissionsComponent extends BaseComponent implements OnInit {
 
   selectRole(role: any): void {
     if (this.hasChanges) {
-      if (!confirm('تغییرات ذخیره نشده دارید. آیا می‌خواهید بدون ذخیره ادامه دهید؟')) return;
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        data: {
+          title: 'تغییرات ذخیره نشده',
+          message: 'تغییرات ذخیره نشده دارید. آیا می‌خواهید بدون ذخیره ادامه دهید؟',
+          confirmText: 'بله، ادامه دهید',
+          icon: 'fa-exclamation-circle',
+          confirmButtonClass: 'btn-confirm-warning'
+        },
+        disableClose: true
+      });
+      dialogRef.afterClosed().subscribe(confirmed => {
+        if (!confirmed) return;
+        this.selectedRole = role;
+        this.activePermissions = this.toMap(role.permissions || []);
+        this.originalPermissions = this.toMap(role.permissions || []);
+        this.hasChanges = false;
+      });
+      return;
     }
     this.selectedRole = role;
     this.activePermissions = this.toMap(role.permissions || []);

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from 'src/app/shared/securities.service';
@@ -8,6 +9,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { NotificationService } from 'src/app/shared/notification.service';
 import { SecuritiesDistribution } from 'src/app/models/SecuritiesDistribution';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
     selector: 'app-securities-list',
@@ -46,7 +48,8 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
         private calendarConversionService: CalendarConversionService,
         private rbacService: RbacService,
         private router: Router,
-        private notification: NotificationService
+        private notification: NotificationService,
+        private dialog: MatDialog
     ) {
         super();
     }
@@ -120,17 +123,26 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
     }
 
     deleteItem(id: number): void {
-        if (confirm('آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟')) {
-            this.securitiesService.delete(id).subscribe({
-                next: (res) => {
-                    this.notification.showDeleteSuccess();
-                    this.loadData();
-                },
-                error: (err) => {
-                    this.notification.showHttpError(err);
-                }
-            });
-        }
+        const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+            data: {
+                title: 'حذف رکورد',
+                message: 'آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟'
+            },
+            disableClose: true
+        });
+        dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed) {
+                this.securitiesService.delete(id).subscribe({
+                    next: (res) => {
+                        this.notification.showDeleteSuccess();
+                        this.loadData();
+                    },
+                    error: (err) => {
+                        this.notification.showHttpError(err);
+                    }
+                });
+            }
+        });
     }
 
     createNew(): void {

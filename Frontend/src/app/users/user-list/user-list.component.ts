@@ -5,6 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { AuthService } from 'src/app/shared/auth.service';
 import { UserEditDialogComponent } from '../user-edit-dialog/user-edit-dialog.component';
+import { ConfirmationDialogComponent } from 'src/app/shared/confirmation-dialog/confirmation-dialog.component';
 import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -150,15 +151,27 @@ export class UserListComponent extends BaseComponent implements OnInit {
   onToggleStatus(user: UserData): void {
     const newStatus = !user.isLocked;
     const action = newStatus ? 'غیرفعال' : 'فعال';
-    if (confirm(`آیا مطمئن هستید که می‌خواهید حساب "${user.userName}" را ${action} کنید؟`)) {
-      this.authService.lockUser(user.userName, newStatus).subscribe({
-        next: () => {
-          this.toastr.success(`حساب کاربری ${action} شد`);
-          this.loadUsers();
-        },
-        error: () => this.toastr.error('خطا در تغییر وضعیت کاربر')
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        title: `${action} کردن حساب`,
+        message: `آیا مطمئن هستید که می‌خواهید حساب "${user.userName}" را ${action} کنید؟`,
+        confirmText: `بله، ${action} شود`,
+        icon: 'fa-user-lock',
+        confirmButtonClass: 'btn-confirm-warning'
+      },
+      disableClose: true
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.authService.lockUser(user.userName, newStatus).subscribe({
+          next: () => {
+            this.toastr.success(`حساب کاربری ${action} شد`);
+            this.loadUsers();
+          },
+          error: () => this.toastr.error('خطا در تغییر وضعیت کاربر')
+        });
+      }
+    });
   }
 
   get currentRoles(): any[] {

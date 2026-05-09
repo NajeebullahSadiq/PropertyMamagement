@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -9,6 +10,7 @@ import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { LicenseApplication, LicenseApplicationReportUser } from 'src/app/models/LicenseApplication';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
     selector: 'app-license-application-list',
@@ -62,7 +64,8 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
         private calendarConversionService: CalendarConversionService,
         private rbacService: RbacService,
         private router: Router,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private dialog: MatDialog
     ) {
         super();
         // Setup debounced search
@@ -270,18 +273,25 @@ export class LicenseApplicationListComponent extends BaseComponent implements On
     }
 
     deleteItem(id: number): void {
-        if (!confirm('آیا مطمئن هستید که می‌خواهید این درخواست را حذف کنید؟')) {
-            return;
-        }
-
-        this.licenseAppService.delete(id).subscribe({
-            next: () => {
-                this.toastr.success('درخواست موفقانه حذف شد');
-                this.loadData();
+        const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+            data: {
+                title: 'حذف درخواست',
+                message: 'آیا مطمئن هستید که می‌خواهید این درخواست را حذف کنید؟'
             },
-            error: (err) => {
-                this.toastr.error('خطا در حذف درخواست');
-                console.error(err);
+            disableClose: true
+        });
+        dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed) {
+                this.licenseAppService.delete(id).subscribe({
+                    next: () => {
+                        this.toastr.success('درخواست موفقانه حذف شد');
+                        this.loadData();
+                    },
+                    error: (err) => {
+                        this.toastr.error('خطا در حذف درخواست');
+                        console.error(err);
+                    }
+                });
             }
         });
     }

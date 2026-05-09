@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -15,6 +16,7 @@ import { NumeralService } from 'src/app/shared/numeral.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarType } from 'src/app/models/calendar-type';
 import { environment } from 'src/environments/environment';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
   selector: 'app-buyerdetail',
@@ -84,7 +86,7 @@ export class BuyerdetailComponent extends BaseComponent {
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
     private duplicateCheckService: DuplicateCheckService, private numeralService: NumeralService,
-    private calendarConversionService: CalendarConversionService){
+    private calendarConversionService: CalendarConversionService, private dialog: MatDialog){
     super();
     // this.mainTableId=propertyService.mainTableId;
     this.sellerForm = this.fb.group({
@@ -493,18 +495,27 @@ deleteBuyer(id: number, event?: Event) {
   if (event) {
     event.stopPropagation();
   }
-  if (confirm('آیا مطمئن هستید که می‌خواهید این مشتری را حذف کنید؟')) {
-    this.selerService.deleteBuyer(id).subscribe(
-      () => {
-        this.toastr.success("مشتری با موفقیت حذف شد");
-        this.loadBuyerDetails();
-        this.resetChild();
-      },
-      (error) => {
-        this.toastr.error("خطا در حذف مشتری");
-      }
-    );
-  }
+  const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+    data: {
+      title: 'حذف مشتری',
+      message: 'آیا مطمئن هستید که می‌خواهید این مشتری را حذف کنید؟'
+    },
+    disableClose: true
+  });
+  dialogRef.afterClosed().subscribe(confirmed => {
+    if (confirmed) {
+      this.selerService.deleteBuyer(id).subscribe(
+        () => {
+          this.toastr.success("مشتری با موفقیت حذف شد");
+          this.loadBuyerDetails();
+          this.resetChild();
+        },
+        (error) => {
+          this.toastr.error("خطا در حذف مشتری");
+        }
+      );
+    }
+  });
 }
   filterResults(getId:any) {
     

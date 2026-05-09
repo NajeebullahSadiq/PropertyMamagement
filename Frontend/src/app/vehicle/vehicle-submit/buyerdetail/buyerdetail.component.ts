@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -13,6 +14,7 @@ import { PropertyService } from 'src/app/shared/property.service';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
 import { VehicleComponent } from '../../vehicle.component';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
   selector: 'app-buyerdetail',
@@ -74,7 +76,8 @@ export class BuyerdetailComponent extends BaseComponent {
   constructor(private vehicleService: VehicleService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private vehiclesubservice:VehiclesubService,
     private localizationService: LocalizationService, private propertyDetailsService: PropertyService,
-    private duplicateCheckService: DuplicateCheckService, private parentComponent: VehicleComponent){
+    private duplicateCheckService: DuplicateCheckService, private parentComponent: VehicleComponent,
+    private dialog: MatDialog){
     super();
     // console.log(propertyService.mainTableId);
     // this.mainTableId=propertyService.mainTableId;
@@ -440,18 +443,27 @@ updateBuyerDetails(): void {
 }
 
 deleteBuyer(id: number) {
-  if (confirm('آیا مطمئن هستید که می‌خواهید این مشتری را حذف کنید؟')) {
-    this.vehiclesubservice.deleteBuyer(id).subscribe(
-      () => {
-        this.toastr.success("مشتری با موفقیت حذف شد");
-        this.loadBuyerDetails();
-        this.resetChild();
-      },
-      (error) => {
-        this.toastr.error("خطا در حذف مشتری");
-      }
-    );
-  }
+  const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+    data: {
+      title: 'حذف مشتری',
+      message: 'آیا مطمئن هستید که می‌خواهید این مشتری را حذف کنید؟'
+    },
+    disableClose: true
+  });
+  dialogRef.afterClosed().subscribe(confirmed => {
+    if (confirmed) {
+      this.vehiclesubservice.deleteBuyer(id).subscribe(
+        () => {
+          this.toastr.success("مشتری با موفقیت حذف شد");
+          this.loadBuyerDetails();
+          this.resetChild();
+        },
+        (error) => {
+          this.toastr.error("خطا در حذف مشتری");
+        }
+      );
+    }
+  });
 }
   filterResults(getId:any) {
     

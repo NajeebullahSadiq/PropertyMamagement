@@ -1,6 +1,7 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -11,6 +12,7 @@ import { CalendarType } from 'src/app/models/calendar-type';
 import { SellerService } from 'src/app/shared/seller.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { AuthService } from 'src/app/shared/auth.service';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 import {
     PetitionWriterLicenseData,
     PetitionWriterRelocationData,
@@ -76,7 +78,8 @@ export class PetitionWriterLicenseFormComponent extends BaseComponent implements
         private calendarConversionService: CalendarConversionService,
         private sellerService: SellerService,
         private rbacService: RbacService,
-        private authService: AuthService
+        private authService: AuthService,
+        private dialog: MatDialog
     ) {
         super();
     }
@@ -490,15 +493,25 @@ export class PetitionWriterLicenseFormComponent extends BaseComponent implements
     }
 
     deleteRelocation(id: number): void {
-        if (!confirm('آیا مطمئن هستید؟')) return;
-        this.licenseService.deleteRelocation(this.licenseService.mainTableId, id).subscribe({
-            next: () => {
-                this.toastr.success('نقل مکان حذف شد');
-                this.loadRelocations();
+        const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+            data: {
+                title: 'حذف نقل مکان',
+                message: 'آیا مطمئن هستید که می‌خواهید این نقل مکان را حذف کنید؟'
             },
-            error: (err) => {
-                this.toastr.error('خطا در حذف');
-                console.error(err);
+            disableClose: true
+        });
+        dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed) {
+                this.licenseService.deleteRelocation(this.licenseService.mainTableId, id).subscribe({
+                    next: () => {
+                        this.toastr.success('نقل مکان حذف شد');
+                        this.loadRelocations();
+                    },
+                    error: (err) => {
+                        this.toastr.error('خطا در حذف');
+                        console.error(err);
+                    }
+                });
             }
         });
     }

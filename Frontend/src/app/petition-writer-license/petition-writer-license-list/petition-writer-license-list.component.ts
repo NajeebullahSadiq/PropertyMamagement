@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -10,6 +11,7 @@ import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { PetitionWriterLicense, LicenseStatusEnum, LicenseStatusTypes } from 'src/app/models/PetitionWriterLicense';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { CalendarType } from 'src/app/models/calendar-type';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
     selector: 'app-petition-writer-license-list',
@@ -54,7 +56,8 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
         private rbacService: RbacService,
         private router: Router,
         private toastr: ToastrService,
-        private calendarConversion: CalendarConversionService
+        private calendarConversion: CalendarConversionService,
+        private dialog: MatDialog
     ) {
         super();
         this.searchSubject.pipe(
@@ -158,16 +161,25 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
     }
 
     deleteItem(id: number): void {
-        if (!confirm('آیا مطمئن هستید که می‌خواهید این جواز را حذف کنید؟')) return;
-
-        this.licenseService.delete(id).subscribe({
-            next: () => {
-                this.toastr.success('جواز با موفقیت حذف شد');
-                this.loadData();
+        const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+            data: {
+                title: 'حذف جواز',
+                message: 'آیا مطمئن هستید که می‌خواهید این جواز را حذف کنید؟'
             },
-            error: (err) => {
-                this.toastr.error('خطا در حذف جواز');
-                console.error(err);
+            disableClose: true
+        });
+        dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed) {
+                this.licenseService.delete(id).subscribe({
+                    next: () => {
+                        this.toastr.success('جواز با موفقیت حذف شد');
+                        this.loadData();
+                    },
+                    error: (err) => {
+                        this.toastr.error('خطا در حذف جواز');
+                        console.error(err);
+                    }
+                });
             }
         });
     }

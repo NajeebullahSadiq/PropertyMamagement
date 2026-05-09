@@ -3,41 +3,44 @@
 
     <!-- Header -->
     <div class="mb-6 text-center">
-      <h1 class="text-3xl font-bold text-gray-800">مدیریت کاربران</h1>
-      <p class="text-gray-500 mt-1 text-sm">مشاهده، جستجو و مدیریت کاربران سیستم</p>
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 text-white mb-3 shadow-lg shadow-blue-600/20">
+        <i class="fas fa-users text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">مدیریت کاربران</h1>
+      <p class="text-gray-500 text-sm">مشاهده، جستجو و مدیریت کاربران سیستم</p>
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 bg-white rounded-xl border border-gray-200 p-1 mb-5 shadow-sm w-fit">
+    <div class="flex gap-2 bg-white rounded-xl border border-gray-200 p-1 mb-5 shadow-sm w-fit mx-auto">
       <button (click)="switchTab('system')"
-        class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+        class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-sm"
         [ngClass]="activeTab === 'system'
-          ? 'bg-blue-600 text-white shadow-sm'
-          : 'text-gray-600 hover:bg-gray-100'">
+          ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
         <i class="fas fa-user-shield text-sm"></i>
         کاربران سیستمی
       </button>
       <button (click)="switchTab('company')"
-        class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+        class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-sm"
         [ngClass]="activeTab === 'company'
-          ? 'bg-blue-600 text-white shadow-sm'
-          : 'text-gray-600 hover:bg-gray-100'">
+          ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
         <i class="fas fa-building text-sm"></i>
         کاربران رهنما
       </button>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-5">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-5">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
         <!-- Search (server-side) -->
         <div class="md:col-span-2">
-          <label class="block text-xs font-semibold text-gray-600 mb-1">جستجو</label>
-          <div class="relative">
-            <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">جستجو</label>
+          <div class="relative group">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm group-focus-within:text-blue-500 transition-colors"></i>
             <input type="text"
-              class="w-full pr-9 pl-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all"
               [(ngModel)]="searchTerm"
               (ngModelChange)="onSearchInput()"
               placeholder="نام کاربری، نام، ایمیل، شماره تماس...">
@@ -46,33 +49,36 @@
 
         <!-- Role filter -->
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">نقش</label>
-          <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">نقش</label>
+          <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all appearance-none bg-white"
             [(ngModel)]="roleFilter" (change)="onFilterChange()">
             <option value="">همه نقش‌ها</option>
             <option *ngFor="let r of currentRoles" [value]="r.id">{{ r.dari }}</option>
           </select>
+          <i class="fas fa-chevron-down absolute right-3 top-[38px] text-gray-400 text-sm pointer-events-none"></i>
         </div>
 
         <!-- Status filter -->
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">وضعیت</label>
-          <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">وضعیت</label>
+          <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all appearance-none bg-white"
             [(ngModel)]="statusFilter" (change)="onFilterChange()">
             <option value="">همه</option>
             <option value="active">فعال</option>
             <option value="inactive">غیرفعال</option>
           </select>
+          <i class="fas fa-chevron-down absolute right-3 top-[38px] text-gray-400 text-sm pointer-events-none"></i>
         </div>
       </div>
 
-      <div class="mt-3 flex items-center justify-between">
-        <span class="text-xs text-gray-400">
+      <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
+          <i class="fas fa-info-circle mr-1"></i>
           {{ total }} کاربر یافت شد
         </span>
         <button (click)="clearFilters()"
-          class="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 px-3 py-1.5 hover:bg-gray-100 rounded-lg transition-all">
-          <i class="fas fa-times"></i> پاک کردن فیلتر
+          class="text-xs font-medium text-gray-500 hover:text-blue-600 hover:bg-blue-50 flex items-center gap-1.5 px-4 py-2 rounded-lg transition-all">
+          <i class="fas fa-times"></i> پاک کردن فیلترها
         </button>
       </div>
     </div>
@@ -81,80 +87,107 @@
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
       <!-- Table header bar -->
-      <div class="px-5 py-3.5 border-b border-gray-100 flex items-center gap-3"
-        [ngClass]="activeTab === 'system' ? 'bg-blue-600' : 'bg-teal-600'">
-        <i class="fas text-white text-sm"
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3"
+        [ngClass]="activeTab === 'system' ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-teal-600 to-teal-700'">
+        <i class="fas text-white text-lg"
           [ngClass]="activeTab === 'system' ? 'fa-user-shield' : 'fa-building'"></i>
-        <span class="text-white font-semibold text-sm">
+        <span class="text-white font-bold text-base">
           {{ activeTab === 'system' ? 'کاربران سیستمی' : 'کاربران رهنما (عملیاتی)' }}
-          <span class="opacity-70 font-normal">({{ total }})</span>
+          <span class="opacity-70 font-normal text-white/90 text-sm ml-2">
+            ({{ total }} نفر)
+          </span>
         </span>
       </div>
 
       <!-- Loading -->
-      <div *ngIf="isLoading" class="py-16 text-center text-gray-400">
-        <i class="fas fa-spinner fa-spin text-3xl mb-3 block"></i>
-        در حال بارگذاری...
+      <div *ngIf="isLoading" class="py-20 text-center">
+        <div class="inline-block w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-500 font-medium">در حال بارگذاری کاربران...</p>
       </div>
 
       <!-- Table -->
       <div *ngIf="!isLoading" class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-50 border-b border-gray-200">
-            <tr class="text-center text-xs font-bold text-gray-600 uppercase tracking-wide">
-              <th class="px-4 py-3">#</th>
-              <th class="px-4 py-3">کاربر</th>
-              <th class="px-4 py-3">نام کاربری</th>
-              <th class="px-4 py-3">ایمیل</th>
-              <th class="px-4 py-3">نقش</th>
-              <th *ngIf="activeTab === 'company'" class="px-4 py-3">نوع جواز</th>
-              <th class="px-4 py-3">وضعیت</th>
-              <th class="px-4 py-3">تاریخ ایجاد</th>
-              <th class="px-4 py-3">عملیات</th>
+            <tr class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+              <th class="px-4 py-4 w-16">#</th>
+              <th class="px-4 py-4">کاربر</th>
+              <th class="px-4 py-4">نام کاربری</th>
+              <th class="px-4 py-4">ایمیل</th>
+              <th class="px-4 py-4">نقش</th>
+              <th *ngIf="activeTab === 'company'" class="px-4 py-4">نوع جواز</th>
+              <th class="px-4 py-4">وضعیت</th>
+              <th class="px-4 py-4">تاریخ ایجاد</th>
+              <th class="px-4 py-4 w-40">عملیات</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <tr *ngFor="let user of users; let i = index"
-              class="text-center hover:bg-gray-50 transition-colors">
-              <td class="px-4 py-3 text-sm text-gray-400">{{ (page - 1) * pageSize + i + 1 }}</td>
+              class="text-center hover:bg-blue-50/30 transition-colors group">
+              <td class="px-4 py-3 text-sm text-gray-400 font-medium">{{ (page - 1) * pageSize + i + 1 }}</td>
               <td class="px-4 py-3">
-                <div class="flex items-center justify-center gap-2">
-                  <img [src]="getUserPhoto(user.photoPath)"
-                    class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0"
-                    (error)="$any($event.target).src = 'assets/img/avatar.png'">
-                  <span class="text-sm font-medium text-gray-800 whitespace-nowrap">
-                    {{ user.firstName }} {{ user.lastName }}
-                  </span>
+                <div class="flex items-center justify-center gap-3">
+                  <div class="relative">
+                    <img [src]="getUserPhoto(user.photoPath)"
+                      class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 flex-shrink-0 shadow-sm group-hover:border-blue-300 transition-colors"
+                      (error)="$any($event.target).src = 'assets/img/avatar.png'">
+                    <i *ngIf="!user.isLocked" class="fas fa-circle text-green-400 text-[10px] absolute -bottom-0.5 -right-0.5"></i>
+                    <i *ngIf="user.isLocked" class="fas fa-circle text-red-400 text-[10px] absolute -bottom-0.5 -right-0.5"></i>
+                  </div>
+                  <div class="text-right">
+                    <span class="block text-sm font-bold text-gray-800">
+                      {{ user.firstName }} {{ user.lastName }}
+                    </span>
+                    <span *ngIf="user.phoneNumber" class="text-xs text-gray-400">
+                      {{ user.phoneNumber }}
+                    </span>
+                  </div>
                 </div>
               </td>
-              <td class="px-4 py-3 text-sm font-mono text-gray-600">{{ user.userName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ user.email || '—' }}</td>
               <td class="px-4 py-3">
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                <div class="text-sm font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded inline-block">
+                  {{ user.userName }}
+                </div>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-500">
+                <span class="inline-block max-w-[150px] truncate" [title]="user.email || ''">
+                  {{ user.email || '—' }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
                   [ngClass]="getRoleColor(user.role)">
                   {{ user.roleDari }}
                 </span>
               </td>
               <td *ngIf="activeTab === 'company'" class="px-4 py-3 text-sm text-gray-600">
-                {{ getLicenseTypeText(user.licenseType) }}
+                <span class="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium">
+                  {{ getLicenseTypeText(user.licenseType) }}
+                </span>
               </td>
               <td class="px-4 py-3">
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                <span class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
                   [ngClass]="user.isLocked ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                  <i class="fas fa-circle text-[8px] mr-1"></i>
                   {{ user.isLocked ? 'غیرفعال' : 'فعال' }}
                 </span>
               </td>
-              <td class="px-4 py-3 text-sm text-gray-500">{{ user.createdAt | calendarDate }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500">
+                <span class="inline-block bg-gray-50 px-2 py-1 rounded text-xs">
+                  {{ user.createdAt | calendarDate }}
+                </span>
+              </td>
               <td class="px-4 py-3">
-                <div class="flex items-center justify-center gap-1.5">
+                <div class="flex items-center justify-center gap-2">
                   <button (click)="onEdit(user)"
-                    class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-all flex items-center gap-1">
+                    class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-1.5"
+                    title="ویرایش کاربر">
                     <i class="fas fa-edit"></i> ویرایش
                   </button>
                   <button (click)="onToggleStatus(user)"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1"
+                    class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-1.5"
                     [ngClass]="user.isLocked
-                      ? 'bg-green-500 hover:bg-green-600 text-white'
+                      ? 'bg-green-600 hover:bg-green-700 text-white'
                       : 'bg-amber-500 hover:bg-amber-600 text-white'">
                     <i [class]="user.isLocked ? 'fas fa-unlock' : 'fas fa-lock'"></i>
                     {{ user.isLocked ? 'فعال' : 'غیرفعال' }}
@@ -164,9 +197,12 @@
             </tr>
 
             <tr *ngIf="users.length === 0">
-              <td [attr.colspan]="activeTab === 'company' ? 9 : 8" class="py-16 text-center text-gray-400">
-                <i class="fas fa-users text-4xl mb-3 block"></i>
-                کاربری یافت نشد
+              <td [attr.colspan]="activeTab === 'company' ? 9 : 8" class="py-20 text-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-4">
+                  <i class="fas fa-users text-4xl text-gray-300"></i>
+                </div>
+                <p class="text-gray-500 text-lg font-medium">کاربری یافت نشد</p>
+                <p class="text-gray-400 text-sm mt-1">در حال حاضر کاربری در سیستم ثبت نشده است</p>
               </td>
             </tr>
           </tbody>
@@ -175,17 +211,21 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex items-center justify-center gap-3 mt-5" *ngIf="total > pageSize">
+    <div class="flex items-center justify-center gap-3 mt-6" *ngIf="total > pageSize">
       <button (click)="onPageChange(page - 1)" [disabled]="page === 1"
-        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-        قبلی
+        class="px-5 py-2.5 text-sm font-bold rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md flex items-center gap-2"
+        [disabled]="page === 1">
+        <i class="fas fa-chevron-left"></i> قبلی
       </button>
-      <span class="text-sm text-gray-600">
-        صفحه {{ page }} از {{ totalPages }}
-      </span>
+      <div class="flex items-center gap-1 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+        <span class="text-sm text-gray-600 font-medium">
+          صفحه <span class="text-blue-600 font-bold">{{ page }}</span> از {{ totalPages }}
+        </span>
+      </div>
       <button (click)="onPageChange(page + 1)" [disabled]="page >= totalPages"
-        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-        بعدی
+        class="px-5 py-2.5 text-sm font-bold rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md flex items-center gap-2"
+        [disabled]="page >= totalPages">
+        بعدی <i class="fas fa-chevron-right"></i>
       </button>
     </div>
 

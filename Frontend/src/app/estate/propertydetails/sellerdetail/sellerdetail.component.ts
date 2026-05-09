@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -12,6 +13,7 @@ import { UploadComponent } from '../../upload/upload.component';
 import { NationalidUploadComponent } from '../../nationalid-upload/nationalid-upload.component';
 import { ProfileImageCropperComponent } from 'src/app/shared/profile-image-cropper/profile-image-cropper.component';
 import { environment } from 'src/environments/environment';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
   selector: 'app-sellerdetail',
@@ -65,18 +67,27 @@ export class SellerdetailComponent extends BaseComponent {
     if (event) {
       event.stopPropagation();
     }
-    if (confirm('آیا مطمئن هستید که می‌خواهید این فروشنده را حذف کنید؟')) {
-      this.selerService.deleteSeller(id).subscribe(
-        () => {
-          this.toastr.success("فروشنده با موفقیت حذف شد");
-          this.loadSellerDetails();
-          this.resetChild();
-        },
-        (error) => {
-          this.toastr.error("خطا در حذف فروشنده");
-        }
-      );
-    }
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      data: {
+        title: 'حذف فروشنده',
+        message: 'آیا مطمئن هستید که می‌خواهید این فروشنده را حذف کنید؟'
+      },
+      disableClose: true
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.selerService.deleteSeller(id).subscribe(
+          () => {
+            this.toastr.success("فروشنده با موفقیت حذف شد");
+            this.loadSellerDetails();
+            this.resetChild();
+          },
+          (error) => {
+            this.toastr.error("خطا در حذف فروشنده");
+          }
+        );
+      }
+    });
   }
 
   onSubmit(): void {
@@ -98,7 +109,7 @@ export class SellerdetailComponent extends BaseComponent {
 
   constructor(private propertyDetailsService: PropertyService,private toastr: ToastrService
     ,private fb: FormBuilder, private selerService:SellerService, private localizationService: LocalizationService,
-    private duplicateCheckService: DuplicateCheckService){
+    private duplicateCheckService: DuplicateCheckService, private dialog: MatDialog){
     super();
     this.sellerForm = this.fb.group({
       id: [0],

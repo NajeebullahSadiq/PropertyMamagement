@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
@@ -9,6 +10,7 @@ import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 import { PetitionWriterMonitoringRecord, PetitionWriterMonitoringSectionTypes, ActivityStatusOptions } from 'src/app/models/PetitionWriterMonitoring';
+import { DeleteConfirmationDialogComponent } from 'src/app/shared/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
     selector: 'app-petition-writer-monitoring-list',
@@ -55,7 +57,8 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
         private toastr: ToastrService,
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService,
-        private rbacService: RbacService
+        private rbacService: RbacService,
+        private dialog: MatDialog
     ) {
         super();
     }
@@ -123,18 +126,27 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
     }
 
     deleteRecord(id: number): void {
-        if (confirm('آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟')) {
-            this.service.delete(id).subscribe({
-                next: () => {
-                    this.toastr.success('رکورد موفقانه حذف شد');
-                    this.loadData();
-                },
-                error: (err) => {
-                    this.toastr.error('خطا در حذف رکورد');
-                    console.error(err);
-                }
-            });
-        }
+        const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+            data: {
+                title: 'حذف رکورد',
+                message: 'آیا مطمئن هستید که می‌خواهید این رکورد را حذف کنید؟'
+            },
+            disableClose: true
+        });
+        dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed) {
+                this.service.delete(id).subscribe({
+                    next: () => {
+                        this.toastr.success('رکورد موفقانه حذف شد');
+                        this.loadData();
+                    },
+                    error: (err) => {
+                        this.toastr.error('خطا در حذف رکورد');
+                        console.error(err);
+                    }
+                });
+            }
+        });
     }
 
     getSectionTypeLabel(sectionType: string): string {
