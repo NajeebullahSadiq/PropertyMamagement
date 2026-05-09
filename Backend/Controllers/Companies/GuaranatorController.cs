@@ -144,6 +144,194 @@ namespace WebAPIBackend.Controllers.Companies
             }
         }
 
+        /// <summary>
+        /// Check if a guarantor with the same ElectronicNationalIdNumber already exists
+        /// </summary>
+        [HttpPost("CheckDuplicateGuarantor")]
+        public async Task<IActionResult> CheckDuplicateGuarantor([FromBody] DuplicateGuarantorCheckRequest request)
+        {
+            try
+            {
+                var electronicNationalIdNumber = request.ElectronicNationalIdNumber?.Trim() ?? "";
+
+                if (string.IsNullOrEmpty(electronicNationalIdNumber))
+                {
+                    return Ok(new { isDuplicate = false, message = "" });
+                }
+
+                var query = _context.Guarantors
+                    .AsNoTracking()
+                    .Where(g => g.Status == true &&
+                        (g.ElectronicNationalIdNumber ?? "").Trim() == electronicNationalIdNumber);
+
+                // Exclude current guarantor if editing
+                if (request.GuarantorId > 0)
+                {
+                    query = query.Where(g => g.Id != request.GuarantorId);
+                }
+
+                var duplicates = await query
+                    .Select(g => new
+                    {
+                        g.Id,
+                        g.IsActive,
+                        GuarantorName = g.FirstName + " " + (g.FatherName ?? "") + " " + (g.GrandFatherName ?? ""),
+                        CompanyTitle = g.Company != null ? g.Company.Title : "نامعلوم",
+                        LicenseNumber = g.Company != null ? g.Company.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault() : null
+                    })
+                    .ToListAsync();
+
+                if (duplicates.Count > 0)
+                {
+                    var existing = duplicates.First();
+                    var statusText = existing.IsActive ? "فعال" : "غیرفعال";
+                    var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                        : $"شرکت: {existing.CompanyTitle}";
+
+                    var message = $"تضمین کننده با همین نمبر الکترونیکی تذکره قبلاً در سیستم ثبت شده است.\n" +
+                                  $"نام تضمین کننده: {existing.GuarantorName}\n" +
+                                  $"{companyInfo}\n" +
+                                  $"وضعیت: {statusText}\n" +
+                                  $"لطفاً ابتدا رکورد موجود را بررسی نموده و در صورت ضرورت آن را ویرایش کنید.";
+
+                    return Ok(new { isDuplicate = true, message });
+                }
+
+                return Ok(new { isDuplicate = false, message = "" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Check if a guarantor with the same SetSerialNumber (نمبر سریال سټه) already exists
+        /// </summary>
+        [HttpPost("CheckDuplicateSetSerialNumber")]
+        public async Task<IActionResult> CheckDuplicateSetSerialNumber([FromBody] DuplicateGuarantorFieldCheckRequest request)
+        {
+            try
+            {
+                var setSerialNumber = request.SetSerialNumber?.Trim() ?? "";
+
+                if (string.IsNullOrEmpty(setSerialNumber))
+                {
+                    return Ok(new { isDuplicate = false, message = "" });
+                }
+
+                var query = _context.Guarantors
+                    .AsNoTracking()
+                    .Where(g => g.Status == true &&
+                        g.GuaranteeTypeId == GuaranteeType_CustomaryDeed &&
+                        (g.SetSerialNumber ?? "").Trim() == setSerialNumber);
+
+                // Exclude current guarantor if editing
+                if (request.GuarantorId > 0)
+                {
+                    query = query.Where(g => g.Id != request.GuarantorId);
+                }
+
+                var duplicates = await query
+                    .Select(g => new
+                    {
+                        g.Id,
+                        g.IsActive,
+                        GuarantorName = g.FirstName + " " + (g.FatherName ?? "") + " " + (g.GrandFatherName ?? ""),
+                        CompanyTitle = g.Company != null ? g.Company.Title : "نامعلوم",
+                        LicenseNumber = g.Company != null ? g.Company.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault() : null
+                    })
+                    .ToListAsync();
+
+                if (duplicates.Count > 0)
+                {
+                    var existing = duplicates.First();
+                    var statusText = existing.IsActive ? "فعال" : "غیرفعال";
+                    var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                        : $"شرکت: {existing.CompanyTitle}";
+
+                    var message = $"نمبر سریال سټه ({setSerialNumber}) قبلاً در سیستم ثبت شده است.\n" +
+                                  $"نام تضمین کننده: {existing.GuarantorName}\n" +
+                                  $"{companyInfo}\n" +
+                                  $"وضعیت: {statusText}\n" +
+                                  $"لطفاً نمبر سریال سټه دیگری وارد کنید.";
+
+                    return Ok(new { isDuplicate = true, message });
+                }
+
+                return Ok(new { isDuplicate = false, message = "" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Check if a guarantor with the same PropertyDocumentNumber (نمبر سند تضمین) already exists
+        /// </summary>
+        [HttpPost("CheckDuplicatePropertyDocumentNumber")]
+        public async Task<IActionResult> CheckDuplicatePropertyDocumentNumber([FromBody] DuplicateGuarantorFieldCheckRequest request)
+        {
+            try
+            {
+                if (!request.PropertyDocumentNumber.HasValue || request.PropertyDocumentNumber.Value == 0)
+                {
+                    return Ok(new { isDuplicate = false, message = "" });
+                }
+
+                var docNumber = request.PropertyDocumentNumber.Value;
+
+                var query = _context.Guarantors
+                    .AsNoTracking()
+                    .Where(g => g.Status == true &&
+                        g.GuaranteeTypeId == GuaranteeType_ShariaDeed &&
+                        g.PropertyDocumentNumber == docNumber);
+
+                // Exclude current guarantor if editing
+                if (request.GuarantorId > 0)
+                {
+                    query = query.Where(g => g.Id != request.GuarantorId);
+                }
+
+                var duplicates = await query
+                    .Select(g => new
+                    {
+                        g.Id,
+                        g.IsActive,
+                        GuarantorName = g.FirstName + " " + (g.FatherName ?? "") + " " + (g.GrandFatherName ?? ""),
+                        CompanyTitle = g.Company != null ? g.Company.Title : "نامعلوم",
+                        LicenseNumber = g.Company != null ? g.Company.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault() : null
+                    })
+                    .ToListAsync();
+
+                if (duplicates.Count > 0)
+                {
+                    var existing = duplicates.First();
+                    var statusText = existing.IsActive ? "فعال" : "غیرفعال";
+                    var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                        : $"شرکت: {existing.CompanyTitle}";
+
+                    var message = $"نمبر سند تضمین ({docNumber}) قبلاً در سیستم ثبت شده است.\n" +
+                                  $"نام تضمین کننده: {existing.GuarantorName}\n" +
+                                  $"{companyInfo}\n" +
+                                  $"وضعیت: {statusText}\n" +
+                                  $"لطفاً نمبر سند تضمین دیگری وارد کنید.";
+
+                    return Ok(new { isDuplicate = true, message });
+                }
+
+                return Ok(new { isDuplicate = false, message = "" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> getGuaranatorById(int id, [FromQuery] string? calendarType = null)
         {

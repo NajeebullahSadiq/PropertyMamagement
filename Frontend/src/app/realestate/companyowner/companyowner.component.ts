@@ -13,6 +13,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
+import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 
 @Component({
 	selector: 'app-companyowner',
@@ -24,6 +25,8 @@ export class CompanyownerComponent extends BaseComponent {
 	imagePath: string = 'assets/img/avatar.png';
 	imageName: string = '';
 	selectedId: number = 0;
+	isDuplicateCheckLoading: boolean = false;
+	duplicateError: string = '';
 	
 	// Force Hijri Shamsi calendar for company module
 	readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
@@ -85,7 +88,8 @@ export class CompanyownerComponent extends BaseComponent {
 		private selerService: SellerService,
 		private calendarConversionService: CalendarConversionService,
 		private calendarService: CalendarService,
-		private licenseAppService: LicenseApplicationService
+		private licenseAppService: LicenseApplicationService,
+		private duplicateCheckService: DuplicateCheckService
 	) {
 		super();
 		this.ownerForm = this.fb.group({
@@ -436,18 +440,45 @@ export class CompanyownerComponent extends BaseComponent {
 		details.permanentDistrictId = this.ownerForm.get('permanentDistrictId')?.value || null;
 		details.permanentVillage = this.ownerForm.get('permanentVillage')?.value || null;
 
-		this.comservice.addcompanyOwner(details).subscribe(
-			result => {
-				if (result.id !== 0) {
-					this.toastr.success("معلومات موفقانه ثبت شد");
-					this.comservice.ownerId = result.id;
-					this.selectedId = result.id;
-					this.onNextClick();
+		// Check for duplicate owner before saving
+		this.isDuplicateCheckLoading = true;
+		this.duplicateError = '';
+
+		this.duplicateCheckService.checkDuplicateCompanyOwner(
+			details.firstName,
+			details.fatherName,
+			details.grandFatherName || '',
+			details.electronicNationalIdNumber || '',
+			0
+		).subscribe(
+			(response) => {
+				this.isDuplicateCheckLoading = false;
+
+				if (response.isDuplicate) {
+					this.duplicateError = response.message;
+					this.toastr.error(response.message);
+					return;
 				}
+
+				// No duplicate, proceed with save
+				this.comservice.addcompanyOwner(details).subscribe(
+					result => {
+						if (result.id !== 0) {
+							this.toastr.success("معلومات موفقانه ثبت شد");
+							this.comservice.ownerId = result.id;
+							this.selectedId = result.id;
+							this.onNextClick();
+						}
+					},
+					error => {
+						console.error('Error adding owner:', error);
+						this.toastr.error("خرابی در ثبت معلومات: " + (error.error || error.message || 'نامعلوم'));
+					}
+				);
 			},
-			error => {
-				console.error('Error adding owner:', error);
-				this.toastr.error("خرابی در ثبت معلومات: " + (error.error || error.message || 'نامعلوم'));
+			(error) => {
+				this.isDuplicateCheckLoading = false;
+				this.toastr.error("خطا در بررسی تکراری");
 			}
 		);
 	}
@@ -500,24 +531,51 @@ export class CompanyownerComponent extends BaseComponent {
 			details.isAddressChange = false;
 		}
 
-		this.comservice.updateowner(details).subscribe(
-			result => {
-				if (result.id !== 0) {
-					this.selectedId = result.id;
-					if (this.isAddressChangeMode) {
-						this.toastr.success("آدرس موفقانه تغییر یافت");
-						this.isAddressChangeMode = false;
-						// Reload data to refresh address display
-						this.ngOnInit();
-					} else {
-						this.toastr.info("معلومات موفقانه تغیر یافت");
-					}
-					this.onNextClick();
+		// Check for duplicate owner before updating
+		this.isDuplicateCheckLoading = true;
+		this.duplicateError = '';
+
+		this.duplicateCheckService.checkDuplicateCompanyOwner(
+			details.firstName,
+			details.fatherName,
+			details.grandFatherName || '',
+			details.electronicNationalIdNumber || '',
+			this.selectedId
+		).subscribe(
+			(response) => {
+				this.isDuplicateCheckLoading = false;
+
+				if (response.isDuplicate) {
+					this.duplicateError = response.message;
+					this.toastr.error(response.message);
+					return;
 				}
+
+				// No duplicate, proceed with update
+				this.comservice.updateowner(details).subscribe(
+					result => {
+						if (result.id !== 0) {
+							this.selectedId = result.id;
+							if (this.isAddressChangeMode) {
+								this.toastr.success("آدرس موفقانه تغییر یافت");
+								this.isAddressChangeMode = false;
+								// Reload data to refresh address display
+								this.ngOnInit();
+							} else {
+								this.toastr.info("معلومات موفقانه تغیر یافت");
+							}
+							this.onNextClick();
+						}
+					},
+					error => {
+						console.error('Error updating owner:', error);
+						this.toastr.error("خرابی در تغیر معلومات: " + (error.error || error.message || 'نامعلوم'));
+					}
+				);
 			},
-			error => {
-				console.error('Error updating owner:', error);
-				this.toastr.error("خرابی در تغیر معلومات: " + (error.error || error.message || 'نامعلوم'));
+			(error) => {
+				this.isDuplicateCheckLoading = false;
+				this.toastr.error("خطا در بررسی تکراری");
 			}
 		);
 	}

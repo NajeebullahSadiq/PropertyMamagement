@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 export class DuplicateCheckService {
   private estateSellerUrl = environment.apiUrl + '/SellerDetails';
   private vehicleSellerUrl = environment.apiUrl + '/VehiclesSub';
+  private companyOwnerUrl = environment.apiUrl + '/CompanyOwner';
+  private guarantorUrl = environment.apiUrl + '/Guaranator';
 
   constructor(private http: HttpClient) { }
 
@@ -54,5 +56,40 @@ export class DuplicateCheckService {
       sellerId: buyerId
     };
     return this.http.post(`${this.vehicleSellerUrl}/CheckDuplicateBuyer`, request);
+  }
+
+  checkDuplicateCompanyOwner(firstName: string, fatherName: string, grandFatherName: string, electronicNationalIdNumber: string, ownerId: number = 0): Observable<any> {
+    const request = {
+      firstName,
+      fatherName,
+      grandFatherName,
+      electronicNationalIdNumber,
+      ownerId
+    };
+    return this.http.post(`${this.companyOwnerUrl}/CheckDuplicateOwner`, request);
+  }
+
+  checkDuplicateGuarantor(electronicNationalIdNumber: string, guarantorId: number = 0): Observable<any> {
+    const request = {
+      electronicNationalIdNumber,
+      guarantorId
+    };
+    return this.http.post(`${this.guarantorUrl}/CheckDuplicateGuarantor`, request);
+  }
+
+  checkDuplicateSetSerialNumber(setSerialNumber: string, guarantorId: number = 0): Observable<any> {
+    const request = {
+      setSerialNumber,
+      guarantorId
+    };
+    return this.http.post(`${this.guarantorUrl}/CheckDuplicateSetSerialNumber`, request);
+  }
+
+  checkDuplicatePropertyDocumentNumber(propertyDocumentNumber: number, guarantorId: number = 0): Observable<any> {
+    const request = {
+      propertyDocumentNumber,
+      guarantorId
+    };
+    return this.http.post(`${this.guarantorUrl}/CheckDuplicatePropertyDocumentNumber`, request);
   }
 }

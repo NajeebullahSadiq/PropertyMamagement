@@ -15,6 +15,7 @@ import { CalendarConversionService } from 'src/app/shared/calendar-conversion.se
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarType } from 'src/app/models/calendar-type';
 import { LicenseApplicationService } from 'src/app/shared/license-application.service';
+import { DuplicateCheckService } from 'src/app/shared/duplicate-check.service';
 import '@angular/localize/init';
 
 @Component({
@@ -29,6 +30,8 @@ export class GuaranatorsComponent extends BaseComponent {
   
   // Force Hijri Shamsi calendar for company module
   readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
+  isDuplicateCheckLoading: boolean = false;
+  duplicateError: string = '';
   selectedId: number = 0;
   IdTypes: any;
   province: any;
@@ -73,7 +76,8 @@ export class GuaranatorsComponent extends BaseComponent {
     private calendarConversionService: CalendarConversionService,
     private calendarService: CalendarService,
     private dialog: MatDialog,
-    private licenseAppService: LicenseApplicationService
+    private licenseAppService: LicenseApplicationService,
+    private duplicateCheckService: DuplicateCheckService
   ) {
     super();
     this.guaranatorForm = this.fb.group({
@@ -245,29 +249,98 @@ export class GuaranatorsComponent extends BaseComponent {
       details.id = 0;
     }
 
-    this.comservice.addcompanyGuaranator(details).subscribe(
-      result => {
-        if (result.id !== 0) {
-          const message = (result as any).message || "معلومات موفقانه ثبت شد";
-          this.toastr.success(message);
-          this.selectedId = result.id;
-          this.comservice.getGuaranatorById(this.id)
-            .subscribe(detail => {
-              this.guaranatorDetails = detail;
-              this.separateActiveAndHistory();
-            });
+    // Check for duplicate guarantor before saving
+    this.isDuplicateCheckLoading = true;
+    this.duplicateError = '';
+
+    const electronicNid = String(details.electronicNationalIdNumber || '').trim();
+
+    this.duplicateCheckService.checkDuplicateGuarantor(electronicNid, 0).subscribe(
+      (response) => {
+        if (response.isDuplicate) {
+          this.isDuplicateCheckLoading = false;
+          this.duplicateError = response.message;
+          this.toastr.error(response.message);
+          return;
         }
+
+        // Check SetSerialNumber duplicate (Customary Deed - قباله عرفی)
+        if (details.guaranteeTypeId === GuaranteeTypeEnum.CustomaryDeed && details.setSerialNumber) {
+          this.duplicateCheckService.checkDuplicateSetSerialNumber(String(details.setSerialNumber), 0).subscribe(
+            (res) => {
+              if (res.isDuplicate) {
+                this.isDuplicateCheckLoading = false;
+                this.duplicateError = res.message;
+                this.toastr.error(res.message);
+                return;
+              }
+              // All checks passed, proceed with save
+              this.proceedAddGuarantor(details);
+            },
+            () => {
+              this.isDuplicateCheckLoading = false;
+              this.toastr.error("خطا در بررسی تکراری");
+            }
+          );
+          return;
+        }
+
+        // Check PropertyDocumentNumber duplicate (Sharia Deed - قباله شرعی)
+        if (details.guaranteeTypeId === GuaranteeTypeEnum.ShariaDeed && details.propertyDocumentNumber) {
+          this.duplicateCheckService.checkDuplicatePropertyDocumentNumber(Number(details.propertyDocumentNumber), 0).subscribe(
+            (res) => {
+              if (res.isDuplicate) {
+                this.isDuplicateCheckLoading = false;
+                this.duplicateError = res.message;
+                this.toastr.error(res.message);
+                return;
+              }
+              // All checks passed, proceed with save
+              this.proceedAddGuarantor(details);
+            },
+            () => {
+              this.isDuplicateCheckLoading = false;
+              this.toastr.error("خطا در بررسی تکراری");
+            }
+          );
+          return;
+        }
+
+        // No conditional field checks needed, proceed with save
+        this.proceedAddGuarantor(details);
       },
-      error => {
-        if (error.status === 400) {
-          this.toastr.error(error.error || "خطا در ثبت معلومات");
-        } else if (error.status === 312) {
-          this.toastr.error("لطفا ابتدا معلومات جدول اصلی را ثبت کنید");
-        } else {
-          this.toastr.error("خطا در ثبت معلومات");
-        }
+      (error) => {
+        this.isDuplicateCheckLoading = false;
+        this.toastr.error("خطا در بررسی تکراری");
       }
     );
+  }
+
+  private proceedAddGuarantor(details: Guarantor): void {
+    this.isDuplicateCheckLoading = false;
+    this.comservice.addcompanyGuaranator(details).subscribe(
+          result => {
+            if (result.id !== 0) {
+              const message = (result as any).message || "معلومات موفقانه ثبت شد";
+              this.toastr.success(message);
+              this.selectedId = result.id;
+              this.comservice.getGuaranatorById(this.id)
+                .subscribe(detail => {
+                  this.guaranatorDetails = detail;
+                  this.separateActiveAndHistory();
+                });
+            }
+          },
+          error => {
+            if (error.status === 400) {
+              this.toastr.error(error.error || "خطا در ثبت معلومات");
+            } else if (error.status === 312) {
+              this.toastr.error("لطفا ابتدا معلومات جدول اصلی را ثبت کنید");
+            } else {
+              this.toastr.error("خطا در ثبت معلومات");
+            }
+          }
+        );
   }
 
   updateData(): void {
@@ -299,6 +372,74 @@ export class GuaranatorsComponent extends BaseComponent {
     if (details.id === 0 && this.selectedId !== 0 || this.selectedId !== null) {
       details.id = this.selectedId;
     }
+
+    // Check for duplicate guarantor before updating
+    this.isDuplicateCheckLoading = true;
+    this.duplicateError = '';
+
+    const electronicNid = String(details.electronicNationalIdNumber || '').trim();
+
+    this.duplicateCheckService.checkDuplicateGuarantor(electronicNid, this.selectedId).subscribe(
+      (response) => {
+        if (response.isDuplicate) {
+          this.isDuplicateCheckLoading = false;
+          this.duplicateError = response.message;
+          this.toastr.error(response.message);
+          return;
+        }
+
+        // Check SetSerialNumber duplicate (Customary Deed - قباله عرفی)
+        if (details.guaranteeTypeId === GuaranteeTypeEnum.CustomaryDeed && details.setSerialNumber) {
+          this.duplicateCheckService.checkDuplicateSetSerialNumber(String(details.setSerialNumber), this.selectedId).subscribe(
+            (res) => {
+              if (res.isDuplicate) {
+                this.isDuplicateCheckLoading = false;
+                this.duplicateError = res.message;
+                this.toastr.error(res.message);
+                return;
+              }
+              this.proceedUpdateGuarantor(details);
+            },
+            () => {
+              this.isDuplicateCheckLoading = false;
+              this.toastr.error("خطا در بررسی تکراری");
+            }
+          );
+          return;
+        }
+
+        // Check PropertyDocumentNumber duplicate (Sharia Deed - قباله شرعی)
+        if (details.guaranteeTypeId === GuaranteeTypeEnum.ShariaDeed && details.propertyDocumentNumber) {
+          this.duplicateCheckService.checkDuplicatePropertyDocumentNumber(Number(details.propertyDocumentNumber), this.selectedId).subscribe(
+            (res) => {
+              if (res.isDuplicate) {
+                this.isDuplicateCheckLoading = false;
+                this.duplicateError = res.message;
+                this.toastr.error(res.message);
+                return;
+              }
+              this.proceedUpdateGuarantor(details);
+            },
+            () => {
+              this.isDuplicateCheckLoading = false;
+              this.toastr.error("خطا در بررسی تکراری");
+            }
+          );
+          return;
+        }
+
+        // No conditional field checks needed, proceed with update
+        this.proceedUpdateGuarantor(details);
+      },
+      (error) => {
+        this.isDuplicateCheckLoading = false;
+        this.toastr.error("خطا در بررسی تکراری");
+      }
+    );
+  }
+
+  private proceedUpdateGuarantor(details: Guarantor): void {
+    this.isDuplicateCheckLoading = false;
     this.comservice.updateGuaranator(details).subscribe(
       result => {
         if (result.id !== 0) {

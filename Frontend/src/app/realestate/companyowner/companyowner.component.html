@@ -70,6 +70,17 @@
     </div>
 
     <form [formGroup]="ownerForm" (ngSubmit)="ownerForm.valid ? selectedId ? updateOwner() : addOwner() : null">
+      <!-- Duplicate Owner Error Alert -->
+      <div *ngIf="duplicateError" class="mb-4 bg-red-50 border border-red-300 rounded-lg p-4">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-exclamation-circle text-red-500 text-xl mt-1"></i>
+          <div class="text-red-700 font-medium whitespace-pre-line">{{ duplicateError }}</div>
+        </div>
+      </div>
+      <div *ngIf="isDuplicateCheckLoading" class="mb-4 flex items-center gap-2 text-blue-600">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>در حال بررسی تکراری...</span>
+      </div>
       <div class="hidden">
         <input type="hidden" formControlName="id">
       </div>

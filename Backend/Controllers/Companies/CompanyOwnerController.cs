@@ -25,6 +25,67 @@ namespace WebAPIBackend.Controllers.Companies
             _companyService = companyService;
         }
 
+        /// <summary>
+        /// Check if a company owner with the same FirstName, FatherName, GrandFatherName and ElectronicNationalIdNumber already exists
+        /// </summary>
+        [HttpPost("CheckDuplicateOwner")]
+        public async Task<IActionResult> CheckDuplicateOwner([FromBody] DuplicateCompanyOwnerCheckRequest request)
+        {
+            try
+            {
+                var firstName = request.FirstName?.Trim() ?? "";
+                var fatherName = request.FatherName?.Trim() ?? "";
+                var grandFatherName = request.GrandFatherName?.Trim() ?? "";
+                var electronicNationalIdNumber = request.ElectronicNationalIdNumber?.Trim() ?? "";
+
+                var query = _context.CompanyOwners
+                    .AsNoTracking()
+                    .Where(o => o.Status == true &&
+                        (o.FirstName ?? "").Trim() == firstName &&
+                        (o.FatherName ?? "").Trim() == fatherName &&
+                        (o.GrandFatherName ?? "").Trim() == grandFatherName);
+
+                // If ElectronicNationalIdNumber is provided, include it in the check
+                if (!string.IsNullOrEmpty(electronicNationalIdNumber))
+                {
+                    query = query.Where(o => (o.ElectronicNationalIdNumber ?? "").Trim() == electronicNationalIdNumber);
+                }
+
+                // Exclude current owner if editing
+                if (request.OwnerId > 0)
+                {
+                    query = query.Where(o => o.Id != request.OwnerId);
+                }
+
+                var duplicates = await query
+                    .Select(o => new
+                    {
+                        o.Id,
+                        CompanyTitle = o.Company != null ? o.Company.Title : "نامعلوم",
+                        LicenseNumber = o.Company != null ? o.Company.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault() : null
+                    })
+                    .ToListAsync();
+
+                if (duplicates.Count > 0)
+                {
+                    var existing = duplicates.First();
+                    var ownerInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                        : $"شرکت: {existing.CompanyTitle}";
+
+                    var message = $"مالک با همین اسم، ولد، ولدیت و نمبر الکترونیکی قبلاً در سیستم ثبت شده است.\n{ownerInfo}\nلطفاً ابتدا رکورد موجود را بررسی نموده و در صورت ضرورت آن را ویرایش کنید.";
+
+                    return Ok(new { isDuplicate = true, message });
+                }
+
+                return Ok(new { isDuplicate = false, message = "" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> getOwnerById(int id, [FromQuery] string? calendarType = null)
         {

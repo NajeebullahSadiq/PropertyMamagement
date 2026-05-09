@@ -489,6 +489,32 @@ namespace WebAPIBackend.Controllers.Companies
                     _provinceFilter.ValidateProvinceAccess(provinceId.Value);
                 }
 
+                // Check for duplicate TIN number
+                if (!string.IsNullOrWhiteSpace(request.Tin))
+                {
+                    var normalizedTin = request.Tin.Trim();
+                    var existingTinCompany = await _context.CompanyDetails
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(c => c.Tin != null && c.Tin.Trim() == normalizedTin);
+                    
+                    if (existingTinCompany != null)
+                    {
+                        var licenseNumber = await _context.LicenseDetails
+                            .AsNoTracking()
+                            .Where(l => l.CompanyId == existingTinCompany.Id)
+                            .Select(l => l.LicenseNumber)
+                            .FirstOrDefaultAsync();
+
+                        var companyInfo = !string.IsNullOrEmpty(licenseNumber)
+                            ? $"شرکت: {existingTinCompany.Title} - جواز شماره: {licenseNumber}"
+                            : $"شرکت: {existingTinCompany.Title}";
+
+                        return BadRequest(new { 
+                            message = $"نمبر TIN ({normalizedTin}) قبلاً در سیستم ثبت شده است.\n{companyInfo}\nلطفاً نمبر TIN دیگری وارد کنید."
+                        });
+                    }
+                }
+
                 var property = new CompanyDetail
                 {
                     Title = request.Title,
@@ -553,6 +579,33 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 // Validate province access
                 _provinceFilter.ValidateProvinceAccess(existingProperty.ProvinceId);
+
+                // Check for duplicate TIN number (excluding current company)
+                if (!string.IsNullOrWhiteSpace(request.Tin))
+                {
+                    var normalizedTin = request.Tin.Trim();
+                    var existingTinCompany = await _context.CompanyDetails
+                        .AsNoTracking()
+                        .Where(c => c.Id != id)
+                        .FirstOrDefaultAsync(c => c.Tin != null && c.Tin.Trim() == normalizedTin);
+                    
+                    if (existingTinCompany != null)
+                    {
+                        var licenseNumber = await _context.LicenseDetails
+                            .AsNoTracking()
+                            .Where(l => l.CompanyId == existingTinCompany.Id)
+                            .Select(l => l.LicenseNumber)
+                            .FirstOrDefaultAsync();
+
+                        var companyInfo = !string.IsNullOrEmpty(licenseNumber)
+                            ? $"شرکت: {existingTinCompany.Title} - جواز شماره: {licenseNumber}"
+                            : $"شرکت: {existingTinCompany.Title}";
+
+                        return BadRequest(new { 
+                            message = $"نمبر TIN ({normalizedTin}) قبلاً در سیستم ثبت شده است.\n{companyInfo}\nلطفاً نمبر TIN دیگری وارد کنید."
+                        });
+                    }
+                }
 
                 // Check for duplicate company name (excluding current company)
                 // Trim and normalize the title for comparison
