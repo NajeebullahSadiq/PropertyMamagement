@@ -59,8 +59,8 @@ export class PetitionWriterMonitoringService {
         return this.http.get<PetitionWriterMonitoringRecord>(`${this.baseUrl}/${id}`, { params });
     }
 
-    create(data: PetitionWriterMonitoringData): Observable<{ id: number; message: string }> {
-        return this.http.post<{ id: number; message: string }>(this.baseUrl, data).pipe(
+    create(data: PetitionWriterMonitoringData): Observable<{ id: number; serialNumber: string; message: string }> {
+        return this.http.post<{ id: number; serialNumber: string; message: string }>(this.baseUrl, data).pipe(
             tap((result) => {
                 this.mainTableId = result.id;
                 this.notifyDataChanged();

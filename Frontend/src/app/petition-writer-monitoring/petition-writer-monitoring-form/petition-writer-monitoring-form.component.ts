@@ -504,8 +504,9 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
             });
         } else {
             this.service.create(data).subscribe({
-                next: () => {
+                next: (result) => {
                     this.toastr.success('معلومات موفقانه ثبت شد');
+                    this.mainForm.patchValue({ serialNumber: result.serialNumber });
                     this.goToList();
                 },
                 error: (err) => {

@@ -352,9 +352,18 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     deedItemsJson = JsonSerializer.Serialize(request.DeedItems);
                 }
 
+                // Auto-generate serial number atomically to prevent duplicates
+                var serialQuery = _context.ActivityMonitoringRecords
+                    .Where(x => x.Status == true && x.SectionType == request.SectionType && x.SerialNumber != null);
+                var existingSerials = await serialQuery.Select(x => x.SerialNumber!).ToListAsync();
+                int nextSerial = existingSerials
+                    .Select(s => int.TryParse(s, out int n) ? n : 0)
+                    .DefaultIfEmpty(0)
+                    .Max() + 1;
+
                 var entity = new ActivityMonitoringRecord
                 {
-                    SerialNumber = request.SerialNumber,
+                    SerialNumber = nextSerial.ToString(),
                     LicenseNumber = request.LicenseNumber,
                     LicenseHolderName = request.LicenseHolderName,
                     CompanyTitle = request.CompanyTitle,
@@ -396,7 +405,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 _context.ActivityMonitoringRecords.Add(entity);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { id = entity.Id, message = "معلومات موفقانه ثبت شد" });
+                return Ok(new { id = entity.Id, serialNumber = entity.SerialNumber, message = "معلومات موفقانه ثبت شد" });
             }
             catch (Exception ex)
             {

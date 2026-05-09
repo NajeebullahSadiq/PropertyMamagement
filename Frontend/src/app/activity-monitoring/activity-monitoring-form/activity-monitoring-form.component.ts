@@ -597,7 +597,7 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
                     this.toastr.success('معلومات موفقانه ثبت شد');
                     this.editId = result.id;
                     this.isEditMode = true;
-                    this.mainForm.patchValue({ id: result.id });
+                    this.mainForm.patchValue({ id: result.id, serialNumber: result.serialNumber });
                     this.service.mainTableId = result.id;
                 },
                 error: (err) => {
