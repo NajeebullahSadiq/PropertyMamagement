@@ -205,6 +205,29 @@ namespace WebAPI.Controllers
                         return StatusCode(418, new { message = "حساب کاربری قفل شده است" });
                     }
 
+                    // Auto-deactivate company users with expired license or cancelled (فسخ/لغوه) company
+                    if (user.CompanyId > 0 && (user.UserRole == UserRoles.PropertyOperator || user.UserRole == UserRoles.VehicleOperator))
+                    {
+                        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+                        // Check expired license
+                        var hasExpiredLicense = await _context.LicenseDetails.AsNoTracking()
+                            .AnyAsync(l => l.CompanyId == user.CompanyId && l.ExpireDate.HasValue && l.ExpireDate.Value < today);
+
+                        // Check cancelled (فسخ or لغوه)
+                        var hasCancellation = await _context.CompanyCancellationInfos.AsNoTracking()
+                            .AnyAsync(c => c.CompanyId == user.CompanyId && c.Status != false && (c.CancellationType == "فسخ" || c.CancellationType == "لغوه"));
+
+                        if (hasExpiredLicense || hasCancellation)
+                        {
+                            user.IsLocked = true;
+                            await _userManager.UpdateAsync(user);
+
+                            var deactivationReason = hasExpiredLicense ? "ختم جواز" : "فسخ/لغوه";
+                            return StatusCode(418, new { message = $"جواز شما به دلیل {deactivationReason} باطل شده است. لطفاً برای تجدید جواز با اداره مربوطه تماس بگیرید." });
+                        }
+                    }
+
                     // Get role assigned to the user
                     var roles = await _userManager.GetRolesAsync(user);
                     var primaryRole = roles.FirstOrDefault() ?? user.UserRole ?? "USER";

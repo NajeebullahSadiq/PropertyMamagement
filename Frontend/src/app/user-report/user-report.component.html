@@ -1,0 +1,456 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 print:p-0 print:bg-white">
+  <!-- Header -->
+  <div class="mb-6 print:mb-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">گزارش‌گیری کاربران</h1>
+        <p class="text-slate-500 text-sm">گزارش مجموع، غیرفعال، ولایت و جوازهای در حال ختم</p>
+      </div>
+      <div class="flex gap-2 print:hidden">
+        <button (click)="exportToPdf()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center gap-2 transition-colors text-sm">
+          <i class="fas fa-file-pdf"></i>
+          <span>چاپ / PDF</span>
+        </button>
+        <button (click)="exportToExcel()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center gap-2 transition-colors text-sm">
+          <i class="fas fa-file-excel"></i>
+          <span>Excel</span>
+        </button>
+        <button (click)="autoDeactivate()" [disabled]="isAutoDeactivating"
+          class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center gap-2 transition-colors text-sm disabled:opacity-50">
+          <i class="fas" [class.fa-spinner]="isAutoDeactivating" [class.fa-user-lock]="!isAutoDeactivating" [class.fa-spin]="isAutoDeactivating"></i>
+          <span>{{ isAutoDeactivating ? 'در حال اجرا...' : 'غیرفعال‌سازی خودکار' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Panel -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 print:hidden">
+    <div class="p-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">از تاریخ</label>
+          <app-multi-calendar-datepicker [(ngModel)]="startDate" class="block"></app-multi-calendar-datepicker>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">الی تاریخ</label>
+          <app-multi-calendar-datepicker [(ngModel)]="endDate" class="block"></app-multi-calendar-datepicker>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">ولایت</label>
+          <select [(ngModel)]="provinceFilter"
+            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+            <option [ngValue]="null">همه ولایت‌ها</option>
+            <option *ngFor="let p of provinces" [ngValue]="p.id">{{ p.dari }}</option>
+          </select>
+        </div>
+        <div *ngIf="activeTab === 'inactive'" class="flex flex-col">
+          <label class="block text-xs font-medium text-slate-600 mb-1">دلیل غیرفعالی</label>
+          <select [(ngModel)]="inactiveReasonFilter"
+            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+            <option value="">همه دلایل</option>
+            <option value="locked">قفل شده</option>
+            <option value="expired">ختم جواز</option>
+            <option value="cancelled">فسخ / لغوه</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 flex gap-3">
+        <button (click)="applyFilters()"
+          class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+          <i class="fas fa-filter"></i> اعمال فیلتر
+        </button>
+        <button (click)="resetFilters()"
+          class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+          <i class="fas fa-times"></i> پاک کردن
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-white rounded-xl border border-slate-200 p-1 mb-6 shadow-sm w-fit print:hidden">
+    <button (click)="onTabChange('summary')"
+      class="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+      [ngClass]="activeTab === 'summary' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'">
+      خلاصه
+    </button>
+    <button (click)="onTabChange('byProvince')"
+      class="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+      [ngClass]="activeTab === 'byProvince' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'">
+      بر اساس ولایت
+    </button>
+    <button (click)="onTabChange('inactive')"
+      class="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+      [ngClass]="activeTab === 'inactive' ? 'bg-red-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'">
+      کاربران غیرفعال
+    </button>
+    <button (click)="onTabChange('trend')"
+      class="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+      [ngClass]="activeTab === 'trend' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'">
+      روند ثبت‌نام
+    </button>
+    <button (click)="onTabChange('expiring')"
+      class="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+      [ngClass]="activeTab === 'expiring' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'">
+      جوازهای در حال ختم
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="py-20 text-center">
+    <div class="inline-block w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+    <p class="text-slate-500">در حال بارگذاری...</p>
+  </div>
+
+  <!-- ============ SUMMARY TAB ============ -->
+  <div *ngIf="!isLoading && activeTab === 'summary' && summary" class="space-y-6">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+            <i class="fas fa-users text-blue-600"></i>
+          </div>
+          <span class="text-xs font-medium text-slate-500 uppercase">مجموع کاربران</span>
+        </div>
+        <p class="text-3xl font-bold text-slate-800">{{ formatNumber(summary.totalUsers) }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+            <i class="fas fa-user-check text-green-600"></i>
+          </div>
+          <span class="text-xs font-medium text-slate-500 uppercase">کاربران فعال</span>
+        </div>
+        <p class="text-3xl font-bold text-green-600">{{ formatNumber(summary.activeUsers) }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+            <i class="fas fa-user-times text-red-600"></i>
+          </div>
+          <span class="text-xs font-medium text-slate-500 uppercase">کاربران غیرفعال</span>
+        </div>
+        <p class="text-3xl font-bold text-red-600">{{ formatNumber(summary.inactiveUsers) }}</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+            <i class="fas fa-building text-purple-600"></i>
+          </div>
+          <span class="text-xs font-medium text-slate-500 uppercase">کاربران رهنما</span>
+        </div>
+        <p class="text-3xl font-bold text-purple-600">{{ formatNumber(summary.companyUsers) }}</p>
+      </div>
+    </div>
+
+    <!-- Inactive Breakdown -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+      <h3 class="text-lg font-bold text-slate-700 mb-4">
+        <i class="fas fa-chart-pie text-red-500 ml-2"></i>
+        جزئیات غیرفعالی
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div class="flex items-center gap-2 mb-2">
+            <i class="fas fa-lock text-gray-500"></i>
+            <span class="text-sm font-medium text-gray-600">قفل شده (دستی)</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-700">{{ formatNumber(summary.inactiveByLock) }}</p>
+        </div>
+        <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+          <div class="flex items-center gap-2 mb-2">
+            <i class="fas fa-calendar-times text-red-500"></i>
+            <span class="text-sm font-medium text-red-600">ختم جواز</span>
+          </div>
+          <p class="text-2xl font-bold text-red-700">{{ formatNumber(summary.inactiveByExpiredLicense) }}</p>
+        </div>
+        <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
+          <div class="flex items-center gap-2 mb-2">
+            <i class="fas fa-ban text-orange-500"></i>
+            <span class="text-sm font-medium text-orange-600">فسخ / لغوه</span>
+          </div>
+          <p class="text-2xl font-bold text-orange-700">{{ formatNumber(summary.inactiveByCancellation) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- System vs Company -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-700 mb-4">
+          <i class="fas fa-user-shield text-blue-500 ml-2"></i>
+          کاربران سیستمی: {{ formatNumber(summary.systemUsers) }}
+        </h3>
+        <div class="space-y-2">
+          <div *ngFor="let r of summary.byRole" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-slate-50">
+            <span class="text-sm text-slate-600">{{ r.roleDari }}</span>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-green-600">{{ r.active }} فعال</span>
+              <span class="text-xs text-red-600" *ngIf="r.inactive > 0">{{ r.inactive }} غیرفعال</span>
+              <span class="text-sm font-bold text-slate-800">{{ r.count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-700 mb-4">
+          <i class="fas fa-building text-teal-500 ml-2"></i>
+          کاربران رهنما بر اساس نوع جواز
+        </h3>
+        <div class="space-y-2">
+          <div *ngFor="let lt of summary.byLicenseType" class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-slate-50">
+            <span class="text-sm text-slate-600">{{ lt.licenseTypeDari }}</span>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-green-600">{{ lt.active }} فعال</span>
+              <span class="text-xs text-red-600" *ngIf="lt.inactive > 0">{{ lt.inactive }} غیرفعال</span>
+              <span class="text-sm font-bold text-slate-800">{{ lt.count }}</span>
+            </div>
+          </div>
+          <div *ngIf="summary.byLicenseType.length === 0" class="text-center py-6 text-slate-400">
+            کاربر رهنما یافت نشد
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BY PROVINCE TAB ============ -->
+  <div *ngIf="!isLoading && activeTab === 'byProvince'" class="space-y-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-600 to-blue-700">
+        <span class="text-white font-bold">توزیع کاربران بر اساس ولایت</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <th class="px-4 py-3">#</th>
+              <th class="px-4 py-3">ولایت</th>
+              <th class="px-4 py-3">مجموع کاربران</th>
+              <th class="px-4 py-3">فعال</th>
+              <th class="px-4 py-3">غیرفعال</th>
+              <th class="px-4 py-3">درصد غیرفعال</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let p of byProvinceData; let i = index" class="text-center hover:bg-blue-50/30 transition-colors">
+              <td class="px-4 py-3 text-sm text-slate-400">{{ i + 1 }}</td>
+              <td class="px-4 py-3 text-sm font-medium text-slate-700">{{ p.provinceDari }}</td>
+              <td class="px-4 py-3 text-sm font-bold text-slate-800">{{ formatNumber(p.totalUsers) }}</td>
+              <td class="px-4 py-3 text-sm text-green-600 font-medium">{{ formatNumber(p.activeUsers) }}</td>
+              <td class="px-4 py-3 text-sm text-red-600 font-medium">{{ formatNumber(p.inactiveUsers) }}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-1 rounded-full text-xs font-bold"
+                  [ngClass]="p.totalUsers > 0 && (p.inactiveUsers / p.totalUsers) > 0.3 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                  {{ p.totalUsers > 0 ? (p.inactiveUsers / p.totalUsers * 100).toFixed(1) : '0' }}%
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="byProvinceData.length === 0">
+              <td colspan="6" class="py-12 text-center text-slate-400">
+                <i class="fas fa-map-marker-alt text-3xl mb-2 block"></i>
+                داده‌ای یافت نشد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ INACTIVE USERS TAB ============ -->
+  <div *ngIf="!isLoading && activeTab === 'inactive'" class="space-y-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-red-600 to-red-700 flex items-center justify-between">
+        <span class="text-white font-bold">
+          کاربران غیرفعال
+          <span class="opacity-70 font-normal text-sm ml-2">({{ inactiveTotal }} نفر)</span>
+        </span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <th class="px-3 py-3">#</th>
+              <th class="px-3 py-3">نام</th>
+              <th class="px-3 py-3">نام کاربری</th>
+              <th class="px-3 py-3">شرکت</th>
+              <th class="px-3 py-3">نوع جواز</th>
+              <th class="px-3 py-3">نقش</th>
+              <th class="px-3 py-3">ولایت</th>
+              <th class="px-3 py-3">دلیل غیرفعالی</th>
+              <th class="px-3 py-3">جزئیات</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let u of inactiveUsers; let i = index" class="text-center hover:bg-red-50/30 transition-colors">
+              <td class="px-3 py-3 text-sm text-slate-400">{{ (inactivePage - 1) * inactivePageSize + i + 1 }}</td>
+              <td class="px-3 py-3 text-sm font-medium text-slate-700">{{ u.firstName }} {{ u.lastName }}</td>
+              <td class="px-3 py-3 text-sm text-slate-600 font-mono">{{ u.userName }}</td>
+              <td class="px-3 py-3 text-sm text-slate-600">{{ u.companyName || '—' }}</td>
+              <td class="px-3 py-3 text-sm">
+                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-xs">{{ u.licenseTypeDari }}</span>
+              </td>
+              <td class="px-3 py-3 text-sm">
+                <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs">{{ u.roleDari }}</span>
+              </td>
+              <td class="px-3 py-3 text-sm text-slate-600">{{ u.province?.dari || '—' }}</td>
+              <td class="px-3 py-3">
+                <div class="flex flex-wrap gap-1 justify-center">
+                  <span *ngFor="let r of u.reasons"
+                    class="px-2 py-0.5 rounded-full text-xs font-bold"
+                    [ngClass]="getReasonBadgeClass(r)">
+                    {{ getReasonLabel(r) }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-3 py-3 text-xs text-slate-500">
+                <div *ngFor="let d of u.details" class="whitespace-nowrap">
+                  <span *ngIf="d.reasonEn === 'expired'">جواز: {{ d.licenseNumber || '—' }} | ختم: {{ d.expireDate || '—' }}</span>
+                  <span *ngIf="d.reasonEn === 'cancelled'">{{ d.cancellationType || '—' }} | تاریخ: {{ d.cancellationDate || '—' }}</span>
+                  <span *ngIf="d.reasonEn === 'locked'">قفل دستی</span>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="inactiveUsers.length === 0">
+              <td colspan="9" class="py-12 text-center text-slate-400">
+                <i class="fas fa-user-check text-3xl mb-2 block"></i>
+                کاربر غیرفعال یافت نشد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-center gap-3" *ngIf="inactiveTotal > inactivePageSize">
+      <button (click)="onInactivePageChange(inactivePage - 1)" [disabled]="inactivePage === 1"
+        class="px-4 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <span class="text-sm text-slate-600">صفحه {{ inactivePage }} از {{ getInactiveTotalPages() }}</span>
+      <button (click)="onInactivePageChange(inactivePage + 1)" [disabled]="inactivePage >= getInactiveTotalPages()"
+        class="px-4 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============ REGISTRATION TREND TAB ============ -->
+  <div *ngIf="!isLoading && activeTab === 'trend'" class="space-y-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-indigo-600 to-indigo-700">
+        <span class="text-white font-bold">روند ثبت‌نام کاربران بر اساس ماه</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <th class="px-4 py-3">ماه</th>
+              <th class="px-4 py-3">مجموع ثبت‌نام</th>
+              <th class="px-4 py-3">کاربران سیستمی</th>
+              <th class="px-4 py-3">کاربران رهنما</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let t of registrationTrend" class="text-center hover:bg-indigo-50/30 transition-colors">
+              <td class="px-4 py-3 text-sm font-medium text-slate-700">{{ t.monthLabel }}</td>
+              <td class="px-4 py-3 text-sm font-bold text-slate-800">{{ formatNumber(t.totalRegistrations) }}</td>
+              <td class="px-4 py-3 text-sm text-blue-600">{{ formatNumber(t.systemUsers) }}</td>
+              <td class="px-4 py-3 text-sm text-teal-600">{{ formatNumber(t.companyUsers) }}</td>
+            </tr>
+            <tr *ngIf="registrationTrend.length === 0">
+              <td colspan="4" class="py-12 text-center text-slate-400">
+                <i class="fas fa-chart-line text-3xl mb-2 block"></i>
+                داده‌ای یافت نشد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ EXPIRING LICENSES TAB ============ -->
+  <div *ngIf="!isLoading && activeTab === 'expiring'" class="space-y-4">
+    <!-- Days ahead selector -->
+    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center gap-4 print:hidden">
+      <label class="text-sm font-medium text-slate-600">نمایش جوازهای ختم شونده در:</label>
+      <select [(ngModel)]="expiringDaysAhead" (change)="loadExpiringLicenses()"
+        class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+        <option [ngValue]="7">۷ روز</option>
+        <option [ngValue]="15">۱۵ روز</option>
+        <option [ngValue]="30">۳۰ روز</option>
+        <option [ngValue]="60">۶۰ روز</option>
+        <option [ngValue]="90">۹۰ روز</option>
+      </select>
+      <span class="text-sm text-slate-500">مجموع: {{ formatNumber(expiringTotal) }} جواز</span>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-amber-600 to-amber-700">
+        <span class="text-white font-bold">جوازهای در حال ختم</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <th class="px-3 py-3">#</th>
+              <th class="px-3 py-3">نمبر جواز</th>
+              <th class="px-3 py-3">نوع جواز</th>
+              <th class="px-3 py-3">تاریخ ختم</th>
+              <th class="px-3 py-3">روز باقیمانده</th>
+              <th class="px-3 py-3">شرکت</th>
+              <th class="px-3 py-3">ولایت</th>
+              <th class="px-3 py-3">کاربران</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let l of expiringLicenses; let i = index" class="text-center hover:bg-amber-50/30 transition-colors">
+              <td class="px-3 py-3 text-sm text-slate-400">{{ (expiringPage - 1) * expiringPageSize + i + 1 }}</td>
+              <td class="px-3 py-3 text-sm font-mono text-slate-700">{{ l.licenseNumber || '—' }}</td>
+              <td class="px-3 py-3 text-sm">
+                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-xs">{{ l.licenseTypeDari }}</span>
+              </td>
+              <td class="px-3 py-3 text-sm text-slate-600">{{ l.expireDate }}</td>
+              <td class="px-3 py-3">
+                <span class="font-bold" [ngClass]="getDaysRemainingClass(l.daysRemaining)">
+                  {{ formatNumber(l.daysRemaining) }} روز
+                </span>
+              </td>
+              <td class="px-3 py-3 text-sm text-slate-600">{{ l.company?.title || '—' }}</td>
+              <td class="px-3 py-3 text-sm text-slate-600">{{ l.province?.dari || '—' }}</td>
+              <td class="px-3 py-3 text-xs text-slate-500">
+                <div *ngFor="let u of l.users">{{ u.firstName }} {{ u.lastName }}</div>
+                <span *ngIf="l.users.length === 0">—</span>
+              </td>
+            </tr>
+            <tr *ngIf="expiringLicenses.length === 0">
+              <td colspan="8" class="py-12 text-center text-slate-400">
+                <i class="fas fa-certificate text-3xl mb-2 block"></i>
+                جواز در حال ختم یافت نشد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-center gap-3" *ngIf="expiringTotal > expiringPageSize">
+      <button (click)="onExpiringPageChange(expiringPage - 1)" [disabled]="expiringPage === 1"
+        class="px-4 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <span class="text-sm text-slate-600">صفحه {{ expiringPage }} از {{ getExpiringTotalPages() }}</span>
+      <button (click)="onExpiringPageChange(expiringPage + 1)" [disabled]="expiringPage >= getExpiringTotalPages()"
+        class="px-4 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

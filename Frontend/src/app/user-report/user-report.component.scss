@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  direction: rtl;
+}
+
+@media print {
+  .print\\:hidden {
+    display: none !important;
+  }
+  .print\\:p-0 {
+    padding: 0 !important;
+  }
+  .print\\:bg-white {
+    background: white !important;
+  }
+  .print\\:mb-4 {
+    margin-bottom: 1rem !important;
+  }
+}
