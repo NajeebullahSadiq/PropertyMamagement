@@ -28,6 +28,11 @@ public partial class LicenseDetail : IProvinceEntity
 
     public string? TransferLocation { get; set; }
 
+    /// <summary>
+    /// تاریخ محل انتقال - Transfer Location Date
+    /// </summary>
+    public DateOnly? TransferLocationDate { get; set; }
+
     public string? ActivityLocation { get; set; }
 
     public string? OfficeAddress { get; set; }

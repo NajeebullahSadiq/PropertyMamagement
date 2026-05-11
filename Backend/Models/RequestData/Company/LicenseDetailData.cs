@@ -18,6 +18,11 @@
 
         public string? TransferLocation { get; set; }
 
+        /// <summary>
+        /// تاریخ محل انتقال - Transfer Location Date (string format for multi-calendar support)
+        /// </summary>
+        public string? TransferLocationDate { get; set; }
+
         public string? ActivityLocation { get; set; }
 
         public string? OfficeAddress { get; set; }

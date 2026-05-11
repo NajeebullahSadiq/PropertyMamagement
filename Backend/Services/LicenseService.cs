@@ -29,7 +29,7 @@ namespace WebAPIBackend.Services
         {
             var query = _context.LicenseDetails
                 .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""TransferLocation"", ""TransferLocationDate"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                               ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                               ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                               ""CreatedBy"", ""Status"", ""IsComplete""
@@ -43,7 +43,7 @@ namespace WebAPIBackend.Services
         {
             var license = await _context.LicenseDetails
                 .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""TransferLocation"", ""TransferLocationDate"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                               ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                               ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                               ""CreatedBy"", ""Status"", ""IsComplete""
@@ -83,7 +83,7 @@ namespace WebAPIBackend.Services
         {
             var license = await _context.LicenseDetails
                 .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""TransferLocation"", ""TransferLocationDate"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                               ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                               ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                               ""CreatedBy"", ""Status"", ""IsComplete""
@@ -106,6 +106,7 @@ namespace WebAPIBackend.Services
             license.IssueDate = updatedLicense.IssueDate;
             license.ExpireDate = updatedLicense.ExpireDate;
             license.TransferLocation = updatedLicense.TransferLocation;
+            license.TransferLocationDate = updatedLicense.TransferLocationDate;
             license.OfficeAddress = updatedLicense.OfficeAddress;
             license.DocPath = updatedLicense.DocPath;
             license.LicenseType = updatedLicense.LicenseType;
@@ -131,7 +132,7 @@ namespace WebAPIBackend.Services
         {
             var license = await _context.LicenseDetails
                 .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                              ""TransferLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                              ""TransferLocation"", ""TransferLocationDate"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                               ""LicenseCategory"", ""RenewalRound"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                               ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                               ""CreatedBy"", ""Status"", ""IsComplete""

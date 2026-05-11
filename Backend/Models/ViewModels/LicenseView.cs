@@ -83,4 +83,9 @@ public partial class LicenseView
     /// تاریخ مکتوب قوای بشری - HR Letter Date
     /// </summary>
     public DateOnly? HrLetterDate { get; set; }
+
+    /// <summary>
+    /// تاریخ محل انتقال - Transfer Location Date
+    /// </summary>
+    public DateOnly? TransferLocationDate { get; set; }
 }

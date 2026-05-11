@@ -5,6 +5,7 @@ export interface LicenseDetail{
     issueDate:string;
     expireDate:string;
     transferLocation?:string;   // محل انتقال (Transfer Location) - replaces areaId
+    transferLocationDate?:string; // تاریخ محل انتقال (Transfer Location Date)
     activityLocation?:string;   // محل فعالیت (Activity Location)
     officeAddress:string;
     companyId:number;

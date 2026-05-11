@@ -1834,9 +1834,9 @@ namespace WebAPIBackend.Controllers.Companies
                         && !string.IsNullOrWhiteSpace(l.TransferLocation));
 
                 if (parsedStart.HasValue)
-                    query = query.Where(l => l.IssueDate >= parsedStart);
+                    query = query.Where(l => l.TransferLocationDate.HasValue && l.TransferLocationDate >= parsedStart);
                 if (parsedEnd.HasValue)
-                    query = query.Where(l => l.IssueDate <= parsedEnd);
+                    query = query.Where(l => l.TransferLocationDate.HasValue && l.TransferLocationDate <= parsedEnd);
 
                 var result = await query
                     .OrderBy(l => l.IssueDate)
@@ -1856,6 +1856,8 @@ namespace WebAPIBackend.Controllers.Companies
                         expireDate = l.ExpireDate.HasValue
                             ? DateConversionHelper.FormatDateOnly(l.ExpireDate, calendar) : "",
                         transferLocation = l.TransferLocation,
+                        transferLocationDate = l.TransferLocationDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(l.TransferLocationDate, calendar) : "",
                         royaltyAmount = l.RoyaltyAmount,
                         penaltyAmount = l.PenaltyAmount
                     })

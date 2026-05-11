@@ -15,6 +15,7 @@ namespace WebAPIBackend.Models.RequestData.Company
         public DateOnly? IssueDate { get; set; }
         public DateOnly? ExpireDate { get; set; }
         public string? TransferLocation { get; set; }
+        public DateOnly? TransferLocationDate { get; set; }
         public string? ActivityLocation { get; set; }
         public string? OfficeAddress { get; set; }
         public string? DocPath { get; set; }
@@ -41,6 +42,7 @@ namespace WebAPIBackend.Models.RequestData.Company
         public DateOnly? IssueDate { get; set; }
         public DateOnly? ExpireDate { get; set; }
         public string? TransferLocation { get; set; }
+        public DateOnly? TransferLocationDate { get; set; }
         public string? ActivityLocation { get; set; }
         public string? OfficeAddress { get; set; }
         public string? DocPath { get; set; }

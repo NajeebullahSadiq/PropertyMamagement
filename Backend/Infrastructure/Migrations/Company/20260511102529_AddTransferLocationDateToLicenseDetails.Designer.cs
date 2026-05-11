@@ -9,11 +9,11 @@ using WebAPIBackend.Configuration;
 
 #nullable disable
 
-namespace WebAPIBackend.Infrastructure.Migrations.PetitionWriterLicense
+namespace WebAPIBackend.Infrastructure.Migrations.Company
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260506060155_UpdatePetitionWriterLicenseUniqueIndex")]
-    partial class UpdatePetitionWriterLicenseUniqueIndex
+    [Migration("20260511102529_AddTransferLocationDateToLicenseDetails")]
+    partial class AddTransferLocationDateToLicenseDetails
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

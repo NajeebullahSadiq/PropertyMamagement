@@ -266,6 +266,10 @@ namespace WebAPIBackend.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("BaiUlWafaDeedsCount");
 
+                    b.Property<DateOnly?>("ClosureDate")
+                        .HasColumnType("date")
+                        .HasColumnName("ClosureDate");
+
                     b.Property<string>("ClosureReason")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
@@ -350,11 +354,6 @@ namespace WebAPIBackend.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("SaleDeedsCount");
 
-                    b.Property<string>("SealRemovalReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("SealRemovalReason");
-
                     b.Property<string>("SectionType")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
@@ -368,10 +367,6 @@ namespace WebAPIBackend.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("boolean")
                         .HasColumnName("Status");
-
-                    b.Property<decimal?>("TaxAmount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("TaxAmount");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone")
@@ -390,6 +385,10 @@ namespace WebAPIBackend.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("ViolationActionsTaken");
+
+                    b.Property<DateOnly?>("ViolationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("ViolationDate");
 
                     b.Property<string>("ViolationRemarks")
                         .HasMaxLength(1000)
@@ -752,6 +751,12 @@ namespace WebAPIBackend.Migrations
                     b.Property<string>("AuthorizationLetter")
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("ContractEndDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ContractStartDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -916,10 +921,6 @@ namespace WebAPIBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CancellationType")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
@@ -942,17 +943,6 @@ namespace WebAPIBackend.Migrations
                         .HasColumnType("character varying(1000)");
 
                     b.Property<string>("RevenueCancellationLetterNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateOnly?>("RevocationLetterDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("RevocationLetterNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("RevocationRevenueLetterNumber")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -1662,10 +1652,6 @@ namespace WebAPIBackend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("GuaranteeLocation")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
                     b.Property<int>("GuaranteeTypeId")
                         .HasColumnType("integer");
 
@@ -2250,8 +2236,7 @@ namespace WebAPIBackend.Migrations
                     b.HasIndex("CurrentProvinceId");
 
                     b.HasIndex("LicenseNumber")
-                        .IsUnique()
-                        .HasFilter("\"Status\" = true");
+                        .IsUnique();
 
                     b.HasIndex("LicenseStatus");
 
@@ -2310,16 +2295,6 @@ namespace WebAPIBackend.Migrations
                         .HasColumnName("Id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActivityPermissionReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("ActivityPermissionReason");
-
-                    b.Property<string>("ActivityStatus")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("ActivityStatus");
 
                     b.Property<string>("ComplainantName")
                         .HasMaxLength(200)
@@ -2573,7 +2548,7 @@ namespace WebAPIBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("setadocuments");
+                    b.ToTable("setadocuments", (string)null);
                 });
 
             modelBuilder.Entity("WebAPIBackend.Models.PropertyAddress", b =>
@@ -2732,7 +2707,7 @@ namespace WebAPIBackend.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("IssuanceDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("IssuanceNumber")
                         .HasColumnType("text")
@@ -2790,7 +2765,7 @@ namespace WebAPIBackend.Migrations
                         .HasColumnName("South");
 
                     b.Property<DateTime?>("TransactionDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("TransactionTypeId")
                         .HasColumnType("integer");
@@ -4927,8 +4902,7 @@ namespace WebAPIBackend.Migrations
 
                     b.HasOne("WebAPIBackend.Models.Location", "Province")
                         .WithMany()
-                        .HasForeignKey("ProvinceId")
-                        .HasConstraintName("PetitionWriterLicenses_ProvinceId_fkey");
+                        .HasForeignKey("ProvinceId");
 
                     b.Navigation("CurrentDistrict");
 

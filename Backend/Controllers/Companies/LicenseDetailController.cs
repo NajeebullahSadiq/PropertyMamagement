@@ -41,7 +41,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Get licenses for the company using FromSqlRaw to avoid AreaId
                 var licenses = await _context.LicenseDetails
                     .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                                  ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                                  ""TransferLocation"", ""TransferLocationDate"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                                   ""LicenseCategory"", ""RenewalRound"", ""DuplicateIssueDate"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                                   ""CreatedBy"", ""Status"", ""IsComplete"", ""DateType""
@@ -174,6 +174,17 @@ namespace WebAPIBackend.Controllers.Companies
                     duplicateIssueDate = parsedDuplicateIssueDate;
                 }
 
+                // Parse TransferLocationDate if provided
+                DateOnly? transferLocationDate = null;
+                if (!string.IsNullOrWhiteSpace(request.TransferLocationDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.TransferLocationDate, request.CalendarType, out var parsedTransferLocationDate))
+                    {
+                        return BadRequest($"تاریخ انتقال نامعتبر است. / Invalid transfer location date format.");
+                    }
+                    transferLocationDate = parsedTransferLocationDate;
+                }
+
                 // Validate numeric fields
                 if (request.RoyaltyAmount.HasValue && request.RoyaltyAmount < 0)
                 {
@@ -224,6 +235,7 @@ namespace WebAPIBackend.Controllers.Companies
                     ExpireDate = expireDate,
                     DateType = request.CalendarType, // Store the calendar type used for date entry
                     TransferLocation = request.TransferLocation,
+                    TransferLocationDate = transferLocationDate,
                     ActivityLocation = request.ActivityLocation,
                     OfficeAddress = request.OfficeAddress,
                     CompanyId = request.CompanyId,
@@ -313,7 +325,7 @@ namespace WebAPIBackend.Controllers.Companies
                 // Load entity using FromSqlRaw to avoid AreaId column
                 var existingProperty = await _context.LicenseDetails
                     .FromSqlRaw(@"SELECT ""Id"", ""LicenseNumber"", ""ProvinceId"", ""IssueDate"", ""ExpireDate"", 
-                                  ""DateType"", ""TransferLocation"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
+                                  ""DateType"", ""TransferLocation"", ""TransferLocationDate"", ""ActivityLocation"", ""OfficeAddress"", ""CompanyId"", ""DocPath"", ""LicenseType"", 
                                   ""LicenseCategory"", ""RenewalRound"", ""DuplicateIssueDate"", ""RoyaltyAmount"", ""RoyaltyDate"", ""TariffNumber"", 
                                   ""PenaltyAmount"", ""PenaltyDate"", ""HrLetter"", ""HrLetterDate"", ""CreatedAt"", 
                                   ""CreatedBy"", ""Status"", ""IsComplete""
@@ -379,6 +391,17 @@ namespace WebAPIBackend.Controllers.Companies
                     duplicateIssueDate = parsedDuplicateIssueDate;
                 }
 
+                // Parse TransferLocationDate if provided (تاریخ محل انتقال)
+                DateOnly? transferLocationDate = null;
+                if (!string.IsNullOrWhiteSpace(request.TransferLocationDate))
+                {
+                    if (!DateConversionHelper.TryParseToDateOnlyFlexible(request.TransferLocationDate, request.CalendarType, out var parsedTransferLocationDate))
+                    {
+                        return BadRequest($"تاریخ محل انتقال نامعتبر است. / Invalid transfer location date format.");
+                    }
+                    transferLocationDate = parsedTransferLocationDate;
+                }
+
                 // Validate numeric fields
                 if (request.RoyaltyAmount.HasValue && request.RoyaltyAmount < 0)
                 {
@@ -420,6 +443,7 @@ namespace WebAPIBackend.Controllers.Companies
                 existingProperty.ExpireDate = expireDate;
                 existingProperty.DateType = request.CalendarType; // Update the calendar type
                 existingProperty.TransferLocation = request.TransferLocation;
+                existingProperty.TransferLocationDate = transferLocationDate;
                 existingProperty.ActivityLocation = request.ActivityLocation;
                 existingProperty.OfficeAddress = request.OfficeAddress;
                 existingProperty.DocPath = request.DocPath;
@@ -649,6 +673,10 @@ namespace WebAPIBackend.Controllers.Companies
                     data.HrLetter,
                     data.HrLetterDate,
                     hrLetterDateFormatted,
+                    TransferLocationDate = data.TransferLocationDate,
+                    transferLocationDateFormatted = data.TransferLocationDate.HasValue 
+                        ? DateConversionHelper.FormatDateOnly(data.TransferLocationDate, printCalendar) 
+                        : "",
                 };
 
                 return Ok(result);
@@ -728,6 +756,10 @@ namespace WebAPIBackend.Controllers.Companies
                             WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'DuplicateIssueDate') THEN
                             ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""DuplicateIssueDate"" DATE NULL;
                         END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                            WHERE table_schema = 'org' AND table_name = 'LicenseDetails' AND column_name = 'TransferLocationDate') THEN
+                            ALTER TABLE org.""LicenseDetails"" ADD COLUMN ""TransferLocationDate"" DATE NULL;
+                        END IF;
                     END $$;
 
                     -- Recreate the LicenseView
@@ -739,7 +771,7 @@ namespace WebAPIBackend.Controllers.Companies
                         co.""PhoneNumber"",
                         co.""WhatsAppNumber"",
                         cd.""Title"",
-                        cd.""TIN"",
+                        cd.""TIN"" AS ""Tin"",
                         co.""FirstName"",
                         co.""FatherName"",
                         co.""GrandFatherName"",
@@ -761,7 +793,8 @@ namespace WebAPIBackend.Controllers.Companies
                         ld.""PenaltyAmount"",
                         ld.""PenaltyDate"",
                         ld.""HrLetter"",
-                        ld.""HrLetterDate""
+                        ld.""HrLetterDate"",
+                        ld.""TransferLocationDate""
                     FROM org.""CompanyDetails"" cd
                     LEFT JOIN org.""CompanyOwner"" co ON cd.""Id"" = co.""CompanyId""
                     LEFT JOIN org.""LicenseDetails"" ld ON cd.""Id"" = ld.""CompanyId""

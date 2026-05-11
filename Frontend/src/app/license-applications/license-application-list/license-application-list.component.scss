@@ -16,14 +16,14 @@
       }
 
       &.current {
-        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        background: linear-gradient(135deg, #004532, #065f46);
         span {
           color: white;
         }
       }
 
       &:not(.current):not(.disabled) a:hover {
-        background: #e5e7eb;
+        background: #d9e6dd;
       }
 
       &.disabled span {

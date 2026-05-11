@@ -883,6 +883,7 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.CreatedBy).HasMaxLength(50);
                 entity.Property(e => e.TariffNumber).HasMaxLength(100);
                 entity.Property(e => e.TransferLocation).HasMaxLength(500);
+                entity.Property(e => e.TransferLocationDate);
 
                 entity.HasOne(d => d.Company).WithMany(p => p.LicenseDetails)
                     .HasForeignKey(d => d.CompanyId)

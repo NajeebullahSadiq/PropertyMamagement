@@ -79,6 +79,7 @@ export class LicensedetailsComponent extends BaseComponent {
 			issueDate: ['', Validators.required],
 			expireDate: ['', Validators.required],
 			transferLocation: [''],
+			transferLocationDate: [''],
 			activityLocation: [''],
 			officeAddress: ['', Validators.required],
 			licenseType: ['', Validators.required],
@@ -257,6 +258,7 @@ export class LicensedetailsComponent extends BaseComponent {
 							issueDate: detail[0].issueDate,
 							expireDate: detail[0].expireDate,
 							transferLocation: detail[0].transferLocation || '',
+							transferLocationDate: detail[0].transferLocationDate || '',
 							activityLocation: detail[0].activityLocation || '',
 							officeAddress: detail[0].officeAddress,
 							licenseType: detail[0].licenseType,
@@ -316,6 +318,7 @@ export class LicensedetailsComponent extends BaseComponent {
 		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;
 		const royaltyDateValue = this.licenseForm.get('royaltyDate')?.value;
 		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
+		const transferLocationDateValue = this.licenseForm.get('transferLocationDate')?.value;
 		// Company module ALWAYS uses Hijri Shamsi
 		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
@@ -345,6 +348,9 @@ export class LicensedetailsComponent extends BaseComponent {
 		}
 		if (penaltyDateValue) {
 			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
+		}
+		if (transferLocationDateValue) {
+			details.transferLocationDate = this.formatDateForBackend(transferLocationDateValue);
 		}
 
 		// Format duplicateIssueDate if provided
@@ -388,6 +394,7 @@ export class LicensedetailsComponent extends BaseComponent {
 		const hrLetterDateValue = this.licenseForm.get('hrLetterDate')?.value;
 		const royaltyDateValue = this.licenseForm.get('royaltyDate')?.value;
 		const penaltyDateValue = this.licenseForm.get('penaltyDate')?.value;
+		const transferLocationDateValue = this.licenseForm.get('transferLocationDate')?.value;
 		// Company module ALWAYS uses Hijri Shamsi
 		const currentCalendar = CalendarType.HIJRI_SHAMSI;
 
@@ -417,6 +424,9 @@ export class LicensedetailsComponent extends BaseComponent {
 		}
 		if (penaltyDateValue) {
 			details.penaltyDate = this.formatDateForBackend(penaltyDateValue);
+		}
+		if (transferLocationDateValue) {
+			details.transferLocationDate = this.formatDateForBackend(transferLocationDateValue);
 		}
 
 		// Format duplicateIssueDate if provided
@@ -506,6 +516,7 @@ export class LicensedetailsComponent extends BaseComponent {
 	get renewalRound() { return this.licenseForm.get('renewalRound'); }
 	get duplicateIssueDate() { return this.licenseForm.get('duplicateIssueDate'); }
 	get transferLocation() { return this.licenseForm.get('transferLocation'); }
+	get transferLocationDate() { return this.licenseForm.get('transferLocationDate'); }
 	get companyId() { return this.licenseForm.get('companyId'); }
 	get docPath() { return this.licenseForm.get('docPath'); }
 	// Financial and Administrative Fields getters

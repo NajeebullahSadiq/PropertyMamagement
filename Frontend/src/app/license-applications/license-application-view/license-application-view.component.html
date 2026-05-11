@@ -1,8 +1,8 @@
-<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8">
   <div class="max-w-5xl mx-auto px-4 sm:px-6">
     <!-- Page Header -->
     <div class="mb-8 text-center">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 mb-4">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004532] to-[#065f46] shadow-lg shadow-[#004532]/30 mb-4">
         <i class="fas fa-file-alt text-white text-2xl"></i>
       </div>
       <h1 class="text-3xl font-bold text-gray-800 mb-2">جزئیات درخواست جواز رهنمای معاملات</h1>
@@ -11,25 +11,25 @@
 
     <!-- Loading -->
     <div *ngIf="isLoading" class="text-center py-8">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#004532] border-t-transparent"></div>
+      <p class="mt-2 text-[#6f7973]">در حال بارگذاری...</p>
     </div>
 
     <div *ngIf="!isLoading && item">
       <!-- Action Buttons -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+      <div class="bg-white rounded-2xl shadow-lg border border-[#bec9c2] overflow-hidden mb-6">
         <div class="p-4">
           <div class="flex flex-wrap gap-4 justify-between">
-            <button (click)="goBack()" class="px-6 py-2.5 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+            <button (click)="goBack()" class="px-6 py-2.5 bg-[#55615a] hover:bg-[#3f4944] text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
               <i class="fas fa-arrow-right"></i>
               بازگشت به لیست
             </button>
             <div class="flex gap-3">
-              <button *ngIf="canEdit" (click)="editItem()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+              <button *ngIf="canEdit" (click)="editItem()" class="px-6 py-2.5 bg-gradient-to-r from-[#004532] to-[#065f46] hover:from-[#065f46] hover:to-[#004532] text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
                 <i class="fas fa-edit"></i>
                 ویرایش
               </button>
-              <button (click)="printItem()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+              <button (click)="printItem()" class="px-6 py-2.5 bg-gradient-to-r from-[#065f46] to-[#004532] hover:from-[#004532] hover:to-[#065f46] text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
                 <i class="fas fa-print"></i>
                 چاپ
               </button>
@@ -46,60 +46,58 @@
       </div>
 
       <!-- Section 1: مشخصات درخواست متقاضی -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
-        <div (click)="toggleSection('applicant')" class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 cursor-pointer flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-              <i class="fas fa-user text-sm"></i>
-            </div>
+      <div class="bg-white rounded-2xl shadow-lg border border-[#bec9c2] overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('applicant')" class="border-r-4 border-[#004532] px-4 py-2 bg-[#f2f4f6] cursor-pointer flex justify-between items-center">
+          <h2 class="text-sm font-extrabold text-[#004532] flex items-center gap-2">
+            <i class="fas fa-user text-xs"></i>
             <span>مشخصات درخواست متقاضی</span>
           </h2>
-          <i class="fas text-white" [ngClass]="sections.applicant ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          <i class="fas text-[#004532]" [ngClass]="sections.applicant ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
         </div>
         <div *ngIf="sections.applicant" class="p-6">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-hashtag text-blue-500"></i>نمبر عریضه</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.requestSerialNumber }}</p>
+            <div class="p-4 bg-[#f2f4f6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-hashtag text-[#004532]"></i>نمبر عریضه</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ item.requestSerialNumber }}</p>
             </div>
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-blue-500"></i>تاریخ درخواست</span>
-              <p class="font-bold text-gray-800 mt-1">{{ (item.requestDate | calendarDate) || '-' }}</p>
+            <div class="p-4 bg-[#f2f4f6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-calendar text-[#004532]"></i>تاریخ درخواست</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ (item.requestDate | calendarDate) || '-' }}</p>
             </div>
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>نام متقاضی</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.applicantName }}</p>
+            <div class="p-4 bg-[#f2f4f6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-user text-[#004532]"></i>نام متقاضی</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ item.applicantName }}</p>
             </div>
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>نام پدر متقاضی</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.applicantFatherName || '-' }}</p>
+            <div class="p-4 bg-[#f2f4f6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-user text-[#004532]"></i>نام پدر متقاضی</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ item.applicantFatherName || '-' }}</p>
             </div>
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-user text-blue-500"></i>نام پدرکلان متقاضی</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.applicantGrandfatherName || '-' }}</p>
+            <div class="p-4 bg-[#f2f4f6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-user text-[#004532]"></i>نام پدرکلان متقاضی</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ item.applicantGrandfatherName || '-' }}</p>
             </div>
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-id-card text-blue-500"></i>نمبر الکترونیکی متقاضی</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.applicantElectronicNumber || '-' }}</p>
+            <div class="p-4 bg-[#f2f4f6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-id-card text-[#004532]"></i>نمبر الکترونیکی متقاضی</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ item.applicantElectronicNumber || '-' }}</p>
             </div>
-            <div class="p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl border border-gray-100">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-building text-blue-500"></i>نام پیشنهادی رهنما</span>
-              <p class="font-bold text-gray-800 mt-1">{{ item.proposedGuideName }}</p>
+            <div class="p-4 bg-[#f2f4f6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-building text-[#004532]"></i>نام پیشنهادی رهنما</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ item.proposedGuideName }}</p>
             </div>
           </div>
 
           <!-- Addresses -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-5 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border border-indigo-200">
-              <h3 class="font-bold text-indigo-800 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> سکونت اصلی</h3>
+            <div class="p-5 bg-[#d9e6dd] rounded-xl border border-[#bec9c2]">
+              <h3 class="font-bold text-[#004532] mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> سکونت اصلی</h3>
               <div class="space-y-2 text-sm">
                 <p><span class="text-gray-600">ولایت:</span> <span class="font-semibold">{{ item.permanentProvinceName || '-' }}</span></p>
                 <p><span class="text-gray-600">ناحیه:</span> <span class="font-semibold">{{ item.permanentDistrictName || '-' }}</span></p>
                 <p><span class="text-gray-600">قریه/گذر:</span> <span class="font-semibold">{{ item.permanentVillage || '-' }}</span></p>
               </div>
             </div>
-            <div class="p-5 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-200">
-              <h3 class="font-bold text-teal-800 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> سکونت فعلی</h3>
+            <div class="p-5 bg-[#a6f2d1] rounded-xl border border-[#bec9c2]">
+              <h3 class="font-bold text-[#065f46] mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> سکونت فعلی</h3>
               <div class="space-y-2 text-sm">
                 <p><span class="text-gray-600">ولایت:</span> <span class="font-semibold">{{ item.currentProvinceName || '-' }}</span></p>
                 <p><span class="text-gray-600">ناحیه:</span> <span class="font-semibold">{{ item.currentDistrictName || '-' }}</span></p>
@@ -111,15 +109,13 @@
       </div>
 
       <!-- Section 2: تضمین‌کنندگان -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
-        <div (click)="toggleSection('guarantors')" class="bg-gradient-to-r from-purple-600 to-violet-600 px-6 py-4 cursor-pointer flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-              <i class="fas fa-user-shield text-sm"></i>
-            </div>
+      <div class="bg-white rounded-2xl shadow-lg border border-[#bec9c2] overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('guarantors')" class="border-r-4 border-[#55615a] px-4 py-2 bg-[#f2f4f6] cursor-pointer flex justify-between items-center">
+          <h2 class="text-sm font-extrabold text-[#55615a] flex items-center gap-2">
+            <i class="fas fa-user-shield text-xs"></i>
             <span>تضمین‌کنندگان ({{ guarantors.length }})</span>
           </h2>
-          <i class="fas text-white" [ngClass]="sections.guarantors ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          <i class="fas text-[#55615a]" [ngClass]="sections.guarantors ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
         </div>
         <div *ngIf="sections.guarantors" class="p-6">
           <div *ngIf="guarantors.length === 0" class="text-center py-8 text-gray-500">
@@ -127,8 +123,8 @@
             <p>هیچ تضمین‌کننده‌ای ثبت نشده است</p>
           </div>
           <div *ngFor="let g of guarantors; let i = index" class="mb-4 last:mb-0">
-            <div class="p-5 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border border-purple-200">
-              <h3 class="font-bold text-purple-800 mb-3">تضمین‌کننده {{ i + 1 }}: {{ g.guarantorName }}</h3>
+            <div class="p-5 bg-[#d9e6dd] rounded-xl border border-[#bec9c2]">
+              <h3 class="font-bold text-[#004532] mb-3">تضمین‌کننده {{ i + 1 }}: {{ g.guarantorName }}</h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <p><span class="text-gray-600">ولد:</span> <span class="font-semibold">{{ g.guarantorFatherName || '-' }}</span></p>
                 <p><span class="text-gray-600">نوعیت ضمانت:</span> <span class="font-semibold">{{ getGuaranteeTypeName(g.guaranteeTypeId) }}</span></p>
@@ -143,25 +139,23 @@
       </div>
 
       <!-- Section 3: انصراف -->
-      <div *ngIf="withdrawal" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
-        <div (click)="toggleSection('withdrawal')" class="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 cursor-pointer flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-              <i class="fas fa-times-circle text-sm"></i>
-            </div>
+      <div *ngIf="withdrawal" class="bg-white rounded-2xl shadow-lg border border-[#bec9c2] overflow-hidden mb-6 hover:shadow-xl transition-shadow duration-300">
+        <div (click)="toggleSection('withdrawal')" class="border-r-4 border-[#ba1a1a] px-4 py-2 bg-[#ffdad6] cursor-pointer flex justify-between items-center">
+          <h2 class="text-sm font-extrabold text-[#ba1a1a] flex items-center gap-2">
+            <i class="fas fa-times-circle text-xs"></i>
             <span>معلومات انصراف</span>
           </h2>
-          <i class="fas text-white" [ngClass]="sections.withdrawal ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          <i class="fas text-[#ba1a1a]" [ngClass]="sections.withdrawal ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
         </div>
         <div *ngIf="sections.withdrawal" class="p-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-comment text-red-500"></i>علت انصراف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ withdrawal.withdrawalReason }}</p>
+            <div class="p-4 bg-[#ffdad6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-comment text-[#ba1a1a]"></i>علت انصراف</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ withdrawal.withdrawalReason }}</p>
             </div>
-            <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200">
-              <span class="text-sm text-gray-500 flex items-center gap-2"><i class="fas fa-calendar text-red-500"></i>تاریخ انصراف</span>
-              <p class="font-bold text-gray-800 mt-1">{{ (withdrawal.withdrawalDate | calendarDate) || '-' }}</p>
+            <div class="p-4 bg-[#ffdad6] rounded-xl border border-[#bec9c2]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2"><i class="fas fa-calendar text-[#ba1a1a]"></i>تاریخ انصراف</span>
+              <p class="font-bold text-[#191c1e] mt-1">{{ (withdrawal.withdrawalDate | calendarDate) || '-' }}</p>
             </div>
           </div>
         </div>
