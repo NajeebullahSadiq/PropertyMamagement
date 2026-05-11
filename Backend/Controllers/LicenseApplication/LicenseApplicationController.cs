@@ -80,6 +80,29 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
         }
 
+        private async Task<bool> HasDuplicateRequestSerialNumberAsync(string serialNumber, int? excludeId = null)
+        {
+            var normalizedSerial = NormalizeApplicantField(serialNumber);
+            if (string.IsNullOrWhiteSpace(normalizedSerial)) return false;
+
+            var query = _context.LicenseApplications
+                .AsNoTracking()
+                .Where(x => x.Status == true);
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(x => x.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync(x => x.RequestSerialNumber == normalizedSerial);
+        }
+
+        private async Task<bool> ValidateLocationExistsAsync(int? locationId)
+        {
+            if (!locationId.HasValue) return true;
+            return await _context.Locations.AsNoTracking().AnyAsync(l => l.Id == locationId.Value);
+        }
+
         private async Task<bool> HasDuplicateApplicantAsync(LicenseApplicationData request, int? excludeId = null)
         {
             var applicantName = NormalizeApplicantField(request.ApplicantName);
@@ -179,6 +202,26 @@ namespace WebAPIBackend.Controllers.LicenseApplication
         #region Duplicate Check
 
         /// <summary>
+        /// Check if a request serial number already exists
+        /// </summary>
+        [HttpGet("check-request-serial-number")]
+        public async Task<IActionResult> CheckRequestSerialNumber(
+            [FromQuery] string serialNumber,
+            [FromQuery] int? excludeId = null)
+        {
+            try
+            {
+                var isDuplicate = await HasDuplicateRequestSerialNumberAsync(serialNumber, excludeId);
+                return Ok(new { isDuplicate });
+            }
+            catch (Exception ex)
+            {
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
+            }
+        }
+
+        /// <summary>
         /// Check if a proposed guide name already exists
         /// </summary>
         [HttpGet("check-proposed-guide-name")]
@@ -193,7 +236,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -213,7 +257,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -232,7 +277,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -251,7 +297,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -392,7 +439,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -638,7 +686,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -694,7 +743,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -715,6 +765,11 @@ namespace WebAPIBackend.Controllers.LicenseApplication
 
                 var userId = userIdClaim.Value;
 
+                if (await HasDuplicateRequestSerialNumberAsync(request.RequestSerialNumber))
+                {
+                    return BadRequest("نمبر عریضه قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
+                }
+
                 if (await HasDuplicateApplicantAsync(request))
                 {
                     return BadRequest("متقاضی با این مشخصات قبلاً در سیستم ثبت شده است.");
@@ -724,6 +779,16 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 {
                     return BadRequest("نام پیشنهادی رهنما قبلاً در سیستم ثبت شده است. لطفاً نام دیگری وارد کنید.");
                 }
+
+                // Validate foreign key references
+                if (!await ValidateLocationExistsAsync(request.PermanentProvinceId))
+                    return BadRequest("ولایت سکونت اصلی معتبر نیست.");
+                if (!await ValidateLocationExistsAsync(request.PermanentDistrictId))
+                    return BadRequest("ولسوالی سکونت اصلی معتبر نیست.");
+                if (!await ValidateLocationExistsAsync(request.CurrentProvinceId))
+                    return BadRequest("ولایت سکونت فعلی معتبر نیست.");
+                if (!await ValidateLocationExistsAsync(request.CurrentDistrictId))
+                    return BadRequest("ولسوالی سکونت فعلی معتبر نیست.");
 
                 // Parse date
                 DateConversionHelper.TryParseToDateOnly(request.RequestDate, request.CalendarType, out var requestDate);
@@ -756,7 +821,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -783,6 +849,11 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     return NotFound("درخواست یافت نشد");
                 }
 
+                if (await HasDuplicateRequestSerialNumberAsync(request.RequestSerialNumber, id))
+                {
+                    return BadRequest("نمبر عریضه قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
+                }
+
                 if (await HasDuplicateApplicantAsync(request, id))
                 {
                     return BadRequest("متقاضی با این مشخصات قبلاً در سیستم ثبت شده است.");
@@ -792,6 +863,16 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 {
                     return BadRequest("نام پیشنهادی رهنما قبلاً در سیستم ثبت شده است. لطفاً نام دیگری وارد کنید.");
                 }
+
+                // Validate foreign key references
+                if (!await ValidateLocationExistsAsync(request.PermanentProvinceId))
+                    return BadRequest("ولایت سکونت اصلی معتبر نیست.");
+                if (!await ValidateLocationExistsAsync(request.PermanentDistrictId))
+                    return BadRequest("ولسوالی سکونت اصلی معتبر نیست.");
+                if (!await ValidateLocationExistsAsync(request.CurrentProvinceId))
+                    return BadRequest("ولایت سکونت فعلی معتبر نیست.");
+                if (!await ValidateLocationExistsAsync(request.CurrentDistrictId))
+                    return BadRequest("ولسوالی سکونت فعلی معتبر نیست.");
 
                 // Parse date
                 DateConversionHelper.TryParseToDateOnly(request.RequestDate, request.CalendarType, out var requestDate);
@@ -818,7 +899,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -844,7 +926,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -897,7 +980,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -973,7 +1057,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1035,7 +1120,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1063,7 +1149,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1107,7 +1194,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1171,7 +1259,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1206,7 +1295,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1243,7 +1333,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1300,7 +1391,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1385,7 +1477,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1448,7 +1541,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 
@@ -1550,7 +1644,8 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
         }
 

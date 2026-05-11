@@ -199,6 +199,14 @@ export class LicenseApplicationService {
 
     // ==================== Duplicate Check ====================
 
+    checkRequestSerialNumber(serialNumber: string, excludeId?: number): Observable<{ isDuplicate: boolean }> {
+        let params = new HttpParams().set('serialNumber', serialNumber);
+        if (excludeId) {
+            params = params.set('excludeId', excludeId.toString());
+        }
+        return this.http.get<{ isDuplicate: boolean }>(`${this.baseUrl}/check-request-serial-number`, { params });
+    }
+
     checkProposedGuideName(proposedGuideName: string, excludeId?: number): Observable<{ isDuplicate: boolean }> {
         let params = new HttpParams().set('proposedGuideName', proposedGuideName);
         if (excludeId) {

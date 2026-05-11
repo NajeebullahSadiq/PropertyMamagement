@@ -104,7 +104,10 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
         this.applicationForm = this.fb.group({
             id: [null],
             requestDate: ['', Validators.required],
-            requestSerialNumber: ['', [Validators.required, Validators.maxLength(50)]],
+            requestSerialNumber: ['',
+                [Validators.required, Validators.maxLength(50)],
+                [this.requestSerialNumberAsyncValidator()]
+            ],
             applicantName: ['', [Validators.required, Validators.maxLength(200)]],
             applicantFatherName: ['', Validators.maxLength(200)],
             applicantGrandfatherName: ['', Validators.maxLength(200)],
@@ -726,6 +729,24 @@ export class LicenseApplicationFormComponent extends BaseComponent implements On
         this.showCashFields = false;
         this.showShariaDeedFields = false;
         this.showCustomaryDeedFields = false;
+    }
+
+    requestSerialNumberAsyncValidator(): AsyncValidatorFn {
+        return (control: AbstractControl): Observable<ValidationErrors | null> => {
+            if (!control.value || control.value.trim() === '') {
+                return of(null);
+            }
+            return of(control.value).pipe(
+                debounceTime(500),
+                switchMap((value: string) =>
+                    this.licenseAppService.checkRequestSerialNumber(value.trim(), this.editId ?? undefined)
+                        .pipe(
+                            map((result) => result.isDuplicate ? { duplicateRequestSerialNumber: true } : null)
+                        )
+                ),
+                first()
+            );
+        };
     }
 
     proposedGuideNameAsyncValidator(): AsyncValidatorFn {
