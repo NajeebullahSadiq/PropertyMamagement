@@ -320,9 +320,6 @@ namespace WebAPIBackend.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging
-                Console.WriteLine($"Error in GetPropertyById: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return StatusCode(500, new { message = "خطای داخلی سرور", error = ex.Message });
             }
         }
@@ -634,9 +631,6 @@ namespace WebAPIBackend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in SaveProperty: {ex.Message}");
-                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return StatusCode(500, new { message = "خطای داخلی سرور", error = ex.Message, innerError = ex.InnerException?.Message });
             }
         }
@@ -1151,11 +1145,6 @@ namespace WebAPIBackend.Controllers
             }
             catch (Exception ex)
             {
-                // Log the detailed error for debugging
-                Console.WriteLine($"Error deleting property: {ex.Message}");
-                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                
                 return StatusCode(500, new { 
                     message = $"خطا در حذف سند: {ex.Message}",
                     details = ex.InnerException?.Message 

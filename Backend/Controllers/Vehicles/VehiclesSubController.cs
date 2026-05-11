@@ -464,12 +464,6 @@ namespace WebAPIBackend.Controllers.Vehicles
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging
-                Console.WriteLine($"Error saving seller: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                }
                 return StatusCode(500, $"Error saving seller: {ex.Message}");
             }
             var result = new { Id = seller.Id };

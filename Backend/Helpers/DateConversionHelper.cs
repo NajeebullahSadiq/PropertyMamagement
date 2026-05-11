@@ -100,15 +100,13 @@ namespace WebAPIBackend.Helpers
                 // Additional validation to ensure year is reasonable
                 if (year < 1 || year > 9999)
                 {
-                    Console.WriteLine($"Warning: Invalid year {year} for date {date.Value} in calendar {calendarType}");
                     return "";
                 }
                 
                 return $"{year:D4}/{month:D2}/{day:D2}";
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error formatting date {date.Value} to {calendarType}: {ex.Message}");
                 return "";
             }
         }
@@ -217,10 +215,9 @@ namespace WebAPIBackend.Helpers
                 // Date is out of range for the target calendar, return a default valid date
                 return (1, 1, 1);
             }
-            catch (Exception ex)
+            catch
             {
-                // Log the error but don't throw - return a default valid date
-                Console.WriteLine($"Warning: Failed to convert Gregorian date {gregorianDate} to {targetCalendar}: {ex.Message}");
+                // Return a default valid date
                 return (1, 1, 1);
             }
         }
@@ -256,15 +253,13 @@ namespace WebAPIBackend.Helpers
                 var (isValid, errorMessage) = ValidateDateWithMessage(year, month, day, calendarType);
                 if (!isValid)
                 {
-                    Console.WriteLine($"Date validation failed: {errorMessage}");
                     return null;
                 }
 
                 return ToGregorian(year, month, day, calendarType);
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error parsing date '{dateString}' for calendar {calendarType}: {ex.Message}");
                 return null;
             }
         }

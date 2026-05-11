@@ -1660,6 +1660,7 @@ namespace WebAPIBackend.Controllers.Companies
                         .ThenInclude(c => c!.LicenseDetails)
                     .Include(x => x.Company)
                         .ThenInclude(c => c!.Guarantors)
+                    .AsSplitQuery()
                     .Where(x => x.Status != false
                         && x.CancellationType == "فسخ"
                         && x.Company != null
@@ -1746,6 +1747,7 @@ namespace WebAPIBackend.Controllers.Companies
                         .ThenInclude(c => c!.LicenseDetails)
                     .Include(x => x.Company)
                         .ThenInclude(c => c!.Guarantors)
+                    .AsSplitQuery()
                     .Where(x => x.Status != false
                         && x.CancellationType == "لغوه"
                         && x.Company != null
@@ -1829,6 +1831,7 @@ namespace WebAPIBackend.Controllers.Companies
                         .ThenInclude(c => c!.CompanyOwners)
                     .Include(l => l.Company)
                         .ThenInclude(c => c!.Guarantors)
+                    .AsSplitQuery()
                     .Where(l => l.CompanyId.HasValue
                         && allowedCompanyIds.Contains(l.CompanyId.Value)
                         && !string.IsNullOrWhiteSpace(l.TransferLocation));

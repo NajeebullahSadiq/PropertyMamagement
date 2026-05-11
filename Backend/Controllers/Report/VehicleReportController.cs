@@ -429,6 +429,7 @@ namespace WebAPIBackend.Controllers.Report
                 .Include(p => p.TransactionType)
                 .Include(p => p.VehiclesSellerDetails)
                 .Include(p => p.VehiclesBuyerDetails)
+                .AsSplitQuery()
                 .OrderByDescending(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

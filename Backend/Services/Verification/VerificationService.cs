@@ -453,6 +453,7 @@ namespace WebAPIBackend.Services.Verification
             var license = await _context.LicenseDetails
                 .Include(l => l.Company)
                     .ThenInclude(c => c!.CompanyOwners)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(l => l.Id == licenseId);
 
             if (license == null) return null;
@@ -476,6 +477,7 @@ namespace WebAPIBackend.Services.Verification
             var license = await _context.LicenseDetails
                 .Include(l => l.Company)
                     .ThenInclude(c => c!.CompanyOwners)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(l => l.Id == licenseId);
 
             if (license == null) return null;
@@ -770,6 +772,7 @@ namespace WebAPIBackend.Services.Verification
             var vehicle = await _context.VehiclesPropertyDetails
                 .Include(v => v.VehiclesSellerDetails)
                 .Include(v => v.VehiclesBuyerDetails)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(v => v.Id == vehicleId);
 
             if (vehicle == null) return null;

@@ -351,9 +351,6 @@ namespace WebAPIBackend.Controllers.Companies
             }
             catch (Exception ex)
             {
-                // Log the full exception for debugging
-                Console.WriteLine($"Error in getGuaranatorById: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -380,7 +377,6 @@ namespace WebAPIBackend.Controllers.Companies
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetActiveGuarantor: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -418,7 +414,6 @@ namespace WebAPIBackend.Controllers.Companies
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetGuarantorHistory: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -747,7 +742,6 @@ namespace WebAPIBackend.Controllers.Companies
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting guarantor: {ex.Message}");
                 return StatusCode(500, new { 
                     message = "خطا در حذف شاهد",
                     error = ex.Message 

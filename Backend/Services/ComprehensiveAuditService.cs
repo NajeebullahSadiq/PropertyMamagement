@@ -110,15 +110,9 @@ namespace WebAPIBackend.Services
                 _context.Set<ComprehensiveAuditLog>().Add(auditLog);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch
             {
-                // Log to console but don't break the main functionality
-                Console.WriteLine($"[AuditLog Error] Failed to log audit entry: {ex.Message}");
-                // Optionally log inner exception for debugging
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"[AuditLog Error] Inner exception: {ex.InnerException.Message}");
-                }
+                // Silently ignore audit logging failures to not break main functionality
             }
         }
 
