@@ -1,145 +1,101 @@
-<section class="w-full bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">معلومات مالیه</h1>
-      <p class="text-center text-gray-600">لطفاً تمام معلومات مربوط به مالیه و تصفیه حساب را با دقت تکمیل نمایید</p>
+<div class="space-y-5">
+  <form [formGroup]="accountForm" (ngSubmit)="accountForm.valid ? selectedId ? updateData() : addData() : null">
+    <input type="hidden" formControlName="id">
+    <input type="hidden" formControlName="companyId">
+
+    <!-- Account Settlement Information -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#0d9488] flex items-center justify-center">
+          <i class="fas fa-file-invoice-dollar text-white text-[10px]"></i>
+        </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">معلومات تصفیه حساب</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="md:col-span-2">
+            <label for="settlementInfo" class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمرمكتوب تصفيه معلومات</label>
+            <div class="relative">
+              <span class="absolute top-3 left-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+              <textarea id="settlementInfo" formControlName="settlementInfo" rows="3" class="form-input pl-9" placeholder="توضیحات تصفیه حساب را وارد کنید" maxlength="500"></textarea>
+            </div>
+            <div *ngIf="settlementInfo?.invalid && (settlementInfo?.dirty || settlementInfo?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="settlementInfo?.errors?.['maxlength']">حداکثر ۵۰۰ حرف مجاز است</small>
+            </div>
+            <small class="text-[#6f7973] text-[11px] mt-1 block">{{ settlementInfo?.value?.length || 0 }}/500</small>
+          </div>
+          <div>
+            <label for="taxPaymentAmount" class="block text-xs font-semibold text-[#4a5568] mb-1.5">تحويل ماليات (مبلغ) <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-money-bill-wave text-xs"></i></span>
+              <input type="text" appNumericInput [allowDecimal]="true" id="taxPaymentAmount" formControlName="taxPaymentAmount" class="form-input pl-9" placeholder="مبلغ مالیات را وارد کنید">
+            </div>
+            <div *ngIf="taxPaymentAmount?.invalid && (taxPaymentAmount?.dirty || taxPaymentAmount?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="taxPaymentAmount?.errors?.['required']">این فیلد الزامی است</small>
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="taxPaymentAmount?.errors?.['min']">مبلغ باید مثبت باشد</small>
+            </div>
+          </div>
+          <div>
+            <label for="settlementYear" class="block text-xs font-semibold text-[#4a5568] mb-1.5">سال تصفيه مالية</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-calendar-alt text-xs"></i></span>
+              <input type="text" appNumericInput id="settlementYear" formControlName="settlementYear" class="form-input pl-9" placeholder="سال را وارد کنید">
+            </div>
+            <div *ngIf="settlementYear?.invalid && (settlementYear?.dirty || settlementYear?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="settlementYear?.errors?.['min'] || settlementYear?.errors?.['max']">سال باید بین ۱۳۰۰ و ۲۱۰۰ باشد</small>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <form [formGroup]="accountForm" (ngSubmit)="accountForm.valid ? selectedId ? updateData() : addData() : null">
-      <div class="hidden">
-        <input type="hidden" formControlName="id">
-        <input type="hidden" formControlName="companyId">
-      </div>
-
-      <!-- Account Settlement Information Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-file-invoice-dollar"></i>
-            <span>معلومات تصفیه حساب</span>
-          </h2>
+    <!-- Tax Payment and Transaction Details -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#4f46e5] flex items-center justify-center">
+          <i class="fas fa-receipt text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Settlement Info (نمرمكتوب تصفيه معلومات) -->
-            <div class="md:col-span-2">
-              <label for="settlementInfo" class="block text-sm font-semibold text-gray-700 mb-2">نمرمكتوب تصفيه معلومات</label>
-              <div class="relative">
-                <span class="absolute top-3 left-3 text-gray-500">
-                  <i class="fas fa-file-alt"></i>
-                </span>
-                <textarea id="settlementInfo" formControlName="settlementInfo" rows="3"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                  placeholder="توضیحات تصفیه حساب را وارد کنید" maxlength="500"></textarea>
-              </div>
-              <div *ngIf="settlementInfo?.invalid && (settlementInfo?.dirty || settlementInfo?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="settlementInfo?.errors?.['maxlength']">حداکثر ۵۰۰ حرف مجاز است</small>
-              </div>
-              <small class="text-gray-500 text-xs mt-1 block">{{ settlementInfo?.value?.length || 0 }}/500</small>
+        <h3 class="text-base font-extrabold text-[#1a2332]">جزئیات پرداخت و معاملات</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <app-multi-calendar-datepicker formControlName="taxPaymentDate" label="تاريخ تحويل ماليات"></app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <label for="transactionCount" class="block text-xs font-semibold text-[#4a5568] mb-1.5">تعدادی معامله</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-list-ol text-xs"></i></span>
+              <input type="text" appNumericInput id="transactionCount" formControlName="transactionCount" class="form-input pl-9" placeholder="تعداد معاملات را وارد کنید">
             </div>
-
-            <!-- Tax Payment Amount (تحويل ماليات - مبلغ) -->
-            <div>
-              <label for="taxPaymentAmount" class="block text-sm font-semibold text-gray-700 mb-2">تحويل ماليات (مبلغ) <span class="text-red-500">*</span></label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-money-bill-wave"></i>
-                </span>
-                <input type="text" appNumericInput [allowDecimal]="true" id="taxPaymentAmount" formControlName="taxPaymentAmount"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                  placeholder="مبلغ مالیات را وارد کنید">
-              </div>
-              <div *ngIf="taxPaymentAmount?.invalid && (taxPaymentAmount?.dirty || taxPaymentAmount?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="taxPaymentAmount?.errors?.['required']">این فیلد الزامی است</small>
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="taxPaymentAmount?.errors?.['min']">مبلغ باید مثبت باشد</small>
-              </div>
+            <div *ngIf="transactionCount?.invalid && (transactionCount?.dirty || transactionCount?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="transactionCount?.errors?.['min']">تعداد باید مثبت باشد</small>
             </div>
-
-            <!-- Settlement Year (سال تصفيه مالية) -->
-            <div>
-              <label for="settlementYear" class="block text-sm font-semibold text-gray-700 mb-2">سال تصفيه مالية</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-calendar-alt"></i>
-                </span>
-                <input type="text" appNumericInput id="settlementYear" formControlName="settlementYear"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                  placeholder="سال را وارد کنید">
-              </div>
-              <div *ngIf="settlementYear?.invalid && (settlementYear?.dirty || settlementYear?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="settlementYear?.errors?.['min'] || settlementYear?.errors?.['max']">سال باید بین ۱۳۰۰ و ۲۱۰۰ باشد</small>
-              </div>
+          </div>
+          <div>
+            <label for="companyCommission" class="block text-xs font-semibold text-[#4a5568] mb-1.5">كمیشن رهنما</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-percentage text-xs"></i></span>
+              <input type="text" appNumericInput [allowDecimal]="true" id="companyCommission" formControlName="companyCommission" class="form-input pl-9" placeholder="مبلغ کمیشن را وارد کنید">
+            </div>
+            <div *ngIf="companyCommission?.invalid && (companyCommission?.dirty || companyCommission?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="companyCommission?.errors?.['min']">مبلغ باید مثبت باشد</small>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Tax Payment and Transaction Details Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-receipt"></i>
-            <span>جزئیات پرداخت و معاملات</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Tax Payment Date (تاريخ تحويل ماليات) -->
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="taxPaymentDate"
-                label="تاريخ تحويل ماليات">
-              </app-multi-calendar-datepicker>
-            </div>
-
-            <!-- Transaction Count (تعدادی معامله) -->
-            <div>
-              <label for="transactionCount" class="block text-sm font-semibold text-gray-700 mb-2">تعدادی معامله</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-list-ol"></i>
-                </span>
-                <input type="text" appNumericInput id="transactionCount" formControlName="transactionCount"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder="تعداد معاملات را وارد کنید">
-              </div>
-              <div *ngIf="transactionCount?.invalid && (transactionCount?.dirty || transactionCount?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="transactionCount?.errors?.['min']">تعداد باید مثبت باشد</small>
-              </div>
-            </div>
-
-            <!-- Company Commission (كمیشن رهنما) -->
-            <div>
-              <label for="companyCommission" class="block text-sm font-semibold text-gray-700 mb-2">كمیشن رهنما</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-percentage"></i>
-                </span>
-                <input type="text" appNumericInput [allowDecimal]="true" id="companyCommission" formControlName="companyCommission"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder="مبلغ کمیشن را وارد کنید">
-              </div>
-              <div *ngIf="companyCommission?.invalid && (companyCommission?.dirty || companyCommission?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="companyCommission?.errors?.['min']">مبلغ باید مثبت باشد</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex gap-4 justify-center pb-6">
-        <button type="submit" [disabled]="accountForm.invalid" 
-          class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
-          <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
-        </button>
-        <button type="reset" (click)="resetForms()" 
-          class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas fa-plus-circle"></i>
-          <span>جدید</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</section>
+    <!-- Action Buttons -->
+    <div class="flex gap-3 justify-center pb-4">
+      <button type="submit" [disabled]="accountForm.invalid" class="btn-primary">
+        <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
+        <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+      </button>
+      <button type="reset" (click)="resetForms()" class="btn-secondary">
+        <i class="fas fa-plus-circle"></i>
+        <span>جدید</span>
+      </button>
+    </div>
+  </form>
+</div>

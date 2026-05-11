@@ -1,607 +1,453 @@
-<section class="w-full bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">ثبت مشخصات تضمین کننده ها</h1>
-      <p class="text-center text-gray-600">لطفا تمام معلومات مربوط به تضمین کننده و تضمین را با دقت تکمیل نمایید</p>
+<div class="space-y-5">
+  <form [formGroup]="guaranatorForm" (ngSubmit)="guaranatorForm.valid ? selectedId ? updateData() : addData() : null">
+    <div *ngIf="duplicateError" class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="flex items-start gap-3">
+        <i class="fas fa-exclamation-circle text-red-500 text-lg mt-0.5"></i>
+        <div class="text-red-700 text-sm font-medium whitespace-pre-line">{{ duplicateError }}</div>
+      </div>
+    </div>
+    <div *ngIf="isDuplicateCheckLoading" class="mb-4 flex items-center gap-2 text-[#004532] text-sm">
+      <i class="fas fa-spinner fa-spin"></i><span>در حال بررسی تکراری...</span>
+    </div>
+    <input type="hidden" formControlName="id">
+
+    <!-- Search License Application -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#d97706] flex items-center justify-center">
+          <i class="fas fa-search text-white text-[10px]"></i>
+        </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">جستجو از درخواست جواز</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div class="md:col-span-4">
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر عریضه</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-hashtag text-xs"></i></span>
+              <input type="text" [(ngModel)]="serialNumberSearch" [ngModelOptions]="{standalone: true}" (keyup.enter)="searchBySerialNumber()" class="form-input pl-9" placeholder="نمبر عریضه درخواست جواز را وارد کنید">
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <button type="button" (click)="searchBySerialNumber()" [disabled]="isSearching" class="btn-amber w-full">
+              <i class="fas" [ngClass]="isSearching ? 'fa-spinner fa-spin' : 'fa-search'"></i><span>جستجو</span>
+            </button>
+          </div>
+          <div class="md:col-span-6">
+            <p class="text-xs text-[#6f7973] mt-1">با جستجوی نمبر عریضه، معلومات تضمین‌کننده از درخواست جواز دریافت و فیلدهای زیر خودکار پر می‌شود</p>
+          </div>
+        </div>
+        <div *ngIf="showLicenseAppSearchResults && licenseAppSearchResults.length > 0" class="mt-4 relative">
+          <div class="absolute z-50 w-full bg-white border border-[#eceef0] rounded-lg shadow-xl max-h-64 overflow-y-auto">
+            <div class="bg-[#f9fafb] px-4 py-2 border-b border-[#eceef0] flex justify-between items-center">
+              <span class="text-xs font-semibold text-[#4a5568]">{{ licenseAppSearchResults.length }} درخواست یافت شد</span>
+              <button type="button" (click)="closeLicenseAppSearchResults()" class="text-[#6f7973] hover:text-[#1a2332]"><i class="fas fa-times text-xs"></i></button>
+            </div>
+            <div *ngFor="let app of licenseAppSearchResults" (click)="onLicenseAppSelected(app)" class="px-4 py-3 hover:bg-[#fffbeb] cursor-pointer border-b border-[#f3f4f6] transition-colors">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="font-semibold text-[#1a2332] text-sm">{{ app.applicantName }}</span>
+                  <span *ngIf="app.applicantFatherName" class="text-[#6f7973] mx-1 text-sm">ولد {{ app.applicantFatherName }}</span>
+                </div>
+                <span class="text-xs text-[#d97706] font-mono bg-[#fffbeb] px-2 py-1 rounded">{{ app.requestSerialNumber }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showGuarantorSelection && licenseAppGuarantors.length > 1" class="mt-4">
+          <div class="bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-4">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-xs font-semibold text-[#1e40af] flex items-center gap-2"><i class="fas fa-users"></i><span>{{ licenseAppGuarantors.length }} تضمین‌کننده یافت شد</span></h3>
+              <button type="button" (click)="closeGuarantorSelection()" class="text-[#6f7973] hover:text-[#1a2332]"><i class="fas fa-times text-xs"></i></button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div *ngFor="let g of licenseAppGuarantors; let i = index" (click)="fillGuarantorFromLicenseApplication(g)" class="bg-white border border-[#bfdbfe] rounded-lg p-4 hover:border-[#d97706] hover:bg-[#fffbeb] cursor-pointer transition-all">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-[#dbeafe] flex items-center justify-center text-[#1e40af] text-xs font-bold">{{ i + 1 }}</div>
+                  <div>
+                    <p class="font-semibold text-[#1a2332] text-sm">{{ g.guarantorName }}</p>
+                    <p *ngIf="g.guarantorFatherName" class="text-xs text-[#6f7973]">ولد {{ g.guarantorFatherName }}</p>
+                    <p class="text-xs text-[#6f7973] mt-1"><span class="inline-flex items-center px-2 py-0.5 rounded bg-[#fffbeb] text-[#d97706]">{{ getGuaranteeTypeName(g.guaranteeTypeId) }}</span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <form [formGroup]="guaranatorForm" (ngSubmit)="guaranatorForm.valid ? selectedId ? updateData() : addData() : null">
-      <!-- Duplicate Guarantor Error Alert -->
-      <div *ngIf="duplicateError" class="mb-4 bg-red-50 border border-red-300 rounded-lg p-4">
-        <div class="flex items-start gap-3">
-          <i class="fas fa-exclamation-circle text-red-500 text-xl mt-1"></i>
-          <div class="text-red-700 font-medium whitespace-pre-line">{{ duplicateError }}</div>
+    <!-- Personal Information -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#2563eb] flex items-center justify-center">
+          <i class="fas fa-user text-white text-[10px]"></i>
+        </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">معلومات شخصی تضمین کننده</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label for="firstName" class="block text-xs font-semibold text-[#4a5568] mb-1.5">اسم</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-user text-xs"></i></span>
+              <input type="text" id="firstName" formControlName="firstName" class="form-input pl-9">
+            </div>
+            <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="firstName?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">ولد</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-user text-xs"></i></span>
+              <input type="text" id="fatherName" formControlName="fatherName" class="form-input pl-9">
+            </div>
+            <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="fatherName?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">ولدیت</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-user text-xs"></i></span>
+              <input type="text" id="grandFatherName" formControlName="grandFatherName" class="form-input pl-9">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">شماره تماس</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-phone text-xs"></i></span>
+              <input type="text" id="phoneNumber" formControlName="phoneNumber" class="form-input pl-9">
+            </div>
+            <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="phoneNumber?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">الیکټرونیکی تذکره نمبر</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-id-card text-xs"></i></span>
+              <input type="text" id="electronicNationalIdNumber" formControlName="electronicNationalIdNumber" class="form-input pl-9" placeholder="الیکټرونیکی تذکره نمبر">
+            </div>
+            <div *ngIf="electronicNationalIdNumber?.invalid && (electronicNationalIdNumber?.dirty || electronicNationalIdNumber?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="electronicNationalIdNumber?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
         </div>
       </div>
-      <div *ngIf="isDuplicateCheckLoading" class="mb-4 flex items-center gap-2 text-blue-600">
-        <i class="fas fa-spinner fa-spin"></i>
-        <span>در حال بررسی تکراری...</span>
-      </div>
-      <div class="hidden">
-        <input type="hidden" formControlName="id">
-      </div>
+    </div>
 
-      <!-- Search License Application Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-search"></i>
-            <span>جستجو از درخواست جواز</span>
-          </h2>
+    <!-- Permanent Address -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#4f46e5] flex items-center justify-center">
+          <i class="fas fa-map-marker-alt text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div class="md:col-span-4">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر عریضه</label>
+        <h3 class="text-base font-extrabold text-[#1a2332]">سکونت اصلی</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">ولایت</label>
+            <ng-select formControlName="paddressProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterResults($event)" class="custom-ng-select"></ng-select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">ناحیه/ولسوالی</label>
+            <ng-select formControlName="paddressDistrictId" [items]="district" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+          </div>
+          <div>
+            <label for="paddressVillage" class="block text-xs font-semibold text-[#4a5568] mb-1.5">ګذر / قریه / ادرس بلاک</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-map-marker text-xs"></i></span>
+              <input type="text" id="paddressVillage" formControlName="paddressVillage" class="form-input pl-9">
+            </div>
+            <div *ngIf="paddressVillage?.invalid && (paddressVillage?.dirty || paddressVillage?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="paddressVillage?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Temporary Address -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#0d9488] flex items-center justify-center">
+          <i class="fas fa-map-marker-alt text-white text-[10px]"></i>
+        </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">سکونت فعلی</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">ولایت</label>
+            <ng-select formControlName="taddressProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterResults2($event)" class="custom-ng-select"></ng-select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">ناحیه/ولسوالی</label>
+            <ng-select formControlName="taddressDistrictId" [items]="district2" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+          </div>
+          <div>
+            <label for="taddressVillage" class="block text-xs font-semibold text-[#4a5568] mb-1.5">قریه</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-map-marker text-xs"></i></span>
+              <input type="text" id="taddressVillage" formControlName="taddressVillage" class="form-input pl-9">
+            </div>
+            <div *ngIf="taddressVillage?.invalid && (taddressVillage?.dirty || taddressVillage?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="taddressVillage?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guarantee Information -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#d97706] flex items-center justify-center">
+          <i class="fas fa-shield-alt text-white text-[10px]"></i>
+        </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">معلومات تضمین</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نوعیت تضمین <span class="text-red-500">*</span></label>
+            <ng-select [items]="localizedGuaranteeTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="guaranteeTypeId" (change)="onGuaranteeTypeChange()" class="custom-ng-select"></ng-select>
+            <div *ngIf="guaranteeTypeId?.invalid && (guaranteeTypeId?.dirty || guaranteeTypeId?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="guaranteeTypeId?.errors?.['required']">این فیلد الزامی است</small>
+            </div>
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="propertyDocumentDate" label="تاریخ سند(تضمین)"></app-multi-calendar-datepicker>
+          </div>
+        </div>
+
+        <!-- Sharia Deed Conditional Fields -->
+        <div *ngIf="showShariaDeedFields" class="border-t border-[#eceef0] pt-5 mt-5">
+          <h4 class="text-xs font-semibold text-[#4a5568] mb-4 flex items-center gap-2"><i class="fas fa-gavel text-[#d97706]"></i><span>معلومات قباله شرعی</span></h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر سند(تضمین)</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-hashtag"></i>
-                </span>
-                <input type="text" [(ngModel)]="serialNumberSearch" [ngModelOptions]="{standalone: true}" (keyup.enter)="searchBySerialNumber()" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all" placeholder="نمبر عریضه درخواست جواز را وارد کنید">
-              </div>
-            </div>
-            <div class="md:col-span-2">
-              <button type="button" (click)="searchBySerialNumber()" [disabled]="isSearching" class="w-full px-6 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                <i class="fas" [ngClass]="isSearching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
-                <span>جستجو</span>
-              </button>
-            </div>
-            <div class="md:col-span-6">
-              <p class="text-sm text-gray-500 mt-1">با جستجوی نمبر عریضه، معلومات تضمین‌کننده از درخواست جواز دریافت و فیلدهای زیر خودکار پر می‌شود: اسم، ولد، نوعیت تضمین، سکونت اصلی، سکونت فعلی</p>
-            </div>
-          </div>
-
-          <!-- Application Search Results Dropdown -->
-          <div *ngIf="showLicenseAppSearchResults && licenseAppSearchResults.length > 0" class="mt-4 relative">
-            <div class="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
-              <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
-                <span class="text-sm font-semibold text-gray-700">{{ licenseAppSearchResults.length }} درخواست یافت شد</span>
-                <button type="button" (click)="closeLicenseAppSearchResults()" class="text-gray-500 hover:text-gray-700">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <div *ngFor="let app of licenseAppSearchResults" (click)="onLicenseAppSelected(app)" class="px-4 py-3 hover:bg-amber-50 cursor-pointer border-b border-gray-100 transition-colors">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="font-semibold text-gray-800">{{ app.applicantName }}</span>
-                    <span *ngIf="app.applicantFatherName" class="text-gray-600 mx-1">ولد {{ app.applicantFatherName }}</span>
-                  </div>
-                  <span class="text-sm text-amber-600 font-mono bg-amber-50 px-2 py-1 rounded">{{ app.requestSerialNumber }}</span>
-                </div>
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+                <input type="text" id="propertyDocumentNumber" formControlName="propertyDocumentNumber" class="form-input pl-9">
               </div>
             </div>
           </div>
-
-          <!-- Guarantor Selection (when multiple guarantors found) -->
-          <div *ngIf="showGuarantorSelection && licenseAppGuarantors.length > 1" class="mt-4">
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div class="flex justify-between items-center mb-3">
-                <h3 class="text-sm font-semibold text-blue-700 flex items-center gap-2">
-                  <i class="fas fa-users"></i>
-                  <span>{{ licenseAppGuarantors.length }} تضمین‌کننده یافت شد - لطفاً یکی را انتخاب کنید</span>
-                </h3>
-                <button type="button" (click)="closeGuarantorSelection()" class="text-gray-500 hover:text-gray-700">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div *ngFor="let g of licenseAppGuarantors; let i = index" (click)="fillGuarantorFromLicenseApplication(g)" class="bg-white border border-blue-300 rounded-lg p-4 hover:border-amber-400 hover:bg-amber-50 cursor-pointer transition-all">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                      {{ i + 1 }}
-                    </div>
-                    <div>
-                      <p class="font-semibold text-gray-800">{{ g.guarantorName }}</p>
-                      <p *ngIf="g.guarantorFatherName" class="text-sm text-gray-600">ولد {{ g.guarantorFatherName }}</p>
-                      <p class="text-xs text-gray-500 mt-1">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-amber-100 text-amber-700">{{ getGuaranteeTypeName(g.guaranteeTypeId) }}</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Personal Information Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-user"></i>
-            <span>معلومات شخصی تضمین کننده</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">اسم</label>
+              <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">محکمه نوم <span class="text-red-500">*</span></label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-user"></i>
-                </span>
-                <input type="text" id="firstName" formControlName="firstName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-balance-scale text-xs"></i></span>
+                <input type="text" formControlName="courtName" class="form-input pl-9">
               </div>
-              <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="firstName?.errors?.['required']">این فیلد الزامی است</small>
+              <div *ngIf="courtName?.invalid && (courtName?.dirty || courtName?.touched)">
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="courtName?.errors?.['required']">این فیلد الزامی است</small>
               </div>
             </div>
-
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ولد</label>
+              <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر وثیقه <span class="text-red-500">*</span></label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-user"></i>
-                </span>
-                <input type="text" id="fatherName" formControlName="fatherName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-contract text-xs"></i></span>
+                <input type="text" formControlName="collateralNumber" class="form-input pl-9">
               </div>
-              <div *ngIf="fatherName?.invalid && (fatherName?.dirty || fatherName?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="fatherName?.errors?.['required']">این فیلد الزامی است</small>
+              <div *ngIf="collateralNumber?.invalid && (collateralNumber?.dirty || collateralNumber?.touched)">
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="collateralNumber?.errors?.['required']">این فیلد الزامی است</small>
               </div>
             </div>
+          </div>
+        </div>
 
+        <!-- Customary Deed Conditional Fields -->
+        <div *ngIf="showCustomaryDeedFields" class="border-t border-[#eceef0] pt-5 mt-5">
+          <h4 class="text-xs font-semibold text-[#4a5568] mb-4 flex items-center gap-2"><i class="fas fa-scroll text-[#d97706]"></i><span>معلومات قباله عرفی</span></h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ولدیت</label>
+              <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر سریال سټه <span class="text-red-500">*</span></label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-user"></i>
-                </span>
-                <input type="text" id="grandFatherName" formControlName="grandFatherName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-hashtag text-xs"></i></span>
+                <input type="text" formControlName="setSerialNumber" class="form-input pl-9">
+              </div>
+              <div *ngIf="setSerialNumber?.invalid && (setSerialNumber?.dirty || setSerialNumber?.touched)">
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="setSerialNumber?.errors?.['required']">این فیلد الزامی است</small>
               </div>
             </div>
-
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره تماس</label>
+              <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">ناحیه</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-phone"></i>
-                </span>
-                <input type="text" id="phoneNumber" formControlName="phoneNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-              <div *ngIf="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="phoneNumber?.errors?.['required']">این فیلد الزامی است</small>
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-map-marker-alt text-xs"></i></span>
+                <input type="text" formControlName="guaranteeDistrictName" class="form-input pl-9" placeholder="نام ناحیه را وارد کنید">
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Identity Card Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-id-card"></i>
-            <span>معلومات تذکره</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <!-- Cash Conditional Fields -->
+        <div *ngIf="showCashFields" class="border-t border-[#eceef0] pt-5 mt-5">
+          <h4 class="text-xs font-semibold text-[#4a5568] mb-4 flex items-center gap-2"><i class="fas fa-money-bill-wave text-[#d97706]"></i><span>معلومات پول نقد</span></h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">الیکټرونیکی تذکره نمبر</label>
+              <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">بانک <span class="text-red-500">*</span></label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-id-card"></i>
-                </span>
-                <input type="text" id="electronicNationalIdNumber" formControlName="electronicNationalIdNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="الیکټرونیکی تذکره نمبر">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-university text-xs"></i></span>
+                <input type="text" formControlName="bankName" class="form-input pl-9">
               </div>
-              <div *ngIf="electronicNationalIdNumber?.invalid && (electronicNationalIdNumber?.dirty || electronicNationalIdNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="electronicNationalIdNumber?.errors?.['required']">این فیلد الزامی است</small>
+              <div *ngIf="bankName?.invalid && (bankName?.dirty || bankName?.touched)">
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="bankName?.errors?.['required']">این فیلد الزامی است</small>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Permanent Address Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>سکونت اصلی</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
-              <ng-select formControlName="paddressProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterResults($event)" class="custom-ng-select">
-              </ng-select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
-              <ng-select formControlName="paddressDistrictId" [items]="district" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select">
-              </ng-select>
-            </div>
-
-            <div>
-              <label for="paddressVillage" class="block text-sm font-semibold text-gray-700 mb-2">ګذر / قریه / ادرس بلاک</label>
+              <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر اویز <span class="text-red-500">*</span></label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-map-marker"></i>
-                </span>
-                <input type="text" id="paddressVillage" formControlName="paddressVillage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-receipt text-xs"></i></span>
+                <input type="text" formControlName="depositNumber" class="form-input pl-9">
               </div>
-              <div *ngIf="paddressVillage?.invalid && (paddressVillage?.dirty || paddressVillage?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="paddressVillage?.errors?.['required']">این فیلد الزامی است</small>
+              <div *ngIf="depositNumber?.invalid && (depositNumber?.dirty || depositNumber?.touched)">
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="depositNumber?.errors?.['required']">این فیلد الزامی است</small>
+              </div>
+            </div>
+            <div>
+              <app-multi-calendar-datepicker formControlName="depositDate" label="تاریخ اویز" [required]="true"></app-multi-calendar-datepicker>
+              <div *ngIf="depositDate?.invalid && (depositDate?.dirty || depositDate?.touched)">
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="depositDate?.errors?.['required']">این فیلد الزامی است</small>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Temporary Address Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>سکونت فعلی</span>
-          </h2>
+    <!-- Maktob Information -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#e11d48] flex items-center justify-center">
+          <i class="fas fa-file-alt text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
-              <ng-select formControlName="taddressProvinceId" [items]="province" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="filterResults2($event)" class="custom-ng-select">
-              </ng-select>
+        <h3 class="text-base font-extrabold text-[#1a2332]">معلومات مکتوب</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">شماره مکتوب ارسالی به مرجع تضمین</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+              <input type="text" id="senderMaktobNumber" formControlName="senderMaktobNumber" class="form-input pl-9">
             </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
-              <ng-select formControlName="taddressDistrictId" [items]="district2" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select">
-              </ng-select>
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="senderMaktobDate" label="تاریخ مکتوب ارسالی به مرجع تضمین"></app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">شماره مکتوب جوابیه تضمین</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+              <input type="text" id="answerdMaktobNumber" formControlName="answerdMaktobNumber" class="form-input pl-9">
             </div>
-
-            <div>
-              <label for="taddressVillage" class="block text-sm font-semibold text-gray-700 mb-2">قریه</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-map-marker"></i>
-                </span>
-                <input type="text" id="taddressVillage" formControlName="taddressVillage" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-              <div *ngIf="taddressVillage?.invalid && (taddressVillage?.dirty || taddressVillage?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="taddressVillage?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
-            </div>
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="answerdMaktobDate" label="تاریخ مکتوب جوابیه تضمین"></app-multi-calendar-datepicker>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Guarantee Information Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-shield-alt"></i>
-            <span>معلومات تضمین</span>
-          </h2>
+    <!-- Guarantee Document Upload -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#0891b2] flex items-center justify-center">
+          <i class="fas fa-cloud-upload-alt text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تضمین <span class="text-red-500">*</span></label>
-              <ng-select [items]="localizedGuaranteeTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="guaranteeTypeId" (change)="onGuaranteeTypeChange()" class="custom-ng-select">
-              </ng-select>
-              <div *ngIf="guaranteeTypeId?.invalid && (guaranteeTypeId?.dirty || guaranteeTypeId?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="guaranteeTypeId?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
-            </div>
-
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="propertyDocumentDate"
-                label="تاریخ سند(تضمین)">
-              </app-multi-calendar-datepicker>
-            </div>
-          </div>
-
-          <!-- Sharia Deed Conditional Fields (قباله شرعی) -->
-          <div *ngIf="showShariaDeedFields" class="border-t border-gray-200 pt-6 mt-2">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <i class="fas fa-gavel text-amber-600"></i>
-              <span>معلومات قباله شرعی</span>
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر سند(تضمین)</label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-file-alt"></i>
-                  </span>
-                  <input type="text" id="propertyDocumentNumber" formControlName="propertyDocumentNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
-                </div>
-              </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">محکمه نوم <span class="text-red-500">*</span></label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-balance-scale"></i>
-                  </span>
-                  <input type="text" formControlName="courtName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
-                </div>
-                <div *ngIf="courtName?.invalid && (courtName?.dirty || courtName?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="courtName?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر وثیقه <span class="text-red-500">*</span></label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-file-contract"></i>
-                  </span>
-                  <input type="text" formControlName="collateralNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
-                </div>
-                <div *ngIf="collateralNumber?.invalid && (collateralNumber?.dirty || collateralNumber?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="collateralNumber?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Customary Deed Conditional Fields (قباله عرفی) -->
-          <div *ngIf="showCustomaryDeedFields" class="border-t border-gray-200 pt-6 mt-2">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <i class="fas fa-scroll text-amber-600"></i>
-              <span>معلومات قباله عرفی</span>
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر سریال سټه <span class="text-red-500">*</span></label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-hashtag"></i>
-                  </span>
-                  <input type="text" formControlName="setSerialNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
-                </div>
-                <div *ngIf="setSerialNumber?.invalid && (setSerialNumber?.dirty || setSerialNumber?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="setSerialNumber?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه</label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-map-marker-alt"></i>
-                  </span>
-                  <input type="text" formControlName="guaranteeDistrictName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all" placeholder="نام ناحیه را وارد کنید">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cash Conditional Fields (پول نقد) -->
-          <div *ngIf="showCashFields" class="border-t border-gray-200 pt-6 mt-2">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <i class="fas fa-money-bill-wave text-amber-600"></i>
-              <span>معلومات پول نقد</span>
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">بانک <span class="text-red-500">*</span></label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-university"></i>
-                  </span>
-                  <input type="text" formControlName="bankName" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
-                </div>
-                <div *ngIf="bankName?.invalid && (bankName?.dirty || bankName?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="bankName?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر اویز <span class="text-red-500">*</span></label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <i class="fas fa-receipt"></i>
-                  </span>
-                  <input type="text" formControlName="depositNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
-                </div>
-                <div *ngIf="depositNumber?.invalid && (depositNumber?.dirty || depositNumber?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="depositNumber?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
-              </div>
-
-              <div>
-                <app-multi-calendar-datepicker
-                  formControlName="depositDate"
-                  label="تاریخ اویز"
-                  [required]="true">
-                </app-multi-calendar-datepicker>
-                <div *ngIf="depositDate?.invalid && (depositDate?.dirty || depositDate?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="depositDate?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
-              </div>
-            </div>
-          </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">آپلود اسناد تضمین</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="bg-[#f9fafb] p-4 rounded-lg border border-[#eceef0]">
+          <app-fileupload #guaranteeFileUpload [existingFilePath]="guaranatorForm.get('guaranteeDocPath')?.value" documentType="company" acceptTypes="image/*,.pdf,.doc,.docx" (sendMessage)="guaranteeDocUploadFinished($event)"></app-fileupload>
         </div>
       </div>
+    </div>
 
-      <!-- Maktob Information Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-rose-600 to-rose-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-file-alt"></i>
-            <span>معلومات مکتوب</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره مکتوب ارسالی به مرجع تضمین</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-alt"></i>
-                </span>
-                <input type="text" id="senderMaktobNumber" formControlName="senderMaktobNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-            </div>
+    <!-- Form Action Buttons -->
+    <div class="flex gap-3 justify-center pb-4">
+      <button type="submit" [disabled]="guaranatorForm.invalid" class="btn-primary">
+        <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
+        <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+      </button>
+      <button type="reset" (click)="resetForms()" class="btn-secondary">
+        <i class="fas fa-plus-circle"></i>
+        <span>جدید</span>
+      </button>
+    </div>
+  </form>
 
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="senderMaktobDate"
-                label="تاریخ مکتوب ارسالی به مرجع تضمین">
-              </app-multi-calendar-datepicker>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">شماره مکتوب جوابیه تضمین</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-alt"></i>
-                </span>
-                <input type="text" id="answerdMaktobNumber" formControlName="answerdMaktobNumber" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-            </div>
-
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="answerdMaktobDate"
-                label="تاریخ مکتوب جوابیه تضمین">
-              </app-multi-calendar-datepicker>
-            </div>
+  <!-- Active Witness Section -->
+  <div *ngIf="activeWitness" class="bg-white rounded-xl border-2 border-[#059669] overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-lg bg-[#059669] flex items-center justify-center">
+        <i class="fas fa-check-circle text-white text-[10px]"></i>
+      </div>
+      <h3 class="text-base font-extrabold text-[#1a2332]">تضمین کننده فعال</h3>
+    </div>
+    <div class="p-5">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div><span class="text-xs text-[#6f7973]">نام:</span><p class="font-semibold text-[#1a2332] text-sm">{{ activeWitness.firstName }} {{ activeWitness.fatherName }}</p></div>
+            <div><span class="text-xs text-[#6f7973]">تذکره:</span><p class="font-semibold text-[#1a2332] text-sm">{{ activeWitness.electronicNationalIdNumber || '-' }}</p></div>
+            <div><span class="text-xs text-[#6f7973]">تلفن:</span><p class="font-semibold text-[#1a2332] text-sm">{{ activeWitness.phoneNumber }}</p></div>
+            <div><span class="text-xs text-[#6f7973]">نوعیت تضمین:</span><p class="font-semibold text-[#1a2332] text-sm">{{ getGuaranteeTypeName(activeWitness.guaranteeTypeId) }}</p></div>
           </div>
         </div>
-      </div>
-
-      <!-- Guarantee Document Upload Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-cyan-600 to-cyan-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <span>آپلود اسناد تضمین</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="space-y-4">
-            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-              <app-fileupload #guaranteeFileUpload 
-                [existingFilePath]="guaranatorForm.get('guaranteeDocPath')?.value"
-                documentType="company"
-                acceptTypes="image/*,.pdf,.doc,.docx"
-                (sendMessage)="guaranteeDocUploadFinished($event)">
-              </app-fileupload>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex gap-4 justify-center pb-6">
-        <button type="submit" [disabled]="guaranatorForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
-          <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
-        </button>
-        <button type="reset" (click)="resetForms()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas fa-plus-circle"></i>
-          <span>جدید</span>
-        </button>
-      </div>
-    </form>
-
-    <!-- Active Witness and History -->
-    <div class="space-y-6 mt-8">
-      <!-- Active Witness Section -->
-      <div *ngIf="activeWitness" class="bg-white rounded-xl shadow-md border-2 border-green-500 overflow-hidden">
-        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-check-circle"></i>
-            <span>تضمین کننده فعال</span>
-          </h2>
-        </div>
-        <div class="p-6">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <span class="text-sm text-gray-600">نام:</span>
-                  <p class="font-semibold text-gray-800">{{ activeWitness.firstName }} {{ activeWitness.fatherName }}</p>
-                </div>
-                <div>
-                  <span class="text-sm text-gray-600">تذکره:</span>
-                  <p class="font-semibold text-gray-800">{{ activeWitness.electronicNationalIdNumber || '-' }}</p>
-                </div>
-                <div>
-                  <span class="text-sm text-gray-600">تلفن:</span>
-                  <p class="font-semibold text-gray-800">{{ activeWitness.phoneNumber }}</p>
-                </div>
-                <div>
-                  <span class="text-sm text-gray-600">نوعیت تضمین:</span>
-                  <p class="font-semibold text-gray-800">{{ getGuaranteeTypeName(activeWitness.guaranteeTypeId) }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="mr-4 flex gap-2">
-              <button (click)="BindValu(activeWitness.id)" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-                <i class="fas fa-edit"></i>
-                <span>ویرایش</span>
-              </button>
-              <button (click)="deleteWitness(activeWitness.id)" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-                <i class="fas fa-trash"></i>
-                <span>حذف</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add New Witness Button -->
-      <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 text-center">
-        <p class="text-gray-700 mb-3">
-          <i class="fas fa-info-circle text-blue-600"></i>
-          برای اضافه کردن تضمین کننده جدید، فورم بالا را پر کنید و ثبت کنید
-        </p>
-        <p class="text-sm text-gray-600">
-          <i class="fas fa-exclamation-triangle text-amber-600"></i>
-          توجه: اضافه کردن تضمین کننده جدید، شاهد فعلی را منقضی می‌کند
-        </p>
-      </div>
-
-      <!-- Witness History Section -->
-      <div *ngIf="witnessHistory.length > 0" class="bg-white rounded-xl shadow-md border border-gray-300 overflow-hidden">
-        <div class="bg-gradient-to-r from-gray-600 to-gray-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-history"></i>
-            <span>تاریخچه شاهدان</span>
-          </h2>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50 border-b-2 border-gray-200">
-              <tr class="text-center">
-                <th class="px-4 py-4 text-sm font-bold text-gray-700">اسم</th>
-                <th class="px-4 py-4 text-sm font-bold text-gray-700">ولد</th>
-                <th class="px-4 py-4 text-sm font-bold text-gray-700">تذکره</th>
-                <th class="px-4 py-4 text-sm font-bold text-gray-700">تلفن</th>
-                <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت تضمین</th>
-                <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ انقضا</th>
-                <th class="px-4 py-4 text-sm font-bold text-gray-700">وضعیت</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              <tr *ngFor="let w of witnessHistory" class="text-center hover:bg-gray-50 transition-colors">
-                <td class="px-4 py-3 text-sm text-gray-700">{{ w.firstName }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ w.fatherName }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ w.electronicNationalIdNumber || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ w.phoneNumber }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ getGuaranteeTypeName(w.guaranteeTypeId) }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ w.expiredAt | calendarDate }}</td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">
-                    <i class="fas fa-lock mr-1"></i>
-                    منقضی شده
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="mr-4 flex gap-2">
+          <button (click)="BindValu(activeWitness.id)" class="btn-sm-blue"><i class="fas fa-edit"></i><span>ویرایش</span></button>
+          <button (click)="deleteWitness(activeWitness.id)" class="btn-sm-red"><i class="fas fa-trash"></i><span>حذف</span></button>
         </div>
       </div>
     </div>
   </div>
-</section>
+
+  <!-- Info Box -->
+  <div class="bg-[#eff6ff] border-2 border-[#bfdbfe] rounded-xl p-5 text-center">
+    <p class="text-[#4a5568] text-sm mb-2"><i class="fas fa-info-circle text-[#2563eb]"></i> برای اضافه کردن تضمین کننده جدید، فورم بالا را پر کنید و ثبت کنید</p>
+    <p class="text-xs text-[#6f7973]"><i class="fas fa-exclamation-triangle text-[#d97706]"></i> توجه: اضافه کردن تضمین کننده جدید، شاهد فعلی را منقضی می‌کند</p>
+  </div>
+
+  <!-- Witness History -->
+  <div *ngIf="witnessHistory.length > 0" class="bg-white rounded-xl border border-[#eceef0] overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-lg bg-[#6f7973] flex items-center justify-center">
+        <i class="fas fa-history text-white text-[10px]"></i>
+      </div>
+      <h3 class="text-base font-extrabold text-[#1a2332]">تاریخچه شاهدان</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-[#f9fafb] border-b border-[#eceef0]">
+          <tr class="text-center">
+            <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">اسم</th>
+            <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">ولد</th>
+            <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تذکره</th>
+            <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تلفن</th>
+            <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">نوعیت تضمین</th>
+            <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تاریخ انقضا</th>
+            <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">وضعیت</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#f3f4f6]">
+          <tr *ngFor="let w of witnessHistory" class="text-center hover:bg-[#f9fafb] transition-colors">
+            <td class="px-4 py-3 text-sm text-[#4a5568]">{{ w.firstName }}</td>
+            <td class="px-4 py-3 text-sm text-[#4a5568]">{{ w.fatherName }}</td>
+            <td class="px-4 py-3 text-sm text-[#4a5568]">{{ w.electronicNationalIdNumber || '-' }}</td>
+            <td class="px-4 py-3 text-sm text-[#4a5568]">{{ w.phoneNumber }}</td>
+            <td class="px-4 py-3 text-sm text-[#4a5568]">{{ getGuaranteeTypeName(w.guaranteeTypeId) }}</td>
+            <td class="px-4 py-3 text-sm text-[#4a5568]">{{ w.expiredAt | calendarDate }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#e5e7eb] text-[#6f7973]"><i class="fas fa-lock mr-1"></i>منقضی شده</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

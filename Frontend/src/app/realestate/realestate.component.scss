@@ -1,71 +1,78 @@
-mat-toolbar {
-  background: #004a9f;
-  color: white;
-}
-
-mat-sidenav {
-  margin: 16px;
-  width: 200px;
-  border-right: none;
-  background: #002b5c;
-  color: white;
-  border-radius: 10px;
-  padding: 16px;
-  text-align: center;
-}
-
-.content {
-  height: calc(100vh - 98px);
-  border-radius: 10px;
-  margin: 16px;
-  margin-left: 32px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 2rem;
-  color: lightgray;
-}
-
-mat-sidenav-container {
-  height: calc(100vh - 65px);
-}
-.menu-button {
-  width: 100%;
+/* Custom Stepper Navigation */
+.stepper-step {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  font-size: 1rem;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #eceef0;
+  color: #6f7973;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-  mat-icon {
-      margin-right: 8px;
+  &.active {
+    background: #004532;
+    color: #ffffff;
+    border-color: #004532;
+    box-shadow: 0 4px 12px rgba(0, 69, 50, 0.25);
+  }
+
+  &.done {
+    background: #d9e6dd;
+    color: #004532;
+    border-color: #8bd6b6;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .stepper-num {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  &.active .stepper-num {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  &.done .stepper-num {
+    background: #004532;
+    color: #ffffff;
+  }
+
+  .stepper-label {
+    white-space: nowrap;
   }
 }
 
-.avatar {
-  margin-top: 16px;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+.stepper-line {
+  width: 2.5rem;
+  height: 2px;
+  background: #bec9c2;
+  transition: background 0.3s ease;
+
+  &.filled {
+    background: #004532;
+  }
 }
 
-.name {
-  margin-top: 8px;
-  font-weight: normal;
+/* Hide mat-tab headers */
+:host ::ng-deep .hidden-tabs {
+  .mat-tab-header { display: none !important; }
+  .mat-tab-body-wrapper { border: none; }
 }
 
-.designation {
-  margin-top: 2px;
-  font-size: 0.7rem;
-  color: lightgrey;
-}
-
-mat-divider {
-  margin-top: 16px;
-  margin-bottom: 16px;
-  background-color: rgba(255, 255, 255, 0.5);
-}
-.spacer {
-  flex: 1 1 auto;
-}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

@@ -1,193 +1,131 @@
-<section class="w-full bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">فسخ / لغوه</h1>
-      <p class="text-center text-gray-600">لطفاً تمام معلومات مربوط به فسخ یا لغو جواز را با دقت تکمیل نمایید</p>
-    </div>
+<div class="space-y-5">
+  <form [formGroup]="cancellationForm" (ngSubmit)="cancellationForm.valid ? selectedId ? updateData() : addData() : null">
+    <input type="hidden" formControlName="id">
+    <input type="hidden" formControlName="companyId">
 
-    <form [formGroup]="cancellationForm" (ngSubmit)="cancellationForm.valid ? selectedId ? updateData() : addData() : null">
-      <div class="hidden">
-        <input type="hidden" formControlName="id">
-        <input type="hidden" formControlName="companyId">
-      </div>
-
-      <!-- Cancellation Type Selection -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-file-contract"></i>
-            <span>نوعیت ختم جواز</span>
-          </h2>
+    <!-- Cancellation Information Card -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#dc2626] flex items-center justify-center">
+          <i class="fas fa-file-contract text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Cancellation Type Dropdown -->
-            <div>
-              <label for="cancellationType" class="block text-sm font-semibold text-gray-700 mb-2"> نوعیت ختم جواز</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-list-alt"></i>
-                </span>
-                <select id="cancellationType" formControlName="cancellationType"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all appearance-none bg-white">
-                  <option value="فسخ">فسخ</option>
-                  <option value="لغوه">لغوه</option>
-                </select>
-              </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">معلومات {{ isLaghwa ? 'لغوه' : 'فسخ' }} جواز</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="cancellationType" class="block text-xs font-semibold text-[#4a5568] mb-1.5">نوعیت ختم جواز</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-list-alt text-xs"></i></span>
+              <select id="cancellationType" formControlName="cancellationType" class="form-input pl-9 appearance-none">
+                <option value="فسخ">فسخ</option>
+                <option value="لغوه">لغوه</option>
+              </select>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- فسخ Fields (shown when cancellationType is فسخ) -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" *ngIf="isFaskh">
-        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-file-contract"></i>
-            <span>معلومات فسخ جواز</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- License Cancellation Letter Number (نمبر مکتوب فسخ جواز) -->
+        <!-- فسخ Fields -->
+        <div *ngIf="isFaskh" class="mt-5 pt-5 border-t border-[#eceef0]">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 rounded-lg bg-[#dc2626] flex items-center justify-center"><i class="fas fa-file-contract text-white text-[9px]"></i></div>
+            <h4 class="text-xs font-bold text-[#1a2332]">معلومات فسخ جواز</h4>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label for="licenseCancellationLetterNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر مکتوب فسخ جواز</label>
+              <label for="licenseCancellationLetterNumber" class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر مکتوب فسخ جواز</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-alt"></i>
-                </span>
-                <input type="text" id="licenseCancellationLetterNumber" formControlName="licenseCancellationLetterNumber"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                  placeholder="نمبر مکتوب فسخ جواز را وارد کنید" maxlength="100">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+                <input type="text" id="licenseCancellationLetterNumber" formControlName="licenseCancellationLetterNumber" class="form-input pl-9" placeholder="نمبر مکتوب فسخ جواز را وارد کنید" maxlength="100">
               </div>
               <div *ngIf="licenseCancellationLetterNumber?.invalid && (licenseCancellationLetterNumber?.dirty || licenseCancellationLetterNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="licenseCancellationLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="licenseCancellationLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
               </div>
             </div>
-
-            <!-- Revenue Cancellation Letter Number (نمبر مکتوب فسخ عواید) -->
             <div>
-              <label for="revenueCancellationLetterNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر مکتوب فسخ عواید</label>
+              <label for="revenueCancellationLetterNumber" class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر مکتوب فسخ عواید</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-invoice"></i>
-                </span>
-                <input type="text" id="revenueCancellationLetterNumber" formControlName="revenueCancellationLetterNumber"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                  placeholder="نمبر مکتوب فسخ عواید را وارد کنید" maxlength="100">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-invoice text-xs"></i></span>
+                <input type="text" id="revenueCancellationLetterNumber" formControlName="revenueCancellationLetterNumber" class="form-input pl-9" placeholder="نمبر مکتوب فسخ عواید را وارد کنید" maxlength="100">
               </div>
               <div *ngIf="revenueCancellationLetterNumber?.invalid && (revenueCancellationLetterNumber?.dirty || revenueCancellationLetterNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="revenueCancellationLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="revenueCancellationLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
               </div>
             </div>
-
-            <!-- License Cancellation Letter Date (تاریخ مکتوب فسخ جواز) -->
             <div>
-              <app-multi-calendar-datepicker
-                formControlName="licenseCancellationLetterDate"
-                label="تاریخ مکتوب فسخ جواز">
-              </app-multi-calendar-datepicker>
+              <app-multi-calendar-datepicker formControlName="licenseCancellationLetterDate" label="تاریخ مکتوب فسخ جواز"></app-multi-calendar-datepicker>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- لغوه Fields (shown when cancellationType is لغوه) -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" *ngIf="isLaghwa">
-        <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-ban"></i>
-            <span>معلومات لغوه جواز</span>
-          </h2>
-        </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Revocation Letter Number (نمبر مکتوب لغوه جواز) -->
+        <!-- لغوه Fields -->
+        <div *ngIf="isLaghwa" class="mt-5 pt-5 border-t border-[#eceef0]">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 rounded-lg bg-[#ea580c] flex items-center justify-center"><i class="fas fa-ban text-white text-[9px]"></i></div>
+            <h4 class="text-xs font-bold text-[#1a2332]">معلومات لغوه جواز</h4>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label for="revocationLetterNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر مکتوب لغوه جواز</label>
+              <label for="revocationLetterNumber" class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر مکتوب لغوه جواز</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-alt"></i>
-                </span>
-                <input type="text" id="revocationLetterNumber" formControlName="revocationLetterNumber"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="نمبر مکتوب لغوه جواز را وارد کنید" maxlength="100">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+                <input type="text" id="revocationLetterNumber" formControlName="revocationLetterNumber" class="form-input pl-9" placeholder="نمبر مکتوب لغوه جواز را وارد کنید" maxlength="100">
               </div>
               <div *ngIf="revocationLetterNumber?.invalid && (revocationLetterNumber?.dirty || revocationLetterNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="revocationLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="revocationLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
               </div>
             </div>
-
-            <!-- Revocation Revenue Letter Number (نمبر مکتوب لغوه عواید) -->
             <div>
-              <label for="revocationRevenueLetterNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر مکتوب لغوه عواید</label>
+              <label for="revocationRevenueLetterNumber" class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر مکتوب لغوه عواید</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-invoice"></i>
-                </span>
-                <input type="text" id="revocationRevenueLetterNumber" formControlName="revocationRevenueLetterNumber"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="نمبر مکتوب لغوه عواید را وارد کنید" maxlength="100">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-invoice text-xs"></i></span>
+                <input type="text" id="revocationRevenueLetterNumber" formControlName="revocationRevenueLetterNumber" class="form-input pl-9" placeholder="نمبر مکتوب لغوه عواید را وارد کنید" maxlength="100">
               </div>
               <div *ngIf="revocationRevenueLetterNumber?.invalid && (revocationRevenueLetterNumber?.dirty || revocationRevenueLetterNumber?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="revocationRevenueLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
+                <small class="text-red-500 text-[11px] mt-1 block" *ngIf="revocationRevenueLetterNumber?.errors?.['maxlength']">حداکثر ۱۰۰ حرف مجاز است</small>
               </div>
             </div>
-
-            <!-- Revocation Letter Date (تاریخ مکتوب لغوه جواز) -->
             <div>
-              <app-multi-calendar-datepicker
-                formControlName="revocationLetterDate"
-                label="تاریخ مکتوب لغوه جواز">
-              </app-multi-calendar-datepicker>
+              <app-multi-calendar-datepicker formControlName="revocationLetterDate" label="تاریخ مکتوب لغوه جواز"></app-multi-calendar-datepicker>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Remarks Section -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-sticky-note"></i>
-            <span>ملاحظات</span>
-          </h2>
+    <!-- Remarks Section -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#d97706] flex items-center justify-center">
+          <i class="fas fa-sticky-note text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 gap-6">
-            <!-- Remarks (ملاحظات) -->
-            <div>
-              <label for="remarks" class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات / یادداشت‌ها</label>
-              <div class="relative">
-                <span class="absolute top-3 left-3 text-gray-500">
-                  <i class="fas fa-comment-alt"></i>
-                </span>
-                <textarea id="remarks" formControlName="remarks" rows="4"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                  placeholder="توضیحات اضافی، یادداشت‌های قانونی یا اداری را وارد کنید" maxlength="1000"></textarea>
-              </div>
-              <div *ngIf="remarks?.invalid && (remarks?.dirty || remarks?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="remarks?.errors?.['maxlength']">حداکثر ۱۰۰۰ حرف مجاز است</small>
-              </div>
-              <small class="text-gray-500 text-xs mt-1 block">{{ remarks?.value?.length || 0 }}/1000</small>
-            </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">ملاحظات</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div>
+          <label for="remarks" class="block text-xs font-semibold text-[#4a5568] mb-1.5">ملاحظات / یادداشت‌ها</label>
+          <div class="relative">
+            <span class="absolute top-3 left-3 text-[#9ca3af]"><i class="fas fa-comment-alt text-xs"></i></span>
+            <textarea id="remarks" formControlName="remarks" rows="4" class="form-input pl-9" placeholder="توضیحات اضافی، یادداشت‌های قانونی یا اداری را وارد کنید" maxlength="1000"></textarea>
           </div>
+          <div *ngIf="remarks?.invalid && (remarks?.dirty || remarks?.touched)">
+            <small class="text-red-500 text-[11px] mt-1 block" *ngIf="remarks?.errors?.['maxlength']">حداکثر ۱۰۰۰ حرف مجاز است</small>
+          </div>
+          <small class="text-[#6f7973] text-[11px] mt-1 block">{{ remarks?.value?.length || 0 }}/1000</small>
         </div>
       </div>
+    </div>
 
-      <!-- Action Buttons -->
-      <div class="flex gap-4 justify-center pb-6">
-        <button type="submit" 
-          class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
-          <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
-        </button>
-        <button type="reset" (click)="resetForms()" 
-          class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas fa-plus-circle"></i>
-          <span>جدید</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</section>
+    <!-- Action Buttons -->
+    <div class="flex gap-3 justify-center pb-4">
+      <button type="submit" class="btn-primary">
+        <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
+        <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+      </button>
+      <button type="reset" (click)="resetForms()" class="btn-secondary">
+        <i class="fas fa-plus-circle"></i>
+        <span>جدید</span>
+      </button>
+    </div>
+  </form>
+</div>

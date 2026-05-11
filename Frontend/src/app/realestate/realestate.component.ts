@@ -44,6 +44,12 @@ export class RealestateComponent extends BaseComponent {
       this.tabGroup.selectedIndex = nextIndex % (tabCount || 1);
     }
   }
+
+  setTab(index: number) {
+    if (this.tabGroup) {
+      this.tabGroup.selectedIndex = index;
+    }
+  }
   
   resetChild(){
     this.companydetails.resetChild();

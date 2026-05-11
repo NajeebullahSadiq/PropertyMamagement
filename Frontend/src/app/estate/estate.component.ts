@@ -21,6 +21,7 @@ import { WitnessdetailComponent } from './propertydetails/witnessdetail/witnessd
 export class EstateComponent extends BaseComponent {
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
   PropertyId: number=0;
+  currentTab: number = 0;
   @ViewChild('propertyDetails') propertyDetails!:PropertydetailsComponent;
   @ViewChild('propertySeller') propertySeller!: SellerdetailComponent;
   @ViewChild('propertyBuyer') propertyBuyer!: BuyerdetailComponent;
@@ -42,8 +43,13 @@ export class EstateComponent extends BaseComponent {
     const nextIndex = (this.tabGroup?.selectedIndex ?? 0) + 1;
     if (this.tabGroup) {
       const tabCount = this.tabGroup._tabs.length;
-      this.tabGroup.selectedIndex = nextIndex % (tabCount || 1);
+      this.currentTab = nextIndex % (tabCount || 1);
+      this.tabGroup.selectedIndex = this.currentTab;
     }
+  }
+
+  setTab(index: number) {
+    this.currentTab = index;
   }
 
   onTabChange(event: any) {

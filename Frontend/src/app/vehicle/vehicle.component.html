@@ -1,47 +1,62 @@
-<div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-  <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-    <mat-tab-group #tabGroup class="modern-tabs" (selectedTabChange)="setTab($event.index)">
-      <mat-tab class="blue-tab">
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <!-- Custom Stepper Navigation -->
+  <div class="flex items-center justify-center mb-6 gap-0">
+    <button (click)="currentTab = 0; setTab(0)" class="stepper-step" [class.active]="currentTab === 0" [class.done]="currentTab > 0">
+      <span class="stepper-num">۱</span>
+      <span class="stepper-label">وسایط نقلیه</span>
+    </button>
+    <div class="stepper-line" [class.filled]="currentTab > 0"></div>
+    <button (click)="vehicleService.mainTableId ? setTab(1) : null" class="stepper-step" [class.active]="currentTab === 1" [class.done]="currentTab > 1" [class.disabled]="vehicleService.mainTableId === 0">
+      <span class="stepper-num">۲</span>
+      <span class="stepper-label">فروشنده</span>
+    </button>
+    <div class="stepper-line" [class.filled]="currentTab > 1"></div>
+    <button (click)="vehicleService.mainTableId ? setTab(2) : null" class="stepper-step" [class.active]="currentTab === 2" [class.done]="currentTab > 2" [class.disabled]="vehicleService.mainTableId === 0">
+      <span class="stepper-num">۳</span>
+      <span class="stepper-label">مشتری</span>
+    </button>
+    <div class="stepper-line" [class.filled]="currentTab > 2"></div>
+    <button (click)="vehicleService.mainTableId ? setTab(3) : null" class="stepper-step" [class.active]="currentTab === 3" [class.disabled]="vehicleService.mainTableId === 0">
+      <span class="stepper-num">۴</span>
+      <span class="stepper-label">شاهدین</span>
+    </button>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+    <mat-tab-group #tabGroup class="hidden-tabs" [(selectedIndex)]="currentTab">
+      <mat-tab>
         <ng-template matTabLabel>
-          <div class="flex items-center gap-2 px-3 py-2">
-            <mat-icon class="large-icon text-blue-900">directions_car</mat-icon>
-            <span class="font-semibold">وسایط</span>
-          </div>
+          <mat-icon class="large-icon">directions_car</mat-icon>
+          وسایط
         </ng-template>
-        <div class="p-6">
+        <div class="p-0">
           <app-vehicle-submit #propertyDetails [id]="PropertyId" (next)="nextTab()"></app-vehicle-submit>
         </div>
       </mat-tab>
       <mat-tab [disabled]="vehicleService.mainTableId === 0">
         <ng-template matTabLabel>
-          <div class="flex items-center gap-2 px-3 py-2">
-            <mat-icon class="large-icon text-blue-900">person</mat-icon>
-            <span class="font-semibold">فروشنده</span>
-          </div>
+          <mat-icon class="large-icon">person</mat-icon>
+          فروشنده
         </ng-template>
-        <div class="p-6">
+        <div class="p-0">
           <app-sellerdetail #propertySeller [id]="PropertyId" (next)="nextTab()"></app-sellerdetail>
         </div>
       </mat-tab>
       <mat-tab [disabled]="vehicleService.mainTableId === 0">
         <ng-template matTabLabel>
-          <div class="flex items-center gap-2 px-3 py-2">
-            <mat-icon class="large-icon text-blue-900">person</mat-icon>
-            <span class="font-semibold">مشتری</span>
-          </div>
+          <mat-icon class="large-icon">person</mat-icon>
+          مشتری
         </ng-template>
-        <div class="p-6">
+        <div class="p-0">
           <app-buyerdetail #propertyBuyer [id]="PropertyId" (next)="nextTab()"></app-buyerdetail>
         </div>
       </mat-tab>
       <mat-tab [disabled]="vehicleService.mainTableId === 0">
         <ng-template matTabLabel>
-          <div class="flex items-center gap-2 px-3 py-2">
-            <mat-icon class="large-icon text-blue-900">person</mat-icon>
-            <span class="font-semibold">شاهدین</span>
-          </div>
+          <mat-icon class="large-icon">person</mat-icon>
+          شاهدین
         </ng-template>
-        <div class="p-6">
+        <div class="p-0">
           <app-witnessdetail #propertyWitness [id]="PropertyId" (next)="nextTab()"></app-witnessdetail>
         </div>
       </mat-tab>

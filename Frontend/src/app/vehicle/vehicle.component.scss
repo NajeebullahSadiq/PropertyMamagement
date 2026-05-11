@@ -1,5 +1,84 @@
+/* Hide Material tab header - we use custom stepper */
+::ng-deep .hidden-tabs .mat-mdc-tab-header {
+  display: none !important;
+}
+
+::ng-deep .hidden-tabs .mat-mdc-tab-body-wrapper {
+  background: #f7f9fb;
+}
+
+/* Custom Stepper Navigation */
+.stepper-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #eceef0;
+  color: #6f7973;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: #004532;
+    color: #ffffff;
+    border-color: #004532;
+    box-shadow: 0 4px 12px rgba(0, 69, 50, 0.25);
+  }
+
+  &.done {
+    background: #d9e6dd;
+    color: #004532;
+    border-color: #8bd6b6;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .stepper-num {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  &.active .stepper-num {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  &.done .stepper-num {
+    background: #004532;
+    color: #ffffff;
+  }
+
+  .stepper-label {
+    white-space: nowrap;
+  }
+}
+
+.stepper-line {
+  width: 2.5rem;
+  height: 2px;
+  background: #bec9c2;
+  transition: background 0.3s ease;
+
+  &.filled {
+    background: #004532;
+  }
+}
+
 .large-icon {
-   
-    color:#002b5c;
-     }
-     
+  font-size: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+}

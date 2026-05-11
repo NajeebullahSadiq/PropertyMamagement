@@ -1,33 +1,31 @@
-/* AccountInfo Component Styles */
-
-/* Custom ng-select styling to match the design */
+/* Premium Form Input */
+.form-input {
+  width: 100%; padding: 0.5625rem 0.875rem; border: 1.5px solid #d1d5db;
+  border-radius: 0.5rem; font-size: 0.8125rem; color: #1a2332; background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &::placeholder { color: #9ca3af; }
+  &:focus { outline: none; border-color: #004532; box-shadow: 0 0 0 3px rgba(0,69,50,0.1); }
+  &:hover:not(:focus) { border-color: #9ca3af; }
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.625rem 1.5rem; background: #004532; color: #fff;
+  font-size: 0.8125rem; font-weight: 600; border-radius: 0.5rem;
+  border: none; cursor: pointer; transition: background 0.15s, box-shadow 0.15s;
+  &:hover:not(:disabled) { background: #003528; box-shadow: 0 2px 8px rgba(0,69,50,0.2); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.625rem 1.5rem; background: #fff; color: #4a5568;
+  font-size: 0.8125rem; font-weight: 600; border-radius: 0.5rem;
+  border: 1.5px solid #d1d5db; cursor: pointer; transition: all 0.15s;
+  &:hover { background: #f9fafb; border-color: #9ca3af; }
+}
 :host ::ng-deep .custom-ng-select {
-  .ng-select-container {
-    border-radius: 0.5rem;
-    border-color: #d1d5db;
-    min-height: 42px;
-    
-    &:hover {
-      border-color: #9ca3af;
-    }
+  .ng-select-container { border-radius: 0.5rem; border-color: #d1d5db; min-height: 38px;
+    &:hover { border-color: #9ca3af; }
   }
-  
-  &.ng-select-focused {
-    .ng-select-container {
-      border-color: #14b8a6;
-      box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
-    }
-  }
+  &.ng-select-focused .ng-select-container { border-color: #004532; box-shadow: 0 0 0 3px rgba(0,69,50,0.1); }
 }
-
-/* Form input focus states */
-input:focus, textarea:focus, select:focus {
-  outline: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grid-cols-2 {
-    grid-template-columns: 1fr;
-  }
-}
+input:focus, textarea:focus, select:focus { outline: none; }

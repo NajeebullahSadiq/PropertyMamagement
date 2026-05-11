@@ -1,291 +1,170 @@
-<div class="container p-6">
-  <div class="max-w-7xl mx-auto">
-    <form [formGroup]="licenseForm" (ngSubmit)="licenseForm.valid ? selectedId ? updateData() : addData() : null">
-      <div class="hidden">
-        <input type="hidden" formControlName="id">
-      </div>
+<div class="space-y-5">
+  <form [formGroup]="licenseForm" (ngSubmit)="licenseForm.valid ? selectedId ? updateData() : addData() : null">
+    <input type="hidden" formControlName="id">
 
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i class="fas fa-file-alt"></i>
-            <span>معلومات جواز</span>
-          </h3>
+    <!-- License Information Card -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#2563eb] flex items-center justify-center">
+          <i class="fas fa-file-alt text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-4">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <!-- Province Selector - FIRST FIELD -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <span class="text-red-500">*</span> ولایت
-              </label>
-              <ng-select 
-                [items]="provinces" 
-                [selectOnTab]="true" 
-                bindLabel="dari" 
-                bindValue="id" 
-                formControlName="provinceId" 
-                class="custom-ng-select"
-                placeholder="ولایت را انتخاب کنید">
-              </ng-select>
-              <div *ngIf="provinceId?.invalid && (provinceId?.dirty || provinceId?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="provinceId?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
-              <!-- Show message for non-admin users -->
-              <small *ngIf="!isAdmin && userProvinceId" class="text-blue-600 text-xs mt-1 block">
-                <i class="fas fa-info-circle"></i> ولایت از پروفایل شما خودکار انتخاب شده است
-              </small>
+        <h3 class="text-base font-extrabold text-[#1a2332]">معلومات جواز</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5"><span class="text-red-500">*</span> ولایت</label>
+            <ng-select [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" formControlName="provinceId" class="custom-ng-select" placeholder="ولایت را انتخاب کنید"></ng-select>
+            <div *ngIf="provinceId?.invalid && (provinceId?.dirty || provinceId?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="provinceId?.errors?.['required']">این فیلد الزامی است</small>
             </div>
-
-            <!-- License Number - AUTO-GENERATED (editable for admin) -->
-            <div>
-              <label for="licenseNumber" class="block text-sm font-semibold text-gray-700 mb-2">
-                شماره جواز
-                <span class="text-xs text-gray-500" *ngIf="!isAdmin">(خودکار)</span>
-              </label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-alt"></i>
-                </span>
-                <input 
-                  type="text" 
-                  id="licenseNumber" 
-                  formControlName="licenseNumber" 
-                  [readonly]="!isAdmin"
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  [ngClass]="{'bg-gray-50 cursor-not-allowed': !isAdmin}"
-                  [placeholder]="isAdmin ? 'شماره جواز را وارد کنید' : 'خودکار تولید می‌شود'">
-              </div>
-              <small class="text-gray-500 text-xs mt-1 block" *ngIf="!isAdmin">
-                <i class="fas fa-info-circle"></i> بعد از انتخاب ولایت و ذخیره، شماره جواز خودکار تولید می‌شود
-              </small>
-              <small class="text-blue-600 text-xs mt-1 block" *ngIf="isAdmin">
-                <i class="fas fa-edit"></i> به عنوان مدیر، شما می‌توانید شماره جواز را وارد یا تغییر دهید
-              </small>
+            <small *ngIf="!isAdmin && userProvinceId" class="text-[#004532] text-[11px] mt-1 block"><i class="fas fa-info-circle"></i> ولایت از پروفایل شما خودکار انتخاب شده است</small>
+          </div>
+          <div>
+            <label for="licenseNumber" class="block text-xs font-semibold text-[#4a5568] mb-1.5">شماره جواز <span class="text-[#9ca3af] text-[10px]" *ngIf="!isAdmin">(خودکار)</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+              <input type="text" id="licenseNumber" formControlName="licenseNumber" [readonly]="!isAdmin" class="form-input pl-9" [ngClass]="{'bg-[#f9fafb] cursor-not-allowed': !isAdmin}" [placeholder]="isAdmin ? 'شماره جواز را وارد کنید' : 'خودکار تولید می‌شود'">
             </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">نوع جواز</label>
-              <ng-select [items]="licenseTypes" [selectOnTab]="true" bindLabel="dari" bindValue="id" formControlName="licenseType" class="custom-ng-select">
-              </ng-select>
-              <div *ngIf="licenseType?.invalid && (licenseType?.dirty || licenseType?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="licenseType?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
+            <small class="text-[#6f7973] text-[11px] mt-1 block" *ngIf="!isAdmin"><i class="fas fa-info-circle"></i> بعد از انتخاب ولایت و ذخیره، شماره جواز خودکار تولید می‌شود</small>
+            <small class="text-[#2563eb] text-[11px] mt-1 block" *ngIf="isAdmin"><i class="fas fa-edit"></i> به عنوان مدیر، شما می‌توانید شماره جواز را وارد یا تغییر دهید</small>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نوع جواز</label>
+            <ng-select [items]="licenseTypes" [selectOnTab]="true" bindLabel="dari" bindValue="id" formControlName="licenseType" class="custom-ng-select"></ng-select>
+            <div *ngIf="licenseType?.invalid && (licenseType?.dirty || licenseType?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="licenseType?.errors?.['required']">این فیلد الزامی است</small>
             </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت جواز</label>
-              <ng-select [items]="licenseCategoryOptions" [selectOnTab]="true" bindLabel="label" bindValue="value" formControlName="licenseCategory" class="custom-ng-select" placeholder="انتخاب نوعیت جواز">
-              </ng-select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">نوعیت جواز</label>
+            <ng-select [items]="licenseCategoryOptions" [selectOnTab]="true" bindLabel="label" bindValue="value" formControlName="licenseCategory" class="custom-ng-select" placeholder="انتخاب نوعیت جواز"></ng-select>
+          </div>
+          <div *ngIf="licenseCategory?.value === 'تجدید'">
+            <label for="renewalRound" class="block text-xs font-semibold text-[#4a5568] mb-1.5">دور تجدید</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-redo text-xs"></i></span>
+              <input type="number" id="renewalRound" formControlName="renewalRound" min="1" class="form-input pl-9" placeholder="دور تجدید را وارد کنید">
             </div>
-
-            <!-- Renewal Round Field - Only shown when تجدید is selected -->
-            <div *ngIf="licenseCategory?.value === 'تجدید'">
-              <label for="renewalRound" class="block text-sm font-semibold text-gray-700 mb-2">دور تجدید</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-redo"></i>
-                </span>
-                <input type="number" id="renewalRound" formControlName="renewalRound" min="1" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="دور تجدید را وارد کنید">
-              </div>
-              <div *ngIf="renewalRound?.invalid && (renewalRound?.dirty || renewalRound?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="renewalRound?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
+            <div *ngIf="renewalRound?.invalid && (renewalRound?.dirty || renewalRound?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="renewalRound?.errors?.['required']">این فیلد الزامی است</small>
             </div>
-
-            <!-- Duplicate Issue Date (تاریخ صدور مثنی) - Only shown when مثنی is selected -->
-            <div *ngIf="licenseCategory?.value === 'مثنی'">
-              <app-multi-calendar-datepicker
-                formControlName="duplicateIssueDate"
-                label="تاریخ صدور مثنی">
-              </app-multi-calendar-datepicker>
-              <div *ngIf="duplicateIssueDate?.invalid && (duplicateIssueDate?.dirty || duplicateIssueDate?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="duplicateIssueDate?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
+          </div>
+          <div *ngIf="licenseCategory?.value === 'مثنی'">
+            <app-multi-calendar-datepicker formControlName="duplicateIssueDate" label="تاریخ صدور مثنی"></app-multi-calendar-datepicker>
+            <div *ngIf="duplicateIssueDate?.invalid && (duplicateIssueDate?.dirty || duplicateIssueDate?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="duplicateIssueDate?.errors?.['required']">این فیلد الزامی است</small>
             </div>
-
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="issueDate"
-                label="تاریخ صدور جواز">
-              </app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="issueDate" label="تاریخ صدور جواز"></app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <div class="relative">
+              <app-multi-calendar-datepicker formControlName="expireDate" [disabled]="true" label="تاریخ ختم جواز"></app-multi-calendar-datepicker>
+              <span class="absolute top-0 left-0 mt-1 ml-1 text-[10px] px-2 py-0.5 rounded-full bg-[#e5e7eb] text-[#6f7973]">سیستمی</span>
             </div>
-
-            <div>
-              <div class="relative">
-                <app-multi-calendar-datepicker
-                  formControlName="expireDate"
-                  [disabled]="true"
-                  label="تاریخ ختم جواز">
-                </app-multi-calendar-datepicker>
-                <span class="absolute top-0 left-0 mt-1 ml-1 text-[10px] px-2 py-0.5 rounded-full bg-gray-200 text-gray-700">
-                  سیستمی
-                </span>
-              </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">محل انتقال <span class="text-[#9ca3af] text-[10px]">(اختیاری)</span></label>
+            <input type="text" formControlName="transferLocation" class="form-input" placeholder="محل انتقال را وارد کنید">
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="transferLocationDate" label="تاریخ محل انتقال"></app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#4a5568] mb-1.5">محل فعالیت <span class="text-[#9ca3af] text-[10px]">(اختیاری)</span></label>
+            <input type="text" formControlName="activityLocation" class="form-input" placeholder="محل فعالیت را وارد کنید">
+          </div>
+          <div>
+            <label for="officeAddress" class="block text-xs font-semibold text-[#4a5568] mb-1.5">آدرس دقیق دفتر</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-map-marker text-xs"></i></span>
+              <input type="text" id="officeAddress" formControlName="officeAddress" class="form-input pl-9">
             </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                محل انتقال
-                <span class="text-xs text-gray-500">(اختیاری)</span>
-              </label>
-              <input type="text" formControlName="transferLocation" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="محل انتقال را وارد کنید">
-            </div>
-
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="transferLocationDate"
-                label="تاریخ محل انتقال">
-              </app-multi-calendar-datepicker>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                محل فعالیت
-                <span class="text-xs text-gray-500">(اختیاری)</span>
-              </label>
-              <input type="text" formControlName="activityLocation" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="محل فعالیت را وارد کنید">
-            </div>
-
-            <div>
-              <label for="officeAddress" class="block text-sm font-semibold text-gray-700 mb-2">آدرس دقیق دفتر</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-map-marker"></i>
-                </span>
-                <input type="text" id="officeAddress" formControlName="officeAddress" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-              </div>
-              <div *ngIf="officeAddress?.invalid && (officeAddress?.dirty || officeAddress?.touched)">
-                <small class="text-red-600 text-xs mt-1 block" *ngIf="officeAddress?.errors?.['required']">این فیلد الزامی است</small>
-              </div>
+            <div *ngIf="officeAddress?.invalid && (officeAddress?.dirty || officeAddress?.touched)">
+              <small class="text-red-500 text-[11px] mt-1 block" *ngIf="officeAddress?.errors?.['required']">این فیلد الزامی است</small>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
-        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <span>آپلود اسنادها در سیستم</span>
-          </h3>
-        </div>
-        <div class="px-6 py-4">
-          <div class="space-y-4">
-            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-              <app-fileupload #childComponent 
-                [existingFilePath]="licenseForm.get('docPath')?.value"
-                documentType="license"
-                acceptTypes="image/*,.pdf,.doc,.docx"
-                (sendMessage)="uploadFinished($event)">
-              </app-fileupload>
-            </div>
+        <!-- Document Upload -->
+        <div class="mt-5 pt-5 border-t border-[#eceef0]">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-6 h-6 rounded-lg bg-[#6366f1] flex items-center justify-center"><i class="fas fa-cloud-upload-alt text-white text-[9px]"></i></div>
+            <h4 class="text-xs font-bold text-[#1a2332]">آپلود اسنادها در سیستم</h4>
+          </div>
+          <div class="bg-[#f9fafb] p-4 rounded-lg border border-[#eceef0]">
+            <app-fileupload #childComponent [existingFilePath]="licenseForm.get('docPath')?.value" documentType="license" acceptTypes="image/*,.pdf,.doc,.docx" (sendMessage)="uploadFinished($event)"></app-fileupload>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Financial and Administrative Section (جزئیات مالی و اسناد جواز) -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4">
-        <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-3">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i class="fas fa-file-invoice-dollar"></i>
-            <span>جزئیات مالی و اسناد جواز</span>
-          </h3>
+    <!-- Financial and Administrative Section -->
+    <div class="bg-white rounded-xl border border-[#eceef0] overflow-hidden mb-5">
+      <div class="px-5 py-3.5 border-b border-[#eceef0] flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg bg-[#059669] flex items-center justify-center">
+          <i class="fas fa-file-invoice-dollar text-white text-[10px]"></i>
         </div>
-        <div class="px-6 py-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Royalty Amount (مبلغ حق‌الامتیاز) -->
-            <div>
-              <label for="royaltyAmount" class="block text-sm font-semibold text-gray-700 mb-2">مبلغ حق‌الامتیاز</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-money-bill-wave"></i>
-                </span>
-                <input type="text" appNumericInput [allowDecimal]="true" id="royaltyAmount" formControlName="royaltyAmount" 
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                  placeholder="مبلغ را وارد کنید">
-              </div>
+        <h3 class="text-base font-extrabold text-[#1a2332]">جزئیات مالی و اسناد جواز</h3>
+      </div>
+      <div class="px-5 py-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="royaltyAmount" class="block text-xs font-semibold text-[#4a5568] mb-1.5">مبلغ حق‌الامتیاز</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-money-bill-wave text-xs"></i></span>
+              <input type="text" appNumericInput [allowDecimal]="true" id="royaltyAmount" formControlName="royaltyAmount" class="form-input pl-9" placeholder="مبلغ را وارد کنید">
             </div>
-
-            <!-- Royalty Date (تاریخ حق‌الامتیاز) -->
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="royaltyDate"
-                label="تاریخ پرداخت تعرفه">
-              </app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="royaltyDate" label="تاریخ پرداخت تعرفه"></app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <label for="tariffNumber" class="block text-xs font-semibold text-[#4a5568] mb-1.5">نمبر تعرفه</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-hashtag text-xs"></i></span>
+              <input type="text" id="tariffNumber" formControlName="tariffNumber" class="form-input pl-9" placeholder="نمبر تعرفه را وارد کنید">
             </div>
-
-            <div>
-              <label for="tariffNumber" class="block text-sm font-semibold text-gray-700 mb-2">نمبر تعرفه</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-hashtag"></i>
-                </span>
-                <input type="text" id="tariffNumber" formControlName="tariffNumber" 
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                  placeholder="نمبر تعرفه را وارد کنید">
-              </div>
+          </div>
+          <div>
+            <label for="penaltyAmount" class="block text-xs font-semibold text-[#4a5568] mb-1.5">مبلغ جریمه</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-exclamation-triangle text-xs"></i></span>
+              <input type="text" appNumericInput [allowDecimal]="true" id="penaltyAmount" formControlName="penaltyAmount" class="form-input pl-9" placeholder="مبلغ جریمه را وارد کنید">
             </div>
-
-            <!-- Penalty Amount (مبلغ جریمه) -->
-            <div>
-              <label for="penaltyAmount" class="block text-sm font-semibold text-gray-700 mb-2">مبلغ جریمه</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-exclamation-triangle"></i>
-                </span>
-                <input type="text" appNumericInput [allowDecimal]="true" id="penaltyAmount" formControlName="penaltyAmount" 
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                  placeholder="مبلغ جریمه را وارد کنید">
-              </div>
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="penaltyDate" label="تاریخ جریمه"></app-multi-calendar-datepicker>
+          </div>
+          <div>
+            <label for="hrLetter" class="block text-xs font-semibold text-[#4a5568] mb-1.5">مکتوب قوای بشری</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#9ca3af]"><i class="fas fa-file-alt text-xs"></i></span>
+              <input type="text" id="hrLetter" formControlName="hrLetter" class="form-input pl-9" placeholder="شماره یا توضیحات مکتوب">
             </div>
-
-            <!-- Penalty Date (تاریخ جریمه) -->
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="penaltyDate"
-                label="تاریخ جریمه">
-              </app-multi-calendar-datepicker>
-            </div>
-
-            <!-- HR Letter (مکتوب قوای بشری) -->
-            <div>
-              <label for="hrLetter" class="block text-sm font-semibold text-gray-700 mb-2">مکتوب قوای بشری</label>
-              <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-file-alt"></i>
-                </span>
-                <input type="text" id="hrLetter" formControlName="hrLetter" 
-                  class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                  placeholder="شماره یا توضیحات مکتوب">
-              </div>
-            </div>
-
-            <!-- HR Letter Date (تاریخ مکتوب قوای بشری) -->
-            <div>
-              <app-multi-calendar-datepicker
-                formControlName="hrLetterDate"
-                label="تاریخ مکتوب قوای بشری">
-              </app-multi-calendar-datepicker>
-            </div>
+          </div>
+          <div>
+            <app-multi-calendar-datepicker formControlName="hrLetterDate" label="تاریخ مکتوب قوای بشری"></app-multi-calendar-datepicker>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="flex gap-4 justify-center pb-4">
-        <button type="submit" [disabled]="licenseForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
-          <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
-        </button>
-        <button type="reset" (click)="resetForms()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas fa-plus-circle"></i>
-          <span>جدید</span>
-        </button>
-        <button type="button" (click)="navigateToPrint()" class="px-8 py-3 bg-gray-700 hover:bg-gray-800 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-          <i class="fas fa-print"></i>
-          <span>چاپ جواز</span>
-        </button>
-      </div>
-    </form>
-  </div>
+    <!-- Action Buttons -->
+    <div class="flex gap-3 justify-center pb-4">
+      <button type="submit" [disabled]="licenseForm.invalid" class="btn-primary">
+        <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
+        <span>{{selectedId ? 'تغیر معلومات' : 'ثبت معلومات'}}</span>
+      </button>
+      <button type="reset" (click)="resetForms()" class="btn-secondary">
+        <i class="fas fa-plus-circle"></i>
+        <span>جدید</span>
+      </button>
+      <button type="button" (click)="navigateToPrint()" class="btn-dark">
+        <i class="fas fa-print"></i>
+        <span>چاپ جواز</span>
+      </button>
+    </div>
+  </form>
 </div>

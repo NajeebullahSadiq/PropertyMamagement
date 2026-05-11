@@ -1,1 +1,21 @@
-/* Company Details View - Matches Property Details View styling */
+.btn-sm-green {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.375rem 0.75rem; background: #059669; color: #fff;
+  font-size: 0.75rem; font-weight: 600; border-radius: 0.375rem;
+  border: none; cursor: pointer; transition: background 0.15s;
+  &:hover { background: #047857; }
+}
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.375rem 0.75rem; background: #4b5563; color: #fff;
+  font-size: 0.75rem; font-weight: 600; border-radius: 0.375rem;
+  border: none; cursor: pointer; transition: background 0.15s;
+  &:hover { background: #374151; }
+}
+.btn-action {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.75rem; height: 1.75rem; font-size: 0.625rem; font-weight: 600;
+  border-radius: 0.375rem; border: none; cursor: pointer; transition: background 0.15s;
+}
+.btn-action-view { background: #2563eb; color: #fff; &:hover { background: #1d4ed8; } }
+.btn-action-download { background: #059669; color: #fff; &:hover { background: #047857; } }

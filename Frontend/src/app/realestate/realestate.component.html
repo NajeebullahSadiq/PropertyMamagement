@@ -1,54 +1,131 @@
-<div class="container">
-  <mat-tab-group #tabGroup>
-    <!-- Tab 1: Office Information (اطلاعات دفتر) -->
-    <mat-tab class="blue-tab">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">business</mat-icon>
-        اطلاعات دفتر
-      </ng-template>
-      <app-companydetails #companydetails [id]="PropertyId" (next)="nextTab()"></app-companydetails>
-    </mat-tab>
+<div class="min-h-screen bg-[#f6f7f9]">
+  <!-- Page Header -->
+  <div class="bg-white border-b border-[#eceef0] px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#004532] flex items-center justify-center">
+          <i class="fas fa-building text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-[#1a2332]">ثبت دفتر رهنمایی معاملات</h1>
+          <p class="text-xs text-[#6f7973]">معلومات کامل دفتر رهنمایی معاملات را ثبت نمایید</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- Tab 2: Owner Information (مالک) -->
-    <mat-tab [disabled]="comservice.mainTableId === 0">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">person</mat-icon>
-        مالک
-      </ng-template>
-      <app-companyowner #companyowner [id]="PropertyId" (next)="nextTab()"></app-companyowner>
-    </mat-tab>
+  <!-- Stepper Navigation -->
+  <div class="bg-white border-b border-[#eceef0] sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex items-center justify-center gap-0 overflow-x-auto py-3 scrollbar-hide">
+        <button type="button" (click)="setTab(0)"
+          class="stepper-step"
+          [class.active]="tabGroup?.selectedIndex === 0"
+          [class.done]="(tabGroup?.selectedIndex ?? 0) > 0">
+          <span class="stepper-num">۱</span>
+          <span class="stepper-label">اطلاعات دفتر</span>
+        </button>
 
-    <!-- Tab 3: License Information (جواز) -->
-    <mat-tab [disabled]="comservice.mainTableId === 0">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">description</mat-icon>
-        جواز
-      </ng-template>
-      <app-licensedetails #licensedetails [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
-    </mat-tab>
+        <div class="stepper-line" [class.filled]="(tabGroup?.selectedIndex ?? 0) > 0"></div>
 
-    <mat-tab [disabled]="comservice.mainTableId === 0">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">security</mat-icon>
-        تضمین کنندگان
-      </ng-template>
-      <app-guaranators #guaranators [id]="PropertyId" (next)="nextTab()"></app-guaranators>
-    </mat-tab>
+        <button type="button" (click)="setTab(1)"
+          class="stepper-step"
+          [class.active]="tabGroup?.selectedIndex === 1"
+          [class.done]="(tabGroup?.selectedIndex ?? 0) > 1"
+          [class.disabled]="comservice.mainTableId === 0"
+          [disabled]="comservice.mainTableId === 0">
+          <span class="stepper-num">۲</span>
+          <span class="stepper-label">مالک</span>
+        </button>
 
-    <mat-tab [disabled]="comservice.mainTableId === 0">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">account_balance</mat-icon>
-        مالیه
-      </ng-template>
-      <app-accountinfo #accountinfo [id]="PropertyId" (next)="nextTab()"></app-accountinfo>
-    </mat-tab>
+        <div class="stepper-line" [class.filled]="(tabGroup?.selectedIndex ?? 0) > 1"></div>
 
-    <mat-tab [disabled]="comservice.mainTableId === 0">
-      <ng-template matTabLabel>
-        <mat-icon class="large-icon">cancel</mat-icon>
-        فسخ / لغوه
-      </ng-template>
-      <app-cancellationinfo #cancellationinfo [id]="PropertyId" (next)="nextTab()"></app-cancellationinfo>
-    </mat-tab>
-  </mat-tab-group>
+        <button type="button" (click)="setTab(2)"
+          class="stepper-step"
+          [class.active]="tabGroup?.selectedIndex === 2"
+          [class.done]="(tabGroup?.selectedIndex ?? 0) > 2"
+          [class.disabled]="comservice.mainTableId === 0"
+          [disabled]="comservice.mainTableId === 0">
+          <span class="stepper-num">۳</span>
+          <span class="stepper-label">جواز</span>
+        </button>
+
+        <div class="stepper-line" [class.filled]="(tabGroup?.selectedIndex ?? 0) > 2"></div>
+
+        <button type="button" (click)="setTab(3)"
+          class="stepper-step"
+          [class.active]="tabGroup?.selectedIndex === 3"
+          [class.done]="(tabGroup?.selectedIndex ?? 0) > 3"
+          [class.disabled]="comservice.mainTableId === 0"
+          [disabled]="comservice.mainTableId === 0">
+          <span class="stepper-num">۴</span>
+          <span class="stepper-label">تضمین کنندگان</span>
+        </button>
+
+        <div class="stepper-line" [class.filled]="(tabGroup?.selectedIndex ?? 0) > 3"></div>
+
+        <button type="button" (click)="setTab(4)"
+          class="stepper-step"
+          [class.active]="tabGroup?.selectedIndex === 4"
+          [class.done]="(tabGroup?.selectedIndex ?? 0) > 4"
+          [class.disabled]="comservice.mainTableId === 0"
+          [disabled]="comservice.mainTableId === 0">
+          <span class="stepper-num">۵</span>
+          <span class="stepper-label">مالیه</span>
+        </button>
+
+        <div class="stepper-line" [class.filled]="(tabGroup?.selectedIndex ?? 0) > 4"></div>
+
+        <button type="button" (click)="setTab(5)"
+          class="stepper-step"
+          [class.active]="tabGroup?.selectedIndex === 5"
+          [class.disabled]="comservice.mainTableId === 0"
+          [disabled]="comservice.mainTableId === 0">
+          <span class="stepper-num">۶</span>
+          <span class="stepper-label">فسخ / لغوه</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="max-w-7xl mx-auto px-6 py-6">
+    <mat-tab-group #tabGroup class="hidden-tabs">
+      <!-- Tab 1: Office Information -->
+      <mat-tab>
+        <ng-template matTabLabel><span></span></ng-template>
+        <app-companydetails #companydetails [id]="PropertyId" (next)="nextTab()"></app-companydetails>
+      </mat-tab>
+
+      <!-- Tab 2: Owner Information -->
+      <mat-tab [disabled]="comservice.mainTableId === 0">
+        <ng-template matTabLabel><span></span></ng-template>
+        <app-companyowner #companyowner [id]="PropertyId" (next)="nextTab()"></app-companyowner>
+      </mat-tab>
+
+      <!-- Tab 3: License Information -->
+      <mat-tab [disabled]="comservice.mainTableId === 0">
+        <ng-template matTabLabel><span></span></ng-template>
+        <app-licensedetails #licensedetails [id]="PropertyId" (next)="nextTab()"></app-licensedetails>
+      </mat-tab>
+
+      <!-- Tab 4: Guarantors -->
+      <mat-tab [disabled]="comservice.mainTableId === 0">
+        <ng-template matTabLabel><span></span></ng-template>
+        <app-guaranators #guaranators [id]="PropertyId" (next)="nextTab()"></app-guaranators>
+      </mat-tab>
+
+      <!-- Tab 5: Finance -->
+      <mat-tab [disabled]="comservice.mainTableId === 0">
+        <ng-template matTabLabel><span></span></ng-template>
+        <app-accountinfo #accountinfo [id]="PropertyId" (next)="nextTab()"></app-accountinfo>
+      </mat-tab>
+
+      <!-- Tab 6: Cancellation -->
+      <mat-tab [disabled]="comservice.mainTableId === 0">
+        <ng-template matTabLabel><span></span></ng-template>
+        <app-cancellationinfo #cancellationinfo [id]="PropertyId" (next)="nextTab()"></app-cancellationinfo>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>
