@@ -171,24 +171,29 @@ namespace WebAPIBackend.Configuration
             try
             {
                 await context.Database.ExecuteSqlRawAsync(@"
-                    DROP VIEW IF EXISTS public.""LicenseView"";
+                    DROP VIEW IF EXISTS public.""LicenseView"" CASCADE;
                     CREATE VIEW public.""LicenseView"" AS
                     SELECT 
                         cd.""Id"" AS ""CompanyId"",
                         co.""PhoneNumber"",
                         co.""WhatsAppNumber"",
                         cd.""Title"",
-                        cd.""TIN"" AS ""Tin"",
+                        cd.""TIN"",
                         co.""FirstName"",
                         co.""FatherName"",
                         co.""GrandFatherName"",
                         co.""DateofBirth"",
-                        co.""ElectronicNationalIdNumber"",
+                        co.""ElectronicNationalIdNumber"" AS ""IndentityCardNumber"",
                         co.""PothoPath"" AS ""OwnerPhoto"",
                         ld.""LicenseNumber"",
+                        ld.""LicenseCategory"",
                         ld.""OfficeAddress"",
                         ld.""IssueDate"",
                         ld.""ExpireDate"",
+                        ld.""DuplicateIssueDate"",
+                        pp.""Dari"" AS ""PermanentProvinceName"",
+                        pd.""Dari"" AS ""PermanentDistrictName"",
+                        co.""PermanentVillage"",
                         ld.""RoyaltyAmount"",
                         ld.""RoyaltyDate"",
                         ld.""TariffNumber"",
@@ -196,9 +201,7 @@ namespace WebAPIBackend.Configuration
                         ld.""PenaltyDate"",
                         ld.""HrLetter"",
                         ld.""HrLetterDate"",
-                        pp.""Dari"" AS ""PermanentProvinceName"",
-                        pd.""Dari"" AS ""PermanentDistrictName"",
-                        co.""PermanentVillage""
+                        ld.""TransferLocationDate""
                     FROM org.""CompanyDetails"" cd
                     LEFT JOIN org.""CompanyOwner"" co ON cd.""Id"" = co.""CompanyId""
                     LEFT JOIN org.""LicenseDetails"" ld ON cd.""Id"" = ld.""CompanyId""

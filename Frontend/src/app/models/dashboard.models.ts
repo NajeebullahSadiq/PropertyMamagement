@@ -51,3 +51,24 @@ export interface VehicleReportData {
   month: string;
   totalPriceOfProperties: number;
 }
+
+export interface ModuleCountResponse {
+  items: any[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface ModuleSummary {
+  id: string;
+  name: string;
+  nameDari: string;
+  icon: string;
+  route: string;
+  count: number;
+  color: string;
+  gradientFrom: string;
+  gradientTo: string;
+  description: string;
+  permission: string;
+}

@@ -763,7 +763,7 @@ namespace WebAPIBackend.Controllers.Companies
                     END $$;
 
                     -- Recreate the LicenseView
-                    DROP VIEW IF EXISTS public.""LicenseView"";
+                    DROP VIEW IF EXISTS public.""LicenseView"" CASCADE;
                     
                     CREATE OR REPLACE VIEW public.""LicenseView"" AS
                     SELECT 
@@ -771,7 +771,7 @@ namespace WebAPIBackend.Controllers.Companies
                         co.""PhoneNumber"",
                         co.""WhatsAppNumber"",
                         cd.""Title"",
-                        cd.""TIN"" AS ""Tin"",
+                        cd.""TIN"",
                         co.""FirstName"",
                         co.""FatherName"",
                         co.""GrandFatherName"",

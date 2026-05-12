@@ -5,7 +5,7 @@ ALTER TABLE org."LicenseDetails" ADD COLUMN IF NOT EXISTS "TransferLocationDate"
 
 -- Drop and recreate LicenseView to include the new column
 -- (Views don't store data, so DROP/CREATE is safe)
-DROP VIEW IF EXISTS public."LicenseView";
+DROP VIEW IF EXISTS public."LicenseView" CASCADE;
 
 CREATE VIEW public."LicenseView" AS
 SELECT 
@@ -13,7 +13,7 @@ SELECT
     co."PhoneNumber",
     co."WhatsAppNumber",
     cd."Title",
-    cd."TIN" AS "Tin",
+    cd."TIN",
     co."FirstName",
     co."FatherName",
     co."GrandFatherName",
