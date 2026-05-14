@@ -79,13 +79,16 @@ namespace WebAPIBackend.Controllers.Report
                 .Distinct()
                 .ToListAsync();
 
-            // Get cancelled (فسخ / لغوه) company IDs
-            var cancelledCompanyIds = await _context.CompanyCancellationInfos.AsNoTracking()
-                .Where(c => c.Status != false && (c.CancellationType == "فسخ" || c.CancellationType == "لغوه"))
-                .Where(c => companyUserIds.Contains(c.CompanyId))
+            // Get cancelled (فسخ / لغوه) company IDs - must have all required fields
+            var allCancellations = await _context.CompanyCancellationInfos.AsNoTracking()
+                .Where(c => c.Status != false && companyUserIds.Contains(c.CompanyId))
+                .ToListAsync();
+            
+            var cancelledCompanyIds = allCancellations
+                .Where(c => CancellationHelper.IsValidCancellation(c))
                 .Select(c => c.CompanyId)
                 .Distinct()
-                .ToListAsync();
+                .ToList();
 
             // Combine: inactive = IsLocked OR (company user with expired license) OR (company user with cancelled license)
             var inactiveByLock = userList.Count(u => u.IsLocked);
@@ -178,9 +181,13 @@ namespace WebAPIBackend.Controllers.Report
             var expiredCompanyIds = await _context.LicenseDetails.AsNoTracking()
                 .Where(l => l.ExpireDate.HasValue && l.ExpireDate.Value < today && companyIds.Contains(l.CompanyId ?? 0))
                 .Select(l => l.CompanyId ?? 0).Distinct().ToListAsync();
-            var cancelledCompanyIds = await _context.CompanyCancellationInfos.AsNoTracking()
-                .Where(c => c.Status != false && (c.CancellationType == "فسخ" || c.CancellationType == "لغوه") && companyIds.Contains(c.CompanyId))
-                .Select(c => c.CompanyId).Distinct().ToListAsync();
+            
+            var allCancellations = await _context.CompanyCancellationInfos.AsNoTracking()
+                .Where(c => c.Status != false && companyIds.Contains(c.CompanyId))
+                .ToListAsync();
+            var cancelledCompanyIds = allCancellations
+                .Where(c => CancellationHelper.IsValidCancellation(c))
+                .Select(c => c.CompanyId).Distinct().ToList();
 
             var provinces = await _context.Locations.AsNoTracking()
                 .Where(l => l.ParentId == null && l.IsActive == 1)
@@ -249,9 +256,13 @@ namespace WebAPIBackend.Controllers.Report
             var expiredCompanyIds = await _context.LicenseDetails.AsNoTracking()
                 .Where(l => l.ExpireDate.HasValue && l.ExpireDate.Value < today && companyIds.Contains(l.CompanyId ?? 0))
                 .Select(l => l.CompanyId ?? 0).Distinct().ToListAsync();
-            var cancelledCompanyIds = await _context.CompanyCancellationInfos.AsNoTracking()
-                .Where(c => c.Status != false && (c.CancellationType == "فسخ" || c.CancellationType == "لغوه") && companyIds.Contains(c.CompanyId))
-                .Select(c => c.CompanyId).Distinct().ToListAsync();
+            
+            var allCancellations = await _context.CompanyCancellationInfos.AsNoTracking()
+                .Where(c => c.Status != false && companyIds.Contains(c.CompanyId))
+                .ToListAsync();
+            var cancelledCompanyIds = allCancellations
+                .Where(c => CancellationHelper.IsValidCancellation(c))
+                .Select(c => c.CompanyId).Distinct().ToList();
 
             var total = users.Count;
             var inactive = users.Count(u =>
@@ -320,12 +331,14 @@ namespace WebAPIBackend.Controllers.Report
 
             var expiredCompanyIds = expiredLicenses.Select(l => l.CompanyId ?? 0).Distinct().ToList();
 
-            // Get cancelled company details
+            // Get cancelled company details - must have all required fields
             var cancellations = await _context.CompanyCancellationInfos.AsNoTracking()
-                .Where(c => c.Status != false && (c.CancellationType == "فسخ" || c.CancellationType == "لغوه") && companyIds.Contains(c.CompanyId))
+                .Where(c => c.Status != false && companyIds.Contains(c.CompanyId))
                 .ToListAsync();
 
-            var cancelledCompanyIds = cancellations.Select(c => c.CompanyId).Distinct().ToList();
+            var cancelledCompanyIds = cancellations
+                .Where(c => CancellationHelper.IsValidCancellation(c))
+                .Select(c => c.CompanyId).Distinct().ToList();
 
             // Build result list
             var inactiveList = new List<object>();
@@ -542,13 +555,16 @@ namespace WebAPIBackend.Controllers.Report
                 .Distinct()
                 .ToListAsync();
 
-            // Find companies with فسخ or لغوه
-            var cancelledCompanyIds = await _context.CompanyCancellationInfos.AsNoTracking()
-                .Where(c => c.Status != false && (c.CancellationType == "فسخ" || c.CancellationType == "لغوه"))
-                .Where(c => companyIds.Contains(c.CompanyId))
+            // Find companies with فسخ or لغوه - must have all required fields
+            var allCancellations = await _context.CompanyCancellationInfos.AsNoTracking()
+                .Where(c => c.Status != false && companyIds.Contains(c.CompanyId))
+                .ToListAsync();
+            
+            var cancelledCompanyIds = allCancellations
+                .Where(c => CancellationHelper.IsValidCancellation(c))
                 .Select(c => c.CompanyId)
                 .Distinct()
-                .ToListAsync();
+                .ToList();
 
             var toDeactivate = companyIds.Where(id => expiredCompanyIds.Contains(id) || cancelledCompanyIds.Contains(id)).ToList();
 

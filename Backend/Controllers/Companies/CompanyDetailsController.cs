@@ -1349,18 +1349,22 @@ namespace WebAPIBackend.Controllers.Companies
                 }
 
                 // Get cancellations count (date range) - split by type
-                // فسخ uses LicenseCancellationLetterDate
+                // فسخ requires both LicenseCancellationLetterNumber AND RevenueCancellationLetterNumber
                 var faskhQuery = _context.CompanyCancellationInfos
-                    .Where(x => x.Status != false && x.CancellationType == "فسخ");
+                    .Where(x => x.Status != false && x.CancellationType == "فسخ"
+                        && !string.IsNullOrWhiteSpace(x.LicenseCancellationLetterNumber)
+                        && !string.IsNullOrWhiteSpace(x.RevenueCancellationLetterNumber));
                 if (parsedStartDate.HasValue)
                     faskhQuery = faskhQuery.Where(x => x.LicenseCancellationLetterDate >= parsedStartDate);
                 if (parsedEndDate.HasValue)
                     faskhQuery = faskhQuery.Where(x => x.LicenseCancellationLetterDate <= parsedEndDate);
                 var totalFaskh = await faskhQuery.CountAsync();
 
-                // لغوه uses RevocationLetterDate
+                // لغوه requires both RevocationLetterNumber AND RevocationRevenueLetterNumber
                 var laghwaQuery = _context.CompanyCancellationInfos
-                    .Where(x => x.Status != false && x.CancellationType == "لغوه");
+                    .Where(x => x.Status != false && x.CancellationType == "لغوه"
+                        && !string.IsNullOrWhiteSpace(x.RevocationLetterNumber)
+                        && !string.IsNullOrWhiteSpace(x.RevocationRevenueLetterNumber));
                 if (parsedStartDate.HasValue)
                     laghwaQuery = laghwaQuery.Where(x => x.RevocationLetterDate >= parsedStartDate);
                 if (parsedEndDate.HasValue)
@@ -1663,6 +1667,8 @@ namespace WebAPIBackend.Controllers.Companies
                     .AsSplitQuery()
                     .Where(x => x.Status != false
                         && x.CancellationType == "فسخ"
+                        && !string.IsNullOrWhiteSpace(x.LicenseCancellationLetterNumber)
+                        && !string.IsNullOrWhiteSpace(x.RevenueCancellationLetterNumber)
                         && x.Company != null
                         && allowedCompanyIds.Contains(x.CompanyId));
 
@@ -1750,6 +1756,8 @@ namespace WebAPIBackend.Controllers.Companies
                     .AsSplitQuery()
                     .Where(x => x.Status != false
                         && x.CancellationType == "لغوه"
+                        && !string.IsNullOrWhiteSpace(x.RevocationLetterNumber)
+                        && !string.IsNullOrWhiteSpace(x.RevocationRevenueLetterNumber)
                         && x.Company != null
                         && allowedCompanyIds.Contains(x.CompanyId));
 

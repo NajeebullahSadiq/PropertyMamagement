@@ -18,7 +18,6 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
     @Input() embeddedMode = false;
     
     items: PetitionWriterSecurities[] = [];
-    filteredItems: PetitionWriterSecurities[] = [];
     totalCount = 0;
     page = 1;
     pageSize = 10;
@@ -82,7 +81,6 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
         this.petitionService.getAll(this.page, this.pageSize, this.searchTerm, calendar).subscribe({
             next: (response) => {
                 this.items = response.items;
-                this.filteredItems = this.filterItems(response.items, this.searchTerm);
                 this.totalCount = response.totalCount;
                 this.isLoading = false;
             },
@@ -94,31 +92,9 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
         });
     }
 
-    filterItems(items: PetitionWriterSecurities[], searchTerm: string): PetitionWriterSecurities[] {
-        const term = (searchTerm ?? '').toString().trim().toLowerCase();
-        if (!term) {
-            return items;
-        }
-
-        const toText = (value: unknown) => (value ?? '').toString().toLowerCase();
-
-        return (items || []).filter(item => {
-            const regMatch = toText(item.registrationNumber).includes(term);
-            const nameMatch = toText(item.petitionWriterName).includes(term);
-            const fatherMatch = toText(item.petitionWriterFatherName).includes(term);
-            const licenseMatch = toText(item.licenseNumber).includes(term);
-            const bankMatch = toText(item.bankReceiptNumber).includes(term);
-            const serialStartMatch = toText(item.serialNumberStart).includes(term);
-            const serialEndMatch = toText(item.serialNumberEnd).includes(term);
-
-            return regMatch || nameMatch || fatherMatch || licenseMatch || bankMatch || serialStartMatch || serialEndMatch;
-        });
-    }
-
     onSearch(): void {
-        this.filteredItems = this.filterItems(this.items, this.searchTerm);
-        this.totalCount = this.filteredItems.length;
         this.page = 1;
+        this.loadData();
     }
 
     onTableDataChange(event: any): void {

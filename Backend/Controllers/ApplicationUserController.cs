@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 
 namespace WebAPI.Controllers
 {
@@ -210,8 +211,13 @@ namespace WebAPI.Controllers
                             .AnyAsync(l => l.CompanyId == user.CompanyId && l.ExpireDate.HasValue && l.ExpireDate.Value < today);
 
                         // Check cancelled (فسخ or لغوه)
-                        var hasCancellation = await _context.CompanyCancellationInfos.AsNoTracking()
-                            .AnyAsync(c => c.CompanyId == user.CompanyId && c.Status != false && (c.CancellationType == "فسخ" || c.CancellationType == "لغوه"));
+                        // فسخ requires both LicenseCancellationLetterNumber AND RevenueCancellationLetterNumber
+                        // لغوه requires both RevocationLetterNumber AND RevocationRevenueLetterNumber
+                        var cancellation = await _context.CompanyCancellationInfos.AsNoTracking()
+                            .Where(c => c.CompanyId == user.CompanyId && c.Status != false)
+                            .FirstOrDefaultAsync();
+
+                        bool hasCancellation = CancellationHelper.IsValidCancellation(cancellation);
 
                         if (hasExpiredLicense || hasCancellation)
                         {
