@@ -200,12 +200,7 @@ namespace WebAPI.Controllers
                
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password ?? ""))
                 {
-                    if (user.IsLocked.Equals(true))
-                    {
-                        return StatusCode(418, new { message = "حساب کاربری قفل شده است" });
-                    }
-
-                    // Auto-deactivate company users with expired license or cancelled (فسخ/لغوه) company
+                    // Check if user should remain locked or can be unlocked
                     if (user.CompanyId > 0 && (user.UserRole == UserRoles.PropertyOperator || user.UserRole == UserRoles.VehicleOperator))
                     {
                         var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -220,12 +215,29 @@ namespace WebAPI.Controllers
 
                         if (hasExpiredLicense || hasCancellation)
                         {
-                            user.IsLocked = true;
-                            await _userManager.UpdateAsync(user);
+                            // Lock the user if not already locked
+                            if (!user.IsLocked)
+                            {
+                                user.IsLocked = true;
+                                await _userManager.UpdateAsync(user);
+                            }
 
                             var deactivationReason = hasExpiredLicense ? "ختم جواز" : "فسخ/لغوه";
                             return StatusCode(418, new { message = $"جواز شما به دلیل {deactivationReason} باطل شده است. لطفاً برای تجدید جواز با اداره مربوطه تماس بگیرید." });
                         }
+                        else if (user.IsLocked)
+                        {
+                            // Auto-unlock: conditions that caused the lock are no longer present
+                            // (license renewed or cancellation removed)
+                            user.IsLocked = false;
+                            await _userManager.UpdateAsync(user);
+                        }
+                    }
+                    else if (user.IsLocked)
+                    {
+                        // For non-company users (admin, etc.) who are locked, keep them locked
+                        // unless manually unlocked
+                        return StatusCode(418, new { message = "حساب کاربری قفل شده است" });
                     }
 
                     // Get role assigned to the user
