@@ -1,28 +1,95 @@
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1rem;
-    color: #333;
-    font-size: 0.9rem;
-    text-align: left;
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #bec9c2;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  color: #191c1e;
+  background: #ffffff;
+  transition: all 0.15s ease;
+  outline: none;
+  direction: rtl;
+
+  &:focus {
+    border-color: #004532;
+    box-shadow: 0 0 0 3px rgba(0, 69, 50, 0.12);
   }
-  
-  th {
-    background-color: #002b5c;
-    color: #fff;
-    font-weight: bold;
-    padding: 0.75rem;
-    vertical-align: top;
+}
+
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236f7973' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 16px 12px;
+  padding-left: 2.5rem;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  background: #004532;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: #065f46;
   }
-  
-  td {
-    padding: 0.75rem;
-    vertical-align: top;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
-  
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
+}
+
+::ng-deep .custom-pagination {
+  .pagination-next,
+  .pagination-prev {
+    a {
+      background: white;
+      border: 1px solid #bec9c2;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      color: #55615a;
+      font-size: 0.875rem;
+      &:hover {
+        background: #f7f9fb;
+        border-color: #004532;
+        color: #004532;
+      }
+    }
   }
-  .fontstyle{
-    font-family: 'PersianFont', sans-serif;
+  .pagination-page {
+    a {
+      background: white;
+      border: 1px solid #bec9c2;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      color: #55615a;
+      font-size: 0.875rem;
+      &:hover {
+        background: #f7f9fb;
+        border-color: #004532;
+        color: #004532;
+      }
+    }
+    &.active a {
+      background: #004532;
+      border-color: #004532;
+      color: white;
+    }
   }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

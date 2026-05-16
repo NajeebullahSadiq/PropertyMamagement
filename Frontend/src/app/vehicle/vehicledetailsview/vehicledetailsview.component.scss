@@ -2,18 +2,8 @@
   .no-print {
     display: none !important;
   }
-  
-  .print-only {
-    display: block !important;
-  }
-  
+
   body {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  
-  .bg-gradient-to-r,
-  .bg-gradient-to-br {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }

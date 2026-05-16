@@ -148,10 +148,10 @@ export class EstateReportService {
     }
 
     getProvinces(): Observable<any> {
-        return this.http.get(environment.apiUrl + '/Setup/GetProvinces');
+        return this.http.get(environment.apiUrl + '/DistrictManagement/provinces');
     }
 
     getDistricts(provinceId: number): Observable<any> {
-        return this.http.get(environment.apiUrl + '/Setup/GetDistrictsByProvince/' + provinceId);
+        return this.http.get(environment.apiUrl + '/DistrictManagement/province/' + provinceId);
     }
 }
