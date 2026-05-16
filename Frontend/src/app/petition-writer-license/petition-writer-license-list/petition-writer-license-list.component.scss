@@ -1,32 +1,46 @@
-::ng-deep .custom-pagination {
-  .ngx-pagination {
-    display: flex;
-    gap: 0.25rem;
-    padding: 0;
-    margin: 0;
-    
-    li {
+// Petition Writer License List - Clean Minimal Design (matching securities style)
+
+::ng-deep .ngx-pagination {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0;
+  margin: 0;
+
+  li {
+    border-radius: 0.5rem;
+    overflow: hidden;
+
+    &.current {
+      background: #004532;
+
+      a {
+        color: white !important;
+        background: transparent !important;
+      }
+    }
+
+    a, span {
+      padding: 0.5rem 0.875rem;
+      display: block;
+      color: #334155;
+      text-decoration: none;
+      border: 1px solid #bec9c2;
       border-radius: 0.5rem;
-      
-      &.current {
-        background: linear-gradient(to right, #8b5cf6, #6366f1);
-        border-radius: 0.5rem;
-        
-        span {
-          color: white;
-          background: transparent;
-        }
+      transition: all 0.2s;
+      font-size: 0.875rem;
+
+      &:hover {
+        background: #f1f5f9;
+        border-color: #6f7973;
       }
-      
-      a, span {
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        color: #374151;
-        
-        &:hover {
-          background-color: #f3f4f6;
-        }
-      }
+    }
+  }
+
+  .pagination-previous,
+  .pagination-next {
+    a::before,
+    a::after {
+      display: none;
     }
   }
 }

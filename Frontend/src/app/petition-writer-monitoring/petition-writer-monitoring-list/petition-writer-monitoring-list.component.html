@@ -1,38 +1,75 @@
-<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
     <!-- Page Header -->
     <div class="mb-8 text-center">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 shadow-lg shadow-teal-500/30 mb-4">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004532] to-[#065f46] shadow-lg shadow-[#004532]/30 mb-4">
         <i class="fas fa-file-signature text-white text-2xl"></i>
       </div>
       <h1 class="text-3xl font-bold text-gray-800 mb-2">جدول ثبت نظارت بر فعالیت عریضه نویسان</h1>
       <p class="text-gray-500 max-w-md mx-auto">لیست تمام رکوردهای نظارت بر فعالیت عریضه نویسان</p>
     </div>
 
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#6f7973] font-medium mb-1">کل رکوردها</p>
+            <p class="text-3xl font-bold text-[#191c1e]">{{ totalCount | number }}</p>
+          </div>
+          <div class="w-12 h-12 bg-[#004532] rounded-xl flex items-center justify-center">
+            <i class="fas fa-database text-white text-xl"></i>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#6f7973] font-medium mb-1">در صفحه فعلی</p>
+            <p class="text-3xl font-bold text-[#191c1e]">{{ items.length | number }}</p>
+          </div>
+          <div class="w-12 h-12 bg-[#065f46] rounded-xl flex items-center justify-center">
+            <i class="fas fa-list text-white text-xl"></i>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 cursor-pointer hover:border-[#55615a] transition-colors" (click)="toggleReport()">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#6f7973] font-medium mb-1">گزارش‌گیری</p>
+            <p class="text-lg font-bold text-[#55615a]">تولید گزارش</p>
+          </div>
+          <div class="w-12 h-12 bg-[#55615a] rounded-xl flex items-center justify-center">
+            <i class="fas fa-chart-bar text-white text-xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Search and Actions -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
       <div class="p-4">
         <div class="flex flex-wrap gap-4 justify-between items-center">
           <div class="flex-1 min-w-[200px] max-w-md">
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#6f7973]">
                 <i class="fas fa-search"></i>
               </span>
-              <input type="text" [(ngModel)]="searchText" (keyup.enter)="onSearch()" placeholder="جستجو..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+              <input type="text" [(ngModel)]="searchText" (keyup.enter)="onSearch()" placeholder="جستجو..." class="w-full pl-10 pr-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#004532] focus:border-transparent">
             </div>
           </div>
           <div class="flex-1 min-w-[150px] max-w-xs">
-            <select [(ngModel)]="selectedSectionType" (change)="onSectionTypeChange()" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+            <select [(ngModel)]="selectedSectionType" (change)="onSectionTypeChange()" class="w-full px-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#004532] focus:border-transparent">
               <option value="">همه انواع ثبت</option>
               <option *ngFor="let type of sectionTypes" [value]="type.value">{{ type.label }}</option>
             </select>
           </div>
           <div class="flex gap-3">
-            <button (click)="toggleReport()" class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+            <button (click)="toggleReport()" class="px-5 py-2.5 bg-white border border-[#bec9c2] hover:bg-[#f7f9fb] text-[#55615a] font-medium rounded-xl transition-colors flex items-center gap-2">
               <i class="fas" [class.fa-chart-bar]="!showReport" [class.fa-list]="showReport"></i>
               {{ showReport ? 'لیست رکوردها' : 'گزارش‌گیری' }}
             </button>
-            <button *ngIf="canCreate && !showReport" (click)="goToForm()" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+            <button *ngIf="canCreate && !showReport" (click)="goToForm()" class="px-5 py-2.5 bg-gradient-to-r from-[#004532] to-[#065f46] hover:from-[#065f46] hover:to-[#004532] text-white font-medium rounded-xl transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2">
               <i class="fas fa-plus"></i>
               ثبت جدید
             </button>
@@ -45,90 +82,90 @@
     <ng-container *ngIf="!showReport">
     <!-- Loading -->
     <div *ngIf="isLoading" class="text-center py-8">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-500 border-t-transparent"></div>
-      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#004532] border-t-transparent"></div>
+      <p class="mt-2 text-[#6f7973]">در حال بارگذاری...</p>
     </div>
 
     <!-- Data Table -->
-    <div *ngIf="!isLoading" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+    <div *ngIf="!isLoading" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
-          
+
           <!-- Complaints Columns -->
-          <thead *ngIf="selectedSectionType === 'complaints'" class="bg-gradient-to-r from-red-100 to-rose-100 border-b-2 border-red-200">
+          <thead *ngIf="selectedSectionType === 'complaints'" class="bg-[#92400e] border-b border-[#78350f]">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عریضه نویس</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عارض</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">موضوع شکایت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">اجراآت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">نمبر مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">نمبر جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ناحیه</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">شهرت عریضه نویس</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">شهرت عارض</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">موضوع شکایت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">تاریخ ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">اجراآت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
 
           <!-- Violations Columns -->
-          <thead *ngIf="selectedSectionType === 'violations'" class="bg-gradient-to-r from-orange-100 to-amber-100 border-b-2 border-orange-200">
+          <thead *ngIf="selectedSectionType === 'violations'" class="bg-[#ba1a1a] border-b border-[#991b1b]">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عریضه نویس</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">وضعیت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">اجراآت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">نمبر مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">شهرت عریضه نویس</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">نمبر جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ناحیه</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">وضعیت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">اجراآت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
 
           <!-- Monitoring Columns -->
-          <thead *ngIf="selectedSectionType === 'monitoring'" class="bg-gradient-to-r from-green-100 to-emerald-100 border-b-2 border-green-200">
+          <thead *ngIf="selectedSectionType === 'monitoring'" class="bg-[#44546a] border-b border-[#334155]">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">سال</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ماه</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تعداد نظارت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ملاحظات</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">سال</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ماه</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">تعداد نظارت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ملاحظات</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
 
           <!-- All Types (Default) Columns -->
-          <thead *ngIf="!selectedSectionType" class="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200">
+          <thead *ngIf="!selectedSectionType" class="bg-[#004532] border-b border-[#065f46]">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر مسلسل</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نوعیت ثبت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ ثبت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">ناحیه</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عریضه نویس</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">وضعیت</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شهرت عارض</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">عملیات</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">نمبر مسلسل</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">نوعیت ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">تاریخ ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">نمبر جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ناحیه</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">شهرت عریضه نویس</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">وضعیت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">شهرت عارض</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-gray-200">
+          <tbody class="divide-y divide-[#eceef0]">
             <!-- Complaints Rows -->
             <ng-container *ngIf="selectedSectionType === 'complaints'">
-              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-red-50 transition-colors">
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterLicenseNumber || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterDistrict || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.complainantName || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintSubject || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ (item.registrationDate | calendarDate) || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.complaintActionsTaken || '-' }}</td>
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-[#fef2f2] transition-colors">
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.serialNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterLicenseNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterDistrict || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.complainantName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]" dir="rtl">{{ item.complaintSubject || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ (item.registrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.complaintActionsTaken || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
-                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
                       <i class="fas fa-eye"></i>
                     </button>
-                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-[#92400e] hover:bg-[#fef3c7] rounded-lg transition-colors" title="ویرایش">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors" title="حذف">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
@@ -138,22 +175,26 @@
 
             <!-- Violations Rows -->
             <ng-container *ngIf="selectedSectionType === 'violations'">
-              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-orange-50 transition-colors">
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterLicenseNumber || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterDistrict || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ getActivityStatusLabel(item.activityStatus!) }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.violationActionsTaken || '-' }}</td>
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-[#fff7ed] transition-colors">
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.serialNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterLicenseNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterDistrict || '-' }}</td>
+                <td class="px-4 py-3 text-sm">
+                  <span [ngClass]="getActivityStatusClass(item.activityStatus!)" class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{ getActivityStatusLabel(item.activityStatus!) }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.violationActionsTaken || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
-                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
                       <i class="fas fa-eye"></i>
                     </button>
-                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-[#92400e] hover:bg-[#fef3c7] rounded-lg transition-colors" title="ویرایش">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors" title="حذف">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
@@ -163,20 +204,20 @@
 
             <!-- Monitoring Rows -->
             <ng-container *ngIf="selectedSectionType === 'monitoring'">
-              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-green-50 transition-colors">
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.monitoringYear || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.monitoringMonth || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.monitoringCount || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.monitoringRemarks || '-' }}</td>
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-[#ecfdf5] transition-colors">
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.monitoringYear || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.monitoringMonth || '-' }}</td>
+                <td class="px-4 py-3 text-sm font-bold text-[#004532]">{{ item.monitoringCount || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.monitoringRemarks || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
-                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
                       <i class="fas fa-eye"></i>
                     </button>
-                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-[#92400e] hover:bg-[#fef3c7] rounded-lg transition-colors" title="ویرایش">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors" title="حذف">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
@@ -186,33 +227,33 @@
 
             <!-- All Types (Default) Rows -->
             <ng-container *ngIf="!selectedSectionType">
-              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-teal-50 transition-colors">
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumber || '-' }}</td>
+              <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }" class="text-center hover:bg-[#f7f9fb] transition-colors">
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.serialNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm">
                   <span [ngClass]="getSectionTypeClass(item.sectionType!)" class="px-2 py-1 rounded-full text-xs font-medium">
                     {{ getSectionTypeLabel(item.sectionType!) }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ (item.registrationDate | calendarDate) || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterLicenseNumber || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterDistrict || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ (item.registrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterLicenseNumber || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterDistrict || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterName || '-' }}</td>
                 <td class="px-4 py-3 text-sm">
                   <span *ngIf="item.activityStatus" [ngClass]="getActivityStatusClass(item.activityStatus!)" class="px-2 py-1 rounded-full text-xs font-medium">
                     {{ getActivityStatusLabel(item.activityStatus!) }}
                   </span>
                   <span *ngIf="!item.activityStatus">-</span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ item.complainantName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.complainantName || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
-                    <button (click)="viewRecord(item.id!)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="مشاهده">
+                    <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
                       <i class="fas fa-eye"></i>
                     </button>
-                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="ویرایش">
+                    <button *ngIf="canEdit" (click)="editRecord(item.id!)" class="p-2 text-[#92400e] hover:bg-[#fef3c7] rounded-lg transition-colors" title="ویرایش">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="حذف">
+                    <button *ngIf="canDelete" (click)="deleteRecord(item.id!)" class="p-2 text-[#ba1a1a] hover:bg-[#fef2f2] rounded-lg transition-colors" title="حذف">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
@@ -221,8 +262,8 @@
             </ng-container>
 
             <tr *ngIf="items.length === 0">
-              <td [attr.colspan]="getColspan()" class="px-4 py-8 text-center text-gray-500">
-                <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
+              <td [attr.colspan]="getColspan()" class="px-4 py-8 text-center text-[#6f7973]">
+                <i class="fas fa-inbox text-4xl mb-2 text-[#bec9c2]"></i>
                 <p>هیچ رکوردی یافت نشد</p>
               </td>
             </tr>
@@ -231,13 +272,13 @@
       </div>
 
       <!-- Pagination -->
-      <div *ngIf="items.length > 0" class="px-6 py-4 border-t border-gray-200 flex flex-wrap justify-between items-center gap-4">
+      <div *ngIf="items.length > 0" class="px-6 py-4 border-t border-[#eceef0] flex flex-wrap justify-between items-center gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">نمایش</span>
-          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500">
+          <span class="text-sm text-[#6f7973]">نمایش</span>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="px-3 py-1.5 border border-[#bec9c2] rounded-lg text-sm focus:ring-2 focus:ring-[#004532]">
             <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
           </select>
-          <span class="text-sm text-gray-600">مورد از {{ totalCount }}</span>
+          <span class="text-sm text-[#6f7973]">مورد از {{ totalCount }}</span>
         </div>
         <pagination-controls (pageChange)="onPageChange($event)" previousLabel="قبلی" nextLabel="بعدی" class="custom-pagination"></pagination-controls>
       </div>
@@ -247,37 +288,40 @@
     <!-- ============ REPORT PANEL ============ -->
     <ng-container *ngIf="showReport">
       <!-- Report Filters -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="p-5 border-b border-gray-100">
-          <div class="flex items-center gap-2 mb-4">
-            <i class="fas fa-filter text-indigo-500"></i>
-            <span class="font-bold text-gray-700">فیلترهای گزارش</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
+        <div class="px-5 py-4 bg-[#55615a] flex items-center justify-between border-b border-[#3f4944]">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fas fa-chart-bar"></i>
+            گزارش نظارت بر فعالیت عریضه نویسان
+          </h3>
+          <button (click)="toggleReport()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="p-4 bg-[#f7f9fb] border-b border-[#eceef0]">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">از تاریخ</label>
-              <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" class="block"></app-multi-calendar-datepicker>
+              <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" label="از تاریخ"></app-multi-calendar-datepicker>
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">الی تاریخ</label>
-              <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" class="block"></app-multi-calendar-datepicker>
+              <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" label="تا تاریخ"></app-multi-calendar-datepicker>
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">ثبت کننده</label>
-              <select [(ngModel)]="reportCreatedBy" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ثبت کننده</label>
+              <select [(ngModel)]="reportCreatedBy" class="form-input">
                 <option value="">همه کاربران</option>
                 <option *ngFor="let user of reportUsers" [value]="user.id">{{ user.name }}</option>
               </select>
             </div>
             <div class="flex items-end gap-2">
-              <button (click)="applyReportFilters()" class="flex-1 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+              <button (click)="applyReportFilters()" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#004532] to-[#065f46] hover:from-[#065f46] hover:to-[#004532] text-white font-medium rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
                 <i class="fas fa-search"></i>
                 اعمال فیلتر
               </button>
-              <button (click)="resetReportFilters()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+              <button (click)="resetReportFilters()" class="px-4 py-2.5 bg-white border border-[#bec9c2] hover:bg-[#f7f9fb] text-[#55615a] rounded-xl transition-colors flex items-center justify-center gap-2">
                 <i class="fas fa-undo"></i>
               </button>
-              <button (click)="exportToExcel()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+              <button (click)="exportToExcel()" class="px-4 py-2.5 bg-[#004532] hover:bg-[#065f46] text-white font-medium rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
                 <i class="fas fa-file-excel"></i>
                 Excel
               </button>
@@ -288,44 +332,44 @@
 
       <!-- Report Loading -->
       <div *ngIf="reportLoading" class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
-        <p class="mt-2 text-gray-600">در حال بارگذاری گزارش...</p>
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#004532] border-t-transparent"></div>
+        <p class="mt-2 text-[#6f7973]">در حال بارگذاری گزارش...</p>
       </div>
 
       <!-- Report Content -->
       <div *ngIf="!reportLoading && reportSummary">
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
           <!-- Tabs -->
-          <div class="flex border-b border-gray-200 overflow-x-auto">
+          <div class="flex border-b border-[#eceef0] overflow-x-auto">
             <button (click)="onReportTabChange('overall')"
-                    [class.border-indigo-500]="reportActiveTab === 'overall'"
-                    [class.text-indigo-600]="reportActiveTab === 'overall'"
+                    [class.border-[#004532]]="reportActiveTab === 'overall'"
+                    [class.text-[#004532]]="reportActiveTab === 'overall'"
                     [class.border-transparent]="reportActiveTab !== 'overall'"
-                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-indigo-600 flex items-center gap-2">
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-[#004532] flex items-center gap-2 text-[#6f7973]">
               <i class="fas fa-chart-pie"></i>
               گزارش کلی
             </button>
             <button (click)="onReportTabChange('complaints')"
-                    [class.border-red-500]="reportActiveTab === 'complaints'"
-                    [class.text-red-600]="reportActiveTab === 'complaints'"
+                    [class.border-[#92400e]]="reportActiveTab === 'complaints'"
+                    [class.text-[#92400e]]="reportActiveTab === 'complaints'"
                     [class.border-transparent]="reportActiveTab !== 'complaints'"
-                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-red-600 flex items-center gap-2">
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-[#92400e] flex items-center gap-2 text-[#6f7973]">
               <i class="fas fa-exclamation-circle"></i>
               ۱. ثبت شکایات
             </button>
             <button (click)="onReportTabChange('violations')"
-                    [class.border-orange-500]="reportActiveTab === 'violations'"
-                    [class.text-orange-600]="reportActiveTab === 'violations'"
+                    [class.border-[#ba1a1a]]="reportActiveTab === 'violations'"
+                    [class.text-[#ba1a1a]]="reportActiveTab === 'violations'"
                     [class.border-transparent]="reportActiveTab !== 'violations'"
-                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-orange-600 flex items-center gap-2">
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-[#ba1a1a] flex items-center gap-2 text-[#6f7973]">
               <i class="fas fa-gavel"></i>
               ۲. تخلفات عریضه نویسان
             </button>
             <button (click)="onReportTabChange('monitoring')"
-                    [class.border-green-500]="reportActiveTab === 'monitoring'"
-                    [class.text-green-600]="reportActiveTab === 'monitoring'"
+                    [class.border-[#44546a]]="reportActiveTab === 'monitoring'"
+                    [class.text-[#44546a]]="reportActiveTab === 'monitoring'"
                     [class.border-transparent]="reportActiveTab !== 'monitoring'"
-                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-green-600 flex items-center gap-2">
+                    class="px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors hover:text-[#44546a] flex items-center gap-2 text-[#6f7973]">
               <i class="fas fa-search"></i>
               ۳. نظارت فعالیت
             </button>
@@ -333,9 +377,9 @@
 
           <!-- OVERALL TAB -->
           <div *ngIf="reportActiveTab === 'overall'" class="p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">گزارش کلی نظارت بر فعالیت عریضه نویسان</h2>
+            <h2 class="text-xl font-bold text-[#191c1e] mb-6 text-center">گزارش کلی نظارت بر فعالیت عریضه نویسان</h2>
             <div class="mb-6">
-              <div class="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-5 text-white">
+              <div class="bg-gradient-to-r from-[#004532] to-[#065f46] rounded-xl p-5 text-white">
                 <div class="flex items-center justify-between">
                   <div>
                     <div class="text-sm opacity-90">مجموع رکوردها</div>
@@ -346,44 +390,41 @@
               </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- Complaints Card -->
-              <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-5 border border-red-200">
+              <div class="bg-[#fef3c7] rounded-xl p-5 border border-[#fbbf24]">
                 <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
+                  <div class="w-10 h-10 bg-[#92400e] rounded-lg flex items-center justify-center">
                     <i class="fas fa-exclamation-circle text-white"></i>
                   </div>
-                  <div class="font-bold text-red-800">ثبت شکایات</div>
+                  <div class="font-bold text-[#92400e]">ثبت شکایات</div>
                 </div>
-                <div class="text-3xl font-bold text-red-700">{{ formatNumber(reportSummary.complaints.totalRecords) }}</div>
-                <div class="text-sm text-red-600 mt-1">تعداد شکایات ثبت شده</div>
+                <div class="text-3xl font-bold text-[#92400e]">{{ formatNumber(reportSummary.complaints.totalRecords) }}</div>
+                <div class="text-sm text-[#92400e] mt-1">تعداد شکایات ثبت شده</div>
               </div>
-              <!-- Violations Card -->
-              <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-5 border border-orange-200">
+              <div class="bg-[#fef2f2] rounded-xl p-5 border border-[#fecaca]">
                 <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <div class="w-10 h-10 bg-[#ba1a1a] rounded-lg flex items-center justify-center">
                     <i class="fas fa-gavel text-white"></i>
                   </div>
-                  <div class="font-bold text-orange-800">تخلفات عریضه نویسان</div>
+                  <div class="font-bold text-[#ba1a1a]">تخلفات عریضه نویسان</div>
                 </div>
-                <div class="text-3xl font-bold text-orange-700">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
-                <div class="text-sm text-orange-600 mt-1">تعداد تخلفات</div>
-                <div class="mt-3 pt-3 border-t border-orange-200 space-y-1">
-                  <div class="flex justify-between text-xs"><span class="text-orange-600">جلوګیری فعالیت:</span><span class="font-bold text-red-700">{{ formatNumber(reportSummary.violations.activityPreventionCount) }}</span></div>
-                  <div class="flex justify-between text-xs"><span class="text-orange-600">اجازه فعالیت:</span><span class="font-bold text-green-700">{{ formatNumber(reportSummary.violations.activityPermissionCount) }}</span></div>
+                <div class="text-3xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
+                <div class="text-sm text-[#ba1a1a] mt-1">تعداد تخلفات</div>
+                <div class="mt-3 pt-3 border-t border-[#fecaca] space-y-1">
+                  <div class="flex justify-between text-xs"><span class="text-[#ba1a1a]">جلوګیری فعالیت:</span><span class="font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.activityPreventionCount) }}</span></div>
+                  <div class="flex justify-between text-xs"><span class="text-[#ba1a1a]">اجازه فعالیت:</span><span class="font-bold text-[#004532]">{{ formatNumber(reportSummary.violations.activityPermissionCount) }}</span></div>
                 </div>
               </div>
-              <!-- Monitoring Card -->
-              <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
+              <div class="bg-[#ecfdf5] rounded-xl p-5 border border-[#a7f3d0]">
                 <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                  <div class="w-10 h-10 bg-[#44546a] rounded-lg flex items-center justify-center">
                     <i class="fas fa-search text-white"></i>
                   </div>
-                  <div class="font-bold text-green-800">نظارت فعالیت</div>
+                  <div class="font-bold text-[#44546a]">نظارت فعالیت</div>
                 </div>
-                <div class="text-3xl font-bold text-green-700">{{ formatNumber(reportSummary.monitoring.totalRecords) }}</div>
-                <div class="text-sm text-green-600 mt-1">تعداد نظارت</div>
-                <div class="mt-3 pt-3 border-t border-green-200">
-                  <div class="flex justify-between text-xs"><span class="text-green-600">مجموع تعداد نظارت:</span><span class="font-bold text-green-800">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</span></div>
+                <div class="text-3xl font-bold text-[#44546a]">{{ formatNumber(reportSummary.monitoring.totalRecords) }}</div>
+                <div class="text-sm text-[#44546a] mt-1">تعداد نظارت</div>
+                <div class="mt-3 pt-3 border-t border-[#a7f3d0]">
+                  <div class="flex justify-between text-xs"><span class="text-[#44546a]">مجموع تعداد نظارت:</span><span class="font-bold text-[#004532]">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</span></div>
                 </div>
               </div>
             </div>
@@ -391,154 +432,154 @@
 
           <!-- COMPLAINTS TAB -->
           <div *ngIf="reportActiveTab === 'complaints'" class="p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">ثبت شکایات</h2>
+            <h2 class="text-xl font-bold text-[#191c1e] mb-4">ثبت شکایات</h2>
             <div *ngIf="reportSummary" class="mb-6">
-              <div class="bg-gradient-to-r from-red-500 to-rose-600 rounded-xl p-5 text-white inline-block">
+              <div class="bg-gradient-to-r from-[#92400e] to-[#78350f] rounded-xl p-5 text-white inline-block">
                 <div class="text-sm opacity-90">تعداد شکایات ثبت شده</div>
                 <div class="text-4xl font-bold">{{ formatNumber(reportSummary.complaints.totalRecords) }}</div>
               </div>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
-                <thead class="bg-red-50">
+                <thead class="bg-[#fef3c7]">
                   <tr>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر مسلسل</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر جواز</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ناحیه</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">شهرت عریضه نویس</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">شهرت عارض</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">موضوع شکایت</th>
-                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تاریخ ثبت</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">اجراآت</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ثبت کننده</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">نمبر مسلسل</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">نمبر جواز</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">ناحیه</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">شهرت عریضه نویس</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">شهرت عارض</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">موضوع شکایت</th>
+                    <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#fbbf24]">تاریخ ثبت</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">اجراآت</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">ثبت کننده</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of complaintDetails" class="hover:bg-red-50 border-b border-gray-100">
-                    <td class="px-3 py-2 text-gray-700">{{ row.serialNumber || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-700">{{ row.petitionWriterLicenseNumber || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-700">{{ row.petitionWriterDistrict || '-' }}</td>
-                    <td class="px-3 py-2 font-medium text-gray-800">{{ row.petitionWriterName || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-700">{{ row.complainantName || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-700">{{ row.complaintSubject || '-' }}</td>
-                    <td class="px-3 py-2 text-center text-gray-700">{{ row.registrationDate || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-600">{{ row.complaintActionsTaken || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-600">{{ row.createdBy }}</td>
+                  <tr *ngFor="let row of complaintDetails" class="hover:bg-[#fef3c7] border-b border-[#eceef0]">
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.serialNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.petitionWriterLicenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.petitionWriterDistrict || '-' }}</td>
+                    <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.petitionWriterName || '-' }}</td>
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.complainantName || '-' }}</td>
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.complaintSubject || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-[#6f7973]">{{ row.complaintActionsTaken || '-' }}</td>
+                    <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div *ngIf="complaintDetails.length === 0" class="text-center py-8 text-gray-500">
-              <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+            <div *ngIf="complaintDetails.length === 0" class="text-center py-8 text-[#6f7973]">
+              <i class="fas fa-inbox text-4xl text-[#bec9c2] mb-2"></i>
               <p>داده‌ای یافت نشد</p>
             </div>
           </div>
 
           <!-- VIOLATIONS TAB -->
           <div *ngIf="reportActiveTab === 'violations'" class="p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">تخلفات عریضه نویسان</h2>
+            <h2 class="text-xl font-bold text-[#191c1e] mb-4">تخلفات عریضه نویسان</h2>
             <div *ngIf="reportSummary" class="grid grid-cols-3 gap-4 mb-6">
-              <div class="bg-orange-50 rounded-xl p-4 border border-orange-200 text-center">
-                <div class="text-2xl font-bold text-orange-700">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
-                <div class="text-xs text-orange-600">مجموع تخلفات</div>
+              <div class="bg-[#fef2f2] rounded-xl p-4 border border-[#fecaca] text-center">
+                <div class="text-2xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
+                <div class="text-xs text-[#ba1a1a]">مجموع تخلفات</div>
               </div>
-              <div class="bg-red-50 rounded-xl p-4 border border-red-200 text-center">
-                <div class="text-2xl font-bold text-red-700">{{ formatNumber(reportSummary.violations.activityPreventionCount) }}</div>
-                <div class="text-xs text-red-600">جلوګیری فعالیت</div>
+              <div class="bg-[#fef2f2] rounded-xl p-4 border border-[#fecaca] text-center">
+                <div class="text-2xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.activityPreventionCount) }}</div>
+                <div class="text-xs text-[#ba1a1a]">جلوګیری فعالیت</div>
               </div>
-              <div class="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
-                <div class="text-2xl font-bold text-green-700">{{ formatNumber(reportSummary.violations.activityPermissionCount) }}</div>
-                <div class="text-xs text-green-600">اجازه فعالیت</div>
+              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center">
+                <div class="text-2xl font-bold text-[#004532]">{{ formatNumber(reportSummary.violations.activityPermissionCount) }}</div>
+                <div class="text-xs text-[#004532]">اجازه فعالیت</div>
               </div>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
-                <thead class="bg-orange-50">
+                <thead class="bg-[#fef2f2]">
                   <tr>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر مسلسل</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">شهرت عریضه نویس</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نمبر جواز</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ناحیه</th>
-                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">وضعیت فعالیت</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">نوعیت تخلف</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">علت اجازه فعالیت</th>
-                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تاریخ ثبت</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">اجراآت</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ثبت کننده</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">نمبر مسلسل</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">شهرت عریضه نویس</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">نمبر جواز</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">ناحیه</th>
+                    <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#fecaca]">وضعیت فعالیت</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">نوعیت تخلف</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">علت اجازه فعالیت</th>
+                    <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#fecaca]">تاریخ ثبت</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">اجراآت</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">ثبت کننده</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of violationDetails" class="hover:bg-orange-50 border-b border-gray-100">
-                    <td class="px-3 py-2 text-gray-700">{{ row.serialNumber || '-' }}</td>
-                    <td class="px-3 py-2 font-medium text-gray-800">{{ row.petitionWriterName || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-700">{{ row.petitionWriterLicenseNumber || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-700">{{ row.petitionWriterDistrict || '-' }}</td>
+                  <tr *ngFor="let row of violationDetails" class="hover:bg-[#fef2f2] border-b border-[#eceef0]">
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.serialNumber || '-' }}</td>
+                    <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.petitionWriterName || '-' }}</td>
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.petitionWriterLicenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.petitionWriterDistrict || '-' }}</td>
                     <td class="px-3 py-2 text-center">
                       <span [ngClass]="getActivityStatusClass(row.activityStatus)" class="px-2 py-1 rounded-full text-xs font-medium">
                         {{ getActivityStatusLabel(row.activityStatus) }}
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-gray-700">{{ row.violationType || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-600">{{ row.activityPermissionReason || '-' }}</td>
-                    <td class="px-3 py-2 text-center text-gray-700">{{ row.registrationDate || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-600">{{ row.violationActionsTaken || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-600">{{ row.createdBy }}</td>
+                    <td class="px-3 py-2 text-[#191c1e]">{{ row.violationType || '-' }}</td>
+                    <td class="px-3 py-2 text-[#6f7973]">{{ row.activityPermissionReason || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-[#6f7973]">{{ row.violationActionsTaken || '-' }}</td>
+                    <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div *ngIf="violationDetails.length === 0" class="text-center py-8 text-gray-500">
-              <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+            <div *ngIf="violationDetails.length === 0" class="text-center py-8 text-[#6f7973]">
+              <i class="fas fa-inbox text-4xl text-[#bec9c2] mb-2"></i>
               <p>داده‌ای یافت نشد</p>
             </div>
           </div>
 
           <!-- MONITORING TAB -->
           <div *ngIf="reportActiveTab === 'monitoring'" class="p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">نظارت فعالیت عریضه نویسان</h2>
+            <h2 class="text-xl font-bold text-[#191c1e] mb-4">نظارت فعالیت عریضه نویسان</h2>
             <div *ngIf="reportSummary" class="grid grid-cols-2 gap-4 mb-6">
-              <div class="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
-                <div class="text-2xl font-bold text-green-700">{{ formatNumber(reportSummary.monitoring.totalRecords) }}</div>
-                <div class="text-xs text-green-600">تعداد نظارت</div>
+              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center">
+                <div class="text-2xl font-bold text-[#44546a]">{{ formatNumber(reportSummary.monitoring.totalRecords) }}</div>
+                <div class="text-xs text-[#44546a]">تعداد نظارت</div>
               </div>
-              <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 text-center">
-                <div class="text-2xl font-bold text-emerald-700">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</div>
-                <div class="text-xs text-emerald-600">مجموع تعداد نظارت</div>
+              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center">
+                <div class="text-2xl font-bold text-[#004532]">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</div>
+                <div class="text-xs text-[#004532]">مجموع تعداد نظارت</div>
               </div>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
-                <thead class="bg-green-50">
+                <thead class="bg-[#ecfdf5]">
                   <tr>
-                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">سال</th>
-                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">ماه</th>
-                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تعداد نظارت</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ملاحظات</th>
-                    <th class="px-3 py-3 text-center font-bold text-gray-700 border-b">تاریخ ثبت</th>
-                    <th class="px-3 py-3 text-right font-bold text-gray-700 border-b">ثبت کننده</th>
+                    <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#a7f3d0]">سال</th>
+                    <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#a7f3d0]">ماه</th>
+                    <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#a7f3d0]">تعداد نظارت</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#a7f3d0]">ملاحظات</th>
+                    <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#a7f3d0]">تاریخ ثبت</th>
+                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#a7f3d0]">ثبت کننده</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of monitoringDetails" class="hover:bg-green-50 border-b border-gray-100">
-                    <td class="px-3 py-2 text-center text-gray-700">{{ row.monitoringYear || '-' }}</td>
-                    <td class="px-3 py-2 text-center text-gray-700">{{ row.monitoringMonth || '-' }}</td>
-                    <td class="px-3 py-2 text-center font-bold text-green-700">{{ row.monitoringCount }}</td>
-                    <td class="px-3 py-2 text-gray-600">{{ row.monitoringRemarks || '-' }}</td>
-                    <td class="px-3 py-2 text-center text-gray-700">{{ row.registrationDate || '-' }}</td>
-                    <td class="px-3 py-2 text-gray-600">{{ row.createdBy }}</td>
+                  <tr *ngFor="let row of monitoringDetails" class="hover:bg-[#ecfdf5] border-b border-[#eceef0]">
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.monitoringYear || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.monitoringMonth || '-' }}</td>
+                    <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ row.monitoringCount }}</td>
+                    <td class="px-3 py-2 text-[#6f7973]">{{ row.monitoringRemarks || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                   </tr>
                 </tbody>
-                <tfoot *ngIf="monitoringDetails.length > 0" class="bg-green-100">
+                <tfoot *ngIf="monitoringDetails.length > 0" class="bg-[#ecfdf5]">
                   <tr>
-                    <td colspan="2" class="px-3 py-2 font-bold text-gray-800">مجموع</td>
-                    <td class="px-3 py-2 text-center font-bold text-green-700">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</td>
+                    <td colspan="2" class="px-3 py-2 font-bold text-[#191c1e]">مجموع</td>
+                    <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</td>
                     <td colspan="3" class="px-3 py-2"></td>
                   </tr>
                 </tfoot>
               </table>
             </div>
-            <div *ngIf="monitoringDetails.length === 0" class="text-center py-8 text-gray-500">
-              <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
+            <div *ngIf="monitoringDetails.length === 0" class="text-center py-8 text-[#6f7973]">
+              <i class="fas fa-inbox text-4xl text-[#bec9c2] mb-2"></i>
               <p>داده‌ای یافت نشد</p>
             </div>
           </div>
@@ -546,8 +587,8 @@
       </div>
 
       <!-- No Data -->
-      <div *ngIf="!reportLoading && !reportSummary" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center text-gray-500">
-        <i class="fas fa-chart-bar text-4xl text-gray-300 mb-2"></i>
+      <div *ngIf="!reportLoading && !reportSummary" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-8 text-center text-[#6f7973]">
+        <i class="fas fa-chart-bar text-4xl text-[#bec9c2] mb-2"></i>
         <p>گزارشی موجود نیست. لطفاً فیلترها را اعمال کنید.</p>
       </div>
     </ng-container>

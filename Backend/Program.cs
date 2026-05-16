@@ -25,7 +25,10 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
                opts.UseNpgsql(builder.Configuration["connection:connectionString"], npgsqlOpts =>
                    npgsqlOpts.MaxBatchSize(100))
                .ConfigureWarnings(warnings =>
-                   warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+               {
+                   warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning);
+                   warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning);
+               }));
 //Get data from appsettings.json and store to ApplicationSettings model than we use in our classes and Controller like Login Controller
 builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
 builder.Services.AddMvc();

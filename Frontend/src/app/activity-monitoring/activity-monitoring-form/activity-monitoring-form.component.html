@@ -1,404 +1,308 @@
 <div class="container">
-  <section class="w-full bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">{{ isEditMode ? 'ویرایش' : 'ثبت' }} نظارت بر
-          فعالیت دفاتر رهنمای معاملات و عریضه نویسان</h1>
-        <p class="text-center text-gray-600">لطفا معلومات نظارت را با دقت تکمیل نمایید</p>
-      </div>
-
+  <section class="w-full bg-[#f7f9fb] py-6">
+    <div class="max-w-5xl mx-auto px-4">
       <form [formGroup]="mainForm" (ngSubmit)="saveForm()">
-        <!-- Section 1: Annual Activity Report -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-file-alt"></i>
-              <span>ثبت نظارت </span>
-            </h2>
-          </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مسلسل</label>
-                <input type="text" formControlName="serialNumber" readonly
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ثبت <span
-                    class="text-red-500">*</span></label>
-                <select formControlName="sectionType" (change)="onSectionTypeChange()"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option value="annualReport">۱. گزارش سالانه</option>
-                  <option value="complaints">۲. ثبت شکایات</option>
-                  <option value="violations">۳. تخلفات دفاتر رهنمای معاملات</option>
-                  <option value="inspection">۴. نظارت وبررسی فعالیت دفاتر رهنمای معاملات</option>
-                </select>
-              </div>
-              <!-- License fields - hidden when inspection is selected -->
-              <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر جواز <span
-                    class="text-red-500">*</span></label>
-                <div class="relative">
-                  <button type="button" *ngIf="licenseNumber?.value" (click)="searchCompanyByLicense()"
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 text-purple-600 hover:text-purple-800 transition-colors z-10">
-                    <i class="fas fa-search text-lg"></i>
-                  </button>
-                  <input type="text" formControlName="licenseNumber" (blur)="searchCompanyByLicense()"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    [ngClass]="{'pl-12': licenseNumber?.value}" placeholder="نمبر جواز را وارد کنید">
-                </div>
-                <div *ngIf="companySearching" class="text-purple-600 text-xs mt-1 flex items-center gap-1">
-                  <i class="fas fa-spinner fa-spin"></i>در حال جستجو...
-                </div>
-                <div *ngIf="companyNotFound" class="text-orange-600 text-xs mt-1 flex items-center gap-1">
-                  <i class="fas fa-exclamation-triangle"></i>شرکت با این نمبر جواز یافت نشد
-                </div>
-                <div *ngIf="companyFound" class="text-green-600 text-xs mt-1 flex items-center gap-1">
-                  <i class="fas fa-check-circle"></i>شرکت یافت شد
-                </div>
-              </div>
+        <input type="hidden" formControlName="id">
 
-              <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت دارنده جواز دفتر رهنمای معاملات <span
-                    class="text-red-500">*</span></label>
-                <input type="text" formControlName="licenseHolderName" [readonly]="companyFound"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  [ngClass]="{'bg-gray-100 cursor-not-allowed': companyFound}">
-                <div
-                  *ngIf="mainForm.get('licenseHolderName')?.invalid && (mainForm.get('licenseHolderName')?.dirty || mainForm.get('licenseHolderName')?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">عنوان رهنمایی معاملات</label>
-                <input type="text" formControlName="companyTitle" [readonly]="companyFound"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  [ngClass]="{'bg-gray-100 cursor-not-allowed': companyFound}">
-              </div>
-              <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه</label>
-                <input type="text" formControlName="district" [readonly]="companyFound"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  [ngClass]="{'bg-gray-100 cursor-not-allowed': companyFound}">
-              </div>
-              <div>
-                <app-multi-calendar-datepicker formControlName="reportRegistrationDate" label="تاریخ ثبت ">
-                </app-multi-calendar-datepicker>
-              </div>
+        <!-- Section 1: ثبت نظارت -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#004532] flex items-center justify-center">
+              <i class="fas fa-clipboard-list text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">ثبت نظارت</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- نمبر مسلسل -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر مسلسل</label>
+              <input type="text" formControlName="serialNumber" readonly
+                class="form-input bg-[#f7f9fb]" placeholder="نمبر مسلسل">
+              <small class="text-[#6f7973] text-xs mt-1 block">
+                <i class="fas fa-info-circle ml-1"></i>این نمبر به صورت خودکار تولید می‌شود
+              </small>
             </div>
 
-            <!-- Deed Items Section - Only shown for annualReport -->
-            <div *ngIf="mainForm.get('sectionType')?.value === 'annualReport'" class="mt-6">
-              <h3 class="text-lg font-bold text-gray-800 mb-4">سته‌های اسناد</h3>
+            <!-- نوعیت ثبت -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نوعیت ثبت <span class="text-red-500">*</span></label>
+              <select formControlName="sectionType" (change)="onSectionTypeChange()"
+                class="form-input" placeholder="انتخاب کنید">
+                <option value="">انتخاب کنید</option>
+                <option value="annualReport">۱. گزارش سالانه</option>
+                <option value="complaints">۲. ثبت شکایات</option>
+                <option value="violations">۳. تخلفات دفاتر رهنمای معاملات</option>
+                <option value="inspection">۴. نظارت و بررسی فعالیت دفاتر رهنمای معاملات</option>
+              </select>
+            </div>
 
-              <!-- Add Deed Item -->
-              <div class="flex gap-4 mb-4">
-                <div class="flex-1">
-                  <ng-select [(ngModel)]="selectedDeedType" [ngModelOptions]="{standalone: true}" [items]="deedTypes"
-                    bindLabel="name" bindValue="id" placeholder="نوعیت اسناد را انتخاب کنید"
-                    class="custom-ng-select"></ng-select>
-                </div>
-                <button type="button" (click)="addDeedItem()" [disabled]="!selectedDeedType"
-                  class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                  <i class="fas fa-plus"></i>
-                  <span>افزودن</span>
+            <!-- نمبر جواز - hidden when inspection -->
+            <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر جواز <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <input type="text" formControlName="licenseNumber" (blur)="searchCompanyByLicense()"
+                  class="form-input" placeholder="نمبر جواز را وارد کنید">
+                <button type="button" *ngIf="licenseNumber?.value" (click)="searchCompanyByLicense()"
+                  class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#004532] hover:text-[#065f46] transition-colors z-10">
+                  <i class="fas fa-search"></i>
                 </button>
               </div>
-
-              <!-- Deed Items List -->
-              <div *ngIf="deedItems.length > 0" class="space-y-4">
-                <div *ngFor="let item of deedItems; let i = index"
-                  class="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
-
-                  <div class="flex justify-between items-start mb-4">
-                    <h4 class="font-bold text-gray-800">{{ getDeedTypeName(item.deedType) }}</h4>
-                    <button type="button" (click)="removeDeedItem(i)"
-                      class="text-red-600 hover:text-red-800 transition-colors">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-
-                  <!-- Serial Fields -->
-                  <div *ngIf="hasSerialNumbers(item.deedType)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">آغاز سریال نمبر</label>
-                      <input type="text" [(ngModel)]="item.serialStart" [ngModelOptions]="{standalone: true}"
-                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
-                        placeholder="مثال: 1001">
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">ختم سریال نمبر</label>
-                      <input type="text" [(ngModel)]="item.serialEnd" [ngModelOptions]="{standalone: true}"
-                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
-                        placeholder="مثال: 1100">
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">تعداد <span
-                          class="text-red-500">*</span></label>
-                      <input type="number" [(ngModel)]="item.count" [ngModelOptions]="{standalone: true}"
-                        (ngModelChange)="onDeedCountChange(item)"
-                        class="w-full px-4 py-2.5 border-2 border-purple-300 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all bg-white"
-                        placeholder="تعداد را وارد کنید">
-                    </div>
-                  </div>
-
-                  <!-- Remarks Field -->
-                  <div class="mt-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
-                    <textarea [(ngModel)]="item.remarks" [ngModelOptions]="{standalone: true}" rows="2"
-                      class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
-                      placeholder="ملاحظات را وارد کنید"></textarea>
-                  </div>
-                </div>
+              <div *ngIf="companySearching" class="text-[#004532] text-xs mt-1 flex items-center gap-1">
+                <i class="fas fa-spinner fa-spin"></i> در حال جستجو...
               </div>
-
-              <!-- Empty State -->
-              <div *ngIf="deedItems.length === 0"
-                class="text-center py-6 text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                <i class="fas fa-inbox text-3xl mb-2"></i>
-                <p>هیچ سته اضافه نشده است</p>
-                <p class="text-sm mt-1">از بخش بالا نوعیت اسناد را انتخاب کرده و افزودن کنید</p>
+              <div *ngIf="companyNotFound" class="text-[#92400e] text-xs mt-1 flex items-center gap-1">
+                <i class="fas fa-exclamation-triangle"></i> شرکت با این نمبر جواز یافت نشد
               </div>
-
-              <!-- Tax Amount Field -->
-              <div class="mt-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">مقدار مالیات</label>
-                <input type="number" formControlName="taxAmount"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="مقدار مالیات را وارد کنید">
-              </div>
-
-              <!-- Summary -->
-              <div *ngIf="deedItems.length > 0" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                  <span class="text-sm text-gray-600">سته‌های وسایط نقلیه:</span>
-                  <span class="font-bold text-purple-600 mr-2">{{ mainForm.get('vehicleTransactionDeedsCount')?.value ||
-                    0 }}</span>
-                </div>
-                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                  <span class="text-sm text-gray-600">سته‌های فروش:</span>
-                  <span class="font-bold text-purple-600 mr-2">{{ mainForm.get('saleDeedsCount')?.value || 0 }}</span>
-                </div>
-                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                  <span class="text-sm text-gray-600">سته‌های بیع الوفا:</span>
-                  <span class="font-bold text-purple-600 mr-2">{{ mainForm.get('baiUlWafaDeedsCount')?.value || 0
-                    }}</span>
-                </div>
-                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                  <span class="text-sm text-gray-600">سته‌های کرایی:</span>
-                  <span class="font-bold text-purple-600 mr-2">{{ mainForm.get('rentalDeedsCount')?.value || 0 }}</span>
-                </div>
-
-
+              <div *ngIf="companyFound" class="text-[#065f46] text-xs mt-1 flex items-center gap-1">
+                <i class="fas fa-check-circle"></i> شرکت یافت شد
               </div>
             </div>
 
-          </div>
-        </div>
-
-        <!-- Section 2: Complaints Registration -->
-        <div *ngIf="showComplaintsSection"
-          class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-exclamation-triangle"></i>
-              <span>۲. ثبت شکایات</span>
-            </h2>
-          </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">موضوع شکایت <span
-                    class="text-red-500">*</span></label>
-                <input type="text" formControlName="complaintSubject"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('complaintSubject')?.invalid && mainForm.get('complaintSubject')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عارض <span
-                    class="text-red-500">*</span></label>
-                <input type="text" formControlName="complainantName"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('complainantName')?.invalid && mainForm.get('complainantName')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
+            <!-- شهرت دارنده جواز - hidden when inspection -->
+            <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">شهرت دارنده جواز دفتر رهنمای معاملات <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="licenseHolderName" [readonly]="companyFound"
+                class="form-input" [ngClass]="{'bg-[#f7f9fb]': companyFound}"
+                placeholder="شهرت دارنده جواز">
+              <div *ngIf="mainForm.get('licenseHolderName')?.invalid && (mainForm.get('licenseHolderName')?.dirty || mainForm.get('licenseHolderName')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
-                <textarea formControlName="complaintActionsTaken" rows="2"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
-                <textarea formControlName="complaintRemarks" rows="2"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
-              </div>
+
+            <!-- عنوان رهنمایی معاملات - hidden when inspection -->
+            <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">عنوان رهنمایی معاملات</label>
+              <input type="text" formControlName="companyTitle" [readonly]="companyFound"
+                class="form-input" [ngClass]="{'bg-[#f7f9fb]': companyFound}"
+                placeholder="عنوان رهنمایی معاملات">
+            </div>
+
+            <!-- ناحیه - hidden when inspection -->
+            <div *ngIf="mainForm.get('sectionType')?.value !== 'inspection'">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ناحیه</label>
+              <input type="text" formControlName="district" [readonly]="companyFound"
+                class="form-input" [ngClass]="{'bg-[#f7f9fb]': companyFound}"
+                placeholder="ناحیه">
+            </div>
+
+            <!-- تاریخ ثبت -->
+            <div>
+              <app-multi-calendar-datepicker formControlName="reportRegistrationDate" label="تاریخ ثبت"></app-multi-calendar-datepicker>
             </div>
           </div>
         </div>
 
-        <!-- Section 3: Real Estate Violations -->
-        <div *ngIf="showViolationsSection"
-          class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-ban"></i>
-              <span>۳. تخلفات دفاتر رهنمای معاملات</span>
-            </h2>
+        <!-- Section 2: سته‌های اسناد (Annual Report Only) -->
+        <div *ngIf="mainForm.get('sectionType')?.value === 'annualReport'" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#065f46] flex items-center justify-center">
+              <i class="fas fa-file-invoice text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">سته‌های اسناد</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">وضعیت  <span
-                    class="text-red-500">*</span></label>
-                <select formControlName="violationStatus" (change)="onViolationStatusChange()"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option value="منجر به مسدودی">منجر به مسدودی</option>
-                  <option value="عادی">عادی</option>
-                  <option value="رفع مهرلاک">رفع مهرلاک</option>
-                </select>
-                <div *ngIf="mainForm.get('violationStatus')?.invalid && mainForm.get('violationStatus')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-            </div>
 
-            <!-- Conditional Fields for منجر به مسدودی -->
-            <div *ngIf="mainForm.get('violationStatus')?.value === 'منجر به مسدودی'"
-              class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">علت مسدودی <span
-                    class="text-red-500">*</span></label>
-                <input type="text" formControlName="closureReason"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('closureReason')?.invalid && mainForm.get('closureReason')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
+          <!-- Add Deed Item -->
+          <div class="flex gap-4 mb-4">
+            <div class="flex-1">
+              <ng-select [(ngModel)]="selectedDeedType" [ngModelOptions]="{standalone: true}" [items]="deedTypes"
+                bindLabel="name" bindValue="id" placeholder="نوعیت اسناد را انتخاب کنید"
+                class="custom-ng-select"></ng-select>
             </div>
+            <button type="button" (click)="addDeedItem()" [disabled]="!selectedDeedType"
+              class="px-5 py-2.5 bg-[#004532] hover:bg-[#065f46] text-white font-medium rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fas fa-plus"></i>
+              <span>افزودن</span>
+            </button>
+          </div>
 
-            <!-- Conditional Fields for رفع مهرلاک -->
-            <div *ngIf="mainForm.get('violationStatus')?.value === 'رفع مهرلاک'"
-              class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">علت رفع مهرلاک <span
-                    class="text-red-500">*</span></label>
-                <input type="text" formControlName="sealRemovalReason"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('sealRemovalReason')?.invalid && mainForm.get('sealRemovalReason')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+          <!-- Deed Items List -->
+          <div *ngIf="deedItems.length > 0" class="space-y-3">
+            <div *ngFor="let item of deedItems; let i = index" class="p-4 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="font-semibold text-[#191c1e] text-sm">{{ getDeedTypeName(item.deedType) }}</h4>
+                <button type="button" (click)="removeDeedItem(i)" class="text-[#ba1a1a] hover:text-[#92400e] transition-colors">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              <div *ngIf="hasSerialNumbers(item.deedType)" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-[#6f7973] mb-1">آغاز سریال نمبر</label>
+                  <input type="text" [(ngModel)]="item.serialStart" [ngModelOptions]="{standalone: true}"
+                    class="form-input text-sm" placeholder="مثال: 1001">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#6f7973] mb-1">ختم سریال نمبر</label>
+                  <input type="text" [(ngModel)]="item.serialEnd" [ngModelOptions]="{standalone: true}"
+                    class="form-input text-sm" placeholder="مثال: 1100">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#6f7973] mb-1">تعداد <span class="text-red-500">*</span></label>
+                  <input type="number" [(ngModel)]="item.count" [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="onDeedCountChange(item)" class="form-input text-sm border-[#004532]" placeholder="تعداد">
                 </div>
               </div>
+              <div class="mt-3">
+                <label class="block text-xs font-semibold text-[#6f7973] mb-1">ملاحظات</label>
+                <textarea [(ngModel)]="item.remarks" [ngModelOptions]="{standalone: true}" rows="2"
+                  class="form-input text-sm resize-none" placeholder="ملاحظات را وارد کنید"></textarea>
+              </div>
             </div>
+          </div>
 
-            <!-- Conditional Fields for عادی -->
-            <div *ngIf="mainForm.get('violationStatus')?.value === 'عادی'"
-              class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تخلف <span
-                    class="text-red-500">*</span></label>
-                <input type="text" formControlName="violationType"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('violationType')?.invalid && mainForm.get('violationType')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
+          <!-- Empty State -->
+          <div *ngIf="deedItems.length === 0" class="text-center py-6 text-[#6f7973] bg-[#f7f9fb] rounded-xl border-2 border-dashed border-[#bec9c2]">
+            <i class="fas fa-inbox text-2xl mb-2 text-[#bec9c2]"></i>
+            <p class="text-sm font-medium">هیچ سته اضافه نشده است</p>
+            <p class="text-xs mt-1">از بخش بالا نوعیت اسناد را انتخاب کرده و افزودن کنید</p>
+          </div>
+
+          <!-- Tax Amount -->
+          <div class="mt-4">
+            <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">مقدار مالیات</label>
+            <input type="number" formControlName="taxAmount" class="form-input max-w-xs" placeholder="مقدار مالیات را وارد کنید">
+          </div>
+
+          <!-- Summary Cards -->
+          <div *ngIf="deedItems.length > 0" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white p-3 rounded-xl border border-[#eceef0]">
+              <span class="text-xs text-[#6f7973]">سته‌های وسایط نقلیه:</span>
+              <span class="font-bold text-[#004532] mr-2 text-sm">{{ mainForm.get('vehicleTransactionDeedsCount')?.value || 0 }}</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
-                <textarea formControlName="violationActionsTaken" rows="2"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
-                <textarea formControlName="violationRemarks" rows="2"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
-              </div>
+            <div class="bg-white p-3 rounded-xl border border-[#eceef0]">
+              <span class="text-xs text-[#6f7973]">سته‌های فروش:</span>
+              <span class="font-bold text-[#004532] mr-2 text-sm">{{ mainForm.get('saleDeedsCount')?.value || 0 }}</span>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-[#eceef0]">
+              <span class="text-xs text-[#6f7973]">سته‌های بیع الوفا:</span>
+              <span class="font-bold text-[#004532] mr-2 text-sm">{{ mainForm.get('baiUlWafaDeedsCount')?.value || 0 }}</span>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-[#eceef0]">
+              <span class="text-xs text-[#6f7973]">سته‌های کرایی:</span>
+              <span class="font-bold text-[#004532] mr-2 text-sm">{{ mainForm.get('rentalDeedsCount')?.value || 0 }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Section 4: Inspection & Supervision Summary -->
-        <div *ngIf="showInspectionSection"
-          class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-clipboard-check"></i>
-              <span>۴. نظارت وبررسی فعالیت دفاتر رهنمای معاملات</span>
-            </h2>
+        <!-- Section 3: شکایات (Complaints Only) -->
+        <div *ngIf="showComplaintsSection" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#92400e] flex items-center justify-center">
+              <i class="fas fa-exclamation-triangle text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">ثبت شکایات</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">سال <span
-                    class="text-red-500">*</span></label>
-                <select formControlName="year"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option *ngFor="let year of monitoringYears" [value]="year">{{ year }}</option>
-                </select>
-                <div *ngIf="mainForm.get('year')?.invalid && mainForm.get('year')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ماه <span
-                    class="text-red-500">*</span></label>
-                <select formControlName="month"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option *ngFor="let month of monitoringMonths" [value]="month.value">{{ month.label }}</option>
-                </select>
-                <div *ngIf="mainForm.get('month')?.invalid && mainForm.get('month')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد نظارت <span
-                    class="text-red-500">*</span></label>
-                <input type="number" formControlName="monitoringCount"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('monitoringCount')?.invalid && mainForm.get('monitoringCount')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
-                <textarea formControlName="monitoringRemarks" rows="2"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
-              </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">موضوع شکایت <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="complaintSubject" class="form-input" placeholder="موضوع شکایت">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">شهرت عارض <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="complainantName" class="form-input" placeholder="شهرت عارض">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">اجراآت</label>
+              <textarea formControlName="complaintActionsTaken" rows="2" class="form-input resize-none" placeholder="اجراآت انجام شده"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ملاحظات</label>
+              <textarea formControlName="complaintRemarks" rows="2" class="form-input resize-none" placeholder="ملاحظات"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: تخلفات (Violations Only) -->
+        <div *ngIf="showViolationsSection" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#ba1a1a] flex items-center justify-center">
+              <i class="fas fa-ban text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">تخلفات دفاتر رهنمای معاملات</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">وضعیت <span class="text-red-500">*</span></label>
+              <select formControlName="violationStatus" (change)="onViolationStatusChange()" class="form-input">
+                <option value="">انتخاب کنید</option>
+                <option value="منجر به مسدودی">منجر به مسدودی</option>
+                <option value="عادی">عادی</option>
+                <option value="رفع مهرلاک">رفع مهرلاک</option>
+              </select>
+            </div>
+            <div *ngIf="mainForm.get('violationStatus')?.value === 'منجر به مسدودی'">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">علت مسدودی <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="closureReason" class="form-input" placeholder="علت مسدودی">
+            </div>
+            <div *ngIf="mainForm.get('violationStatus')?.value === 'رفع مهرلاک'">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">علت رفع مهرلاک <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="sealRemovalReason" class="form-input" placeholder="علت رفع مهرلاک">
+            </div>
+            <div *ngIf="mainForm.get('violationStatus')?.value === 'عادی'">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نوعیت تخلف <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="violationType" class="form-input" placeholder="نوعیت تخلف">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">اجراآت</label>
+              <textarea formControlName="violationActionsTaken" rows="2" class="form-input resize-none" placeholder="اجراآت انجام شده"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ملاحظات</label>
+              <textarea formControlName="violationRemarks" rows="2" class="form-input resize-none" placeholder="ملاحظات"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: نظارت و بررسی (Inspection Only) -->
+        <div *ngIf="showInspectionSection" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#44546a] flex items-center justify-center">
+              <i class="fas fa-clipboard-check text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">نظارت و بررسی فعالیت دفاتر رهنمای معاملات</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">سال <span class="text-red-500">*</span></label>
+              <select formControlName="year" class="form-input">
+                <option value="">انتخاب کنید</option>
+                <option *ngFor="let year of monitoringYears" [value]="year">{{ year }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ماه <span class="text-red-500">*</span></label>
+              <select formControlName="month" class="form-input">
+                <option value="">انتخاب کنید</option>
+                <option *ngFor="let month of monitoringMonths" [value]="month.value">{{ month.label }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">تعداد نظارت <span class="text-red-500">*</span></label>
+              <input type="number" formControlName="monitoringCount" class="form-input" placeholder="تعداد نظارت">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ملاحظات</label>
+              <textarea formControlName="monitoringRemarks" rows="2" class="form-input resize-none" placeholder="ملاحظات"></textarea>
             </div>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="px-6 py-6">
-            <div class="flex flex-wrap gap-4 justify-center">
-              <button type="submit" [disabled]="isViewOnly || mainForm.invalid"
-                class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-                <i class="fas fa-save"></i>
-                <span>ذخیره معلومات</span>
-              </button>
-              <button type="button" (click)="goToList()"
-                class="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-                <i class="fas fa-list"></i>
-                <span>برگشت به لیست</span>
-              </button>
-              <button type="button" (click)="resetForm()"
-                class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-                <i class="fas fa-redo"></i>
-                <span>پاک کردن فورم</span>
-              </button>
-            </div>
-          </div>
+        <div class="flex gap-3 justify-center pt-4 pb-4">
+          <button type="submit" [disabled]="isViewOnly || mainForm.invalid" class="btn-primary">
+            <i class="fas fa-save"></i>
+            <span>{{ isEditMode ? 'تغییر معلومات' : 'ثبت معلومات' }}</span>
+          </button>
+          <button type="button" (click)="resetForm()" class="btn-secondary">
+            <i class="fas fa-plus-circle"></i>
+            <span>جدید</span>
+          </button>
+          <button type="button" (click)="goToList()" class="btn-ghost">
+            <i class="fas fa-list"></i>
+            <span>لیست</span>
+          </button>
         </div>
       </form>
     </div>

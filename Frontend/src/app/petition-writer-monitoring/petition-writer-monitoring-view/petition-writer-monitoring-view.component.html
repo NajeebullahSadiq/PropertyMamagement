@@ -1,186 +1,255 @@
-<section class="w-full min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-8">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6">
-    <!-- Loading -->
-    <div *ngIf="isLoading" class="text-center py-8">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-500 border-t-transparent"></div>
-      <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8 no-print">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004532] to-[#065f46] shadow-lg shadow-[#004532]/30 mb-4">
+        <i class="fas fa-file-signature text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">مشاهده رکورد نظارت بر فعالیت عریضه نویسان</h1>
+      <p class="text-gray-500 max-w-md mx-auto">جزئیات کامل رکورد نظارت بر فعالیت عریضه نویسان</p>
     </div>
 
-    <!-- Record Details -->
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#004532] border-t-transparent"></div>
+      <p class="mt-2 text-[#6f7973]">در حال بارگذاری...</p>
+    </div>
+
     <div *ngIf="!isLoading && record">
-      <!-- Page Header -->
-      <div class="mb-8 text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 shadow-lg shadow-teal-500/30 mb-4">
-          <i class="fas fa-file-signature text-white text-2xl"></i>
-        </div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">مشاهده رکورد نظارت بر فعالیت عریضه نویسان</h1>
-        <p class="text-gray-500">جزئیات رکورد شماره {{ record.serialNumber }}</p>
+      <!-- Action Buttons -->
+      <div class="flex justify-center gap-3 mb-6">
+        <button (click)="goToList()" class="px-6 py-2.5 bg-white border border-[#bec9c2] hover:bg-[#f7f9fb] text-[#55615a] font-medium rounded-xl transition-colors flex items-center gap-2">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت به لیست
+        </button>
+        <button *ngIf="canEdit" (click)="editRecord()" class="px-6 py-2.5 bg-[#d9e6dd] border border-[#8bd6b6] hover:bg-[#c2d6cc] text-[#004532] font-medium rounded-xl transition-colors flex items-center gap-2">
+          <i class="fas fa-edit"></i>
+          ویرایش
+        </button>
+        <button (click)="printRecord()" class="px-6 py-2.5 bg-gradient-to-r from-[#004532] to-[#065f46] hover:from-[#065f46] hover:to-[#004532] text-white font-medium rounded-xl transition-colors shadow-sm hover:shadow-md flex items-center gap-2">
+          <i class="fas fa-print"></i>
+          چاپ
+        </button>
       </div>
 
       <!-- Common Information Card -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-teal-600 to-cyan-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-clipboard-list"></i>
-            <span>معلومات عمومی</span>
-          </h2>
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
+        <div class="px-5 py-4 bg-[#004532] flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+            <i class="fas fa-clipboard-list text-white text-xs"></i>
+          </div>
+          <h2 class="text-sm font-bold text-white">معلومات عمومی</h2>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <span class="text-sm text-gray-500 block mb-1">نمبر مسلسل</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.serialNumber || '-' }}</span>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-hashtag text-[#004532] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">نمبر مسلسل</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.serialNumber || '-' }}</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <span class="text-sm text-gray-500 block mb-1">نوعیت ثبت</span>
-              <span class="text-lg font-bold text-gray-800">{{ getSectionTypeLabel(record.sectionType!) }}</span>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-tag text-[#004532] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">نوعیت ثبت</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ getSectionTypeLabel(record.sectionType!) }}</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <span class="text-sm text-gray-500 block mb-1">تاریخ ثبت</span>
-              <span class="text-lg font-bold text-gray-800">{{ (record.registrationDate | calendarDate) || '-' }}</span>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-calendar text-[#004532] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">تاریخ ثبت</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ (record.registrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Complaints Section -->
-      <div *ngIf="record.sectionType === 'complaints'" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span>ثبت شکایات</span>
-          </h2>
+      <div *ngIf="record.sectionType === 'complaints'" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
+        <div class="px-5 py-4 bg-[#92400e] flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-white text-xs"></i>
+          </div>
+          <h2 class="text-sm font-bold text-white">ثبت شکایات</h2>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
-              <span class="text-sm text-red-600 block mb-1">نمبر جواز</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterLicenseNumber || '-' }}</span>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-id-card text-[#92400e] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">نمبر جواز</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.petitionWriterLicenseNumber || '-' }}</p>
             </div>
-            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
-              <span class="text-sm text-red-600 block mb-1">شهرت عریضه نویس</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterName || '-' }}</span>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-user text-[#92400e] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">شهرت عریضه نویس</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.petitionWriterName || '-' }}</p>
             </div>
-            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
-              <span class="text-sm text-red-600 block mb-1">ناحیه</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterDistrict || '-' }}</span>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-map-marker-alt text-[#92400e] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">ناحیه</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.petitionWriterDistrict || '-' }}</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
-              <span class="text-sm text-red-600 block mb-1">شهرت عارض</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.complainantName || '-' }}</span>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-[#fef3c7] rounded-xl border border-[#fcd34d] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-user text-[#92400e] text-xs"></i>
+                <span class="text-xs text-[#92400e]">شهرت عارض</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.complainantName || '-' }}</p>
             </div>
-            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
-              <span class="text-sm text-red-600 block mb-1">موضوع شکایت</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.complaintSubject || '-' }}</span>
+            <div class="bg-[#fef3c7] rounded-xl border border-[#fcd34d] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-comment text-[#92400e] text-xs"></i>
+                <span class="text-xs text-[#92400e]">موضوع شکایت</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.complaintSubject || '-' }}</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <span class="text-sm text-gray-500 block mb-1">اجراآت</span>
-              <p class="text-gray-800">{{ record.complaintActionsTaken || '-' }}</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div *ngIf="record.complaintActionsTaken" class="p-4 bg-[#fef3c7] rounded-xl border border-[#fcd34d]">
+              <span class="text-sm text-[#92400e] flex items-center gap-2 mb-2">
+                <i class="fas fa-tasks"></i>اقدامات انجام شده
+              </span>
+              <p class="text-[#191c1e]">{{ record.complaintActionsTaken }}</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <span class="text-sm text-gray-500 block mb-1">ملاحظات</span>
-              <p class="text-gray-800">{{ record.complaintRemarks || '-' }}</p>
+            <div *ngIf="record.complaintRemarks" class="p-4 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2 mb-2">
+                <i class="fas fa-comment text-[#6f7973]"></i>ملاحظات
+              </span>
+              <p class="text-[#191c1e]">{{ record.complaintRemarks }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Violations Section -->
-      <div *ngIf="record.sectionType === 'violations'" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-gavel"></i>
-            <span>تخلفات عریضه نویسان</span>
-          </h2>
+      <div *ngIf="record.sectionType === 'violations'" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
+        <div class="px-5 py-4 bg-[#ba1a1a] flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+            <i class="fas fa-gavel text-white text-xs"></i>
+          </div>
+          <h2 class="text-sm font-bold text-white">تخلفات عریضه نویسان</h2>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
-              <span class="text-sm text-orange-600 block mb-1">شهرت عریضه نویس</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterName || '-' }}</span>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-user text-[#ba1a1a] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">شهرت عریضه نویس</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.petitionWriterName || '-' }}</p>
             </div>
-            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
-              <span class="text-sm text-orange-600 block mb-1">نمبر جواز</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterLicenseNumber || '-' }}</span>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-id-card text-[#ba1a1a] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">نمبر جواز</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.petitionWriterLicenseNumber || '-' }}</p>
             </div>
-            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
-              <span class="text-sm text-orange-600 block mb-1">ناحیه</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.petitionWriterDistrict || '-' }}</span>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-map-marker-alt text-[#ba1a1a] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">ناحیه</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.petitionWriterDistrict || '-' }}</p>
             </div>
           </div>
-          <div class="mt-6 bg-orange-50 p-4 rounded-xl border border-orange-100">
-            <span class="text-sm text-orange-600 block mb-1">وضعیت</span>
-            <span class="text-lg font-bold text-gray-800">{{ getActivityStatusLabel(record.activityStatus!) }}</span>
-          </div>
-          <div *ngIf="record.activityStatus === 'activity_prevention'" class="mt-4 bg-orange-50 p-4 rounded-xl border border-orange-100">
-            <span class="text-sm text-orange-600 block mb-1">نوعیت تخلف</span>
-            <span class="text-lg font-bold text-gray-800">{{ record.violationType || '-' }}</span>
-          </div>
-          <div *ngIf="record.activityStatus === 'activity_permission'" class="mt-4 bg-orange-50 p-4 rounded-xl border border-orange-100">
-            <span class="text-sm text-orange-600 block mb-1">علت اجازه فعالیت</span>
-            <span class="text-lg font-bold text-gray-800">{{ record.activityPermissionReason || '-' }}</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <span class="text-sm text-gray-500 block mb-1">اجراآت</span>
-              <p class="text-gray-800">{{ record.violationActionsTaken || '-' }}</p>
+
+          <div class="border-t border-[#eceef0] my-4"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-[#fef2f2] rounded-xl border border-[#fecaca] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-flag text-[#ba1a1a] text-xs"></i>
+                <span class="text-xs text-[#ba1a1a]">وضعیت</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ getActivityStatusLabel(record.activityStatus!) }}</p>
             </div>
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <span class="text-sm text-gray-500 block mb-1">ملاحظات</span>
-              <p class="text-gray-800">{{ record.violationRemarks || '-' }}</p>
+            <div *ngIf="record.activityStatus === 'activity_prevention'" class="bg-[#fef2f2] rounded-xl border border-[#fecaca] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-tag text-[#ba1a1a] text-xs"></i>
+                <span class="text-xs text-[#ba1a1a]">نوعیت تخلف</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.violationType || '-' }}</p>
+            </div>
+            <div *ngIf="record.activityStatus === 'activity_permission'" class="bg-[#ecfdf5] rounded-xl border border-[#a7f3d0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-check text-[#059669] text-xs"></i>
+                <span class="text-xs text-[#059669]">علت اجازه فعالیت</span>
+              </div>
+              <p class="text-sm font-semibold text-[#047857]">{{ record.activityPermissionReason || '-' }}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div *ngIf="record.violationActionsTaken" class="p-4 bg-[#fef2f2] rounded-xl border border-[#fecaca]">
+              <span class="text-sm text-[#ba1a1a] flex items-center gap-2 mb-2">
+                <i class="fas fa-tasks"></i>اجراآت
+              </span>
+              <p class="text-[#191c1e]">{{ record.violationActionsTaken }}</p>
+            </div>
+            <div *ngIf="record.violationRemarks" class="p-4 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+              <span class="text-sm text-[#6f7973] flex items-center gap-2 mb-2">
+                <i class="fas fa-comment text-[#6f7973]"></i>ملاحظات
+              </span>
+              <p class="text-[#191c1e]">{{ record.violationRemarks }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Monitoring Section -->
-      <div *ngIf="record.sectionType === 'monitoring'" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fas fa-chart-line"></i>
-            <span>نظارت فعالیت عریضه نویسان</span>
-          </h2>
+      <div *ngIf="record.sectionType === 'monitoring'" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
+        <div class="px-5 py-4 bg-[#44546a] flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+            <i class="fas fa-chart-line text-white text-xs"></i>
+          </div>
+          <h2 class="text-sm font-bold text-white">نظارت فعالیت عریضه نویسان</h2>
         </div>
-        <div class="px-6 py-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
-              <span class="text-sm text-green-600 block mb-1">سال</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.monitoringYear || '-' }}</span>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-calendar text-[#44546a] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">سال</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.monitoringYear || '-' }}</p>
             </div>
-            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
-              <span class="text-sm text-green-600 block mb-1">ماه</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.monitoringMonth || '-' }}</span>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-calendar text-[#44546a] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">ماه</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.monitoringMonth || '-' }}</p>
             </div>
-            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
-              <span class="text-sm text-green-600 block mb-1">تعداد نظارت</span>
-              <span class="text-lg font-bold text-gray-800">{{ record.monitoringCount || '-' }}</span>
+            <div class="bg-[#ecfdf5] rounded-xl border border-[#a7f3d0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-hashtag text-[#004532] text-xs"></i>
+                <span class="text-xs text-[#004532]">تعداد نظارت</span>
+              </div>
+              <p class="text-sm font-bold text-[#004532]">{{ record.monitoringCount || '-' }}</p>
+            </div>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-comment text-[#44546a] text-xs"></i>
+                <span class="text-xs text-[#6f7973]">ملاحظات</span>
+              </div>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.monitoringRemarks || '-' }}</p>
             </div>
           </div>
-          <div class="mt-6 bg-gray-50 p-4 rounded-xl">
-            <span class="text-sm text-gray-500 block mb-1">ملاحظات</span>
-            <p class="text-gray-800">{{ record.monitoringRemarks || '-' }}</p>
-          </div>
         </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex flex-wrap gap-4 justify-center">
-        <button *ngIf="canEdit" (click)="editRecord()" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-          <i class="fas fa-edit"></i>
-          <span>ویرایش</span>
-        </button>
-        <button (click)="goToList()" class="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-          <i class="fas fa-list"></i>
-          <span>برگشت به لیست</span>
-        </button>
-        <button (click)="printRecord()" class="px-8 py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-          <i class="fas fa-print"></i>
-          <span>چاپ</span>
-        </button>
       </div>
     </div>
   </div>

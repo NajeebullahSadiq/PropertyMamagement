@@ -1,264 +1,266 @@
-<div class="w-full bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">جدول اسناد بهادار عریضه‌ نویسان</h1>
-      <p class="text-center text-gray-600">مشاهده و مدیریت تمام اسناد بهادار عریضه‌ نویسان ثبت شده</p>
-      <!-- View-only badge -->
-      <div *ngIf="isViewOnly" class="text-center mt-2">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
-          <i class="fas fa-eye mr-2"></i>
-          حالت فقط مشاهده
-        </span>
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004532] to-[#065f46] shadow-lg shadow-[#004532]/30 mb-4">
+        <i class="fas fa-file-invoice text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">اسناد بهادار عریضه‌نویسان</h1>
+      <p class="text-gray-500 max-w-md mx-auto">مشاهده و مدیریت تمام اسناد بهادار عریضه‌نویسان</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#6f7973] font-medium mb-1">کل اسناد</p>
+            <p class="text-3xl font-bold text-[#191c1e]">{{ totalCount | number }}</p>
+          </div>
+          <div class="w-12 h-12 bg-[#004532] rounded-xl flex items-center justify-center">
+            <i class="fas fa-file-alt text-white text-xl"></i>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#6f7973] font-medium mb-1">در صفحه فعلی</p>
+            <p class="text-3xl font-bold text-[#191c1e]">{{ items.length | number }}</p>
+          </div>
+          <div class="w-12 h-12 bg-[#065f46] rounded-xl flex items-center justify-center">
+            <i class="fas fa-chart-line text-white text-xl"></i>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 cursor-pointer hover:border-[#55615a] transition-colors" (click)="toggleReports()">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#6f7973] font-medium mb-1">گزارشات</p>
+            <p class="text-lg font-bold text-[#55615a]">تولید گزارش</p>
+          </div>
+          <div class="w-12 h-12 bg-[#55615a] rounded-xl flex items-center justify-center">
+            <i class="fas fa-chart-bar text-white text-xl"></i>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">جستجو</label>
-          <div class="flex gap-2">
-            <div class="relative flex-1">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+    <!-- Search and Actions -->
+    <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
+      <div class="p-4">
+        <div class="flex flex-wrap gap-4 justify-between items-center">
+          <div class="flex-1 min-w-[200px] max-w-md">
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#6f7973]">
                 <i class="fas fa-search"></i>
               </span>
-              <input type="text" class="w-full px-4 py-2.5 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" (keyup.enter)="onSearch()" placeholder="نمبر ثبت، نام عریضه‌نویس، نمبر جواز، آویز بانکی" aria-label="Search">
+              <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"
+                placeholder="جستجو بر اساس نمبر ثبت، نام عریضه‌نویس، نمبر جواز، آویز بانکی..."
+                class="w-full pl-10 pr-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#004532] focus:border-transparent">
             </div>
-            <button class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg" type="button" (click)="onSearch()">
-              جستجو
+          </div>
+          <div class="flex gap-3">
+            <button *ngIf="!isViewOnly && canEdit" (click)="createNew()" class="px-6 py-2.5 bg-gradient-to-r from-[#004532] to-[#065f46] hover:from-[#065f46] hover:to-[#004532] text-white font-medium rounded-xl transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2">
+              <i class="fas fa-plus"></i>
+              ثبت جدید
             </button>
           </div>
         </div>
-        <div class="flex items-end gap-4">
-          <div class="flex-1">
-            <label for="tableSize" class="block text-sm font-semibold text-gray-700 mb-2">تعداد ردیف ها</label>
-            <select id="tableSize" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" [(ngModel)]="pageSize" (change)="onTableSizeChange($event)">
-              <option *ngFor="let size of tableSizes" [value]="size">{{ size }}</option>
-            </select>
+
+        <!-- View Only Badge -->
+        <div *ngIf="isViewOnly" class="mt-4 pt-4 border-t border-[#eceef0]">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#fef3c7] border border-[#fcd34d] rounded-xl text-sm font-semibold text-[#92400e]">
+            <i class="fas fa-eye"></i>
+            حالت فقط مشاهده
           </div>
-          <button (click)="toggleReports()" class="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
-            <i class="fas fa-chart-bar"></i>
-            گزارشات
-          </button>
         </div>
       </div>
     </div>
 
     <!-- Reports Panel -->
-    <div *ngIf="showReports" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-6">
-      <!-- Header -->
-      <div class="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 flex items-center justify-between">
-        <h3 class="text-xl font-bold text-white flex items-center gap-2">
-          <i class="fas fa-chart-line"></i>
+    <div *ngIf="showReports" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden mb-6">
+      <div class="px-6 py-4 bg-[#55615a] border-b border-[#3f4944] flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fas fa-chart-bar"></i>
           گزارش اسناد بهادار عریضه‌نویسان
         </h3>
-        <button (click)="toggleReports()" class="text-white hover:text-gray-200 transition-colors">
-          <i class="fas fa-times text-2xl"></i>
+        <button (click)="toggleReports()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors">
+          <i class="fas fa-times"></i>
         </button>
       </div>
 
       <!-- Report Filters -->
-      <div class="p-6 bg-gray-50 border-b border-gray-200">
+      <div class="p-4 bg-[#f7f9fb] border-b border-[#eceef0]">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-calendar-alt text-purple-500 mr-1"></i>
-              تاریخ شروع
-            </label>
-            <app-multi-calendar-datepicker [(ngModel)]="reportStartDate"></app-multi-calendar-datepicker>
+            <app-multi-calendar-datepicker [(ngModel)]="reportStartDate" label="از تاریخ"></app-multi-calendar-datepicker>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-calendar-check text-purple-500 mr-1"></i>
-              تاریخ پایان
-            </label>
-            <app-multi-calendar-datepicker [(ngModel)]="reportEndDate"></app-multi-calendar-datepicker>
+            <app-multi-calendar-datepicker [(ngModel)]="reportEndDate" label="تا تاریخ"></app-multi-calendar-datepicker>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-filter text-purple-500 mr-1"></i>
-              نوع گزارش
-            </label>
-            <select [(ngModel)]="reportType" (change)="reportLicenseNumber = ''"
-              class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white">
+            <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نوع گزارش</label>
+            <select [(ngModel)]="reportType" (change)="reportLicenseNumber = ''" class="w-full px-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#55615a] focus:border-transparent">
               <option value="all">همه عریضه‌نویسان</option>
               <option value="single">عریضه‌نویس مشخص</option>
             </select>
           </div>
           <div *ngIf="reportType === 'single'">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-id-card text-purple-500 mr-1"></i>
-              نمبر جواز
-            </label>
-            <input type="text" [(ngModel)]="reportLicenseNumber"
-              class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
-              placeholder="نمبر جواز را وارد کنید">
+            <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر جواز</label>
+            <input type="text" [(ngModel)]="reportLicenseNumber" placeholder="نمبر جواز را وارد کنید" class="w-full px-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#55615a] focus:border-transparent">
           </div>
         </div>
-
         <div class="flex gap-3 mt-4">
-          <button (click)="generateReport()" [disabled]="isLoadingReport"
-            class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-            <i class="fas fa-chart-bar"></i>
-            <span>تولید گزارش</span>
+          <button (click)="generateReport()" [disabled]="isLoadingReport" class="px-6 py-2.5 bg-[#55615a] hover:bg-[#3f4944] text-white font-medium rounded-xl transition-colors shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50">
+            <i class="fas" [ngClass]="isLoadingReport ? 'fa-spinner fa-spin' : 'fa-chart-bar'"></i>
+            تولید گزارش
           </button>
-          <button *ngIf="reportData" (click)="exportToExcel()"
-            class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <button *ngIf="reportData" (click)="exportToExcel()" class="px-6 py-2.5 bg-[#065f46] hover:bg-[#004532] text-white font-medium rounded-xl transition-colors shadow-sm hover:shadow-md flex items-center gap-2">
             <i class="fas fa-file-excel"></i>
-            <span>صادر کردن Excel</span>
+            صادر کردن Excel
           </button>
         </div>
       </div>
 
       <!-- Report Results -->
-      <div *ngIf="reportData" class="p-6">
-        <!-- Metadata Banner -->
-        <div class="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg p-4 mb-6 border border-purple-200">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-            <div>
-              <p class="text-xs text-gray-600 mb-1">از تاریخ</p>
-              <p class="text-lg font-bold text-purple-700">{{ reportData.startDate }}</p>
+      <div *ngIf="reportData" class="p-4">
+        <!-- Meta Info -->
+        <div class="bg-[#d9e6dd] rounded-xl p-4 mb-4">
+          <div class="flex flex-wrap justify-center gap-6 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-[#6f7973]">از تاریخ:</span>
+              <span class="font-bold text-[#004532]">{{ reportData.startDate }}</span>
             </div>
-            <div>
-              <p class="text-xs text-gray-600 mb-1">تا تاریخ</p>
-              <p class="text-lg font-bold text-purple-700">{{ reportData.endDate }}</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[#6f7973]">تا تاریخ:</span>
+              <span class="font-bold text-[#004532]">{{ reportData.endDate }}</span>
             </div>
-            <div>
-              <p class="text-xs text-gray-600 mb-1">عریضه‌نویس</p>
-              <p class="text-lg font-bold text-purple-700">{{ reportData.licenseNumber }}</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[#6f7973]">عریضه‌نویس:</span>
+              <span class="font-bold text-[#004532]">{{ reportData.licenseNumber }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-8 text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1">
-            <div class="flex items-start justify-between mb-4">
-              <div class="bg-white/20 rounded-xl p-4">
-                <i class="fas fa-file-alt text-4xl"></i>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="bg-white rounded-xl border border-[#bec9c2] p-5">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-[#004532] rounded-xl flex items-center justify-center">
+                <i class="fas fa-file-alt text-white text-xl"></i>
               </div>
-              <span class="text-xs bg-white/20 px-3 py-1 rounded-full">تعداد</span>
-            </div>
-            <p class="text-sm opacity-90 mb-2">تعداد عریضه</p>
-            <p class="text-5xl font-bold mb-2">{{ reportData.petitionCount | number }}</p>
-            <div class="flex items-center gap-2 text-sm opacity-75">
-              <i class="fas fa-info-circle"></i>
-              <span>مجموع عریضه‌های ثبت شده</span>
+              <div>
+                <p class="text-sm text-[#6f7973]">تعداد عریضه</p>
+                <p class="text-3xl font-bold text-[#191c1e]">{{ reportData.petitionCount | number }}</p>
+              </div>
             </div>
           </div>
-
-          <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-8 text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1">
-            <div class="flex items-start justify-between mb-4">
-              <div class="bg-white/20 rounded-xl p-4">
-                <i class="fas fa-money-bill-wave text-4xl"></i>
+          <div class="bg-white rounded-xl border border-[#bec9c2] p-5">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-[#065f46] rounded-xl flex items-center justify-center">
+                <i class="fas fa-money-bill-wave text-white text-xl"></i>
               </div>
-              <span class="text-xs bg-white/20 px-3 py-1 rounded-full">مبلغ</span>
-            </div>
-            <p class="text-sm opacity-90 mb-2">مبلغ پول عریضه</p>
-            <p class="text-5xl font-bold mb-2">{{ reportData.petitionAmount | number }}</p>
-            <div class="flex items-center gap-2 text-sm opacity-75">
-              <i class="fas fa-coins"></i>
-              <span>افغانی</span>
+              <div>
+                <p class="text-sm text-[#6f7973]">مبلغ پول عریضه (افغانی)</p>
+                <p class="text-3xl font-bold text-[#191c1e]">{{ reportData.petitionAmount | number }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Additional Info Card -->
-        <div class="mt-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
-          <div class="flex items-center justify-center gap-4">
+        <!-- Additional Info -->
+        <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-4">
+          <div class="flex flex-wrap justify-center gap-6 text-sm">
             <div class="flex items-center gap-2">
-              <i class="fas fa-clipboard-list text-gray-600"></i>
-              <span class="text-sm text-gray-700">تعداد توزیع:</span>
-              <span class="font-bold text-gray-900">{{ reportData.totalDistributions }}</span>
+              <i class="fas fa-clipboard-list text-[#6f7973]"></i>
+              <span class="text-[#6f7973]">تعداد توزیع:</span>
+              <span class="font-bold text-[#191c1e]">{{ reportData.totalDistributions }}</span>
             </div>
-            <div class="h-6 w-px bg-gray-300"></div>
             <div class="flex items-center gap-2">
-              <i class="fas fa-clock text-gray-600"></i>
-              <span class="text-sm text-gray-700">تاریخ تولید گزارش:</span>
-              <span class="font-bold text-gray-900">{{ reportData.reportGeneratedAt | calendarDate }}</span>
+              <i class="fas fa-clock text-[#6f7973]"></i>
+              <span class="text-[#6f7973]">تاریخ تولید گزارش:</span>
+              <span class="font-bold text-[#191c1e]">{{ reportData.reportGeneratedAt | calendarDate }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-      <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-          <i class="fas fa-table"></i>
-          <span>لیست اسناد بهادار عریضه‌ نویسان</span>
-        </h2>
-      </div>
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#004532] border-t-transparent"></div>
+      <p class="mt-2 text-[#6f7973]">در حال بارگذاری...</p>
+    </div>
 
-      <!-- Loading Indicator -->
-      <div *ngIf="isLoading" class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-        <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
-      </div>
-
-      <div *ngIf="!isLoading" class="overflow-x-auto">
+    <!-- Data Table -->
+    <div *ngIf="!isLoading" class="bg-white rounded-2xl shadow-sm border border-[#bec9c2] overflow-hidden">
+      <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 border-b-2 border-gray-200">
+          <thead class="bg-[#eceef0] border-b-2 border-[#bec9c2]">
             <tr class="text-center">
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">شماره مسلسل</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر ثبت تعرفه</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">اسم عریضه نویس</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">نمبر جواز</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تعداد عریضه</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">مبلغ پول</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">سریال نمبر</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ توزیع</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700">تاریخ تحویلی اویز</th>
-              <th class="px-4 py-4 text-sm font-bold text-gray-700" colspan="3">عملیات</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">#</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">نمبر ثبت</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">اسم عریضه‌نویس</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">نمبر جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">تعداد عریضه</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">مبلغ پول</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">سریال نمبر</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">تاریخ توزیع</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">تاریخ تحویلی</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">عملیات</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }; let i = index" class="text-center hover:bg-blue-50 transition-colors">
-              <td class="px-4 py-3 text-sm text-gray-700 font-medium">{{ (page - 1) * pageSize + i + 1 }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700 font-semibold">{{ item.registrationNumber }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionWriterName }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.licenseNumber }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.petitionCount | number }}</td>
-              <td class="px-4 py-3 text-sm font-semibold text-green-600">{{ item.amount | number }} افغانی</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ item.serialNumberStart }} - {{ item.serialNumberEnd }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ (item.distributionDate | calendarDate) || '-' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-700">{{ (item.deliveryDate | calendarDate) || '-' }}</td>
+          <tbody class="divide-y divide-[#bec9c2]">
+            <tr *ngFor="let item of items | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalCount }; let i = index" class="text-center hover:bg-[#d9e6dd] transition-colors">
+              <td class="px-4 py-3 text-sm text-[#6f7973] font-medium">{{ (page - 1) * pageSize + i + 1 }}</td>
+              <td class="px-4 py-3 text-sm text-[#191c1e] font-semibold">{{ item.registrationNumber }}</td>
+              <td class="px-4 py-3 text-sm text-[#3f4944]">{{ item.petitionWriterName }}</td>
+              <td class="px-4 py-3 text-sm text-[#3f4944]">{{ item.licenseNumber }}</td>
               <td class="px-4 py-3">
-                <button class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" (click)="onView(item.id!)" title="مشاهده">
-                  <i class="fas fa-eye"></i>
-                  <span>مشاهده</span>
-                </button>
+                <span class="px-3 py-1 bg-[#eff6ff] border border-[#bfdbfe] rounded-lg text-xs font-semibold text-[#1e40af]">{{ item.petitionCount | number }}</span>
               </td>
               <td class="px-4 py-3">
-                <button *ngIf="!isViewOnly && canEdit" 
-                        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" 
-                        (click)="onEdit(item.id!)" 
-                        title="ویرایش">
-                  <i class="fas fa-edit"></i>
-                  <span>ویرایش</span>
-                </button>
-                <span *ngIf="isViewOnly || !canEdit" class="text-gray-400 text-sm">-</span>
+                <span class="px-3 py-1 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg text-xs font-semibold text-[#15803d]">{{ item.amount | number }} افغانی</span>
               </td>
+              <td class="px-4 py-3 text-sm text-[#3f4944]">{{ item.serialNumberStart }} - {{ item.serialNumberEnd }}</td>
+              <td class="px-4 py-3 text-sm text-[#3f4944]">{{ (item.distributionDate | calendarDate) || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-[#3f4944]">{{ (item.deliveryDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3">
-                <button *ngIf="canPrint" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-300 shadow-sm hover:shadow flex items-center gap-2 mx-auto" (click)="onPrint(item.id!)" title="چاپ">
-                  <i class="fas fa-print"></i>
-                  <span>چاپ</span>
-                </button>
-                <span *ngIf="!canPrint" class="text-gray-400 text-sm">-</span>
+                <div class="flex justify-center gap-2">
+                  <button (click)="onView(item.id!)" class="p-2 text-[#004532] hover:bg-[#d9e6dd] rounded-lg transition-colors" title="مشاهده">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button *ngIf="!isViewOnly && canEdit" (click)="onEdit(item.id!)" class="p-2 text-[#44546a] hover:bg-[#d3e4fe] rounded-lg transition-colors" title="ویرایش">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button *ngIf="canPrint" (click)="onPrint(item.id!)" class="p-2 text-[#065f46] hover:bg-[#d1fae5] rounded-lg transition-colors" title="چاپ">
+                    <i class="fas fa-print"></i>
+                  </button>
+                </div>
               </td>
             </tr>
             <tr *ngIf="items.length === 0">
-              <td colspan="12" class="px-4 py-8 text-center text-gray-500">
-                <i class="fas fa-inbox text-4xl mb-2 text-gray-300"></i>
+              <td colspan="10" class="px-4 py-8 text-center text-[#6f7973]">
+                <i class="fas fa-inbox text-4xl mb-2 text-[#bec9c2]"></i>
                 <p>هیچ رکوردی یافت نشد</p>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
 
-    <div class="flex justify-center mt-6">
-      <pagination-controls (pageChange)="onTableDataChange($event)" [previousLabel]="'قبلی'" [nextLabel]="'بعدی'"></pagination-controls>
+      <!-- Pagination -->
+      <div *ngIf="totalCount > 0" class="px-6 py-4 border-t border-[#bec9c2] flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-[#6f7973]">نمایش</span>
+          <select [(ngModel)]="pageSize" (change)="onTableSizeChange($event)" class="px-3 py-1.5 border border-[#bec9c2] rounded-lg text-sm focus:ring-2 focus:ring-[#004532]">
+            <option *ngFor="let size of tableSizes" [value]="size">{{ size }}</option>
+          </select>
+          <span class="text-sm text-[#6f7973]">مورد از {{ totalCount }}</span>
+        </div>
+        <pagination-controls (pageChange)="onTableDataChange($event)" [previousLabel]="'قبلی'" [nextLabel]="'بعدی'"></pagination-controls>
+      </div>
     </div>
   </div>
-</div>
+</section>

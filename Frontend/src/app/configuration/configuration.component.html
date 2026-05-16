@@ -1,82 +1,93 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 p-6">
-  <!-- Page Header -->
-  <div class="mb-10 text-center">
-    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 mb-4">
-      <mat-icon class="text-white text-3xl">settings</mat-icon>
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004532] to-[#065f46] shadow-lg shadow-[#004532]/30 mb-4">
+        <i class="fas fa-cog text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">تنظیمات سیستم</h1>
+      <p class="text-gray-500 max-w-md mx-auto">مدیریت کاربران، صلاحیت‌ها و تنظیمات سیستم</p>
     </div>
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">تنظیمات سیستم</h1>
-    <p class="text-gray-500">مدیریت کاربران، صلاحیت‌ها و تنظیمات سیستم</p>
-  </div>
 
-  <!-- Configuration Cards Grid -->
-  <div class="max-w-5xl mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Configuration Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       <div *ngFor="let card of configCards"
            (click)="navigateTo(card.route)"
-           class="group bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
-        
-        <!-- Card Content -->
+           class="group bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 hover:shadow-md hover:-translate-y-1 hover:border-[#bec9c2] transition-all duration-300 cursor-pointer">
+
         <div class="flex items-start gap-4">
           <!-- Icon Container -->
-          <div [class]="'w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 ' + card.gradient">
-            <mat-icon class="text-white text-2xl">{{ card.icon }}</mat-icon>
+          <div class="w-14 h-14 rounded-xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110 flex-shrink-0"
+               [ngClass]="card.iconBg">
+            <i [ngClass]="card.icon" class="text-white text-xl"></i>
           </div>
-          
+
           <!-- Text Content -->
-          <div class="flex-1">
-            <h3 class="text-lg font-bold text-gray-800 mb-1 group-hover:text-indigo-600 transition-colors">
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-extrabold text-[#191c1e] mb-1 group-hover:text-[#004532] transition-colors">
               {{ card.title }}
             </h3>
-            <p class="text-sm text-gray-500 leading-relaxed">
+            <p class="text-xs text-[#6f7973] leading-relaxed">
               {{ card.description }}
             </p>
           </div>
-          
+
           <!-- Arrow Icon -->
-          <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <mat-icon class="text-indigo-500">arrow_back</mat-icon>
+          <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex-shrink-0">
+            <i class="fas fa-chevron-left text-[#004532] text-xs"></i>
           </div>
         </div>
-        
-        <!-- Bottom Accent Line -->
-        <div [class]="'h-1 w-0 group-hover:w-full rounded-full bg-gradient-to-r transition-all duration-500 mt-4 ' + card.gradient"></div>
       </div>
     </div>
-  </div>
 
-  <!-- Quick Stats Section -->
-  <div class="max-w-5xl mx-auto mt-10">
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-      <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <mat-icon class="text-indigo-500">info</mat-icon>
-        راهنمای تنظیمات
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-        <div class="flex items-start gap-2">
-          <mat-icon class="text-blue-500 text-lg">check_circle</mat-icon>
-          <span>از بخش لیست کاربران می‌توانید کاربران جدید را مشاهده و مدیریت کنید</span>
+    <!-- Guide Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+      <div class="px-5 py-4 bg-[#004532] flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+          <i class="fas fa-info-circle text-white text-xs"></i>
         </div>
-        <div class="flex items-start gap-2">
-          <mat-icon class="text-purple-500 text-lg">check_circle</mat-icon>
-          <span>از بخش مدیریت صلاحیت‌ها می‌توانید صلاحیت‌های هر کاربر را تعیین کنید</span>
-        </div>
-        <div class="flex items-start gap-2">
-          <mat-icon class="text-emerald-500 text-lg">check_circle</mat-icon>
-          <span>از بخش صلاحیت‌های نقش‌ها می‌توانید نقش‌های سیستم را مدیریت کنید</span>
-        </div>
-        <div class="flex items-start gap-2">
-          <mat-icon class="text-amber-500 text-lg">check_circle</mat-icon>
-          <span>از بخش مدیریت ولسوالی‌ها می‌توانید ولسوالی‌ها را فعال کنید</span>
-        </div>
-        <div class="flex items-start gap-2">
-          <mat-icon class="text-orange-500 text-lg">check_circle</mat-icon>
-          <span>از بخش محل فعالیت عریضه‌نویس می‌توانید محل فعالیت‌ها را مدیریت کنید</span>
-        </div>
-        <div class="flex items-start gap-2">
-          <mat-icon class="text-rose-500 text-lg">check_circle</mat-icon>
-          <span>از بخش لاگ فعالیت‌ها می‌توانید تمام فعالیت‌های سیستم را بررسی کنید</span>
+        <h2 class="text-sm font-bold text-white">راهنمای تنظیمات</h2>
+      </div>
+      <div class="p-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-start gap-3 p-3 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+            <div class="w-6 h-6 rounded-full bg-[#004532] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i class="fas fa-users text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-[#191c1e] leading-relaxed">از بخش لیست کاربران می‌توانید کاربران جدید را مشاهده و مدیریت کنید</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+            <div class="w-6 h-6 rounded-full bg-[#065f46] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i class="fas fa-shield-halved text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-[#191c1e] leading-relaxed">از بخش مدیریت صلاحیت‌ها می‌توانید صلاحیت‌های هر کاربر را تعیین کنید</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+            <div class="w-6 h-6 rounded-full bg-[#44546a] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i class="fas fa-user-gear text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-[#191c1e] leading-relaxed">از بخش صلاحیت‌های نقش‌ها می‌توانید نقش‌های سیستم را مدیریت کنید</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+            <div class="w-6 h-6 rounded-full bg-[#92400e] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i class="fas fa-location-dot text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-[#191c1e] leading-relaxed">از بخش مدیریت ولسوالی‌ها می‌توانید ولسوالی‌ها را فعال کنید</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+            <div class="w-6 h-6 rounded-full bg-[#55615a] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i class="fas fa-gavel text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-[#191c1e] leading-relaxed">از بخش محل فعالیت عریضه‌نویس می‌توانید محل فعالیت‌ها را مدیریت کنید</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 bg-[#f7f9fb] rounded-xl border border-[#eceef0]">
+            <div class="w-6 h-6 rounded-full bg-[#ba1a1a] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i class="fas fa-clock-rotate-left text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-[#191c1e] leading-relaxed">از بخش لاگ فعالیت‌ها می‌توانید تمام فعالیت‌های سیستم را بررسی کنید</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>

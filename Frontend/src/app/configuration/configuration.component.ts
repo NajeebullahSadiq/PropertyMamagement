@@ -6,8 +6,7 @@ interface ConfigCard {
   description: string;
   icon: string;
   route: string;
-  color: string;
-  gradient: string;
+  iconBg: string;
 }
 
 @Component({
@@ -20,50 +19,44 @@ export class ConfigurationComponent {
     {
       title: 'لیست کاربران',
       description: 'مشاهده و مدیریت تمام کاربران سیستم',
-      icon: 'people',
+      icon: 'fas fa-users',
       route: '/users',
-      color: 'blue',
-      gradient: 'from-blue-500 to-indigo-600'
+      iconBg: 'bg-[#004532]'
     },
     {
       title: 'مدیریت صلاحیت‌ها',
       description: 'تعیین و مدیریت صلاحیت‌های کاربران',
-      icon: 'admin_panel_settings',
+      icon: 'fas fa-shield-halved',
       route: '/users/permissions',
-      color: 'purple',
-      gradient: 'from-purple-500 to-violet-600'
+      iconBg: 'bg-[#065f46]'
     },
     {
       title: 'صلاحیت‌های نقش‌ها',
       description: 'مدیریت صلاحیت‌های نقش‌های مختلف سیستم',
-      icon: 'manage_accounts',
+      icon: 'fas fa-user-gear',
       route: '/users/role-permissions',
-      color: 'emerald',
-      gradient: 'from-emerald-500 to-teal-600'
+      iconBg: 'bg-[#44546a]'
     },
     {
       title: 'مدیریت ولسوالی‌ها',
       description: 'فعال‌سازی و مدیریت ولسوالی‌ها',
-      icon: 'location_city',
+      icon: 'fas fa-location-dot',
       route: '/district-management',
-      color: 'amber',
-      gradient: 'from-amber-500 to-orange-600'
+      iconBg: 'bg-[#92400e]'
     },
     {
       title: 'لاگ فعالیت‌های سیستم',
       description: 'مشاهده و بررسی تمام فعالیت‌های سیستم',
-      icon: 'history',
+      icon: 'fas fa-clock-rotate-left',
       route: '/audit-log',
-      color: 'rose',
-      gradient: 'from-rose-500 to-pink-600'
+      iconBg: 'bg-[#ba1a1a]'
     },
     {
       title: 'محل فعالیت عریضه‌نویس',
       description: 'مدیریت محل فعالیت‌های عریضه‌نویسان',
-      icon: 'gavel',
+      icon: 'fas fa-gavel',
       route: '/petition-writer-activity-location-management',
-      color: 'orange',
-      gradient: 'from-orange-500 to-amber-600'
+      iconBg: 'bg-[#55615a]'
     }
   ];
 

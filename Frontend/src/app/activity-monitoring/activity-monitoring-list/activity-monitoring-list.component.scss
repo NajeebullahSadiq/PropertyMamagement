@@ -1,18 +1,43 @@
-.card {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    padding: 1rem;
-}
-
-table {
-    width: 100%;
-}
-
-.mat-column-actions {
-    width: 150px;
-    text-align: center;
+// Custom pagination styling
+::ng-deep .custom-pagination {
+  .pagination-next,
+  .pagination-prev {
+    a {
+      background: white;
+      border: 1px solid #bec9c2;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      color: #55615a;
+      font-size: 0.875rem;
+      
+      &:hover {
+        background: #f7f9fb;
+        border-color: #004532;
+        color: #004532;
+      }
+    }
+  }
+  
+  .pagination-page {
+    a {
+      background: white;
+      border: 1px solid #bec9c2;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      color: #55615a;
+      font-size: 0.875rem;
+      
+      &:hover {
+        background: #f7f9fb;
+        border-color: #004532;
+        color: #004532;
+      }
+    }
+    
+    &.active a {
+      background: #004532;
+      border-color: #004532;
+      color: white;
+    }
+  }
 }

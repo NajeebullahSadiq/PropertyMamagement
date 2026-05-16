@@ -1,15 +1,21 @@
-/* Petition Writer Monitoring View Styles */
-
+// Print styles
 @media print {
   section {
     background: white !important;
     padding: 0 !important;
   }
-  
-  .shadow-lg, .shadow-md {
+
+  .shadow-lg,
+  .shadow-md,
+  .shadow-sm {
     box-shadow: none !important;
   }
-  
+
+  .border,
+  .border-\[#eceef0\] {
+    border: 1px solid #e5e7eb !important;
+  }
+
   button {
     display: none !important;
   }

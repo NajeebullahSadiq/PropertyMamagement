@@ -77,17 +77,14 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
     initForm(): void {
         this.securitiesForm = this.fb.group({
             id: [null],
-            // Tab 1
             registrationNumber: ['', [Validators.required, Validators.maxLength(50)]],
             licenseOwnerName: ['', [Validators.required, Validators.maxLength(200)]],
             licenseOwnerFatherName: ['', [Validators.required, Validators.maxLength(200)]],
             transactionGuideName: ['', [Validators.required, Validators.maxLength(200)]],
             licenseNumber: ['', [Validators.required, Validators.maxLength(50)]],
-            // Tab 3
             pricePerDocument: [4000, [Validators.min(0)]],
             totalDocumentsPrice: [null, [Validators.min(0)]],
             totalSecuritiesPrice: [null, [Validators.min(0)]],
-            // Tab 4
             bankReceiptNumber: ['', [Validators.maxLength(100)]],
             deliveryDate: [null],
             distributionDate: [null]
@@ -109,7 +106,6 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
                     totalDocumentsPrice: data.totalDocumentsPrice,
                     totalSecuritiesPrice: data.totalSecuritiesPrice,
                     bankReceiptNumber: data.bankReceiptNumber,
-                    // Use raw date fields - global JSON converter already converts DateOnly? to Hijri Shamsi strings
                     deliveryDate: data.deliveryDate || null,
                     distributionDate: data.distributionDate || null
                 });
@@ -126,6 +122,9 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
                     }));
                     this.calculateTotals();
                 }
+                
+                // Mark as company found for existing records
+                this.companyFound = true;
             },
             error: (err) => {
                 this.toastr.error('خطا در بارگذاری اطلاعات');
@@ -133,6 +132,10 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
             }
         });
     }
+
+    // ============================================
+    // Document Items Management
+    // ============================================
 
     addItem(): void {
         if (!this.selectedDocumentType) {
@@ -162,15 +165,7 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
         this.toastr.info('سند حذف شد');
     }
 
-    calculateItemCount(item: SecuritiesDistributionItem): void {
-        // Serial numbers are just reference numbers for tracking
-        // They should NOT affect the count or price
-        // Only the manually entered count should be used
-        this.calculateItemPrice(item);
-    }
-
     onCountChange(item: SecuritiesDistributionItem): void {
-        // When count is manually changed, recalculate price
         this.calculateItemPrice(item);
     }
 
@@ -185,7 +180,6 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
     }
 
     calculateTotals(): void {
-        const totalDocs = this.items.reduce((sum, item) => sum + item.count, 0);
         const totalPrice = this.items.reduce((sum, item) => sum + item.price, 0);
 
         this.securitiesForm.patchValue({
@@ -203,6 +197,62 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
         const docType = this.documentTypes.find(d => d.id === documentType);
         return docType ? docType.hasSerial : false;
     }
+
+    // ============================================
+    // Company Search
+    // ============================================
+
+    searchCompanyByLicense(): void {
+        const licenseNumber = this.securitiesForm.get('licenseNumber')?.value;
+        
+        if (!licenseNumber || !licenseNumber.trim()) {
+            return;
+        }
+
+        this.companySearching = true;
+        this.companyFound = false;
+        this.companyNotFound = false;
+        this.selectedCompanyId = null;
+
+        const provinceId = this.authService.getUserProvinceId();
+
+        this.companyService.searchCompanyByLicense(licenseNumber.trim(), provinceId || undefined).subscribe({
+            next: (companies) => {
+                this.companySearching = false;
+                
+                if (companies && companies.length > 0) {
+                    const company = companies[0];
+                    this.companyFound = true;
+                    this.companyNotFound = false;
+                    this.selectedCompanyId = company.companyId || company.id;
+
+                    this.securitiesForm.patchValue({
+                        transactionGuideName: company.companyName || company.companyTitle || '',
+                        licenseOwnerName: company.ownerName || '',
+                        licenseOwnerFatherName: company.ownerFatherName || '',
+                        licenseNumber: company.licenseNumber || licenseNumber
+                    });
+
+                    this.toastr.success('معلومات شرکت با موفقیت بارگذاری شد');
+                } else {
+                    this.companyFound = false;
+                    this.companyNotFound = true;
+                    this.toastr.warning('شرکت با این نمبر جواز یافت نشد');
+                }
+            },
+            error: (err) => {
+                this.companySearching = false;
+                this.companyFound = false;
+                this.companyNotFound = true;
+                console.error('Error searching company:', err);
+                this.toastr.error('خطا در جستجوی شرکت');
+            }
+        });
+    }
+
+    // ============================================
+    // Form Submission
+    // ============================================
 
     onSubmit(): void {
         if (this.securitiesForm.invalid) {
@@ -233,7 +283,6 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
 
         const formValue = this.securitiesForm.value;
         
-        // Convert dates to Hijri Shamsi format for backend
         const deliveryDate = formValue.deliveryDate 
             ? this.formatDateForBackend(formValue.deliveryDate)
             : null;
@@ -301,7 +350,6 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
         this.companyNotFound = false;
         this.selectedCompanyId = null;
         
-        // If in edit mode, navigate to create page
         if (this.isEditMode) {
             this.isEditMode = false;
             this.editId = null;
@@ -311,57 +359,6 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
 
     goToList(): void {
         this.router.navigate(['/securities/list']);
-    }
-
-    searchCompanyByLicense(): void {
-        const licenseNumber = this.securitiesForm.get('licenseNumber')?.value;
-        
-        if (!licenseNumber || !licenseNumber.trim()) {
-            return;
-        }
-
-        // Reset states
-        this.companySearching = true;
-        this.companyFound = false;
-        this.companyNotFound = false;
-        this.selectedCompanyId = null;
-
-        // Get user's province if available
-        const provinceId = this.authService.getUserProvinceId();
-
-        this.companyService.searchCompanyByLicense(licenseNumber.trim(), provinceId || undefined).subscribe({
-            next: (companies) => {
-                this.companySearching = false;
-                
-                if (companies && companies.length > 0) {
-                    const company = companies[0]; // Take first match
-                    this.companyFound = true;
-                    this.companyNotFound = false;
-                    this.selectedCompanyId = company.companyId || company.id;
-
-                    // Auto-populate fields (handle both companyTitle and companyName)
-                    this.securitiesForm.patchValue({
-                        transactionGuideName: company.companyName || company.companyTitle || '',
-                        licenseOwnerName: company.ownerName || '',
-                        licenseOwnerFatherName: company.ownerFatherName || '',
-                        licenseNumber: company.licenseNumber || licenseNumber
-                    });
-
-                    this.toastr.success('معلومات شرکت با موفقیت بارگذاری شد');
-                } else {
-                    this.companyFound = false;
-                    this.companyNotFound = true;
-                    this.toastr.warning('شرکت با این نمبر جواز یافت نشد');
-                }
-            },
-            error: (err) => {
-                this.companySearching = false;
-                this.companyFound = false;
-                this.companyNotFound = true;
-                console.error('Error searching company:', err);
-                this.toastr.error('خطا در جستجوی شرکت');
-            }
-        });
     }
 
     // Form control getters

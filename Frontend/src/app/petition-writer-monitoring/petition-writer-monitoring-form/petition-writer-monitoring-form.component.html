@@ -1,293 +1,326 @@
 <div class="container">
-  <section class="w-full bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">{{ isEditMode ? 'ویرایش' : 'ثبت' }} نظارت بر فعالیت عریضه نویسان</h1>
-        <p class="text-center text-gray-600">لطفا معلومات را با دقت تکمیل نمایید</p>
-      </div>
-
+  <section class="w-full bg-[#f7f9fb] py-6">
+    <div class="max-w-5xl mx-auto px-4">
       <form [formGroup]="mainForm" (ngSubmit)="saveForm()">
-        <!-- Section 1: Common Information -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-teal-600 to-cyan-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-clipboard-list"></i>
-              <span>معلومات عمومی</span>
-            </h2>
+        <input type="hidden" formControlName="id">
+
+        <!-- Section 1: معلومات عمومی -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#004532] flex items-center justify-center">
+              <i class="fas fa-clipboard-list text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">معلومات عمومی</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر مسلسل</label>
-                <input type="text" formControlName="serialNumber" readonly
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- نمبر مسلسل -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر مسلسل</label>
+              <input type="text" formControlName="serialNumber" readonly
+                class="form-input bg-[#f7f9fb]" placeholder="نمبر مسلسل">
+              <small class="text-[#6f7973] text-xs mt-1 block">
+                <i class="fas fa-info-circle ml-1"></i>این نمبر به صورت خودکار تولید می‌شود
+              </small>
+            </div>
+
+            <!-- نوعیت ثبت -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نوعیت ثبت <span class="text-red-500">*</span></label>
+              <select formControlName="sectionType" (change)="onSectionTypeChange()"
+                class="form-input" placeholder="انتخاب کنید">
+                <option value="">انتخاب کنید</option>
+                <option *ngFor="let type of sectionTypes" [value]="type.value">{{ type.label }}</option>
+              </select>
+              <div *ngIf="mainForm.get('sectionType')?.invalid && (mainForm.get('sectionType')?.dirty || mainForm.get('sectionType')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت ثبت <span class="text-red-500">*</span></label>
-                <select formControlName="sectionType" (change)="onSectionTypeChange()"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option *ngFor="let type of sectionTypes" [value]="type.value">{{ type.label }}</option>
-                </select>
-                <div *ngIf="mainForm.get('sectionType')?.invalid && mainForm.get('sectionType')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <app-multi-calendar-datepicker formControlName="registrationDate" label="تاریخ ثبت">
-                </app-multi-calendar-datepicker>
-              </div>
+            </div>
+
+            <!-- تاریخ ثبت -->
+            <div>
+              <app-multi-calendar-datepicker formControlName="registrationDate" label="تاریخ ثبت">
+              </app-multi-calendar-datepicker>
             </div>
           </div>
         </div>
 
-        <!-- Section 2: Complaints Registration (ثبت شکایات) -->
-        <div *ngIf="showComplaintsSection" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-exclamation-triangle"></i>
-              <span>۱. ثبت شکایات</span>
-            </h2>
+        <!-- Section 2: ثبت شکایات -->
+        <div *ngIf="showComplaintsSection" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#92400e] flex items-center justify-center">
+              <i class="fas fa-exclamation-triangle text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">۱. ثبت شکایات</h2>
           </div>
-          <div class="px-6 py-6">
-            <!-- License Search Section -->
-            <div class="mb-6 p-4 bg-red-50 rounded-lg border border-red-200">
-              <p class="text-sm text-red-800 mb-3">
-                <i class="fas fa-info-circle ml-2"></i>
-                برای جستجوی معلومات عریضه نویس، نمبر جواز را وارد کرده و دکمه جستجو را بزنید
-              </p>
-              <div class="flex gap-3">
-                <div class="flex-1">
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر جواز <span class="text-red-500">*</span></label>
+
+          <!-- License Search -->
+          <div class="mb-4 p-3 bg-[#fef3c7] rounded-xl border border-[#fbbf24]">
+            <p class="text-xs text-[#92400e] mb-3 flex items-center gap-1">
+              <i class="fas fa-info-circle"></i>
+              برای جستجوی معلومات عریضه نویس، نمبر جواز را وارد کرده و دکمه جستجو را بزنید
+            </p>
+            <div class="flex gap-3">
+              <div class="flex-1">
+                <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر جواز <span class="text-red-500">*</span></label>
+                <div class="relative">
                   <input type="text" formControlName="petitionWriterLicenseNumber"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="مثال: KBL-00000001">
-                </div>
-                <div class="flex items-end">
-                  <button type="button" (click)="searchLicense()" 
-                    [disabled]="!mainForm.get('petitionWriterLicenseNumber')?.value || isSearching"
-                    class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fas fa-search" [ngClass]="{'animate-pulse': isSearching}"></i>
-                    <span>{{ isSearching ? 'جستجو...' : 'جستجو' }}</span>
+                    class="form-input" placeholder="مثال: KBL-00000001">
+                  <button type="button" *ngIf="mainForm.get('petitionWriterLicenseNumber')?.value" (click)="searchLicense()"
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#92400e] hover:text-[#78350f] transition-colors z-10">
+                    <i class="fas fa-search"></i>
                   </button>
                 </div>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عریضه نویس <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="petitionWriterName" [readonly]="licenseFound"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  [class.bg-gray-100]="licenseFound" [class.cursor-not-allowed]="licenseFound">
-                <div *ngIf="mainForm.get('petitionWriterName')?.invalid && mainForm.get('petitionWriterName')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                <div *ngIf="isSearching" class="text-[#92400e] text-xs mt-1 flex items-center gap-1">
+                  <i class="fas fa-spinner fa-spin"></i> در حال جستجو...
                 </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="petitionWriterDistrict" [readonly]="licenseFound"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  [class.bg-gray-100]="licenseFound" [class.cursor-not-allowed]="licenseFound">
-                <div *ngIf="mainForm.get('petitionWriterDistrict')?.invalid && mainForm.get('petitionWriterDistrict')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عارض <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="complainantName"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('complainantName')?.invalid && mainForm.get('complainantName')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div class="md:col-span-2">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">موضوع شکایت <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="complaintSubject"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('complaintSubject')?.invalid && mainForm.get('complaintSubject')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                <div *ngIf="licenseFound" class="text-[#065f46] text-xs mt-1 flex items-center gap-1">
+                  <i class="fas fa-check-circle"></i> معلومات عریضه نویس یافت شد
                 </div>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
-                <textarea formControlName="complaintActionsTaken" rows="3"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- شهرت عریضه نویس -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">شهرت عریضه نویس <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="petitionWriterName" [readonly]="licenseFound"
+                class="form-input" [ngClass]="{'bg-[#f7f9fb]': licenseFound}"
+                placeholder="شهرت عریضه نویس">
+              <div *ngIf="mainForm.get('petitionWriterName')?.invalid && (mainForm.get('petitionWriterName')?.dirty || mainForm.get('petitionWriterName')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
-                <textarea formControlName="complaintRemarks" rows="3"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+            </div>
+
+            <!-- ناحیه -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ناحیه <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="petitionWriterDistrict" [readonly]="licenseFound"
+                class="form-input" [ngClass]="{'bg-[#f7f9fb]': licenseFound}"
+                placeholder="ناحیه">
+              <div *ngIf="mainForm.get('petitionWriterDistrict')?.invalid && (mainForm.get('petitionWriterDistrict')?.dirty || mainForm.get('petitionWriterDistrict')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
+            </div>
+
+            <!-- شهرت عارض -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">شهرت عارض <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="complainantName"
+                class="form-input" placeholder="شهرت عارض">
+              <div *ngIf="mainForm.get('complainantName')?.invalid && (mainForm.get('complainantName')?.dirty || mainForm.get('complainantName')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <!-- موضوع شکایت -->
+            <div class="md:col-span-2 lg:col-span-2">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">موضوع شکایت <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="complaintSubject"
+                class="form-input" placeholder="موضوع شکایت را وارد کنید">
+              <div *ngIf="mainForm.get('complaintSubject')?.invalid && (mainForm.get('complaintSubject')?.dirty || mainForm.get('complaintSubject')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <!-- اجراآت -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">اجراآت</label>
+              <textarea formControlName="complaintActionsTaken" rows="3"
+                class="form-input resize-none" placeholder="اجراآت را وارد کنید"></textarea>
+            </div>
+
+            <!-- ملاحظات -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ملاحظات</label>
+              <textarea formControlName="complaintRemarks" rows="3"
+                class="form-input resize-none" placeholder="ملاحظات را وارد کنید"></textarea>
             </div>
           </div>
         </div>
 
-        <!-- Section 3: Violations (تخلفات عریضه نویسان) -->
-        <div *ngIf="showViolationsSection" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-gavel"></i>
-              <span>۲. تخلفات عریضه نویسان</span>
-            </h2>
+        <!-- Section 3: تخلفات عریضه نویسان -->
+        <div *ngIf="showViolationsSection" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#ba1a1a] flex items-center justify-center">
+              <i class="fas fa-gavel text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">۲. تخلفات عریضه نویسان</h2>
           </div>
-          <div class="px-6 py-6">
-            <!-- License Search Section -->
-            <div class="mb-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
-              <p class="text-sm text-orange-800 mb-3">
-                <i class="fas fa-info-circle ml-2"></i>
-                برای جستجوی معلومات عریضه نویس، نمبر جواز را وارد کرده و دکمه جستجو را بزنید
-              </p>
-              <div class="flex gap-3">
-                <div class="flex-1">
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر جواز <span class="text-red-500">*</span></label>
+
+          <!-- License Search -->
+          <div class="mb-4 p-3 bg-[#fef2f2] rounded-xl border border-[#fecaca]">
+            <p class="text-xs text-[#ba1a1a] mb-3 flex items-center gap-1">
+              <i class="fas fa-info-circle"></i>
+              برای جستجوی معلومات عریضه نویس، نمبر جواز را وارد کرده و دکمه جستجو را بزنید
+            </p>
+            <div class="flex gap-3">
+              <div class="flex-1">
+                <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر جواز <span class="text-red-500">*</span></label>
+                <div class="relative">
                   <input type="text" formControlName="petitionWriterLicenseNumber"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="مثال: KBL-00000001">
-                </div>
-                <div class="flex items-end">
-                  <button type="button" (click)="searchLicense()" 
-                    [disabled]="!mainForm.get('petitionWriterLicenseNumber')?.value || isSearching"
-                    class="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fas fa-search" [ngClass]="{'animate-pulse': isSearching}"></i>
-                    <span>{{ isSearching ? 'جستجو...' : 'جستجو' }}</span>
+                    class="form-input" placeholder="مثال: KBL-00000001">
+                  <button type="button" *ngIf="mainForm.get('petitionWriterLicenseNumber')?.value" (click)="searchLicense()"
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#ba1a1a] hover:text-[#991b1b] transition-colors z-10">
+                    <i class="fas fa-search"></i>
                   </button>
                 </div>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">شهرت عریضه نویس <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="petitionWriterName" [readonly]="licenseFound"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  [class.bg-gray-100]="licenseFound" [class.cursor-not-allowed]="licenseFound">
-                <div *ngIf="mainForm.get('petitionWriterName')?.invalid && mainForm.get('petitionWriterName')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                <div *ngIf="isSearching" class="text-[#ba1a1a] text-xs mt-1 flex items-center gap-1">
+                  <i class="fas fa-spinner fa-spin"></i> در حال جستجو...
                 </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="petitionWriterDistrict" [readonly]="licenseFound"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  [class.bg-gray-100]="licenseFound" [class.cursor-not-allowed]="licenseFound">
-                <div *ngIf="mainForm.get('petitionWriterDistrict')?.invalid && mainForm.get('petitionWriterDistrict')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">وضعیت <span class="text-red-500">*</span></label>
-                <select formControlName="activityStatus" (change)="onActivityStatusChange()"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option *ngFor="let status of activityStatusOptions" [value]="status.value">{{ status.label }}</option>
-                </select>
-                <div *ngIf="mainForm.get('activityStatus')?.invalid && mainForm.get('activityStatus')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div *ngIf="showViolationTypeField" class="md:col-span-2">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت تخلف <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="violationType"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('violationType')?.invalid && mainForm.get('violationType')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div *ngIf="showActivityPermissionReasonField" class="md:col-span-2">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">علت اجازه فعالیت <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="activityPermissionReason"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('activityPermissionReason')?.invalid && mainForm.get('activityPermissionReason')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+                <div *ngIf="licenseFound" class="text-[#065f46] text-xs mt-1 flex items-center gap-1">
+                  <i class="fas fa-check-circle"></i> معلومات عریضه نویس یافت شد
                 </div>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">اجراآت</label>
-                <textarea formControlName="violationActionsTaken" rows="3"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- شهرت عریضه نویس -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">شهرت عریضه نویس <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="petitionWriterName" [readonly]="licenseFound"
+                class="form-input" [ngClass]="{'bg-[#f7f9fb]': licenseFound}"
+                placeholder="شهرت عریضه نویس">
+              <div *ngIf="mainForm.get('petitionWriterName')?.invalid && (mainForm.get('petitionWriterName')?.dirty || mainForm.get('petitionWriterName')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
-                <textarea formControlName="violationRemarks" rows="3"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+            </div>
+
+            <!-- ناحیه -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ناحیه <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="petitionWriterDistrict" [readonly]="licenseFound"
+                class="form-input" [ngClass]="{'bg-[#f7f9fb]': licenseFound}"
+                placeholder="ناحیه">
+              <div *ngIf="mainForm.get('petitionWriterDistrict')?.invalid && (mainForm.get('petitionWriterDistrict')?.dirty || mainForm.get('petitionWriterDistrict')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
+            </div>
+
+            <!-- وضعیت -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">وضعیت <span class="text-red-500">*</span></label>
+              <select formControlName="activityStatus" (change)="onActivityStatusChange()"
+                class="form-input">
+                <option value="">انتخاب کنید</option>
+                <option *ngFor="let status of activityStatusOptions" [value]="status.value">{{ status.label }}</option>
+              </select>
+              <div *ngIf="mainForm.get('activityStatus')?.invalid && (mainForm.get('activityStatus')?.dirty || mainForm.get('activityStatus')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <!-- نوعیت تخلف (conditional) -->
+            <div *ngIf="showViolationTypeField" class="md:col-span-2">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نوعیت تخلف <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="violationType"
+                class="form-input" placeholder="نوعیت تخلف را وارد کنید">
+              <div *ngIf="mainForm.get('violationType')?.invalid && (mainForm.get('violationType')?.dirty || mainForm.get('violationType')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
+            </div>
+
+            <!-- علت اجازه فعالیت (conditional) -->
+            <div *ngIf="showActivityPermissionReasonField" class="md:col-span-2">
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">علت اجازه فعالیت <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="activityPermissionReason"
+                class="form-input" placeholder="علت اجازه فعالیت را وارد کنید">
+              <div *ngIf="mainForm.get('activityPermissionReason')?.invalid && (mainForm.get('activityPermissionReason')?.dirty || mainForm.get('activityPermissionReason')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <!-- اجراآت -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">اجراآت</label>
+              <textarea formControlName="violationActionsTaken" rows="3"
+                class="form-input resize-none" placeholder="اجراآت را وارد کنید"></textarea>
+            </div>
+
+            <!-- ملاحظات -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ملاحظات</label>
+              <textarea formControlName="violationRemarks" rows="3"
+                class="form-input resize-none" placeholder="ملاحظات را وارد کنید"></textarea>
             </div>
           </div>
         </div>
 
-        <!-- Section 4: Monitoring Activities (نظارت فعالیت عریضه نویسان) -->
-        <div *ngIf="showMonitoringSection" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-chart-line"></i>
-              <span>۳. نظارت فعالیت عریضه نویسان</span>
-            </h2>
+        <!-- Section 4: نظارت فعالیت عریضه نویسان -->
+        <div *ngIf="showMonitoringSection" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#44546a] flex items-center justify-center">
+              <i class="fas fa-chart-line text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">۳. نظارت فعالیت عریضه نویسان</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">سال <span class="text-red-500">*</span></label>
-                <select formControlName="monitoringYear"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option *ngFor="let year of monitoringYears" [value]="year">{{ year }}</option>
-                </select>
-                <div *ngIf="mainForm.get('monitoringYear')?.invalid && mainForm.get('monitoringYear')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- سال -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">سال <span class="text-red-500">*</span></label>
+              <select formControlName="monitoringYear"
+                class="form-input">
+                <option value="">انتخاب کنید</option>
+                <option *ngFor="let year of monitoringYears" [value]="year">{{ year }}</option>
+              </select>
+              <div *ngIf="mainForm.get('monitoringYear')?.invalid && (mainForm.get('monitoringYear')?.dirty || mainForm.get('monitoringYear')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ماه <span class="text-red-500">*</span></label>
-                <select formControlName="monitoringMonth"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                  <option value="">انتخاب کنید</option>
-                  <option *ngFor="let month of monitoringMonths" [value]="month.value">{{ month.label }}</option>
-                </select>
-                <div *ngIf="mainForm.get('monitoringMonth')?.invalid && mainForm.get('monitoringMonth')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
+            </div>
+
+            <!-- ماه -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ماه <span class="text-red-500">*</span></label>
+              <select formControlName="monitoringMonth"
+                class="form-input">
+                <option value="">انتخاب کنید</option>
+                <option *ngFor="let month of monitoringMonths" [value]="month.value">{{ month.label }}</option>
+              </select>
+              <div *ngIf="mainForm.get('monitoringMonth')?.invalid && (mainForm.get('monitoringMonth')?.dirty || mainForm.get('monitoringMonth')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">تعداد نظارت <span class="text-red-500">*</span></label>
-                <input type="number" formControlName="monitoringCount"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                <div *ngIf="mainForm.get('monitoringCount')?.invalid && mainForm.get('monitoringCount')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
-                </div>
+            </div>
+
+            <!-- تعداد نظارت -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">تعداد نظارت <span class="text-red-500">*</span></label>
+              <input type="number" formControlName="monitoringCount"
+                class="form-input" placeholder="تعداد نظارت">
+              <div *ngIf="mainForm.get('monitoringCount')?.invalid && (mainForm.get('monitoringCount')?.dirty || mainForm.get('monitoringCount')?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
-                <textarea formControlName="monitoringRemarks" rows="2"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
-              </div>
+            </div>
+
+            <!-- ملاحظات -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ملاحظات</label>
+              <textarea formControlName="monitoringRemarks" rows="3"
+                class="form-input resize-none" placeholder="ملاحظات را وارد کنید"></textarea>
             </div>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="px-6 py-6">
-            <div class="flex flex-wrap gap-4 justify-center">
-              <button type="submit" [disabled]="isViewOnly || mainForm.invalid"
-                class="px-8 py-3 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                <i class="fas fa-save"></i>
-                <span>ذخیره معلومات</span>
-              </button>
-              <button type="button" (click)="goToList()"
-                class="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-                <i class="fas fa-list"></i>
-                <span>برگشت به لیست</span>
-              </button>
-              <button type="button" (click)="resetForm()"
-                class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 flex items-center gap-2">
-                <i class="fas fa-redo"></i>
-                <span>پاک کردن فورم</span>
-              </button>
-            </div>
-          </div>
+        <div class="flex gap-3 justify-center pt-4 pb-4">
+          <button type="submit" [disabled]="isViewOnly || mainForm.invalid" class="btn-primary">
+            <i class="fas fa-save"></i>
+            <span>{{ isEditMode ? 'تغییر معلومات' : 'ثبت معلومات' }}</span>
+          </button>
+          <button type="button" (click)="resetForm()" class="btn-secondary">
+            <i class="fas fa-plus-circle"></i>
+            <span>جدید</span>
+          </button>
+          <button type="button" (click)="goToList()" class="btn-ghost">
+            <i class="fas fa-list"></i>
+            <span>لیست</span>
+          </button>
         </div>
       </form>
     </div>

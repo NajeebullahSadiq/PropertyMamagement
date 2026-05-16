@@ -1,119 +1,239 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8 no-print">
-      <div>
-        <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">نمایش جزئیات سند بهادار عریضه‌ نویسان</h1>
-        <p class="text-sm text-gray-600 mt-2">مشاهده اطلاعات کامل سند بهادار</p>
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <!-- Page Header -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004532] to-[#065f46] shadow-lg shadow-[#004532]/30 mb-4">
+        <i class="fas fa-file-invoice text-white text-2xl"></i>
       </div>
-      <div class="flex gap-3">
-        <button *ngIf="canPrint" (click)="printItem()" class="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-          <i class="fas fa-print"></i>
-          <span class="font-medium">چاپ</span>
-        </button>
-        <button *ngIf="canEdit" (click)="editItem()" class="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-          <i class="fas fa-edit"></i>
-          <span class="font-medium">ویرایش</span>
-        </button>
-        <a routerLink="/petition-writer-securities/list" class="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-gray-950 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-          <i class="fas fa-arrow-right transition-transform group-hover:-translate-x-1"></i>
-          <span class="font-medium">بازگشت به لیست</span>
-        </a>
-      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">جزئیات سند بهادار عریضه‌نویسان</h1>
+      <p class="text-gray-500 max-w-md mx-auto">مشاهده کامل معلومات سند بهادار</p>
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoading" class="bg-white rounded-2xl shadow-xl border border-gray-100 p-12">
-      <div class="flex flex-col items-center justify-center gap-4">
-        <div class="relative">
-          <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <i class="fas fa-file-invoice text-blue-600 text-lg"></i>
-          </div>
-        </div>
-        <p class="text-gray-700 font-semibold text-lg">در حال بارگذاری اطلاعات...</p>
-      </div>
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#004532] border-t-transparent"></div>
+      <p class="mt-2 text-[#6f7973]">در حال بارگذاری...</p>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="!isLoading && error" class="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl shadow-xl border border-red-200 p-8">
-      <div class="flex items-start gap-4 text-red-700">
-        <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-          <i class="fas fa-exclamation-circle text-2xl"></i>
-        </div>
-        <div class="flex-1">
-          <p class="font-bold text-lg">خطا در بارگذاری</p>
-          <p class="mt-2 text-red-600">{{ error }}</p>
-        </div>
+    <div *ngIf="!isLoading && error" class="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-4 mb-6 flex items-center gap-3">
+      <i class="fas fa-exclamation-circle text-[#ba1a1a] text-lg"></i>
+      <div>
+        <p class="font-bold text-[#ba1a1a]">خطا در بارگذاری</p>
+        <p class="text-sm text-[#ba1a1a]">{{ error }}</p>
       </div>
     </div>
 
-    <!-- Main Content -->
-    <div *ngIf="!isLoading && !error && item" class="space-y-8">
-
-      <!-- Section 1: مشخصات عریضه‌نویس -->
-      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
-        <div class="px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 border-b border-blue-500">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-              <i class="fas fa-user text-white text-lg"></i>
+    <!-- Content -->
+    <div *ngIf="!isLoading && !error && item">
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-[#6f7973] font-medium mb-1">تعداد عریضه</p>
+              <p class="text-3xl font-bold text-[#191c1e]">{{ item.petitionCount | number }}</p>
             </div>
-            <h2 class="text-xl font-bold text-white">مشخصات عریضه‌نویس</h2>
+            <div class="w-12 h-12 bg-[#004532] rounded-xl flex items-center justify-center">
+              <i class="fas fa-file-alt text-white text-xl"></i>
+            </div>
           </div>
         </div>
-        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-            <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">نمبر ثبت تعرفه</p>
-            <p class="text-gray-900 font-bold text-lg">{{ item.registrationNumber }}</p>
-          </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">اسم عریضه‌نویس</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ item.petitionWriterName }}</p>
-          </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">اسم پدر عریضه‌نویس / وکیل</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ item.petitionWriterFatherName }}</p>
-          </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">نمبر جواز عریضه‌نویس / وکیل</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ item.licenseNumber }}</p>
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-[#6f7973] font-medium mb-1">مبلغ پول (افغانی)</p>
+              <p class="text-3xl font-bold text-[#191c1e]">{{ item.amount | number }}</p>
+            </div>
+            <div class="w-12 h-12 bg-[#065f46] rounded-xl flex items-center justify-center">
+              <i class="fas fa-coins text-white text-xl"></i>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Section 2: مشخصات سند بهادار عریضه -->
-      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
-        <div class="px-8 py-5 bg-gradient-to-r from-emerald-600 to-green-600 border-b border-emerald-500">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-              <i class="fas fa-file-alt text-white text-lg"></i>
+      <!-- Action Buttons -->
+      <div class="flex justify-center gap-3 mb-6">
+        <button (click)="goBack()" class="px-6 py-2.5 bg-white border border-[#bec9c2] hover:bg-[#f7f9fb] text-[#55615a] font-medium rounded-xl transition-colors flex items-center gap-2">
+          <i class="fas fa-arrow-right"></i>
+          بازگشت
+        </button>
+        <button *ngIf="canEdit" (click)="editItem()" class="px-6 py-2.5 bg-[#d9e6dd] border border-[#8bd6b6] hover:bg-[#c2d6cc] text-[#004532] font-medium rounded-xl transition-colors flex items-center gap-2">
+          <i class="fas fa-edit"></i>
+          ویرایش
+        </button>
+        <button *ngIf="canPrint" (click)="printItem()" class="px-6 py-2.5 bg-gradient-to-r from-[#004532] to-[#065f46] hover:from-[#065f46] hover:to-[#004532] text-white font-medium rounded-xl transition-colors shadow-sm hover:shadow-md flex items-center gap-2">
+          <i class="fas fa-print"></i>
+          چاپ
+        </button>
+      </div>
+
+      <!-- Main Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column - Details (2/3) -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Section 1: مشخصات عریضه‌نویس -->
+          <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+            <div class="px-5 py-4 bg-[#004532] flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              <h2 class="text-sm font-bold text-white">مشخصات عریضه‌نویس</h2>
             </div>
-            <h2 class="text-xl font-bold text-white">مشخصات سند بهادار عریضه</h2>
+            <div class="p-5">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-hashtag text-[#004532] text-xs"></i>
+                    <span class="text-xs text-[#6f7973]">نمبر ثبت تعرفه</span>
+                  </div>
+                  <p class="text-sm font-semibold text-[#191c1e]">{{ item.registrationNumber }}</p>
+                </div>
+                <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-user text-[#004532] text-xs"></i>
+                    <span class="text-xs text-[#6f7973]">اسم عریضه‌نویس</span>
+                  </div>
+                  <p class="text-sm font-semibold text-[#191c1e]">{{ item.petitionWriterName }}</p>
+                </div>
+                <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-user-friends text-[#004532] text-xs"></i>
+                    <span class="text-xs text-[#6f7973]">اسم پدر</span>
+                  </div>
+                  <p class="text-sm font-semibold text-[#191c1e]">{{ item.petitionWriterFatherName }}</p>
+                </div>
+                <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-id-card text-[#004532] text-xs"></i>
+                    <span class="text-xs text-[#6f7973]">نمبر جواز</span>
+                  </div>
+                  <p class="text-sm font-semibold text-[#191c1e]">{{ item.licenseNumber }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: مشخصات سند بهادار -->
+          <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+            <div class="px-5 py-4 bg-[#065f46] flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                <i class="fas fa-file-alt text-white text-xs"></i>
+              </div>
+              <h2 class="text-sm font-bold text-white">مشخصات سند بهادار</h2>
+            </div>
+            <div class="p-5">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-sort-numeric-up text-[#004532] text-xs"></i>
+                    <span class="text-xs text-[#6f7973]">تعداد عریضه</span>
+                  </div>
+                  <p class="text-sm font-semibold text-[#191c1e]">{{ item.petitionCount | number }}</p>
+                </div>
+                <div class="bg-[#ecfdf5] rounded-xl border border-[#a7f3d0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-money-bill-wave text-[#059669] text-xs"></i>
+                    <span class="text-xs text-[#059669]">مبلغ پول</span>
+                  </div>
+                  <p class="text-sm font-bold text-[#047857]">{{ item.amount | number }} افغانی</p>
+                </div>
+                <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-receipt text-[#004532] text-xs"></i>
+                    <span class="text-xs text-[#6f7973]">آویز نمبر بانکی</span>
+                  </div>
+                  <p class="text-sm font-semibold text-[#191c1e]">{{ item.bankReceiptNumber }}</p>
+                </div>
+                <div class="bg-[#eff6ff] rounded-xl border border-[#bfdbfe] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-barcode text-[#2563eb] text-xs"></i>
+                    <span class="text-xs text-[#2563eb]">آغاز سریال</span>
+                  </div>
+                  <p class="text-sm font-bold text-[#1e40af]">{{ item.serialNumberStart }}</p>
+                </div>
+                <div class="bg-[#eff6ff] rounded-xl border border-[#bfdbfe] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-barcode text-[#2563eb] text-xs"></i>
+                    <span class="text-xs text-[#2563eb]">ختم سریال</span>
+                  </div>
+                  <p class="text-sm font-bold text-[#1e40af]">{{ item.serialNumberEnd }}</p>
+                </div>
+                <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-calendar-alt text-[#004532] text-xs"></i>
+                    <span class="text-xs text-[#6f7973]">تاریخ توزیع</span>
+                  </div>
+                  <p class="text-sm font-semibold text-[#191c1e]">{{ (item.distributionDate | calendarDate) || '-' }}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تعداد عریضه</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ item.petitionCount | number }}</p>
+
+        <!-- Right Column - Sidebar (1/3) -->
+        <div class="space-y-4">
+          <!-- Delivery Info -->
+          <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+            <div class="px-5 py-4 bg-[#55615a] flex items-center gap-2">
+              <i class="fas fa-calendar-check text-white"></i>
+              <h3 class="text-sm font-bold text-white">تاریخ تحویلی</h3>
+            </div>
+            <div class="p-4">
+              <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-4 text-center">
+                <i class="fas fa-calendar-alt text-[#55615a] text-2xl mb-2"></i>
+                <p class="text-lg font-bold text-[#191c1e]">{{ (item.deliveryDate | calendarDate) || '-' }}</p>
+              </div>
+            </div>
           </div>
-          <div class="p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
-            <p class="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">مبلغ پول</p>
-            <p class="text-gray-900 font-bold text-xl">{{ item.amount | number }} افغانی</p>
+
+          <!-- Summary Card -->
+          <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+            <div class="px-5 py-4 bg-[#065f46] flex items-center gap-2">
+              <i class="fas fa-clipboard-check text-white"></i>
+              <h3 class="text-sm font-bold text-white">خلاصه</h3>
+            </div>
+            <div class="p-4 space-y-3">
+              <div class="flex justify-between items-center pb-3 border-b border-[#eceef0]">
+                <span class="text-xs text-[#6f7973]">تعداد عریضه</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ item.petitionCount | number }}</span>
+              </div>
+              <div class="flex justify-between items-center pb-3 border-b border-[#eceef0]">
+                <span class="text-xs text-[#6f7973]">قیمت فی دانه</span>
+                <span class="text-sm font-semibold text-[#191c1e]">5 افغانی</span>
+              </div>
+              <div class="flex justify-between items-center pt-2">
+                <span class="text-xs font-semibold text-[#047857]">مجموع کل</span>
+                <span class="text-base font-bold text-[#047857]">{{ item.amount | number }} افغانی</span>
+              </div>
+            </div>
           </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">آویز نمبر بانکی</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ item.bankReceiptNumber }}</p>
+
+          <!-- Serial Range Card -->
+          <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+            <div class="px-5 py-4 bg-[#44546a] flex items-center gap-2">
+              <i class="fas fa-barcode text-white"></i>
+              <h3 class="text-sm font-bold text-white">محدوده سریال</h3>
+            </div>
+            <div class="p-4">
+              <div class="flex items-center justify-between">
+                <div class="text-center">
+                  <p class="text-xs text-[#6f7973] mb-1">از</p>
+                  <p class="text-sm font-bold text-[#191c1e]">{{ item.serialNumberStart }}</p>
+                </div>
+                <div class="flex-1 flex items-center justify-center">
+                  <div class="w-full h-0.5 bg-[#bec9c2]"></div>
+                  <i class="fas fa-arrow-left text-[#6f7973] mx-2"></i>
+                </div>
+                <div class="text-center">
+                  <p class="text-xs text-[#6f7973] mb-1">تا</p>
+                  <p class="text-sm font-bold text-[#191c1e]">{{ item.serialNumberEnd }}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-            <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">آغاز سریال نمبر عریضه</p>
-            <p class="text-gray-900 font-bold text-lg">{{ item.serialNumberStart }}</p>
-          </div>
-          <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-            <p class="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">ختم سریال نمبر عریضه</p>
-            <p class="text-gray-900 font-bold text-lg">{{ item.serialNumberEnd }}</p>
-          </div>
-          <div class="p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">تاریخ توزیع عریضه</p>
-            <p class="text-gray-900 font-semibold text-lg">{{ (item.distributionDate | calendarDate) || '-' }}</p>
-          </div>
- 
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

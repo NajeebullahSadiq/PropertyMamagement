@@ -1,1 +1,26 @@
-// No custom styles needed - using Tailwind
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #bec9c2;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  color: #191c1e;
+  background: #ffffff;
+  transition: all 0.15s ease;
+  outline: none;
+  direction: rtl;
+
+  &:focus {
+    border-color: #004532;
+    box-shadow: 0 0 0 3px rgba(0, 69, 50, 0.12);
+  }
+}
+
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236f7973' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 16px 12px;
+  padding-left: 2.5rem;
+}

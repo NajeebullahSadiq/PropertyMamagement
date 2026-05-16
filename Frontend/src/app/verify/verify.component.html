@@ -1,575 +1,561 @@
-<div class="verify-container">
-  <!-- Header -->
-  <div class="verify-header">
-    <div class="header-content">
-      <img src="/assets/img/afg.png" alt="نشان ملی افغانستان" class="national-emblem">
-      <div class="header-text">
-        <h1>سیستم تصدیق اسناد</h1>
-        <p>وزارت عدلیه - ریاست امور رهنمای معاملات و عریضه نویسان</p>
-     </div>
-    </div>
-    <div class="header-description">
-      <p>برای تصدیق اعتبار اسناد صادر شده، کود تصدیق را وارد کنید یا QR کود را اسکن نمایید</p>
-    </div>
-  </div>
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8">
+  <div class="max-w-4xl mx-auto px-4">
 
-  <!-- Input Mode Tabs -->
-  <div class="input-mode-tabs" *ngIf="!hasSearched">
-    <button 
-      class="tab-btn" 
-      [class.active]="inputMode === 'manual'"
-      (click)="switchToManual()"
-    >
-      <span class="tab-icon">⌨️</span>
-      <span>وارد کردن کود</span>
-    </button>
-    <button 
-      class="tab-btn" 
-      [class.active]="inputMode === 'scanner'"
-      (click)="switchToScanner()"
-    >
-      <span class="tab-icon">📷</span>
-      <span>اسکن QR کود</span>
-    </button>
-  </div>
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-6 md:p-8 text-center mb-6">
+      <div class="flex items-center justify-center gap-4 mb-5 flex-col md:flex-row">
+        <img src="/assets/img/afg.png" alt="نشان ملی افغانستان" class="w-20 h-auto drop-shadow-sm">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-[#191c1e] mb-1">سیستم تصدیق اسناد</h1>
+          <p class="text-sm text-[#6f7973]">وزارت عدلیه - ریاست امور رهنمای معاملات و عریضه نویسان</p>
+        </div>
+      </div>
+      <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0]">
+        <p class="text-sm text-[#065f46]">برای تصدیق اعتبار اسناد صادر شده، کود تصدیق را وارد کنید یا QR کود را اسکن نمایید</p>
+      </div>
+    </div>
 
-  <!-- Manual Input Section -->
-  <div class="search-section" *ngIf="inputMode === 'manual' && !hasSearched">
-    <div class="search-box">
-      <label for="verificationCode">کود تصدیق سند را وارد کنید:</label>
-      <div class="input-group">
-        <input 
-          type="text" 
-          id="verificationCode"
-          [(ngModel)]="verificationCode" 
-          placeholder="مثال: LIC-2026-ABC123"
+    <!-- Input Mode Tabs -->
+    <div *ngIf="!hasSearched" class="grid grid-cols-2 gap-4 mb-6 max-w-lg mx-auto">
+      <button
+        class="flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all cursor-pointer bg-white"
+        [ngClass]="inputMode === 'manual' ? 'border-[#004532] bg-[#ecfdf5] shadow-sm' : 'border-[#eceef0] hover:border-[#bec9c2] hover:bg-[#f7f9fb]'"
+        (click)="switchToManual()">
+        <span class="text-3xl">⌨️</span>
+        <span class="text-sm font-semibold" [ngClass]="inputMode === 'manual' ? 'text-[#004532]' : 'text-[#6f7973]'">وارد کردن کود</span>
+      </button>
+      <button
+        class="flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all cursor-pointer bg-white"
+        [ngClass]="inputMode === 'scanner' ? 'border-[#004532] bg-[#ecfdf5] shadow-sm' : 'border-[#eceef0] hover:border-[#bec9c2] hover:bg-[#f7f9fb]'"
+        (click)="switchToScanner()">
+        <span class="text-3xl">📷</span>
+        <span class="text-sm font-semibold" [ngClass]="inputMode === 'scanner' ? 'text-[#004532]' : 'text-[#6f7973]'">اسکن QR کود</span>
+      </button>
+    </div>
+
+    <!-- Manual Input Section -->
+    <div *ngIf="inputMode === 'manual' && !hasSearched" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-6 mb-6 max-w-lg mx-auto">
+      <label for="verificationCode" class="block text-sm font-semibold text-[#191c1e] mb-4 text-center">کود تصدیق سند را وارد کنید:</label>
+      <div class="flex gap-3">
+        <input type="text" id="verificationCode" dir="ltr"
+          class="form-input flex-1 text-center tracking-wider font-mono font-bold"
+          [(ngModel)]="verificationCode"
+          placeholder="LIC-2026-ABC123"
           (keyup.enter)="verifyDocument()"
-          [disabled]="isLoading"
-          class="verification-input"
-          dir="ltr"
-        >
-        <button 
-          (click)="verifyDocument()" 
-          [disabled]="isLoading || !verificationCode"
-          class="verify-btn"
-        >
+          [disabled]="isLoading">
+        <button (click)="verifyDocument()" [disabled]="isLoading || !verificationCode" class="btn-primary px-6">
           <span *ngIf="!isLoading">تصدیق</span>
           <span *ngIf="isLoading">در حال بررسی...</span>
         </button>
       </div>
-      <p class="input-hint">کود تصدیق در پایین سند چاپ شده قرار دارد</p>
-    </div>
-  </div>
-
-  <!-- QR Scanner Section -->
-  <div class="scanner-section" *ngIf="inputMode === 'scanner' && !hasSearched">
-    <div class="scanner-box">
-      <div class="scanner-header">
-        <h3>اسکن QR کود</h3>
-        <p>QR کود روی سند را مقابل کمره قرار دهید</p>
-      </div>
-
-      <!-- Scanner Error -->
-      <div *ngIf="scannerError" class="scanner-error">
-        <span class="error-icon">⚠️</span>
-        <p>{{ scannerError }}</p>
-        <button (click)="startScanner()" class="retry-scanner-btn">تلاش مجدد</button>
-      </div>
-
-      <!-- Video Preview -->
-      <div class="video-container" *ngIf="!scannerError">
-        <video #videoElement playsinline autoplay muted class="scanner-video"></video>
-        <canvas #canvasElement class="scanner-canvas"></canvas>
-        
-        <!-- Scanning Overlay -->
-        <div class="scan-overlay" *ngIf="isScanning">
-          <div class="scan-frame">
-            <div class="corner top-left"></div>
-            <div class="corner top-right"></div>
-            <div class="corner bottom-left"></div>
-            <div class="corner bottom-right"></div>
-            <div class="scan-line"></div>
-          </div>
-        </div>
-
-        <!-- Loading Camera -->
-        <div class="camera-loading" *ngIf="!isScanning && !scannerError">
-          <div class="spinner"></div>
-          <p>در حال فعال‌سازی کمره...</p>
-        </div>
-      </div>
-
-      <p class="scanner-hint">کود به صورت خودکار شناسایی می‌شود</p>
-    </div>
-  </div>
-
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="loading-section">
-    <div class="spinner"></div>
-    <p>در حال تصدیق سند...</p>
-  </div>
-
-  <!-- Error Message -->
-  <div *ngIf="error && !isLoading" class="error-section">
-    <div class="error-icon">⚠️</div>
-    <p>{{ error }}</p>
-    <button (click)="resetSearch()" class="retry-btn">تلاش مجدد</button>
-  </div>
-
-  <!-- Result Section -->
-  <div *ngIf="result && !isLoading" class="result-section">
-    <!-- Status Banner -->
-    <div class="status-banner" [ngClass]="getStatusClass()">
-      <div class="status-icon">
-        <span *ngIf="result.status === 'Valid'">✓</span>
-        <span *ngIf="result.status === 'Expired'">⏰</span>
-        <span *ngIf="result.status === 'Revoked'">✗</span>
-        <span *ngIf="result.status === 'Invalid'">✗</span>
-      </div>
-      <div class="status-text">
-        <h2>{{ getStatusText() }}</h2>
-        <p *ngIf="result.status === 'Valid'">این سند معتبر و قابل اعتماد است</p>
-        <p *ngIf="result.status === 'Expired'">مدت اعتبار این سند به پایان رسیده است</p>
-        <p *ngIf="result.status === 'Revoked'">این سند لغو شده است: {{ result.revokedReason }}</p>
-        <p *ngIf="result.status === 'Invalid'">این کود تصدیق معتبر نیست</p>
-      </div>
+      <p class="text-xs text-[#6f7973] mt-4 text-center bg-[#f7f9fb] rounded-lg p-3 border-r-2 border-[#004532]">
+        کود تصدیق در پایین سند چاپ شده قرار دارد
+      </p>
     </div>
 
-    <!-- Document Details (only show if valid or expired) -->
-    <div *ngIf="result.isValid || result.status === 'Expired'" class="document-details">
-      <div class="detail-header">
-        <h3>معلومات سند</h3>
-        <span class="document-type">{{ getDocumentTypeText() }}</span>
+    <!-- QR Scanner Section -->
+    <div *ngIf="inputMode === 'scanner' && !hasSearched" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-6 mb-6 max-w-md mx-auto">
+      <div class="text-center mb-4">
+        <h3 class="text-sm font-bold text-[#191c1e]">اسکن QR کود</h3>
+        <p class="text-xs text-[#6f7973]">QR کود روی سند را مقابل کمره قرار دهید</p>
       </div>
 
-      <div class="detail-content">
-        <!-- Photo -->
-        <div class="photo-section">
-          <img [src]="getPhotoUrl()" alt="عکس دارنده جواز" class="holder-photo" onerror="this.src='assets/img/avatar2.png'">
+      <div *ngIf="scannerError" class="text-center p-6 bg-[#fef2f2] rounded-xl border border-[#fecaca]">
+        <span class="text-3xl block mb-3">⚠️</span>
+        <p class="text-sm text-[#ba1a1a] mb-4">{{ scannerError }}</p>
+        <button (click)="startScanner()" class="btn-primary text-xs">تلاش مجدد</button>
+      </div>
+
+      <div class="relative w-full bg-[#1a202c] rounded-xl overflow-hidden" style="aspect-ratio: 4/3" *ngIf="!scannerError">
+        <video #videoElement playsinline autoplay muted class="w-full h-full object-cover"></video>
+        <canvas #canvasElement class="hidden"></canvas>
+
+        <div *ngIf="isScanning" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div class="relative w-[70%] max-w-[250px]" style="aspect-ratio: 1">
+            <div class="absolute top-0 left-0 w-[30px] h-[30px] border-t-4 border-r-4 border-[#004532] rounded-tr-lg"></div>
+            <div class="absolute top-0 right-0 w-[30px] h-[30px] border-t-4 border-l-4 border-[#004532] rounded-tl-lg"></div>
+            <div class="absolute bottom-0 left-0 w-[30px] h-[30px] border-b-4 border-r-4 border-[#004532] rounded-br-lg"></div>
+            <div class="absolute bottom-0 right-0 w-[30px] h-[30px] border-b-4 border-l-4 border-[#004532] rounded-bl-lg"></div>
+            <div class="absolute left-[5%] right-[5%] h-[3px] bg-gradient-to-r from-transparent via-[#004532] to-transparent animate-scan-line"></div>
+          </div>
         </div>
 
-        <!-- Info Grid -->
-        <div class="info-grid">
-          <div class="info-item" *ngIf="result.licenseNumber">
-            <label>شماره جواز:</label>
-            <span>{{ result.licenseNumber }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.holderName">
-            <label>نام دارنده:</label>
-            <span>{{ result.holderName }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.companyTitle">
-            <label>نام رهنما:</label>
-            <span>{{ result.companyTitle }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.issueDate">
-            <label>تاریخ صدور:</label>
-            <span>{{ result.issueDate | calendarDate }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.expiryDate">
-            <label>تاریخ انقضا:</label>
-            <span>{{ result.expiryDate | calendarDate }}</span>
-          </div>
-          <div class="info-item full-width" *ngIf="result.officeAddress">
-            <label>آدرس دفتر:</label>
-            <span>{{ result.officeAddress }}</span>
-          </div>
+        <div *ngIf="!isScanning && !scannerError" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
+          <div class="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+          <p class="text-white text-sm">در حال فعال‌سازی کمره...</p>
         </div>
       </div>
 
-      <!-- Property Details Section (for PropertyDocument) -->
-      <div *ngIf="result.documentType === 'PropertyDocument'" class="property-details-section">
-        <div class="detail-section-header">
-          <h4>معلومات ملکیت</h4>
+      <p class="text-xs text-[#6f7973] mt-4 text-center">کود به صورت خودکار شناسایی می‌شود</p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-10">
+      <div class="w-12 h-12 border-4 border-[#bec9c2] border-t-[#004532] rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-sm text-[#6f7973]">در حال تصدیق سند...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error && !isLoading" class="bg-[#fef2f2] rounded-2xl border border-[#fecaca] p-6 text-center max-w-md mx-auto">
+      <span class="text-4xl block mb-4">⚠️</span>
+      <p class="text-sm text-[#ba1a1a] mb-4">{{ error }}</p>
+      <button (click)="resetSearch()" class="btn-primary">تلاش مجدد</button>
+    </div>
+
+    <!-- Result Section -->
+    <div *ngIf="result && !isLoading" class="space-y-4">
+
+      <!-- Status Banner -->
+      <div class="rounded-2xl p-6 flex items-center gap-4 border-2 shadow-sm"
+        [ngClass]="result.status === 'Valid' ? 'bg-[#ecfdf5] border-[#6ee7b7]' : result.status === 'Expired' ? 'bg-[#fef3c7] border-[#fbbf24]' : 'bg-[#fef2f2] border-[#fecaca]'">
+
+        <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-sm flex-shrink-0"
+          [ngClass]="result.status === 'Valid' ? 'bg-[#059669] text-white' : result.status === 'Expired' ? 'bg-[#d97706] text-white' : 'bg-[#dc2626] text-white'">
+          <span *ngIf="result.status === 'Valid'">✓</span>
+          <span *ngIf="result.status === 'Expired'">⏰</span>
+          <span *ngIf="result.status === 'Revoked' || result.status === 'Invalid'">✗</span>
         </div>
-        
-        <div class="info-grid">
-          <div class="info-item" *ngIf="result.serialNumber">
-            <label>نمبر مسلسل:</label>
-            <span>{{ result.serialNumber }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.customDocumentType">
-            <label>نوعیت سند:</label>
-            <span>{{ result.customDocumentType }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.propertyTypeName || result.propertyTypeDari">
-            <label>نوعیت ملکیت:</label>
-            <span>{{ result.propertyTypeDari || result.propertyTypeName }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.area">
-            <label>مساحت:</label>
-            <span>{{ result.area }} {{ result.unitTypeDari || result.unitType || '' }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.provinceDari || result.province">
-            <label>ولایت:</label>
-            <span>{{ result.provinceDari || result.province }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.districtDari || result.district">
-            <label>ناحیه/ولسوالی:</label>
-            <span>{{ result.districtDari || result.district }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.village">
-            <label>قریه/گذر:</label>
-            <span>{{ result.village }}</span>
+
+        <div>
+          <h2 class="text-xl font-bold"
+            [ngClass]="result.status === 'Valid' ? 'text-[#065f46]' : result.status === 'Expired' ? 'text-[#92400e]' : 'text-[#991b1b]'">
+            {{ getStatusText() }}
+          </h2>
+          <p class="text-sm"
+            [ngClass]="result.status === 'Valid' ? 'text-[#047857]' : result.status === 'Expired' ? 'text-[#78350f]' : 'text-[#7f1d1d]'">
+            <ng-container [ngSwitch]="result.status">
+              <span *ngSwitchCase="'Valid'">این سند معتبر و قابل اعتماد است</span>
+              <span *ngSwitchCase="'Expired'">مدت اعتبار این سند به پایان رسیده است</span>
+              <span *ngSwitchCase="'Revoked'">این سند لغو شده است: {{ result.revokedReason }}</span>
+              <span *ngSwitchDefault>این کود تصدیق معتبر نیست</span>
+            </ng-container>
+          </p>
+        </div>
+      </div>
+
+      <!-- Document Details -->
+      <div *ngIf="result.isValid || result.status === 'Expired'" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
+
+        <!-- Detail Header -->
+        <div class="flex items-center justify-between px-5 py-4 bg-[#f7f9fb] border-b border-[#eceef0]">
+          <h3 class="text-sm font-bold text-[#191c1e]">معلومات سند</h3>
+          <span class="px-4 py-1.5 bg-[#004532] text-white text-xs font-semibold rounded-full">{{ getDocumentTypeText() }}</span>
+        </div>
+
+        <div class="p-5">
+          <div class="flex flex-col md:flex-row gap-6">
+            <!-- Photo -->
+            <div class="flex-shrink-0 text-center">
+              <img [src]="getPhotoUrl()" alt="عکس دارنده جواز" class="w-28 h-36 object-cover rounded-xl border-4 border-[#eceef0] shadow-sm mx-auto"
+                onerror="this.src='assets/img/avatar2.png'">
+            </div>
+
+            <!-- Info Grid -->
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div *ngIf="result.licenseNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شماره جواز</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.licenseNumber }}</span>
+              </div>
+              <div *ngIf="result.holderName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام دارنده</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.holderName }}</span>
+              </div>
+              <div *ngIf="result.companyTitle" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام رهنما</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.companyTitle }}</span>
+              </div>
+              <div *ngIf="result.issueDate" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">تاریخ صدور</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.issueDate | calendarDate }}</span>
+              </div>
+              <div *ngIf="result.expiryDate" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">تاریخ انقضا</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.expiryDate | calendarDate }}</span>
+              </div>
+              <div *ngIf="result.officeAddress" class="sm:col-span-2 bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">آدرس دفتر</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.officeAddress }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Boundaries -->
-        <div class="info-section" *ngIf="result.north || result.south || result.east || result.west">
-          <h5 class="section-title">حدود اربعه</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.north">
-              <label>شمال:</label>
-              <span>{{ result.north }}</span>
+        <!-- Property Details Section -->
+        <div *ngIf="result.documentType === 'PropertyDocument'" class="border-t border-[#eceef0]">
+          <div class="px-5 py-4 bg-[#ecfdf5] border-b border-[#a7f3d0]">
+            <h4 class="text-sm font-bold text-[#065f46]">معلومات ملکیت</h4>
+          </div>
+          <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngIf="result.serialNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">نمبر مسلسل</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.serialNumber }}</span>
             </div>
-            <div class="info-item" *ngIf="result.south">
-              <label>جنوب:</label>
-              <span>{{ result.south }}</span>
+            <div *ngIf="result.customDocumentType" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">نوعیت سند</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.customDocumentType }}</span>
             </div>
-            <div class="info-item" *ngIf="result.east">
-              <label>شرق:</label>
-              <span>{{ result.east }}</span>
+            <div *ngIf="result.propertyTypeDari || result.propertyTypeName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">نوعیت ملکیت</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.propertyTypeDari || result.propertyTypeName }}</span>
             </div>
-            <div class="info-item" *ngIf="result.west">
-              <label>غرب:</label>
-              <span>{{ result.west }}</span>
+            <div *ngIf="result.area" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">مساحت</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.area }} {{ result.unitTypeDari || result.unitType || '' }}</span>
+            </div>
+            <div *ngIf="result.provinceDari || result.province" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">ولایت</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.provinceDari || result.province }}</span>
+            </div>
+            <div *ngIf="result.districtDari || result.district" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">ناحیه/ولسوالی</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.districtDari || result.district }}</span>
+            </div>
+            <div *ngIf="result.village" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">قریه/گذر</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.village }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="result.north || result.south || result.east || result.west" class="px-5 py-3 border-t border-[#eceef0]">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">حدود اربعه</h5>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div *ngIf="result.north" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شمال</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.north }}</span>
+              </div>
+              <div *ngIf="result.south" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">جنوب</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.south }}</span>
+              </div>
+              <div *ngIf="result.east" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شرق</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.east }}</span>
+              </div>
+              <div *ngIf="result.west" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">غرب</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.west }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="result.price || result.priceText || result.royaltyAmount" class="px-5 py-3 border-t border-[#eceef0]">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">معلومات معاملہ</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div *ngIf="result.price" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قیمت (عدد)</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.price }} افغانی</span>
+              </div>
+              <div *ngIf="result.priceText" class="sm:col-span-2 bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قیمت (حروف)</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.priceText }}</span>
+              </div>
+              <div *ngIf="result.royaltyAmount" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">حق العمل رهنما</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.royaltyAmount }}</span>
+              </div>
+              <div *ngIf="result.halfPrice" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">مناصفه قیمت</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.halfPrice }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="result.witnessOne?.firstName || result.witnessTwo?.firstName" class="px-5 py-3 border-t border-[#eceef0]">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">شاهدان</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div *ngIf="result.witnessOne?.firstName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شاهد اول</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.witnessOne?.firstName }} ولد {{ result.witnessOne?.fatherName }}</span>
+                <span *ngIf="result.witnessOne?.electronicNationalIdNumber" class="text-xs text-[#6f7973] block mt-1" dir="ltr">تذکره: {{ result.witnessOne?.electronicNationalIdNumber }}</span>
+              </div>
+              <div *ngIf="result.witnessTwo?.firstName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شاهد دوم</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.witnessTwo?.firstName }} ولد {{ result.witnessTwo?.fatherName }}</span>
+                <span *ngIf="result.witnessTwo?.electronicNationalIdNumber" class="text-xs text-[#6f7973] block mt-1" dir="ltr">تذکره: {{ result.witnessTwo?.electronicNationalIdNumber }}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Price Info -->
-        <div class="info-section" *ngIf="result.price || result.priceText || result.royaltyAmount">
-          <h5 class="section-title">معلومات معاملہ</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.price">
-              <label>قیمت (عدد):</label>
-              <span>{{ result.price }} افغانی</span>
+        <!-- Vehicle Details Section -->
+        <div *ngIf="result.documentType === 'VehicleDocument'" class="border-t border-[#eceef0]">
+          <div class="px-5 py-4 bg-[#ecfdf5] border-b border-[#a7f3d0]">
+            <h4 class="text-sm font-bold text-[#065f46]">معلومات واسطه</h4>
+          </div>
+          <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngIf="result.plateNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">نمبر پلیټ</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.plateNumber }}</span>
             </div>
-            <div class="info-item full-width" *ngIf="result.priceText">
-              <label>قیمت (حروف):</label>
-              <span>{{ result.priceText }}</span>
+            <div *ngIf="result.vehicleType" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">نوعیت واسطه</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.vehicleType }}</span>
             </div>
-            <div class="info-item" *ngIf="result.royaltyAmount">
-              <label>حق العمل رهنما:</label>
-              <span>{{ result.royaltyAmount }}</span>
+            <div *ngIf="result.vehicleModel" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">مدل</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.vehicleModel }}</span>
             </div>
-            <div class="info-item" *ngIf="result.halfPrice">
-              <label>مناصفه قیمت:</label>
-              <span>{{ result.halfPrice }}</span>
+            <div *ngIf="result.engineNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">نمبر انجن</span>
+              <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.engineNumber }}</span>
+            </div>
+            <div *ngIf="result.chassisNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">نمبر شاسی</span>
+              <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.chassisNumber }}</span>
+            </div>
+            <div *ngIf="result.vehicleColor" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-xs text-[#6f7973] block mb-1">رنگ</span>
+              <span class="text-sm font-semibold text-[#191c1e]">{{ result.vehicleColor }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="result.price || result.priceText || result.royaltyAmount" class="px-5 py-3 border-t border-[#eceef0]">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">معلومات معاملہ</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div *ngIf="result.price" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قیمت (عدد)</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.price }} افغانی</span>
+              </div>
+              <div *ngIf="result.priceText" class="sm:col-span-2 bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قیمت (حروف)</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.priceText }}</span>
+              </div>
+              <div *ngIf="result.royaltyAmount" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">حق العمل رهنما</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.royaltyAmount }}</span>
+              </div>
+              <div *ngIf="result.halfPrice" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">مناصفه قیمت</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.halfPrice }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="result.description" class="px-5 py-3 border-t border-[#eceef0]">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">توضیحات</h5>
+            <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+              <span class="text-sm text-[#191c1e]">{{ result.description }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Witnesses -->
-        <div class="info-section" *ngIf="result.witnessOne || result.witnessTwo">
-          <h5 class="section-title">شاهدان</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.witnessOne?.firstName">
-              <label>شاهد اول:</label>
-              <span>{{ result.witnessOne?.firstName }} ولد {{ result.witnessOne?.fatherName }}</span>
+        <!-- Petition Writer Information -->
+        <div *ngIf="result.petitionWriterInfo" class="border-t border-[#eceef0]">
+          <div class="px-5 py-4 bg-[#ecfdf5] border-b border-[#a7f3d0]">
+            <h4 class="text-sm font-bold text-[#065f46]">معلومات تفصیلی عریضه نویس</h4>
+          </div>
+
+          <div *ngIf="result.petitionWriterInfo.applicantFatherName || result.petitionWriterInfo.applicantGrandFatherName || result.petitionWriterInfo.electronicNationalIdNumber || result.petitionWriterInfo.mobileNumber" class="p-5">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">معلومات شخصی</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div *ngIf="result.petitionWriterInfo.applicantFatherName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام پدر</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.applicantFatherName }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.applicantGrandFatherName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام پدر کلان</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.applicantGrandFatherName }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.electronicNationalIdNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شماره تذکره</span>
+                <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.petitionWriterInfo.electronicNationalIdNumber }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.mobileNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شماره تماس</span>
+                <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.petitionWriterInfo.mobileNumber }}</span>
+              </div>
             </div>
-            <div class="info-item" *ngIf="result.witnessOne?.electronicNationalIdNumber">
-              <label>تذکره شاهد اول:</label>
-              <span dir="ltr">{{ result.witnessOne?.electronicNationalIdNumber }}</span>
+          </div>
+
+          <div *ngIf="result.petitionWriterInfo.permanentProvinceName || result.petitionWriterInfo.permanentDistrictName || result.petitionWriterInfo.permanentVillage" class="px-5 pb-4">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">سکونت اصلی</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div *ngIf="result.petitionWriterInfo.permanentProvinceName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولایت</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.permanentProvinceName }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.permanentDistrictName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولسوالی</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.permanentDistrictName }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.permanentVillage" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ناحیه / قریه</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.permanentVillage }}</span>
+              </div>
             </div>
-            <div class="info-item" *ngIf="result.witnessTwo?.firstName">
-              <label>شاهد دوم:</label>
-              <span>{{ result.witnessTwo?.firstName }} ولد {{ result.witnessTwo?.fatherName }}</span>
+          </div>
+
+          <div *ngIf="result.petitionWriterInfo.currentProvinceName || result.petitionWriterInfo.currentDistrictName || result.petitionWriterInfo.currentVillage" class="px-5 pb-4">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">سکونت فعلی</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div *ngIf="result.petitionWriterInfo.currentProvinceName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولایت</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.currentProvinceName }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.currentDistrictName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولسوالی</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.currentDistrictName }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.currentVillage" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قریه / گذر</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.currentVillage }}</span>
+              </div>
             </div>
-            <div class="info-item" *ngIf="result.witnessTwo?.electronicNationalIdNumber">
-              <label>تذکره شاهد دوم:</label>
-              <span dir="ltr">{{ result.witnessTwo?.electronicNationalIdNumber }}</span>
+          </div>
+
+          <div *ngIf="result.petitionWriterInfo.district || result.petitionWriterInfo.detailedAddress || result.petitionWriterInfo.latestRelocation" class="px-5 pb-4">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">محل فعالیت</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div *ngIf="result.petitionWriterInfo.district" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ناحیه</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.district }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.detailedAddress" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">آدرس دقیق</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.detailedAddress }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.latestRelocation" class="sm:col-span-2 bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نقل مکان</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.latestRelocation }}</span>
+              </div>
             </div>
+          </div>
+
+          <div *ngIf="result.petitionWriterInfo.competency || result.petitionWriterInfo.licenseType || result.petitionWriterInfo.licensePrice" class="px-5 pb-5">
+            <h5 class="text-xs font-bold text-[#6f7973] mb-3">معلومات جواز</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div *ngIf="result.petitionWriterInfo.competency" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">اهلیت</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ getCompetencyDisplay(result.petitionWriterInfo.competency) }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.licenseType" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نوع جواز</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ getLicenseTypeDisplay(result.petitionWriterInfo.licenseType) }}</span>
+              </div>
+              <div *ngIf="result.petitionWriterInfo.licensePrice" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قیمت جواز</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.petitionWriterInfo.licensePrice }} افغانی</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seller Information -->
+        <div *ngIf="result.sellerInfo" class="border-t border-[#eceef0]">
+          <div class="px-5 py-4 bg-[#fef3c7] border-b border-[#fbbf24]">
+            <h4 class="text-sm font-bold text-[#92400e]">معلومات فروشنده</h4>
+          </div>
+          <div class="p-5 flex flex-col md:flex-row gap-6">
+            <div *ngIf="result.sellerInfo.photo" class="flex-shrink-0 text-center">
+              <img [src]="getSellerPhotoUrl()" alt="عکس فروشنده" class="w-24 h-28 object-cover rounded-xl border-4 border-[#eceef0] shadow-sm mx-auto"
+                onerror="this.src='assets/img/avatar2.png'">
+            </div>
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div *ngIf="result.sellerInfo.firstName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.sellerInfo.firstName }}</span>
+              </div>
+              <div *ngIf="result.sellerInfo.fatherName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام پدر</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.sellerInfo.fatherName }}</span>
+              </div>
+              <div *ngIf="result.sellerInfo.grandFatherName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام پدر کلان</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.sellerInfo.grandFatherName }}</span>
+              </div>
+              <div *ngIf="result.sellerInfo.electronicNationalIdNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شماره تذکره</span>
+                <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.sellerInfo.electronicNationalIdNumber }}</span>
+              </div>
+              <div *ngIf="result.sellerInfo.phoneNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شماره تماس</span>
+                <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.sellerInfo.phoneNumber }}</span>
+              </div>
+              <div *ngIf="result.sellerInfo.province" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولایت</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.sellerInfo.province }}</span>
+              </div>
+              <div *ngIf="result.sellerInfo.district" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولسوالی</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.sellerInfo.district }}</span>
+              </div>
+              <div *ngIf="result.sellerInfo.village" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قریه/گذر</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.sellerInfo.village }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buyer Information -->
+        <div *ngIf="result.buyerInfo" class="border-t border-[#eceef0]">
+          <div class="px-5 py-4 bg-[#ecfdf5] border-b border-[#a7f3d0]">
+            <h4 class="text-sm font-bold text-[#065f46]">معلومات خریدار</h4>
+          </div>
+          <div class="p-5 flex flex-col md:flex-row gap-6">
+            <div *ngIf="result.buyerInfo.photo" class="flex-shrink-0 text-center">
+              <img [src]="getBuyerPhotoUrl()" alt="عکس خریدار" class="w-24 h-28 object-cover rounded-xl border-4 border-[#eceef0] shadow-sm mx-auto"
+                onerror="this.src='assets/img/avatar2.png'">
+            </div>
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div *ngIf="result.buyerInfo.firstName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.buyerInfo.firstName }}</span>
+              </div>
+              <div *ngIf="result.buyerInfo.fatherName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام پدر</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.buyerInfo.fatherName }}</span>
+              </div>
+              <div *ngIf="result.buyerInfo.grandFatherName" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">نام پدر کلان</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.buyerInfo.grandFatherName }}</span>
+              </div>
+              <div *ngIf="result.buyerInfo.electronicNationalIdNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شماره تذکره</span>
+                <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.buyerInfo.electronicNationalIdNumber }}</span>
+              </div>
+              <div *ngIf="result.buyerInfo.phoneNumber" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">شماره تماس</span>
+                <span class="text-sm font-semibold text-[#191c1e]" dir="ltr">{{ result.buyerInfo.phoneNumber }}</span>
+              </div>
+              <div *ngIf="result.buyerInfo.province" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولایت</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.buyerInfo.province }}</span>
+              </div>
+              <div *ngIf="result.buyerInfo.district" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">ولسوالی</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.buyerInfo.district }}</span>
+              </div>
+              <div *ngIf="result.buyerInfo.village" class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
+                <span class="text-xs text-[#6f7973] block mb-1">قریه/گذر</span>
+                <span class="text-sm font-semibold text-[#191c1e]">{{ result.buyerInfo.village }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Info -->
+        <div class="px-5 py-4 bg-[#f7f9fb] border-t border-[#eceef0]">
+          <div class="flex flex-wrap justify-between gap-3 text-xs text-[#6f7973]">
+            <span>کود تصدیق: <strong class="text-[#191c1e]" dir="ltr">{{ result.verificationCode }}</strong></span>
+            <span>تاریخ تصدیق: <strong class="text-[#191c1e]">{{ result.verifiedAt | calendarDate }}</strong></span>
           </div>
         </div>
       </div>
 
-      <!-- Vehicle Details Section (for VehicleDocument) -->
-      <div *ngIf="result.documentType === 'VehicleDocument'" class="vehicle-details-section">
-        <div class="detail-section-header">
-          <h4>معلومات واسطه</h4>
-        </div>
-        
-        <div class="info-grid">
-          <div class="info-item" *ngIf="result.plateNumber">
-            <label>نمبر پلیټ:</label>
-            <span>{{ result.plateNumber }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.vehicleType">
-            <label>نوعیت واسطه:</label>
-            <span>{{ result.vehicleType }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.vehicleModel">
-            <label>مدل:</label>
-            <span>{{ result.vehicleModel }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.engineNumber">
-            <label>نمبر انجن:</label>
-            <span dir="ltr">{{ result.engineNumber }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.chassisNumber">
-            <label>نمبر شاسی:</label>
-            <span dir="ltr">{{ result.chassisNumber }}</span>
-          </div>
-          <div class="info-item" *ngIf="result.vehicleColor">
-            <label>رنگ:</label>
-            <span>{{ result.vehicleColor }}</span>
-          </div>
-        </div>
-
-        <!-- Price Info -->
-        <div class="info-section" *ngIf="result.price || result.priceText || result.royaltyAmount">
-          <h5 class="section-title">معلومات معاملہ</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.price">
-              <label>قیمت (عدد):</label>
-              <span>{{ result.price }} افغانی</span>
-            </div>
-            <div class="info-item full-width" *ngIf="result.priceText">
-              <label>قیمت (حروف):</label>
-              <span>{{ result.priceText }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.royaltyAmount">
-              <label>حق العمل رهنما:</label>
-              <span>{{ result.royaltyAmount }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.halfPrice">
-              <label>مناصفه قیمت:</label>
-              <span>{{ result.halfPrice }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Description -->
-        <div class="info-section" *ngIf="result.description">
-          <h5 class="section-title">توضیحات</h5>
-          <div class="info-grid">
-            <div class="info-item full-width">
-              <span>{{ result.description }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Petition Writer Information (for PetitionWriterLicense documents) -->
-      <div *ngIf="result.petitionWriterInfo" class="petition-writer-details">
-        <div class="detail-section-header">
-          <h4>معلومات تفصیلی عریضه نویس</h4>
-        </div>
-        
-        <!-- Personal Information -->
-        <div class="info-section">
-          <h5 class="section-title">معلومات شخصی</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.petitionWriterInfo.applicantFatherName">
-              <label>نام پدر:</label>
-              <span>{{ result.petitionWriterInfo.applicantFatherName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.petitionWriterInfo.applicantGrandFatherName">
-              <label>نام پدر کلان:</label>
-              <span>{{ result.petitionWriterInfo.applicantGrandFatherName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.petitionWriterInfo.electronicNationalIdNumber">
-              <label>شماره تذکره:</label>
-              <span dir="ltr">{{ result.petitionWriterInfo.electronicNationalIdNumber }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.petitionWriterInfo.mobileNumber">
-              <label>شماره تماس:</label>
-              <span dir="ltr">{{ result.petitionWriterInfo.mobileNumber }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Permanent Address -->
-        <div class="info-section" *ngIf="result.petitionWriterInfo.permanentProvinceName || result.petitionWriterInfo.permanentDistrictName || result.petitionWriterInfo.permanentVillage">
-          <h5 class="section-title">سکونت اصلی</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.petitionWriterInfo.permanentProvinceName">
-              <label>ولایت:</label>
-              <span>{{ result.petitionWriterInfo.permanentProvinceName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.petitionWriterInfo.permanentDistrictName">
-              <label>ولسوالی:</label>
-              <span>{{ result.petitionWriterInfo.permanentDistrictName }}</span>
-            </div>
-            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.permanentVillage">
-              <label>ناحیه / قریه:</label>
-              <span>{{ result.petitionWriterInfo.permanentVillage }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Current Address -->
-        <div class="info-section" *ngIf="result.petitionWriterInfo.currentProvinceName || result.petitionWriterInfo.currentDistrictName || result.petitionWriterInfo.currentVillage">
-          <h5 class="section-title">سکونت فعلی</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.petitionWriterInfo.currentProvinceName">
-              <label>ولایت:</label>
-              <span>{{ result.petitionWriterInfo.currentProvinceName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.petitionWriterInfo.currentDistrictName">
-              <label>ولسوالی:</label>
-              <span>{{ result.petitionWriterInfo.currentDistrictName }}</span>
-            </div>
-            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.currentVillage">
-              <label>قریه / گذر:</label>
-              <span>{{ result.petitionWriterInfo.currentVillage }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Activity Location -->
-        <div class="info-section" *ngIf="result.petitionWriterInfo.district || result.petitionWriterInfo.detailedAddress || result.petitionWriterInfo.latestRelocation">
-          <h5 class="section-title">محل فعالیت</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.petitionWriterInfo.district">
-              <label>ناحیه:</label>
-              <span>{{ result.petitionWriterInfo.district }}</span>
-            </div>
-            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.detailedAddress">
-              <label>آدرس دقیق:</label>
-              <span>{{ result.petitionWriterInfo.detailedAddress }}</span>
-            </div>
-            <div class="info-item full-width" *ngIf="result.petitionWriterInfo.latestRelocation">
-              <label>نقل مکان:</label>
-              <span>{{ result.petitionWriterInfo.latestRelocation }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- License Details -->
-        <div class="info-section" *ngIf="result.petitionWriterInfo.competency || result.petitionWriterInfo.licenseType || result.petitionWriterInfo.licensePrice">
-          <h5 class="section-title">معلومات جواز</h5>
-          <div class="info-grid">
-            <div class="info-item" *ngIf="result.petitionWriterInfo.competency">
-              <label>اهلیت:</label>
-              <span>{{ getCompetencyDisplay(result.petitionWriterInfo.competency) }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.petitionWriterInfo.licenseType">
-              <label>نوع جواز:</label>
-              <span>{{ getLicenseTypeDisplay(result.petitionWriterInfo.licenseType) }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.petitionWriterInfo.licensePrice">
-              <label>قیمت جواز:</label>
-              <span>{{ result.petitionWriterInfo.licensePrice }} افغانی</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Seller Information (for Property and Vehicle documents) -->
-      <div *ngIf="result.sellerInfo" class="party-details seller-details">
-        <div class="party-header">
-          <h4>معلومات فروشنده</h4>
-        </div>
-        <div class="party-content">
-          <!-- Seller Photo -->
-          <div class="party-photo-section" *ngIf="result.sellerInfo.photo">
-            <img [src]="getSellerPhotoUrl()" alt="عکس فروشنده" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
-          </div>
-          
-          <!-- Seller Info Grid -->
-          <div class="party-info-grid">
-            <div class="info-item" *ngIf="result.sellerInfo.firstName">
-              <label>نام:</label>
-              <span>{{ result.sellerInfo.firstName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.sellerInfo.fatherName">
-              <label>نام پدر:</label>
-              <span>{{ result.sellerInfo.fatherName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.sellerInfo.grandFatherName">
-              <label>نام پدر کلان:</label>
-              <span>{{ result.sellerInfo.grandFatherName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.sellerInfo.electronicNationalIdNumber">
-              <label>شماره تذکره:</label>
-              <span dir="ltr">{{ result.sellerInfo.electronicNationalIdNumber }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.sellerInfo.phoneNumber">
-              <label>شماره تماس:</label>
-              <span dir="ltr">{{ result.sellerInfo.phoneNumber }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.sellerInfo.province">
-              <label>ولایت:</label>
-              <span>{{ result.sellerInfo.province }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.sellerInfo.district">
-              <label>ولسوالی:</label>
-              <span>{{ result.sellerInfo.district }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.sellerInfo.village">
-              <label>قریه/گذر:</label>
-              <span>{{ result.sellerInfo.village }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Buyer Information (for Property and Vehicle documents) -->
-      <div *ngIf="result.buyerInfo" class="party-details buyer-details">
-        <div class="party-header">
-          <h4>معلومات خریدار</h4>
-        </div>
-        <div class="party-content">
-          <!-- Buyer Photo -->
-          <div class="party-photo-section" *ngIf="result.buyerInfo.photo">
-            <img [src]="getBuyerPhotoUrl()" alt="عکس خریدار" class="party-photo" onerror="this.src='assets/img/avatar2.png'">
-          </div>
-          
-          <!-- Buyer Info Grid -->
-          <div class="party-info-grid">
-            <div class="info-item" *ngIf="result.buyerInfo.firstName">
-              <label>نام:</label>
-              <span>{{ result.buyerInfo.firstName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.buyerInfo.fatherName">
-              <label>نام پدر:</label>
-              <span>{{ result.buyerInfo.fatherName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.buyerInfo.grandFatherName">
-              <label>نام پدر کلان:</label>
-              <span>{{ result.buyerInfo.grandFatherName }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.buyerInfo.electronicNationalIdNumber">
-              <label>شماره تذکره:</label>
-              <span dir="ltr">{{ result.buyerInfo.electronicNationalIdNumber }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.buyerInfo.phoneNumber">
-              <label>شماره تماس:</label>
-              <span dir="ltr">{{ result.buyerInfo.phoneNumber }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.buyerInfo.province">
-              <label>ولایت:</label>
-              <span>{{ result.buyerInfo.province }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.buyerInfo.district">
-              <label>ولسوالی:</label>
-              <span>{{ result.buyerInfo.district }}</span>
-            </div>
-            <div class="info-item" *ngIf="result.buyerInfo.village">
-              <label>قریه/گذر:</label>
-              <span>{{ result.buyerInfo.village }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="verification-info">
-        <p>کود تصدیق: <strong dir="ltr">{{ result.verificationCode }}</strong></p>
-        <p>تاریخ تصدیق: {{ result.verifiedAt | calendarDate }}</p>
+      <!-- Search Again Button -->
+      <div class="text-center">
+        <button (click)="resetSearch()" class="btn-primary">
+          <i class="fas fa-search ml-1"></i>
+          تصدیق سند دیگر
+        </button>
       </div>
     </div>
 
-    <!-- Search Again Button -->
-    <div class="action-section">
-      <button (click)="resetSearch()" class="search-again-btn">تصدیق سند دیگر</button>
+    <!-- Footer -->
+    <div class="text-center mt-8 pt-6 border-t border-[#eceef0]">
+      <p class="text-xs text-[#6f7973]">© {{ currentYear }} وزارت عدلیه - تمام حقوق محفوظ است</p>
+      <p class="text-xs text-[#bec9c2] mt-1">برای تصدیق سند، کود QR روی سند را اسکن کنید یا کود تصدیق را وارد نمایید</p>
     </div>
   </div>
-
-  <!-- Footer -->
-  <div class="verify-footer">
-    <p>© {{ currentYear }} وزارت عدلیه - تمام حقوق محفوظ است</p>
-    <p class="help-text">برای تصدیق سند، کود QR روی سند را اسکن کنید یا کود تصدیق را وارد نمایید</p>
-  </div>
-</div>
+</section>

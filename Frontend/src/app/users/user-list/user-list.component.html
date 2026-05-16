@@ -1,49 +1,47 @@
-<div class="w-full bg-gray-50 min-h-screen py-6">
+<section class="w-full min-h-screen bg-[#f7f9fb] py-8">
   <div class="max-w-7xl mx-auto px-4">
-
     <!-- Header -->
-    <div class="mb-6 text-center">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 text-white mb-3 shadow-lg shadow-blue-600/20">
-        <i class="fas fa-users text-2xl"></i>
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#004532] to-[#065f46] shadow-lg shadow-[#004532]/30 mb-4">
+        <i class="fas fa-users text-white text-2xl"></i>
       </div>
       <h1 class="text-3xl font-bold text-gray-800 mb-2">مدیریت کاربران</h1>
-      <p class="text-gray-500 text-sm">مشاهده، جستجو و مدیریت کاربران سیستم</p>
-      <a routerLink="/user-report" class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-all shadow-sm">
+      <p class="text-gray-500 text-sm max-w-md mx-auto">مشاهده، جستجو و مدیریت کاربران سیستم</p>
+      <a routerLink="/user-report" class="inline-flex items-center gap-2 mt-3 px-5 py-2.5 bg-white border border-[#bec9c2] hover:bg-[#f7f9fb] text-[#55615a] font-medium rounded-xl transition-colors text-sm">
         <i class="fas fa-chart-bar"></i> گزارش کاربران
       </a>
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-2 bg-white rounded-xl border border-gray-200 p-1 mb-5 shadow-sm w-fit mx-auto">
+    <div class="flex gap-2 bg-white rounded-2xl shadow-sm border border-[#eceef0] p-1 mb-5 w-fit mx-auto">
       <button (click)="switchTab('system')"
-        class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-sm"
+        class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
         [ngClass]="activeTab === 'system'
-          ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
+          ? 'bg-[#004532] text-white shadow-sm'
+          : 'text-[#6f7973] hover:bg-[#f7f9fb] hover:text-[#191c1e]'">
         <i class="fas fa-user-shield text-sm"></i>
         کاربران سیستمی
       </button>
       <button (click)="switchTab('company')"
-        class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 shadow-sm"
+        class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
         [ngClass]="activeTab === 'company'
-          ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
+          ? 'bg-[#065f46] text-white shadow-sm'
+          : 'text-[#6f7973] hover:bg-[#f7f9fb] hover:text-[#191c1e]'">
         <i class="fas fa-building text-sm"></i>
         کاربران رهنما
       </button>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-5">
+    <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-5">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-        <!-- Search (server-side) -->
+        <!-- Search -->
         <div class="md:col-span-2">
-          <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">جستجو</label>
-          <div class="relative group">
-            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm group-focus-within:text-blue-500 transition-colors"></i>
+          <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">جستجو</label>
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#bec9c2] text-sm"></i>
             <input type="text"
-              class="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all"
+              class="form-input pl-9"
               [(ngModel)]="searchTerm"
               (ngModelChange)="onSearchInput()"
               placeholder="نام کاربری، نام، ایمیل، شماره تماس...">
@@ -52,67 +50,58 @@
 
         <!-- Role filter -->
         <div>
-          <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">نقش</label>
-          <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all appearance-none bg-white"
-            [(ngModel)]="roleFilter" (change)="onFilterChange()">
+          <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نقش</label>
+          <select class="form-input" [(ngModel)]="roleFilter" (change)="onFilterChange()">
             <option value="">همه نقش‌ها</option>
             <option *ngFor="let r of currentRoles" [value]="r.id">{{ r.dari }}</option>
           </select>
-          <i class="fas fa-chevron-down absolute right-3 top-[38px] text-gray-400 text-sm pointer-events-none"></i>
         </div>
 
         <!-- Status filter -->
         <div>
-          <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">وضعیت</label>
-          <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none transition-all appearance-none bg-white"
-            [(ngModel)]="statusFilter" (change)="onFilterChange()">
+          <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">وضعیت</label>
+          <select class="form-input" [(ngModel)]="statusFilter" (change)="onFilterChange()">
             <option value="">همه</option>
             <option value="active">فعال</option>
             <option value="inactive">غیرفعال</option>
           </select>
-          <i class="fas fa-chevron-down absolute right-3 top-[38px] text-gray-400 text-sm pointer-events-none"></i>
         </div>
       </div>
 
-      <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
-          <i class="fas fa-info-circle mr-1"></i>
+      <div class="mt-4 pt-4 border-t border-[#eceef0] flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span class="text-xs font-medium text-[#6f7973] bg-[#f7f9fb] px-3 py-1.5 rounded-full">
+          <i class="fas fa-info-circle ml-1"></i>
           {{ total }} کاربر یافت شد
         </span>
         <button (click)="clearFilters()"
-          class="text-xs font-medium text-gray-500 hover:text-blue-600 hover:bg-blue-50 flex items-center gap-1.5 px-4 py-2 rounded-lg transition-all">
+          class="text-xs font-medium text-[#6f7973] hover:text-[#004532] hover:bg-[#ecfdf5] flex items-center gap-1.5 px-4 py-2 rounded-lg transition-all">
           <i class="fas fa-times"></i> پاک کردن فیلترها
         </button>
       </div>
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-
+    <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] overflow-hidden">
       <!-- Table header bar -->
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3"
-        [ngClass]="activeTab === 'system' ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-teal-600 to-teal-700'">
-        <i class="fas text-white text-lg"
-          [ngClass]="activeTab === 'system' ? 'fa-user-shield' : 'fa-building'"></i>
+      <div class="px-6 py-4 flex items-center gap-3 bg-[#004532]">
+        <i class="fas text-white text-lg" [ngClass]="activeTab === 'system' ? 'fa-user-shield' : 'fa-building'"></i>
         <span class="text-white font-bold text-base">
           {{ activeTab === 'system' ? 'کاربران سیستمی' : 'کاربران رهنما (عملیاتی)' }}
-          <span class="opacity-70 font-normal text-white/90 text-sm ml-2">
-            ({{ total }} نفر)
-          </span>
+          <span class="opacity-70 font-normal text-white/90 text-sm mr-2">({{ total }} نفر)</span>
         </span>
       </div>
 
       <!-- Loading -->
       <div *ngIf="isLoading" class="py-20 text-center">
-        <div class="inline-block w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-        <p class="text-gray-500 font-medium">در حال بارگذاری کاربران...</p>
+        <div class="inline-block w-12 h-12 border-4 border-[#bec9c2] border-t-[#004532] rounded-full animate-spin mb-4"></div>
+        <p class="text-[#6f7973] font-medium">در حال بارگذاری کاربران...</p>
       </div>
 
       <!-- Table -->
       <div *ngIf="!isLoading" class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+          <thead class="bg-[#f7f9fb] border-b border-[#eceef0]">
+            <tr class="text-center text-xs font-bold text-[#6f7973]">
               <th class="px-4 py-4 w-16">#</th>
               <th class="px-4 py-4">کاربر</th>
               <th class="px-4 py-4">نام کاربری</th>
@@ -124,38 +113,32 @@
               <th class="px-4 py-4 w-40">عملیات</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-[#eceef0]">
             <tr *ngFor="let user of users; let i = index"
-              class="text-center hover:bg-blue-50/30 transition-colors group">
-              <td class="px-4 py-3 text-sm text-gray-400 font-medium">{{ (page - 1) * pageSize + i + 1 }}</td>
+              class="text-center hover:bg-[#ecfdf5] transition-colors group">
+              <td class="px-4 py-3 text-sm text-[#bec9c2] font-medium">{{ (page - 1) * pageSize + i + 1 }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-3">
                   <div class="relative">
                     <img [src]="getUserPhoto(user.photoPath)"
-                      class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 flex-shrink-0 shadow-sm group-hover:border-blue-300 transition-colors"
+                      class="w-10 h-10 rounded-full object-cover border-2 border-[#eceef0] flex-shrink-0 shadow-sm group-hover:border-[#004532] transition-colors"
                       (error)="$any($event.target).src = 'assets/img/avatar.png'">
-                    <i *ngIf="!user.isLocked" class="fas fa-circle text-green-400 text-[10px] absolute -bottom-0.5 -right-0.5"></i>
+                    <i *ngIf="!user.isLocked" class="fas fa-circle text-emerald-400 text-[10px] absolute -bottom-0.5 -right-0.5"></i>
                     <i *ngIf="user.isLocked" class="fas fa-circle text-red-400 text-[10px] absolute -bottom-0.5 -right-0.5"></i>
                   </div>
                   <div class="text-right">
-                    <span class="block text-sm font-bold text-gray-800">
-                      {{ user.firstName }} {{ user.lastName }}
-                    </span>
-                    <span *ngIf="user.phoneNumber" class="text-xs text-gray-400">
-                      {{ user.phoneNumber }}
-                    </span>
+                    <span class="block text-sm font-bold text-[#191c1e]">{{ user.firstName }} {{ user.lastName }}</span>
+                    <span *ngIf="user.phoneNumber" class="text-xs text-[#6f7973]">{{ user.phoneNumber }}</span>
                   </div>
                 </div>
               </td>
               <td class="px-4 py-3">
-                <div class="text-sm font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded inline-block">
+                <span class="text-sm font-mono text-[#6f7973] bg-[#f7f9fb] px-2 py-1 rounded inline-block">
                   {{ user.userName }}
-                </div>
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-500">
-                <span class="inline-block max-w-[150px] truncate" [title]="user.email || ''">
-                  {{ user.email || '—' }}
                 </span>
+              </td>
+              <td class="px-4 py-3 text-sm text-[#6f7973]">
+                <span class="inline-block max-w-[150px] truncate" [title]="user.email || ''">{{ user.email || '—' }}</span>
               </td>
               <td class="px-4 py-3">
                 <span class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
@@ -163,35 +146,35 @@
                   {{ user.roleDari }}
                 </span>
               </td>
-              <td *ngIf="activeTab === 'company'" class="px-4 py-3 text-sm text-gray-600">
-                <span class="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium">
+              <td *ngIf="activeTab === 'company'" class="px-4 py-3 text-sm text-[#6f7973]">
+                <span class="px-2 py-1 rounded bg-[#f7f9fb] text-[#6f7973] text-xs font-medium">
                   {{ getLicenseTypeText(user.licenseType) }}
                 </span>
               </td>
               <td class="px-4 py-3">
                 <span class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
-                  [ngClass]="user.isLocked ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
-                  <i class="fas fa-circle text-[8px] mr-1"></i>
+                  [ngClass]="user.isLocked ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'">
+                  <i class="fas fa-circle text-[8px] ml-1"></i>
                   {{ user.isLocked ? 'غیرفعال' : 'فعال' }}
                 </span>
               </td>
-              <td class="px-4 py-3 text-sm text-gray-500">
-                <span class="inline-block bg-gray-50 px-2 py-1 rounded text-xs">
+              <td class="px-4 py-3 text-sm text-[#6f7973]">
+                <span class="inline-block bg-[#f7f9fb] px-2 py-1 rounded text-xs">
                   {{ user.createdAt | calendarDate }}
                 </span>
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-2">
                   <button (click)="onEdit(user)"
-                    class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-1.5"
+                    class="px-3 py-1.5 bg-[#004532] hover:bg-[#065f46] text-white text-xs font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-1.5"
                     title="ویرایش کاربر">
                     <i class="fas fa-edit"></i> ویرایش
                   </button>
                   <button (click)="onToggleStatus(user)"
                     class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-1.5"
                     [ngClass]="user.isLocked
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-amber-500 hover:bg-amber-600 text-white'">
+                      ? 'bg-[#065f46] hover:bg-[#004532] text-white'
+                      : 'bg-[#ba1a1a] hover:bg-[#991b1b] text-white'">
                     <i [class]="user.isLocked ? 'fas fa-unlock' : 'fas fa-lock'"></i>
                     {{ user.isLocked ? 'فعال' : 'غیرفعال' }}
                   </button>
@@ -201,11 +184,11 @@
 
             <tr *ngIf="users.length === 0">
               <td [attr.colspan]="activeTab === 'company' ? 9 : 8" class="py-20 text-center">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-4">
-                  <i class="fas fa-users text-4xl text-gray-300"></i>
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#f7f9fb] mb-4">
+                  <i class="fas fa-users text-4xl text-[#bec9c2]"></i>
                 </div>
-                <p class="text-gray-500 text-lg font-medium">کاربری یافت نشد</p>
-                <p class="text-gray-400 text-sm mt-1">در حال حاضر کاربری در سیستم ثبت نشده است</p>
+                <p class="text-[#6f7973] text-lg font-medium">کاربری یافت نشد</p>
+                <p class="text-[#bec9c2] text-sm mt-1">در حال حاضر کاربری در سیستم ثبت نشده است</p>
               </td>
             </tr>
           </tbody>
@@ -216,21 +199,20 @@
     <!-- Pagination -->
     <div class="flex items-center justify-center gap-3 mt-6" *ngIf="total > pageSize">
       <button (click)="onPageChange(page - 1)" [disabled]="page === 1"
-        class="px-5 py-2.5 text-sm font-bold rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md flex items-center gap-2"
+        class="px-5 py-2.5 text-sm font-bold rounded-xl border border-[#bec9c2] bg-white hover:bg-[#f7f9fb] hover:border-[#004532] disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-2"
         [disabled]="page === 1">
         <i class="fas fa-chevron-left"></i> قبلی
       </button>
-      <div class="flex items-center gap-1 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
-        <span class="text-sm text-gray-600 font-medium">
-          صفحه <span class="text-blue-600 font-bold">{{ page }}</span> از {{ totalPages }}
+      <div class="flex items-center gap-1 bg-white px-4 py-2 rounded-xl border border-[#eceef0] shadow-sm">
+        <span class="text-sm text-[#6f7973] font-medium">
+          صفحه <span class="text-[#004532] font-bold">{{ page }}</span> از {{ totalPages }}
         </span>
       </div>
       <button (click)="onPageChange(page + 1)" [disabled]="page >= totalPages"
-        class="px-5 py-2.5 text-sm font-bold rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md flex items-center gap-2"
+        class="px-5 py-2.5 text-sm font-bold rounded-xl border border-[#bec9c2] bg-white hover:bg-[#f7f9fb] hover:border-[#004532] disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-2"
         [disabled]="page >= totalPages">
         بعدی <i class="fas fa-chevron-right"></i>
       </button>
     </div>
-
   </div>
-</div>
+</section>

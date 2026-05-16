@@ -1,325 +1,319 @@
 <div class="container">
-  <section class="w-full bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">ثبت جواز عریضه‌نویسان</h1>
-        <p class="text-center text-gray-600">لطفا معلومات عریضه‌نویس را با دقت تکمیل نمایید</p>
-      </div>
-      
+  <section class="w-full bg-[#f7f9fb] py-6">
+    <div class="max-w-5xl mx-auto px-4">
       <form [formGroup]="licenseForm" (ngSubmit)="saveLicense()">
-        <!-- Basic Info Section -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-info-circle"></i>
-              <span>معلومات اساسی</span>
-            </h2>
+        <!-- Section 1: معلومات اساسی -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#004532] flex items-center justify-center">
+              <i class="fas fa-info-circle text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">معلومات اساسی</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <!-- Province Selection -->
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت <span class="text-red-500">*</span></label>
-                <ng-select formControlName="provinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onProvinceChange()" [disabled]="hasProvinceAccess" class="custom-ng-select" placeholder="ولایت را انتخاب کنید"></ng-select>
-                <div *ngIf="licenseForm.get('provinceId')?.invalid && licenseForm.get('provinceId')?.touched">
-                  <small class="text-red-600 text-xs mt-1 block">ولایت الزامی است</small>
-                </div>
-                <!-- Show message for province-based users -->
-                <small *ngIf="hasProvinceAccess && userProvinceId" class="text-blue-600 text-xs mt-1 block">
-                  <i class="fas fa-info-circle"></i> ولایت از پروفایل شما خودکار انتخاب شده است
-                </small>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Province Selection -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ولایت <span class="text-red-500">*</span></label>
+              <ng-select formControlName="provinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onProvinceChange()" [disabled]="hasProvinceAccess" class="custom-ng-select" placeholder="ولایت را انتخاب کنید"></ng-select>
+              <div *ngIf="licenseForm.get('provinceId')?.invalid && licenseForm.get('provinceId')?.touched">
+                <small class="text-red-600 text-xs mt-1 block">ولایت الزامی است</small>
               </div>
-              <!-- License Number -->
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر جواز</label>
-                <input type="text" formControlName="licenseNumber" 
-                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                       placeholder="نمبر جواز را وارد کنید (خالی بگذارید تا خودکار تولید شود)">
-                <small class="text-gray-500 text-xs mt-1 block">
-                  <i class="fas fa-info-circle"></i> اگر نمبر جواز را وارد نکنید، به صورت خودکار بر اساس ولایت تولید می‌شود
-                </small>
+              <small *ngIf="hasProvinceAccess && userProvinceId" class="text-[#6f7973] text-xs mt-1 block">
+                <i class="fas fa-info-circle ml-1"></i>ولایت از پروفایل شما خودکار انتخاب شده است
+              </small>
+            </div>
+
+            <!-- License Number -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر جواز</label>
+              <input type="text" formControlName="licenseNumber" class="form-input" placeholder="نمبر جواز (خالی بگذارید تا خودکار تولید شود)">
+              <small class="text-[#6f7973] text-xs mt-1 block">
+                <i class="fas fa-info-circle ml-1"></i>اگر خالی بگذارید، خودکار تولید می‌شود
+              </small>
+            </div>
+
+            <!-- Name -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نام <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="applicantName" class="form-input" [class.border-red-500]="applicantName?.invalid && (applicantName?.dirty || applicantName?.touched)" placeholder="نام متقاضی">
+              <div *ngIf="applicantName?.invalid && (applicantName?.dirty || applicantName?.touched)">
+                <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نام <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="applicantName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <div *ngIf="applicantName?.invalid && (applicantName?.dirty || applicantName?.touched)">
-                  <small class="text-red-600 text-xs mt-1 block" *ngIf="applicantName?.errors?.['required']">این فیلد الزامی است</small>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نام پدر</label>
-                <input type="text" formControlName="applicantFatherName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نام پدر کلان</label>
-                <input type="text" formControlName="applicantGrandFatherName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">شماره تماس</label>
-                <input type="text" formControlName="mobileNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="07XX XXX XXX">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">درجه اهلیت</label>
-                <ng-select formControlName="competency" [items]="competencyLevels" [selectOnTab]="true" bindLabel="name" bindValue="id" class="custom-ng-select" placeholder="درجه اهلیت را انتخاب کنید"></ng-select>
-              </div>
+            </div>
+
+            <!-- Father Name -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نام پدر</label>
+              <input type="text" formControlName="applicantFatherName" class="form-input" placeholder="نام پدر">
+            </div>
+
+            <!-- Grandfather Name -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نام پدر کلان</label>
+              <input type="text" formControlName="applicantGrandFatherName" class="form-input" placeholder="نام پدر کلان">
+            </div>
+
+            <!-- Mobile Number -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">شماره تماس</label>
+              <input type="text" formControlName="mobileNumber" class="form-input" placeholder="07XX XXX XXX">
+            </div>
+
+            <!-- Competency Level -->
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">درجه اهلیت</label>
+              <ng-select formControlName="competency" [items]="competencyLevels" [selectOnTab]="true" bindLabel="name" bindValue="id" class="custom-ng-select" placeholder="درجه اهلیت را انتخاب کنید"></ng-select>
             </div>
           </div>
         </div>
 
-        <!-- Identity Card Section -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-id-card"></i>
-              <span>معلومات تذکره</span>
-            </h2>
+        <!-- Section 2: معلومات تذکره -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#065f46] flex items-center justify-center">
+              <i class="fas fa-id-card text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">معلومات تذکره</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">الیکټرونیکی تذکره نمبر <span class="text-red-500">*</span></label>
-                <input type="text" formControlName="electronicNationalIdNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="الیکټرونیکی تذکره نمبر" required>
-              </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">الیکټرونیکی تذکره نمبر <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="electronicNationalIdNumber" class="form-input" placeholder="الیکټرونیکی تذکره نمبر">
             </div>
           </div>
         </div>
 
-        <!-- Permanent Address Section -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>سکونت اصلی</span>
-            </h2>
+        <!-- Section 3: سکونت اصلی -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#55615a] flex items-center justify-center">
+              <i class="fas fa-map-marker-alt text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">سکونت اصلی</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
-                <ng-select formControlName="permanentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onPermanentProvinceChange($event)" class="custom-ng-select"></ng-select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
-                <ng-select formControlName="permanentDistrictId" [items]="permanentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">قریه / گذر</label>
-                <input type="text" formControlName="permanentVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ولایت</label>
+              <ng-select formControlName="permanentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onPermanentProvinceChange($event)" class="custom-ng-select"></ng-select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ناحیه/ولسوالی</label>
+              <ng-select formControlName="permanentDistrictId" [items]="permanentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">قریه / گذر</label>
+              <input type="text" formControlName="permanentVillage" class="form-input" placeholder="قریه / گذر">
             </div>
           </div>
         </div>
 
-        <!-- Current Address Section -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>سکونت فعلی</span>
-            </h2>
+        <!-- Section 4: سکونت فعلی -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#2d3d52] flex items-center justify-center">
+              <i class="fas fa-map-marker-alt text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">سکونت فعلی</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ولایت</label>
-                <ng-select formControlName="currentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onCurrentProvinceChange($event)" class="custom-ng-select"></ng-select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه/ولسوالی</label>
-                <ng-select formControlName="currentDistrictId" [items]="currentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">قریه / گذر</label>
-                <input type="text" formControlName="currentVillage" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ولایت</label>
+              <ng-select formControlName="currentProvinceId" [items]="provinces" [selectOnTab]="true" bindLabel="dari" bindValue="id" (change)="onCurrentProvinceChange($event)" class="custom-ng-select"></ng-select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ناحیه/ولسوالی</label>
+              <ng-select formControlName="currentDistrictId" [items]="currentDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="id" class="custom-ng-select"></ng-select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">قریه / گذر</label>
+              <input type="text" formControlName="currentVillage" class="form-input" placeholder="قریه / گذر">
             </div>
           </div>
         </div>
 
-        <!-- Activity Location Section -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-building"></i>
-              <span>ساحه فعالیت</span>
-            </h2>
+        <!-- Section 5: ساحه فعالیت -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#44546a] flex items-center justify-center">
+              <i class="fas fa-building text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">ساحه فعالیت</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">محل فعالیت عریضه‌نویس</label>
-                <ng-select formControlName="activityLocation" [items]="activityLocations" [selectOnTab]="true" bindLabel="dariName" bindValue="dariName" class="custom-ng-select" placeholder="محل فعالیت را انتخاب کنید"></ng-select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">ناحیه <span class="text-red-500">*</span></label>
-                <ng-select formControlName="activityNahia" [items]="activityDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="dari" class="custom-ng-select" placeholder="ناحیه را انتخاب کنید"></ng-select>
-                <small *ngIf="hasProvinceAccess && activityDistricts.length > 0" class="text-blue-600 text-xs mt-1 block">
-                  <i class="fas fa-info-circle"></i> ناحیه‌ها بر اساس ولایت شما نمایش داده شده است
-                </small>
-              </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">محل فعالیت عریضه‌نویس</label>
+              <ng-select formControlName="activityLocation" [items]="activityLocations" [selectOnTab]="true" bindLabel="dariName" bindValue="dariName" class="custom-ng-select" placeholder="محل فعالیت را انتخاب کنید"></ng-select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ناحیه <span class="text-red-500">*</span></label>
+              <ng-select formControlName="activityNahia" [items]="activityDistricts" [selectOnTab]="true" bindLabel="dari" bindValue="dari" class="custom-ng-select" placeholder="ناحیه را انتخاب کنید"></ng-select>
+              <small *ngIf="hasProvinceAccess && activityDistricts.length > 0" class="text-[#6f7973] text-xs mt-1 block">
+                <i class="fas fa-info-circle ml-1"></i>ناحیه‌ها بر اساس ولایت شما نمایش داده شده است
+              </small>
             </div>
           </div>
         </div>
 
-        <!-- Picture Upload Section -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-cloud-upload-alt"></i>
-              <span>آپلود عکس</span>
-            </h2>
+        <!-- Section 6: آپلود عکس -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#065f46] flex items-center justify-center">
+              <i class="fas fa-cloud-upload-alt text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">آپلود عکس</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="space-y-4">
-              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                <app-profile-image-cropper
-                  [initialImageUrl]="imageName"
-                  [documentType]="'petition-writer-picture'"
-                  [roundCropper]="false"
-                  (imageUploaded)="onProfileImageUploaded($event)">
-                </app-profile-image-cropper>
-              </div>
+          
+          <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-4">
+            <app-profile-image-cropper
+              [initialImageUrl]="imageName"
+              [documentType]="'petition-writer-picture'"
+              [roundCropper]="false"
+              (imageUploaded)="onProfileImageUploaded($event)">
+            </app-profile-image-cropper>
+          </div>
+        </div>
+
+        <!-- Section 7: معلومات مالی و جواز -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4" [formGroup]="financialForm">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#004532] flex items-center justify-center">
+              <i class="fas fa-money-bill-wave text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">معلومات مالی و جواز</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر آویز بانکی</label>
+              <input type="text" formControlName="bankReceiptNumber" class="form-input" placeholder="نمبر آویز بانکی">
+            </div>
+            <div>
+              <app-multi-calendar-datepicker formControlName="bankReceiptDate" label="تاریخ پرداخت آویز"></app-multi-calendar-datepicker>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نوعیت جواز</label>
+              <ng-select [items]="licenseTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="licenseType" class="custom-ng-select"></ng-select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">قیمت</label>
+              <input type="number" formControlName="licenseCost" readonly class="form-input bg-[#f7f9fb]">
+            </div>
+            <div>
+              <app-multi-calendar-datepicker formControlName="licenseIssueDate" label="تاریخ صدور جواز"></app-multi-calendar-datepicker>
+            </div>
+            <div>
+              <app-multi-calendar-datepicker formControlName="licenseExpiryDate" label="تاریخ ختم جواز"></app-multi-calendar-datepicker>
             </div>
           </div>
         </div>
 
-        <!-- Financial Info Section (from Tab 2) -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" [formGroup]="financialForm">
-          <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-money-bill-wave"></i>
-              <span>معلومات مالی و جواز</span>
-            </h2>
+        <!-- Section 8: وضعیت جواز -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4" [formGroup]="cancellationForm">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#ba1a1a] flex items-center justify-center">
+              <i class="fas fa-times-circle text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">وضعیت جواز</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نمبر آویز بانکی</label>
-                <input type="text" formControlName="bankReceiptNumber" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-              </div>
-              <div>
-                <app-multi-calendar-datepicker formControlName="bankReceiptDate" label="تاریخ پرداخت آویز"></app-multi-calendar-datepicker>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">نوعیت جواز</label>
-                <ng-select [items]="licenseTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="licenseType" class="custom-ng-select"></ng-select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">قیمت</label>
-                <input type="number" formControlName="licenseCost" readonly class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
-              </div>
-              <div>
-                <app-multi-calendar-datepicker formControlName="licenseIssueDate" label="تاریخ صدور جواز"></app-multi-calendar-datepicker>
-              </div>
-              <div>
-                <app-multi-calendar-datepicker formControlName="licenseExpiryDate" label="تاریخ ختم جواز"></app-multi-calendar-datepicker>
-              </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">وضعیت <span class="text-red-500">*</span></label>
+              <ng-select [items]="licenseStatusTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="licenseStatus" class="custom-ng-select"></ng-select>
+            </div>
+            <div>
+              <app-multi-calendar-datepicker formControlName="cancellationDate" label="تاریخ لغو / انصراف"></app-multi-calendar-datepicker>
             </div>
           </div>
         </div>
 
-        <!-- License Status Section (from Tab 3) -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6" [formGroup]="cancellationForm">
-          <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-times-circle"></i>
-              <span>وضعیت جواز</span>
-            </h2>
+        <!-- Section 9: نقل مکان (Edit Mode Only) -->
+        <div *ngIf="isEditMode && editId" class="bg-white rounded-2xl shadow-sm border border-[#eceef0] p-5 mb-4">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 rounded-lg bg-[#92400e] flex items-center justify-center">
+              <i class="fas fa-exchange-alt text-white text-xs"></i>
+            </div>
+            <h2 class="text-sm font-extrabold text-[#191c1e]">نقل مکان / ساحه فعالیت</h2>
           </div>
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <form [formGroup]="relocationForm" (ngSubmit)="saveRelocation()">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">وضعیت <span class="text-red-500">*</span></label>
-                <ng-select [items]="licenseStatusTypes" [selectOnTab]="true" bindLabel="name" bindValue="id" formControlName="licenseStatus" class="custom-ng-select"></ng-select>
+                <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">محل فعالیت جدید <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="newActivityLocation" class="form-input" placeholder="محل فعالیت جدید">
               </div>
               <div>
-                <app-multi-calendar-datepicker formControlName="cancellationDate" label="تاریخ لغو / انصراف"></app-multi-calendar-datepicker>
+                <app-multi-calendar-datepicker formControlName="relocationDate" label="تاریخ نقل مکان"></app-multi-calendar-datepicker>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ملاحظات</label>
+                <input type="text" formControlName="remarks" class="form-input" placeholder="ملاحظات">
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Relocation Section (from Tab 2) -->
-        <div *ngIf="isEditMode && editId" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-6">
-          <div class="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fas fa-exchange-alt"></i>
-              <span>نقل مکان / ساحه فعالیت</span>
-            </h2>
-          </div>
-          <div class="px-6 py-6">
-            <form [formGroup]="relocationForm" (ngSubmit)="saveRelocation()">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">محل فعالیت جدید <span class="text-red-500">*</span></label>
-                  <input type="text" formControlName="newActivityLocation" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
-                </div>
-                <div>
-                  <app-multi-calendar-datepicker formControlName="relocationDate" label="تاریخ نقل مکان"></app-multi-calendar-datepicker>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
-                  <input type="text" formControlName="remarks" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent">
-                </div>
-              </div>
-              <div class="flex gap-2">
-                <button type="submit" [disabled]="relocationForm.invalid || isViewOnly" class="px-6 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-all">
-                  <i class="fas" [ngClass]="selectedRelocationId ? 'fa-edit' : 'fa-plus'"></i>
-                  {{selectedRelocationId ? 'تغییر' : 'افزودن'}}
-                </button>
-                <button type="button" (click)="resetRelocationForm()" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all">
-                  <i class="fas fa-times"></i> انصراف
-                </button>
-              </div>
-            </form>
-
-            <!-- Relocations Table -->
-            <div class="mt-6 overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-gray-50 border-b-2 border-gray-200">
-                  <tr class="text-center">
-                    <th class="px-4 py-3 text-sm font-bold text-gray-700">محل فعالیت جدید</th>
-                    <th class="px-4 py-3 text-sm font-bold text-gray-700">تاریخ نقل مکان</th>
-                    <th class="px-4 py-3 text-sm font-bold text-gray-700">ملاحظات</th>
-                    <th class="px-4 py-3 text-sm font-bold text-gray-700">عملیات</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                  <tr *ngFor="let r of relocationsList" class="text-center hover:bg-amber-50 transition-colors">
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ r.newActivityLocation }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ (r.relocationDate | calendarDate) || '-' }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ r.remarks || '-' }}</td>
-                    <td class="px-4 py-3">
-                      <div class="flex justify-center gap-2">
-                        <button type="button" (click)="selectRelocation(r)" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg" title="ویرایش">
-                          <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" (click)="deleteRelocation(r.id!)" [disabled]="isViewOnly" class="p-2 text-red-600 hover:bg-red-100 rounded-lg" title="حذف">
-                          <i class="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr *ngIf="relocationsList.length === 0">
-                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">هیچ نقل مکانی ثبت نشده است</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="flex gap-3 mb-4">
+              <button type="submit" [disabled]="relocationForm.invalid || isViewOnly" class="btn-primary">
+                <i class="fas" [ngClass]="selectedRelocationId ? 'fa-edit' : 'fa-plus'"></i>
+                <span>{{selectedRelocationId ? 'تغییر' : 'افزودن'}}</span>
+              </button>
+              <button type="button" (click)="resetRelocationForm()" class="btn-ghost">
+                <i class="fas fa-times"></i>
+                <span>انصراف</span>
+              </button>
             </div>
+          </form>
+
+          <!-- Relocations Table -->
+          <div *ngIf="relocationsList.length > 0" class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-[#f7f9fb] border-b border-[#eceef0]">
+                <tr class="text-center">
+                  <th class="px-4 py-3 text-xs font-bold text-[#3f4944]">محل فعالیت جدید</th>
+                  <th class="px-4 py-3 text-xs font-bold text-[#3f4944]">تاریخ نقل مکان</th>
+                  <th class="px-4 py-3 text-xs font-bold text-[#3f4944]">ملاحظات</th>
+                  <th class="px-4 py-3 text-xs font-bold text-[#3f4944]">عملیات</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#eceef0]">
+                <tr *ngFor="let r of relocationsList" class="text-center hover:bg-[#d9e6dd]/40 transition-colors">
+                  <td class="px-4 py-3 text-xs text-[#3f4944]">{{ r.newActivityLocation }}</td>
+                  <td class="px-4 py-3 text-xs text-[#3f4944]">{{ (r.relocationDate | calendarDate) || '-' }}</td>
+                  <td class="px-4 py-3 text-xs text-[#3f4944]">{{ r.remarks || '-' }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex justify-center gap-2">
+                      <button type="button" (click)="selectRelocation(r)" class="p-2 text-[#004532] hover:bg-[#d9e6dd] rounded-lg transition-colors" title="ویرایش">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button type="button" (click)="deleteRelocation(r.id!)" [disabled]="isViewOnly" class="p-2 text-[#ba1a1a] hover:bg-[#ffdad6] rounded-lg transition-colors" title="حذف">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="relocationsList.length === 0" class="text-center py-4 text-[#6f7973]">
+            <i class="fas fa-inbox text-2xl mb-2 text-[#bec9c2]"></i>
+            <p class="text-sm">هیچ نقل مکانی ثبت نشده است</p>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-4 justify-center pb-6">
-          <button *ngIf="!isViewOnly" type="submit" [disabled]="licenseForm.invalid" class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+        <div class="flex gap-3 justify-center pt-4 pb-4">
+          <button *ngIf="!isViewOnly" type="submit" [disabled]="licenseForm.invalid" class="btn-primary">
             <i class="fas" [ngClass]="isEditMode ? 'fa-edit' : 'fa-save'"></i>
             <span>{{isEditMode ? 'تغییر معلومات' : 'ثبت معلومات'}}</span>
           </button>
-          <button *ngIf="!isViewOnly" type="button" (click)="resetAll()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <button *ngIf="!isViewOnly" type="button" (click)="resetAll()" class="btn-secondary">
             <i class="fas fa-plus-circle"></i>
             <span>جدید</span>
           </button>
-          <button type="button" (click)="goToList()" class="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <button type="button" (click)="goToList()" class="btn-ghost">
             <i class="fas fa-list"></i>
             <span>لیست</span>
           </button>
