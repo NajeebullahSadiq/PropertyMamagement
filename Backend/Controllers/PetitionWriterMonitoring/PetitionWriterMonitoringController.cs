@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
 using WebAPIBackend.Models.PetitionWriterMonitoring;
@@ -18,10 +20,12 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
     public class PetitionWriterMonitoringController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public PetitionWriterMonitoringController(AppDbContext context)
+        public PetitionWriterMonitoringController(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         #region Main Record CRUD
@@ -66,7 +70,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 // Always use HijriShamsi for list display
                 var calendar = CalendarType.HijriShamsi;
 
-                var items = await query
+                var pageItems = await query
                     .OrderByDescending(x => x.CreatedAt)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -104,9 +108,57 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                         
                         x.Status,
                         x.CreatedAt,
-                        x.CreatedBy
+                        x.CreatedBy,
+                        x.UpdatedAt,
+                        x.UpdatedBy
                     })
                     .ToListAsync();
+
+                var userNameLookup = await BuildUserNameLookupAsync(
+                    pageItems
+                        .SelectMany(x => new[] { x.CreatedBy, x.UpdatedBy })
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .Select(x => x!)
+                );
+
+                var items = pageItems.Select(x =>
+                {
+                    var savedById = !string.IsNullOrWhiteSpace(x.UpdatedBy) ? x.UpdatedBy : x.CreatedBy;
+                    var savedByName = !string.IsNullOrWhiteSpace(savedById) && userNameLookup.TryGetValue(savedById!, out var resolvedName)
+                        ? resolvedName
+                        : "-";
+
+                    return new
+                    {
+                        x.Id,
+                        x.SerialNumber,
+                        x.SectionType,
+                        x.RegistrationDate,
+                        x.RegistrationDateFormatted,
+                        x.ComplainantName,
+                        x.ComplaintSubject,
+                        x.ComplaintActionsTaken,
+                        x.ComplaintRemarks,
+                        x.PetitionWriterName,
+                        x.PetitionWriterLicenseNumber,
+                        x.PetitionWriterDistrict,
+                        x.ViolationType,
+                        x.ViolationActionsTaken,
+                        x.ViolationRemarks,
+                        x.ActivityStatus,
+                        x.ActivityPermissionReason,
+                        x.MonitoringYear,
+                        x.MonitoringMonth,
+                        x.MonitoringCount,
+                        x.MonitoringRemarks,
+                        x.Status,
+                        x.CreatedAt,
+                        x.CreatedBy,
+                        x.UpdatedAt,
+                        x.UpdatedBy,
+                        savedBy = savedByName
+                    };
+                }).ToList();
 
                 return Ok(new
                 {
@@ -367,6 +419,32 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
         #endregion
 
         #region Utility
+
+        private async Task<Dictionary<string, string>> BuildUserNameLookupAsync(IEnumerable<string> userIdsOrNames)
+        {
+            var lookup = new Dictionary<string, string>();
+
+            foreach (var value in userIdsOrNames.Distinct())
+            {
+                if (!Guid.TryParse(value, out _))
+                {
+                    lookup[value] = value;
+                    continue;
+                }
+
+                var user = await _userManager.FindByIdAsync(value);
+                if (user == null)
+                {
+                    lookup[value] = value;
+                    continue;
+                }
+
+                var fullName = $"{user.FirstName} {user.LastName}".Trim();
+                lookup[value] = string.IsNullOrWhiteSpace(fullName) ? (user.UserName ?? value) : fullName;
+            }
+
+            return lookup;
+        }
 
         /// <summary>
         /// Get next serial number for new record

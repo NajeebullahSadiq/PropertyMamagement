@@ -211,17 +211,8 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
             }
         }
 
-        // Load deed items if available
-        if (data.deedItems && data.deedItems.length > 0) {
-            this.deedItems = data.deedItems.map((item: any) => ({
-                id: item.id,
-                deedType: item.deedType,
-                serialStart: item.serialStart,
-                serialEnd: item.serialEnd,
-                count: item.count,
-                remarks: item.remarks
-            }));
-        }
+        this.deedItems = this.parseDeedItems(data.deedItems);
+        this.updateDeedCounts();
 
         // Load section-specific data based on sectionType
         if (data.sectionType === 'annualReport') {
@@ -259,6 +250,35 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
 
         // Trigger section visibility based on sectionType
         this.onSectionTypeChange();
+    }
+
+    private parseDeedItems(rawDeedItems: any): DeedItem[] {
+        if (!rawDeedItems) {
+            return [];
+        }
+
+        let parsed = rawDeedItems;
+        if (typeof rawDeedItems === 'string') {
+            try {
+                parsed = JSON.parse(rawDeedItems);
+            } catch (error) {
+                console.error('Error parsing deedItems:', error);
+                return [];
+            }
+        }
+
+        if (!Array.isArray(parsed)) {
+            return [];
+        }
+
+        return parsed.map((item: any) => ({
+            id: item.id ?? item.Id,
+            deedType: Number(item.deedType ?? item.DeedType),
+            serialStart: item.serialStart ?? item.SerialStart,
+            serialEnd: item.serialEnd ?? item.SerialEnd,
+            count: Number(item.count ?? item.Count ?? 0),
+            remarks: item.remarks ?? item.Remarks
+        }));
     }
 
     private parseDateString(dateStr: string): Date | string | null {
@@ -399,7 +419,7 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
     onViolationStatusChange(): void {
         const status = this.mainForm.get('violationStatus')?.value;
         
-        if (status === 'منجر به مسدودی') {
+        if (status === 'منجر به مهرلاک' || status === 'منجر به مسدودی') {
             // Leading to Closure - require closure fields
             this.mainForm.get('closureReason')?.setValidators([Validators.required, Validators.maxLength(500)]);
             this.mainForm.get('violationType')?.clearValidators();

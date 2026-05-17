@@ -159,12 +159,18 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
             [FromQuery] string? createdBy = null,
-            [FromQuery] string? calendarType = null)
+            [FromQuery] string? calendarType = null,
+            [FromQuery] string? activityStatus = null)
         {
             try
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
+                if (!string.IsNullOrWhiteSpace(activityStatus))
+                {
+                    query = query.Where(x => x.ActivityStatus == activityStatus);
+                }
+
                 var records = await query
                     .Where(x => x.SectionType == "violations")
                     .ToListAsync();

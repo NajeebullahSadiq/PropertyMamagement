@@ -93,6 +93,19 @@ export class ActivityMonitoringViewComponent extends BaseComponent implements On
         return types[deedType] || 'نامشخص';
     }
 
+    getViolationStatusLabel(status?: string): string {
+        if (status === 'منجر به مسدودی' || status === 'blocked') {
+            return 'منجر به مهرلاک';
+        }
+        if (status === 'normal') {
+            return 'عادی';
+        }
+        if (status === 'sealRemoved') {
+            return 'رفع مهرلاک';
+        }
+        return status || '-';
+    }
+
     goToList(): void {
         this.router.navigate(['/activity-monitoring/list']);
     }

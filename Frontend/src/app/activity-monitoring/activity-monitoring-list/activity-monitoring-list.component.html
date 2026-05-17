@@ -355,18 +355,22 @@
               <div class="text-2xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
               <div class="text-xs text-[#6f7973]">مجموع تخلفات</div>
             </div>
-            <div class="bg-[#fef2f2] rounded-xl p-4 border border-[#fecaca] text-center">
+            <div (click)="filterViolationsByStatus('blocked')" class="bg-[#fef2f2] rounded-xl p-4 border text-center cursor-pointer transition-colors hover:bg-[#fee2e2]" [ngClass]="selectedViolationStatus === 'blocked' ? 'border-[#ba1a1a] ring-2 ring-[#fecaca]' : 'border-[#fecaca]'">
               <div class="text-2xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.blockedCount) }}</div>
-              <div class="text-xs text-[#ba1a1a]">منجر به مسدودی</div>
+              <div class="text-xs text-[#ba1a1a]">منجر به مهرلاک</div>
             </div>
-            <div class="bg-[#fffbeb] rounded-xl p-4 border border-[#fcd34d] text-center">
+            <div (click)="filterViolationsByStatus('normal')" class="bg-[#fffbeb] rounded-xl p-4 border text-center cursor-pointer transition-colors hover:bg-[#fef3c7]" [ngClass]="selectedViolationStatus === 'normal' ? 'border-[#92400e] ring-2 ring-[#fde68a]' : 'border-[#fcd34d]'">
               <div class="text-2xl font-bold text-[#92400e]">{{ formatNumber(reportSummary.violations.normalCount) }}</div>
               <div class="text-xs text-[#92400e]">عادی</div>
             </div>
-            <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center">
+            <div (click)="filterViolationsByStatus('sealRemoved')" class="bg-[#ecfdf5] rounded-xl p-4 border text-center cursor-pointer transition-colors hover:bg-[#d1fae5]" [ngClass]="selectedViolationStatus === 'sealRemoved' ? 'border-[#047857] ring-2 ring-[#a7f3d0]' : 'border-[#a7f3d0]'">
               <div class="text-2xl font-bold text-[#047857]">{{ formatNumber(reportSummary.violations.sealRemovedCount) }}</div>
               <div class="text-xs text-[#047857]">رفع مهرلاک</div>
             </div>
+          </div>
+          <div *ngIf="selectedViolationStatus" class="mb-4 flex items-center justify-between bg-[#f7f9fb] border border-[#eceef0] rounded-xl px-4 py-2">
+            <span class="text-sm font-semibold text-[#3f4944]">لیست {{ getSelectedViolationStatusLabel() }}</span>
+            <button type="button" (click)="selectedViolationStatus = ''" class="text-xs text-[#ba1a1a] hover:underline">نمایش همه</button>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -378,13 +382,13 @@
                   <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">تاریخ ثبت</th>
                   <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">وضعیت</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">نوعیت تخلف</th>
-                  <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">علت مسدودی</th>
+                  <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">علت مهرلاک</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">اجراآت</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">ثبت کننده</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#bec9c2]">
-                <tr *ngFor="let row of violationDetails" class="hover:bg-[#fef2f2] transition-colors">
+                <tr *ngFor="let row of getFilteredViolationDetails()" class="hover:bg-[#fef2f2] transition-colors">
                   <td class="px-3 py-2 text-[#6f7973]">{{ row.serialNumber || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.licenseNumber || '-' }}</td>
                   <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.licenseHolderName || '-' }}</td>
@@ -402,7 +406,7 @@
               </tbody>
             </table>
           </div>
-          <div *ngIf="violationDetails.length === 0" class="text-center py-8 text-[#6f7973]">
+          <div *ngIf="getFilteredViolationDetails().length === 0" class="text-center py-8 text-[#6f7973]">
             <i class="fas fa-inbox text-4xl text-[#bec9c2] mb-2"></i>
             <p>داده‌ای یافت نشد</p>
           </div>

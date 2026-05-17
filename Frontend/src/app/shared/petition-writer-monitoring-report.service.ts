@@ -121,12 +121,13 @@ export class PetitionWriterMonitoringReportService {
         return this.http.get<any>(`${this.baseUrl}/complaints`, { params });
     }
 
-    getViolations(startDate?: string, endDate?: string, createdBy?: string, calendarType?: string): Observable<{ summary: ViolationsSummary; details: ViolationDetail[] }> {
+    getViolations(startDate?: string, endDate?: string, createdBy?: string, calendarType?: string, activityStatus?: string): Observable<{ summary: ViolationsSummary; details: ViolationDetail[] }> {
         let params = new HttpParams();
         if (startDate) params = params.set('startDate', startDate);
         if (endDate) params = params.set('endDate', endDate);
         if (createdBy) params = params.set('createdBy', createdBy);
         if (calendarType) params = params.set('calendarType', calendarType);
+        if (activityStatus) params = params.set('activityStatus', activityStatus);
         return this.http.get<any>(`${this.baseUrl}/violations`, { params });
     }
 

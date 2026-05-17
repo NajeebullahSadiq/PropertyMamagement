@@ -44,6 +44,7 @@ export interface PetitionWriterMonitoringRecord {
     createdBy?: string;
     updatedAt?: Date;
     updatedBy?: string;
+    savedBy?: string;
 }
 
 /**

@@ -102,6 +102,7 @@
               <th class="px-4 py-4 text-sm font-bold text-white">موضوع شکایت</th>
               <th class="px-4 py-4 text-sm font-bold text-white">تاریخ ثبت</th>
               <th class="px-4 py-4 text-sm font-bold text-white">اجراآت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ثبت کننده</th>
               <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
@@ -115,6 +116,7 @@
               <th class="px-4 py-4 text-sm font-bold text-white">ناحیه</th>
               <th class="px-4 py-4 text-sm font-bold text-white">وضعیت</th>
               <th class="px-4 py-4 text-sm font-bold text-white">اجراآت</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ثبت کننده</th>
               <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
@@ -126,6 +128,7 @@
               <th class="px-4 py-4 text-sm font-bold text-white">ماه</th>
               <th class="px-4 py-4 text-sm font-bold text-white">تعداد نظارت</th>
               <th class="px-4 py-4 text-sm font-bold text-white">ملاحظات</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ثبت کننده</th>
               <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
@@ -141,6 +144,7 @@
               <th class="px-4 py-4 text-sm font-bold text-white">شهرت عریضه نویس</th>
               <th class="px-4 py-4 text-sm font-bold text-white">وضعیت</th>
               <th class="px-4 py-4 text-sm font-bold text-white">شهرت عارض</th>
+              <th class="px-4 py-4 text-sm font-bold text-white">ثبت کننده</th>
               <th class="px-4 py-4 text-sm font-bold text-white">عملیات</th>
             </tr>
           </thead>
@@ -155,8 +159,9 @@
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.complainantName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]" dir="rtl">{{ item.complaintSubject || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ (item.registrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.registrationDateFormatted || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.complaintActionsTaken || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.savedBy || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
                     <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
@@ -186,6 +191,7 @@
                   </span>
                 </td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.violationActionsTaken || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.savedBy || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
                     <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
@@ -209,6 +215,7 @@
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.monitoringMonth || '-' }}</td>
                 <td class="px-4 py-3 text-sm font-bold text-[#004532]">{{ item.monitoringCount || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.monitoringRemarks || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.savedBy || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
                     <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
@@ -234,7 +241,7 @@
                     {{ getSectionTypeLabel(item.sectionType!) }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ (item.registrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.registrationDateFormatted || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterLicenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterDistrict || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.petitionWriterName || '-' }}</td>
@@ -245,6 +252,7 @@
                   <span *ngIf="!item.activityStatus">-</span>
                 </td>
                 <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.complainantName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#191c1e]">{{ item.savedBy || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
                     <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#ecfdf5] rounded-lg transition-colors" title="مشاهده">
@@ -410,8 +418,8 @@
                 <div class="text-3xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
                 <div class="text-sm text-[#ba1a1a] mt-1">تعداد تخلفات</div>
                 <div class="mt-3 pt-3 border-t border-[#fecaca] space-y-1">
-                  <div class="flex justify-between text-xs"><span class="text-[#ba1a1a]">جلوګیری فعالیت:</span><span class="font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.activityPreventionCount) }}</span></div>
-                  <div class="flex justify-between text-xs"><span class="text-[#ba1a1a]">اجازه فعالیت:</span><span class="font-bold text-[#004532]">{{ formatNumber(reportSummary.violations.activityPermissionCount) }}</span></div>
+                  <div class="flex justify-between text-xs cursor-pointer hover:underline" (click)="showReportTabForEveryone('violations', 'activity_prevention')"><span class="text-[#ba1a1a]">جلوګیری فعالیت:</span><span class="font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.activityPreventionCount) }}</span></div>
+                  <div class="flex justify-between text-xs cursor-pointer hover:underline" (click)="showReportTabForEveryone('violations', 'activity_permission')"><span class="text-[#ba1a1a]">اجازه فعالیت:</span><span class="font-bold text-[#004532]">{{ formatNumber(reportSummary.violations.activityPermissionCount) }}</span></div>
                 </div>
               </div>
               <div class="bg-[#ecfdf5] rounded-xl p-5 border border-[#a7f3d0]">
@@ -421,10 +429,10 @@
                   </div>
                   <div class="font-bold text-[#44546a]">نظارت فعالیت</div>
                 </div>
-                <div class="text-3xl font-bold text-[#44546a]">{{ formatNumber(reportSummary.monitoring.totalRecords) }}</div>
+                <div class="text-3xl font-bold text-[#44546a] cursor-pointer hover:underline" (click)="showReportTabForEveryone('monitoring')">{{ formatNumber(reportSummary.monitoring.totalRecords) }}</div>
                 <div class="text-sm text-[#44546a] mt-1">تعداد نظارت</div>
                 <div class="mt-3 pt-3 border-t border-[#a7f3d0]">
-                  <div class="flex justify-between text-xs"><span class="text-[#44546a]">مجموع تعداد نظارت:</span><span class="font-bold text-[#004532]">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</span></div>
+                  <div class="flex justify-between text-xs cursor-pointer hover:underline" (click)="showReportTabForEveryone('monitoring')"><span class="text-[#44546a]">مجموع تعداد نظارت:</span><span class="font-bold text-[#004532]">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</span></div>
                 </div>
               </div>
             </div>
@@ -451,7 +459,6 @@
                     <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">موضوع شکایت</th>
                     <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#fbbf24]">تاریخ ثبت</th>
                     <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">اجراآت</th>
-                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fbbf24]">ثبت کننده</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -464,7 +471,6 @@
                     <td class="px-3 py-2 text-[#191c1e]">{{ row.complaintSubject || '-' }}</td>
                     <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.complaintActionsTaken || '-' }}</td>
-                    <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -479,15 +485,15 @@
           <div *ngIf="reportActiveTab === 'violations'" class="p-6">
             <h2 class="text-xl font-bold text-[#191c1e] mb-4">تخلفات عریضه نویسان</h2>
             <div *ngIf="reportSummary" class="grid grid-cols-3 gap-4 mb-6">
-              <div class="bg-[#fef2f2] rounded-xl p-4 border border-[#fecaca] text-center">
+              <div class="bg-[#fef2f2] rounded-xl p-4 border border-[#fecaca] text-center cursor-pointer hover:border-[#ba1a1a]" (click)="showReportTabForEveryone('violations')">
                 <div class="text-2xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.totalRecords) }}</div>
                 <div class="text-xs text-[#ba1a1a]">مجموع تخلفات</div>
               </div>
-              <div class="bg-[#fef2f2] rounded-xl p-4 border border-[#fecaca] text-center">
+              <div class="bg-[#fef2f2] rounded-xl p-4 border border-[#fecaca] text-center cursor-pointer hover:border-[#ba1a1a]" (click)="showReportTabForEveryone('violations', 'activity_prevention')">
                 <div class="text-2xl font-bold text-[#ba1a1a]">{{ formatNumber(reportSummary.violations.activityPreventionCount) }}</div>
                 <div class="text-xs text-[#ba1a1a]">جلوګیری فعالیت</div>
               </div>
-              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center">
+              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center cursor-pointer hover:border-[#004532]" (click)="showReportTabForEveryone('violations', 'activity_permission')">
                 <div class="text-2xl font-bold text-[#004532]">{{ formatNumber(reportSummary.violations.activityPermissionCount) }}</div>
                 <div class="text-xs text-[#004532]">اجازه فعالیت</div>
               </div>
@@ -505,7 +511,6 @@
                     <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">علت اجازه فعالیت</th>
                     <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#fecaca]">تاریخ ثبت</th>
                     <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">اجراآت</th>
-                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#fecaca]">ثبت کننده</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -523,7 +528,6 @@
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.activityPermissionReason || '-' }}</td>
                     <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.violationActionsTaken || '-' }}</td>
-                    <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -538,11 +542,11 @@
           <div *ngIf="reportActiveTab === 'monitoring'" class="p-6">
             <h2 class="text-xl font-bold text-[#191c1e] mb-4">نظارت فعالیت عریضه نویسان</h2>
             <div *ngIf="reportSummary" class="grid grid-cols-2 gap-4 mb-6">
-              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center">
+              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center cursor-pointer hover:border-[#44546a]" (click)="showReportTabForEveryone('monitoring')">
                 <div class="text-2xl font-bold text-[#44546a]">{{ formatNumber(reportSummary.monitoring.totalRecords) }}</div>
                 <div class="text-xs text-[#44546a]">تعداد نظارت</div>
               </div>
-              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center">
+              <div class="bg-[#ecfdf5] rounded-xl p-4 border border-[#a7f3d0] text-center cursor-pointer hover:border-[#004532]" (click)="showReportTabForEveryone('monitoring')">
                 <div class="text-2xl font-bold text-[#004532]">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</div>
                 <div class="text-xs text-[#004532]">مجموع تعداد نظارت</div>
               </div>
@@ -556,7 +560,6 @@
                     <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#a7f3d0]">تعداد نظارت</th>
                     <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#a7f3d0]">ملاحظات</th>
                     <th class="px-3 py-3 text-center font-bold text-[#191c1e] border-b border-[#a7f3d0]">تاریخ ثبت</th>
-                    <th class="px-3 py-3 text-right font-bold text-[#191c1e] border-b border-[#a7f3d0]">ثبت کننده</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -566,14 +569,13 @@
                     <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ row.monitoringCount }}</td>
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.monitoringRemarks || '-' }}</td>
                     <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
-                    <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                   </tr>
                 </tbody>
                 <tfoot *ngIf="monitoringDetails.length > 0" class="bg-[#ecfdf5]">
                   <tr>
                     <td colspan="2" class="px-3 py-2 font-bold text-[#191c1e]">مجموع</td>
                     <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ formatNumber(reportSummary.monitoring.totalMonitoringCount) }}</td>
-                    <td colspan="3" class="px-3 py-2"></td>
+                    <td colspan="2" class="px-3 py-2"></td>
                   </tr>
                 </tfoot>
               </table>

@@ -205,14 +205,14 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="bg-[#fef2f2] rounded-xl border border-[#fecaca] p-3">
               <div class="flex items-center gap-2 mb-1"><i class="fas fa-flag text-[#ba1a1a] text-xs"></i><span class="text-xs text-[#ba1a1a]">وضعیت</span></div>
-              <p class="text-sm font-semibold text-[#ba1a1a]">{{ record.violationStatus || '-' }}</p>
+              <p class="text-sm font-semibold text-[#ba1a1a]">{{ getViolationStatusLabel(record.violationStatus) }}</p>
             </div>
             <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
               <div class="flex items-center gap-2 mb-1"><i class="fas fa-tag text-[#ba1a1a] text-xs"></i><span class="text-xs text-[#6f7973]">نوعیت تخلف</span></div>
               <p class="text-sm font-semibold text-[#191c1e]">{{ record.violationType || '-' }}</p>
             </div>
             <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
-              <div class="flex items-center gap-2 mb-1"><i class="fas fa-comment text-[#ba1a1a] text-xs"></i><span class="text-xs text-[#6f7973]">علت مسدودی</span></div>
+              <div class="flex items-center gap-2 mb-1"><i class="fas fa-comment text-[#ba1a1a] text-xs"></i><span class="text-xs text-[#6f7973]">علت مهرلاک</span></div>
               <p class="text-sm font-semibold text-[#191c1e]">{{ record.closureReason || '-' }}</p>
             </div>
             <div *ngIf="record.violationStatus === 'رفع مهرلاک'" class="bg-[#ecfdf5] rounded-xl border border-[#a7f3d0] p-3">

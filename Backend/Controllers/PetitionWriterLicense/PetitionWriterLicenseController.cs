@@ -453,6 +453,194 @@ namespace WebAPIBackend.Controllers.PetitionWriterLicense
             }
         }
 
+        /// <summary>
+        /// Get the detailed list behind a selected report category.
+        /// Categories: new, renewal, duplicate, cancelled, withdrawn, relocation
+        /// </summary>
+        [HttpGet("report/list")]
+        public async Task<IActionResult> GetReportList(
+            [FromQuery] string type,
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null,
+            [FromQuery] string? calendarType = null,
+            [FromQuery] string? activityLocation = null,
+            [FromQuery] int? provinceId = null,
+            [FromQuery] int? districtId = null)
+        {
+            try
+            {
+                var calendar = CalendarType.HijriShamsi;
+
+                DateOnly? parsedStart = null;
+                DateOnly? parsedEnd = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate) && DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var start))
+                    parsedStart = start;
+
+                if (!string.IsNullOrWhiteSpace(endDate) && DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var end))
+                    parsedEnd = end;
+
+                var normalizedType = (type ?? string.Empty).Trim().ToLowerInvariant();
+                var validTypes = new[] { "new", "renewal", "duplicate", "cancelled", "withdrawn", "relocation" };
+                if (!validTypes.Contains(normalizedType))
+                {
+                    return BadRequest(new { message = "Invalid report list type." });
+                }
+
+                var licenseQuery = _context.PetitionWriterLicenses
+                    .AsNoTracking()
+                    .Where(x => x.Status == true);
+
+                if (provinceId.HasValue && provinceId.Value > 0)
+                    licenseQuery = licenseQuery.Where(x => x.ProvinceId == provinceId.Value);
+
+                if (districtId.HasValue && districtId.Value > 0)
+                    licenseQuery = licenseQuery.Where(x => x.CurrentDistrictId == districtId.Value);
+
+                if (!string.IsNullOrWhiteSpace(activityLocation))
+                    licenseQuery = licenseQuery.Where(x => x.ActivityLocation == activityLocation);
+
+                static string MapLicenseType(string? t) => t switch
+                {
+                    "new" => "جدید",
+                    "renewal" => "تجدید",
+                    "duplicate" => "مثنی",
+                    null or "" => "نامشخص",
+                    _ => t
+                };
+
+                static string MapLicenseStatus(int status) => status switch
+                {
+                    1 => "فعال",
+                    2 => "لغو",
+                    3 => "انصراف",
+                    _ => "نامشخص"
+                };
+
+                if (normalizedType == "relocation")
+                {
+                    var relocationQuery = _context.PetitionWriterRelocations
+                        .AsNoTracking()
+                        .Include(x => x.PetitionWriterLicense)
+                            .ThenInclude(x => x!.Province)
+                        .Include(x => x.PetitionWriterLicense)
+                            .ThenInclude(x => x!.CurrentDistrict)
+                        .Where(x => x.PetitionWriterLicense != null && x.PetitionWriterLicense.Status == true);
+
+                    if (provinceId.HasValue && provinceId.Value > 0)
+                        relocationQuery = relocationQuery.Where(x => x.PetitionWriterLicense!.ProvinceId == provinceId.Value);
+
+                    if (districtId.HasValue && districtId.Value > 0)
+                        relocationQuery = relocationQuery.Where(x => x.PetitionWriterLicense!.CurrentDistrictId == districtId.Value);
+
+                    if (!string.IsNullOrWhiteSpace(activityLocation))
+                        relocationQuery = relocationQuery.Where(x => x.PetitionWriterLicense!.ActivityLocation == activityLocation);
+
+                    if (parsedStart.HasValue)
+                        relocationQuery = relocationQuery.Where(x => x.RelocationDate.HasValue && x.RelocationDate >= parsedStart);
+
+                    if (parsedEnd.HasValue)
+                        relocationQuery = relocationQuery.Where(x => x.RelocationDate.HasValue && x.RelocationDate <= parsedEnd);
+
+                    var relocations = await relocationQuery
+                        .OrderByDescending(x => x.RelocationDate)
+                        .ToListAsync();
+
+                    var relocationRows = relocations
+                        .Select(x => new
+                        {
+                            x.PetitionWriterLicense!.Id,
+                            x.PetitionWriterLicense.LicenseNumber,
+                            provinceName = x.PetitionWriterLicense.Province != null ? x.PetitionWriterLicense.Province.Dari : "",
+                            applicantName = x.PetitionWriterLicense.ApplicantName,
+                            applicantFatherName = x.PetitionWriterLicense.ApplicantFatherName,
+                            activityLocation = x.PetitionWriterLicense.ActivityLocation,
+                            currentDistrictName = x.PetitionWriterLicense.CurrentDistrict != null ? x.PetitionWriterLicense.CurrentDistrict.Dari : "",
+                            licenseType = MapLicenseType(x.PetitionWriterLicense.LicenseType),
+                            licenseStatus = MapLicenseStatus(x.PetitionWriterLicense.LicenseStatus),
+                            eventDate = x.RelocationDate.HasValue ? DateConversionHelper.FormatDateOnly(x.RelocationDate, calendar) : "",
+                            licenseIssueDate = x.PetitionWriterLicense.LicenseIssueDate.HasValue ? DateConversionHelper.FormatDateOnly(x.PetitionWriterLicense.LicenseIssueDate, calendar) : "",
+                            cancellationDate = x.PetitionWriterLicense.CancellationDate.HasValue ? DateConversionHelper.FormatDateOnly(x.PetitionWriterLicense.CancellationDate, calendar) : "",
+                            newActivityLocation = x.NewActivityLocation,
+                            x.Remarks,
+                            x.PetitionWriterLicense.BankReceiptNumber,
+                            x.PetitionWriterLicense.LicenseCost
+                        })
+                        .ToList();
+
+                    return Ok(new
+                    {
+                        items = relocationRows,
+                        totalCount = relocationRows.Count,
+                        type = normalizedType,
+                        startDate = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : null,
+                        endDate = parsedEnd.HasValue ? DateConversionHelper.FormatDateOnly(parsedEnd, calendar) : null
+                    });
+                }
+
+                if (normalizedType is "new" or "renewal" or "duplicate")
+                {
+                    licenseQuery = licenseQuery.Where(x => x.LicenseType == normalizedType);
+                    if (parsedStart.HasValue)
+                        licenseQuery = licenseQuery.Where(x => x.LicenseIssueDate.HasValue && x.LicenseIssueDate >= parsedStart);
+                    if (parsedEnd.HasValue)
+                        licenseQuery = licenseQuery.Where(x => x.LicenseIssueDate.HasValue && x.LicenseIssueDate <= parsedEnd);
+                }
+                else
+                {
+                    var status = normalizedType == "cancelled" ? 2 : 3;
+                    licenseQuery = licenseQuery.Where(x => x.LicenseStatus == status);
+                    if (parsedStart.HasValue)
+                        licenseQuery = licenseQuery.Where(x => x.CancellationDate.HasValue && x.CancellationDate >= parsedStart);
+                    if (parsedEnd.HasValue)
+                        licenseQuery = licenseQuery.Where(x => x.CancellationDate.HasValue && x.CancellationDate <= parsedEnd);
+                }
+
+                var licenses = await licenseQuery
+                    .Include(x => x.Province)
+                    .Include(x => x.CurrentDistrict)
+                    .OrderByDescending(x => normalizedType == "cancelled" || normalizedType == "withdrawn" ? x.CancellationDate : x.LicenseIssueDate)
+                    .ToListAsync();
+
+                var rows = licenses
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.LicenseNumber,
+                        provinceName = x.Province != null ? x.Province.Dari : "",
+                        x.ApplicantName,
+                        x.ApplicantFatherName,
+                        x.ActivityLocation,
+                        currentDistrictName = x.CurrentDistrict != null ? x.CurrentDistrict.Dari : "",
+                        licenseType = MapLicenseType(x.LicenseType),
+                        licenseStatus = MapLicenseStatus(x.LicenseStatus),
+                        eventDate = normalizedType == "cancelled" || normalizedType == "withdrawn"
+                            ? (x.CancellationDate.HasValue ? DateConversionHelper.FormatDateOnly(x.CancellationDate, calendar) : "")
+                            : (x.LicenseIssueDate.HasValue ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, calendar) : ""),
+                        licenseIssueDate = x.LicenseIssueDate.HasValue ? DateConversionHelper.FormatDateOnly(x.LicenseIssueDate, calendar) : "",
+                        cancellationDate = x.CancellationDate.HasValue ? DateConversionHelper.FormatDateOnly(x.CancellationDate, calendar) : "",
+                        newActivityLocation = "",
+                        remarks = "",
+                        x.BankReceiptNumber,
+                        x.LicenseCost
+                    })
+                    .ToList();
+
+                return Ok(new
+                {
+                    items = rows,
+                    totalCount = rows.Count,
+                    type = normalizedType,
+                    startDate = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : null,
+                    endDate = parsedEnd.HasValue ? DateConversionHelper.FormatDateOnly(parsedEnd, calendar) : null
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "خطا در بارگذاری لیست گزارش", error = ex.Message });
+            }
+        }
+
         #endregion
 
         #region Provinces

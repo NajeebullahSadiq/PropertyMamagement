@@ -43,6 +43,7 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
     reportEndDate: any;
     reportCreatedBy = '';
     reportActiveTab = 'overall';
+    selectedViolationStatus = '';
 
     // Report detail data
     annualReportDetails: AnnualReportDetail[] = [];
@@ -262,7 +263,33 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
 
     onReportTabChange(tab: string): void {
         this.reportActiveTab = tab;
+        if (tab !== 'violations') {
+            this.selectedViolationStatus = '';
+        }
         this.loadReportTabData();
+    }
+
+    filterViolationsByStatus(status: string): void {
+        this.reportActiveTab = 'violations';
+        this.selectedViolationStatus = this.selectedViolationStatus === status ? '' : status;
+        this.loadReportTabData();
+    }
+
+    getFilteredViolationDetails(): ViolationDetail[] {
+        if (!this.selectedViolationStatus) {
+            return this.violationDetails;
+        }
+
+        return this.violationDetails.filter(row => this.isViolationStatus(row.violationStatus, this.selectedViolationStatus));
+    }
+
+    getSelectedViolationStatusLabel(): string {
+        switch (this.selectedViolationStatus) {
+            case 'blocked': return 'منجر به مهرلاک';
+            case 'normal': return 'عادی';
+            case 'sealRemoved': return 'رفع مهرلاک';
+            default: return '';
+        }
     }
 
     applyReportFilters(): void {
@@ -273,6 +300,7 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
         this.reportStartDate = null;
         this.reportEndDate = null;
         this.reportCreatedBy = '';
+        this.selectedViolationStatus = '';
         this.loadReportData();
     }
 
@@ -324,9 +352,9 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
             const violationData = this.reportActiveTab === 'violations' ? data : data.filter(r => r.sectionType === 'violations');
             if (violationData.length > 0) {
                 csv += 'تخلفات دفاتر رهنمای معاملات\n';
-                csv += 'نمبر مسلسل,نمبر جواز,شهرت دارنده جواز,ناحیه,نوعیت تخلف,وضعیت تخلف,علت مسدودی,علت رفع مهرلاک,اجراآت,تاریخ ثبت,ثبت کننده\n';
+                csv += 'نمبر مسلسل,نمبر جواز,شهرت دارنده جواز,ناحیه,نوعیت تخلف,وضعیت تخلف,علت مهرلاک,علت رفع مهرلاک,اجراآت,تاریخ ثبت,ثبت کننده\n';
                 violationData.forEach(row => {
-                    csv += `${row.serialNumber || '-'},${row.licenseNumber || '-'},${row.licenseHolderName || '-'},${row.district || '-'},${row.violationType || '-'},${row.violationStatus || '-'},${row.closureReason || '-'},${row.sealRemovalReason || '-'},${row.violationActionsTaken || '-'},${row.reportRegistrationDate || '-'},${row.createdBy || '-'}\n`;
+                    csv += `${row.serialNumber || '-'},${row.licenseNumber || '-'},${row.licenseHolderName || '-'},${row.district || '-'},${row.violationType || '-'},${this.getViolationStatusLabel(row.violationStatus)},${row.closureReason || '-'},${row.sealRemovalReason || '-'},${row.violationActionsTaken || '-'},${row.reportRegistrationDate || '-'},${row.createdBy || '-'}\n`;
                 });
                 csv += '\n';
             }
@@ -381,9 +409,13 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
 
     getViolationStatusLabel(status: string): string {
         switch (status) {
-            case 'blocked': return 'منجر به مسدودی';
+            case 'blocked': return 'منجر به مهرلاک';
+            case 'منجر به مسدودی': return 'منجر به مهرلاک';
+            case 'منجر به مهرلاک': return 'منجر به مهرلاک';
             case 'normal': return 'عادی';
+            case 'عادی': return 'عادی';
             case 'sealRemoved': return 'رفع مهرلاک';
+            case 'رفع مهرلاک': return 'رفع مهرلاک';
             default: return status || '-';
         }
     }
@@ -391,9 +423,26 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
     getViolationStatusClass(status: string): string {
         switch (status) {
             case 'blocked': return 'bg-red-100 text-red-700';
+            case 'منجر به مهرلاک':
+            case 'منجر به مسدودی': return 'bg-red-100 text-red-700';
             case 'normal': return 'bg-yellow-100 text-yellow-700';
+            case 'عادی': return 'bg-yellow-100 text-yellow-700';
             case 'sealRemoved': return 'bg-green-100 text-green-700';
+            case 'رفع مهرلاک': return 'bg-green-100 text-green-700';
             default: return 'bg-gray-100 text-gray-700';
         }
+    }
+
+    private isViolationStatus(status: string, filter: string): boolean {
+        if (filter === 'blocked') {
+            return status === 'blocked' || status === 'منجر به مهرلاک' || status === 'منجر به مسدودی';
+        }
+        if (filter === 'normal') {
+            return status === 'normal' || status === 'عادی';
+        }
+        if (filter === 'sealRemoved') {
+            return status === 'sealRemoved' || status === 'رفع مهرلاک';
+        }
+        return true;
     }
 }

@@ -49,6 +49,7 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
     complaintDetails: ComplaintDetail[] = [];
     violationDetails: ViolationDetail[] = [];
     monitoringDetails: MonitoringDetail[] = [];
+    reportViolationStatusFilter = '';
 
     constructor(
         private router: Router,
@@ -186,13 +187,13 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
     getColspan(): number {
         switch (this.selectedSectionType) {
             case 'complaints':
-                return 9;
+                return 10;
             case 'violations':
-                return 7;
+                return 8;
             case 'monitoring':
-                return 5;
+                return 6;
             default:
-                return 9;
+                return 10;
         }
     }
 
@@ -234,11 +235,11 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
         this.loadReportTabData();
     }
 
-    loadReportTabData(): void {
+    loadReportTabData(showAllUsers = false): void {
         const calendar = this.calendarService.getSelectedCalendar();
         const startDateStr = this.formatDateForBackend(this.reportStartDate);
         const endDateStr = this.formatDateForBackend(this.reportEndDate);
-        const createdBy = this.reportCreatedBy || undefined;
+        const createdBy = showAllUsers ? undefined : (this.reportCreatedBy || undefined);
 
         switch (this.reportActiveTab) {
             case 'complaints':
@@ -248,7 +249,7 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
                 });
                 break;
             case 'violations':
-                this.reportService.getViolations(startDateStr, endDateStr, createdBy, calendar).subscribe({
+                this.reportService.getViolations(startDateStr, endDateStr, createdBy, calendar, this.reportViolationStatusFilter || undefined).subscribe({
                     next: (res) => { this.violationDetails = res.details; },
                     error: (err) => console.error(err)
                 });
@@ -264,7 +265,14 @@ export class PetitionWriterMonitoringListComponent extends BaseComponent impleme
 
     onReportTabChange(tab: string): void {
         this.reportActiveTab = tab;
+        this.reportViolationStatusFilter = '';
         this.loadReportTabData();
+    }
+
+    showReportTabForEveryone(tab: string, activityStatus = ''): void {
+        this.reportActiveTab = tab;
+        this.reportViolationStatusFilter = activityStatus;
+        this.loadReportTabData(true);
     }
 
     applyReportFilters(): void {

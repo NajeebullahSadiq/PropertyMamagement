@@ -142,29 +142,32 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         
                         x.Status,
                         x.CreatedAt,
-                        x.CreatedBy
+                        x.CreatedBy,
+                        x.UpdatedAt,
+                        x.UpdatedBy
                     })
                     .ToListAsync();
 
-                // Resolve any GUID-based CreatedBy values to display names
+                // Resolve any GUID-based audit values to display names
                 // Done sequentially to avoid concurrent DbContext access
                 var userNameCache = new Dictionary<string, string>();
                 var resolvedItems = new List<object>();
                 foreach (var x in rawItems)
                 {
+                    var effectiveUser = !string.IsNullOrWhiteSpace(x.UpdatedBy) ? x.UpdatedBy : x.CreatedBy;
                     string resolvedName;
-                    if (string.IsNullOrEmpty(x.CreatedBy))
+                    if (string.IsNullOrEmpty(effectiveUser))
                     {
                         resolvedName = "-";
                     }
-                    else if (userNameCache.TryGetValue(x.CreatedBy, out var cached))
+                    else if (userNameCache.TryGetValue(effectiveUser, out var cached))
                     {
                         resolvedName = cached;
                     }
                     else
                     {
-                        resolvedName = await ResolveDisplayName(x.CreatedBy);
-                        userNameCache[x.CreatedBy] = resolvedName;
+                        resolvedName = await ResolveDisplayName(effectiveUser);
+                        userNameCache[effectiveUser] = resolvedName;
                     }
 
                     resolvedItems.Add(new
@@ -200,6 +203,9 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.MonitoringRemarks,
                         x.Status,
                         x.CreatedAt,
+                        x.UpdatedAt,
+                        OriginalCreatedBy = await ResolveDisplayName(x.CreatedBy),
+                        UpdatedBy = await ResolveDisplayName(x.UpdatedBy),
                         CreatedBy = resolvedName
                     });
                 }

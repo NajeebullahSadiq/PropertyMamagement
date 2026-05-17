@@ -42,9 +42,20 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
     reportDistrictId = 0;
     reportData: any = null;
     isLoadingReport = false;
+    reportListType = 'new';
+    reportList: any[] = [];
+    isLoadingReportList = false;
     activityLocations: string[] = [];
     reportProvinces: any[] = [];
     reportDistricts: any[] = [];
+    reportListTypes = [
+        { value: 'new', label: 'جدید' },
+        { value: 'renewal', label: 'تجدید' },
+        { value: 'duplicate', label: 'مثنی' },
+        { value: 'cancelled', label: 'لغو' },
+        { value: 'relocation', label: 'نقل مکان' },
+        { value: 'withdrawn', label: 'انصراف' }
+    ];
 
     readonly hijriShamsi = CalendarType.HIJRI_SHAMSI;
 
@@ -244,6 +255,7 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
                 this.reportData = data;
                 this.activityLocations = data?.activityLocations || this.activityLocations;
                 this.isLoadingReport = false;
+                this.loadReportList(startDate, endDate);
             },
             error: (err) => {
                 this.toastr.error('خطا در تولید گزارش');
@@ -251,6 +263,64 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
                 console.error(err);
             }
         });
+    }
+
+    onReportListTypeChange(): void {
+        if (!this.reportStartDate || !this.reportEndDate) {
+            this.reportList = [];
+            return;
+        }
+
+        const startDate = this.reportStartDate instanceof Date
+            ? this.convertToHijriString(this.reportStartDate)
+            : String(this.reportStartDate);
+
+        const endDate = this.reportEndDate instanceof Date
+            ? this.convertToHijriString(this.reportEndDate)
+            : String(this.reportEndDate);
+
+        this.loadReportList(startDate, endDate);
+    }
+
+    private loadReportList(startDate: string, endDate: string): void {
+        this.isLoadingReportList = true;
+        this.licenseService.getReportList(
+            this.reportListType,
+            startDate,
+            endDate,
+            'hijriShamsi',
+            this.reportActivityLocation || undefined,
+            this.reportProvinceId > 0 ? this.reportProvinceId : undefined,
+            this.reportDistrictId > 0 ? this.reportDistrictId : undefined
+        ).subscribe({
+            next: (data) => {
+                this.reportList = data?.items || [];
+                this.isLoadingReportList = false;
+            },
+            error: (err) => {
+                this.toastr.error('خطا در بارگذاری لیست گزارش');
+                this.reportList = [];
+                this.isLoadingReportList = false;
+                console.error(err);
+            }
+        });
+    }
+
+    getSelectedReportListLabel(): string {
+        return this.reportListTypes.find(x => x.value === this.reportListType)?.label || '';
+    }
+
+    getReportListDateLabel(): string {
+        switch (this.reportListType) {
+            case 'cancelled':
+                return 'تاریخ لغو';
+            case 'withdrawn':
+                return 'تاریخ انصراف';
+            case 'relocation':
+                return 'تاریخ نقل مکان';
+            default:
+                return 'تاریخ صدور';
+        }
     }
 
     exportToExcel(): void {
@@ -324,6 +394,44 @@ export class PetitionWriterLicenseListComponent extends BaseComponent implements
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `petition-writer-report-${Date.now()}.csv`;
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.toastr.success('گزارش با موفقیت صادر شد');
+    }
+    exportReportListToExcel(): void {
+        if (!this.reportList.length) {
+            this.toastr.warning('داده‌ای برای صادرات وجود ندارد');
+            return;
+        }
+
+        const rows: any[][] = [
+            [`لیست ${this.getSelectedReportListLabel()}`],
+            ['#', 'نمبر جواز', 'ولایت', 'شهرت عریضه‌نویس', 'ولد', 'محل فعالیت', 'ولسوالی', 'نوعیت جواز', 'وضعیت', this.getReportListDateLabel(), 'محل جدید', 'نمبر آویز', 'عواید']
+        ];
+
+        this.reportList.forEach((r, i) => rows.push([
+            i + 1,
+            r.licenseNumber,
+            r.provinceName,
+            r.applicantName,
+            r.applicantFatherName,
+            r.activityLocation,
+            r.currentDistrictName,
+            r.licenseType,
+            r.licenseStatus,
+            r.eventDate,
+            r.newActivityLocation,
+            r.bankReceiptNumber,
+            r.licenseCost
+        ]));
+
+        const csv = rows.map(r => r.map(c => `"${(c ?? '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `petition-writer-${this.reportListType}-list-${Date.now()}.csv`;
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();

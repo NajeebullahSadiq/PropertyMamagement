@@ -79,6 +79,12 @@
               <option *ngFor="let d of reportDistricts" [value]="d.id">{{ d.name }}</option>
             </select>
           </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">لیست گزارش</label>
+            <select [(ngModel)]="reportListType" (ngModelChange)="onReportListTypeChange()" class="w-full px-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#55615a] focus:border-transparent bg-white">
+              <option *ngFor="let type of reportListTypes" [value]="type.value">{{ type.label }}</option>
+            </select>
+          </div>
           <div class="flex items-end gap-2">
             <button (click)="generateReport()" [disabled]="isLoadingReport" class="flex-1 px-6 py-2.5 bg-[#55615a] hover:bg-[#3f4944] text-white font-medium rounded-xl transition-colors shadow-sm hover:shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
               <i class="fas" [ngClass]="isLoadingReport ? 'fa-spinner fa-spin' : 'fa-chart-line'"></i>
@@ -195,6 +201,62 @@
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <!-- Selected Report List -->
+        <div class="mt-4 bg-white rounded-xl border border-[#eceef0] overflow-hidden">
+          <div class="px-4 py-3 bg-[#f7f9fb] border-b border-[#eceef0] flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-list text-[#004532] text-sm"></i>
+              <span class="text-sm font-bold text-[#191c1e]">لیست {{ getSelectedReportListLabel() }}</span>
+              <span class="bg-[#004532] text-white text-xs font-bold px-2.5 py-0.5 rounded-full">{{ reportList.length }}</span>
+            </div>
+            <button (click)="exportReportListToExcel()" [disabled]="!reportList.length" class="px-4 py-2 bg-[#065f46] hover:bg-[#004532] text-white text-xs font-medium rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
+              <i class="fas fa-file-excel"></i>
+              صادرات لیست
+            </button>
+          </div>
+
+          <div *ngIf="isLoadingReportList" class="py-8 text-center text-[#6f7973]">
+            <i class="fas fa-spinner fa-spin ml-2"></i>
+            در حال بارگذاری لیست...
+          </div>
+
+          <div *ngIf="!isLoadingReportList" class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-[#f7f9fb] border-b border-[#eceef0]">
+                <tr class="text-center">
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">#</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">نمبر جواز</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">شهرت</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">ولایت</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">محل فعالیت</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">نوعیت جواز</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">وضعیت</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">{{ getReportListDateLabel() }}</th>
+                  <th *ngIf="reportListType === 'relocation'" class="py-2 px-3 text-xs font-semibold text-[#6f7973]">محل جدید</th>
+                  <th class="py-2 px-3 text-xs font-semibold text-[#6f7973]">عواید</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#eceef0]">
+                <tr *ngFor="let row of reportList; let i = index" class="text-center hover:bg-[#f7f9fb] transition-colors">
+                  <td class="py-2.5 px-3 text-[#6f7973]">{{ i + 1 }}</td>
+                  <td class="py-2.5 px-3 font-semibold text-[#004532]">{{ row.licenseNumber }}</td>
+                  <td class="py-2.5 px-3 text-right text-[#191c1e]">{{ row.applicantName }} <span *ngIf="row.applicantFatherName" class="text-[#6f7973]">ولد {{ row.applicantFatherName }}</span></td>
+                  <td class="py-2.5 px-3 text-[#3f4944]">{{ row.provinceName || '-' }}</td>
+                  <td class="py-2.5 px-3 text-[#3f4944]">{{ row.activityLocation || '-' }}</td>
+                  <td class="py-2.5 px-3 text-[#3f4944]">{{ row.licenseType || '-' }}</td>
+                  <td class="py-2.5 px-3 text-[#3f4944]">{{ row.licenseStatus || '-' }}</td>
+                  <td class="py-2.5 px-3 text-[#3f4944]">{{ row.eventDate || '-' }}</td>
+                  <td *ngIf="reportListType === 'relocation'" class="py-2.5 px-3 text-[#3f4944]">{{ row.newActivityLocation || '-' }}</td>
+                  <td class="py-2.5 px-3 font-semibold text-[#065f46]">{{ row.licenseCost | number }}</td>
+                </tr>
+                <tr *ngIf="reportList.length === 0">
+                  <td [attr.colspan]="reportListType === 'relocation' ? 10 : 9" class="py-8 text-center text-[#9ca3af] text-sm">هیچ موردی یافت نشد</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

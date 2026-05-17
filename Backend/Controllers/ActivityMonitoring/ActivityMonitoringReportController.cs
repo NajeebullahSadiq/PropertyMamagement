@@ -425,10 +425,29 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
             return new
             {
                 totalRecords = records.Count,
-                blockedCount = records.Count(x => x.ViolationStatus == "blocked"),
-                normalCount = records.Count(x => x.ViolationStatus == "normal"),
-                sealRemovedCount = records.Count(x => x.ViolationStatus == "sealRemoved")
+                blockedCount = records.Count(x => IsBlockedViolation(x.ViolationStatus)),
+                normalCount = records.Count(x => IsNormalViolation(x.ViolationStatus)),
+                sealRemovedCount = records.Count(x => IsSealRemovedViolation(x.ViolationStatus))
             };
+        }
+
+        private static bool IsBlockedViolation(string? status)
+        {
+            return status == "blocked"
+                || status == "منجر به مهرلاک"
+                || status == "منجر به مسدودی";
+        }
+
+        private static bool IsNormalViolation(string? status)
+        {
+            return status == "normal"
+                || status == "عادی";
+        }
+
+        private static bool IsSealRemovedViolation(string? status)
+        {
+            return status == "sealRemoved"
+                || status == "رفع مهرلاک";
         }
 
         private static object BuildInspectionSummary(List<ActivityMonitoringRecord> records, CalendarType calendar)
