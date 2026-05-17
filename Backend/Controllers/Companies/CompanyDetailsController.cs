@@ -493,9 +493,7 @@ namespace WebAPIBackend.Controllers.Companies
                 if (!string.IsNullOrWhiteSpace(request.Tin))
                 {
                     var normalizedTin = request.Tin.Trim();
-                    var existingTinCompany = await _context.CompanyDetails
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.Tin != null && c.Tin.Trim() == normalizedTin);
+                    var existingTinCompany = await FindBlockingTinDuplicateAsync(normalizedTin);
                     
                     if (existingTinCompany != null)
                     {
@@ -584,10 +582,7 @@ namespace WebAPIBackend.Controllers.Companies
                 if (!string.IsNullOrWhiteSpace(request.Tin))
                 {
                     var normalizedTin = request.Tin.Trim();
-                    var existingTinCompany = await _context.CompanyDetails
-                        .AsNoTracking()
-                        .Where(c => c.Id != id)
-                        .FirstOrDefaultAsync(c => c.Tin != null && c.Tin.Trim() == normalizedTin);
+                    var existingTinCompany = await FindBlockingTinDuplicateAsync(normalizedTin, id);
                     
                     if (existingTinCompany != null)
                     {
@@ -1963,6 +1958,41 @@ namespace WebAPIBackend.Controllers.Companies
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+
+        private async Task<CompanyDetail?> FindBlockingTinDuplicateAsync(string normalizedTin, int? excludedCompanyId = null)
+        {
+            var matchingTinCompaniesQuery = _context.CompanyDetails
+                .AsNoTracking()
+                .Where(c => c.Tin != null && c.Tin.Trim() == normalizedTin);
+
+            if (excludedCompanyId.HasValue)
+            {
+                matchingTinCompaniesQuery = matchingTinCompaniesQuery.Where(c => c.Id != excludedCompanyId.Value);
+            }
+
+            var matchingTinCompanies = await matchingTinCompaniesQuery.ToListAsync();
+            if (matchingTinCompanies.Count == 0)
+            {
+                return null;
+            }
+
+            var matchingCompanyIds = matchingTinCompanies.Select(c => c.Id).ToList();
+            var reusableCompanyIds = await _context.CompanyCancellationInfos
+                .AsNoTracking()
+                .Where(c => matchingCompanyIds.Contains(c.CompanyId)
+                    && c.Status != false
+                    && ((c.CancellationType == "\u0641\u0633\u062e"
+                            && !string.IsNullOrWhiteSpace(c.LicenseCancellationLetterNumber)
+                            && !string.IsNullOrWhiteSpace(c.RevenueCancellationLetterNumber))
+                        || (c.CancellationType == "\u0644\u063a\u0648\u0647"
+                            && !string.IsNullOrWhiteSpace(c.RevocationLetterNumber)
+                            && !string.IsNullOrWhiteSpace(c.RevocationRevenueLetterNumber))))
+                .Select(c => c.CompanyId)
+                .Distinct()
+                .ToListAsync();
+
+            return matchingTinCompanies.FirstOrDefault(c => !reusableCompanyIds.Contains(c.Id));
         }
 
         #endregion
