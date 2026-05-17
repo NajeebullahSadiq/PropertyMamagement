@@ -469,7 +469,7 @@
                     <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.petitionWriterName || '-' }}</td>
                     <td class="px-3 py-2 text-[#191c1e]">{{ row.complainantName || '-' }}</td>
                     <td class="px-3 py-2 text-[#191c1e]">{{ row.complaintSubject || '-' }}</td>
-                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ (row.registrationDate | calendarDate) || '-' }}</td>
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.complaintActionsTaken || '-' }}</td>
                   </tr>
                 </tbody>
@@ -526,7 +526,7 @@
                     </td>
                     <td class="px-3 py-2 text-[#191c1e]">{{ row.violationType || '-' }}</td>
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.activityPermissionReason || '-' }}</td>
-                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ (row.registrationDate | calendarDate) || '-' }}</td>
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.violationActionsTaken || '-' }}</td>
                   </tr>
                 </tbody>
@@ -568,7 +568,7 @@
                     <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.monitoringMonth || '-' }}</td>
                     <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ row.monitoringCount }}</td>
                     <td class="px-3 py-2 text-[#6f7973]">{{ row.monitoringRemarks || '-' }}</td>
-                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ row.registrationDate || '-' }}</td>
+                    <td class="px-3 py-2 text-center text-[#191c1e]">{{ (row.registrationDate | calendarDate) || '-' }}</td>
                   </tr>
                 </tbody>
                 <tfoot *ngIf="monitoringDetails.length > 0" class="bg-[#ecfdf5]">

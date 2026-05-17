@@ -265,7 +265,6 @@
                   <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">سته وسایط</th>
                   <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">مجموع سته‌ها</th>
                   <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">مالیات</th>
-                  <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">ثبت کننده</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#bec9c2]">
@@ -274,14 +273,13 @@
                   <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.licenseHolderName || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.companyTitle || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.district || '-' }}</td>
-                  <td class="px-3 py-2 text-center text-[#55615a]">{{ row.reportRegistrationDate || '-' }}</td>
+                  <td class="px-3 py-2 text-center text-[#55615a]">{{ (row.reportRegistrationDate | calendarDate) || '-' }}</td>
                   <td class="px-3 py-2 text-center text-[#004532] font-bold">{{ row.saleDeedsCount }}</td>
                   <td class="px-3 py-2 text-center text-[#004532] font-bold">{{ row.rentalDeedsCount }}</td>
                   <td class="px-3 py-2 text-center text-[#004532] font-bold">{{ row.baiUlWafaDeedsCount }}</td>
                   <td class="px-3 py-2 text-center text-[#004532] font-bold">{{ row.vehicleTransactionDeedsCount }}</td>
                   <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ row.totalDeedsCount }}</td>
                   <td class="px-3 py-2 text-center font-bold text-[#047857]">{{ formatNumber(row.taxAmount) }}</td>
-                  <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                 </tr>
               </tbody>
               <tfoot *ngIf="annualReportDetails.length > 0" class="bg-[#d9e6dd]">
@@ -293,7 +291,6 @@
                   <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ formatNumber(reportSummary.annualReport.vehicleTransactionDeedsCount || 0) }}</td>
                   <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ formatNumber(reportSummary.annualReport.totalDeedsCount || 0) }}</td>
                   <td class="px-3 py-2 text-center font-bold text-[#047857]">{{ formatNumber(reportSummary.annualReport.totalTaxAmount || 0) }}</td>
-                  <td class="px-3 py-2"></td>
                 </tr>
               </tfoot>
             </table>
@@ -324,7 +321,6 @@
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">موضوع شکایت</th>
                   <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">تاریخ ثبت</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">اجراآت</th>
-                  <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">ثبت کننده</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#bec9c2]">
@@ -334,9 +330,8 @@
                   <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.licenseHolderName || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.complainantName || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.complaintSubject || '-' }}</td>
-                  <td class="px-3 py-2 text-center text-[#55615a]">{{ row.reportRegistrationDate || '-' }}</td>
+                  <td class="px-3 py-2 text-center text-[#55615a]">{{ (row.reportRegistrationDate | calendarDate) || '-' }}</td>
                   <td class="px-3 py-2 text-[#6f7973]">{{ row.complaintActionsTaken || '-' }}</td>
-                  <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                 </tr>
               </tbody>
             </table>
@@ -384,7 +379,6 @@
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">نوعیت تخلف</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">علت مهرلاک</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">اجراآت</th>
-                  <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">ثبت کننده</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#bec9c2]">
@@ -392,7 +386,7 @@
                   <td class="px-3 py-2 text-[#6f7973]">{{ row.serialNumber || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.licenseNumber || '-' }}</td>
                   <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.licenseHolderName || '-' }}</td>
-                  <td class="px-3 py-2 text-center text-[#55615a]">{{ row.reportRegistrationDate || '-' }}</td>
+                  <td class="px-3 py-2 text-center text-[#55615a]">{{ (row.reportRegistrationDate | calendarDate) || '-' }}</td>
                   <td class="px-3 py-2 text-center">
                     <span [ngClass]="getViolationStatusClass(row.violationStatus)" class="px-2 py-1 rounded-full text-xs font-medium">
                       {{ getViolationStatusLabel(row.violationStatus) }}
@@ -401,7 +395,6 @@
                   <td class="px-3 py-2 text-[#55615a]">{{ row.violationType || '-' }}</td>
                   <td class="px-3 py-2 text-[#6f7973]">{{ row.closureReason || '-' }}</td>
                   <td class="px-3 py-2 text-[#6f7973]">{{ row.violationActionsTaken || '-' }}</td>
-                  <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
                 </tr>
               </tbody>
             </table>
@@ -434,7 +427,6 @@
                 <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">تعداد نظارت</th>
                 <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">ملاحظات</th>
                 <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">تاریخ ثبت</th>
-                <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">ثبت کننده</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#bec9c2]">
@@ -443,15 +435,14 @@
                 <td class="px-3 py-2 text-center text-[#55615a]">{{ row.month || '-' }}</td>
                 <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ row.monitoringCount }}</td>
                 <td class="px-3 py-2 text-[#6f7973]">{{ row.monitoringRemarks || '-' }}</td>
-                <td class="px-3 py-2 text-center text-[#55615a]">{{ row.reportRegistrationDate || '-' }}</td>
-                <td class="px-3 py-2 text-[#6f7973]">{{ row.createdBy }}</td>
+                <td class="px-3 py-2 text-center text-[#55615a]">{{ (row.reportRegistrationDate | calendarDate) || '-' }}</td>
               </tr>
             </tbody>
             <tfoot *ngIf="inspectionDetails.length > 0" class="bg-[#d9e6dd]">
               <tr>
                 <td colspan="2" class="px-3 py-2 font-bold text-[#191c1e]">مجموع</td>
                 <td class="px-3 py-2 text-center font-bold text-[#004532]">{{ formatNumber(reportSummary.inspection.totalMonitoringCount || 0) }}</td>
-                <td colspan="3" class="px-3 py-2"></td>
+                <td colspan="2" class="px-3 py-2"></td>
               </tr>
             </tfoot>
           </table>
@@ -548,7 +539,7 @@
                 <td class="px-4 py-3 text-sm text-[#191c1e] font-semibold">{{ item.licenseHolderName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.companyTitle || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.district || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-[#55615a]">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.reportRegistrationDateFormatted || (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#6f7973]">{{ item.createdBy || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
@@ -574,7 +565,7 @@
                 <td class="px-4 py-3 text-sm text-[#191c1e] font-semibold">{{ item.licenseHolderName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.complainantName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.complaintSubject || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-[#55615a]">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.reportRegistrationDateFormatted || (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">
                     <button (click)="viewRecord(item.id!)" class="p-2 text-[#004532] hover:bg-[#d9e6dd] rounded-lg transition-colors" title="مشاهده">
@@ -597,7 +588,7 @@
                 <td class="px-4 py-3 text-sm text-[#6f7973] font-medium">{{ item.serialNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.licenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.district || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-[#55615a]">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.reportRegistrationDateFormatted || (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3">
                   <span [ngClass]="getViolationStatusClass(item.violationStatus!)" class="px-2 py-1 rounded-full text-xs font-medium">
                     {{ getViolationStatusLabel(item.violationStatus!) }}
@@ -655,7 +646,7 @@
                     {{ getSectionTypeLabel(item.sectionType!) }}
                   </span>
                 </td>
-                <td class="px-4 py-3 text-sm text-[#55615a]">{{ (item.reportRegistrationDate | calendarDate) || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.reportRegistrationDateFormatted || (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.licenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e] font-semibold">{{ item.licenseHolderName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#6f7973]">{{ item.createdBy || '-' }}</td>

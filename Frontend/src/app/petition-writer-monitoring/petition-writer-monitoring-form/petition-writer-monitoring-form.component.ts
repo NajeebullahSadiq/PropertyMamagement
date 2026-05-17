@@ -228,8 +228,9 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
         });
 
         // Parse dates - raw dates are already Hijri Shamsi strings from backend
-        if (data.registrationDate) {
-            const date = this.parseDateString(data.registrationDate);
+        const registrationDate = data.registrationDateFormatted || data.registrationDate;
+        if (registrationDate) {
+            const date = this.parseDateString(registrationDate);
             if (date) {
                 this.mainForm.patchValue({ registrationDate: date });
             }
@@ -245,20 +246,25 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
     parseDateString(dateStr: string): Date | string | null {
         if (!dateStr) return null;
         
-        // If already in Hijri Shamsi format (YYYY/MM/DD), return as-is
-        if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) {
-            return dateStr;
+        const normalized = dateStr.trim();
+        const dateParts = normalized.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/);
+        if (dateParts) {
+            const year = Number(dateParts[1]);
+            if (year >= 1300 && year <= 1599) {
+                return `${dateParts[1]}/${dateParts[2]}/${dateParts[3]}`;
+            }
         }
         
         try {
-            const parts = dateStr.split('/');
-            if (parts.length === 3) {
-                return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const date = new Date(normalized);
+            if (!Number.isNaN(date.getTime())) {
+                return this.calendarConversionService.formatDateForInput(date, CalendarType.HIJRI_SHAMSI);
             }
-            return new Date(dateStr);
         } catch {
             return null;
         }
+
+        return null;
     }
 
     onSectionTypeChange(): void {
@@ -517,11 +523,15 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
         }
     }
 
-    formatDate(date: Date): string {
-        const d = new Date(date);
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
+    formatDate(date: Date | string): string {
+        if (typeof date === 'string') {
+            return date.replace(/\//g, '-');
+        }
+
+        const calendarDate = this.calendarConversionService.fromGregorian(date, CalendarType.HIJRI_SHAMSI);
+        const year = calendarDate.year;
+        const month = String(calendarDate.month).padStart(2, '0');
+        const day = String(calendarDate.day).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
 

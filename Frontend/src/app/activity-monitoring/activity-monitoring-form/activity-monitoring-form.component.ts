@@ -17,6 +17,7 @@ import {
     DeedDocumentTypes,
     DeedItem
 } from 'src/app/models/ActivityMonitoring';
+import { CalendarType } from 'src/app/models/calendar-type';
 
 @Component({
     selector: 'app-activity-monitoring-form',
@@ -204,8 +205,9 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
         }
 
         // Parse dates - raw dates are already Hijri Shamsi strings from backend
-        if (data.reportRegistrationDate) {
-            const date = this.parseDateString(data.reportRegistrationDate);
+        const reportRegistrationDate = data.reportRegistrationDateFormatted || data.reportRegistrationDate;
+        if (reportRegistrationDate) {
+            const date = this.parseDateString(reportRegistrationDate);
             if (date) {
                 this.mainForm.patchValue({ reportRegistrationDate: date });
             }
@@ -284,22 +286,28 @@ export class ActivityMonitoringFormComponent extends BaseComponent implements On
     private parseDateString(dateStr: string): Date | string | null {
         if (!dateStr) return null;
         
-        // If already in Hijri Shamsi format (YYYY/MM/DD), return as-is
-        if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) {
-            return dateStr;
+        const normalized = dateStr.trim();
+        const dateParts = normalized.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/);
+        if (dateParts) {
+            const year = Number(dateParts[1]);
+            if (year >= 1300 && year <= 1599) {
+                return `${dateParts[1]}/${dateParts[2]}/${dateParts[3]}`;
+            }
         }
         
-        const calendar = this.calendarService.getSelectedCalendar();
-        return this.calendarConversionService.parseInputDate(dateStr, calendar);
+        const date = new Date(normalized);
+        if (!Number.isNaN(date.getTime())) {
+            return this.calendarConversionService.formatDateForInput(date, CalendarType.HIJRI_SHAMSI);
+        }
+
+        return null;
     }
 
     private formatDateForBackend(dateValue: any): string {
         if (!dateValue) return '';
         
-        const currentCalendar = this.calendarService.getSelectedCalendar();
-
         if (dateValue instanceof Date) {
-            return this.calendarConversionService.formatDate(dateValue, currentCalendar).replace(/\//g, '-');
+            return this.calendarConversionService.formatDate(dateValue, CalendarType.HIJRI_SHAMSI).replace(/\//g, '-');
         } else if (typeof dateValue === 'string') {
             return dateValue.replace(/\//g, '-');
         }

@@ -65,7 +65,7 @@
             </div>
             <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
               <div class="flex items-center gap-2 mb-1"><i class="fas fa-calendar text-[#004532] text-xs"></i><span class="text-xs text-[#6f7973]">تاریخ ثبت</span></div>
-              <p class="text-sm font-semibold text-[#191c1e]">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.reportRegistrationDateFormatted || (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
             <div class="bg-[#ecfdf5] rounded-xl border border-[#a7f3d0] p-3">
               <div class="flex items-center gap-2 mb-1"><i class="fas fa-money-bill text-[#059669] text-xs"></i><span class="text-xs text-[#059669]">مقدار مالیات</span></div>
@@ -142,7 +142,7 @@
             </div>
             <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
               <div class="flex items-center gap-2 mb-1"><i class="fas fa-calendar text-[#92400e] text-xs"></i><span class="text-xs text-[#6f7973]">تاریخ ثبت</span></div>
-              <p class="text-sm font-semibold text-[#191c1e]">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.reportRegistrationDateFormatted || (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
           <div class="border-t border-[#eceef0] my-4"></div>
@@ -198,7 +198,7 @@
             </div>
             <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
               <div class="flex items-center gap-2 mb-1"><i class="fas fa-calendar text-[#ba1a1a] text-xs"></i><span class="text-xs text-[#6f7973]">تاریخ ثبت</span></div>
-              <p class="text-sm font-semibold text-[#191c1e]">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.reportRegistrationDateFormatted || (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
           <div class="border-t border-[#eceef0] my-4"></div>
@@ -246,7 +246,7 @@
             </div>
             <div class="bg-[#f7f9fb] rounded-xl border border-[#eceef0] p-3">
               <div class="flex items-center gap-2 mb-1"><i class="fas fa-calendar text-[#44546a] text-xs"></i><span class="text-xs text-[#6f7973]">تاریخ ثبت</span></div>
-              <p class="text-sm font-semibold text-[#191c1e]">{{ (record.reportRegistrationDate | calendarDate) || '-' }}</p>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.reportRegistrationDateFormatted || (record.reportRegistrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
           <div class="border-t border-[#eceef0] my-4"></div>

@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { CalendarService } from './calendar.service';
 import { CalendarConversionService } from './calendar-conversion.service';
+import { CalendarType } from '../models/calendar-type';
 
 @Pipe({
   name: 'calendarDate',
@@ -8,7 +8,6 @@ import { CalendarConversionService } from './calendar-conversion.service';
 })
 export class CalendarDatePipe implements PipeTransform {
   constructor(
-    private calendarService: CalendarService,
     private conversionService: CalendarConversionService
   ) {}
 
@@ -17,9 +16,20 @@ export class CalendarDatePipe implements PipeTransform {
       return '';
     }
 
-    // If it's already a Hijri Shamsi string (YYYY/MM/DD format), return as-is
-    if (typeof value === 'string' && /^\d{4}\/\d{2}\/\d{2}$/.test(value)) {
-      return value;
+    if (typeof value === 'string') {
+      const normalized = value.trim();
+      const dateParts = normalized.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})/);
+
+      if (dateParts) {
+        const year = Number(dateParts[1]);
+        if (year >= 1300 && year <= 1599) {
+          return `${dateParts[1]}/${dateParts[2]}/${dateParts[3]}`;
+        }
+      }
+
+      if (/^\d{4}\/\d{2}\/\d{2}$/.test(normalized)) {
+        return normalized;
+      }
     }
 
     const d = typeof value === 'string' ? new Date(value) : value;
@@ -27,7 +37,7 @@ export class CalendarDatePipe implements PipeTransform {
       return '';
     }
 
-    const calendarType = this.calendarService.getSelectedCalendar();
-    return this.conversionService.formatDate(d, calendarType);
+    // The application displays dates in Hijri Shamsi regardless of browser locale/calendar settings.
+    return this.conversionService.formatDate(d, CalendarType.HIJRI_SHAMSI);
   }
 }

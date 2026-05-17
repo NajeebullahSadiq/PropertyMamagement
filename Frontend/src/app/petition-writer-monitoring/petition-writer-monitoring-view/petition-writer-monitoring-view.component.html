@@ -61,7 +61,7 @@
                 <i class="fas fa-calendar text-[#004532] text-xs"></i>
                 <span class="text-xs text-[#6f7973]">تاریخ ثبت</span>
               </div>
-              <p class="text-sm font-semibold text-[#191c1e]">{{ (record.registrationDate | calendarDate) || '-' }}</p>
+              <p class="text-sm font-semibold text-[#191c1e]">{{ record.registrationDateFormatted || (record.registrationDate | calendarDate) || '-' }}</p>
             </div>
           </div>
         </div>
