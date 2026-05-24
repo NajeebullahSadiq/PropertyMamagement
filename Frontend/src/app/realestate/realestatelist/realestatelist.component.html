@@ -360,7 +360,7 @@
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.ownerFullName || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.ownerFatherName || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseNumber || '-' }}</td>
-                    <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseType || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ getLicenseTypeDari(r.licenseType) }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseCategory || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.issueDate || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.expireDate || '-' }}</td>
@@ -418,7 +418,7 @@
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseNumber || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.issueDate || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.guarantor || '-' }}</td>
-                    <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseType || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ getLicenseTypeDari(r.licenseType) }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseCategory || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.expireDate || '-' }}</td>
                     <td class="px-3 py-2 font-medium text-[#0d9488]">{{ r.transferLocation }}</td>
@@ -469,7 +469,7 @@
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseNumber || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.issueDate || '-' }}</td>
                     <td class="px-3 py-2 text-[#4a5568]">{{ r.guarantor || '-' }}</td>
-                    <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseType || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ getLicenseTypeDari(r.licenseType) }}</td>
                     <td class="px-3 py-2 font-medium text-[#dc2626]">{{ r.expireDate }}</td>
                   </tr>
                   <tr *ngIf="!inactiveList.length"><td colspan="9" class="px-4 py-6 text-center text-[#9ca3af] text-xs">داده‌ای یافت نشد</td></tr>

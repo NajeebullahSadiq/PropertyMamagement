@@ -37,6 +37,22 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
   canEdit: boolean = false;
   canPrint: boolean = false;
   private searchSubject = new Subject<string>();
+  private readonly licenseTypeDariLabels: { [key: string]: string } = {
+    realestate: '\u0627\u0645\u0644\u0627\u06a9',
+    'real estate': '\u0627\u0645\u0644\u0627\u06a9',
+    property: '\u0627\u0645\u0644\u0627\u06a9',
+    '\u0627\u0645\u0644\u0627\u06a9': '\u0627\u0645\u0644\u0627\u06a9',
+    '\u0639\u0642\u0627\u0631': '\u0627\u0645\u0644\u0627\u06a9',
+    '\u0645\u0644\u06a9\u06cc\u062a': '\u0627\u0645\u0644\u0627\u06a9',
+    carsale: '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631',
+    'car sale': '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631',
+    vehicle: '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631',
+    car: '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631',
+    motor: '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631',
+    '\u0645\u0648\u067c\u0631 \u0641\u0631\u0648\u0634\u06cc': '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631',
+    '\u0645\u0648\u062a\u0631 \u0641\u0631\u0648\u0634\u06cc': '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631',
+    '\u0645\u0648\u062a\u0631': '\u0641\u0631\u0648\u0634 \u0645\u0648\u062a\u0631'
+  };
 
   // Report fields
   showReports = false;
@@ -236,6 +252,14 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
     return this.activeFilterTab === tab;
   }
 
+  getLicenseTypeDari(licenseType: any): string {
+    if (!licenseType) return '-';
+
+    const originalValue = String(licenseType).trim();
+    const normalizedValue = originalValue.toLowerCase();
+    return this.licenseTypeDariLabels[normalizedValue] || originalValue;
+  }
+
   /**
    * Convert Gregorian Date object to Hijri Shamsi string format (YYYY/MM/DD)
    */
@@ -368,7 +392,7 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
 
     this.licenseCategoryList.forEach((r, i) => rows.push([
       i + 1, r.companyTitle, r.ownerFullName, r.ownerFatherName,
-      r.licenseNumber, r.licenseType, r.licenseCategory,
+      r.licenseNumber, this.getLicenseTypeDari(r.licenseType), r.licenseCategory,
       r.issueDate, r.expireDate, r.renewalRound,
       r.duplicateIssueDate, r.guarantor, r.royaltyAmount, r.penaltyAmount
     ]));
@@ -399,7 +423,7 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
     this.transferList.forEach((r, i) => rows.push([
       i + 1, r.companyTitle, r.ownerFullName, r.ownerFatherName,
       r.licenseNumber, r.issueDate, r.guarantor,
-      r.licenseType, r.licenseCategory, r.expireDate,
+      this.getLicenseTypeDari(r.licenseType), r.licenseCategory, r.expireDate,
       r.transferLocation, r.royaltyAmount, r.penaltyAmount
     ]));
     this.downloadCsv(rows, 'transfer-location-list');
@@ -428,7 +452,7 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
     this.inactiveList.forEach((r, i) => rows.push([
       i + 1, r.title, r.ownerFullName, r.ownerFatherName,
       r.licenseNumber, r.issueDate, r.guarantor,
-      r.licenseType, r.expireDate
+      this.getLicenseTypeDari(r.licenseType), r.expireDate
     ]));
     this.downloadCsv(rows, 'inactive-companies-list');
   }
