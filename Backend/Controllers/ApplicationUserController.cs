@@ -476,11 +476,36 @@ namespace WebAPI.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
+            var companyIds = users
+                .Where(u => u.CompanyId > 0)
+                .Select(u => u.CompanyId)
+                .Distinct()
+                .ToList();
+
+            var companyLicenses = await _context.LicenseDetails
+                .AsNoTracking()
+                .Where(l => l.CompanyId.HasValue && companyIds.Contains(l.CompanyId.Value) && l.Status != false)
+                .Select(l => new
+                {
+                    l.CompanyId,
+                    l.LicenseType,
+                    l.LicenseNumber,
+                    l.Id
+                })
+                .ToListAsync();
+
             var userList = new List<object>();
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
                 var primaryRole = roles.FirstOrDefault() ?? user.UserRole ?? "";
+                var licenseNumber = companyLicenses
+                    .Where(l => l.CompanyId == user.CompanyId)
+                    .OrderByDescending(l => l.LicenseType == user.LicenseType)
+                    .ThenByDescending(l => l.Id)
+                    .Select(l => l.LicenseNumber)
+                    .FirstOrDefault();
+
                 userList.Add(new
                 {
                     user.Id,
@@ -491,6 +516,7 @@ namespace WebAPI.Controllers
                     user.PhoneNumber,
                     user.CompanyId,
                     user.LicenseType,
+                    LicenseNumber = licenseNumber,
                     user.IsLocked,
                     user.PhotoPath,
                     user.CreatedAt,

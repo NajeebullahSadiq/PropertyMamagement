@@ -1371,62 +1371,8 @@ namespace WebAPIBackend.Controllers.Companies
                 // Get all-time cancellations count (no date filter)
                 var totalCancellationsAllTime = await _context.CompanyCancellationInfos.AsNoTracking().Where(x => x.Status != false).CountAsync();
 
-                // Get companies status based on license expiry date
-                var allCompaniesQuery = _context.CompanyDetails.AsNoTracking().AsQueryable();
-                allCompaniesQuery = _provinceFilter.ApplyProvinceFilter(allCompaniesQuery);
-                
-                // Apply province filter if specified
-                if (provinceId.HasValue && provinceId.Value > 0)
-                {
-                    allCompaniesQuery = allCompaniesQuery.Where(c => c.ProvinceId == provinceId.Value);
-                }
-                
-                // Get all company IDs (filtered by province if specified)
-                var allCompanyIds = await allCompaniesQuery.Select(c => c.Id).ToListAsync();
-                
-                // Get licenses for these companies to check expiry dates and apply district filter
+                // The summary report date range is based on license issue date.
                 var today = DateOnly.FromDateTime(DateTime.Today);
-                var licensesForStatusQuery = _context.LicenseDetails
-                    .Where(l => l.CompanyId.HasValue && allCompanyIds.Contains(l.CompanyId.Value));
-                
-                // Apply district filter if specified
-                if (districtId.HasValue && districtId.Value > 0)
-                {
-                    licensesForStatusQuery = licensesForStatusQuery.Where(l => l.ProvinceId == districtId.Value);
-                }
-                
-                var licensesForStatus = await licensesForStatusQuery
-                    .Select(l => new { l.CompanyId, l.ExpireDate })
-                    .ToListAsync();
-                
-                // Group by company and get the latest expiry date for each company
-                var companyExpiryStatus = licensesForStatus
-                    .GroupBy(l => l.CompanyId)
-                    .Select(g => new
-                    {
-                        CompanyId = g.Key,
-                        LatestExpireDate = g.Max(l => l.ExpireDate),
-                        IsActive = g.Max(l => l.ExpireDate).HasValue && g.Max(l => l.ExpireDate) >= today
-                    })
-                    .ToList();
-                
-                // Count active and inactive companies based on license expiry (all-time)
-                var activeCompanies = companyExpiryStatus.Count(c => c.IsActive);
-                var inactiveCompanies = companyExpiryStatus.Count(c => !c.IsActive);
-                
-                // Add companies without licenses as inactive
-                var companiesWithoutLicenses = allCompanyIds.Count - companyExpiryStatus.Count;
-                inactiveCompanies += companiesWithoutLicenses;
-                
-                var totalCompanies = activeCompanies + inactiveCompanies;
-
-                // Count inactive companies whose license expired within the date range
-                // (دفتر‌های غیرفعال based on date range)
-                var inactiveInDateRange = companyExpiryStatus
-                    .Count(c => !c.IsActive
-                        && c.LatestExpireDate.HasValue
-                        && (!parsedStartDate.HasValue || c.LatestExpireDate >= parsedStartDate)
-                        && (!parsedEndDate.HasValue || c.LatestExpireDate <= parsedEndDate));
 
                 // Get licenses by category
                 var allowedCompanyIds = await _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
@@ -1468,6 +1414,26 @@ namespace WebAPIBackend.Controllers.Companies
                 // Get all licenses that match the criteria
                 var allLicenses = await licensesQuery.ToListAsync();
 
+                var companyExpiryStatus = allLicenses
+                    .Where(l => l.CompanyId.HasValue)
+                    .GroupBy(l => l.CompanyId!.Value)
+                    .Select(g =>
+                    {
+                        var latestExpireDate = g.Max(l => l.ExpireDate);
+                        return new
+                        {
+                            CompanyId = g.Key,
+                            LatestExpireDate = latestExpireDate,
+                            IsActive = latestExpireDate.HasValue && latestExpireDate >= today
+                        };
+                    })
+                    .ToList();
+
+                var activeCompanies = companyExpiryStatus.Count(c => c.IsActive);
+                var inactiveCompanies = companyExpiryStatus.Count(c => !c.IsActive);
+                var totalCompanies = companyExpiryStatus.Count;
+                var inactiveInDateRange = inactiveCompanies;
+
                 
                 // Group by LicenseCategory with proper handling of NULL/empty values
                 var licensesByCategory = allLicenses
@@ -1482,19 +1448,10 @@ namespace WebAPIBackend.Controllers.Companies
                     
                 var totalLicenses = licensesByCategory.Sum(l => l.count);
 
-                // Get guarantors by type
+                // Get guarantors by type for companies with licenses issued in the selected date range.
+                var issuedCompanyIds = companyExpiryStatus.Select(c => c.CompanyId).ToList();
                 var guarantorsQuery = _context.Guarantors
-                    .Where(x => x.Status != false && x.IsActive == true && x.CompanyId.HasValue && allowedCompanyIds.Contains(x.CompanyId.Value));
-                if (parsedStartDate.HasValue)
-                {
-                    var startDateTime = parsedStartDate.Value.ToDateTime(TimeOnly.MinValue);
-                    guarantorsQuery = guarantorsQuery.Where(x => x.CreatedAt >= startDateTime);
-                }
-                if (parsedEndDate.HasValue)
-                {
-                    var endDateTime = parsedEndDate.Value.ToDateTime(TimeOnly.MaxValue);
-                    guarantorsQuery = guarantorsQuery.Where(x => x.CreatedAt <= endDateTime);
-                }
+                    .Where(x => x.Status != false && x.IsActive == true && x.CompanyId.HasValue && issuedCompanyIds.Contains(x.CompanyId.Value));
                 var guarantorsByType = await guarantorsQuery
                     .Where(g => g.GuaranteeTypeId.HasValue)
                     .GroupBy(g => g.GuaranteeTypeId!.Value)
@@ -1890,7 +1847,7 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         /// <summary>
-        /// Get list of inactive companies (license expired within date range)
+        /// Get list of inactive companies with licenses issued within date range
         /// </summary>
         [HttpGet("reports/inactive-companies-list")]
         public async Task<IActionResult> GetInactiveCompaniesList(
@@ -1912,7 +1869,7 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var companiesQuery = _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails.AsNoTracking());
 
-                // Get companies whose latest license expired within the date range
+                // Get inactive companies whose latest license was issued within the date range.
                 var result = await companiesQuery
                     .Select(c => new
                     {
@@ -1930,13 +1887,14 @@ namespace WebAPIBackend.Controllers.Companies
                     })
                     .ToListAsync();
 
-                // Filter in memory: expired (< today) and expiry within date range
+                // Filter in memory: inactive by expiry, date range by issue date.
                 var filtered = result
                     .Where(c => c.ExpireDate.HasValue
                         && c.ExpireDate < today
-                        && (!parsedStart.HasValue || c.ExpireDate >= parsedStart)
-                        && (!parsedEnd.HasValue || c.ExpireDate <= parsedEnd))
-                    .OrderBy(c => c.ExpireDate)
+                        && c.IssueDate.HasValue
+                        && (!parsedStart.HasValue || c.IssueDate >= parsedStart)
+                        && (!parsedEnd.HasValue || c.IssueDate <= parsedEnd))
+                    .OrderBy(c => c.IssueDate)
                     .Select(c => new
                     {
                         c.Id,

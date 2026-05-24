@@ -108,6 +108,7 @@
               <th class="px-4 py-4">ایمیل</th>
               <th class="px-4 py-4">نقش</th>
               <th *ngIf="activeTab === 'company'" class="px-4 py-4">نوع جواز</th>
+              <th *ngIf="activeTab === 'company'" class="px-4 py-4">نمبر جواز دفتر</th>
               <th class="px-4 py-4">وضعیت</th>
               <th class="px-4 py-4">تاریخ ایجاد</th>
               <th class="px-4 py-4 w-40">عملیات</th>
@@ -151,6 +152,11 @@
                   {{ getLicenseTypeText(user.licenseType) }}
                 </span>
               </td>
+              <td *ngIf="activeTab === 'company'" class="px-4 py-3 text-sm text-[#6f7973]">
+                <span class="text-sm font-mono text-[#6f7973] bg-[#f7f9fb] px-2 py-1 rounded inline-block">
+                  {{ user.licenseNumber || '—' }}
+                </span>
+              </td>
               <td class="px-4 py-3">
                 <span class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
                   [ngClass]="user.isLocked ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'">
@@ -183,7 +189,7 @@
             </tr>
 
             <tr *ngIf="users.length === 0">
-              <td [attr.colspan]="activeTab === 'company' ? 9 : 8" class="py-20 text-center">
+              <td [attr.colspan]="activeTab === 'company' ? 10 : 8" class="py-20 text-center">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#f7f9fb] mb-4">
                   <i class="fas fa-users text-4xl text-[#bec9c2]"></i>
                 </div>

@@ -19,6 +19,7 @@ export interface UserData {
   phoneNumber: string;
   companyId: number;
   licenseType: string;
+  licenseNumber: string;
   isLocked: boolean;
   photoPath: string;
   createdAt: string;
