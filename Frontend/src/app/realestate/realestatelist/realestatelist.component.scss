@@ -31,6 +31,8 @@
 .tab-active-purple { background: #7c3aed; color: #fff; &:hover { background: #6d28d9; } }
 .tab-active-red { background: #dc2626; color: #fff; &:hover { background: #b91c1c; } }
 .tab-active-orange { background: #ea580c; color: #fff; &:hover { background: #c2410c; } }
+.tab-active-green { background: #059669; color: #fff; &:hover { background: #047857; } }
+.tab-active-blue { background: #2563eb; color: #fff; &:hover { background: #1d4ed8; } }
 .tab-active-teal { background: #0d9488; color: #fff; &:hover { background: #0f766e; } }
 .tab-active-gray { background: #4b5563; color: #fff; &:hover { background: #374151; } }
 .btn-sm-red {
@@ -47,6 +49,14 @@
   font-size: 0.75rem; font-weight: 600; border-radius: 0.375rem;
   border: none; cursor: pointer; transition: background 0.15s;
   &:hover:not(:disabled) { background: #c2410c; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+.btn-sm-blue {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.375rem 0.75rem; background: #2563eb; color: #fff;
+  font-size: 0.75rem; font-weight: 600; border-radius: 0.375rem;
+  border: none; cursor: pointer; transition: background 0.15s;
+  &:hover:not(:disabled) { background: #1d4ed8; }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .btn-sm-teal {

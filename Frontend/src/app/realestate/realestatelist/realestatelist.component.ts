@@ -60,6 +60,12 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
   laghwaList: any[] = [];
   isLoadingLaghwa = false;
 
+  licenseCategoryStartDate: any = '';
+  licenseCategoryEndDate: any = '';
+  licenseCategoryList: any[] = [];
+  isLoadingLicenseCategory = false;
+  activeLicenseCategory: 'جدید' | 'تجدید' | 'مثنی' = 'جدید';
+
   transferStartDate: any = '';
   transferEndDate: any = '';
   transferList: any[] = [];
@@ -217,6 +223,13 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
 
   setFilterTab(tab: string): void {
     this.activeFilterTab = tab;
+    const previousCategory = this.activeLicenseCategory;
+    if (tab === 'new-license') this.activeLicenseCategory = 'جدید';
+    if (tab === 'renewal-license') this.activeLicenseCategory = 'تجدید';
+    if (tab === 'duplicate-license') this.activeLicenseCategory = 'مثنی';
+    if (previousCategory !== this.activeLicenseCategory) {
+      this.licenseCategoryList = [];
+    }
   }
 
   isTab(tab: string): boolean {
@@ -317,6 +330,50 @@ export class RealestatelistComponent extends BaseComponent implements OnInit, On
       r.revocationLetterDate, r.remarks
     ]));
     this.downloadCsv(rows, 'laghwa-list');
+  }
+
+  // ---- license category lists: جدید / تجدید / مثنی ----
+  loadLicenseCategoryList(): void {
+    if (!this.licenseCategoryStartDate || !this.licenseCategoryEndDate) {
+      this.toastr.warning('لطفاً تاریخ شروع و پایان را وارد کنید');
+      return;
+    }
+    this.isLoadingLicenseCategory = true;
+    this.comservice.getLicenseCategoryList(
+      this.activeLicenseCategory,
+      this.toHijriString(this.licenseCategoryStartDate),
+      this.toHijriString(this.licenseCategoryEndDate)
+    ).subscribe({
+      next: (data) => {
+        this.licenseCategoryList = data.items || [];
+        this.isLoadingLicenseCategory = false;
+      },
+      error: () => {
+        this.toastr.error(`خطا در بارگذاری لیست ${this.activeLicenseCategory}`);
+        this.isLoadingLicenseCategory = false;
+      }
+    });
+  }
+
+  exportLicenseCategoryToExcel(): void {
+    if (!this.licenseCategoryList.length) {
+      this.toastr.warning('داده‌ای برای صادرات وجود ندارد');
+      return;
+    }
+
+    const rows: any[] = [
+      [`لیست ${this.activeLicenseCategory}`],
+      ['#', 'عنوان رهنمایی معاملات', 'نام مالک', 'نام پدر مالک', 'نمبر جواز', 'نوع جواز', 'نوعیت جواز', 'تاریخ صدور جواز', 'تاریخ ختم جواز', 'دور تجدید', 'تاریخ صدور مثنی', 'تضمین کننده', 'حق‌الامتیاز', 'جریمه']
+    ];
+
+    this.licenseCategoryList.forEach((r, i) => rows.push([
+      i + 1, r.companyTitle, r.ownerFullName, r.ownerFatherName,
+      r.licenseNumber, r.licenseType, r.licenseCategory,
+      r.issueDate, r.expireDate, r.renewalRound,
+      r.duplicateIssueDate, r.guarantor, r.royaltyAmount, r.penaltyAmount
+    ]));
+
+    this.downloadCsv(rows, `${this.activeLicenseCategory}-license-list`);
   }
 
   // ---- محل انتقال list ----

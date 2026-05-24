@@ -41,6 +41,9 @@
           <button (click)="setFilterTab('summary')" [class]="isTab('summary') ? 'tab-btn tab-active-purple' : 'tab-btn'"><i class="fas fa-chart-pie ml-1"></i> خلاصه آماری</button>
           <button (click)="setFilterTab('faskh')" [class]="isTab('faskh') ? 'tab-btn tab-active-red' : 'tab-btn'"><i class="fas fa-file-circle-xmark ml-1"></i> لیست فسخ</button>
           <button (click)="setFilterTab('laghwa')" [class]="isTab('laghwa') ? 'tab-btn tab-active-orange' : 'tab-btn'"><i class="fas fa-ban ml-1"></i> لیست لغوه</button>
+          <button (click)="setFilterTab('new-license')" [class]="isTab('new-license') ? 'tab-btn tab-active-green' : 'tab-btn'"><i class="fas fa-certificate ml-1"></i> لیست جدید</button>
+          <button (click)="setFilterTab('renewal-license')" [class]="isTab('renewal-license') ? 'tab-btn tab-active-blue' : 'tab-btn'"><i class="fas fa-rotate ml-1"></i> لیست تجدید</button>
+          <button (click)="setFilterTab('duplicate-license')" [class]="isTab('duplicate-license') ? 'tab-btn tab-active-purple' : 'tab-btn'"><i class="fas fa-copy ml-1"></i> لیست مثنی</button>
           <button (click)="setFilterTab('transfer')" [class]="isTab('transfer') ? 'tab-btn tab-active-teal' : 'tab-btn'"><i class="fas fa-location-arrow ml-1"></i> لیست محل انتقال</button>
           <button (click)="setFilterTab('inactive')" [class]="isTab('inactive') ? 'tab-btn tab-active-gray' : 'tab-btn'"><i class="fas fa-times-circle ml-1"></i> دفتر‌های غیرفعال</button>
         </div>
@@ -311,6 +314,63 @@
                     <td class="px-3 py-2 text-[#9ca3af]">{{ r.remarks || '-' }}</td>
                   </tr>
                   <tr *ngIf="!laghwaList.length"><td colspan="11" class="px-4 py-6 text-center text-[#9ca3af] text-xs">داده‌ای یافت نشد</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: License Category Lists ===== -->
+        <div *ngIf="isTab('new-license') || isTab('renewal-license') || isTab('duplicate-license')">
+          <div class="flex flex-wrap gap-3 items-end mb-4">
+            <div class="min-w-[180px]"><app-multi-calendar-datepicker [(ngModel)]="licenseCategoryStartDate" label="از تاریخ" [required]="false"></app-multi-calendar-datepicker></div>
+            <div class="min-w-[180px]"><app-multi-calendar-datepicker [(ngModel)]="licenseCategoryEndDate" label="تا تاریخ" [required]="false"></app-multi-calendar-datepicker></div>
+            <button (click)="loadLicenseCategoryList()" [disabled]="isLoadingLicenseCategory" class="btn-sm-blue"><i class="fas fa-sync-alt" [class.fa-spin]="isLoadingLicenseCategory"></i> جستجو</button>
+            <button *ngIf="licenseCategoryList.length" (click)="exportLicenseCategoryToExcel()" class="btn-sm-green"><i class="fas fa-file-excel"></i> صادرات Excel</button>
+          </div>
+          <div class="bg-white rounded-xl border border-[#bfdbfe] overflow-hidden">
+            <div class="px-5 py-3 bg-[#eff6ff] border-b border-[#bfdbfe] flex items-center justify-between">
+              <h4 class="text-xs font-bold text-[#1e40af] flex items-center gap-2"><i class="fas fa-certificate"></i> لیست {{ activeLicenseCategory }}</h4>
+              <span class="text-xs text-[#2563eb]">تعداد: {{ licenseCategoryList.length }}</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead class="bg-[#f9fafb] border-b border-[#eceef0]">
+                  <tr class="text-center">
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">#</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">عنوان رهنمایی معاملات</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">نام مالک</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">نام پدر مالک</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">نمبر جواز</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">نوع جواز</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">نوعیت</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">تاریخ صدور جواز</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">تاریخ ختم</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">دور تجدید</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">تاریخ صدور مثنی</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">تضمین کننده</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">حق‌الامتیاز</th>
+                    <th class="px-3 py-3 font-bold text-[#4a5568]">جریمه</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#eceef0]">
+                  <tr *ngFor="let r of licenseCategoryList; let i=index" class="text-center hover:bg-[#eff6ff]">
+                    <td class="px-3 py-2 text-[#9ca3af]">{{ i+1 }}</td>
+                    <td class="px-3 py-2 font-medium text-[#1a2332]">{{ r.companyTitle }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.ownerFullName || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.ownerFatherName || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseNumber || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseType || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.licenseCategory || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.issueDate || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.expireDate || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.renewalRound || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.duplicateIssueDate || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.guarantor || '-' }}</td>
+                    <td class="px-3 py-2 text-[#4a5568]">{{ r.royaltyAmount ? (r.royaltyAmount | number) : '-' }}</td>
+                    <td class="px-3 py-2 text-[#dc2626]">{{ r.penaltyAmount ? (r.penaltyAmount | number) : '-' }}</td>
+                  </tr>
+                  <tr *ngIf="!licenseCategoryList.length"><td colspan="14" class="px-4 py-6 text-center text-[#9ca3af] text-xs">داده‌ای یافت نشد</td></tr>
                 </tbody>
               </table>
             </div>

@@ -1771,6 +1771,98 @@ namespace WebAPIBackend.Controllers.Companies
         }
 
         /// <summary>
+        /// Get list of licenses by category (جدید / تجدید / مثنی) within date range.
+        /// Uses DuplicateIssueDate for مثنی and IssueDate for other categories.
+        /// </summary>
+        [HttpGet("reports/license-category-list")]
+        public async Task<IActionResult> GetLicenseCategoryList(
+            [FromQuery] string category,
+            [FromQuery] string? startDate = null,
+            [FromQuery] string? endDate = null)
+        {
+            try
+            {
+                var allowedCategories = new[] { "جدید", "تجدید", "مثنی" };
+                if (string.IsNullOrWhiteSpace(category) || !allowedCategories.Contains(category))
+                    return BadRequest("Invalid category. Allowed values: جدید, تجدید, مثنی");
+
+                var calendar = CalendarType.HijriShamsi;
+                DateOnly? parsedStart = null;
+                DateOnly? parsedEnd = null;
+
+                if (!string.IsNullOrWhiteSpace(startDate) && DateConversionHelper.TryParseToDateOnly(startDate, calendar, out var s))
+                    parsedStart = s;
+                if (!string.IsNullOrWhiteSpace(endDate) && DateConversionHelper.TryParseToDateOnly(endDate, calendar, out var e))
+                    parsedEnd = e;
+
+                var allowedCompanyIds = await _provinceFilter.ApplyProvinceFilter(_context.CompanyDetails)
+                    .Select(c => c.Id).ToListAsync();
+
+                var query = _context.LicenseDetails
+                    .Include(l => l.Company)
+                        .ThenInclude(c => c!.CompanyOwners)
+                    .Include(l => l.Company)
+                        .ThenInclude(c => c!.Guarantors)
+                    .AsSplitQuery()
+                    .Where(l => l.CompanyId.HasValue
+                        && allowedCompanyIds.Contains(l.CompanyId.Value)
+                        && l.LicenseCategory == category);
+
+                if (parsedStart.HasValue)
+                {
+                    query = category == "مثنی"
+                        ? query.Where(l => l.DuplicateIssueDate.HasValue && l.DuplicateIssueDate >= parsedStart)
+                        : query.Where(l => l.IssueDate.HasValue && l.IssueDate >= parsedStart);
+                }
+
+                if (parsedEnd.HasValue)
+                {
+                    query = category == "مثنی"
+                        ? query.Where(l => l.DuplicateIssueDate.HasValue && l.DuplicateIssueDate <= parsedEnd)
+                        : query.Where(l => l.IssueDate.HasValue && l.IssueDate <= parsedEnd);
+                }
+
+                var result = await query
+                    .OrderBy(l => category == "مثنی" ? l.DuplicateIssueDate : l.IssueDate)
+                    .Select(l => new
+                    {
+                        companyId = l.CompanyId,
+                        companyTitle = l.Company != null ? l.Company.Title : "",
+                        ownerFullName = l.Company != null ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault() : null,
+                        ownerFatherName = l.Company != null ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault() : null,
+                        guarantor = l.Company != null ? l.Company.Guarantors.OrderBy(g => g.Id)
+                            .Select(g => (g.FirstName ?? "") + " " + (g.FatherName ?? "")).FirstOrDefault() : null,
+                        licenseNumber = l.LicenseNumber,
+                        licenseType = l.LicenseType,
+                        licenseCategory = l.LicenseCategory,
+                        issueDate = l.IssueDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(l.IssueDate, calendar) : "",
+                        expireDate = l.ExpireDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(l.ExpireDate, calendar) : "",
+                        renewalRound = l.RenewalRound,
+                        duplicateIssueDate = l.DuplicateIssueDate.HasValue
+                            ? DateConversionHelper.FormatDateOnly(l.DuplicateIssueDate, calendar) : "",
+                        royaltyAmount = l.RoyaltyAmount,
+                        penaltyAmount = l.PenaltyAmount
+                    })
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    items = result,
+                    totalCount = result.Count,
+                    category,
+                    startDate = parsedStart.HasValue ? DateConversionHelper.FormatDateOnly(parsedStart, calendar) : "",
+                    endDate = parsedEnd.HasValue ? DateConversionHelper.FormatDateOnly(parsedEnd, calendar) : ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Get list of licenses with محل انتقال (TransferLocation) within date range
         /// </summary>
         [HttpGet("reports/transfer-location-list")]

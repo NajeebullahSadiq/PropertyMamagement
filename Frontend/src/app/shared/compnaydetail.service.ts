@@ -242,6 +242,13 @@ export class CompnaydetailService {
     return this.http.get(url);
   }
 
+  getLicenseCategoryList(category: string, startDate?: string, endDate?: string): Observable<any> {
+    let url = `${this.baseUrl}/reports/license-category-list?category=${encodeURIComponent(category)}`;
+    if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
+    if (endDate) url += `&endDate=${encodeURIComponent(endDate)}`;
+    return this.http.get(url);
+  }
+
   getTransferLocationList(startDate?: string, endDate?: string): Observable<any> {
     let url = `${this.baseUrl}/reports/transfer-location-list?`;
     if (startDate) url += `startDate=${encodeURIComponent(startDate)}&`;
