@@ -1525,8 +1525,8 @@ namespace WebAPIBackend.Controllers.Companies
                     })
                     .ToList();
 
-                // Calculate revenue based on license type, including penalty amounts
-                // RoyaltyAmount + PenaltyAmount (if not null/zero) = total per license
+                // Calculate license revenue based on RoyaltyAmount only.
+                // PenaltyAmount is reported separately so it does not inflate license fee totals.
                 // The database stores English values: 'realEstate' and 'carSale'
                 var amlakLicenses = allLicenses
                     .Where(l => string.IsNullOrWhiteSpace(l.LicenseType) ||
@@ -1552,7 +1552,8 @@ namespace WebAPIBackend.Controllers.Companies
                     .Where(l => l.PenaltyAmount.HasValue && l.PenaltyAmount > 0)
                     .ToList();
                 var motorWithPenaltyCount = motorWithPenalty.Count;
-                var motorWithPenaltyRevenue = motorWithPenalty.Sum(l => (l.RoyaltyAmount ?? 0) + (l.PenaltyAmount ?? 0));
+                var motorWithPenaltyRevenue = motorWithPenalty.Sum(l => l.RoyaltyAmount ?? 0);
+                var motorPenaltyRevenue = motorWithPenalty.Sum(l => l.PenaltyAmount ?? 0);
 
                 // املاک: without penalty
                 var amlakWithoutPenalty = amlakLicenses
@@ -1566,13 +1567,15 @@ namespace WebAPIBackend.Controllers.Companies
                     .Where(l => l.PenaltyAmount.HasValue && l.PenaltyAmount > 0)
                     .ToList();
                 var amlakWithPenaltyCount = amlakWithPenalty.Count;
-                var amlakWithPenaltyRevenue = amlakWithPenalty.Sum(l => (l.RoyaltyAmount ?? 0) + (l.PenaltyAmount ?? 0));
+                var amlakWithPenaltyRevenue = amlakWithPenalty.Sum(l => l.RoyaltyAmount ?? 0);
+                var amlakPenaltyRevenue = amlakWithPenalty.Sum(l => l.PenaltyAmount ?? 0);
 
                 var amlakCount = amlakLicenses.Count;
                 var motorCount = motorLicenses.Count;
                 var amlakTotalRevenue = amlakWithoutPenaltyRevenue + amlakWithPenaltyRevenue;
                 var motorTotalRevenue = motorWithoutPenaltyRevenue + motorWithPenaltyRevenue;
                 var totalRevenue = amlakTotalRevenue + motorTotalRevenue;
+                var totalPenaltyRevenue = amlakPenaltyRevenue + motorPenaltyRevenue;
 
                 var licenseRevenueByType = new[]
                 {
@@ -1584,6 +1587,7 @@ namespace WebAPIBackend.Controllers.Companies
                         countWithPenalty = motorWithPenaltyCount,
                         revenueWithoutPenalty = motorWithoutPenaltyRevenue,
                         revenueWithPenalty = motorWithPenaltyRevenue,
+                        penaltyRevenue = motorPenaltyRevenue,
                         totalRevenue = motorTotalRevenue
                     },
                     new
@@ -1594,6 +1598,7 @@ namespace WebAPIBackend.Controllers.Companies
                         countWithPenalty = amlakWithPenaltyCount,
                         revenueWithoutPenalty = amlakWithoutPenaltyRevenue,
                         revenueWithPenalty = amlakWithPenaltyRevenue,
+                        penaltyRevenue = amlakPenaltyRevenue,
                         totalRevenue = amlakTotalRevenue
                     }
                 };
@@ -1618,6 +1623,7 @@ namespace WebAPIBackend.Controllers.Companies
                     totalGuarantors,
                     licenseRevenueByType,
                     totalRevenue,
+                    totalPenaltyRevenue,
                     transferLocationCount,
                     startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
                     endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
