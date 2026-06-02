@@ -49,6 +49,9 @@ CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_Status"
 CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_EntityType_EntityId" 
     ON audit."ComprehensiveAuditLogs"("EntityType", "EntityId");
 
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_EntityType_EntityId_ActionType" 
+    ON audit."ComprehensiveAuditLogs"("EntityType", "EntityId", "ActionType");
+
 CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_UserProvince" 
     ON audit."ComprehensiveAuditLogs"("UserProvince");
 

@@ -23,13 +23,15 @@ namespace WebAPIBackend.Controllers
         private UserManager<ApplicationUser> _userManager;
         private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
         private readonly ILookupCacheService _cache;
+        private readonly ICompanyService _companyService;
 
-        public PropertyDetailsController ( AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService, ILookupCacheService cache)
+        public PropertyDetailsController ( AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService, ILookupCacheService cache, ICompanyService companyService)
         {
             _context = context;
             _userManager = userManager;
             _auditService = auditService;
             _cache = cache;
+            _companyService = companyService;
         }
 
         private static readonly HashSet<string> AllowedPropertyTypeNames = new(StringComparer.OrdinalIgnoreCase)
@@ -296,6 +298,10 @@ namespace WebAPIBackend.Controllers
                         p.IssuanceDate,
                         p.SerialNumber,
                         p.TransactionDate,
+                        p.ApartmentNumber,
+                        p.Above,
+                        p.Below,
+                        p.PrivateDeedNumber,
                         p.FilePath,
                         p.PreviousDocumentsPath,
                         p.ExistingDocumentsPath,
@@ -536,6 +542,24 @@ namespace WebAPIBackend.Controllers
                     return StatusCode(403, new { message = "شما اجازه ایجاد سند ملکیت را ندارید" });
                 }
 
+                if (RbacHelper.ShouldFilterByCompany(roles, "property"))
+                {
+                    if (user.CompanyId == 0)
+                    {
+                        return StatusCode(403, new { message = "شما به هیچ رهنما متصل نیستید" });
+                    }
+
+                    var readiness = await _companyService.ValidateCompanyCanCreateRecordsAsync(user.CompanyId, user.LicenseType);
+                    if (!readiness.CanCreateRecords)
+                    {
+                        return StatusCode(403, new
+                        {
+                            message = readiness.Message,
+                            missingFields = readiness.MissingFields
+                        });
+                    }
+                }
+
                 var (isValid, errorMessage, normalizedCustomPropertyType) = await ValidateAndNormalizePropertyTypeAsync(request.PropertyTypeId, request.CustomPropertyType);
                 if (!isValid)
                 {
@@ -609,6 +633,10 @@ namespace WebAPIBackend.Controllers
                     IssuanceDate=issuanceDate,
                     SerialNumber=request.SerialNumber,
                     TransactionDate=transactionDate,
+                    ApartmentNumber=request.ApartmentNumber,
+                    Above=request.Above,
+                    Below=request.Below,
+                    PrivateDeedNumber=request.PrivateDeedNumber,
                     iscomplete = false,
                     iseditable = false
                     

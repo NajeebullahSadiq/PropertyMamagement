@@ -14,6 +14,16 @@ namespace WebAPIBackend.Services
         Task DeleteCompanyAsync(int id);
         Task UpdateLicenseCompletionStatusAsync(int companyId);
         Task UpdateLicenseStatusByExpiryAsync();
+        Task<CompanyReadinessResult> ValidateCompanyCanCreateRecordsAsync(int companyId, string? licenseType);
+    }
+
+    public class CompanyReadinessResult
+    {
+        public bool CanCreateRecords { get; set; }
+        public List<string> MissingFields { get; set; } = new();
+        public string Message => CanCreateRecords
+            ? "Company is ready to create records."
+            : $"حالت رهنما ناقص است. برای ثبت معامله ابتدا این معلومات را تکمیل کنید: {string.Join("، ", MissingFields)}";
     }
 
     public class CompanyService : ICompanyService
@@ -258,6 +268,84 @@ namespace WebAPIBackend.Services
             {
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<CompanyReadinessResult> ValidateCompanyCanCreateRecordsAsync(int companyId, string? licenseType)
+        {
+            var result = new CompanyReadinessResult();
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            await UpdateLicenseCompletionStatusAsync(companyId);
+
+            var company = await _context.CompanyDetails
+                .AsNoTracking()
+                .Include(c => c.CompanyOwners)
+                .Include(c => c.Guarantors)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(c => c.Id == companyId);
+
+            if (company == null)
+            {
+                result.MissingFields.Add("رهنما یافت نشد");
+                return result;
+            }
+
+            if (string.IsNullOrWhiteSpace(company.Title))
+            {
+                result.MissingFields.Add("عنوان رهنما");
+            }
+
+            var owner = company.CompanyOwners.FirstOrDefault();
+            if (owner == null)
+            {
+                result.MissingFields.Add("معلومات مالک");
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(owner.FirstName)) result.MissingFields.Add("نام مالک");
+                if (string.IsNullOrWhiteSpace(owner.FatherName)) result.MissingFields.Add("نام پدر مالک");
+                if (string.IsNullOrWhiteSpace(owner.ElectronicNationalIdNumber)) result.MissingFields.Add("نمبر تذکره الکترونیکی مالک");
+            }
+
+            var licenseQuery = _context.LicenseDetails
+                .AsNoTracking()
+                .Where(l => l.CompanyId == companyId);
+
+            if (!string.IsNullOrWhiteSpace(licenseType))
+            {
+                licenseQuery = licenseQuery.Where(l => l.LicenseType == licenseType);
+            }
+
+            var license = await licenseQuery.OrderByDescending(l => l.Id).FirstOrDefaultAsync();
+            if (license == null)
+            {
+                result.MissingFields.Add("معلومات جواز");
+            }
+            else
+            {
+                if (!license.IssueDate.HasValue) result.MissingFields.Add("تاریخ صدور جواز");
+                if (!license.ExpireDate.HasValue) result.MissingFields.Add("تاریخ ختم جواز");
+                if (license.ExpireDate.HasValue && license.ExpireDate.Value < today) result.MissingFields.Add("جواز منقضی شده است");
+                if (string.IsNullOrWhiteSpace(license.OfficeAddress)) result.MissingFields.Add("آدرس دفتر");
+                if (license.Status == false) result.MissingFields.Add("جواز غیرفعال است");
+                if (!license.IsComplete) result.MissingFields.Add("حالت جواز ناقص است");
+            }
+
+            var guarantor = company.Guarantors.FirstOrDefault();
+            if (guarantor == null)
+            {
+                result.MissingFields.Add("معلومات تضمین کننده");
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(guarantor.FirstName)) result.MissingFields.Add("نام تضمین کننده");
+                if (string.IsNullOrWhiteSpace(guarantor.FatherName)) result.MissingFields.Add("نام پدر تضمین کننده");
+                if (string.IsNullOrWhiteSpace(guarantor.ElectronicNationalIdNumber)) result.MissingFields.Add("نمبر تذکره الکترونیکی تضمین کننده");
+            }
+
+            result.MissingFields = result.MissingFields.Distinct().ToList();
+            result.CanCreateRecords = result.MissingFields.Count == 0;
+            return result;
         }
     }
 }

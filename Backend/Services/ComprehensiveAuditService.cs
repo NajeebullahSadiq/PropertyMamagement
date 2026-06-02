@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -84,9 +85,9 @@ namespace WebAPIBackend.Services
 
                 var auditLog = new ComprehensiveAuditLog
                 {
-                    UserId = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "System",
-                    UserName = user?.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? user?.Identity?.Name,
-                    UserRole = user?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value,
+                    UserId = GetClaimValue(user, "UserID", ClaimTypes.NameIdentifier) ?? "System",
+                    UserName = GetClaimValue(user, ClaimTypes.Name, "unique_name", "name") ?? user?.Identity?.Name,
+                    UserRole = GetClaimValue(user, ClaimTypes.Role, "role", "userRole"),
                     ActionType = actionType,
                     Module = module,
                     EntityType = entityType,
@@ -102,7 +103,7 @@ namespace WebAPIBackend.Services
                     Status = status,
                     ErrorMessage = errorMessage,
                     Metadata = metadata != null ? JsonSerializer.Serialize(metadata, _jsonOptions) : null,
-                    UserProvince = user?.FindFirst("ProvinceId")?.Value,
+                    UserProvince = GetClaimValue(user, CustomClaimTypes.ProvinceId, "ProvinceId", "provinceId"),
                     Timestamp = DateTime.UtcNow,
                     DurationMs = durationMs
                 };
@@ -112,6 +113,14 @@ namespace WebAPIBackend.Services
             }
             catch
             {
+                foreach (var entry in _context.ChangeTracker.Entries<ComprehensiveAuditLog>())
+                {
+                    if (entry.State == EntityState.Added)
+                    {
+                        entry.State = EntityState.Detached;
+                    }
+                }
+
                 // Silently ignore audit logging failures to not break main functionality
             }
         }
@@ -293,7 +302,34 @@ namespace WebAPIBackend.Services
                 }
             }
 
+            var realIp = httpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(realIp))
+            {
+                return realIp;
+            }
+
             return httpContext.Connection.RemoteIpAddress?.ToString();
+        }
+
+        private static string? GetClaimValue(System.Security.Claims.ClaimsPrincipal? user, params string[] claimTypes)
+        {
+            if (user == null)
+            {
+                return null;
+            }
+
+            foreach (var claimType in claimTypes)
+            {
+                var value = user.Claims.FirstOrDefault(c =>
+                    string.Equals(c.Type, claimType, StringComparison.OrdinalIgnoreCase))?.Value;
+
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            return null;
         }
     }
 }

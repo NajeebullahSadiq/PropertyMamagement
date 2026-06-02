@@ -59,7 +59,8 @@ namespace WebAPIBackend.Controllers
                 }
 
                 var activeQuery = propertyQuery
-                    .Where(p => !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == p.Id));
+                    .Where(p => p.iscomplete == true &&
+                                !_context.PropertyCancellations.Any(c => c.PropertyDetailsId == p.Id));
 
                 var totalCount = await activeQuery.CountAsync();
 
@@ -199,6 +200,11 @@ namespace WebAPIBackend.Controllers
                 if (property == null)
                 {
                     return NotFound(new { error = "Property not found" });
+                }
+
+                if (property.iscomplete != true)
+                {
+                    return BadRequest(new { error = "Incomplete property records cannot be cancelled" });
                 }
 
                 var existingCancellation = await _context.PropertyCancellations

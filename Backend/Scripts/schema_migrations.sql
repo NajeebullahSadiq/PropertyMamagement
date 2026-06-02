@@ -119,6 +119,68 @@ ON org."BuyerDetails"("PropertyDetailsId", "ElectronicNationalIdNumber");
 CREATE INDEX IF NOT EXISTS "IX_SellerDetails_PropertyDetailsId_ElectronicNationalIdNumber"
 ON org."SellerDetails"("PropertyDetailsId", "ElectronicNationalIdNumber");
 
--- ComprehensiveAuditLogs composite index for filtering by entity type + entity + action
-CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_EntityType_EntityId_Action"
-ON public."ComprehensiveAuditLogs"("EntityType", "EntityId", "Action");
+-- ComprehensiveAuditLogs table and indexes for audit-log module
+CREATE SCHEMA IF NOT EXISTS audit;
+
+CREATE TABLE IF NOT EXISTS audit."ComprehensiveAuditLogs" (
+    "Id" BIGSERIAL PRIMARY KEY,
+    "UserId" VARCHAR(450) NOT NULL,
+    "UserName" VARCHAR(200),
+    "UserRole" VARCHAR(100),
+    "ActionType" VARCHAR(50) NOT NULL,
+    "Module" VARCHAR(100) NOT NULL,
+    "EntityType" VARCHAR(100),
+    "EntityId" VARCHAR(100),
+    "Description" VARCHAR(1000) NOT NULL,
+    "DescriptionDari" VARCHAR(1000),
+    "OldValues" TEXT,
+    "NewValues" TEXT,
+    "IpAddress" VARCHAR(45),
+    "UserAgent" VARCHAR(500),
+    "RequestUrl" VARCHAR(500),
+    "HttpMethod" VARCHAR(10),
+    "Status" VARCHAR(50) NOT NULL DEFAULT 'Success',
+    "ErrorMessage" VARCHAR(1000),
+    "Metadata" TEXT,
+    "UserProvince" VARCHAR(100),
+    "Timestamp" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "DurationMs" BIGINT
+);
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_UserId"
+ON audit."ComprehensiveAuditLogs"("UserId");
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_ActionType"
+ON audit."ComprehensiveAuditLogs"("ActionType");
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_Module"
+ON audit."ComprehensiveAuditLogs"("Module");
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_Timestamp"
+ON audit."ComprehensiveAuditLogs"("Timestamp" DESC);
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_Status"
+ON audit."ComprehensiveAuditLogs"("Status");
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_EntityType_EntityId"
+ON audit."ComprehensiveAuditLogs"("EntityType", "EntityId");
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_EntityType_EntityId_ActionType"
+ON audit."ComprehensiveAuditLogs"("EntityType", "EntityId", "ActionType");
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_UserProvince"
+ON audit."ComprehensiveAuditLogs"("UserProvince");
+
+CREATE INDEX IF NOT EXISTS "IX_ComprehensiveAuditLogs_Module_ActionType_Timestamp"
+ON audit."ComprehensiveAuditLogs"("Module", "ActionType", "Timestamp" DESC);
+
+CREATE OR REPLACE VIEW audit."AuditStatistics" AS
+SELECT
+    DATE("Timestamp") AS "Date",
+    "Module",
+    "ActionType",
+    COUNT(*) AS "TotalCount",
+    COUNT(*) FILTER (WHERE "Status" = 'Success') AS "SuccessCount",
+    COUNT(*) FILTER (WHERE "Status" IN ('Failed', 'Error')) AS "FailedCount"
+FROM audit."ComprehensiveAuditLogs"
+GROUP BY DATE("Timestamp"), "Module", "ActionType";

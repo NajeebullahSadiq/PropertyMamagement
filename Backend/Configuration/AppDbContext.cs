@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Security.Claims;
+using System.Text.Json;
 using WebAPI.Models;
 using WebAPIBackend.Models;
 using WebAPIBackend.Models.Audit;
@@ -11,10 +15,12 @@ namespace WebAPIBackend.Configuration
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
+        private readonly IHttpContextAccessor? _httpContextAccessor;
+        private bool _savingAuditLogs;
 
-        public AppDbContext(DbContextOptions options) : base(options)
+        public AppDbContext(DbContextOptions options, IHttpContextAccessor? httpContextAccessor = null) : base(options)
         {
-
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
@@ -1557,6 +1563,354 @@ namespace WebAPIBackend.Configuration
 
         }
 
+        public override int SaveChanges()
+        {
+            var auditEntries = PrepareAuditEntries();
+            var result = base.SaveChanges();
+            SaveAuditEntries(auditEntries);
+            return result;
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var auditEntries = PrepareAuditEntries();
+            var result = await base.SaveChangesAsync(cancellationToken);
+            await SaveAuditEntriesAsync(auditEntries, cancellationToken);
+            return result;
+        }
+
+        private List<PendingAuditEntry> PrepareAuditEntries()
+        {
+            if (_savingAuditLogs)
+            {
+                return new List<PendingAuditEntry>();
+            }
+
+            return ChangeTracker.Entries()
+                .Where(entry => entry.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
+                .Where(ShouldAuditEntry)
+                .Select(entry => new PendingAuditEntry(
+                    entry,
+                    entry.State,
+                    GetEntityId(entry),
+                    entry.State == EntityState.Added ? null : GetPropertyValues(entry, true, entry.State == EntityState.Modified),
+                    entry.State == EntityState.Deleted ? null : GetPropertyValues(entry, false, entry.State == EntityState.Modified)))
+                .ToList();
+        }
+
+        private async Task SaveAuditEntriesAsync(List<PendingAuditEntry> auditEntries, CancellationToken cancellationToken)
+        {
+            if (auditEntries.Count == 0)
+            {
+                return;
+            }
+
+            var logs = auditEntries.Select(CreateAuditLog).ToList();
+
+            try
+            {
+                _savingAuditLogs = true;
+                ComprehensiveAuditLogs.AddRange(logs);
+                await base.SaveChangesAsync(cancellationToken);
+            }
+            catch
+            {
+                // Audit logging must never block the original business operation.
+                DetachAuditLogs(logs);
+            }
+            finally
+            {
+                _savingAuditLogs = false;
+            }
+        }
+
+        private void SaveAuditEntries(List<PendingAuditEntry> auditEntries)
+        {
+            if (auditEntries.Count == 0)
+            {
+                return;
+            }
+
+            var logs = auditEntries.Select(CreateAuditLog).ToList();
+
+            try
+            {
+                _savingAuditLogs = true;
+                ComprehensiveAuditLogs.AddRange(logs);
+                base.SaveChanges();
+            }
+            catch
+            {
+                // Audit logging must never block the original business operation.
+                DetachAuditLogs(logs);
+            }
+            finally
+            {
+                _savingAuditLogs = false;
+            }
+        }
+
+        private void DetachAuditLogs(IEnumerable<ComprehensiveAuditLog> logs)
+        {
+            foreach (var log in logs)
+            {
+                var entry = Entry(log);
+                if (entry.State != EntityState.Detached)
+                {
+                    entry.State = EntityState.Detached;
+                }
+            }
+        }
+
+        private bool ShouldAuditEntry(EntityEntry entry)
+        {
+            var entityType = entry.Metadata.ClrType;
+            var entityName = entityType.Name;
+            var schema = entry.Metadata.GetSchema();
+
+            if (entityType == typeof(ComprehensiveAuditLog) ||
+                entityName.EndsWith("audit", StringComparison.OrdinalIgnoreCase) ||
+                entityName.EndsWith("Audit", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(schema, "audit", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(schema, "log", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (entry.State == EntityState.Modified &&
+                !entry.Properties.Any(p => p.IsModified && !p.Metadata.IsShadowProperty()))
+            {
+                return false;
+            }
+
+            return !string.IsNullOrWhiteSpace(entry.Metadata.GetTableName());
+        }
+
+        private ComprehensiveAuditLog CreateAuditLog(PendingAuditEntry auditEntry)
+        {
+            var httpContext = _httpContextAccessor?.HttpContext;
+            var user = httpContext?.User;
+            var entry = auditEntry.Entry;
+            var entityType = entry.Metadata.ClrType.Name;
+            var actionType = GetActionType(auditEntry.State);
+            var entityId = string.IsNullOrWhiteSpace(auditEntry.EntityId) ? GetEntityId(entry) : auditEntry.EntityId;
+            var metadata = new
+            {
+                schema = entry.Metadata.GetSchema(),
+                table = entry.Metadata.GetTableName(),
+                route = httpContext?.Request.Path.Value,
+                queryString = httpContext?.Request.QueryString.Value
+            };
+
+            return new ComprehensiveAuditLog
+            {
+                UserId = GetClaimValue(user, "UserID", ClaimTypes.NameIdentifier) ?? "System",
+                UserName = GetClaimValue(user, ClaimTypes.Name, "unique_name", "name") ?? user?.Identity?.Name ?? "System",
+                UserRole = GetClaimValue(user, ClaimTypes.Role, "role", "userRole"),
+                ActionType = actionType,
+                Module = GetAuditModule(entry),
+                EntityType = entityType,
+                EntityId = entityId,
+                Description = $"{actionType} {entityType} with ID {entityId}",
+                DescriptionDari = GetDariDescription(actionType, entityType, entityId),
+                OldValues = SerializeAuditValue(auditEntry.OldValues),
+                NewValues = SerializeAuditValue(auditEntry.State == EntityState.Added
+                    ? GetPropertyValues(entry, false, false)
+                    : auditEntry.NewValues),
+                IpAddress = GetClientIpAddress(httpContext),
+                UserAgent = httpContext?.Request.Headers["User-Agent"].ToString(),
+                RequestUrl = httpContext?.Request.Path.Value,
+                HttpMethod = httpContext?.Request.Method,
+                Status = "Success",
+                Metadata = SerializeAuditValue(metadata),
+                UserProvince = GetClaimValue(user, CustomClaimTypes.ProvinceId, "ProvinceId", "provinceId"),
+                Timestamp = DateTime.UtcNow
+            };
+        }
+
+        private Dictionary<string, object?> GetPropertyValues(EntityEntry entry, bool useOriginalValues, bool onlyChanged)
+        {
+            var values = new Dictionary<string, object?>();
+
+            foreach (var property in entry.Properties)
+            {
+                if (property.Metadata.IsShadowProperty() || IsSensitiveProperty(property.Metadata.Name))
+                {
+                    continue;
+                }
+
+                if (onlyChanged && !property.IsModified)
+                {
+                    continue;
+                }
+
+                values[property.Metadata.Name] = useOriginalValues ? property.OriginalValue : property.CurrentValue;
+            }
+
+            return values;
+        }
+
+        private string? GetEntityId(EntityEntry entry)
+        {
+            var key = entry.Metadata.FindPrimaryKey();
+            if (key == null)
+            {
+                return null;
+            }
+
+            var keyValues = key.Properties
+                .Select(property => entry.Property(property.Name).CurrentValue?.ToString())
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .ToList();
+
+            return keyValues.Count == 0 ? null : string.Join(",", keyValues);
+        }
+
+        private string GetActionType(EntityState state)
+        {
+            return state switch
+            {
+                EntityState.Added => AuditActionTypes.Create,
+                EntityState.Modified => AuditActionTypes.Update,
+                EntityState.Deleted => AuditActionTypes.Delete,
+                _ => AuditActionTypes.Update
+            };
+        }
+
+        private string GetAuditModule(EntityEntry entry)
+        {
+            var entityName = entry.Metadata.ClrType.Name;
+
+            if (entityName.Contains("User", StringComparison.OrdinalIgnoreCase) ||
+                entityName.Contains("Role", StringComparison.OrdinalIgnoreCase) ||
+                entityName.Contains("Identity", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.UserManagement;
+
+            if (entityName.Contains("Company", StringComparison.OrdinalIgnoreCase) ||
+                entityName.Contains("Guarantor", StringComparison.OrdinalIgnoreCase) ||
+                entityName.Contains("License", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.Company;
+
+            if (entityName.Contains("Vehicle", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.Vehicle;
+
+            if (entityName.Contains("Property", StringComparison.OrdinalIgnoreCase) ||
+                entityName.Contains("Buyer", StringComparison.OrdinalIgnoreCase) ||
+                entityName.Contains("Seller", StringComparison.OrdinalIgnoreCase) ||
+                entityName.Contains("Witness", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.Property;
+
+            if (entityName.Contains("Securities", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.Securities;
+
+            if (entityName.Contains("PetitionWriter", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.PetitionWriter;
+
+            if (entityName.Contains("ActivityMonitoring", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.ActivityMonitoring;
+
+            if (entityName.Contains("Verification", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.Verification;
+
+            if (string.Equals(entry.Metadata.GetSchema(), "look", StringComparison.OrdinalIgnoreCase))
+                return AuditModules.DistrictManagement;
+
+            return AuditModules.System;
+        }
+
+        private string GetDariDescription(string actionType, string entityType, string? entityId)
+        {
+            var action = actionType switch
+            {
+                AuditActionTypes.Create => "ثبت",
+                AuditActionTypes.Update => "تغییر",
+                AuditActionTypes.Delete => "حذف",
+                _ => actionType
+            };
+
+            return $"{action} {entityType} با شماره {entityId}";
+        }
+
+        private static string? GetClaimValue(ClaimsPrincipal? user, params string[] claimTypes)
+        {
+            if (user == null)
+            {
+                return null;
+            }
+
+            foreach (var claimType in claimTypes)
+            {
+                var value = user.Claims.FirstOrDefault(c =>
+                    string.Equals(c.Type, claimType, StringComparison.OrdinalIgnoreCase))?.Value;
+
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        private string? GetClientIpAddress(HttpContext? httpContext)
+        {
+            if (httpContext == null)
+            {
+                return null;
+            }
+
+            var forwardedFor = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(forwardedFor))
+            {
+                return forwardedFor.Split(',', StringSplitOptions.TrimEntries).FirstOrDefault();
+            }
+
+            var realIp = httpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(realIp))
+            {
+                return realIp;
+            }
+
+            return httpContext.Connection.RemoteIpAddress?.ToString();
+        }
+
+        private string? SerializeAuditValue(object? value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            return JsonSerializer.Serialize(value, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
+        }
+
+        private bool IsSensitiveProperty(string propertyName)
+        {
+            var sensitiveNames = new[]
+            {
+                "PasswordHash",
+                "SecurityStamp",
+                "ConcurrencyStamp",
+                "AuthenticatorKey",
+                "RecoveryCodes",
+                "Token",
+                "JWT",
+                "Secret"
+            };
+
+            return sensitiveNames.Any(name => propertyName.Contains(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private sealed record PendingAuditEntry(
+            EntityEntry Entry,
+            EntityState State,
+            string? EntityId,
+            Dictionary<string, object?>? OldValues,
+            Dictionary<string, object?>? NewValues);
 
     }
 }

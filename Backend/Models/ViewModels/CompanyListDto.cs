@@ -15,5 +15,6 @@ namespace WebAPIBackend.Models.ViewModels
         public DateOnly? LicenseExpiryDate { get; set; }
         public string? Granator { get; set; }
         public bool? IsComplete { get; set; }
+        public string? CreatedBy { get; set; }
     }
 }

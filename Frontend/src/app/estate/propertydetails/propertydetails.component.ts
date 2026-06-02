@@ -151,6 +151,7 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
 
     const currentPropertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
     this.applyCustomPropertyTypeValidation(currentPropertyTypeId, true);
+    this.applyApartmentFieldValidation(currentPropertyTypeId);
   });
 
   this.propertyForm.get('propertyTypeId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(propertyTypeId => {
@@ -236,6 +237,7 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
                 below: (properties[0] as any).below || '',
                 privateDeedNumber: (properties[0] as any).privateDeedNumber || ''
               });
+              this.applyApartmentFieldValidation(this.propertyForm.get('propertyTypeId')?.value);
               this.imageName=properties.map(item => item.filePath).toString();
               this.previousDocumentsPath = properties[0].previousDocumentsPath || '';
               this.existingDocumentsPath = properties[0].existingDocumentsPath || '';
@@ -379,7 +381,8 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
     
     propertyDetails.calendarType = currentCalendar;
     
-    this.propertyDetailsService.addPropertyDetails(propertyDetails).subscribe(result => {
+    this.propertyDetailsService.addPropertyDetails(propertyDetails).subscribe({
+      next: (result) => {
       if(result.id!==0) {
        this.propertyDetailsService.updateMainTableId(result.id);
        this.selectedPropertyId=result.id;
@@ -387,6 +390,11 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
        // Notify property list to reload
        this.propertyDetailsService.propertyAdded.next();
        this.onNextClick();
+      }
+      },
+      error: (error) => {
+        const message = error?.error?.message || error?.error || 'خطا در ثبت معلومات';
+        this.toastr.error(message);
       }
     });
 }
@@ -797,6 +805,10 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
    */
   isApartmentPropertyType(): boolean {
     const propertyTypeId = this.propertyForm.get('propertyTypeId')?.value;
+    const selectedBackendPropertyType = this.propertypetype?.find((pt: any) => pt.id == propertyTypeId);
+    if (String(selectedBackendPropertyType?.name || '').toLowerCase() === 'apartment') {
+      return true;
+    }
     const selectedPropertyType = this.localizedPropertyTypes?.find((pt: any) => pt.id === propertyTypeId);
     return selectedPropertyType && selectedPropertyType.name === 'آپارتمان';
   }
@@ -814,6 +826,16 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
     }
 
     if (!this.localizedPropertyTypes || this.localizedPropertyTypes.length === 0) {
+      return;
+    }
+
+    if (this.isApartmentPropertyType()) {
+      apartmentNumberControl.setValidators([Validators.required]);
+      aboveControl.setValidators([Validators.required]);
+      belowControl.setValidators([Validators.required]);
+      apartmentNumberControl.updateValueAndValidity();
+      aboveControl.updateValueAndValidity();
+      belowControl.updateValueAndValidity();
       return;
     }
 
@@ -866,6 +888,10 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
   get above() { return this.propertyForm.get('above'); }
   get below() { return this.propertyForm.get('below'); }
   get privateDeedNumber() { return this.propertyForm.get('privateDeedNumber'); }
+
+  isEditing(): boolean {
+    return this.selectedPropertyId > 0 || this.id > 0;
+  }
 
 
 }

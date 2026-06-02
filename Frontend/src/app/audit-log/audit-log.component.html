@@ -1,277 +1,258 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 p-6">
-  <!-- Page Header -->
-  <div class="mb-6">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-          <mat-icon class="text-white text-2xl">history</mat-icon>
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold text-gray-800">لاگ فعالیت‌های سیستم</h1>
-          <p class="text-gray-500 text-sm">مشاهده و بررسی تمام فعالیت‌های سیستم</p>
-        </div>
+<section class="audit-page" dir="rtl">
+  <header class="audit-header">
+    <div class="audit-title-block">
+      <div class="audit-header-icon">
+        <mat-icon>manage_history</mat-icon>
       </div>
-      <div class="flex items-center gap-2">
-        <button (click)="toggleViewMode()" 
-                class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
-          <mat-icon>{{ viewMode === 'list' ? 'bar_chart' : 'list' }}</mat-icon>
-          <span>{{ viewMode === 'list' ? 'آمار' : 'لیست' }}</span>
-        </button>
-        <button (click)="exportLogs()" 
-                class="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:shadow-lg transition-all flex items-center gap-2">
-          <mat-icon>download</mat-icon>
-          <span>صادر کردن</span>
-        </button>
+      <div>
+        <p class="audit-kicker">System Audit Trail</p>
+        <h1>لاگ فعالیت‌های سیستم</h1>
+        <p>ردیابی فعالیت‌ها، تغییرات داده‌ها، ورود کاربران و خطاهای سیستم</p>
       </div>
     </div>
-  </div>
 
-  <!-- Filters Section -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-    <div class="flex items-center justify-between mb-4">
-      <button (click)="showFilters = !showFilters" 
-              class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors">
-        <mat-icon>{{ showFilters ? 'expand_less' : 'expand_more' }}</mat-icon>
-        <span class="font-medium">فیلترها</span>
-      </button>
-      <div class="flex items-center gap-2">
-        <button (click)="onFilter()" 
-                class="px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-sm hover:bg-indigo-600 transition-colors">
-          اعمال فیلتر
+    <div class="audit-actions">
+      <div class="view-toggle" role="group" aria-label="Audit view mode">
+        <button type="button" [class.active]="viewMode === 'list'" (click)="setViewMode('list')">
+          <mat-icon>table_rows</mat-icon>
+          <span>لیست</span>
         </button>
-        <button (click)="resetFilters()" 
-                class="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition-colors">
+        <button type="button" [class.active]="viewMode === 'statistics'" (click)="setViewMode('statistics')">
+          <mat-icon>bar_chart</mat-icon>
+          <span>آمار</span>
+        </button>
+      </div>
+
+      <button type="button" class="export-button" (click)="exportLogs()">
+        <mat-icon>download</mat-icon>
+        <span>صادر کردن</span>
+      </button>
+    </div>
+  </header>
+
+  <form class="filter-panel" [formGroup]="filterForm" (ngSubmit)="onFilter()">
+    <div class="filter-panel-header">
+      <div>
+        <h2>فیلتر و جستجو</h2>
+        <p>{{ getActiveFilterCount() }} فیلتر فعال از {{ totalCount }} نتیجه</p>
+      </div>
+      <button type="button" class="icon-button" (click)="showFilters = !showFilters" [attr.aria-expanded]="showFilters">
+        <mat-icon>{{ showFilters ? 'keyboard_arrow_up' : 'tune' }}</mat-icon>
+      </button>
+    </div>
+
+    <div class="quick-search">
+      <mat-icon>search</mat-icon>
+      <input type="text" formControlName="searchTerm" placeholder="جستجو بر اساس کاربر، توضیحات یا شماره رکورد">
+      <button type="submit">جستجو</button>
+    </div>
+
+    <div class="filter-grid" *ngIf="showFilters">
+      <label>
+        <span>ماژول</span>
+        <select formControlName="module">
+          <option value="">همه ماژول‌ها</option>
+          <option *ngFor="let module of modules" [value]="module">{{ translateModule(module) }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>نوع عملیات</span>
+        <select formControlName="actionType">
+          <option value="">همه عملیات‌ها</option>
+          <option *ngFor="let type of actionTypes" [value]="type">{{ translateActionType(type) }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>وضعیت</span>
+        <select formControlName="status">
+          <option value="">همه وضعیت‌ها</option>
+          <option value="Success">موفق</option>
+          <option value="Failed">ناموفق</option>
+          <option value="Error">خطا</option>
+        </select>
+      </label>
+
+      <label>
+        <span>از تاریخ</span>
+        <input type="date" formControlName="startDate">
+      </label>
+
+      <label>
+        <span>تا تاریخ</span>
+        <input type="date" formControlName="endDate">
+      </label>
+
+      <div class="filter-buttons">
+        <button type="submit" class="primary-button">
+          <mat-icon>filter_alt</mat-icon>
+          اعمال
+        </button>
+        <button type="button" class="secondary-button" (click)="resetFilters()">
+          <mat-icon>restart_alt</mat-icon>
           پاک کردن
         </button>
       </div>
     </div>
-    
-    <form [formGroup]="filterForm">
-      <div *ngIf="showFilters" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div>
-          <label class="block text-xs font-medium text-gray-500 mb-1">ماژول</label>
-          <select formControlName="module" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">همه</option>
-            <option *ngFor="let module of modules" [value]="module">{{ translateModule(module) }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-500 mb-1">نوع عملیات</label>
-          <select formControlName="actionType" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">همه</option>
-            <option *ngFor="let type of actionTypes" [value]="type">{{ translateActionType(type) }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-500 mb-1">وضعیت</label>
-          <select formControlName="status" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">همه</option>
-            <option value="Success">موفق</option>
-            <option value="Failed">ناموفق</option>
-            <option value="Error">خطا</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-500 mb-1">از تاریخ</label>
-          <input type="date" formControlName="startDate" 
-                 class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-500 mb-1">تا تاریخ</label>
-          <input type="date" formControlName="endDate" 
-                 class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-500 mb-1">جستجو</label>
-          <input type="text" formControlName="searchTerm" placeholder="جستجو..."
-                 class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-      </div>
-    </form>
+  </form>
+
+  <div *ngIf="errorMessage" class="alert-panel">
+    <mat-icon>error</mat-icon>
+    <span>{{ errorMessage }}</span>
+    <button type="button" (click)="errorMessage = null; loadAuditLogs()">تلاش مجدد</button>
   </div>
 
-  <!-- Statistics View -->
-  <div *ngIf="viewMode === 'statistics'" class="space-y-6">
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4" *ngIf="statistics">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm text-gray-500 mb-1">مجموع فعالیت‌ها</p>
-            <p class="text-2xl font-bold text-gray-800">{{ statistics.summary.totalActions }}</p>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-            <mat-icon class="text-white">analytics</mat-icon>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm text-gray-500 mb-1">موفق</p>
-            <p class="text-2xl font-bold text-emerald-600">{{ statistics.summary.successfulActions }}</p>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
-            <mat-icon class="text-white">check_circle</mat-icon>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm text-gray-500 mb-1">ناموفق</p>
-            <p class="text-2xl font-bold text-red-600">{{ statistics.summary.failedActions }}</p>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center">
-            <mat-icon class="text-white">error</mat-icon>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm text-gray-500 mb-1">نرخ موفقیت</p>
-            <p class="text-2xl font-bold text-indigo-600">{{ statistics.summary.successRate }}%</p>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-            <mat-icon class="text-white">percent</mat-icon>
-          </div>
-        </div>
-      </div>
+  <section *ngIf="viewMode === 'statistics'" class="statistics-view">
+    <div class="loading-panel" *ngIf="isLoadingStats">
+      <mat-icon>sync</mat-icon>
+      <span>در حال بارگذاری آمار...</span>
     </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" *ngIf="statistics">
-      <!-- Actions by Module -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <mat-icon class="text-indigo-500">folder</mat-icon>
-          فعالیت بر اساس ماژول
-        </h3>
-        <div class="space-y-3">
-          <div *ngFor="let item of statistics.actionsByModule" class="flex items-center gap-3">
-            <span class="w-32 text-sm text-gray-600 truncate">{{ translateModule(item.module) }}</span>
-            <div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-500"
-                   [style.width.%]="(item.count / statistics.summary.totalActions) * 100"></div>
+    <ng-container *ngIf="statistics && !isLoadingStats">
+      <div class="summary-grid">
+        <article class="summary-tile total">
+          <span>مجموع فعالیت‌ها</span>
+          <strong>{{ statistics.summary.totalActions }}</strong>
+          <mat-icon>analytics</mat-icon>
+        </article>
+        <article class="summary-tile success">
+          <span>موفق</span>
+          <strong>{{ statistics.summary.successfulActions }}</strong>
+          <mat-icon>check_circle</mat-icon>
+        </article>
+        <article class="summary-tile failed">
+          <span>ناموفق / خطا</span>
+          <strong>{{ statistics.summary.failedActions }}</strong>
+          <mat-icon>warning</mat-icon>
+        </article>
+        <article class="summary-tile rate">
+          <span>نرخ موفقیت</span>
+          <strong>{{ statistics.summary.successRate }}%</strong>
+          <mat-icon>percent</mat-icon>
+        </article>
+      </div>
+
+      <div class="analytics-grid">
+        <article class="analytics-panel">
+          <h3>
+            <mat-icon>folder_open</mat-icon>
+            فعالیت بر اساس ماژول
+          </h3>
+          <div class="metric-row" *ngFor="let item of statistics.actionsByModule">
+            <span>{{ translateModule(item.module) }}</span>
+            <div class="metric-track">
+              <div class="metric-fill" [style.width.%]="getPercentage(item.count, statistics.summary.totalActions)"></div>
             </div>
-            <span class="w-12 text-sm font-medium text-gray-700 text-right">{{ item.count }}</span>
+            <strong>{{ item.count }}</strong>
           </div>
-        </div>
-      </div>
+        </article>
 
-      <!-- Actions by Type -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <mat-icon class="text-purple-500">touch_app</mat-icon>
-          فعالیت بر اساس نوع
-        </h3>
-        <div class="grid grid-cols-2 gap-3">
-          <div *ngFor="let item of statistics.actionsByType" 
-               class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <span class="text-sm text-gray-600">{{ translateActionType(item.actionType) }}</span>
-            <span class="text-sm font-bold text-gray-800">{{ item.count }}</span>
+        <article class="analytics-panel">
+          <h3>
+            <mat-icon>touch_app</mat-icon>
+            فعالیت بر اساس نوع عملیات
+          </h3>
+          <div class="action-type-grid">
+            <div *ngFor="let item of statistics.actionsByType">
+              <span>{{ translateActionType(item.actionType) }}</span>
+              <strong>{{ item.count }}</strong>
+            </div>
           </div>
+        </article>
+      </div>
+
+      <article class="table-panel" *ngIf="statistics.recentErrors?.length">
+        <div class="panel-title">
+          <h3>
+            <mat-icon>report</mat-icon>
+            خطاهای اخیر
+          </h3>
         </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>زمان</th>
+                <th>کاربر</th>
+                <th>ماژول</th>
+                <th>توضیحات</th>
+                <th>خطا</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let error of statistics.recentErrors">
+                <td>{{ formatDateTime(error.timestamp) }}</td>
+                <td>{{ error.userName || 'System' }}</td>
+                <td>{{ translateModule(error.module) }}</td>
+                <td>{{ error.description }}</td>
+                <td class="error-text">{{ error.errorMessage }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </ng-container>
+  </section>
+
+  <section *ngIf="viewMode === 'list'" class="table-panel">
+    <div class="panel-title">
+      <div>
+        <h2>لیست لاگ‌ها</h2>
+        <p>آخرین فعالیت‌های ثبت شده در سیستم</p>
       </div>
+      <span class="record-count">{{ totalCount }} رکورد</span>
     </div>
 
-    <!-- Recent Errors -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5" *ngIf="statistics?.recentErrors?.length">
-      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <mat-icon class="text-red-500">warning</mat-icon>
-        خطاهای اخیر
-      </h3>
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead>
-            <tr class="text-right border-b border-gray-100">
-              <th class="pb-3 text-sm font-medium text-gray-500">زمان</th>
-              <th class="pb-3 text-sm font-medium text-gray-500">کاربر</th>
-              <th class="pb-3 text-sm font-medium text-gray-500">ماژول</th>
-              <th class="pb-3 text-sm font-medium text-gray-500">توضیحات</th>
-              <th class="pb-3 text-sm font-medium text-gray-500">خطا</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let error of statistics?.recentErrors" class="border-b border-gray-50 hover:bg-gray-50">
-              <td class="py-3 text-sm text-gray-600">{{ formatDateTime(error.timestamp) }}</td>
-              <td class="py-3 text-sm text-gray-600">{{ error.userName }}</td>
-              <td class="py-3 text-sm text-gray-600">{{ translateModule(error.module) }}</td>
-              <td class="py-3 text-sm text-gray-600">{{ error.description }}</td>
-              <td class="py-3 text-sm text-red-600">{{ error.errorMessage }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Error Message -->
-  <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
-    <mat-icon class="text-red-500">error</mat-icon>
-    <span class="text-red-700">{{ errorMessage }}</span>
-    <button (click)="errorMessage = null; loadAuditLogs()" class="ml-auto px-3 py-1 rounded-lg bg-red-100 text-red-700 text-sm hover:bg-red-200 transition-colors">
-      تلاش مجدد
-    </button>
-  </div>
-
-  <!-- List View -->
-  <div *ngIf="viewMode === 'list'" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex items-center justify-center py-20">
-      <mat-icon class="animate-spin text-indigo-500 text-4xl">refresh</mat-icon>
+    <div *ngIf="isLoading" class="loading-panel">
+      <mat-icon>sync</mat-icon>
+      <span>در حال بارگذاری لاگ‌ها...</span>
     </div>
 
-    <!-- Table -->
-    <div *ngIf="!isLoading" class="overflow-x-auto">
-      <table class="w-full">
-        <thead class="bg-gray-50">
-          <tr class="text-right">
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">زمان</th>
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">کاربر</th>
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">نوع عملیات</th>
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">ماژول</th>
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">توضیحات</th>
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">IP</th>
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">وضعیت</th>
-            <th class="px-4 py-3 text-sm font-medium text-gray-500">عملیات</th>
+    <div *ngIf="!isLoading && auditLogs.length > 0" class="table-scroll">
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>زمان</th>
+            <th>کاربر</th>
+            <th>عملیات</th>
+            <th>ماژول</th>
+            <th>توضیحات</th>
+            <th>IP</th>
+            <th>وضعیت</th>
+            <th>جزئیات</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let log of auditLogs" 
-              class="border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
-              (click)="viewLogDetail(log)">
-            <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-              {{ formatDateTime(log.timestamp) }}
-            </td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                  <span class="text-white text-xs font-bold">{{ log.userName.charAt(0) || '?' }}</span>
-                </div>
+          <tr *ngFor="let log of auditLogs" (click)="viewLogDetail(log)">
+            <td class="time-cell">{{ formatDateTime(log.timestamp) }}</td>
+            <td>
+              <div class="user-cell">
+                <span class="avatar">{{ getUserInitial(log.userName) }}</span>
                 <div>
-                  <p class="text-sm font-medium text-gray-800">{{ log.userName }}</p>
-                  <p class="text-xs text-gray-400">{{ log.userRole }}</p>
+                  <strong>{{ log.userName || 'System' }}</strong>
+                  <small>{{ log.userRole || 'بدون نقش' }}</small>
                 </div>
               </div>
             </td>
-            <td class="px-4 py-3">
-              <span [class]="getActionTypeClass(log.actionType) + ' px-2 py-1 rounded-lg text-xs font-medium'">
+            <td>
+              <span class="pill" [ngClass]="getActionTypeClass(log.actionType)">
+                <mat-icon>{{ getActionIcon(log.actionType) }}</mat-icon>
                 {{ translateActionType(log.actionType) }}
               </span>
             </td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ translateModule(log.module) }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{{ log.descriptionDari || log.description }}</td>
-            <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ log.ipAddress }}</td>
-            <td class="px-4 py-3">
-              <span [class]="getStatusClass(log.status) + ' px-2 py-1 rounded-lg text-xs font-medium'">
+            <td>{{ translateModule(log.module) }}</td>
+            <td class="description-cell">{{ log.descriptionDari || log.description }}</td>
+            <td class="mono-cell">{{ log.ipAddress || '-' }}</td>
+            <td>
+              <span class="status-pill" [ngClass]="getStatusClass(log.status)">
+                <mat-icon>{{ getStatusIcon(log.status) }}</mat-icon>
                 {{ translateStatus(log.status) }}
               </span>
             </td>
-            <td class="px-4 py-3">
-              <button class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                <mat-icon class="text-gray-500 text-lg">visibility</mat-icon>
+            <td>
+              <button type="button" class="row-action" (click)="viewLogDetail(log); $event.stopPropagation()">
+                <mat-icon>open_in_new</mat-icon>
               </button>
             </td>
           </tr>
@@ -279,18 +260,16 @@
       </table>
     </div>
 
-    <!-- Empty State -->
-    <div *ngIf="!isLoading && auditLogs.length === 0" class="flex flex-col items-center justify-center py-20">
-      <mat-icon class="text-gray-300 text-6xl mb-4">inbox</mat-icon>
-      <p class="text-gray-500">هیچ لاگی یافت نشد</p>
+    <div *ngIf="!isLoading && auditLogs.length === 0" class="empty-state">
+      <mat-icon>manage_search</mat-icon>
+      <strong>هیچ لاگی یافت نشد</strong>
+      <span>فیلترها را تغییر دهید یا دوباره تلاش کنید.</span>
     </div>
 
-    <!-- Pagination -->
-    <div *ngIf="!isLoading && totalCount > 0" class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100">
-      <div class="flex items-center gap-2 text-sm text-gray-600">
+    <footer *ngIf="!isLoading && totalCount > 0" class="pagination-bar">
+      <div class="page-size">
         <span>نمایش</span>
-        <select [(ngModel)]="pageSize" (change)="onPageSizeChange($any($event.target).value)" 
-                class="px-2 py-1 rounded border border-gray-200 text-sm">
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange($any($event.target).value)">
           <option [ngValue]="10">10</option>
           <option [ngValue]="20">20</option>
           <option [ngValue]="50">50</option>
@@ -298,147 +277,119 @@
         </select>
         <span>از {{ totalCount }} مورد</span>
       </div>
-      <div class="flex items-center gap-1">
-        <button (click)="onPageChange(1)" [disabled]="currentPage === 1"
-                class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
-          <mat-icon class="text-gray-600">first_page</mat-icon>
+
+      <div class="pagination-buttons">
+        <button type="button" (click)="onPageChange(1)" [disabled]="currentPage === 1">
+          <mat-icon>last_page</mat-icon>
         </button>
-        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
-                class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
-          <mat-icon class="text-gray-600">chevron_left</mat-icon>
+        <button type="button" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+          <mat-icon>chevron_right</mat-icon>
         </button>
-        <button *ngFor="let page of getPaginationArray()"
-                (click)="onPageChange(page)"
-                [class]="page === currentPage ? 'px-3 py-1 rounded-lg bg-indigo-500 text-white' : 'px-3 py-1 rounded-lg hover:bg-gray-100 text-gray-700'">
+        <button type="button" *ngFor="let page of getPaginationArray()" (click)="onPageChange(page)" [class.active]="page === currentPage">
           {{ page }}
         </button>
-        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages"
-                class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
-          <mat-icon class="text-gray-600">chevron_right</mat-icon>
+        <button type="button" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">
+          <mat-icon>chevron_left</mat-icon>
         </button>
-        <button (click)="onPageChange(totalPages)" [disabled]="currentPage === totalPages"
-                class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
-          <mat-icon class="text-gray-600">last_page</mat-icon>
+        <button type="button" (click)="onPageChange(totalPages)" [disabled]="currentPage === totalPages">
+          <mat-icon>first_page</mat-icon>
         </button>
       </div>
-    </div>
-  </div>
-</div>
+    </footer>
+  </section>
+</section>
 
-<!-- Detail Panel (Slide-over) -->
-<div *ngIf="showDetailPanel && selectedLog" 
-     class="fixed inset-0 z-50 flex justify-start" 
-     (click)="closeDetailPanel()">
-  <!-- Backdrop -->
-  <div class="absolute inset-0 bg-black/30"></div>
-  
-  <!-- Panel -->
-  <div class="relative w-full max-w-lg bg-white shadow-xl h-full overflow-y-auto"
-       (click)="$event.stopPropagation()">
-    <!-- Header -->
-    <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-      <h2 class="text-lg font-bold text-gray-800">جزئیات فعالیت</h2>
-      <button (click)="closeDetailPanel()" class="p-2 rounded-lg hover:bg-gray-100">
-        <mat-icon class="text-gray-500">close</mat-icon>
-      </button>
-    </div>
-    
-    <!-- Content -->
-    <div class="p-6 space-y-6">
-      <!-- Basic Info -->
-      <div class="space-y-4">
-        <div class="flex items-center gap-3">
-          <span [class]="getActionTypeClass(selectedLog.actionType) + ' px-3 py-1.5 rounded-lg text-sm font-medium'">
-            {{ translateActionType(selectedLog.actionType) }}
-          </span>
-          <span [class]="getStatusClass(selectedLog.status) + ' px-3 py-1.5 rounded-lg text-sm font-medium'">
-            {{ translateStatus(selectedLog.status) }}
-          </span>
-        </div>
-        
-        <div class="bg-gray-50 rounded-lg p-4 space-y-3">
-          <div class="flex justify-between">
-            <span class="text-sm text-gray-500">زمان:</span>
-            <span class="text-sm font-medium text-gray-800">{{ formatDateTime(selectedLog.timestamp) }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-sm text-gray-500">کاربر:</span>
-            <span class="text-sm font-medium text-gray-800">{{ selectedLog.userName }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-sm text-gray-500">نقش:</span>
-            <span class="text-sm font-medium text-gray-800">{{ selectedLog.userRole }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-sm text-gray-500">ماژول:</span>
-            <span class="text-sm font-medium text-gray-800">{{ translateModule(selectedLog.module) }}</span>
-          </div>
-          <div class="flex justify-between" *ngIf="selectedLog.entityType">
-            <span class="text-sm text-gray-500">نوع موجود:</span>
-            <span class="text-sm font-medium text-gray-800">{{ selectedLog.entityType }}</span>
-          </div>
-          <div class="flex justify-between" *ngIf="selectedLog.entityId">
-            <span class="text-sm text-gray-500">شماره موجود:</span>
-            <span class="text-sm font-medium text-gray-800">{{ selectedLog.entityId }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Description -->
+<aside *ngIf="showDetailPanel && selectedLog" class="detail-overlay" dir="rtl" (click)="closeDetailPanel()">
+  <section class="detail-panel" (click)="$event.stopPropagation()">
+    <header>
       <div>
-        <h3 class="text-sm font-medium text-gray-500 mb-2">توضیحات</h3>
-        <p class="text-gray-800">{{ selectedLog.descriptionDari || selectedLog.description }}</p>
+        <p>Audit Detail</p>
+        <h2>جزئیات فعالیت</h2>
       </div>
+      <button type="button" class="icon-button" (click)="closeDetailPanel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
 
-      <!-- Request Info -->
-      <div class="bg-gray-50 rounded-lg p-4 space-y-3">
-        <div class="flex justify-between">
-          <span class="text-sm text-gray-500">IP Address:</span>
-          <span class="text-sm font-mono text-gray-800">{{ selectedLog.ipAddress }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-sm text-gray-500">HTTP Method:</span>
-          <span class="text-sm font-medium text-gray-800">{{ selectedLog.httpMethod }}</span>
-        </div>
-        <div>
-          <span class="text-sm text-gray-500 block mb-1">URL:</span>
-          <span class="text-sm font-mono text-gray-800 break-all">{{ selectedLog.requestUrl }}</span>
-        </div>
-        <div *ngIf="selectedLog.durationMs">
-          <span class="text-sm text-gray-500 block mb-1">مدت زمان:</span>
-          <span class="text-sm text-gray-800">{{ selectedLog.durationMs }} ms</span>
-        </div>
-      </div>
-
-      <!-- User Agent -->
-      <div *ngIf="selectedLog.userAgent">
-        <h3 class="text-sm font-medium text-gray-500 mb-2">User Agent</h3>
-        <p class="text-xs text-gray-600 break-all">{{ selectedLog.userAgent }}</p>
-      </div>
-
-      <!-- Error Message -->
-      <div *ngIf="selectedLog.errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4">
-        <h3 class="text-sm font-medium text-red-700 mb-2">خطا</h3>
-        <p class="text-sm text-red-600">{{ selectedLog.errorMessage }}</p>
-      </div>
-
-      <!-- Old Values -->
-      <div *ngIf="selectedLog.oldValues">
-        <h3 class="text-sm font-medium text-gray-500 mb-2">مقادیر قبلی</h3>
-        <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-xs overflow-x-auto">{{ formatJson(selectedLog.oldValues) }}</pre>
-      </div>
-
-      <!-- New Values -->
-      <div *ngIf="selectedLog.newValues">
-        <h3 class="text-sm font-medium text-gray-500 mb-2">مقادیر جدید</h3>
-        <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-xs overflow-x-auto">{{ formatJson(selectedLog.newValues) }}</pre>
-      </div>
-
-      <!-- Metadata -->
-      <div *ngIf="selectedLog.metadata">
-        <h3 class="text-sm font-medium text-gray-500 mb-2">اطلاعات اضافی</h3>
-        <pre class="bg-gray-800 text-gray-100 p-4 rounded-lg text-xs overflow-x-auto">{{ formatJson(selectedLog.metadata) }}</pre>
-      </div>
+    <div class="detail-status-row">
+      <span class="pill" [ngClass]="getActionTypeClass(selectedLog.actionType)">
+        <mat-icon>{{ getActionIcon(selectedLog.actionType) }}</mat-icon>
+        {{ translateActionType(selectedLog.actionType) }}
+      </span>
+      <span class="status-pill" [ngClass]="getStatusClass(selectedLog.status)">
+        <mat-icon>{{ getStatusIcon(selectedLog.status) }}</mat-icon>
+        {{ translateStatus(selectedLog.status) }}
+      </span>
     </div>
-  </div>
-</div>
+
+    <dl class="detail-grid">
+      <div>
+        <dt>زمان</dt>
+        <dd>{{ formatDateTime(selectedLog.timestamp) }}</dd>
+      </div>
+      <div>
+        <dt>کاربر</dt>
+        <dd>{{ selectedLog.userName || 'System' }}</dd>
+      </div>
+      <div>
+        <dt>نقش</dt>
+        <dd>{{ selectedLog.userRole || '-' }}</dd>
+      </div>
+      <div>
+        <dt>ماژول</dt>
+        <dd>{{ translateModule(selectedLog.module) }}</dd>
+      </div>
+      <div *ngIf="selectedLog.entityType">
+        <dt>نوع رکورد</dt>
+        <dd>{{ selectedLog.entityType }}</dd>
+      </div>
+      <div *ngIf="selectedLog.entityId">
+        <dt>شماره رکورد</dt>
+        <dd>{{ selectedLog.entityId }}</dd>
+      </div>
+      <div>
+        <dt>IP Address</dt>
+        <dd class="mono-cell">{{ selectedLog.ipAddress || '-' }}</dd>
+      </div>
+      <div>
+        <dt>HTTP Method</dt>
+        <dd>{{ selectedLog.httpMethod || '-' }}</dd>
+      </div>
+    </dl>
+
+    <section class="detail-section">
+      <h3>توضیحات</h3>
+      <p>{{ selectedLog.descriptionDari || selectedLog.description }}</p>
+    </section>
+
+    <section class="detail-section" *ngIf="selectedLog.requestUrl">
+      <h3>مسیر درخواست</h3>
+      <code>{{ selectedLog.requestUrl }}</code>
+    </section>
+
+    <section class="detail-section error-box" *ngIf="selectedLog.errorMessage">
+      <h3>خطا</h3>
+      <p>{{ selectedLog.errorMessage }}</p>
+    </section>
+
+    <section class="detail-section" *ngIf="selectedLog.oldValues">
+      <h3>مقادیر قبلی</h3>
+      <pre>{{ formatJson(selectedLog.oldValues) }}</pre>
+    </section>
+
+    <section class="detail-section" *ngIf="selectedLog.newValues">
+      <h3>مقادیر جدید</h3>
+      <pre>{{ formatJson(selectedLog.newValues) }}</pre>
+    </section>
+
+    <section class="detail-section" *ngIf="selectedLog.metadata">
+      <h3>اطلاعات اضافی</h3>
+      <pre>{{ formatJson(selectedLog.metadata) }}</pre>
+    </section>
+
+    <section class="detail-section" *ngIf="selectedLog.userAgent">
+      <h3>User Agent</h3>
+      <p class="user-agent">{{ selectedLog.userAgent }}</p>
+    </section>
+  </section>
+</aside>

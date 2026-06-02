@@ -149,11 +149,14 @@ export class BuyerdetailComponent extends BaseComponent {
       if (roleType && lesseeRoles.includes(roleType)) {
         rentStartDateControl?.setValidators([Validators.required]);
         rentEndDateControl?.setValidators([Validators.required]);
+        rentEndDateControl?.disable({ emitEvent: false });
+        this.updateRentEndDateFromStart();
       } else {
         rentStartDateControl?.clearValidators();
         rentEndDateControl?.clearValidators();
         rentStartDateControl?.reset();
         rentEndDateControl?.reset();
+        rentEndDateControl?.disable({ emitEvent: false });
       }
       rentStartDateControl?.updateValueAndValidity();
       rentEndDateControl?.updateValueAndValidity();
@@ -199,6 +202,12 @@ export class BuyerdetailComponent extends BaseComponent {
 
       this.lastTransactionType = transactionType || null;
     });
+
+    this.sellerForm.get('rentStartDate')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateRentEndDateFromStart();
+    });
+
+    this.sellerForm.get('rentEndDate')?.disable({ emitEvent: false });
   }
   ngOnInit() {
     // Initialize role types from localization service
@@ -274,6 +283,7 @@ export class BuyerdetailComponent extends BaseComponent {
         });
         this.suppressTransactionTypeHandling = false;
         this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
+        this.updateRentEndDateFromStart();
         this.calculateDerivedAmounts();
         this.selectedSellerId=firstBuyer.id;
         this.imagePath=this.constructImageUrl(firstBuyer.photo);
@@ -308,7 +318,7 @@ export class BuyerdetailComponent extends BaseComponent {
     });
   }
   addBuyerDetail(): void {
-    const sellerDetails = this.sellerForm.value as SellerDetail;
+    const sellerDetails = this.sellerForm.getRawValue() as SellerDetail;
     sellerDetails.photo=this.imageName;
     sellerDetails.nationalIdCard = this.nationalIdCardName;
     sellerDetails.authorizationLetter=this.authorizationLetterName;
@@ -383,7 +393,7 @@ export class BuyerdetailComponent extends BaseComponent {
 }
 
 updateBuyerDetails(): void {
-  const sellerDetails = this.sellerForm.value as SellerDetail;
+  const sellerDetails = this.sellerForm.getRawValue() as SellerDetail;
    sellerDetails.photo=this.imageName;
    sellerDetails.nationalIdCard = this.nationalIdCardName;
    sellerDetails.authorizationLetter=this.authorizationLetterName;
@@ -463,6 +473,7 @@ updateBuyerDetails(): void {
     });
     this.suppressTransactionTypeHandling = false;
     this.updatePriceValidators(this.sellerForm.get('transactionType')?.value);
+    this.updateRentEndDateFromStart();
     this.calculateDerivedAmounts();
     this.imagePath = this.constructImageUrl(selectedBuyer.photo)
     this.imageName = selectedBuyer.photo || '';
@@ -546,6 +557,7 @@ deleteBuyer(id: number, event?: Event) {
     }
       this.sellerForm.reset();
       this.sellerForm.patchValue({ roleType: 'Buyer' });
+      this.sellerForm.get('rentEndDate')?.disable({ emitEvent: false });
       this.selectedSellerId=0;
       this.imagePath='assets/img/avatar.png';
       this.nationalIdCardName='';
@@ -608,6 +620,59 @@ deleteBuyer(id: number, event?: Event) {
      },
      { emitEvent: false }
    );
+ }
+
+ private updateRentEndDateFromStart(): void {
+   const rentStartDate = this.sellerForm.get('rentStartDate')?.value;
+   const rentEndDateControl = this.sellerForm.get('rentEndDate');
+   if (!rentEndDateControl) {
+     return;
+   }
+
+   const computedEndDate = this.addOneYearToDateValue(rentStartDate);
+   rentEndDateControl.setValue(computedEndDate, { emitEvent: false });
+   rentEndDateControl.disable({ emitEvent: false });
+   rentEndDateControl.updateValueAndValidity({ emitEvent: false });
+ }
+
+ private addOneYearToDateValue(dateValue: any): any {
+   if (!dateValue) {
+     return '';
+   }
+
+   if (dateValue instanceof Date) {
+     const nextYear = new Date(dateValue);
+     nextYear.setFullYear(nextYear.getFullYear() + 1);
+     const calendarDate = this.calendarConversionService.fromGregorian(nextYear, CalendarType.HIJRI_SHAMSI);
+     const month = String(calendarDate.month).padStart(2, '0');
+     const day = String(calendarDate.day).padStart(2, '0');
+     return `${calendarDate.year}/${month}/${day}`;
+   }
+
+   if (typeof dateValue === 'object' && dateValue.year) {
+     return { ...dateValue, year: Number(dateValue.year) + 1 };
+   }
+
+   if (typeof dateValue === 'string') {
+     const separator = dateValue.includes('/') ? '/' : dateValue.includes('-') ? '-' : null;
+     if (!separator) {
+       return '';
+     }
+
+     const parts = dateValue.split(separator);
+     if (parts.length !== 3) {
+       return '';
+     }
+
+     const year = Number(parts[0]);
+     if (Number.isNaN(year)) {
+       return '';
+     }
+
+     return `${year + 1}${separator}${parts[1]}${separator}${parts[2]}`;
+   }
+
+   return '';
  }
 
  showPriceFields(): boolean {

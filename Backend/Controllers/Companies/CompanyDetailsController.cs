@@ -43,6 +43,50 @@ namespace WebAPIBackend.Controllers.Companies
             _cache = cache;
         }
 
+        private sealed class CompanyAuditUserCandidate
+        {
+            public int CompanyId { get; set; }
+            public string? UpdatedBy { get; set; }
+            public DateTime? UpdatedAt { get; set; }
+        }
+
+        private async Task<string> ResolveDisplayName(string? userIdOrName)
+        {
+            if (string.IsNullOrWhiteSpace(userIdOrName))
+            {
+                return "-";
+            }
+
+            if (Guid.TryParse(userIdOrName, out _))
+            {
+                var user = await _userManager.FindByIdAsync(userIdOrName);
+                if (user != null)
+                {
+                    var fullName = $"{user.FirstName} {user.LastName}".Trim();
+                    return string.IsNullOrWhiteSpace(fullName) ? (user.UserName ?? userIdOrName) : fullName;
+                }
+            }
+
+            return userIdOrName;
+        }
+
+        private async Task<Dictionary<string, string>> BuildUserDisplayLookup(IEnumerable<string?> userValues)
+        {
+            var lookup = new Dictionary<string, string>();
+            var distinctValues = userValues
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x!)
+                .Distinct()
+                .ToList();
+
+            foreach (var userValue in distinctValues)
+            {
+                lookup[userValue] = await ResolveDisplayName(userValue);
+            }
+
+            return lookup;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] int page = 1,
@@ -96,13 +140,14 @@ namespace WebAPIBackend.Controllers.Companies
 
                 var totalCount = await orderedQuery.CountAsync();
 
-                var result = await orderedQuery
+                var items = await orderedQuery
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
-                    .Select(p => new CompanyListDto
+                    .Select(p => new
                     {
-                        Id = p.Id,
-                        Title = p.Title,
+                        p.Id,
+                        p.Title,
+                        p.CreatedBy,
                         OwnerFullName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault(),
                         OwnerFatherName = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault(),
                         OwnerElectronicNationalIdNumber = p.CompanyOwners.OrderBy(o => o.Id).Select(o => o.ElectronicNationalIdNumber).FirstOrDefault(),
@@ -118,6 +163,99 @@ namespace WebAPIBackend.Controllers.Companies
                         IsComplete = p.LicenseDetails.OrderBy(l => l.Id).Select(l => l.IsComplete).FirstOrDefault(),
                     })
                     .ToListAsync();
+
+                var companyIds = items.Select(x => x.Id).ToList();
+
+                var auditCandidates = new List<CompanyAuditUserCandidate>();
+                auditCandidates.AddRange(await _context.Companydetailsaudits
+                    .AsNoTracking()
+                    .Where(a => companyIds.Contains(a.CompanyId))
+                    .Select(a => new CompanyAuditUserCandidate
+                    {
+                        CompanyId = a.CompanyId,
+                        UpdatedBy = a.UpdatedBy,
+                        UpdatedAt = a.UpdatedAt
+                    })
+                    .ToListAsync());
+
+                auditCandidates.AddRange(await _context.Companyowneraudits
+                    .AsNoTracking()
+                    .Where(a => companyIds.Contains(a.Owner.CompanyId ?? 0))
+                    .Select(a => new CompanyAuditUserCandidate
+                    {
+                        CompanyId = a.Owner.CompanyId ?? 0,
+                        UpdatedBy = a.UpdatedBy,
+                        UpdatedAt = a.UpdatedAt
+                    })
+                    .ToListAsync());
+
+                auditCandidates.AddRange(await _context.Licenseaudits
+                    .AsNoTracking()
+                    .Where(a => a.License.CompanyId.HasValue && companyIds.Contains(a.License.CompanyId.Value))
+                    .Select(a => new CompanyAuditUserCandidate
+                    {
+                        CompanyId = a.License.CompanyId!.Value,
+                        UpdatedBy = a.UpdatedBy,
+                        UpdatedAt = a.UpdatedAt
+                    })
+                    .ToListAsync());
+
+                auditCandidates.AddRange(await _context.Guarantorsaudits
+                    .AsNoTracking()
+                    .Where(a => a.Guarantors.CompanyId.HasValue && companyIds.Contains(a.Guarantors.CompanyId.Value))
+                    .Select(a => new CompanyAuditUserCandidate
+                    {
+                        CompanyId = a.Guarantors.CompanyId!.Value,
+                        UpdatedBy = a.UpdatedBy,
+                        UpdatedAt = a.UpdatedAt
+                    })
+                    .ToListAsync());
+
+                auditCandidates.AddRange(await _context.Graunteeaudits
+                    .AsNoTracking()
+                    .Where(a => a.Gaurantee.CompanyId.HasValue && companyIds.Contains(a.Gaurantee.CompanyId.Value))
+                    .Select(a => new CompanyAuditUserCandidate
+                    {
+                        CompanyId = a.Gaurantee.CompanyId!.Value,
+                        UpdatedBy = a.UpdatedBy,
+                        UpdatedAt = a.UpdatedAt
+                    })
+                    .ToListAsync());
+
+                var latestUpdatedByByCompany = auditCandidates
+                    .Where(a => a.CompanyId != 0 && !string.IsNullOrWhiteSpace(a.UpdatedBy))
+                    .GroupBy(a => a.CompanyId)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.OrderByDescending(a => a.UpdatedAt ?? DateTime.MinValue).First().UpdatedBy);
+
+                var userLookup = await BuildUserDisplayLookup(
+                    items.Select(x => latestUpdatedByByCompany.TryGetValue(x.Id, out var updatedBy) ? updatedBy : x.CreatedBy));
+
+                var result = items.Select(p =>
+                {
+                    var effectiveUser = latestUpdatedByByCompany.TryGetValue(p.Id, out var updatedBy)
+                        ? updatedBy
+                        : p.CreatedBy;
+
+                    return new CompanyListDto
+                    {
+                        Id = p.Id,
+                        Title = p.Title,
+                        OwnerFullName = p.OwnerFullName,
+                        OwnerFatherName = p.OwnerFatherName,
+                        OwnerElectronicNationalIdNumber = p.OwnerElectronicNationalIdNumber,
+                        LicenseNumber = p.LicenseNumber,
+                        LicenseCategory = p.LicenseCategory,
+                        LicenseIssueDate = p.LicenseIssueDate,
+                        LicenseExpiryDate = p.LicenseExpiryDate,
+                        Granator = p.Granator,
+                        IsComplete = p.IsComplete,
+                        CreatedBy = !string.IsNullOrWhiteSpace(effectiveUser) && userLookup.TryGetValue(effectiveUser, out var userName)
+                            ? userName
+                            : "-"
+                    };
+                }).ToList();
 
                 return Ok(new
                 {

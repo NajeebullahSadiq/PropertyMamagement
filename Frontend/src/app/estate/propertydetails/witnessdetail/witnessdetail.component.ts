@@ -214,5 +214,9 @@ BindValu(id: number) {
   get witnessSide() { return this.withnessForm.get('witnessSide'); }
   get des() { return this.withnessForm.get('des'); }
   get nationalIdCard() { return this.withnessForm.get('nationalIdCard'); }
+
+  isEditing(): boolean {
+    return this.selectedId > 0;
+  }
  
 }

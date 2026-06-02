@@ -501,6 +501,7 @@
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تاریخ صدور جواز</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تاریخ ختم جواز</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تضمین کننده دفتر</th>
+              <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">ثبت / ویرایش کننده</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">حالت</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">عملیات</th>
             </tr>
@@ -520,6 +521,7 @@
               <td class="px-4 py-3 text-xs text-[#4a5568]">{{ (property.licenseIssueDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3 text-xs text-[#4a5568]">{{ (property.licenseExpiryDate | calendarDate) || '-' }}</td>
               <td class="px-4 py-3 text-xs" [ngClass]="property.granator ? 'text-[#4a5568]' : 'text-[#dc2626] font-semibold'">{{ property.granator ? property.granator : 'تکیمل ناشده' }}</td>
+              <td class="px-4 py-3 text-xs text-[#4a5568]">{{ property.createdBy || '-' }}</td>
               <td class="px-4 py-3">
                 <span *ngIf="property.isComplete; else notCompleted" class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#d1fae5] text-[#065f46]"><i class="fas fa-check-circle mr-1"></i>تکمیل شده</span>
                 <ng-template #notCompleted><span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#fef2f2] text-[#991b1b]"><i class="fas fa-times-circle mr-1"></i>ناقص</span></ng-template>

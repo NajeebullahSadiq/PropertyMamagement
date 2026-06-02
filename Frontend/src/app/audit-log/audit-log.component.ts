@@ -264,9 +264,20 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
   }
 
   onPageSizeChange(size: number): void {
-    this.pageSize = size;
+    this.pageSize = Number(size);
     this.currentPage = 1;
     this.loadAuditLogs();
+  }
+
+  setViewMode(mode: 'list' | 'statistics'): void {
+    if (this.viewMode === mode) {
+      return;
+    }
+
+    this.viewMode = mode;
+    if (mode === 'statistics') {
+      this.loadStatistics();
+    }
   }
 
   toggleViewMode(): void {
@@ -348,26 +359,67 @@ export class AuditLogComponent extends BaseComponent implements OnInit {
     return this.statusTranslations[status] || status;
   }
 
+  getUserInitial(userName: string | null | undefined): string {
+    return userName?.trim().charAt(0) || '?';
+  }
+
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Success': return 'bg-emerald-100 text-emerald-700';
-      case 'Failed': return 'bg-red-100 text-red-700';
-      case 'Error': return 'bg-amber-100 text-amber-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'Success': return 'status-success';
+      case 'Failed': return 'status-failed';
+      case 'Error': return 'status-error';
+      default: return 'status-neutral';
     }
   }
 
   getActionTypeClass(type: string): string {
     switch (type) {
-      case 'Create': return 'bg-blue-100 text-blue-700';
-      case 'Update': return 'bg-purple-100 text-purple-700';
-      case 'Delete': return 'bg-red-100 text-red-700';
-      case 'Login': return 'bg-green-100 text-green-700';
-      case 'Logout': return 'bg-gray-100 text-gray-700';
-      case 'Print': return 'bg-indigo-100 text-indigo-700';
-      case 'Export': return 'bg-cyan-100 text-cyan-700';
-      default: return 'bg-slate-100 text-slate-700';
+      case 'Create': return 'action-create';
+      case 'Update': return 'action-update';
+      case 'Delete': return 'action-delete';
+      case 'Login': return 'action-login';
+      case 'Logout': return 'action-logout';
+      case 'Print': return 'action-print';
+      case 'Export': return 'action-export';
+      case 'FailedLogin': return 'action-delete';
+      case 'Error': return 'action-delete';
+      default: return 'action-default';
     }
+  }
+
+  getStatusIcon(status: string): string {
+    switch (status) {
+      case 'Success': return 'check_circle';
+      case 'Failed': return 'cancel';
+      case 'Error': return 'error';
+      default: return 'help';
+    }
+  }
+
+  getActionIcon(type: string): string {
+    switch (type) {
+      case 'Create': return 'add_circle';
+      case 'Update': return 'edit';
+      case 'Delete': return 'delete';
+      case 'Login': return 'login';
+      case 'Logout': return 'logout';
+      case 'View': return 'visibility';
+      case 'Print': return 'print';
+      case 'Export': return 'download';
+      case 'FailedLogin': return 'block';
+      case 'Error': return 'report';
+      default: return 'bolt';
+    }
+  }
+
+  getPercentage(value: number, total: number): number {
+    if (!total) return 0;
+    return Math.min(100, Math.round((value / total) * 100));
+  }
+
+  getActiveFilterCount(): number {
+    const filters = this.filterForm.value;
+    return Object.values(filters).filter(value => !!value).length;
   }
 
   formatDateTime(date: string): string {

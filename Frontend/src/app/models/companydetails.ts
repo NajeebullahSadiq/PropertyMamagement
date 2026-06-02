@@ -21,6 +21,7 @@ export interface companydetailsList {
     licenseExpiryDate:string;
     granator:string;
     isComplete:boolean;
+    createdBy?:string;
 
 
   }
