@@ -254,7 +254,7 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
             });
         } else if (this.activeTab === 'detail' && this.transactionDetail) {
             this.transactionDetail.records.forEach(r => {
-                csv += [r.pnumber, r.transactionTypeDari, r.price, r.royaltyAmount, r.companyTitle || '—', r.sellerName || '—', r.buyerName || '—'].join(',') + '\n';
+                csv += [r.pnumber, r.transactionTypeDari, r.price, r.royaltyAmount, r.companyTitle || '—', r.sellerName || '—', r.buyerName || '—', r.createdBy || '—'].join(',') + '\n';
             });
         }
 
@@ -271,7 +271,7 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
             case 'byCompany': return ['نام رهنما', 'تعداد', 'مجموع قیمت', 'مجموع حق‌العمل'];
             case 'byProvince': return ['ولایت', 'تعداد', 'مجموع قیمت', 'مجموع حق‌العمل'];
             case 'trend': return ['ماه', 'تعداد', 'مجموع قیمت', 'مجموع حق‌العمل'];
-            case 'detail': return ['شماره مسلسل', 'نوعیت معامله', 'قیمت', 'حق‌العمل', 'رهنما', 'فروشنده', 'مشتری'];
+            case 'detail': return ['شماره مسلسل', 'نوعیت معامله', 'قیمت', 'حق‌العمل', 'رهنما', 'فروشنده', 'مشتری', 'ثبت / ویرایش کننده'];
             default: return ['گزارش املاک'];
         }
     }

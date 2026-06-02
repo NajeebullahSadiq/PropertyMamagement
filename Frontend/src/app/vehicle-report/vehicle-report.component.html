@@ -377,6 +377,7 @@
               <th class="px-3 py-3">رهنما</th>
               <th class="px-3 py-3">فروشنده</th>
               <th class="px-3 py-3">مشتری</th>
+              <th class="px-3 py-3">ثبت / ویرایش کننده</th>
               <th class="px-3 py-3">حالت</th>
             </tr>
           </thead>
@@ -391,6 +392,7 @@
               <td class="px-3 py-3 text-sm text-slate-600">{{ r.companyTitle || '—' }}</td>
               <td class="px-3 py-3 text-sm text-slate-600">{{ r.sellerName || '—' }}</td>
               <td class="px-3 py-3 text-sm text-slate-600">{{ r.buyerName || '—' }}</td>
+              <td class="px-3 py-3 text-sm text-slate-600">{{ r.createdBy || '—' }}</td>
               <td class="px-3 py-3">
                 <span *ngIf="r.iscomplete" class="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">تکمیل</span>
                 <span *ngIf="!r.iscomplete" class="px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">ناقص</span>

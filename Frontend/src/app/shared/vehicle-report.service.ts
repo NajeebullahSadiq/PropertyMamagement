@@ -71,6 +71,7 @@ export interface TransactionTypeDetailRecord {
     createdAt: string | null;
     sellerName: string | null;
     buyerName: string | null;
+    createdBy: string | null;
     iscomplete: boolean | null;
 }
 

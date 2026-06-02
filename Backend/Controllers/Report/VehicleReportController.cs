@@ -23,6 +23,95 @@ namespace WebAPIBackend.Controllers.Report
             _userManager = userManager;
         }
 
+        private sealed class ReportAuditUserCandidate
+        {
+            public int RecordId { get; set; }
+            public string? UpdatedBy { get; set; }
+            public DateTime? UpdatedAt { get; set; }
+        }
+
+        private async Task<string> ResolveDisplayName(string? userIdOrName)
+        {
+            if (string.IsNullOrWhiteSpace(userIdOrName))
+            {
+                return "-";
+            }
+
+            if (Guid.TryParse(userIdOrName, out _))
+            {
+                var user = await _userManager.FindByIdAsync(userIdOrName);
+                if (user != null)
+                {
+                    var fullName = $"{user.FirstName} {user.LastName}".Trim();
+                    return string.IsNullOrWhiteSpace(fullName) ? (user.UserName ?? userIdOrName) : fullName;
+                }
+            }
+
+            return userIdOrName;
+        }
+
+        private async Task<Dictionary<string, string>> BuildUserDisplayLookup(IEnumerable<string?> userValues)
+        {
+            var lookup = new Dictionary<string, string>();
+            var distinctValues = userValues
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x!)
+                .Distinct()
+                .ToList();
+
+            foreach (var userValue in distinctValues)
+            {
+                lookup[userValue] = await ResolveDisplayName(userValue);
+            }
+
+            return lookup;
+        }
+
+        private async Task<Dictionary<int, string?>> GetLatestUpdatedByByVehicle(List<int> vehicleIds)
+        {
+            var auditCandidates = new List<ReportAuditUserCandidate>();
+
+            auditCandidates.AddRange(await _context.Vehicleaudits
+                .AsNoTracking()
+                .Where(a => vehicleIds.Contains(a.VehicleId))
+                .Select(a => new ReportAuditUserCandidate
+                {
+                    RecordId = a.VehicleId,
+                    UpdatedBy = a.UpdatedBy,
+                    UpdatedAt = a.UpdatedAt
+                })
+                .ToListAsync());
+
+            auditCandidates.AddRange(await _context.Vehicleselleraudits
+                .AsNoTracking()
+                .Where(a => a.VehicleSeller.PropertyDetailsId.HasValue && vehicleIds.Contains(a.VehicleSeller.PropertyDetailsId.Value))
+                .Select(a => new ReportAuditUserCandidate
+                {
+                    RecordId = a.VehicleSeller.PropertyDetailsId!.Value,
+                    UpdatedBy = a.UpdatedBy,
+                    UpdatedAt = a.UpdatedAt
+                })
+                .ToListAsync());
+
+            auditCandidates.AddRange(await _context.Vehiclebuyeraudit
+                .AsNoTracking()
+                .Where(a => a.VehicleBuyer.PropertyDetailsId.HasValue && vehicleIds.Contains(a.VehicleBuyer.PropertyDetailsId.Value))
+                .Select(a => new ReportAuditUserCandidate
+                {
+                    RecordId = a.VehicleBuyer.PropertyDetailsId!.Value,
+                    UpdatedBy = a.UpdatedBy,
+                    UpdatedAt = a.UpdatedAt
+                })
+                .ToListAsync());
+
+            return auditCandidates
+                .Where(a => a.RecordId != 0 && !string.IsNullOrWhiteSpace(a.UpdatedBy))
+                .GroupBy(a => a.RecordId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderByDescending(a => a.UpdatedAt ?? DateTime.MinValue).First().UpdatedBy);
+        }
+
         private static readonly Dictionary<string, string> TransactionTypeDariMap = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Sale"] = "خرید و فروش",
@@ -435,6 +524,10 @@ namespace WebAPIBackend.Controllers.Report
                 .Take(pageSize)
                 .ToListAsync();
 
+            var latestUpdatedByByVehicle = await GetLatestUpdatedByByVehicle(items.Select(p => p.Id).ToList());
+            var userLookup = await BuildUserDisplayLookup(
+                items.Select(p => latestUpdatedByByVehicle.TryGetValue(p.Id, out var updatedBy) ? updatedBy : p.CreatedBy));
+
             var result = items.Select(p => new
             {
                 p.Id,
@@ -451,6 +544,13 @@ namespace WebAPIBackend.Controllers.Report
                 p.CreatedAt,
                 SellerName = p.VehiclesSellerDetails.FirstOrDefault()?.FirstName,
                 BuyerName = p.VehiclesBuyerDetails.FirstOrDefault()?.FirstName,
+                CreatedBy = latestUpdatedByByVehicle.TryGetValue(p.Id, out var updatedByValue)
+                    && !string.IsNullOrWhiteSpace(updatedByValue)
+                    && userLookup.TryGetValue(updatedByValue, out var updatedByName)
+                        ? updatedByName
+                        : (!string.IsNullOrWhiteSpace(p.CreatedBy) && userLookup.TryGetValue(p.CreatedBy, out var createdByName)
+                            ? createdByName
+                            : "-"),
                 p.iscomplete
             }).ToList();
 
