@@ -30,6 +30,22 @@ namespace WebAPIBackend.Controllers.Report
             public DateTime? UpdatedAt { get; set; }
         }
 
+        private static readonly string[] HijriShamsiMonthNames =
+        {
+            "\u062d\u0645\u0644",
+            "\u062b\u0648\u0631",
+            "\u062c\u0648\u0632\u0627",
+            "\u0633\u0631\u0637\u0627\u0646",
+            "\u0627\u0633\u062f",
+            "\u0633\u0646\u0628\u0644\u0647",
+            "\u0645\u06cc\u0632\u0627\u0646",
+            "\u0639\u0642\u0631\u0628",
+            "\u0642\u0648\u0633",
+            "\u062c\u062f\u06cc",
+            "\u062f\u0644\u0648",
+            "\u062d\u0648\u062a"
+        };
+
         private async Task<string> ResolveDisplayName(string? userIdOrName)
         {
             if (string.IsNullOrWhiteSpace(userIdOrName))
@@ -135,6 +151,73 @@ namespace WebAPIBackend.Controllers.Report
             return TransactionTypeDariMap.TryGetValue(name, out var dari) ? dari : name;
         }
 
+        private static BuyerDetail? GetPrimaryBuyer(PropertyDetail property)
+        {
+            return property.BuyerDetails.FirstOrDefault();
+        }
+
+        private static string? GetEffectiveTransactionTypeName(PropertyDetail property)
+        {
+            var buyerTransactionType = GetPrimaryBuyer(property)?.TransactionType;
+            return !string.IsNullOrWhiteSpace(buyerTransactionType)
+                ? buyerTransactionType
+                : property.TransactionType?.Name;
+        }
+
+        private static int GetEffectiveTransactionTypeId(PropertyDetail property, Dictionary<string, int> transactionTypeIdsByName)
+        {
+            if (property.TransactionTypeId.HasValue)
+            {
+                return property.TransactionTypeId.Value;
+            }
+
+            var transactionTypeName = GetEffectiveTransactionTypeName(property);
+            return !string.IsNullOrWhiteSpace(transactionTypeName)
+                && transactionTypeIdsByName.TryGetValue(transactionTypeName, out var transactionTypeId)
+                    ? transactionTypeId
+                    : 0;
+        }
+
+        private static string? GetEffectivePrice(PropertyDetail property)
+        {
+            var buyerPrice = GetPrimaryBuyer(property)?.Price;
+            return !string.IsNullOrWhiteSpace(buyerPrice) ? buyerPrice : property.Price;
+        }
+
+        private static string? GetEffectiveRoyaltyAmount(PropertyDetail property)
+        {
+            var buyerRoyaltyAmount = GetPrimaryBuyer(property)?.RoyaltyAmount;
+            return !string.IsNullOrWhiteSpace(buyerRoyaltyAmount) ? buyerRoyaltyAmount : property.RoyaltyAmount;
+        }
+
+        private static string GetEffectivePropertyTypeName(PropertyDetail property)
+        {
+            if (property.PropertyType != null
+                && property.PropertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(property.CustomPropertyType))
+            {
+                return property.CustomPropertyType;
+            }
+
+            return property.PropertyType?.Dari
+                ?? property.PropertyType?.Name
+                ?? "Ù†Ø§Ù…Ø´Ø®Øµ";
+        }
+
+        private static (int Year, int Month, string Key, string Label) GetHijriShamsiMonth(DateTime gregorianDate)
+        {
+            var (year, month, _) = DateConversionHelper.FromGregorian(gregorianDate, CalendarType.HijriShamsi);
+            var monthName = month >= 1 && month <= 12 ? HijriShamsiMonthNames[month - 1] : month.ToString("D2");
+            return (year, month, $"{year:D4}-{month:D2}", $"{monthName} {year:D4}");
+        }
+
+        private async Task<Dictionary<string, int>> GetTransactionTypeIdsByName()
+        {
+            return await _context.TransactionTypes
+                .AsNoTracking()
+                .ToDictionaryAsync(t => t.Name, t => t.Id, StringComparer.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Get RBAC-filtered base query for property details
         /// </summary>
@@ -224,20 +307,28 @@ namespace WebAPIBackend.Controllers.Report
 
             var properties = await query
                 .Include(p => p.TransactionType)
+                .Include(p => p.PropertyType)
+                .Include(p => p.BuyerDetails)
                 .Include(p => p.Company)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var totalRecords = properties.Count;
             var totalRecordsComplete = properties.Count(p => p.iscomplete == true);
+            var transactionTypeIdsByName = await GetTransactionTypeIdsByName();
 
             // Group by transaction type
             var byTransactionType = properties
-                .GroupBy(p => new { Id = p.TransactionTypeId ?? 0, Name = p.TransactionType?.Name ?? "نامشخص" })
+                .GroupBy(p => new
+                {
+                    Id = GetEffectiveTransactionTypeId(p, transactionTypeIdsByName),
+                    Name = GetEffectiveTransactionTypeName(p) ?? "نامشخص"
+                })
                 .Select(g =>
                 {
                     var items = g.ToList();
-                    var totalPrice = items.Sum(p => TryParseDecimal(p.Price));
-                    var totalRoyalty = items.Sum(p => TryParseDecimal(p.RoyaltyAmount));
+                    var totalPrice = items.Sum(p => TryParseDecimal(GetEffectivePrice(p)));
+                    var totalRoyalty = items.Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p)));
 
                     return new
                     {
@@ -254,20 +345,20 @@ namespace WebAPIBackend.Controllers.Report
                 .ToList();
 
             // Overall totals
-            var grandTotalPrice = properties.Sum(p => TryParseDecimal(p.Price));
-            var grandTotalRoyalty = properties.Sum(p => TryParseDecimal(p.RoyaltyAmount));
+            var grandTotalPrice = properties.Sum(p => TryParseDecimal(GetEffectivePrice(p)));
+            var grandTotalRoyalty = properties.Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p)));
 
             // By property type
             var byPropertyType = properties
                 .Where(p => p.PropertyTypeId.HasValue)
-                .GroupBy(p => new { Id = p.PropertyTypeId!.Value, Name = p.PropertyType != null && p.PropertyType.Name.Equals("Other", StringComparison.OrdinalIgnoreCase) && p.CustomPropertyType != null ? p.CustomPropertyType : (p.PropertyType?.Name ?? "نامشخص") })
+                .GroupBy(p => new { Id = p.PropertyTypeId!.Value, Name = GetEffectivePropertyTypeName(p) })
                 .Select(g => new
                 {
                     PropertyTypeId = g.Key.Id,
                     PropertyTypeName = g.Key.Name,
                     Count = g.Count(),
-                    TotalPrice = g.ToList().Sum(p => TryParseDecimal(p.Price)),
-                    TotalRoyaltyAmount = g.ToList().Sum(p => TryParseDecimal(p.RoyaltyAmount))
+                    TotalPrice = g.ToList().Sum(p => TryParseDecimal(GetEffectivePrice(p))),
+                    TotalRoyaltyAmount = g.ToList().Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p)))
                 })
                 .OrderByDescending(t => t.Count)
                 .ToList();
@@ -315,8 +406,11 @@ namespace WebAPIBackend.Controllers.Report
 
             var properties = await query
                 .Include(p => p.TransactionType)
+                .Include(p => p.BuyerDetails)
                 .Include(p => p.Company)
+                .AsSplitQuery()
                 .ToListAsync();
+            var transactionTypeIdsByName = await GetTransactionTypeIdsByName();
 
             var byCompany = properties
                 .Where(p => p.CompanyId.HasValue)
@@ -325,15 +419,19 @@ namespace WebAPIBackend.Controllers.Report
                 {
                     var items = g.ToList();
                     var byType = items
-                        .GroupBy(p => new { Id = p.TransactionTypeId ?? 0, Name = p.TransactionType?.Name ?? "نامشخص" })
+                        .GroupBy(p => new
+                        {
+                            Id = GetEffectiveTransactionTypeId(p, transactionTypeIdsByName),
+                            Name = GetEffectiveTransactionTypeName(p) ?? "نامشخص"
+                        })
                         .Select(tg => new
                         {
                             TransactionTypeId = tg.Key.Id,
                             TransactionTypeName = tg.Key.Name,
                             TransactionTypeDari = GetTransactionTypeDari(tg.Key.Name),
                             Count = tg.Count(),
-                            TotalPrice = tg.ToList().Sum(p => TryParseDecimal(p.Price)),
-                            TotalRoyaltyAmount = tg.ToList().Sum(p => TryParseDecimal(p.RoyaltyAmount))
+                            TotalPrice = tg.ToList().Sum(p => TryParseDecimal(GetEffectivePrice(p))),
+                            TotalRoyaltyAmount = tg.ToList().Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p)))
                         })
                         .OrderByDescending(t => t.Count)
                         .ToList();
@@ -343,8 +441,8 @@ namespace WebAPIBackend.Controllers.Report
                         CompanyId = g.Key.CompanyId,
                         CompanyTitle = g.Key.CompanyTitle,
                         TotalRecords = items.Count,
-                        TotalPrice = items.Sum(p => TryParseDecimal(p.Price)),
-                        TotalRoyaltyAmount = items.Sum(p => TryParseDecimal(p.RoyaltyAmount)),
+                        TotalPrice = items.Sum(p => TryParseDecimal(GetEffectivePrice(p))),
+                        TotalRoyaltyAmount = items.Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p))),
                         ByTransactionType = byType
                     };
                 })
@@ -373,7 +471,10 @@ namespace WebAPIBackend.Controllers.Report
             if (parsedEnd.HasValue)
                 query = query.Where(p => p.CreatedAt.HasValue && p.CreatedAt.Value.Date <= parsedEnd.Value.ToDateTime(TimeOnly.MinValue).Date);
 
-            var properties = await query.ToListAsync();
+            var properties = await query
+                .Include(p => p.BuyerDetails)
+                .AsSplitQuery()
+                .ToListAsync();
 
             // Get addresses for all these properties
             var propertyIds = properties.Select(p => p.Id).ToList();
@@ -398,8 +499,8 @@ namespace WebAPIBackend.Controllers.Report
                     ProvinceName = prov.Name ?? prov.Dari,
                     ProvinceDari = prov.Dari,
                     TotalRecords = propsInProvince.Count,
-                    TotalPrice = propsInProvince.Sum(p => TryParseDecimal(p.Price)),
-                    TotalRoyaltyAmount = propsInProvince.Sum(p => TryParseDecimal(p.RoyaltyAmount))
+                    TotalPrice = propsInProvince.Sum(p => TryParseDecimal(GetEffectivePrice(p))),
+                    TotalRoyaltyAmount = propsInProvince.Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p)))
                 };
             })
             .Where(r => r != null)
@@ -432,16 +533,20 @@ namespace WebAPIBackend.Controllers.Report
             if (parsedEnd.HasValue)
                 query = query.Where(p => p.CreatedAt.HasValue && p.CreatedAt.Value.Date <= parsedEnd.Value.ToDateTime(TimeOnly.MinValue).Date);
 
-            var properties = await query.Include(p => p.TransactionType).ToListAsync();
+            var properties = await query
+                .Include(p => p.TransactionType)
+                .Include(p => p.BuyerDetails)
+                .AsSplitQuery()
+                .ToListAsync();
 
             var trend = properties
                 .Where(p => p.CreatedAt.HasValue)
-                .GroupBy(p => new DateTime(p.CreatedAt!.Value.Year, p.CreatedAt.Value.Month, 1))
+                .GroupBy(p => GetHijriShamsiMonth(p.CreatedAt!.Value))
                 .Select(g =>
                 {
                     var items = g.ToList();
                     var byType = items
-                        .GroupBy(p => p.TransactionType?.Name ?? "نامشخص")
+                        .GroupBy(p => GetEffectiveTransactionTypeName(p) ?? "نامشخص")
                         .Select(tg => new
                         {
                             TransactionType = tg.Key,
@@ -453,11 +558,11 @@ namespace WebAPIBackend.Controllers.Report
 
                     return new
                     {
-                        Month = g.Key.ToString("yyyy-MM"),
-                        MonthLabel = g.Key.ToString("MMM yyyy"),
+                        Month = g.Key.Key,
+                        MonthLabel = g.Key.Label,
                         TotalRecords = items.Count,
-                        TotalPrice = items.Sum(p => TryParseDecimal(p.Price)),
-                        TotalRoyaltyAmount = items.Sum(p => TryParseDecimal(p.RoyaltyAmount)),
+                        TotalPrice = items.Sum(p => TryParseDecimal(GetEffectivePrice(p))),
+                        TotalRoyaltyAmount = items.Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p))),
                         ByTransactionType = byType
                     };
                 })
@@ -485,8 +590,19 @@ namespace WebAPIBackend.Controllers.Report
             TryParseDates(startDate, endDate, calendarType, out var parsedStart, out var parsedEnd);
 
             var query = await GetFilteredQuery();
+            var transactionType = await _context.TransactionTypes.FindAsync(transactionTypeId);
 
-            query = query.Where(p => p.TransactionTypeId == transactionTypeId);
+            if (transactionType != null)
+            {
+                query = query.Where(p =>
+                    p.BuyerDetails.Any(b => b.TransactionType == transactionType.Name)
+                    || (!p.BuyerDetails.Any(b => b.TransactionType != null && b.TransactionType != "")
+                        && p.TransactionTypeId == transactionTypeId));
+            }
+            else
+            {
+                query = query.Where(p => p.TransactionTypeId == transactionTypeId);
+            }
 
             if (companyId.HasValue)
                 query = query.Where(p => p.CompanyId == companyId.Value);
@@ -512,6 +628,7 @@ namespace WebAPIBackend.Controllers.Report
                 .Include(p => p.TransactionType)
                 .Include(p => p.SellerDetails)
                 .Include(p => p.BuyerDetails)
+                .AsSplitQuery()
                 .OrderByDescending(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -525,10 +642,10 @@ namespace WebAPIBackend.Controllers.Report
             {
                 p.Id,
                 p.Pnumber,
-                TransactionType = p.TransactionType?.Name,
-                TransactionTypeDari = GetTransactionTypeDari(p.TransactionType?.Name),
-                p.Price,
-                p.RoyaltyAmount,
+                TransactionType = GetEffectiveTransactionTypeName(p),
+                TransactionTypeDari = GetTransactionTypeDari(GetEffectiveTransactionTypeName(p)),
+                Price = GetEffectivePrice(p),
+                RoyaltyAmount = GetEffectiveRoyaltyAmount(p),
                 CompanyTitle = p.Company?.Title,
                 p.CompanyId,
                 p.CreatedAt,
@@ -544,8 +661,6 @@ namespace WebAPIBackend.Controllers.Report
                 p.iscomplete
             }).ToList();
 
-            var transactionType = await _context.TransactionTypes.FindAsync(transactionTypeId);
-
             return Ok(new
             {
                 TransactionTypeId = transactionTypeId,
@@ -554,8 +669,8 @@ namespace WebAPIBackend.Controllers.Report
                 Total = total,
                 Page = page,
                 PageSize = pageSize,
-                TotalPrice = items.Sum(p => TryParseDecimal(p.Price)),
-                TotalRoyaltyAmount = items.Sum(p => TryParseDecimal(p.RoyaltyAmount)),
+                TotalPrice = items.Sum(p => TryParseDecimal(GetEffectivePrice(p))),
+                TotalRoyaltyAmount = items.Sum(p => TryParseDecimal(GetEffectiveRoyaltyAmount(p))),
                 Records = result
             });
         }
