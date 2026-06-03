@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
+using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
 
 namespace WebAPIBackend.Controllers
@@ -49,9 +50,20 @@ namespace WebAPIBackend.Controllers
 
                 IQueryable<PropertyDetail> propertyQuery;
 
-                if (roles.Contains("ADMIN"))
+                if (RbacHelper.CanViewAllRecords(roles, "property"))
                 {
                     propertyQuery = _context.PropertyDetails.AsNoTracking();
+                }
+                else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
+                {
+                    if (user.CompanyId == 0)
+                    {
+                        return StatusCode(403, new { message = "شما به هیچ رهنما متصل نیستید" });
+                    }
+
+                    propertyQuery = _context.PropertyDetails
+                        .AsNoTracking()
+                        .Where(p => p.CompanyId == user.CompanyId);
                 }
                 else
                 {
@@ -122,9 +134,20 @@ namespace WebAPIBackend.Controllers
 
                 IQueryable<PropertyCancellation> cancellationQuery;
 
-                if (roles.Contains("ADMIN"))
+                if (RbacHelper.CanViewAllRecords(roles, "property"))
                 {
                     cancellationQuery = _context.PropertyCancellations.AsNoTracking();
+                }
+                else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
+                {
+                    if (user.CompanyId == 0)
+                    {
+                        return StatusCode(403, new { message = "شما به هیچ رهنما متصل نیستید" });
+                    }
+
+                    cancellationQuery = _context.PropertyCancellations
+                        .AsNoTracking()
+                        .Where(c => c.PropertyDetails != null && c.PropertyDetails.CompanyId == user.CompanyId);
                 }
                 else
                 {
@@ -196,10 +219,33 @@ namespace WebAPIBackend.Controllers
                     return BadRequest(new { error = "Cancellation reason is required" });
                 }
 
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
                 var property = await _context.PropertyDetails.FindAsync(request.PropertyDetailsId);
                 if (property == null)
                 {
                     return NotFound(new { error = "Property not found" });
+                }
+
+                if (!RbacHelper.CanViewAllRecords(roles, "property"))
+                {
+                    if (RbacHelper.ShouldFilterByCompany(roles, "property"))
+                    {
+                        if (user.CompanyId == 0 || property.CompanyId != user.CompanyId)
+                        {
+                            return StatusCode(403, new { message = "شما اجازه ابطال این معامله را ندارید" });
+                        }
+                    }
+                    else if (property.CreatedBy != userId)
+                    {
+                        return StatusCode(403, new { message = "شما اجازه ابطال این معامله را ندارید" });
+                    }
                 }
 
                 if (property.iscomplete != true)
@@ -305,7 +351,20 @@ namespace WebAPIBackend.Controllers
 
                 IQueryable<PropertyCancellation> cancellationQuery = _context.PropertyCancellations.AsNoTracking();
 
-                if (!roles.Contains("ADMIN"))
+                if (RbacHelper.CanViewAllRecords(roles, "property"))
+                {
+                    // Keep all cancellations visible.
+                }
+                else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
+                {
+                    if (user.CompanyId == 0)
+                    {
+                        return StatusCode(403, new { message = "شما به هیچ رهنما متصل نیستید" });
+                    }
+
+                    cancellationQuery = cancellationQuery.Where(c => c.PropertyDetails != null && c.PropertyDetails.CompanyId == user.CompanyId);
+                }
+                else
                 {
                     cancellationQuery = cancellationQuery.Where(c => c.PropertyDetails != null && c.PropertyDetails.CreatedBy == userId);
                 }

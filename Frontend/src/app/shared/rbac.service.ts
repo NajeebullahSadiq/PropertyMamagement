@@ -113,6 +113,7 @@ export interface UserProfile {
   companyName: string;
   phoneNumber: string;
   licenseType: string;
+  provinceId?: number | null;
   role: string;
   roleDari: string;
   permissions: string[];
@@ -320,7 +321,8 @@ export class RbacService {
     // Admin has all permissions in token, so permission checks cover admin automatically
     switch (module.toLowerCase()) {
       case 'dashboard':
-        return this.hasPermission(Permissions.DashboardView);
+        return this.hasPermission(Permissions.DashboardView) &&
+          this.hasAnyRole([UserRoles.Admin, UserRoles.Authority]);
       case 'company':
         return this.hasPermission(Permissions.CompanyView);
       case 'property':

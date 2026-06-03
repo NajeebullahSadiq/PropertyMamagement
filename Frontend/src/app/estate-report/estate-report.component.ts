@@ -13,6 +13,7 @@ import {
     MonthlyTrendItem,
     TransactionTypeDetailReport
 } from 'src/app/shared/estate-report.service';
+import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
 
 @Component({
     selector: 'app-estate-report',
@@ -29,6 +30,7 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
     provinceFilter: number | null = null;
     districtFilter: number | null = null;
     companyFilter: number | null = null;
+    isPropertyOperatorReport = false;
 
     // Dropdown data
     provinces: any[] = [];
@@ -52,14 +54,55 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
         private toastr: ToastrService,
         private reportService: EstateReportService,
         private calendarService: CalendarService,
-        private calendarConversionService: CalendarConversionService
+        private calendarConversionService: CalendarConversionService,
+        private rbacService: RbacService
     ) {
         super();
     }
 
     ngOnInit(): void {
+        this.initializeUserScope();
         this.loadDropdowns();
         this.loadSummary();
+    }
+
+    private initializeUserScope(): void {
+        this.isPropertyOperatorReport = this.rbacService.hasRole(UserRoles.PropertyOperator);
+
+        if (!this.isPropertyOperatorReport) {
+            return;
+        }
+
+        const companyId = this.rbacService.getCompanyId();
+        this.companyFilter = companyId > 0 ? companyId : null;
+
+        this.rbacService.loadUserProfile().pipe(takeUntil(this.destroy$)).subscribe({
+            next: (profile: any) => {
+                if (profile?.provinceId) {
+                    this.provinceFilter = profile.provinceId;
+                    this.onProvinceChange();
+                }
+
+                if (profile?.companyId) {
+                    this.companyFilter = profile.companyId;
+                }
+
+                this.onTabChange(this.activeTab === 'detail' ? 'summary' : this.activeTab);
+            },
+            error: () => {}
+        });
+    }
+
+    private getEffectiveProvinceFilter(): number | undefined {
+        return this.provinceFilter || undefined;
+    }
+
+    private getEffectiveDistrictFilter(): number | undefined {
+        return this.isPropertyOperatorReport ? undefined : (this.districtFilter || undefined);
+    }
+
+    private getEffectiveCompanyFilter(): number | undefined {
+        return this.companyFilter || undefined;
     }
 
     loadDropdowns(): void {
@@ -118,9 +161,9 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
             this.formatDateForBackend(this.startDate) || undefined,
             this.formatDateForBackend(this.endDate) || undefined,
             this.getCalendarType(),
-            this.provinceFilter || undefined,
-            this.districtFilter || undefined,
-            this.companyFilter || undefined
+            this.getEffectiveProvinceFilter(),
+            this.getEffectiveDistrictFilter(),
+            this.getEffectiveCompanyFilter()
         ).subscribe({
             next: (data) => { this.summary = data; this.isLoading = false; },
             error: () => { this.toastr.error('خطا در بارگذاری خلاصه گزارش'); this.isLoading = false; }
@@ -133,8 +176,8 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
             this.formatDateForBackend(this.startDate) || undefined,
             this.formatDateForBackend(this.endDate) || undefined,
             this.getCalendarType(),
-            this.provinceFilter || undefined,
-            this.districtFilter || undefined
+            this.getEffectiveProvinceFilter(),
+            this.getEffectiveDistrictFilter()
         ).subscribe({
             next: (data) => { this.byCompanyData = data; this.isLoading = false; },
             error: () => { this.toastr.error('خطا در بارگذاری گزارش رهنماها'); this.isLoading = false; }
@@ -159,7 +202,7 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
             this.formatDateForBackend(this.startDate) || undefined,
             this.formatDateForBackend(this.endDate) || undefined,
             this.getCalendarType(),
-            this.companyFilter || undefined
+            this.getEffectiveCompanyFilter()
         ).subscribe({
             next: (data) => { this.monthlyTrendData = data; this.isLoading = false; },
             error: () => { this.toastr.error('خطا در بارگذاری روند ماهانه'); this.isLoading = false; }
@@ -175,9 +218,9 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
             this.formatDateForBackend(this.startDate) || undefined,
             this.formatDateForBackend(this.endDate) || undefined,
             this.getCalendarType(),
-            this.provinceFilter || undefined,
-            this.districtFilter || undefined,
-            this.companyFilter || undefined,
+            this.getEffectiveProvinceFilter(),
+            this.getEffectiveDistrictFilter(),
+            this.getEffectiveCompanyFilter(),
             this.detailPage,
             this.detailPageSize
         ).subscribe({
@@ -199,10 +242,12 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
     resetFilters(): void {
         this.startDate = null;
         this.endDate = null;
-        this.provinceFilter = null;
-        this.districtFilter = null;
-        this.companyFilter = null;
-        this.districts = [];
+        if (!this.isPropertyOperatorReport) {
+            this.provinceFilter = null;
+            this.districtFilter = null;
+            this.companyFilter = null;
+            this.districts = [];
+        }
         this.onTabChange(this.activeTab === 'detail' ? 'summary' : this.activeTab);
     }
 

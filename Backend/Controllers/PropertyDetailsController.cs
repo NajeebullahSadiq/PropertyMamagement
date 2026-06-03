@@ -753,17 +753,20 @@ namespace WebAPIBackend.Controllers
                 request.TransactionDate = DateConversionHelper.ParseDateString(request.TransactionDateStr, calendarType);
             }
 
-            // Store the original values of the CreatedBy and CreatedOn properties
+            // Store values that must not be overwritten by partial frontend payloads.
             var createdBy = existingProperty.CreatedBy;
             var createdAt = existingProperty.CreatedAt;
+            var companyId = existingProperty.CompanyId;
             var pNumber = existingProperty.Pnumber; // Preserve PNumber
 
             // Update the entity with the new values
             _context.Entry(existingProperty).CurrentValues.SetValues(request);
 
-            // Restore the original values of the CreatedBy and CreatedOn properties
+            // Restore server-owned values. The estate form does not post CompanyId, so without
+            // this an edit can detach the record from its company and hide it from operators.
             existingProperty.CreatedBy = createdBy;
             existingProperty.CreatedAt = createdAt;
+            existingProperty.CompanyId = companyId;
             existingProperty.Pnumber = pNumber; // Restore PNumber
 
             var entry = _context.Entry(existingProperty);

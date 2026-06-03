@@ -157,7 +157,7 @@ namespace WebAPI.Controllers
                 "property" => role == UserRoles.PropertyOperator || licenseType == "realEstate",
                 "vehicle" => role == UserRoles.VehicleOperator || licenseType == "carSale",
                 "reports" => role != UserRoles.LicenseReviewer,
-                "dashboard" => role != UserRoles.LicenseReviewer,
+                "dashboard" => role == UserRoles.Admin || role == UserRoles.Authority,
                 "users" => role == UserRoles.Admin,
                 _ => false
             };
