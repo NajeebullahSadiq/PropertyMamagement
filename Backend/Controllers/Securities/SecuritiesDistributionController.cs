@@ -494,6 +494,39 @@ namespace WebAPIBackend.Controllers.Securities
         }
 
         /// <summary>
+        /// Get next registration number for new securities distribution records.
+        /// </summary>
+        [HttpGet("next-registration-number")]
+        public async Task<IActionResult> GetNextRegistrationNumber()
+        {
+            try
+            {
+                // Match petition writer securities behavior: use the max numeric active registration number.
+                var registrationNumbers = await _context.SecuritiesDistributions
+                    .AsNoTracking()
+                    .Where(x => x.Status == true)
+                    .Select(x => x.RegistrationNumber)
+                    .ToListAsync();
+
+                int maxNumber = 0;
+                foreach (var registrationNumber in registrationNumbers)
+                {
+                    if (int.TryParse(registrationNumber, out int number) && number > maxNumber)
+                    {
+                        maxNumber = number;
+                    }
+                }
+
+                int nextNumber = maxNumber + 1;
+                return Ok(new { registrationNumber = nextNumber.ToString() });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error generating next registration number", error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Validate items collection
         /// </summary>
         private (bool IsValid, string? ErrorMessage) ValidateItems(List<SecuritiesDistributionItemData> items)

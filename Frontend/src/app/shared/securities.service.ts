@@ -86,6 +86,13 @@ export class SecuritiesService {
     }
 
     /**
+     * Get next registration number (auto-increment)
+     */
+    getNextRegistrationNumber(): Observable<{ registrationNumber: string }> {
+        return this.http.get<{ registrationNumber: string }>(`${this.baseUrl}/next-registration-number`);
+    }
+
+    /**
      * Get comprehensive securities report
      */
     getComprehensiveReport(

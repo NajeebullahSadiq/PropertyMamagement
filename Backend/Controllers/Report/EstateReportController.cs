@@ -231,11 +231,11 @@ namespace WebAPIBackend.Controllers.Report
 
             IQueryable<PropertyDetail> query;
 
-            if (RbacHelper.CanViewAllRecords(roles, "property"))
+            if (RbacHelper.HasAnyRole(roles, UserRoles.Admin, UserRoles.Authority))
             {
                 query = _context.PropertyDetails.AsNoTracking();
             }
-            else if (RbacHelper.ShouldFilterByCompany(roles, "property"))
+            else if (user.CompanyId > 0)
             {
                 query = _context.PropertyDetails.AsNoTracking()
                     .Where(p => p.CompanyId == user.CompanyId);

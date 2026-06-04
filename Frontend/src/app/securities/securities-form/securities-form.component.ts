@@ -71,6 +71,8 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
             }
             
             this.loadData(this.editId);
+        } else {
+            this.generateNextRegistrationNumber();
         }
     }
 
@@ -329,6 +331,17 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
         });
     }
 
+    generateNextRegistrationNumber(): void {
+        this.securitiesService.getNextRegistrationNumber().subscribe({
+            next: (response) => {
+                this.securitiesForm.patchValue({ registrationNumber: response.registrationNumber });
+            },
+            error: (err) => {
+                console.error('Error fetching next registration number', err);
+            }
+        });
+    }
+
     private formatDateForBackend(dateValue: any): string {
         const currentCalendar = this.calendarService.getSelectedCalendar();
         if (dateValue instanceof Date) {
@@ -355,6 +368,8 @@ export class SecuritiesFormComponent extends BaseComponent implements OnInit {
             this.editId = null;
             this.router.navigate(['/securities']);
         }
+
+        this.generateNextRegistrationNumber();
     }
 
     goToList(): void {

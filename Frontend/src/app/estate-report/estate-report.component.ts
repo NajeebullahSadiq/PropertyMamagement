@@ -13,7 +13,7 @@ import {
     MonthlyTrendItem,
     TransactionTypeDetailReport
 } from 'src/app/shared/estate-report.service';
-import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
+import { RbacService } from 'src/app/shared/rbac.service';
 
 @Component({
     selector: 'app-estate-report',
@@ -30,8 +30,6 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
     provinceFilter: number | null = null;
     districtFilter: number | null = null;
     companyFilter: number | null = null;
-    isPropertyOperatorReport = false;
-
     // Dropdown data
     provinces: any[] = [];
     districts: any[] = [];
@@ -67,12 +65,6 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
     }
 
     private initializeUserScope(): void {
-        this.isPropertyOperatorReport = this.rbacService.hasRole(UserRoles.PropertyOperator);
-
-        if (!this.isPropertyOperatorReport) {
-            return;
-        }
-
         const companyId = this.rbacService.getCompanyId();
         this.companyFilter = companyId > 0 ? companyId : null;
 
@@ -87,7 +79,7 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
                     this.companyFilter = profile.companyId;
                 }
 
-                this.onTabChange(this.activeTab === 'detail' ? 'summary' : this.activeTab);
+                this.onTabChange('summary');
             },
             error: () => {}
         });
@@ -98,7 +90,7 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
     }
 
     private getEffectiveDistrictFilter(): number | undefined {
-        return this.isPropertyOperatorReport ? undefined : (this.districtFilter || undefined);
+        return undefined;
     }
 
     private getEffectiveCompanyFilter(): number | undefined {
@@ -122,13 +114,8 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
     }
 
     onTabChange(tab: string): void {
-        this.activeTab = tab;
-        switch (tab) {
-            case 'summary': this.loadSummary(); break;
-            case 'byCompany': this.loadByCompany(); break;
-            case 'byProvince': this.loadByProvince(); break;
-            case 'trend': this.loadMonthlyTrend(); break;
-        }
+        this.activeTab = 'summary';
+        this.loadSummary();
     }
 
     private formatDateForBackend(dateValue: any): string {
@@ -236,19 +223,13 @@ export class EstateReportComponent extends BaseComponent implements OnInit {
 
     // --- Actions ---
     applyFilters(): void {
-        this.onTabChange(this.activeTab === 'detail' ? 'summary' : this.activeTab);
+        this.onTabChange('summary');
     }
 
     resetFilters(): void {
         this.startDate = null;
         this.endDate = null;
-        if (!this.isPropertyOperatorReport) {
-            this.provinceFilter = null;
-            this.districtFilter = null;
-            this.companyFilter = null;
-            this.districts = [];
-        }
-        this.onTabChange(this.activeTab === 'detail' ? 'summary' : this.activeTab);
+        this.onTabChange('summary');
     }
 
     toggleCompanyExpand(companyId: number): void {

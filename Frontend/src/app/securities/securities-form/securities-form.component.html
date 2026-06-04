@@ -36,7 +36,8 @@
             <div>
               <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر ثبت توزیع <span class="text-red-500">*</span></label>
               <input type="text" formControlName="registrationNumber"
-                class="form-input" [class.border-red-500]="registrationNumber?.invalid && registrationNumber?.touched"
+                class="form-input" [class.bg-gray-50]="!isEditMode" [readonly]="!isEditMode"
+                [class.border-red-500]="registrationNumber?.invalid && registrationNumber?.touched"
                 placeholder="نمبر ثبت را وارد کنید">
               <div *ngIf="registrationNumber?.invalid && registrationNumber?.touched">
                 <small class="text-red-600 text-xs mt-1 block">این فیلد الزامی است</small>
