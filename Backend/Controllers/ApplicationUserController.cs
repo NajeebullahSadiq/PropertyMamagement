@@ -86,11 +86,19 @@ namespace WebAPI.Controllers
                 }
             }
 
-            // Validate company operators must have company and license type
-            if ((model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator) 
-                && model.CompanyId == 0)
+            // Company operators are created from a license number. The matching
+            // license determines the company, license type, and province.
+            if (model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator)
             {
-                return BadRequest(new { message = "Company operators must be associated with a company" });
+                var licenseSelection = await ResolveCompanyLicenseAsync(model.LicenseNumber, model.Role);
+                if (licenseSelection == null)
+                {
+                    return BadRequest(new { message = "شماره جواز معتبر نیست یا رهنما یافت نشد" });
+                }
+
+                model.CompanyId = licenseSelection.CompanyId;
+                model.LicenseType = licenseSelection.LicenseType;
+                model.ProvinceId = licenseSelection.ProvinceId ?? model.ProvinceId;
             }
 
             // Validate company exists and license type matches
@@ -488,8 +496,11 @@ namespace WebAPI.Controllers
                 .Select(l => new
                 {
                     l.CompanyId,
+                    CompanyTitle = l.Company != null ? l.Company.Title : null,
                     l.LicenseType,
                     l.LicenseNumber,
+                    l.ActivityLocation,
+                    l.ProvinceId,
                     l.Id
                 })
                 .ToListAsync();
@@ -505,6 +516,11 @@ namespace WebAPI.Controllers
                     .ThenByDescending(l => l.Id)
                     .Select(l => l.LicenseNumber)
                     .FirstOrDefault();
+                var selectedLicense = companyLicenses
+                    .Where(l => l.CompanyId == user.CompanyId)
+                    .OrderByDescending(l => l.LicenseType == user.LicenseType)
+                    .ThenByDescending(l => l.Id)
+                    .FirstOrDefault();
 
                 userList.Add(new
                 {
@@ -517,6 +533,9 @@ namespace WebAPI.Controllers
                     user.CompanyId,
                     user.LicenseType,
                     LicenseNumber = licenseNumber,
+                    CompanyTitle = selectedLicense?.CompanyTitle,
+                    ActivityLocation = selectedLicense?.ActivityLocation,
+                    selectedLicense?.ProvinceId,
                     user.IsLocked,
                     user.PhotoPath,
                     user.CreatedAt,
@@ -758,6 +777,7 @@ namespace WebAPI.Controllers
             public string LastName { get; set; } = "";
             public string? PhoneNumber { get; set; }
             public int CompanyId { get; set; }
+            public string? LicenseNumber { get; set; }
             public string LicenseType { get; set; } = "";
         }
 
@@ -786,6 +806,19 @@ namespace WebAPI.Controllers
                 {
                     return BadRequest(new { message = "Invalid province" });
                 }
+            }
+
+            if (model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator)
+            {
+                var licenseSelection = await ResolveCompanyLicenseAsync(model.LicenseNumber, model.Role);
+                if (licenseSelection == null)
+                {
+                    return BadRequest(new { message = "شماره جواز معتبر نیست یا رهنما یافت نشد" });
+                }
+
+                model.CompanyId = licenseSelection.CompanyId;
+                model.LicenseType = licenseSelection.LicenseType;
+                model.ProvinceId = licenseSelection.ProvinceId ?? model.ProvinceId;
             }
 
             // Update user properties
@@ -872,6 +905,20 @@ namespace WebAPI.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.UserRole ?? "";
+            var license = user.CompanyId > 0
+                ? await _context.LicenseDetails.AsNoTracking()
+                    .Where(l => l.CompanyId == user.CompanyId && l.Status != false)
+                    .OrderByDescending(l => l.LicenseType == user.LicenseType)
+                    .ThenByDescending(l => l.Id)
+                    .Select(l => new
+                    {
+                        l.LicenseNumber,
+                        l.ActivityLocation,
+                        CompanyTitle = l.Company != null ? l.Company.Title : null,
+                        l.ProvinceId
+                    })
+                    .FirstOrDefaultAsync()
+                : null;
 
             return Ok(new
             {
@@ -883,6 +930,9 @@ namespace WebAPI.Controllers
                 user.PhoneNumber,
                 user.CompanyId,
                 user.LicenseType,
+                LicenseNumber = license?.LicenseNumber,
+                CompanyTitle = license?.CompanyTitle,
+                ActivityLocation = license?.ActivityLocation,
                 user.IsLocked,
                 user.PhotoPath,
                 user.CreatedAt,
@@ -901,6 +951,7 @@ namespace WebAPI.Controllers
             public string Email { get; set; } = "";
             public string? PhoneNumber { get; set; }
             public int CompanyId { get; set; }
+            public string? LicenseNumber { get; set; }
             public string? LicenseType { get; set; }
             public string? Role { get; set; }
             public int? ProvinceId { get; set; }
@@ -994,5 +1045,38 @@ namespace WebAPI.Controllers
                 message = "صلاحیت‌ها با موفقیت به‌روز شد"
             });
         }
+
+        private async Task<CompanyLicenseSelection?> ResolveCompanyLicenseAsync(string? licenseNumber, string? role)
+        {
+            if (string.IsNullOrWhiteSpace(licenseNumber))
+                return null;
+
+            var expectedLicenseType = role == UserRoles.PropertyOperator ? "realEstate"
+                : role == UserRoles.VehicleOperator ? "carSale"
+                : null;
+
+            if (expectedLicenseType == null)
+                return null;
+
+            var normalizedLicenseNumber = licenseNumber.Trim().ToLower();
+
+            return await _context.LicenseDetails
+                .AsNoTracking()
+                .Where(l => l.LicenseNumber != null
+                    && l.LicenseNumber.ToLower() == normalizedLicenseNumber
+                    && l.LicenseType == expectedLicenseType
+                    && l.CompanyId.HasValue
+                    && l.Company != null
+                    && l.Status != false
+                    && l.Company.Status != false)
+                .OrderByDescending(l => l.Id)
+                .Select(l => new CompanyLicenseSelection(
+                    l.CompanyId!.Value,
+                    l.LicenseType ?? expectedLicenseType,
+                    l.ProvinceId ?? l.Company!.ProvinceId))
+                .FirstOrDefaultAsync();
+        }
+
+        private sealed record CompanyLicenseSelection(int CompanyId, string LicenseType, int? ProvinceId);
     }
 }

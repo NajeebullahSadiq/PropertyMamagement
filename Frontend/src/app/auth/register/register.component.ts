@@ -33,6 +33,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
   searchProvinceId: number | null = null;
   searchResults: any[] = [];
   isSearching: boolean = false;
+  selectedCompanyInfo: any = null;
   provinces: any = [];
 
   // UI State
@@ -95,6 +96,13 @@ export class RegisterComponent extends BaseComponent implements OnInit {
 
     this.service.photoPath = this.imageName;
 
+    if (this.showCompanySelect && (!this.service.formModel.get('LicenseNumber')?.value || !this.service.formModel.get('CompanyId')?.value)) {
+      this.isSubmitting = false;
+      this.errorMessage = 'لطفاً رهنما را بر اساس شماره جواز انتخاب کنید.';
+      this.toastr.error(this.errorMessage);
+      return;
+    }
+
     this.service.register().subscribe(
       (res: any) => {
         this.isSubmitting = false;
@@ -106,6 +114,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           this.filePath = 'assets/img/avatar.png';
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
+          this.selectedCompanyInfo = null;
           // Refresh user list
           this.service.getUserProfile().subscribe(res => {
             this.userDetails = res;
@@ -184,6 +193,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     this.imageName = '';
     this.showCompanySelect = false;
     this.showLicenseTypeSelect = false;
+    this.selectedCompanyInfo = null;
     this.successMessage = '';
     this.errorMessage = '';
     this.showPassword = false;
@@ -198,6 +208,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
       const roleControl = this.service.formModel.get('Role');
       const companyIdControl = this.service.formModel.get('CompanyId');
       const licenseTypeControl = this.service.formModel.get('LicenseType');
+      const licenseNumberControl = this.service.formModel.get('LicenseNumber');
       const provinceIdControl = this.service.formModel.get('ProvinceId');
 
       if (roleControl && companyIdControl) {
@@ -215,7 +226,11 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           // System-level roles don't need company or province
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');
+          licenseNumberControl?.setValue('');
+          licenseNumberControl?.clearValidators();
+          licenseNumberControl?.updateValueAndValidity();
           provinceIdControl?.setValue(null);
+          this.selectedCompanyInfo = null;
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
           this.showProvinceSelect = false;
@@ -223,6 +238,10 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           // Company registrar and petition writer license manager need province but not company association
           companyIdControl.setValue(0);
           licenseTypeControl?.setValue('');
+          licenseNumberControl?.setValue('');
+          licenseNumberControl?.clearValidators();
+          licenseNumberControl?.updateValueAndValidity();
+          this.selectedCompanyInfo = null;
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
           this.showProvinceSelect = true;
@@ -234,7 +253,13 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           // Company operators need company and license type
           this.showCompanySelect = true;
           this.showLicenseTypeSelect = true;
+          this.showLicenseSearch = true;
           this.showProvinceSelect = false;
+          companyIdControl.setValue(0);
+          licenseNumberControl?.setValue('');
+          licenseNumberControl?.setValidators([Validators.required]);
+          licenseNumberControl?.updateValueAndValidity();
+          this.selectedCompanyInfo = null;
           provinceIdControl?.setValue(null);
           provinceIdControl?.clearValidators();
           provinceIdControl?.updateValueAndValidity();
@@ -246,7 +271,10 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           }
         } else {
           this.showCompanySelect = true;
+          this.showLicenseSearch = true;
           this.showLicenseTypeSelect = false;
+          licenseNumberControl?.setValidators([Validators.required]);
+          licenseNumberControl?.updateValueAndValidity();
           this.showProvinceSelect = false;
           provinceIdControl?.setValue(null);
           provinceIdControl?.clearValidators();
@@ -312,6 +340,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
   selectCompanyFromSearch(result: any) {
     const companyIdControl = this.service.formModel.get('CompanyId');
     const licenseTypeControl = this.service.formModel.get('LicenseType');
+    const licenseNumberControl = this.service.formModel.get('LicenseNumber');
     const provinceIdControl = this.service.formModel.get('ProvinceId');
     
     if (companyIdControl && result.companyId) {
@@ -321,15 +350,21 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     if (licenseTypeControl && result.licenseType) {
       licenseTypeControl.setValue(result.licenseType);
     }
+
+    if (licenseNumberControl && result.licenseNumber) {
+      licenseNumberControl.setValue(result.licenseNumber);
+    }
     
     // Auto-populate provinceId from search result
     if (provinceIdControl && result.provinceId) {
       provinceIdControl.setValue(result.provinceId);
     }
     
+    this.selectedCompanyInfo = result;
+
     // Clear search
     this.searchResults = [];
-    this.searchLicenseNumber = '';
+    this.searchLicenseNumber = result.licenseNumber || '';
     this.searchProvinceId = null;
     this.showLicenseSearch = false;
   }

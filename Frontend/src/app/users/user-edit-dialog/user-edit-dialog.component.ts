@@ -19,6 +19,11 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
   companies: any[] = [];
   showCompanySelect = false;
   showLicenseTypeSelect = false;
+  showLicenseSearch = false;
+  searchLicenseNumber = '';
+  searchResults: any[] = [];
+  isSearching = false;
+  selectedCompanyInfo: any = null;
 
   licenseTypes = [
     { id: 'realEstate', name: 'Real Estate', dari: 'املاک' },
@@ -52,8 +57,20 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
       phoneNumber: [this.data.user.phoneNumber],
       role: [this.data.user.role, Validators.required],
       companyId: [this.data.user.companyId || 0],
+      licenseNumber: [this.data.user.licenseNumber || ''],
       licenseType: [this.data.user.licenseType || '']
     });
+
+    if (this.data.user.licenseNumber || this.data.user.companyTitle) {
+      this.selectedCompanyInfo = {
+        licenseNumber: this.data.user.licenseNumber,
+        companyTitle: this.data.user.companyTitle,
+        activityLocation: this.data.user.activityLocation,
+        companyId: this.data.user.companyId,
+        licenseType: this.data.user.licenseType
+      };
+      this.searchLicenseNumber = this.data.user.licenseNumber || '';
+    }
   }
 
   loadCompanies(): void {
@@ -75,6 +92,7 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
   updateFieldVisibility(role: string): void {
     const companyIdControl = this.editForm.get('companyId');
     const licenseTypeControl = this.editForm.get('licenseType');
+    const licenseNumberControl = this.editForm.get('licenseNumber');
 
     if (role === UserRoles.Admin || 
         role === UserRoles.Authority || 
@@ -83,13 +101,22 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
       // System-level roles don't need company
       companyIdControl?.setValue(0);
       licenseTypeControl?.setValue('');
+      licenseNumberControl?.setValue('');
+      licenseNumberControl?.clearValidators();
+      licenseNumberControl?.updateValueAndValidity();
+      this.selectedCompanyInfo = null;
       this.showCompanySelect = false;
       this.showLicenseTypeSelect = false;
+      this.showLicenseSearch = false;
     } else if (role === UserRoles.PropertyOperator || 
                role === UserRoles.VehicleOperator) {
       // Company operators need company and license type
       this.showCompanySelect = true;
       this.showLicenseTypeSelect = true;
+      this.showLicenseSearch = true;
+      companyIdControl?.setValue(this.selectedCompanyInfo?.companyId || 0);
+      licenseNumberControl?.setValidators([Validators.required]);
+      licenseNumberControl?.updateValueAndValidity();
       // Auto-set license type based on role
       if (role === UserRoles.PropertyOperator) {
         licenseTypeControl?.setValue('realEstate');
@@ -99,12 +126,20 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
     } else {
       this.showCompanySelect = true;
       this.showLicenseTypeSelect = false;
+      this.showLicenseSearch = true;
+      licenseNumberControl?.setValidators([Validators.required]);
+      licenseNumberControl?.updateValueAndValidity();
     }
   }
 
   onSubmit(): void {
     if (this.editForm.invalid) {
       this.toastr.error('لطفاً تمام فیلدهای ضروری را پر کنید');
+      return;
+    }
+
+    if (this.showCompanySelect && (!this.editForm.get('licenseNumber')?.value || !this.editForm.get('companyId')?.value)) {
+      this.toastr.error('لطفاً رهنما را بر اساس شماره جواز انتخاب کنید.');
       return;
     }
 
@@ -132,5 +167,45 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
   getRoleDari(role: string): string {
     const roleInfo = this.data.roles.find(r => r.id === role);
     return roleInfo?.dari || role;
+  }
+
+  searchCompanyByLicense(): void {
+    if (!this.searchLicenseNumber || this.searchLicenseNumber.trim() === '') {
+      this.toastr.warning('لطفاً شماره جواز را وارد کنید');
+      return;
+    }
+
+    this.isSearching = true;
+    this.searchResults = [];
+
+    this.http.get<any[]>(`${this.baseUrl}/CompanyDetails/searchByLicense?licenseNumber=${encodeURIComponent(this.searchLicenseNumber.trim())}`).subscribe({
+      next: (results) => {
+        this.isSearching = false;
+        this.searchResults = results || [];
+
+        if (this.searchResults.length === 0) {
+          this.toastr.info('هیچ رهنمای با این شماره جواز یافت نشد');
+        } else if (this.searchResults.length === 1) {
+          this.selectCompanyFromSearch(this.searchResults[0]);
+        }
+      },
+      error: (err) => {
+        this.isSearching = false;
+        this.searchResults = [];
+        this.toastr.error(err.error?.message || 'خطا در جستجوی رهنما');
+      }
+    });
+  }
+
+  selectCompanyFromSearch(result: any): void {
+    this.selectedCompanyInfo = result;
+    this.editForm.patchValue({
+      companyId: result.companyId || 0,
+      licenseType: result.licenseType || this.editForm.get('licenseType')?.value,
+      licenseNumber: result.licenseNumber || ''
+    });
+    this.searchLicenseNumber = result.licenseNumber || '';
+    this.searchResults = [];
+    this.showLicenseSearch = false;
   }
 }

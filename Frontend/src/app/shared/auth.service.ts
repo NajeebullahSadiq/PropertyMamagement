@@ -43,6 +43,7 @@ export class AuthService {
     PhoneNumber:[''],
     PhotoPath:[],
     LicenseType: [''],
+    LicenseNumber: [''],
     ProvinceId: [null], // Province assignment for COMPANY_REGISTRAR
     Passwords: this.fb.group({
       Password: ['', [Validators.required, Validators.minLength(4)]],
@@ -78,6 +79,7 @@ export class AuthService {
       companyId: this.formModel.value.CompanyId,
       photoPath: this.photoPath,
       licenseType: this.formModel.value.LicenseType,
+      licenseNumber: this.formModel.value.LicenseNumber,
       provinceId: this.formModel.value.ProvinceId
     };
     return this.http.post(this.BaseURI + '/ApplicationUser/Register', body);
