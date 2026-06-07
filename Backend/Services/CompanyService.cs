@@ -149,14 +149,19 @@ namespace WebAPIBackend.Services
                 isComplete = false;
             }
 
-            // 2. Check if company has at least one owner with required fields
-            if (!company.CompanyOwners.Any())
+            // 2. Check if company has an active/latest owner with required fields
+            var owner = company.CompanyOwners
+                .Where(o => o.Status != false)
+                .OrderByDescending(o => o.Id)
+                .FirstOrDefault()
+                ?? company.CompanyOwners.OrderByDescending(o => o.Id).FirstOrDefault();
+
+            if (owner == null)
             {
                 isComplete = false;
             }
             else
             {
-                var owner = company.CompanyOwners.First();
                 if (string.IsNullOrWhiteSpace(owner.FirstName) ||
                     string.IsNullOrWhiteSpace(owner.FatherName) ||
                     string.IsNullOrWhiteSpace(owner.ElectronicNationalIdNumber))
@@ -165,33 +170,48 @@ namespace WebAPIBackend.Services
                 }
             }
 
-            // 3. Check if company has at least one license with required fields (except LicenseNumber which will be auto-generated)
-            if (!licenseDetails.Any())
+            // 3. Check if company has an active/latest license with required fields (except LicenseNumber which will be auto-generated)
+            var licenseForCompletion = licenseDetails
+                .Where(l => l.Status != false)
+                .OrderByDescending(l => l.Id)
+                .FirstOrDefault()
+                ?? licenseDetails.OrderByDescending(l => l.Id).FirstOrDefault();
+
+            if (licenseForCompletion == null)
             {
                 isComplete = false;
             }
             else
             {
-                var license = licenseDetails.First();
                 // Don't check LicenseNumber here - it will be generated when complete
-                if (!license.IssueDate.HasValue ||
-                    !license.ExpireDate.HasValue ||
-                    string.IsNullOrWhiteSpace(license.OfficeAddress))
+                if (!licenseForCompletion.IssueDate.HasValue ||
+                    !licenseForCompletion.ExpireDate.HasValue ||
+                    string.IsNullOrWhiteSpace(licenseForCompletion.OfficeAddress))
                 {
                     isComplete = false;
                 }
             }
 
-            // 4. Check if company has at least one guarantor with required fields
-            if (company.Guarantors == null || !company.Guarantors.Any())
+            // 4. Check if company has an active/latest guarantor with required fields
+            var guarantor = company.Guarantors?
+                .Where(g => g.Status != false && g.IsActive)
+                .OrderByDescending(g => g.Id)
+                .FirstOrDefault()
+                ?? company.Guarantors?
+                    .Where(g => g.Status != false)
+                    .OrderByDescending(g => g.Id)
+                    .FirstOrDefault()
+                ?? company.Guarantors?.OrderByDescending(g => g.Id).FirstOrDefault();
+
+            if (guarantor == null)
             {
                 isComplete = false;
             }
             else
             {
-                var guarantor = company.Guarantors.First();
                 if (string.IsNullOrWhiteSpace(guarantor.FirstName) ||
-                    string.IsNullOrWhiteSpace(guarantor.FatherName))
+                    string.IsNullOrWhiteSpace(guarantor.FatherName) ||
+                    string.IsNullOrWhiteSpace(guarantor.ElectronicNationalIdNumber))
                 {
                     isComplete = false;
                 }
@@ -274,6 +294,8 @@ namespace WebAPIBackend.Services
             var result = new CompanyReadinessResult();
             var today = DateOnly.FromDateTime(DateTime.Today);
 
+            await UpdateLicenseCompletionStatusAsync(companyId);
+
             var company = await _context.CompanyDetails
                 .AsNoTracking()
                 .Include(c => c.CompanyOwners)
@@ -292,16 +314,21 @@ namespace WebAPIBackend.Services
                 result.MissingFields.Add("عنوان رهنما");
             }
 
-            var owner = company.CompanyOwners.FirstOrDefault();
-            if (owner == null)
+            var readinessOwner = company.CompanyOwners
+                .Where(o => o.Status != false)
+                .OrderByDescending(o => o.Id)
+                .FirstOrDefault()
+                ?? company.CompanyOwners.OrderByDescending(o => o.Id).FirstOrDefault();
+
+            if (readinessOwner == null)
             {
                 result.MissingFields.Add("معلومات مالک");
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(owner.FirstName)) result.MissingFields.Add("نام مالک");
-                if (string.IsNullOrWhiteSpace(owner.FatherName)) result.MissingFields.Add("نام پدر مالک");
-                if (string.IsNullOrWhiteSpace(owner.ElectronicNationalIdNumber)) result.MissingFields.Add("نمبر تذکره الکترونیکی مالک");
+                if (string.IsNullOrWhiteSpace(readinessOwner.FirstName)) result.MissingFields.Add("نام مالک");
+                if (string.IsNullOrWhiteSpace(readinessOwner.FatherName)) result.MissingFields.Add("نام پدر مالک");
+                if (string.IsNullOrWhiteSpace(readinessOwner.ElectronicNationalIdNumber)) result.MissingFields.Add("نمبر تذکره الکترونیکی مالک");
             }
 
             var licenseQuery = _context.LicenseDetails
@@ -326,15 +353,25 @@ namespace WebAPIBackend.Services
                 if (!license.IsComplete) result.MissingFields.Add("جواز تکمیل نشده است");
             }
 
-            var guarantor = company.Guarantors.FirstOrDefault();
-            if (guarantor == null)
+            var readinessGuarantor = company.Guarantors
+                .Where(g => g.Status != false && g.IsActive)
+                .OrderByDescending(g => g.Id)
+                .FirstOrDefault()
+                ?? company.Guarantors
+                    .Where(g => g.Status != false)
+                    .OrderByDescending(g => g.Id)
+                    .FirstOrDefault()
+                ?? company.Guarantors.OrderByDescending(g => g.Id).FirstOrDefault();
+
+            if (readinessGuarantor == null)
             {
                 result.MissingFields.Add("معلومات تضمین کننده");
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(guarantor.FirstName)) result.MissingFields.Add("نام تضمین کننده");
-                if (string.IsNullOrWhiteSpace(guarantor.FatherName)) result.MissingFields.Add("نام پدر تضمین کننده");
+                if (string.IsNullOrWhiteSpace(readinessGuarantor.FirstName)) result.MissingFields.Add("نام تضمین کننده");
+                if (string.IsNullOrWhiteSpace(readinessGuarantor.FatherName)) result.MissingFields.Add("نام پدر تضمین کننده");
+                if (string.IsNullOrWhiteSpace(readinessGuarantor.ElectronicNationalIdNumber)) result.MissingFields.Add("نمبر تذکره الکترونیکی تضمین کننده");
             }
 
             result.MissingFields = result.MissingFields.Distinct().ToList();
