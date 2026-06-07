@@ -8,6 +8,7 @@ using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Models;
 using WebAPIBackend.Helpers;
+using WebAPIBackend.Services;
 
 namespace WebAPIBackend.Controllers.Vehicles
 {
@@ -20,12 +21,14 @@ namespace WebAPIBackend.Controllers.Vehicles
         private readonly AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
         private readonly WebAPIBackend.Services.IComprehensiveAuditService _auditService;
+        private readonly ICompanyService _companyService;
 
-        public VehiclesController(AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService)
+        public VehiclesController(AppDbContext context, UserManager<ApplicationUser> userManager, WebAPIBackend.Services.IComprehensiveAuditService auditService, ICompanyService companyService)
         {
             _context = context;
             _userManager = userManager;
             _auditService = auditService;
+            _companyService = companyService;
 
         }
 
@@ -358,6 +361,11 @@ namespace WebAPIBackend.Controllers.Vehicles
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            if (!RbacHelper.CanCreateRecords(roles, "vehicle"))
+            {
+                return StatusCode(403, new { message = "شما اجازه ایجاد سند موتر را ندارید" });
+            }
+
             // Determine CompanyId based on user role
             int? companyId;
             if (roles.Contains(UserRoles.Admin) || roles.Contains(UserRoles.Authority))
@@ -383,7 +391,17 @@ namespace WebAPIBackend.Controllers.Vehicles
                 // Validate that the user has a company assigned
                 if (!companyId.HasValue || companyId.Value == 0)
                 {
-                    return BadRequest(new { message = "شما به هیچ رهنمای متصل نیستید" });
+                    return StatusCode(403, new { message = "شما به هیچ رهنما متصل نیستید" });
+                }
+
+                var readiness = await _companyService.ValidateCompanyCanCreateRecordsAsync(user.CompanyId, user.LicenseType);
+                if (!readiness.CanCreateRecords)
+                {
+                    return StatusCode(403, new
+                    {
+                        message = readiness.Message,
+                        missingFields = readiness.MissingFields
+                    });
                 }
             }
 

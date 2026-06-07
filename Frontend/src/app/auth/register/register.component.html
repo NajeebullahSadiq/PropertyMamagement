@@ -282,20 +282,20 @@
             <div class="p-4 bg-[#f7f9fb] border border-[#eceef0] rounded-xl mt-3">
               <div *ngIf="selectedCompanyInfo; else noCompanySelected" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                 <div>
-                  <span class="block text-xs font-semibold text-[#6f7973] mb-1">Ø´Ù…Ø§Ø±Ù‡ Ø¬ÙˆØ§Ø²</span>
+                  <span class="block text-xs font-semibold text-[#6f7973] mb-1">شماره جواز</span>
                   <span class="font-semibold text-[#191c1e]" dir="ltr">{{ selectedCompanyInfo.licenseNumber }}</span>
                 </div>
                 <div>
-                  <span class="block text-xs font-semibold text-[#6f7973] mb-1">Ù†Ø§Ù… Ø´Ø±Ú©Øª</span>
+                  <span class="block text-xs font-semibold text-[#6f7973] mb-1">نام شرکت</span>
                   <span class="font-semibold text-[#191c1e]">{{ selectedCompanyInfo.companyTitle || '-' }}</span>
                 </div>
                 <div>
-                  <span class="block text-xs font-semibold text-[#6f7973] mb-1">Ù…Ø­Ù„ / Ù†Ø§Ø­ÛŒÙ‡</span>
+                  <span class="block text-xs font-semibold text-[#6f7973] mb-1">محل / ناحیه</span>
                   <span class="font-semibold text-[#191c1e]">{{ selectedCompanyInfo.activityLocation || '-' }}</span>
                 </div>
               </div>
               <ng-template #noCompanySelected>
-                <p class="text-sm text-[#6f7973]">Ø¨Ø±Ø§ÛŒ Ø§ÛŒØ¬Ø§Ø¯ Ú©Ø§Ø±Ø¨Ø±ØŒ Ø´Ù…Ø§Ø±Ù‡ Ø¬ÙˆØ§Ø² Ø±Ø§ Ø¬Ø³ØªØ¬Ùˆ Ùˆ Ø±Ù‡Ù†Ù…Ø§ Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯.</p>
+                <p class="text-sm text-[#6f7973]">برای ایجاد کاربر، شماره جواز را جستجو و رهنما را انتخاب کنید.</p>
               </ng-template>
             </div>
           </div>

@@ -119,27 +119,27 @@
                  class="p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 transition-all">
               <p class="text-sm font-semibold text-gray-900">{{ result.companyTitle }}</p>
               <p class="text-xs text-gray-500" dir="ltr">{{ result.licenseNumber }}</p>
-              <p class="text-xs text-gray-500">Ø¬Ø§ÛŒ / Ù†Ø§Ø­ÛŒÙ‡: {{ result.activityLocation || '-' }}</p>
+              <p class="text-xs text-gray-500">محل / ناحیه: {{ result.activityLocation || '-' }}</p>
             </div>
           </div>
         </div>
         <div class="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
           <div *ngIf="selectedCompanyInfo; else noCompanySelectedEdit" class="grid grid-cols-1 gap-2 text-sm">
             <div>
-              <span class="text-gray-500">Ø´Ù…Ø§Ø±Ù‡ Ø¬ÙˆØ§Ø²:</span>
+              <span class="text-gray-500">شماره جواز:</span>
               <span class="mr-2 font-medium" dir="ltr">{{ selectedCompanyInfo.licenseNumber }}</span>
             </div>
             <div>
-              <span class="text-gray-500">Ù†Ø§Ù… Ø´Ø±Ú©Øª:</span>
+              <span class="text-gray-500">نام شرکت:</span>
               <span class="mr-2 font-medium">{{ selectedCompanyInfo.companyTitle || '-' }}</span>
             </div>
             <div>
-              <span class="text-gray-500">Ø¬Ø§ÛŒ / Ù†Ø§Ø­ÛŒÙ‡:</span>
+              <span class="text-gray-500">محل / ناحیه:</span>
               <span class="mr-2 font-medium">{{ selectedCompanyInfo.activityLocation || '-' }}</span>
             </div>
           </div>
           <ng-template #noCompanySelectedEdit>
-            <p class="text-sm text-gray-500">Ø´Ù…Ø§Ø±Ù‡ Ø¬ÙˆØ§Ø² Ø±Ø§ Ø¬Ø³ØªØ¬Ùˆ Ùˆ Ø±Ù‡Ù†Ù…Ø§ Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯.</p>
+            <p class="text-sm text-gray-500">شماره جواز را جستجو و رهنما را انتخاب کنید.</p>
           </ng-template>
         </div>
       </div>

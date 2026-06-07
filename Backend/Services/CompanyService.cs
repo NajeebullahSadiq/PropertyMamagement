@@ -22,8 +22,8 @@ namespace WebAPIBackend.Services
         public bool CanCreateRecords { get; set; }
         public List<string> MissingFields { get; set; } = new();
         public string Message => CanCreateRecords
-            ? "Company is ready to create records."
-            : $"حالت رهنما ناقص است. برای ثبت معامله ابتدا این معلومات را تکمیل کنید: {string.Join("، ", MissingFields)}";
+            ? "رهنما برای ثبت معامله آماده است."
+            : $"ثبت معامله ممکن نیست. ابتدا این معلومات رهنما را تکمیل کنید: {string.Join("، ", MissingFields)}";
     }
 
     public class CompanyService : ICompanyService
@@ -191,8 +191,7 @@ namespace WebAPIBackend.Services
             {
                 var guarantor = company.Guarantors.First();
                 if (string.IsNullOrWhiteSpace(guarantor.FirstName) ||
-                    string.IsNullOrWhiteSpace(guarantor.FatherName) ||
-                    string.IsNullOrWhiteSpace(guarantor.ElectronicNationalIdNumber))
+                    string.IsNullOrWhiteSpace(guarantor.FatherName))
                 {
                     isComplete = false;
                 }
@@ -275,8 +274,6 @@ namespace WebAPIBackend.Services
             var result = new CompanyReadinessResult();
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            await UpdateLicenseCompletionStatusAsync(companyId);
-
             var company = await _context.CompanyDetails
                 .AsNoTracking()
                 .Include(c => c.CompanyOwners)
@@ -311,12 +308,10 @@ namespace WebAPIBackend.Services
                 .AsNoTracking()
                 .Where(l => l.CompanyId == companyId);
 
-            if (!string.IsNullOrWhiteSpace(licenseType))
-            {
-                licenseQuery = licenseQuery.Where(l => l.LicenseType == licenseType);
-            }
-
-            var license = await licenseQuery.OrderByDescending(l => l.Id).FirstOrDefaultAsync();
+            var licenses = await licenseQuery.OrderByDescending(l => l.Id).ToListAsync();
+            var license = !string.IsNullOrWhiteSpace(licenseType)
+                ? licenses.FirstOrDefault(l => l.LicenseType == licenseType) ?? licenses.FirstOrDefault(l => l.IsComplete)
+                : licenses.FirstOrDefault(l => l.IsComplete) ?? licenses.FirstOrDefault();
             if (license == null)
             {
                 result.MissingFields.Add("معلومات جواز");
@@ -328,7 +323,7 @@ namespace WebAPIBackend.Services
                 if (license.ExpireDate.HasValue && license.ExpireDate.Value < today) result.MissingFields.Add("جواز منقضی شده است");
                 if (string.IsNullOrWhiteSpace(license.OfficeAddress)) result.MissingFields.Add("آدرس دفتر");
                 if (license.Status == false) result.MissingFields.Add("جواز غیرفعال است");
-                if (!license.IsComplete) result.MissingFields.Add("حالت جواز ناقص است");
+                if (!license.IsComplete) result.MissingFields.Add("جواز تکمیل نشده است");
             }
 
             var guarantor = company.Guarantors.FirstOrDefault();
@@ -340,7 +335,6 @@ namespace WebAPIBackend.Services
             {
                 if (string.IsNullOrWhiteSpace(guarantor.FirstName)) result.MissingFields.Add("نام تضمین کننده");
                 if (string.IsNullOrWhiteSpace(guarantor.FatherName)) result.MissingFields.Add("نام پدر تضمین کننده");
-                if (string.IsNullOrWhiteSpace(guarantor.ElectronicNationalIdNumber)) result.MissingFields.Add("نمبر تذکره الکترونیکی تضمین کننده");
             }
 
             result.MissingFields = result.MissingFields.Distinct().ToList();
