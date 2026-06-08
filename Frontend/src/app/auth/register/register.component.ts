@@ -103,6 +103,13 @@ export class RegisterComponent extends BaseComponent implements OnInit {
       return;
     }
 
+    if (this.selectedCompanyInfo?.hasExistingUser) {
+      this.isSubmitting = false;
+      this.errorMessage = 'این دفتر رهنما قبلاً دارای کاربر است. هر دفتر فقط می‌تواند یک کاربر داشته باشد.';
+      this.toastr.error(this.errorMessage, 'ثبت نام مجاز نیست');
+      return;
+    }
+
     this.service.register().subscribe({
       next: (res: any) => {
         this.isSubmitting = false;
@@ -283,9 +290,12 @@ export class RegisterComponent extends BaseComponent implements OnInit {
         if (results.length === 0) {
           this.toastr.info('هیچ رهنمای با این شماره جواز یافت نشد', 'نتیجه جستجو');
         } else if (results.length === 1) {
-          // Auto-select if only one result
-          this.selectCompanyFromSearch(results[0]);
-          this.toastr.success('رهنما یافت شد و انتخاب گردید', 'موفق');
+          if (results[0].hasExistingUser) {
+            this.toastr.error('این دفتر رهنما قبلاً دارای کاربر است. هر دفتر فقط یک کاربر می‌تواند داشته باشد.', 'ثبت نام مجاز نیست');
+          } else {
+            this.selectCompanyFromSearch(results[0]);
+            this.toastr.success('رهنما یافت شد و انتخاب گردید', 'موفق');
+          }
         } else {
           this.toastr.info(`${results.length} رهنما یافت شد`, 'نتیجه جستجو');
         }
@@ -303,6 +313,11 @@ export class RegisterComponent extends BaseComponent implements OnInit {
   }
 
   selectCompanyFromSearch(result: any) {
+    if (result?.hasExistingUser) {
+      this.toastr.error('این دفتر رهنما قبلاً دارای کاربر است. هر دفتر فقط یک کاربر می‌تواند داشته باشد.', 'ثبت نام مجاز نیست');
+      return;
+    }
+
     const companyIdControl = this.service.formModel.get('CompanyId');
     const licenseTypeControl = this.service.formModel.get('LicenseType');
     const licenseNumberControl = this.service.formModel.get('LicenseNumber');

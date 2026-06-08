@@ -12,6 +12,7 @@ using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
 using WebAPIBackend.Models.ViewModels;
 using WebAPIBackend.Services;
+using WebAPIBackend.Configuration;
 
 namespace WebAPIBackend.Controllers.Companies
 {
@@ -887,7 +888,10 @@ namespace WebAPIBackend.Controllers.Companies
         /// </summary>
         [HttpGet("searchByLicense")]
         [Authorize]
-        public async Task<IActionResult> SearchCompanyByLicense([FromQuery] string licenseNumber, [FromQuery] int? provinceId)
+        public async Task<IActionResult> SearchCompanyByLicense(
+            [FromQuery] string licenseNumber,
+            [FromQuery] int? provinceId,
+            [FromQuery] string? excludeUserId = null)
         {
             try
             {
@@ -932,7 +936,44 @@ namespace WebAPIBackend.Controllers.Companies
                     return NotFound(new { message = "هیچ رهنمای با این شماره جواز یافت نشد" });
                 }
 
-                return Ok(licenses);
+                var companyIds = licenses
+                    .Where(l => l.CompanyId.HasValue)
+                    .Select(l => l.CompanyId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var companiesWithUsersQuery = _userManager.Users
+                    .AsNoTracking()
+                    .Where(u => companyIds.Contains(u.CompanyId)
+                        && (u.UserRole == UserRoles.PropertyOperator || u.UserRole == UserRoles.VehicleOperator));
+
+                if (!string.IsNullOrWhiteSpace(excludeUserId))
+                    companiesWithUsersQuery = companiesWithUsersQuery.Where(u => u.Id != excludeUserId);
+
+                var companiesWithUsers = await companiesWithUsersQuery
+                    .Select(u => u.CompanyId)
+                    .Distinct()
+                    .ToListAsync();
+
+                var results = licenses.Select(l => new
+                {
+                    l.CompanyId,
+                    l.CompanyTitle,
+                    l.CompanyName,
+                    l.OwnerName,
+                    l.OwnerFatherName,
+                    l.LicenseNumber,
+                    l.LicenseType,
+                    l.ProvinceId,
+                    l.ProvinceName,
+                    l.ActivityLocation,
+                    l.IssueDate,
+                    l.ExpireDate,
+                    l.Status,
+                    HasExistingUser = l.CompanyId.HasValue && companiesWithUsers.Contains(l.CompanyId.Value)
+                }).ToList();
+
+                return Ok(results);
             }
             catch (Exception ex)
             {

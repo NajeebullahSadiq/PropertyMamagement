@@ -178,7 +178,8 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
     this.isSearching = true;
     this.searchResults = [];
 
-    this.http.get<any[]>(`${this.baseUrl}/CompanyDetails/searchByLicense?licenseNumber=${encodeURIComponent(this.searchLicenseNumber.trim())}`).subscribe({
+    const excludeUserId = this.data.user?.id ? `&excludeUserId=${encodeURIComponent(this.data.user.id)}` : '';
+    this.http.get<any[]>(`${this.baseUrl}/CompanyDetails/searchByLicense?licenseNumber=${encodeURIComponent(this.searchLicenseNumber.trim())}${excludeUserId}`).subscribe({
       next: (results) => {
         this.isSearching = false;
         this.searchResults = results || [];
@@ -186,7 +187,11 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
         if (this.searchResults.length === 0) {
           this.toastr.info('هیچ رهنمای با این شماره جواز یافت نشد');
         } else if (this.searchResults.length === 1) {
-          this.selectCompanyFromSearch(this.searchResults[0]);
+          if (this.searchResults[0].hasExistingUser) {
+            this.toastr.error('این دفتر رهنما قبلاً دارای کاربر دیگری است. هر دفتر فقط یک کاربر می‌تواند داشته باشد.', 'تغییر مجاز نیست');
+          } else {
+            this.selectCompanyFromSearch(this.searchResults[0]);
+          }
         }
       },
       error: (err) => {
@@ -198,6 +203,11 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
   }
 
   selectCompanyFromSearch(result: any): void {
+    if (result?.hasExistingUser) {
+      this.toastr.error('این دفتر رهنما قبلاً دارای کاربر دیگری است. هر دفتر فقط یک کاربر می‌تواند داشته باشد.', 'تغییر مجاز نیست');
+      return;
+    }
+
     this.selectedCompanyInfo = result;
 
     const patch: Record<string, unknown> = {

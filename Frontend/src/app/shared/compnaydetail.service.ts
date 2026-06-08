@@ -158,10 +158,13 @@ export class CompnaydetailService {
     return this.http.delete<any>(`${this.baseUrl}/${id}`);
   }
 
-  searchCompanyByLicense(licenseNumber: string, provinceId?: number): Observable<any[]> {
+  searchCompanyByLicense(licenseNumber: string, provinceId?: number, excludeUserId?: string): Observable<any[]> {
     let url = `${this.baseUrl}/searchByLicense?licenseNumber=${encodeURIComponent(licenseNumber)}`;
     if (provinceId && provinceId > 0) {
       url += `&provinceId=${provinceId}`;
+    }
+    if (excludeUserId) {
+      url += `&excludeUserId=${encodeURIComponent(excludeUserId)}`;
     }
     return this.http.get<any[]>(url);
   }

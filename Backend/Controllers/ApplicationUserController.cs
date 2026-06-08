@@ -149,6 +149,14 @@ namespace WebAPI.Controllers
                 }
             }
 
+            if (model.CompanyId > 0 &&
+                (model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator))
+            {
+                var companyUserError = await ValidateCompanyUserLimitAsync(model.CompanyId);
+                if (companyUserError != null)
+                    return BadRequest(new { message = companyUserError });
+            }
+
             // Get current user for CreatedBy
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
@@ -720,6 +728,13 @@ namespace WebAPI.Controllers
             // Determine role based on license type
             var role = model.LicenseType == "realEstate" ? UserRoles.PropertyOperator : UserRoles.VehicleOperator;
 
+            if (model.CompanyId > 0)
+            {
+                var companyUserError = await ValidateCompanyUserLimitAsync(model.CompanyId);
+                if (companyUserError != null)
+                    return BadRequest(new { message = companyUserError });
+            }
+
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
             var applicationUser = new ApplicationUser()
@@ -850,6 +865,15 @@ namespace WebAPI.Controllers
                 model.CompanyId = licenseSelection.CompanyId;
                 model.LicenseType = licenseSelection.LicenseType;
                 model.ProvinceId = licenseSelection.ProvinceId ?? model.ProvinceId;
+            }
+
+            var effectiveRole = !string.IsNullOrEmpty(model.Role) ? model.Role : user.UserRole;
+            if (model.CompanyId > 0 &&
+                (effectiveRole == UserRoles.PropertyOperator || effectiveRole == UserRoles.VehicleOperator))
+            {
+                var companyUserError = await ValidateCompanyUserLimitAsync(model.CompanyId, model.UserId);
+                if (companyUserError != null)
+                    return BadRequest(new { message = companyUserError });
             }
 
             // Update user properties
@@ -1075,6 +1099,25 @@ namespace WebAPI.Controllers
                 isViewOnly = primaryRole == UserRoles.Authority || primaryRole == UserRoles.LicenseReviewer,
                 message = "صلاحیت‌ها با موفقیت به‌روز شد"
             });
+        }
+
+        private async Task<string?> ValidateCompanyUserLimitAsync(int companyId, string? excludeUserId = null)
+        {
+            if (companyId <= 0)
+                return null;
+
+            var query = _userManager.Users
+                .AsNoTracking()
+                .Where(u => u.CompanyId == companyId
+                    && (u.UserRole == UserRoles.PropertyOperator || u.UserRole == UserRoles.VehicleOperator));
+
+            if (!string.IsNullOrWhiteSpace(excludeUserId))
+                query = query.Where(u => u.Id != excludeUserId);
+
+            if (await query.AnyAsync())
+                return "این دفتر رهنما قبلاً دارای کاربر است. هر دفتر فقط می‌تواند یک کاربر داشته باشد.";
+
+            return null;
         }
 
         private static string? ValidateOperatorRoleLicenseType(string? role, string? licenseType)
