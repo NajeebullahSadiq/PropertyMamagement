@@ -199,11 +199,21 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
 
   selectCompanyFromSearch(result: any): void {
     this.selectedCompanyInfo = result;
-    this.editForm.patchValue({
+
+    const patch: Record<string, unknown> = {
       companyId: result.companyId || 0,
       licenseType: result.licenseType || this.editForm.get('licenseType')?.value,
       licenseNumber: result.licenseNumber || ''
-    });
+    };
+
+    if (result.licenseType === 'carSale') {
+      patch['role'] = UserRoles.VehicleOperator;
+    } else if (result.licenseType === 'realEstate') {
+      patch['role'] = UserRoles.PropertyOperator;
+    }
+
+    this.editForm.patchValue(patch);
+    this.updateFieldVisibility(this.editForm.get('role')?.value);
     this.searchLicenseNumber = result.licenseNumber || '';
     this.searchResults = [];
     this.showLicenseSearch = false;

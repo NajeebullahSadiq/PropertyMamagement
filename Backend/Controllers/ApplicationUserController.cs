@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -90,7 +90,15 @@ namespace WebAPI.Controllers
             // license determines the company, license type, and province.
             if (model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator)
             {
-                var licenseSelection = await ResolveCompanyLicenseAsync(model.LicenseNumber, model.Role);
+                var roleLicenseMismatch = ValidateOperatorRoleLicenseType(model.Role, model.LicenseType);
+                if (roleLicenseMismatch != null)
+                    return BadRequest(new { message = roleLicenseMismatch });
+
+                var licenseSelection = await ResolveCompanyLicenseAsync(
+                    model.LicenseNumber,
+                    model.Role,
+                    model.LicenseType,
+                    model.CompanyId > 0 ? model.CompanyId : null);
                 if (licenseSelection == null)
                 {
                     return BadRequest(new { message = "شماره جواز معتبر نیست یا رهنما یافت نشد" });
@@ -465,16 +473,27 @@ namespace WebAPI.Controllers
             else if (status == "inactive")
                 query = query.Where(u => u.IsLocked);
 
-            // Search
+            // Search (includes license number for company/guide users)
             if (!string.IsNullOrWhiteSpace(search))
             {
-                var s = search.ToLower();
+                var s = search.ToLower().Trim();
+                var companyIdsByLicense = await _context.LicenseDetails
+                    .AsNoTracking()
+                    .Where(l => l.LicenseNumber != null && l.LicenseNumber.ToLower().Contains(s))
+                    .Select(l => l.CompanyId)
+                    .Where(id => id.HasValue)
+                    .Select(id => id!.Value)
+                    .Distinct()
+                    .ToListAsync();
+
                 query = query.Where(u =>
                     (u.UserName != null && u.UserName.ToLower().Contains(s)) ||
                     (u.FirstName != null && u.FirstName.ToLower().Contains(s)) ||
                     (u.LastName != null && u.LastName.ToLower().Contains(s)) ||
                     (u.Email != null && u.Email.ToLower().Contains(s)) ||
-                    (u.PhoneNumber != null && u.PhoneNumber.Contains(s)));
+                    (u.PhoneNumber != null && u.PhoneNumber.Contains(s)) ||
+                    (u.CompanyId > 0 && companyIdsByLicense.Contains(u.CompanyId)) ||
+                    (u.CompanyId > 0 && u.CompanyId.ToString().Contains(s)));
             }
 
             var total = await query.CountAsync();
@@ -810,7 +829,15 @@ namespace WebAPI.Controllers
 
             if (model.Role == UserRoles.PropertyOperator || model.Role == UserRoles.VehicleOperator)
             {
-                var licenseSelection = await ResolveCompanyLicenseAsync(model.LicenseNumber, model.Role);
+                var roleLicenseMismatch = ValidateOperatorRoleLicenseType(model.Role, model.LicenseType);
+                if (roleLicenseMismatch != null)
+                    return BadRequest(new { message = roleLicenseMismatch });
+
+                var licenseSelection = await ResolveCompanyLicenseAsync(
+                    model.LicenseNumber,
+                    model.Role,
+                    model.LicenseType,
+                    model.CompanyId > 0 ? model.CompanyId : null);
                 if (licenseSelection == null)
                 {
                     return BadRequest(new { message = "شماره جواز معتبر نیست یا رهنما یافت نشد" });
@@ -1046,7 +1073,28 @@ namespace WebAPI.Controllers
             });
         }
 
-        private async Task<CompanyLicenseSelection?> ResolveCompanyLicenseAsync(string? licenseNumber, string? role)
+        private static string? ValidateOperatorRoleLicenseType(string? role, string? licenseType)
+        {
+            if (string.IsNullOrWhiteSpace(licenseType))
+                return null;
+
+            var expectedLicenseType = role == UserRoles.PropertyOperator ? "realEstate"
+                : role == UserRoles.VehicleOperator ? "carSale"
+                : null;
+
+            if (expectedLicenseType == null || licenseType == expectedLicenseType)
+                return null;
+
+            return role == UserRoles.PropertyOperator
+                ? "نقش املاک با جواز موترفروشی مطابقت ندارد. لطفاً نقش موترفروش را انتخاب کنید."
+                : "نقش موترفروش با جواز املاک مطابقت ندارد. لطفاً نقش املاک را انتخاب کنید.";
+        }
+
+        private async Task<CompanyLicenseSelection?> ResolveCompanyLicenseAsync(
+            string? licenseNumber,
+            string? role,
+            string? licenseType = null,
+            int? companyId = null)
         {
             if (string.IsNullOrWhiteSpace(licenseNumber))
                 return null;
@@ -1058,21 +1106,28 @@ namespace WebAPI.Controllers
             if (expectedLicenseType == null)
                 return null;
 
+            var targetLicenseType = !string.IsNullOrWhiteSpace(licenseType) ? licenseType : expectedLicenseType;
+            if (targetLicenseType != expectedLicenseType)
+                return null;
+
             var normalizedLicenseNumber = licenseNumber.Trim().ToLower();
 
-            return await _context.LicenseDetails
+            var query = _context.LicenseDetails
                 .AsNoTracking()
                 .Where(l => l.LicenseNumber != null
                     && l.LicenseNumber.ToLower() == normalizedLicenseNumber
-                    && l.LicenseType == expectedLicenseType
+                    && l.LicenseType == targetLicenseType
                     && l.CompanyId.HasValue
-                    && l.Company != null
-                    && l.Status != false
-                    && l.Company.Status != false)
+                    && (l.Status == null || l.Status == true));
+
+            if (companyId.HasValue && companyId.Value > 0)
+                query = query.Where(l => l.CompanyId == companyId.Value);
+
+            return await query
                 .OrderByDescending(l => l.Id)
                 .Select(l => new CompanyLicenseSelection(
                     l.CompanyId!.Value,
-                    l.LicenseType ?? expectedLicenseType,
+                    l.LicenseType ?? targetLicenseType,
                     l.ProvinceId ?? l.Company!.ProvinceId))
                 .FirstOrDefaultAsync();
         }

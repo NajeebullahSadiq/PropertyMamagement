@@ -307,6 +307,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     const licenseTypeControl = this.service.formModel.get('LicenseType');
     const licenseNumberControl = this.service.formModel.get('LicenseNumber');
     const provinceIdControl = this.service.formModel.get('ProvinceId');
+    const roleControl = this.service.formModel.get('Role');
     
     if (companyIdControl && result.companyId) {
       companyIdControl.setValue(result.companyId);
@@ -314,6 +315,15 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     
     if (licenseTypeControl && result.licenseType) {
       licenseTypeControl.setValue(result.licenseType);
+    }
+
+    // Keep role aligned with the selected license type
+    if (roleControl && result.licenseType) {
+      if (result.licenseType === 'carSale') {
+        roleControl.setValue(UserRoles.VehicleOperator);
+      } else if (result.licenseType === 'realEstate') {
+        roleControl.setValue(UserRoles.PropertyOperator);
+      }
     }
 
     if (licenseNumberControl && result.licenseNumber) {

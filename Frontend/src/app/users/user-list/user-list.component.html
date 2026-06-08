@@ -44,7 +44,7 @@
               class="form-input pl-9"
               [(ngModel)]="searchTerm"
               (ngModelChange)="onSearchInput()"
-              placeholder="نام کاربری، نام، ایمیل، شماره تماس...">
+              [placeholder]="activeTab === 'company' ? 'نام کاربری، نام، ایمیل، نمبر جواز، شماره شرکت...' : 'نام کاربری، نام، ایمیل، شماره تماس...'">
           </div>
         </div>
 
