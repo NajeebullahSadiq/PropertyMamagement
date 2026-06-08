@@ -108,6 +108,7 @@
               <th class="px-4 py-4">ایمیل</th>
               <th class="px-4 py-4">نقش</th>
               <th *ngIf="activeTab === 'company'" class="px-4 py-4">نوع جواز</th>
+              <th *ngIf="activeTab === 'company'" class="px-4 py-4">نوعیت جواز</th>
               <th *ngIf="activeTab === 'company'" class="px-4 py-4">نمبر جواز دفتر</th>
               <th class="px-4 py-4">وضعیت</th>
               <th class="px-4 py-4">تاریخ ایجاد</th>
@@ -148,9 +149,19 @@
                 </span>
               </td>
               <td *ngIf="activeTab === 'company'" class="px-4 py-3 text-sm text-[#6f7973]">
-                <span class="px-2 py-1 rounded bg-[#f7f9fb] text-[#6f7973] text-xs font-medium">
+                <span class="px-2 py-1 rounded bg-[#eff6ff] border border-[#bfdbfe] text-[#1e40af] text-xs font-medium">
                   {{ getLicenseTypeText(user.licenseType) }}
                 </span>
+              </td>
+              <td *ngIf="activeTab === 'company'" class="px-4 py-3 text-sm text-[#6f7973]">
+                <span *ngIf="user.licenseCategory" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                  [ngClass]="{
+                    'bg-[#d1fae5] text-[#065f46]': user.licenseCategory === 'جدید',
+                    'bg-[#dbeafe] text-[#1e40af]': user.licenseCategory === 'تجدید',
+                    'bg-[#ede9fe] text-[#5b21b6]': user.licenseCategory === 'مثنی',
+                    'bg-[#f3f4f6] text-[#374151]': !['جدید', 'تجدید', 'مثنی'].includes(user.licenseCategory)
+                  }">{{ user.licenseCategory }}</span>
+                <span *ngIf="!user.licenseCategory" class="text-[#9ca3af]">—</span>
               </td>
               <td *ngIf="activeTab === 'company'" class="px-4 py-3 text-sm text-[#6f7973]">
                 <span class="text-sm font-mono text-[#6f7973] bg-[#f7f9fb] px-2 py-1 rounded inline-block">
@@ -189,7 +200,7 @@
             </tr>
 
             <tr *ngIf="users.length === 0">
-              <td [attr.colspan]="activeTab === 'company' ? 10 : 8" class="py-20 text-center">
+              <td [attr.colspan]="activeTab === 'company' ? 11 : 8" class="py-20 text-center">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#f7f9fb] mb-4">
                   <i class="fas fa-users text-4xl text-[#bec9c2]"></i>
                 </div>

@@ -19,6 +19,7 @@ export interface UserData {
   phoneNumber: string;
   companyId: number;
   licenseType: string;
+  licenseCategory?: string;
   licenseNumber: string;
   isLocked: boolean;
   photoPath: string;
@@ -219,10 +220,18 @@ export class UserListComponent extends BaseComponent implements OnInit {
   }
 
   getLicenseTypeText(licenseType: string): string {
-    switch (licenseType) {
-      case 'realEstate': return 'املاک';
-      case 'carSale': return 'موتر فروشی';
-      default: return '—';
+    if (!licenseType) return '—';
+    const normalized = licenseType.trim().toLowerCase().replace(/\s+/g, '');
+    switch (normalized) {
+      case 'realestate':
+      case 'property':
+        return 'املاک';
+      case 'carsale':
+      case 'vehicle':
+      case 'car':
+        return 'موتر فروشی';
+      default:
+        return licenseType;
     }
   }
 

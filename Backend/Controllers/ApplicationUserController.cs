@@ -517,6 +517,7 @@ namespace WebAPI.Controllers
                     l.CompanyId,
                     CompanyTitle = l.Company != null ? l.Company.Title : null,
                     l.LicenseType,
+                    l.LicenseCategory,
                     l.LicenseNumber,
                     l.ActivityLocation,
                     l.ProvinceId,
@@ -550,7 +551,10 @@ namespace WebAPI.Controllers
                     user.LastName,
                     user.PhoneNumber,
                     user.CompanyId,
-                    user.LicenseType,
+                    LicenseType = !string.IsNullOrWhiteSpace(user.LicenseType)
+                        ? user.LicenseType
+                        : selectedLicense?.LicenseType,
+                    LicenseCategory = selectedLicense?.LicenseCategory,
                     LicenseNumber = licenseNumber,
                     CompanyTitle = selectedLicense?.CompanyTitle,
                     ActivityLocation = selectedLicense?.ActivityLocation,

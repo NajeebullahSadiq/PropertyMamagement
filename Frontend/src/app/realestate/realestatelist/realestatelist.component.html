@@ -497,6 +497,7 @@
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">نام پدر مالک دفتر</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">شماره تذکره مالک دفتر</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">نمبر جواز دفتر</th>
+              <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">نوع جواز</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">نوعیت جواز</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تاریخ صدور جواز</th>
               <th class="px-4 py-3 text-xs font-bold text-[#4a5568]">تاریخ ختم جواز</th>
@@ -514,6 +515,7 @@
               <td class="px-4 py-3 text-xs" [ngClass]="property.ownerFatherName ? 'text-[#4a5568]' : 'text-[#dc2626] font-semibold'">{{ property.ownerFatherName ? property.ownerFatherName : 'تکیمل ناشده' }}</td>
               <td class="px-4 py-3 text-xs text-[#4a5568]">{{ property.ownerElectronicNationalIdNumber }}</td>
               <td class="px-4 py-3 text-xs text-[#4a5568]">{{ property.licenseNumber }}</td>
+              <td class="px-4 py-3 text-xs text-[#4a5568]">{{ getLicenseTypeDari(property.licenseType) }}</td>
               <td class="px-4 py-3 text-xs">
                 <span *ngIf="property.licenseCategory" class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold" [ngClass]="{'bg-[#d1fae5] text-[#065f46]': property.licenseCategory === 'جدید', 'bg-[#dbeafe] text-[#1e40af]': property.licenseCategory === 'تجدید', 'bg-[#ede9fe] text-[#5b21b6]': property.licenseCategory === 'مثنی', 'bg-[#f3f4f6] text-[#374151]': !['جدید', 'تجدید', 'مثنی'].includes(property.licenseCategory)}">{{ property.licenseCategory }}</span>
                 <span *ngIf="!property.licenseCategory" class="text-[#9ca3af] text-[11px]">-</span>
