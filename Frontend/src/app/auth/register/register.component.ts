@@ -103,8 +103,8 @@ export class RegisterComponent extends BaseComponent implements OnInit {
       return;
     }
 
-    this.service.register().subscribe(
-      (res: any) => {
+    this.service.register().subscribe({
+      next: (res: any) => {
         this.isSubmitting = false;
         if (res.succeeded) {
           this.service.formModel.reset();
@@ -115,57 +115,22 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
           this.selectedCompanyInfo = null;
-          // Refresh user list
-          this.service.getUserProfile().subscribe(res => {
-            this.userDetails = res;
+          this.service.getUserProfile().subscribe(profileRes => {
+            this.userDetails = profileRes;
           });
-          
-          // Auto-hide success message after 5 seconds
+
           setTimeout(() => {
             this.successMessage = '';
           }, 5000);
-        } else {
-          res.errors.forEach((element: { code: any; description: string | undefined; }) => {
-            switch (element.code) {
-              case 'DuplicateUserName':
-                this.errorMessage = 'این نام کاربری قبلاً استفاده شده است. لطفاً نام کاربری دیگری انتخاب کنید.';
-                this.toastr.error('Username is already taken', 'Registration failed.');
-                break;
-              case 'DuplicateEmail':
-                this.errorMessage = 'این ایمیل آدرس قبلاً ثبت شده است.';
-                this.toastr.error('Email is already registered', 'Registration failed.');
-                break;
-              case 'PasswordTooShort':
-                this.errorMessage = 'پسورد باید حداقل ۶ کرکتر باشد.';
-                this.toastr.error('Password is too short', 'Registration failed.');
-                break;
-              case 'PasswordRequiresNonAlphanumeric':
-                this.errorMessage = 'پسورد باید شامل کرکتر های خاص باشد.';
-                this.toastr.error('Password requires special characters', 'Registration failed.');
-                break;
-              case 'PasswordRequiresDigit':
-                this.errorMessage = 'پسورد باید شامل اعداد باشد.';
-                this.toastr.error('Password requires digits', 'Registration failed.');
-                break;
-              case 'PasswordRequiresUpper':
-                this.errorMessage = 'پسورد باید شامل حروف بزرگ باشد.';
-                this.toastr.error('Password requires uppercase letters', 'Registration failed.');
-                break;
-              default:
-                this.errorMessage = element.description || 'خطا در ثبت کاربر. لطفاً دوباره تلاش کنید.';
-                this.toastr.error(element.description, 'Registration failed.');
-                break;
-            }
-          });
+        } else if (res.errors) {
+          this.handleRegistrationErrors(res.errors);
         }
       },
-      err => {
+      error: (err) => {
         this.isSubmitting = false;
-        console.log(err);
-        this.errorMessage = 'خطا در اتصال به سرور. لطفاً اتصال انترنت خود را بررسی کنید.';
-        this.toastr.error('Connection error', 'خطا در اتصال');
+        this.handleRegistrationHttpError(err);
       }
-    );
+    });
   }
 
   uploadFinished = (event: string) => {
@@ -382,5 +347,105 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     this.searchResults = [];
     this.searchLicenseNumber = '';
     this.searchProvinceId = null;
+  }
+
+  private normalizeRegistrationErrors(errors: any): Array<{ code: string; description?: string }> {
+    if (!errors) {
+      return [];
+    }
+    if (Array.isArray(errors)) {
+      return errors;
+    }
+    if (errors.$values && Array.isArray(errors.$values)) {
+      return errors.$values;
+    }
+    return [];
+  }
+
+  private handleRegistrationErrors(errors: any): void {
+    const normalizedErrors = this.normalizeRegistrationErrors(errors);
+    if (!normalizedErrors.length) {
+      this.errorMessage = 'خطا در ثبت کاربر. لطفاً دوباره تلاش کنید.';
+      this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+      return;
+    }
+
+    normalizedErrors.forEach((element) => {
+      switch (element.code) {
+        case 'DuplicateUserName':
+          this.errorMessage = 'این نام کاربری قبلاً استفاده شده است. لطفاً نام کاربری دیگری انتخاب کنید.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
+        case 'DuplicateEmail':
+          this.errorMessage = 'این ایمیل آدرس قبلاً ثبت شده است.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
+        case 'PasswordTooShort':
+          this.errorMessage = 'پسورد باید حداقل ۴ کرکتر باشد.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
+        case 'PasswordRequiresNonAlphanumeric':
+          this.errorMessage = 'پسورد باید شامل کرکتر های خاص باشد.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
+        case 'PasswordRequiresDigit':
+          this.errorMessage = 'پسورد باید شامل اعداد باشد.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
+        case 'PasswordRequiresUpper':
+          this.errorMessage = 'پسورد باید شامل حروف بزرگ باشد.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
+        default:
+          this.errorMessage = element.description || 'خطا در ثبت کاربر. لطفاً دوباره تلاش کنید.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
+      }
+    });
+  }
+
+  private handleRegistrationHttpError(err: any): void {
+    const body = err?.error;
+
+    if (err?.status === 400) {
+      const identityErrors = body?.errors;
+      if (identityErrors) {
+        this.handleRegistrationErrors(identityErrors);
+        return;
+      }
+
+      if (body?.message) {
+        this.errorMessage = body.message;
+        this.toastr.error(body.message, 'ثبت نام ناموفق');
+        return;
+      }
+    }
+
+    if (err?.status === 401) {
+      this.errorMessage = 'نشست شما منقضی شده است. لطفاً دوباره وارد شوید.';
+      this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+      return;
+    }
+
+    if (err?.status === 403) {
+      this.errorMessage = 'شما مجوز ثبت کاربر جدید را ندارید.';
+      this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+      return;
+    }
+
+    if (err?.status === 500) {
+      this.errorMessage = body?.message || body?.error || 'خطای سرور در ثبت کاربر. لطفاً دوباره تلاش کنید.';
+      this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+      return;
+    }
+
+    if (err?.status === 0) {
+      this.errorMessage = 'خطا در اتصال به سرور. لطفاً اتصال انترنت خود را بررسی کنید.';
+      this.toastr.error(this.errorMessage, 'خطا در اتصال');
+      return;
+    }
+
+    this.errorMessage = body?.message || 'خطا در ثبت کاربر. لطفاً دوباره تلاش کنید.';
+    this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
   }
 }

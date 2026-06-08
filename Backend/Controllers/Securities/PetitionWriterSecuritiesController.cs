@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
 using WebAPIBackend.Models;
+using WebAPIBackend.Models.PetitionWriterLicense;
 using WebAPIBackend.Models.RequestData;
 
 namespace WebAPIBackend.Controllers.Securities
@@ -411,7 +412,9 @@ namespace WebAPIBackend.Controllers.Securities
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
             [FromQuery] string? calendarType = null,
-            [FromQuery] string? licenseNumber = null)
+            [FromQuery] string? licenseNumber = null,
+            [FromQuery] int? provinceId = null,
+            [FromQuery] int? districtId = null)
         {
             try
             {
@@ -460,6 +463,80 @@ namespace WebAPIBackend.Controllers.Securities
 
                 var securities = await query.ToListAsync();
 
+                // Resolve province/district via license number -> petition writer license
+                var licenseNumbers = securities
+                    .Select(s => s.LicenseNumber)
+                    .Where(l => !string.IsNullOrWhiteSpace(l))
+                    .Distinct()
+                    .ToList();
+
+                var petitionWriterLicenses = await _context.PetitionWriterLicenses
+                    .AsNoTracking()
+                    .Include(l => l.Province)
+                    .Include(l => l.CurrentDistrict)
+                    .Where(l => licenseNumbers.Contains(l.LicenseNumber))
+                    .ToListAsync();
+
+                var licenseInfoMap = petitionWriterLicenses
+                    .GroupBy(l => l.LicenseNumber)
+                    .ToDictionary(g => g.Key, g =>
+                    {
+                        var license = g.First();
+                        return new
+                        {
+                            ProvinceId = license.ProvinceId,
+                            ProvinceName = license.Province?.Dari ?? "نامشخص",
+                            DistrictId = license.CurrentDistrictId,
+                            DistrictName = license.CurrentDistrict?.Dari ?? "نامشخص"
+                        };
+                    });
+
+                if (provinceId.HasValue && provinceId.Value > 0)
+                {
+                    securities = securities
+                        .Where(s => licenseInfoMap.TryGetValue(s.LicenseNumber, out var info)
+                            && info.ProvinceId == provinceId.Value)
+                        .ToList();
+                }
+
+                if (districtId.HasValue && districtId.Value > 0)
+                {
+                    securities = securities
+                        .Where(s => licenseInfoMap.TryGetValue(s.LicenseNumber, out var info)
+                            && info.DistrictId == districtId.Value)
+                        .ToList();
+                }
+
+                string ResolveProvince(string licenseNo) =>
+                    licenseInfoMap.TryGetValue(licenseNo, out var info) ? info.ProvinceName : "نامشخص";
+
+                string ResolveDistrict(string licenseNo) =>
+                    licenseInfoMap.TryGetValue(licenseNo, out var info) ? info.DistrictName : "نامشخص";
+
+                var byProvince = securities
+                    .GroupBy(s => ResolveProvince(s.LicenseNumber))
+                    .Select(g => new
+                    {
+                        province = g.Key,
+                        count = g.Count(),
+                        petitionCount = g.Sum(x => x.PetitionCount),
+                        petitionAmount = g.Sum(x => x.Amount)
+                    })
+                    .OrderByDescending(x => x.count)
+                    .ToList();
+
+                var byDistrict = securities
+                    .GroupBy(s => ResolveDistrict(s.LicenseNumber))
+                    .Select(g => new
+                    {
+                        district = g.Key,
+                        count = g.Count(),
+                        petitionCount = g.Sum(x => x.PetitionCount),
+                        petitionAmount = g.Sum(x => x.Amount)
+                    })
+                    .OrderByDescending(x => x.count)
+                    .ToList();
+
                 // Calculate totals
                 var totalPetitionCount = securities.Sum(s => s.PetitionCount);
                 var totalAmount = securities.Sum(s => s.Amount);
@@ -474,6 +551,10 @@ namespace WebAPIBackend.Controllers.Securities
                     startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
                     endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
                     licenseNumber = licenseNumber ?? "همه عریضه‌نویسان",
+                    provinceId,
+                    districtId,
+                    byProvince,
+                    byDistrict,
                     reportGeneratedAt = DateTime.UtcNow,
                     totalDistributions = securities.Count
                 });

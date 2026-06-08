@@ -110,6 +110,20 @@
             <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">نمبر جواز</label>
             <input type="text" [(ngModel)]="reportLicenseNumber" placeholder="نمبر جواز را وارد کنید" class="w-full px-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#55615a] focus:border-transparent">
           </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ولایت</label>
+            <select [(ngModel)]="reportProvinceId" (ngModelChange)="onReportProvinceChange()" class="w-full px-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#55615a] focus:border-transparent bg-white">
+              <option [value]="0">همه ولایات</option>
+              <option *ngFor="let p of reportProvinces" [value]="p.id">{{ p.name || p.dari }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#6f7973] mb-1.5">ولسوالی</label>
+            <select [(ngModel)]="reportDistrictId" [disabled]="reportProvinceId === 0" class="w-full px-4 py-2.5 border border-[#bec9c2] rounded-xl focus:ring-2 focus:ring-[#55615a] focus:border-transparent bg-white disabled:bg-[#f7f9fb] disabled:text-[#6f7973] disabled:cursor-not-allowed">
+              <option [value]="0">همه ولسوالی‌ها</option>
+              <option *ngFor="let d of reportDistricts" [value]="d.id">{{ d.name }}</option>
+            </select>
+          </div>
         </div>
         <div class="flex gap-3 mt-4">
           <button (click)="generateReport()" [disabled]="isLoadingReport" class="px-6 py-2.5 bg-[#55615a] hover:bg-[#3f4944] text-white font-medium rounded-xl transition-colors shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50">
@@ -181,6 +195,66 @@
               <i class="fas fa-clock text-[#6f7973]"></i>
               <span class="text-[#6f7973]">تاریخ تولید گزارش:</span>
               <span class="font-bold text-[#191c1e]">{{ reportData.reportGeneratedAt | calendarDate }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Province & District Breakdown -->
+        <div *ngIf="reportData.byProvince?.length || reportData.byDistrict?.length" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div *ngIf="reportData.byProvince?.length" class="bg-white rounded-xl border border-[#eceef0] overflow-hidden">
+            <div class="px-4 py-3 bg-[#f7f9fb] border-b border-[#eceef0] flex items-center gap-2">
+              <i class="fas fa-map text-[#004532] text-sm"></i>
+              <span class="text-sm font-bold text-[#191c1e]">گزارش بر اساس ولایت</span>
+            </div>
+            <div class="overflow-y-auto" style="max-height:200px">
+              <table class="w-full text-sm">
+                <thead class="bg-[#f7f9fb] border-b border-[#eceef0]">
+                  <tr class="text-center">
+                    <th class="py-2 px-3 text-[#6f7973]">ولایت</th>
+                    <th class="py-2 px-3 text-[#6f7973]">توزیع</th>
+                    <th class="py-2 px-3 text-[#6f7973]">عریضه</th>
+                    <th class="py-2 px-3 text-[#6f7973]">مبلغ</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#eceef0]">
+                  <tr *ngFor="let row of reportData.byProvince" class="hover:bg-[#f7f9fb] transition-colors text-center">
+                    <td class="py-2.5 px-3 text-[#191c1e]">{{ row.province }}</td>
+                    <td class="py-2.5 px-3">
+                      <span class="bg-[#004532] text-white text-xs font-bold px-2.5 py-0.5 rounded-full">{{ row.count }}</span>
+                    </td>
+                    <td class="py-2.5 px-3 font-semibold text-[#191c1e]">{{ row.petitionCount | number }}</td>
+                    <td class="py-2.5 px-3 font-semibold text-[#065f46]">{{ row.petitionAmount | number }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div *ngIf="reportData.byDistrict?.length" class="bg-white rounded-xl border border-[#eceef0] overflow-hidden">
+            <div class="px-4 py-3 bg-[#f7f9fb] border-b border-[#eceef0] flex items-center gap-2">
+              <i class="fas fa-map-marker-alt text-[#004532] text-sm"></i>
+              <span class="text-sm font-bold text-[#191c1e]">گزارش بر اساس ولسوالی</span>
+            </div>
+            <div class="overflow-y-auto" style="max-height:200px">
+              <table class="w-full text-sm">
+                <thead class="bg-[#f7f9fb] border-b border-[#eceef0]">
+                  <tr class="text-center">
+                    <th class="py-2 px-3 text-[#6f7973]">ولسوالی</th>
+                    <th class="py-2 px-3 text-[#6f7973]">توزیع</th>
+                    <th class="py-2 px-3 text-[#6f7973]">عریضه</th>
+                    <th class="py-2 px-3 text-[#6f7973]">مبلغ</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#eceef0]">
+                  <tr *ngFor="let row of reportData.byDistrict" class="hover:bg-[#f7f9fb] transition-colors text-center">
+                    <td class="py-2.5 px-3 text-[#191c1e]">{{ row.district }}</td>
+                    <td class="py-2.5 px-3">
+                      <span class="bg-[#004532] text-white text-xs font-bold px-2.5 py-0.5 rounded-full">{{ row.count }}</span>
+                    </td>
+                    <td class="py-2.5 px-3 font-semibold text-[#191c1e]">{{ row.petitionCount | number }}</td>
+                    <td class="py-2.5 px-3 font-semibold text-[#065f46]">{{ row.petitionAmount | number }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

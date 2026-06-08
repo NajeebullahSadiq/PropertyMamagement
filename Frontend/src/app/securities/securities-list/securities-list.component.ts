@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { SecuritiesService } from 'src/app/shared/securities.service';
+import { CompnaydetailService } from 'src/app/shared/compnaydetail.service';
+import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -37,6 +39,10 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
     reportEndDate: any = '';
     reportType: string = 'all'; // 'all' or 'single'
     reportLicenseNumber: string = '';
+    reportProvinceId = 0;
+    reportDistrictId = 0;
+    reportProvinces: any[] = [];
+    reportDistricts: any[] = [];
     reportData: any = null;
     isLoadingReport = false;
 
@@ -44,6 +50,8 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
 
     constructor(
         private securitiesService: SecuritiesService,
+        private companyService: CompnaydetailService,
+        private licenseService: PetitionWriterLicenseService,
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService,
         private rbacService: RbacService,
@@ -57,6 +65,7 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
     ngOnInit(): void {
         this.checkPermissions();
         this.loadData();
+        this.loadReportProvinces();
 
         // Subscribe to data changes
         this.securitiesService.dataChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -187,6 +196,26 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
         this.showReports = !this.showReports;
         if (!this.showReports) {
             this.reportData = null;
+        } else if (!this.reportProvinces.length) {
+            this.loadReportProvinces();
+        }
+    }
+
+    loadReportProvinces(): void {
+        this.companyService.getProvinces().pipe(takeUntil(this.destroy$)).subscribe({
+            next: (res: any) => { this.reportProvinces = res || []; },
+            error: () => {}
+        });
+    }
+
+    onReportProvinceChange(): void {
+        this.reportDistrictId = 0;
+        this.reportDistricts = [];
+        if (this.reportProvinceId > 0) {
+            this.licenseService.getReportDistricts(this.reportProvinceId).pipe(takeUntil(this.destroy$)).subscribe({
+                next: (data) => { this.reportDistricts = data || []; },
+                error: () => {}
+            });
         }
     }
 
@@ -219,7 +248,9 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
             startDate,
             endDate,
             calendar,
-            licenseNumber
+            licenseNumber,
+            this.reportProvinceId > 0 ? this.reportProvinceId : undefined,
+            this.reportDistrictId > 0 ? this.reportDistrictId : undefined
         ).subscribe({
             next: (data) => {
                 this.reportData = data;
@@ -268,6 +299,24 @@ export class SecuritiesListComponent extends BaseComponent implements OnInit, On
         excelData.push(['کتاب ثبت معاملات', this.reportData.registrationBookRevenue]);
         excelData.push(['کتاب ثبت مثنی', this.reportData.registrationBookDuplicateRevenue]);
         excelData.push(['مجموع اسناد بهادار', this.reportData.totalRevenue]);
+        excelData.push([]);
+
+        if (this.reportData.byProvince?.length) {
+            excelData.push(['گزارش بر اساس ولایت']);
+            excelData.push(['ولایت', 'تعداد توزیع', 'مجموع عواید']);
+            this.reportData.byProvince.forEach((row: any) => {
+                excelData.push([row.province, row.count, row.totalRevenue]);
+            });
+            excelData.push([]);
+        }
+
+        if (this.reportData.byDistrict?.length) {
+            excelData.push(['گزارش بر اساس ولسوالی']);
+            excelData.push(['ولسوالی', 'تعداد توزیع', 'مجموع عواید']);
+            this.reportData.byDistrict.forEach((row: any) => {
+                excelData.push([row.district, row.count, row.totalRevenue]);
+            });
+        }
         
         // Convert to CSV
         const csv = excelData.map(row => row.join(',')).join('\n');

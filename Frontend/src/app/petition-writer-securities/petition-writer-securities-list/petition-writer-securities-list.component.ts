@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { PetitionWriterSecuritiesService } from 'src/app/shared/petition-writer-securities.service';
+import { PetitionWriterLicenseService } from 'src/app/shared/petition-writer-license.service';
 import { CalendarService } from 'src/app/shared/calendar.service';
 import { CalendarConversionService } from 'src/app/shared/calendar-conversion.service';
 import { RbacService, UserRoles } from 'src/app/shared/rbac.service';
@@ -38,11 +39,16 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
     reportEndDate: any = '';
     reportType: string = 'all'; // 'all' or 'single'
     reportLicenseNumber: string = '';
+    reportProvinceId = 0;
+    reportDistrictId = 0;
+    reportProvinces: any[] = [];
+    reportDistricts: any[] = [];
     reportData: any = null;
     isLoadingReport = false;
 
     constructor(
         private petitionService: PetitionWriterSecuritiesService,
+        private licenseService: PetitionWriterLicenseService,
         private calendarService: CalendarService,
         private calendarConversionService: CalendarConversionService,
         private rbacService: RbacService,
@@ -55,6 +61,7 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
     ngOnInit(): void {
         this.checkPermissions();
         this.loadData();
+        this.loadReportProvinces();
         
         // Subscribe to data changes from service
         this.petitionService.dataChanged.pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -138,6 +145,26 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
         this.showReports = !this.showReports;
         if (!this.showReports) {
             this.reportData = null;
+        } else if (!this.reportProvinces.length) {
+            this.loadReportProvinces();
+        }
+    }
+
+    loadReportProvinces(): void {
+        this.licenseService.getProvinces().pipe(takeUntil(this.destroy$)).subscribe({
+            next: (res: any) => { this.reportProvinces = res || []; },
+            error: () => {}
+        });
+    }
+
+    onReportProvinceChange(): void {
+        this.reportDistrictId = 0;
+        this.reportDistricts = [];
+        if (this.reportProvinceId > 0) {
+            this.licenseService.getReportDistricts(this.reportProvinceId).pipe(takeUntil(this.destroy$)).subscribe({
+                next: (data) => { this.reportDistricts = data || []; },
+                error: () => {}
+            });
         }
     }
 
@@ -170,7 +197,9 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
             startDate,
             endDate,
             calendar,
-            licenseNumber
+            licenseNumber,
+            this.reportProvinceId > 0 ? this.reportProvinceId : undefined,
+            this.reportDistrictId > 0 ? this.reportDistrictId : undefined
         ).subscribe({
             next: (data) => {
                 this.reportData = data;
@@ -203,6 +232,24 @@ export class PetitionWriterSecuritiesListComponent extends BaseComponent impleme
         excelData.push(['مبلغ پول عریضه', this.reportData.petitionAmount + ' افغانی']);
         excelData.push([]);
         excelData.push(['تعداد توزیع', this.reportData.totalDistributions]);
+        excelData.push([]);
+
+        if (this.reportData.byProvince?.length) {
+            excelData.push(['گزارش بر اساس ولایت']);
+            excelData.push(['ولایت', 'تعداد توزیع', 'تعداد عریضه', 'مبلغ']);
+            this.reportData.byProvince.forEach((row: any) => {
+                excelData.push([row.province, row.count, row.petitionCount, row.petitionAmount]);
+            });
+            excelData.push([]);
+        }
+
+        if (this.reportData.byDistrict?.length) {
+            excelData.push(['گزارش بر اساس ولسوالی']);
+            excelData.push(['ولسوالی', 'تعداد توزیع', 'تعداد عریضه', 'مبلغ']);
+            this.reportData.byDistrict.forEach((row: any) => {
+                excelData.push([row.district, row.count, row.petitionCount, row.petitionAmount]);
+            });
+        }
         
         // Convert to CSV
         const csv = excelData.map(row => row.join(',')).join('\n');

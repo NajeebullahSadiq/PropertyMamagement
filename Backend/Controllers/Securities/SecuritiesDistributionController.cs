@@ -586,7 +586,9 @@ namespace WebAPIBackend.Controllers.Securities
             [FromQuery] string? startDate = null,
             [FromQuery] string? endDate = null,
             [FromQuery] string? calendarType = null,
-            [FromQuery] string? licenseNumber = null)
+            [FromQuery] string? licenseNumber = null,
+            [FromQuery] int? provinceId = null,
+            [FromQuery] int? districtId = null)
         {
             try
             {
@@ -635,6 +637,88 @@ namespace WebAPIBackend.Controllers.Securities
                 }
 
                 var distributions = await query.ToListAsync();
+
+                // Resolve province/district via license number -> company license
+                var licenseNumbers = distributions
+                    .Select(d => d.LicenseNumber)
+                    .Where(l => !string.IsNullOrWhiteSpace(l))
+                    .Distinct()
+                    .ToList();
+
+                var licenseDetails = await _context.LicenseDetails
+                    .AsNoTracking()
+                    .Include(l => l.Province)
+                    .Include(l => l.Company)
+                        .ThenInclude(c => c!.CompanyOwners)
+                        .ThenInclude(o => o.CompanyOwnerAddresses)
+                        .ThenInclude(a => a.District)
+                    .Where(l => l.LicenseNumber != null && licenseNumbers.Contains(l.LicenseNumber))
+                    .ToListAsync();
+
+                var licenseInfoMap = licenseDetails
+                    .GroupBy(l => l.LicenseNumber!)
+                    .ToDictionary(g => g.Key, g =>
+                    {
+                        var license = g.First();
+                        var district = license.Company?.CompanyOwners
+                            .SelectMany(o => o.CompanyOwnerAddresses)
+                            .FirstOrDefault(a => a.DistrictId.HasValue)?.District;
+
+                        return new
+                        {
+                            ProvinceId = license.ProvinceId,
+                            ProvinceName = license.Province?.Dari ?? "نامشخص",
+                            DistrictId = district?.Id,
+                            DistrictName = district?.Dari ?? "نامشخص"
+                        };
+                    });
+
+                if (provinceId.HasValue && provinceId.Value > 0)
+                {
+                    distributions = distributions
+                        .Where(d => licenseInfoMap.TryGetValue(d.LicenseNumber, out var info)
+                            && info.ProvinceId == provinceId.Value)
+                        .ToList();
+                }
+
+                if (districtId.HasValue && districtId.Value > 0)
+                {
+                    distributions = distributions
+                        .Where(d => licenseInfoMap.TryGetValue(d.LicenseNumber, out var info)
+                            && info.DistrictId == districtId.Value)
+                        .ToList();
+                }
+
+                string ResolveProvince(string licenseNo) =>
+                    licenseInfoMap.TryGetValue(licenseNo, out var info) ? info.ProvinceName : "نامشخص";
+
+                string ResolveDistrict(string licenseNo) =>
+                    licenseInfoMap.TryGetValue(licenseNo, out var info) ? info.DistrictName : "نامشخص";
+
+                decimal CalcDistributionRevenue(SecuritiesDistribution distribution) =>
+                    distribution.Items.Sum(i => i.Price * i.Count);
+
+                var byProvince = distributions
+                    .GroupBy(d => ResolveProvince(d.LicenseNumber))
+                    .Select(g => new
+                    {
+                        province = g.Key,
+                        count = g.Count(),
+                        totalRevenue = g.Sum(CalcDistributionRevenue)
+                    })
+                    .OrderByDescending(x => x.count)
+                    .ToList();
+
+                var byDistrict = distributions
+                    .GroupBy(d => ResolveDistrict(d.LicenseNumber))
+                    .Select(g => new
+                    {
+                        district = g.Key,
+                        count = g.Count(),
+                        totalRevenue = g.Sum(CalcDistributionRevenue)
+                    })
+                    .OrderByDescending(x => x.count)
+                    .ToList();
 
                 // Document types:
                 // 1 = سټه خرید و فروش جایداد
@@ -694,6 +778,10 @@ namespace WebAPIBackend.Controllers.Securities
                     startDate = parsedStartDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedStartDate, calendar) : "",
                     endDate = parsedEndDate.HasValue ? DateConversionHelper.FormatDateOnly(parsedEndDate, calendar) : "",
                     licenseNumber = licenseNumber ?? "همه دفاتر",
+                    provinceId,
+                    districtId,
+                    byProvince,
+                    byDistrict,
                     reportGeneratedAt = DateTime.UtcNow,
                     totalDistributions = distributions.Count
                 });
