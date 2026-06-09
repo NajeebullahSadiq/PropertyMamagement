@@ -68,9 +68,9 @@ export class AuthService {
   }
 
   register() {
-    var body = {
+    const email = this.formModel.value.Email?.trim();
+    return this.http.post(this.BaseURI + '/ApplicationUser/Register', {
       userName: this.formModel.value.UserName,
-      email: this.formModel.value.Email?.trim() || null,
       firstName: this.formModel.value.FirstName,
       lastName: this.formModel.value.LastName,
       role: this.formModel.value.Role,
@@ -80,9 +80,9 @@ export class AuthService {
       photoPath: this.photoPath,
       licenseType: this.formModel.value.LicenseType,
       licenseNumber: this.formModel.value.LicenseNumber,
-      provinceId: this.formModel.value.ProvinceId
-    };
-    return this.http.post(this.BaseURI + '/ApplicationUser/Register', body);
+      provinceId: this.formModel.value.ProvinceId,
+      ...(email ? { email } : {})
+    });
   }
 
   getUserProfile(params?: { search?: string; userType?: string; role?: string; status?: string; page?: number; pageSize?: number }) {

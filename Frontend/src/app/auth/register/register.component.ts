@@ -191,7 +191,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
 
     if (role === UserRoles.PropertyOperator || role === UserRoles.VehicleOperator) {
       lastNameControl?.clearValidators();
-      emailControl?.setValidators([Validators.email]);
+      emailControl?.clearValidators();
     } else {
       lastNameControl?.setValidators([Validators.required]);
       emailControl?.setValidators([Validators.email]);

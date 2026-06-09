@@ -51,7 +51,10 @@ builder.Services.AddAuthorization(options =>
 });
 //End Policy Authorization
 builder.Services.Configure<IdentityOptions>(options =>
-options.User.RequireUniqueEmail = true);
+{
+    // Allow users without email (company operators). Duplicate/format checks are done in ApplicationUserController when email is provided.
+    options.User.RequireUniqueEmail = false;
+});
 //Password Configuration
 builder.Services.Configure<IdentityOptions>(options =>
 options.Password.RequireDigit = false);

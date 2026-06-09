@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -161,6 +162,10 @@ namespace WebAPI.Controllers
 
             model.Email = NormalizeOptionalEmail(model.Email);
 
+            var emailValidationError = await ValidateOptionalEmailAsync(model.Email);
+            if (emailValidationError != null)
+                return BadRequest(new { message = emailValidationError });
+
             // Get current user for CreatedBy
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
@@ -168,6 +173,7 @@ namespace WebAPI.Controllers
             {
                 UserName = model.UserName,
                 Email = model.Email,
+                NormalizedEmail = model.Email == null ? null : _userManager.NormalizeEmail(model.Email),
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 PhotoPath = model.PhotoPath,
@@ -745,12 +751,17 @@ namespace WebAPI.Controllers
 
             var normalizedEmail = NormalizeOptionalEmail(model.Email);
 
+            var emailValidationError = await ValidateOptionalEmailAsync(normalizedEmail);
+            if (emailValidationError != null)
+                return BadRequest(new { message = emailValidationError });
+
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
             var applicationUser = new ApplicationUser()
             {
                 UserName = model.UserName,
                 Email = normalizedEmail,
+                NormalizedEmail = normalizedEmail == null ? null : _userManager.NormalizeEmail(normalizedEmail),
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber)
@@ -892,10 +903,16 @@ namespace WebAPI.Controllers
                     return BadRequest(new { message = companyUserError });
             }
 
+            var normalizedEmail = NormalizeOptionalEmail(model.Email);
+            var emailValidationError = await ValidateOptionalEmailAsync(normalizedEmail, model.UserId);
+            if (emailValidationError != null)
+                return BadRequest(new { message = emailValidationError });
+
             // Update user properties
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
-            user.Email = NormalizeOptionalEmail(model.Email);
+            user.Email = normalizedEmail;
+            user.NormalizedEmail = normalizedEmail == null ? null : _userManager.NormalizeEmail(normalizedEmail);
             user.PhoneNumber = model.PhoneNumber;
             user.CompanyId = model.CompanyId;
             user.LicenseType = model.LicenseType;
@@ -1120,6 +1137,24 @@ namespace WebAPI.Controllers
         private static string? NormalizeOptionalEmail(string? email)
         {
             return string.IsNullOrWhiteSpace(email) ? null : email.Trim();
+        }
+
+        private async Task<string?> ValidateOptionalEmailAsync(string? email, string? excludeUserId = null)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            if (!new EmailAddressAttribute().IsValid(email))
+                return "ایمیل آدرس درست نیست";
+
+            var existingUser = await _userManager.FindByEmailAsync(email);
+            if (existingUser != null &&
+                (string.IsNullOrWhiteSpace(excludeUserId) || existingUser.Id != excludeUserId))
+            {
+                return "این ایمیل آدرس قبلاً ثبت شده است";
+            }
+
+            return null;
         }
 
         private sealed class CompanyOwnerContactInfo
