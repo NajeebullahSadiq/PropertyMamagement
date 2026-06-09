@@ -26,6 +26,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
   showCompanySelect = false;
   showLicenseTypeSelect = false;
   showProvinceSelect = false; // Show province field for COMPANY_REGISTRAR
+  companyFieldsLocked = false;
 
   // License search
   showLicenseSearch = false;
@@ -61,8 +62,14 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     super();
   }
 
+  get isCompanyUserMode(): boolean {
+    const role = this.service.formModel.get('Role')?.value;
+    return role === UserRoles.PropertyOperator || role === UserRoles.VehicleOperator;
+  }
+
   ngOnInit(): void {
     this.service.formModel.reset();
+    this.updateFormValidatorsForRole('');
     this.service.getCompanies().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.companylist = res;
     });
@@ -121,7 +128,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           this.filePath = 'assets/img/avatar.png';
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
-          this.selectedCompanyInfo = null;
+          this.clearCompanyAutofill();
           this.service.getUserProfile().subscribe(profileRes => {
             this.userDetails = profileRes;
           });
@@ -166,13 +173,167 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     this.showCompanySelect = false;
     this.showLicenseTypeSelect = false;
     this.selectedCompanyInfo = null;
+    this.companyFieldsLocked = false;
     this.successMessage = '';
     this.errorMessage = '';
     this.showPassword = false;
     this.showConfirmPassword = false;
+    this.updateFormValidatorsForRole('');
     if (this.imageCropper) {
       this.imageCropper.reset();
     }
+  }
+
+  private updateFormValidatorsForRole(role: string | null | undefined): void {
+    role = role ?? '';
+    const lastNameControl = this.service.formModel.get('LastName');
+    const emailControl = this.service.formModel.get('Email');
+
+    if (role === UserRoles.PropertyOperator || role === UserRoles.VehicleOperator) {
+      lastNameControl?.clearValidators();
+      emailControl?.setValidators([Validators.email]);
+    } else {
+      lastNameControl?.setValidators([Validators.required]);
+      emailControl?.setValidators([Validators.email]);
+    }
+
+    lastNameControl?.updateValueAndValidity();
+    emailControl?.updateValueAndValidity();
+  }
+
+  private clearCompanyAutofill(): void {
+    this.companyFieldsLocked = false;
+    this.selectedCompanyInfo = null;
+    this.filePath = 'assets/img/avatar.png';
+    this.imageName = '';
+    this.service.photoPath = '';
+
+    const firstNameControl = this.service.formModel.get('FirstName');
+    const lastNameControl = this.service.formModel.get('LastName');
+    const phoneControl = this.service.formModel.get('PhoneNumber');
+    const provinceIdControl = this.service.formModel.get('ProvinceId');
+
+    firstNameControl?.setValue('');
+    lastNameControl?.setValue('');
+    phoneControl?.setValue('');
+    provinceIdControl?.setValue(null);
+
+    if (this.imageCropper) {
+      this.imageCropper.reset();
+    }
+  }
+
+  private populateFromCompany(result: any): void {
+    const firstNameControl = this.service.formModel.get('FirstName');
+    const lastNameControl = this.service.formModel.get('LastName');
+    const phoneControl = this.service.formModel.get('PhoneNumber');
+    const provinceIdControl = this.service.formModel.get('ProvinceId');
+
+    const ownerName = (result.ownerName || result.OwnerName || '').trim();
+    const ownerFatherName = (result.ownerFatherName || result.OwnerFatherName || '').trim();
+    const ownerGrandFatherName = (result.ownerGrandFatherName || result.OwnerGrandFatherName || '').trim();
+    const ownerPhone = (result.ownerPhoneNumber || result.OwnerPhoneNumber || '').trim();
+    const ownerPhoto = (result.ownerPhotoPath || result.OwnerPhotoPath || '').trim();
+
+    if (firstNameControl) {
+      firstNameControl.setValue(ownerName);
+    }
+
+    if (lastNameControl) {
+      const defaultLastName = ownerFatherName || ownerGrandFatherName;
+      lastNameControl.setValue(defaultLastName);
+    }
+
+    if (phoneControl && ownerPhone) {
+      phoneControl.setValue(ownerPhone);
+    }
+
+    if (provinceIdControl && result.provinceId) {
+      provinceIdControl.setValue(result.provinceId);
+    }
+
+    if (ownerPhoto) {
+      this.applyOwnerPhoto(ownerPhoto);
+    }
+
+    this.companyFieldsLocked = true;
+  }
+
+  private applyOwnerPhoto(photoPath: string): void {
+    this.imageName = photoPath;
+    this.service.photoPath = photoPath;
+    this.filePath = this.getOwnerPhotoUrl(photoPath);
+    if (this.imageCropper) {
+      this.imageCropper.setExistingImage(this.filePath);
+    }
+  }
+
+  private applyOwnerContact(owner: any): void {
+    const phone = (owner?.phoneNumber || owner?.PhoneNumber || owner?.whatsAppNumber || owner?.WhatsAppNumber || '').trim();
+    const photo = (owner?.pothoPath || owner?.PothoPath || '').trim();
+
+    if (phone) {
+      this.service.formModel.get('PhoneNumber')?.setValue(phone);
+    }
+
+    if (photo) {
+      this.applyOwnerPhoto(photo);
+    }
+
+    if (this.selectedCompanyInfo) {
+      this.selectedCompanyInfo = {
+        ...this.selectedCompanyInfo,
+        ownerPhoneNumber: phone || this.selectedCompanyInfo.ownerPhoneNumber,
+        ownerPhotoPath: photo || this.selectedCompanyInfo.ownerPhotoPath
+      };
+    }
+  }
+
+  private normalizeResponseArray(data: any): any[] {
+    if (!data) {
+      return [];
+    }
+    if (Array.isArray(data)) {
+      return data;
+    }
+    if (data.$values && Array.isArray(data.$values)) {
+      return data.$values;
+    }
+    return [data];
+  }
+
+  private loadOwnerContactForCompany(companyId: number): void {
+    this.companyService.getOwnerById(companyId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (owners) => {
+          const ownerList = this.normalizeResponseArray(owners);
+          if (ownerList.length > 0) {
+            this.applyOwnerContact(ownerList[0]);
+          }
+        },
+        error: (error) => {
+          console.error('Failed to load company owner contact info:', error);
+        }
+      });
+  }
+
+  getOwnerPhotoUrl(path: string | null | undefined): string {
+    if (!path) return 'assets/img/avatar.png';
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('assets/')) {
+      return path;
+    }
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    if (cleanPath.startsWith('Resources/')) {
+      return `${environment.apiURL}/Upload/view/${cleanPath}`;
+    }
+    return `${environment.apiURL}/Upload/view/${cleanPath}`;
+  }
+
+  getLicenseTypeLabel(licenseType: string): string {
+    if (licenseType === 'carSale') return 'موتر فروشی';
+    if (licenseType === 'realEstate') return 'املاک';
+    return licenseType || '-';
   }
 
   onPropertyTypeChange() {
@@ -185,6 +346,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
 
       if (roleControl && companyIdControl) {
         const selectedRole = roleControl.value;
+        this.updateFormValidatorsForRole(selectedRole);
 
         // Determine which fields to show based on role
         if (selectedRole === UserRoles.Admin || 
@@ -202,7 +364,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           licenseNumberControl?.clearValidators();
           licenseNumberControl?.updateValueAndValidity();
           provinceIdControl?.setValue(null);
-          this.selectedCompanyInfo = null;
+          this.clearCompanyAutofill();
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
           this.showProvinceSelect = false;
@@ -213,7 +375,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           licenseNumberControl?.setValue('');
           licenseNumberControl?.clearValidators();
           licenseNumberControl?.updateValueAndValidity();
-          this.selectedCompanyInfo = null;
+          this.clearCompanyAutofill();
           this.showCompanySelect = false;
           this.showLicenseTypeSelect = false;
           this.showProvinceSelect = true;
@@ -227,11 +389,13 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           this.showLicenseTypeSelect = true;
           this.showLicenseSearch = true;
           this.showProvinceSelect = false;
-          companyIdControl.setValue(0);
+          if (!this.selectedCompanyInfo) {
+            companyIdControl.setValue(0);
+          }
           licenseNumberControl?.setValue('');
           licenseNumberControl?.setValidators([Validators.required]);
           licenseNumberControl?.updateValueAndValidity();
-          this.selectedCompanyInfo = null;
+          this.clearCompanyAutofill();
           provinceIdControl?.setValue(null);
           provinceIdControl?.clearValidators();
           provinceIdControl?.updateValueAndValidity();
@@ -351,6 +515,11 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     }
     
     this.selectedCompanyInfo = result;
+    this.populateFromCompany(result);
+
+    if (result.companyId) {
+      this.loadOwnerContactForCompany(result.companyId);
+    }
 
     // Clear search
     this.searchResults = [];

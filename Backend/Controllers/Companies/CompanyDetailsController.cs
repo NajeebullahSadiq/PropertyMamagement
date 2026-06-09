@@ -914,11 +914,20 @@ namespace WebAPIBackend.Controllers.Companies
                         CompanyId = l.CompanyId,
                         CompanyTitle = l.Company != null ? l.Company.Title : null,
                         CompanyName = l.Company != null ? l.Company.Title : null,
-                        OwnerName = l.Company != null && l.Company.CompanyOwners.Any() 
-                            ? l.Company.CompanyOwners.FirstOrDefault()!.FirstName 
+                        OwnerName = l.Company != null
+                            ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FirstName).FirstOrDefault()
                             : null,
-                        OwnerFatherName = l.Company != null && l.Company.CompanyOwners.Any() 
-                            ? l.Company.CompanyOwners.FirstOrDefault()!.FatherName 
+                        OwnerFatherName = l.Company != null
+                            ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.FatherName).FirstOrDefault()
+                            : null,
+                        OwnerGrandFatherName = l.Company != null
+                            ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.GrandFatherName).FirstOrDefault()
+                            : null,
+                        OwnerPhoneNumber = l.Company != null
+                            ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.PhoneNumber).FirstOrDefault()
+                            : null,
+                        OwnerPhotoPath = l.Company != null
+                            ? l.Company.CompanyOwners.OrderBy(o => o.Id).Select(o => o.PothoPath).FirstOrDefault()
                             : null,
                         LicenseNumber = l.LicenseNumber,
                         LicenseType = l.LicenseType,
@@ -942,6 +951,28 @@ namespace WebAPIBackend.Controllers.Companies
                     .Distinct()
                     .ToList();
 
+                var ownerRows = await _context.CompanyOwners
+                    .AsNoTracking()
+                    .Where(o => o.CompanyId.HasValue && companyIds.Contains(o.CompanyId.Value))
+                    .Select(o => new { CompanyId = o.CompanyId!.Value, o.Id, o.PhoneNumber, o.WhatsAppNumber, o.PothoPath })
+                    .ToListAsync();
+
+                var ownerByCompanyId = ownerRows
+                    .GroupBy(o => o.CompanyId)
+                    .ToDictionary(
+                        g => g.Key,
+                        g =>
+                        {
+                            var owner = g.OrderBy(x => x.Id).First();
+                            return new
+                            {
+                                PhoneNumber = !string.IsNullOrWhiteSpace(owner.PhoneNumber)
+                                    ? owner.PhoneNumber
+                                    : owner.WhatsAppNumber,
+                                PhotoPath = owner.PothoPath
+                            };
+                        });
+
                 var companiesWithUsersQuery = _userManager.Users
                     .AsNoTracking()
                     .Where(u => companyIds.Contains(u.CompanyId)
@@ -962,6 +993,13 @@ namespace WebAPIBackend.Controllers.Companies
                     l.CompanyName,
                     l.OwnerName,
                     l.OwnerFatherName,
+                    l.OwnerGrandFatherName,
+                    OwnerPhoneNumber = l.CompanyId.HasValue && ownerByCompanyId.TryGetValue(l.CompanyId.Value, out var ownerContact)
+                        ? ownerContact.PhoneNumber
+                        : l.OwnerPhoneNumber,
+                    OwnerPhotoPath = l.CompanyId.HasValue && ownerByCompanyId.TryGetValue(l.CompanyId.Value, out var ownerPhoto)
+                        ? ownerPhoto.PhotoPath
+                        : l.OwnerPhotoPath,
                     l.LicenseNumber,
                     l.LicenseType,
                     l.ProvinceId,

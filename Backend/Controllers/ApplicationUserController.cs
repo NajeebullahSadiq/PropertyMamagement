@@ -157,6 +157,8 @@ namespace WebAPI.Controllers
                     return BadRequest(new { message = companyUserError });
             }
 
+            await ApplyCompanyOwnerDefaultsForOperatorAsync(model);
+
             // Get current user for CreatedBy
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
@@ -735,6 +737,10 @@ namespace WebAPI.Controllers
                     return BadRequest(new { message = companyUserError });
             }
 
+            var ownerDefaults = model.CompanyId > 0
+                ? await GetPrimaryCompanyOwnerContactAsync(model.CompanyId)
+                : null;
+
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
             var applicationUser = new ApplicationUser()
@@ -743,7 +749,12 @@ namespace WebAPI.Controllers
                 Email = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                PhoneNumber = model.PhoneNumber,
+                PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber)
+                    ? ownerDefaults?.PhoneNumber
+                    : model.PhoneNumber,
+                PhotoPath = string.IsNullOrWhiteSpace(model.PhotoPath)
+                    ? ownerDefaults?.PhotoPath
+                    : model.PhotoPath,
                 CompanyId = model.CompanyId,
                 LicenseType = model.LicenseType,
                 UserRole = role,
@@ -814,6 +825,7 @@ namespace WebAPI.Controllers
             public string FirstName { get; set; } = "";
             public string LastName { get; set; } = "";
             public string? PhoneNumber { get; set; }
+            public string? PhotoPath { get; set; }
             public int CompanyId { get; set; }
             public string? LicenseNumber { get; set; }
             public string LicenseType { get; set; } = "";
@@ -1099,6 +1111,77 @@ namespace WebAPI.Controllers
                 isViewOnly = primaryRole == UserRoles.Authority || primaryRole == UserRoles.LicenseReviewer,
                 message = "صلاحیت‌ها با موفقیت به‌روز شد"
             });
+        }
+
+        private sealed class CompanyOwnerContactInfo
+        {
+            public string? PhoneNumber { get; init; }
+            public string? PhotoPath { get; init; }
+            public string? FirstName { get; init; }
+            public string? LastName { get; init; }
+        }
+
+        private async Task<CompanyOwnerContactInfo?> GetPrimaryCompanyOwnerContactAsync(int companyId)
+        {
+            if (companyId <= 0)
+                return null;
+
+            var owner = await _context.CompanyOwners
+                .AsNoTracking()
+                .Where(o => o.CompanyId == companyId)
+                .OrderBy(o => o.Id)
+                .Select(o => new
+                {
+                    o.PhoneNumber,
+                    o.WhatsAppNumber,
+                    o.PothoPath,
+                    o.FirstName,
+                    o.FatherName,
+                    o.GrandFatherName
+                })
+                .FirstOrDefaultAsync();
+
+            if (owner == null)
+                return null;
+
+            var lastName = !string.IsNullOrWhiteSpace(owner.FatherName)
+                ? owner.FatherName
+                : owner.GrandFatherName;
+
+            return new CompanyOwnerContactInfo
+            {
+                PhoneNumber = !string.IsNullOrWhiteSpace(owner.PhoneNumber)
+                    ? owner.PhoneNumber
+                    : owner.WhatsAppNumber,
+                PhotoPath = owner.PothoPath,
+                FirstName = owner.FirstName,
+                LastName = lastName
+            };
+        }
+
+        private async Task ApplyCompanyOwnerDefaultsForOperatorAsync(ApplicationUserModel model)
+        {
+            if (model.CompanyId <= 0)
+                return;
+
+            if (model.Role != UserRoles.PropertyOperator && model.Role != UserRoles.VehicleOperator)
+                return;
+
+            var owner = await GetPrimaryCompanyOwnerContactAsync(model.CompanyId);
+            if (owner == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(model.PhoneNumber))
+                model.PhoneNumber = owner.PhoneNumber;
+
+            if (string.IsNullOrWhiteSpace(model.PhotoPath))
+                model.PhotoPath = owner.PhotoPath;
+
+            if (string.IsNullOrWhiteSpace(model.FirstName))
+                model.FirstName = owner.FirstName;
+
+            if (string.IsNullOrWhiteSpace(model.LastName))
+                model.LastName = owner.LastName;
         }
 
         private async Task<string?> ValidateCompanyUserLimitAsync(int companyId, string? excludeUserId = null)
