@@ -93,11 +93,14 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
     const companyIdControl = this.editForm.get('companyId');
     const licenseTypeControl = this.editForm.get('licenseType');
     const licenseNumberControl = this.editForm.get('licenseNumber');
+    const emailControl = this.editForm.get('email');
 
     if (role === UserRoles.Admin || 
         role === UserRoles.Authority || 
         role === UserRoles.LicenseReviewer ||
         role === UserRoles.CompanyRegistrar) {
+      emailControl?.setValidators([Validators.required, Validators.email]);
+      emailControl?.updateValueAndValidity();
       // System-level roles don't need company
       companyIdControl?.setValue(0);
       licenseTypeControl?.setValue('');
@@ -110,6 +113,8 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
       this.showLicenseSearch = false;
     } else if (role === UserRoles.PropertyOperator || 
                role === UserRoles.VehicleOperator) {
+      emailControl?.setValidators([Validators.email]);
+      emailControl?.updateValueAndValidity();
       // Company operators need company and license type
       this.showCompanySelect = true;
       this.showLicenseTypeSelect = true;
@@ -124,6 +129,8 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
         licenseTypeControl?.setValue('carSale');
       }
     } else {
+      emailControl?.setValidators([Validators.required, Validators.email]);
+      emailControl?.updateValueAndValidity();
       this.showCompanySelect = true;
       this.showLicenseTypeSelect = false;
       this.showLicenseSearch = true;
@@ -144,7 +151,10 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    const formData = this.editForm.value;
+    const formData = {
+      ...this.editForm.value,
+      email: this.editForm.value.email?.trim() || null
+    };
 
     this.http.post(`${this.baseUrl}/ApplicationUser/UpdateUser`, formData).subscribe({
       next: (res: any) => {

@@ -70,7 +70,7 @@ export class AuthService {
   register() {
     var body = {
       userName: this.formModel.value.UserName,
-      email: this.formModel.value.Email,
+      email: this.formModel.value.Email?.trim() || null,
       firstName: this.formModel.value.FirstName,
       lastName: this.formModel.value.LastName,
       role: this.formModel.value.Role,

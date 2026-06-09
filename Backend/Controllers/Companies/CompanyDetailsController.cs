@@ -12,7 +12,6 @@ using WebAPIBackend.Models.Audit;
 using WebAPIBackend.Models.RequestData;
 using WebAPIBackend.Models.ViewModels;
 using WebAPIBackend.Services;
-using WebAPIBackend.Configuration;
 
 namespace WebAPIBackend.Controllers.Companies
 {

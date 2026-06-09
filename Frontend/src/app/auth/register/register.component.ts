@@ -574,6 +574,10 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           this.errorMessage = 'این ایمیل آدرس قبلاً ثبت شده است.';
           this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
           break;
+        case 'InvalidEmail':
+          this.errorMessage = 'ایمیل آدرس درست نیست.';
+          this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');
+          break;
         case 'PasswordTooShort':
           this.errorMessage = 'پسورد باید حداقل ۴ کرکتر باشد.';
           this.toastr.error(this.errorMessage, 'ثبت نام ناموفق');

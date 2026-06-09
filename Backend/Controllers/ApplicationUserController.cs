@@ -159,6 +159,8 @@ namespace WebAPI.Controllers
 
             await ApplyCompanyOwnerDefaultsForOperatorAsync(model);
 
+            model.Email = NormalizeOptionalEmail(model.Email);
+
             // Get current user for CreatedBy
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
@@ -741,12 +743,14 @@ namespace WebAPI.Controllers
                 ? await GetPrimaryCompanyOwnerContactAsync(model.CompanyId)
                 : null;
 
+            var normalizedEmail = NormalizeOptionalEmail(model.Email);
+
             string createdBy = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value ?? "system";
 
             var applicationUser = new ApplicationUser()
             {
                 UserName = model.UserName,
-                Email = model.Email,
+                Email = normalizedEmail,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber)
@@ -891,7 +895,7 @@ namespace WebAPI.Controllers
             // Update user properties
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
-            user.Email = model.Email;
+            user.Email = NormalizeOptionalEmail(model.Email);
             user.PhoneNumber = model.PhoneNumber;
             user.CompanyId = model.CompanyId;
             user.LicenseType = model.LicenseType;
@@ -1111,6 +1115,11 @@ namespace WebAPI.Controllers
                 isViewOnly = primaryRole == UserRoles.Authority || primaryRole == UserRoles.LicenseReviewer,
                 message = "صلاحیت‌ها با موفقیت به‌روز شد"
             });
+        }
+
+        private static string? NormalizeOptionalEmail(string? email)
+        {
+            return string.IsNullOrWhiteSpace(email) ? null : email.Trim();
         }
 
         private sealed class CompanyOwnerContactInfo
