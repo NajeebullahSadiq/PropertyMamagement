@@ -60,8 +60,30 @@ export class WitnessdetailComponent extends BaseComponent {
       return ['Buyer', 'Seller'];
     }
 
-    const usedSides = otherWitnesses.map(w => w.witnessSide).filter(side => side);
+    const usedSides = otherWitnesses
+      .map(w => this.normalizeWitnessSide(w.witnessSide))
+      .filter(side => side);
     return ['Buyer', 'Seller'].filter(side => !usedSides.includes(side));
+  }
+
+  canAddNewWitness(): boolean {
+    return (this.witnessDetails?.length ?? 0) < 2;
+  }
+
+  getDefaultWitnessSideForNew(): string {
+    const availableSides = this.getAvailableWitnessSides();
+    return availableSides.length === 1 ? availableSides[0] : '';
+  }
+
+  normalizeWitnessSide(side: string | null | undefined): string {
+    const value = (side || '').trim().toLowerCase();
+    if (value === 'buyer' || value === 'مشتری') {
+      return 'Buyer';
+    }
+    if (value === 'seller' || value === 'بایع') {
+      return 'Seller';
+    }
+    return side || '';
   }
 
   isWitnessSideDisabled(side: string): boolean {
@@ -81,32 +103,69 @@ export class WitnessdetailComponent extends BaseComponent {
       }
       this.selerService.getWitnessById(effectiveId)
       .subscribe(witness => {
-        this.witnessDetails = witness;
-        if (witness && witness.length > 0) {
-          this.withnessForm.setValue({
-            id: witness[0].id,
-            firstName:witness[0].firstName,
-            fatherName: witness[0].fatherName,
-            grandFatherName: witness[0].grandFatherName || '',
-            electronicNationalIdNumber: witness[0].electronicNationalIdNumber || '',
-            phoneNumber: witness[0].phoneNumber,
-            witnessSide: witness[0].witnessSide || '',
-            des: witness[0].des || '',
-            nationalIdCard: witness[0].nationalIdCard || ''
-          });
-          this.nationalIdCardName = witness[0].nationalIdCard || '';
-          this.selerService.withnessId=witness[0].id;
-          this.selectedId=witness[0].id;
+        this.witnessDetails = (witness || []).map(w => ({
+          ...w,
+          witnessSide: this.normalizeWitnessSide(w.witnessSide)
+        }));
+
+        if (this.witnessDetails.length >= 2) {
+          this.bindWitnessToForm(this.witnessDetails[0]);
+          return;
         }
+
+        if (this.witnessDetails.length === 1) {
+          this.prepareNewWitnessForm();
+          return;
+        }
+
+        this.prepareNewWitnessForm();
+      });
+    }
+
+    private bindWitnessToForm(witness: witnessDetail): void {
+      this.withnessForm.setValue({
+        id: witness.id,
+        firstName: witness.firstName,
+        fatherName: witness.fatherName,
+        grandFatherName: witness.grandFatherName || '',
+        electronicNationalIdNumber: witness.electronicNationalIdNumber || '',
+        phoneNumber: witness.phoneNumber,
+        witnessSide: this.normalizeWitnessSide(witness.witnessSide),
+        des: witness.des || '',
+        nationalIdCard: witness.nationalIdCard || ''
+      });
+      this.nationalIdCardName = witness.nationalIdCard || '';
+      this.selerService.withnessId = witness.id;
+      this.selectedId = witness.id;
+    }
+
+    private prepareNewWitnessForm(): void {
+      this.selectedId = 0;
+      this.selerService.withnessId = 0;
+      this.nationalIdCardName = '';
+      if (this.nationalIdComponent) {
+        this.nationalIdComponent.reset();
+      }
+      this.withnessForm.reset({
+        id: 0,
+        firstName: '',
+        fatherName: '',
+        grandFatherName: '',
+        electronicNationalIdNumber: '',
+        phoneNumber: '',
+        witnessSide: this.getDefaultWitnessSideForNew(),
+        des: '',
+        nationalIdCard: ''
       });
     }
     addwithnessDetails(): void {
       const withnessDetails = this.withnessForm.value as witnessDetail;
       
       // Validate witness side is not already used
-      const selectedSide = withnessDetails.witnessSide;
+      const selectedSide = this.normalizeWitnessSide(withnessDetails.witnessSide);
+      withnessDetails.witnessSide = selectedSide;
       const otherWitnesses = this.witnessDetails?.filter(w => w.id !== withnessDetails.id) || [];
-      const sideAlreadyUsed = otherWitnesses.some(w => w.witnessSide === selectedSide);
+      const sideAlreadyUsed = otherWitnesses.some(w => this.normalizeWitnessSide(w.witnessSide) === selectedSide);
       
       if (sideAlreadyUsed) {
         this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'بایع'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
@@ -126,7 +185,13 @@ export class WitnessdetailComponent extends BaseComponent {
             this.selerService.withnessId = result.id;
             this.selerService.getWitnessById(this.propertyDetailsService.mainTableId)
             .subscribe(witness => {
-              this.witnessDetails = witness;
+              this.witnessDetails = (witness || []).map(w => ({
+                ...w,
+                witnessSide: this.normalizeWitnessSide(w.witnessSide)
+              }));
+              if ((withnessDetails.id ?? 0) === 0) {
+                this.prepareNewWitnessForm();
+              }
             });
           }
         },
@@ -145,10 +210,10 @@ export class WitnessdetailComponent extends BaseComponent {
   updateWitnessDetails(): void {
     const wDetails = this.withnessForm.value as witnessDetail;
     
-    // Validate witness side is not already used by another witness
-    const selectedSide = wDetails.witnessSide;
+    const selectedSide = this.normalizeWitnessSide(wDetails.witnessSide);
+    wDetails.witnessSide = selectedSide;
     const otherWitnesses = this.witnessDetails?.filter(w => w.id !== wDetails.id) || [];
-    const sideAlreadyUsed = otherWitnesses.some(w => w.witnessSide === selectedSide);
+    const sideAlreadyUsed = otherWitnesses.some(w => this.normalizeWitnessSide(w.witnessSide) === selectedSide);
     
     if (sideAlreadyUsed) {
       this.toastr.error(`شاهد از طرف ${selectedSide === 'Buyer' ? 'مشتری' : 'بایع'} قبلاً ثبت شده است. لطفاً طرف دیگر را انتخاب کنید`);
@@ -163,9 +228,11 @@ export class WitnessdetailComponent extends BaseComponent {
       this.selerService.udateSellerId(result.id);
       this.selerService.getWitnessById(this.propertyDetailsService.mainTableId)
             .subscribe(witness => {
-              this.witnessDetails = witness;
+              this.witnessDetails = (witness || []).map(w => ({
+                ...w,
+                witnessSide: this.normalizeWitnessSide(w.witnessSide)
+              }));
             });
-     // this.onNextClick();
    });
   }
 
@@ -173,9 +240,7 @@ resetChild(){
     if (this.nationalIdComponent) {
       this.nationalIdComponent.reset();
     }
-    this.selectedId=0;
-    this.nationalIdCardName='';
-    this.withnessForm.reset(); 
+    this.prepareNewWitnessForm();
  }
  resetlist(){
   this.witnessDetails=[];
@@ -183,21 +248,7 @@ resetChild(){
 BindValu(id: number) {
   const selectedWitness = this.witnessDetails.find(w => w.id === id);
   if (selectedWitness) {
-    this.withnessForm.patchValue({
-      
-      id: selectedWitness.id,
-      firstName: selectedWitness.firstName,
-      fatherName: selectedWitness.fatherName,
-      grandFatherName: selectedWitness.grandFatherName || '',
-      electronicNationalIdNumber: selectedWitness.electronicNationalIdNumber || '',
-      phoneNumber: selectedWitness.phoneNumber,
-      witnessSide: selectedWitness.witnessSide || '',
-      des: selectedWitness.des || '',
-      propertyDetailsId:selectedWitness.propertyDetailsId,
-      nationalIdCard: selectedWitness.nationalIdCard || ''
-    });
-    this.nationalIdCardName = selectedWitness.nationalIdCard || '';
-    this.selectedId=selectedWitness.id;
+    this.bindWitnessToForm(selectedWitness);
   }
 }
   nationalIdUploadFinished = (event:string) => { 

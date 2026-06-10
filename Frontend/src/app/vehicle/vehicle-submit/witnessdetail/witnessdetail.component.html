@@ -105,7 +105,7 @@
                     <i class="fas" [ngClass]="selectedId ? 'fa-edit' : 'fa-save'"></i>
                     <span>{{ selectedId ? "تغیر معلومات" : "ثبت معلومات" }}</span>
                 </button>
-                <button type="reset" class="btn-secondary" (click)="resetChild()">
+                <button type="button" class="btn-secondary" [disabled]="!canAddNewWitness()" (click)="resetChild()">
                     <i class="fas fa-plus-circle"></i><span>ثبت جدید</span>
                 </button>
                 <button type="reset" class="btn-secondary !border-[#55615a] !text-[#55615a]" (click)="reset()">
