@@ -61,6 +61,7 @@ namespace WebAPIBackend.Controllers.Companies
                     .Select(o => new
                     {
                         o.Id,
+                        o.CompanyId,
                         CompanyTitle = o.Company != null ? o.Company.Title : "نامعلوم",
                         LicenseNumber = o.Company != null ? o.Company.LicenseDetails.OrderBy(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault() : null
                     })
@@ -68,14 +69,36 @@ namespace WebAPIBackend.Controllers.Companies
 
                 if (duplicates.Count > 0)
                 {
-                    var existing = duplicates.First();
-                    var ownerInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
-                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
-                        : $"شرکت: {existing.CompanyTitle}";
+                    // Check if all duplicates belong to cancelled/revoked companies
+                    var companyIds = duplicates.Where(d => d.CompanyId.HasValue).Select(d => d.CompanyId!.Value).Distinct().ToList();
+                    var cancelledCompanyIds = new HashSet<int>();
+                    if (companyIds.Any())
+                    {
+                        var cancellations = await _context.CompanyCancellationInfos
+                            .AsNoTracking()
+                            .Where(c => companyIds.Contains(c.CompanyId))
+                            .ToListAsync();
 
-                    var message = $"مالک با همین اسم، ولد، ولدیت و نمبر الکترونیکی قبلاً در سیستم ثبت شده است.\n{ownerInfo}\nلطفاً ابتدا رکورد موجود را بررسی نموده و در صورت ضرورت آن را ویرایش کنید.";
+                        cancelledCompanyIds = cancellations
+                            .Where(c => CancellationHelper.IsValidCancellation(c))
+                            .Select(c => c.CompanyId)
+                            .ToHashSet();
+                    }
 
-                    return Ok(new { isDuplicate = true, message });
+                    // Filter to only duplicates from non-cancelled companies
+                    var activeDuplicates = duplicates.Where(d => !d.CompanyId.HasValue || !cancelledCompanyIds.Contains(d.CompanyId.Value)).ToList();
+
+                    if (activeDuplicates.Count > 0)
+                    {
+                        var existing = activeDuplicates.First();
+                        var ownerInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                            ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                            : $"شرکت: {existing.CompanyTitle}";
+
+                        var message = $"مالک با همین اسم، ولد، ولدیت و نمبر الکترونیکی قبلاً در سیستم ثبت شده است.\n{ownerInfo}\nلطفاً ابتدا رکورد موجود را بررسی نموده و در صورت ضرورت آن را ویرایش کنید.";
+
+                        return Ok(new { isDuplicate = true, message });
+                    }
                 }
 
                 return Ok(new { isDuplicate = false, message = "" });

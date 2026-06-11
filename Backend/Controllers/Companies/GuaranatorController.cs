@@ -174,6 +174,7 @@ namespace WebAPIBackend.Controllers.Companies
                     .Select(g => new
                     {
                         g.Id,
+                        g.CompanyId,
                         g.IsActive,
                         GuarantorName = g.FirstName + " " + (g.FatherName ?? "") + " " + (g.GrandFatherName ?? ""),
                         CompanyTitle = g.Company != null ? g.Company.Title : "نامعلوم",
@@ -183,19 +184,41 @@ namespace WebAPIBackend.Controllers.Companies
 
                 if (duplicates.Count > 0)
                 {
-                    var existing = duplicates.First();
-                    var statusText = existing.IsActive ? "فعال" : "غیرفعال";
-                    var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
-                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
-                        : $"شرکت: {existing.CompanyTitle}";
+                    // Check if all duplicates belong to cancelled/revoked companies
+                    var companyIds = duplicates.Where(d => d.CompanyId.HasValue).Select(d => d.CompanyId!.Value).Distinct().ToList();
+                    var cancelledCompanyIds = new HashSet<int>();
+                    if (companyIds.Any())
+                    {
+                        var cancellations = await _context.CompanyCancellationInfos
+                            .AsNoTracking()
+                            .Where(c => companyIds.Contains(c.CompanyId))
+                            .ToListAsync();
 
-                    var message = $"تضمین کننده با همین نمبر الکترونیکی تذکره قبلاً در سیستم ثبت شده است.\n" +
-                                  $"نام تضمین کننده: {existing.GuarantorName}\n" +
-                                  $"{companyInfo}\n" +
-                                  $"وضعیت: {statusText}\n" +
-                                  $"لطفاً ابتدا رکورد موجود را بررسی نموده و در صورت ضرورت آن را ویرایش کنید.";
+                        cancelledCompanyIds = cancellations
+                            .Where(c => CancellationHelper.IsValidCancellation(c))
+                            .Select(c => c.CompanyId)
+                            .ToHashSet();
+                    }
 
-                    return Ok(new { isDuplicate = true, message });
+                    // Filter to only duplicates from non-cancelled companies
+                    var activeDuplicates = duplicates.Where(d => !d.CompanyId.HasValue || !cancelledCompanyIds.Contains(d.CompanyId.Value)).ToList();
+
+                    if (activeDuplicates.Count > 0)
+                    {
+                        var existing = activeDuplicates.First();
+                        var statusText = existing.IsActive ? "فعال" : "غیرفعال";
+                        var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                            ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                            : $"شرکت: {existing.CompanyTitle}";
+
+                        var message = $"تضمین کننده با همین نمبر الکترونیکی تذکره قبلاً در سیستم ثبت شده است.\n" +
+                                      $"نام تضمین کننده: {existing.GuarantorName}\n" +
+                                      $"{companyInfo}\n" +
+                                      $"وضعیت: {statusText}\n" +
+                                      $"لطفاً ابتدا رکورد موجود را بررسی نموده و در صورت ضرورت آن را ویرایش کنید.";
+
+                        return Ok(new { isDuplicate = true, message });
+                    }
                 }
 
                 return Ok(new { isDuplicate = false, message = "" });
@@ -237,6 +260,7 @@ namespace WebAPIBackend.Controllers.Companies
                     .Select(g => new
                     {
                         g.Id,
+                        g.CompanyId,
                         g.IsActive,
                         GuarantorName = g.FirstName + " " + (g.FatherName ?? "") + " " + (g.GrandFatherName ?? ""),
                         CompanyTitle = g.Company != null ? g.Company.Title : "نامعلوم",
@@ -246,19 +270,41 @@ namespace WebAPIBackend.Controllers.Companies
 
                 if (duplicates.Count > 0)
                 {
-                    var existing = duplicates.First();
-                    var statusText = existing.IsActive ? "فعال" : "غیرفعال";
-                    var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
-                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
-                        : $"شرکت: {existing.CompanyTitle}";
+                    // Check if all duplicates belong to cancelled/revoked companies
+                    var companyIds = duplicates.Where(d => d.CompanyId.HasValue).Select(d => d.CompanyId!.Value).Distinct().ToList();
+                    var cancelledCompanyIds = new HashSet<int>();
+                    if (companyIds.Any())
+                    {
+                        var cancellations = await _context.CompanyCancellationInfos
+                            .AsNoTracking()
+                            .Where(c => companyIds.Contains(c.CompanyId))
+                            .ToListAsync();
 
-                    var message = $"نمبر سریال سټه ({setSerialNumber}) قبلاً در سیستم ثبت شده است.\n" +
-                                  $"نام تضمین کننده: {existing.GuarantorName}\n" +
-                                  $"{companyInfo}\n" +
-                                  $"وضعیت: {statusText}\n" +
-                                  $"لطفاً نمبر سریال سټه دیگری وارد کنید.";
+                        cancelledCompanyIds = cancellations
+                            .Where(c => CancellationHelper.IsValidCancellation(c))
+                            .Select(c => c.CompanyId)
+                            .ToHashSet();
+                    }
 
-                    return Ok(new { isDuplicate = true, message });
+                    // Filter to only duplicates from non-cancelled companies
+                    var activeDuplicates = duplicates.Where(d => !d.CompanyId.HasValue || !cancelledCompanyIds.Contains(d.CompanyId.Value)).ToList();
+
+                    if (activeDuplicates.Count > 0)
+                    {
+                        var existing = activeDuplicates.First();
+                        var statusText = existing.IsActive ? "فعال" : "غیرفعال";
+                        var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                            ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                            : $"شرکت: {existing.CompanyTitle}";
+
+                        var message = $"نمبر سریال سټه ({setSerialNumber}) قبلاً در سیستم ثبت شده است.\n" +
+                                      $"نام تضمین کننده: {existing.GuarantorName}\n" +
+                                      $"{companyInfo}\n" +
+                                      $"وضعیت: {statusText}\n" +
+                                      $"لطفاً نمبر سریال سټه دیگری وارد کنید.";
+
+                        return Ok(new { isDuplicate = true, message });
+                    }
                 }
 
                 return Ok(new { isDuplicate = false, message = "" });
@@ -300,6 +346,7 @@ namespace WebAPIBackend.Controllers.Companies
                     .Select(g => new
                     {
                         g.Id,
+                        g.CompanyId,
                         g.IsActive,
                         GuarantorName = g.FirstName + " " + (g.FatherName ?? "") + " " + (g.GrandFatherName ?? ""),
                         CompanyTitle = g.Company != null ? g.Company.Title : "نامعلوم",
@@ -309,19 +356,41 @@ namespace WebAPIBackend.Controllers.Companies
 
                 if (duplicates.Count > 0)
                 {
-                    var existing = duplicates.First();
-                    var statusText = existing.IsActive ? "فعال" : "غیرفعال";
-                    var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
-                        ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
-                        : $"شرکت: {existing.CompanyTitle}";
+                    // Check if all duplicates belong to cancelled/revoked companies
+                    var companyIds = duplicates.Where(d => d.CompanyId.HasValue).Select(d => d.CompanyId!.Value).Distinct().ToList();
+                    var cancelledCompanyIds = new HashSet<int>();
+                    if (companyIds.Any())
+                    {
+                        var cancellations = await _context.CompanyCancellationInfos
+                            .AsNoTracking()
+                            .Where(c => companyIds.Contains(c.CompanyId))
+                            .ToListAsync();
 
-                    var message = $"نمبر سند تضمین ({docNumber}) قبلاً در سیستم ثبت شده است.\n" +
-                                  $"نام تضمین کننده: {existing.GuarantorName}\n" +
-                                  $"{companyInfo}\n" +
-                                  $"وضعیت: {statusText}\n" +
-                                  $"لطفاً نمبر سند تضمین دیگری وارد کنید.";
+                        cancelledCompanyIds = cancellations
+                            .Where(c => CancellationHelper.IsValidCancellation(c))
+                            .Select(c => c.CompanyId)
+                            .ToHashSet();
+                    }
 
-                    return Ok(new { isDuplicate = true, message });
+                    // Filter to only duplicates from non-cancelled companies
+                    var activeDuplicates = duplicates.Where(d => !d.CompanyId.HasValue || !cancelledCompanyIds.Contains(d.CompanyId.Value)).ToList();
+
+                    if (activeDuplicates.Count > 0)
+                    {
+                        var existing = activeDuplicates.First();
+                        var statusText = existing.IsActive ? "فعال" : "غیرفعال";
+                        var companyInfo = !string.IsNullOrEmpty(existing.LicenseNumber)
+                            ? $"شرکت: {existing.CompanyTitle} - جواز شماره: {existing.LicenseNumber}"
+                            : $"شرکت: {existing.CompanyTitle}";
+
+                        var message = $"نمبر سند تضمین ({docNumber}) قبلاً در سیستم ثبت شده است.\n" +
+                                      $"نام تضمین کننده: {existing.GuarantorName}\n" +
+                                      $"{companyInfo}\n" +
+                                      $"وضعیت: {statusText}\n" +
+                                      $"لطفاً نمبر سند تضمین دیگری وارد کنید.";
+
+                        return Ok(new { isDuplicate = true, message });
+                    }
                 }
 
                 return Ok(new { isDuplicate = false, message = "" });
