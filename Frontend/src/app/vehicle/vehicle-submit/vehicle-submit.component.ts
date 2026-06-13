@@ -64,7 +64,7 @@ export class VehicleSubmitComponent extends BaseComponent implements AfterViewIn
       priceText: ['', Validators.required],
       halfPrice: [''],
       royaltyAmount: [''],
-      des: ['', Validators.required],
+      des: [''],
       filePath: [''],
       vehicleHand: ['', Validators.required],
       iscomplete: [false],
