@@ -169,6 +169,7 @@ namespace WebAPIBackend.Controllers
                 var searchLower = search.ToLower().Trim();
                 propertyQuery = propertyQuery.Where(p =>
                     (p.Pnumber != null && p.Pnumber.ToLower().Contains(searchLower)) ||
+                    (p.Company != null && p.Company.Title.ToLower().Contains(searchLower)) ||
                     (p.SellerDetails.Any(s => (s.FirstName != null && s.FirstName.ToLower().Contains(searchLower)) || (s.ElectronicNationalIdNumber != null && s.ElectronicNationalIdNumber.Contains(searchLower)))) ||
                     (p.BuyerDetails.Any(b => (b.FirstName != null && b.FirstName.ToLower().Contains(searchLower)) || (b.ElectronicNationalIdNumber != null && b.ElectronicNationalIdNumber.Contains(searchLower))))
                 );

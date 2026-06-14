@@ -170,6 +170,7 @@ export class PropertydetailslistComponent extends BaseComponent {
       const sellerNameMatch = toText(property.sellerName).includes(term);
       const buyerNationalIdMatch = toText(property.buyerElectronicNationalIdNumber).includes(term);
       const sellerNationalIdMatch = toText(property.sellerElectronicNationalIdNumber).includes(term);
+      const companyNameMatch = toText(property.companyTitle).includes(term);
 
       return (
         idMatch ||
@@ -179,7 +180,8 @@ export class PropertydetailslistComponent extends BaseComponent {
         buyerNameMatch ||
         sellerNameMatch ||
         buyerNationalIdMatch ||
-        sellerNationalIdMatch
+        sellerNationalIdMatch ||
+        companyNameMatch
       );
     });
   }
