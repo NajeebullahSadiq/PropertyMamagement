@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
 import { BaseComponent } from 'src/app/shared/base-component';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,6 +24,7 @@ export class NationalidUploadComponent extends BaseComponent implements OnInit, 
   @Input() existingFilePath: string = '';
   @Input() existingFileName: string = '';
   @Output() sendMessage=new EventEmitter<string>();
+  @ViewChild('file') fileInput!: ElementRef<HTMLInputElement>;
   myDate=new Date();
   date:any;
   hour:any;
@@ -174,6 +175,9 @@ export class NationalidUploadComponent extends BaseComponent implements OnInit, 
     this.uploadedFilePath = '';
     this.uploadedFileName = '';
     this.isUploading = false;
+    if (this.fileInput?.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
 }
