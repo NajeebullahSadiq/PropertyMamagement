@@ -87,6 +87,21 @@
         </div>
       </div>
 
+      <!-- Province (conditional) -->
+      <div *ngIf="showProvinceSelect">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+          ولایت <span class="text-red-500">*</span>
+        </label>
+        <ng-select formControlName="provinceId" [items]="provinces" [selectOnTab]="true"
+                   bindLabel="dari" bindValue="id" placeholder="انتخاب ولایت"
+                   class="ng-select-custom">
+        </ng-select>
+        <div *ngIf="editForm.get('provinceId')?.touched && editForm.get('provinceId')?.errors?.['required']"
+             class="text-red-500 text-xs mt-1">
+          ولایت ضروری است
+        </div>
+      </div>
+
       <!-- Company (conditional) -->
       <div *ngIf="showCompanySelect">
         <label class="block text-sm font-semibold text-gray-700 mb-2">رهنما</label>

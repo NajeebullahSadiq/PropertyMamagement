@@ -20,10 +20,12 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
   showCompanySelect = false;
   showLicenseTypeSelect = false;
   showLicenseSearch = false;
+  showProvinceSelect = false;
   searchLicenseNumber = '';
   searchResults: any[] = [];
   isSearching = false;
   selectedCompanyInfo: any = null;
+  provinces: any[] = [];
 
   licenseTypes = [
     { id: 'realEstate', name: 'Real Estate', dari: 'املاک' },
@@ -45,10 +47,12 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.loadCompanies();
+    this.loadProvinces();
     this.updateFieldVisibility(this.data.user.role);
   }
 
   initForm(): void {
+    const userProvinceId = this.data.user.userProvinceId || this.data.user.provinceId || null;
     this.editForm = this.fb.group({
       userId: [this.data.user.id],
       firstName: [this.data.user.firstName, Validators.required],
@@ -58,7 +62,8 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
       role: [this.data.user.role, Validators.required],
       companyId: [this.data.user.companyId || 0],
       licenseNumber: [this.data.user.licenseNumber || ''],
-      licenseType: [this.data.user.licenseType || '']
+      licenseType: [this.data.user.licenseType || ''],
+      provinceId: [userProvinceId]
     });
 
     if (this.data.user.licenseNumber || this.data.user.companyTitle) {
@@ -84,6 +89,17 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
     });
   }
 
+  loadProvinces(): void {
+    this.http.get(`${this.baseUrl}/DistrictManagement/provinces`).subscribe({
+      next: (res: any) => {
+        this.provinces = res || [];
+      },
+      error: (err) => {
+        console.error('Error loading provinces:', err);
+      }
+    });
+  }
+
   onRoleChange(): void {
     const selectedRole = this.editForm.get('role')?.value;
     this.updateFieldVisibility(selectedRole);
@@ -94,14 +110,19 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
     const licenseTypeControl = this.editForm.get('licenseType');
     const licenseNumberControl = this.editForm.get('licenseNumber');
     const emailControl = this.editForm.get('email');
+    const provinceIdControl = this.editForm.get('provinceId');
 
     if (role === UserRoles.Admin || 
         role === UserRoles.Authority || 
         role === UserRoles.LicenseReviewer ||
-        role === UserRoles.CompanyRegistrar) {
+        role === UserRoles.LicenseApplicationManager ||
+        role === UserRoles.ActivityMonitoringManager ||
+        role === UserRoles.SecuritiesManager ||
+        role === UserRoles.SecuritiesEntryManager ||
+        role === UserRoles.PetitionWriterSecuritiesEntryManager) {
       emailControl?.setValidators([Validators.required, Validators.email]);
       emailControl?.updateValueAndValidity();
-      // System-level roles don't need company
+      // System-level roles don't need company or province
       companyIdControl?.setValue(0);
       licenseTypeControl?.setValue('');
       licenseNumberControl?.setValue('');
@@ -111,17 +132,39 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
       this.showCompanySelect = false;
       this.showLicenseTypeSelect = false;
       this.showLicenseSearch = false;
+      this.showProvinceSelect = false;
+      provinceIdControl?.clearValidators();
+      provinceIdControl?.updateValueAndValidity();
+    } else if (role === UserRoles.CompanyRegistrar) {
+      emailControl?.setValidators([Validators.required, Validators.email]);
+      emailControl?.updateValueAndValidity();
+      // Company registrar needs province but not company
+      companyIdControl?.setValue(0);
+      licenseTypeControl?.setValue('');
+      licenseNumberControl?.setValue('');
+      licenseNumberControl?.clearValidators();
+      licenseNumberControl?.updateValueAndValidity();
+      this.selectedCompanyInfo = null;
+      this.showCompanySelect = false;
+      this.showLicenseTypeSelect = false;
+      this.showLicenseSearch = false;
+      this.showProvinceSelect = true;
+      provinceIdControl?.setValidators([Validators.required]);
+      provinceIdControl?.updateValueAndValidity();
     } else if (role === UserRoles.PropertyOperator || 
                role === UserRoles.VehicleOperator) {
       emailControl?.setValidators([Validators.email]);
       emailControl?.updateValueAndValidity();
-      // Company operators need company and license type
+      // Company operators need company, license type, and province
       this.showCompanySelect = true;
       this.showLicenseTypeSelect = true;
       this.showLicenseSearch = true;
+      this.showProvinceSelect = true;
       companyIdControl?.setValue(this.selectedCompanyInfo?.companyId || 0);
       licenseNumberControl?.setValidators([Validators.required]);
       licenseNumberControl?.updateValueAndValidity();
+      provinceIdControl?.setValidators([Validators.required]);
+      provinceIdControl?.updateValueAndValidity();
       // Auto-set license type based on role
       if (role === UserRoles.PropertyOperator) {
         licenseTypeControl?.setValue('realEstate');
@@ -134,8 +177,11 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
       this.showCompanySelect = true;
       this.showLicenseTypeSelect = false;
       this.showLicenseSearch = true;
+      this.showProvinceSelect = true;
       licenseNumberControl?.setValidators([Validators.required]);
       licenseNumberControl?.updateValueAndValidity();
+      provinceIdControl?.setValidators([Validators.required]);
+      provinceIdControl?.updateValueAndValidity();
     }
   }
 
@@ -223,7 +269,8 @@ export class UserEditDialogComponent extends BaseComponent implements OnInit {
     const patch: Record<string, unknown> = {
       companyId: result.companyId || 0,
       licenseType: result.licenseType || this.editForm.get('licenseType')?.value,
-      licenseNumber: result.licenseNumber || ''
+      licenseNumber: result.licenseNumber || '',
+      provinceId: result.provinceId || null
     };
 
     if (result.licenseType === 'carSale') {

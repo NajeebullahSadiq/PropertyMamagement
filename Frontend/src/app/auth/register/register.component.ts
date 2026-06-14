@@ -388,7 +388,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           this.showCompanySelect = true;
           this.showLicenseTypeSelect = true;
           this.showLicenseSearch = true;
-          this.showProvinceSelect = false;
+          this.showProvinceSelect = true;
           if (!this.selectedCompanyInfo) {
             companyIdControl.setValue(0);
           }
@@ -396,8 +396,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           licenseNumberControl?.setValidators([Validators.required]);
           licenseNumberControl?.updateValueAndValidity();
           this.clearCompanyAutofill();
-          provinceIdControl?.setValue(null);
-          provinceIdControl?.clearValidators();
+          provinceIdControl?.setValidators([Validators.required]);
           provinceIdControl?.updateValueAndValidity();
           // Auto-set license type based on role
           if (selectedRole === UserRoles.PropertyOperator) {
@@ -411,9 +410,8 @@ export class RegisterComponent extends BaseComponent implements OnInit {
           this.showLicenseTypeSelect = false;
           licenseNumberControl?.setValidators([Validators.required]);
           licenseNumberControl?.updateValueAndValidity();
-          this.showProvinceSelect = false;
-          provinceIdControl?.setValue(null);
-          provinceIdControl?.clearValidators();
+          this.showProvinceSelect = true;
+          provinceIdControl?.setValidators([Validators.required]);
           provinceIdControl?.updateValueAndValidity();
         }
       }

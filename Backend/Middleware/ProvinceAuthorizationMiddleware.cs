@@ -27,17 +27,27 @@ namespace WebAPIBackend.Middleware
                 // Store role in HttpContext for service layer access
                 context.Items["UserRole"] = role;
 
-                // For COMPANY_REGISTRAR users, extract province claim if present
+                // For COMPANY_REGISTRAR users, extract and validate province claim
                 if (role == UserRoles.CompanyRegistrar)
                 {
                     var provinceIdClaim = context.User.FindFirst(CustomClaimTypes.ProvinceId);
-
-                    if (provinceIdClaim != null && !string.IsNullOrEmpty(provinceIdClaim.Value))
+                    
+                    if (provinceIdClaim == null || string.IsNullOrEmpty(provinceIdClaim.Value))
                     {
-                        // Store province in HttpContext for service layer access
-                        context.Items["UserProvinceId"] = provinceIdClaim.Value;
+                        // COMPANY_REGISTRAR must have province claim
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsJsonAsync(new 
+                        { 
+                            statusCode = 401,
+                            message = "Unauthorized",
+                            details = "Province claim missing from token — please contact admin to assign your province",
+                            timestamp = DateTime.UtcNow
+                        });
+                        return;
                     }
-                    // If province claim is missing, the service layer handles it gracefully
+
+                    // Store province in HttpContext for service layer access
+                    context.Items["UserProvinceId"] = provinceIdClaim.Value;
                 }
             }
 

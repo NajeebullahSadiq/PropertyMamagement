@@ -52,8 +52,14 @@ namespace WebAPI.Controllers
                 return BadRequest(new { message = $"Invalid role: {model.Role}" });
             }
 
-            // Validate province requirement for COMPANY_REGISTRAR and PETITION_WRITER_LICENSE_MANAGER
-            if ((model.Role == UserRoles.CompanyRegistrar || model.Role == UserRoles.PetitionWriterLicenseManager) && !model.ProvinceId.HasValue)
+            // Validate province requirement for province-scoped roles
+            var provinceRequiredRoles = new[] {
+                UserRoles.CompanyRegistrar,
+                UserRoles.PropertyOperator,
+                UserRoles.VehicleOperator,
+                UserRoles.PetitionWriterLicenseManager
+            };
+            if (Array.IndexOf(provinceRequiredRoles, model.Role) >= 0 && !model.ProvinceId.HasValue)
             {
                 return BadRequest(new { message = "Province is required for this role" });
             }
@@ -569,6 +575,7 @@ namespace WebAPI.Controllers
                     user.LastName,
                     user.PhoneNumber,
                     user.CompanyId,
+                    UserProvinceId = user.ProvinceId,
                     LicenseType = !string.IsNullOrWhiteSpace(user.LicenseType)
                         ? user.LicenseType
                         : selectedLicense?.LicenseType,
@@ -857,10 +864,16 @@ namespace WebAPI.Controllers
                 return NotFound(new { message = "کاربر یافت نشد" });
             }
 
-            // Validate province requirement for COMPANY_REGISTRAR
-            if (!string.IsNullOrEmpty(model.Role) && model.Role == UserRoles.CompanyRegistrar && !model.ProvinceId.HasValue)
+            // Validate province requirement for province-scoped roles
+            var provinceRequiredRoles = new[] {
+                UserRoles.CompanyRegistrar,
+                UserRoles.PropertyOperator,
+                UserRoles.VehicleOperator,
+                UserRoles.PetitionWriterLicenseManager
+            };
+            if (!string.IsNullOrEmpty(model.Role) && Array.IndexOf(provinceRequiredRoles, model.Role) >= 0 && !model.ProvinceId.HasValue)
             {
-                return BadRequest(new { message = "Province is required for COMPANY_REGISTRAR role" });
+                return BadRequest(new { message = "Province is required for this role" });
             }
 
             // Validate province exists if provided

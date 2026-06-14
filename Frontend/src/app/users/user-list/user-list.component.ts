@@ -27,6 +27,8 @@ export interface UserData {
   role: string;
   roleDari: string;
   isCompanyUser: boolean;
+  userProvinceId?: number;
+  provinceId?: number;
 }
 
 @Component({
