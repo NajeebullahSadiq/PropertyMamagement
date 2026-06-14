@@ -817,6 +817,10 @@ isAuthorizedAgent(): boolean {
   }
 
   private formatDateForBackend(dateValue: any): string {
+    if (dateValue == null) {
+      return '';
+    }
+
     // Property module ALWAYS uses Hijri Shamsi
     const currentCalendar = CalendarType.HIJRI_SHAMSI;
 

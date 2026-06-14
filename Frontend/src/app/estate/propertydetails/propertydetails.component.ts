@@ -309,6 +309,10 @@ export class PropertydetailsComponent extends BaseComponent implements AfterView
   }
 
   private formatDateForBackend(dateValue: any): string {
+    if (dateValue == null) {
+      return '';
+    }
+
     const currentCalendar = this.calendarService.getSelectedCalendar();
 
     if (dateValue instanceof Date) {
