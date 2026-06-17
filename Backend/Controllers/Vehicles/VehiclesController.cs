@@ -89,6 +89,8 @@ namespace WebAPIBackend.Controllers.Vehicles
                     propertyQuery = propertyQuery.Where(p =>
                         (p.PermitNo != null && p.PermitNo.ToLower().Contains(searchLower)) ||
                         (p.PilateNo != null && p.PilateNo.ToLower().Contains(searchLower)) ||
+                        (p.CompanyId != null && _context.CompanyDetails.Any(c => c.Id == p.CompanyId && c.Title != null && c.Title.ToLower().Contains(searchLower))) ||
+                        (p.CompanyId != null && _context.CompanyDetails.Where(c => c.Id == p.CompanyId).SelectMany(c => c.LicenseDetails).Any(l => l.LicenseNumber != null && l.LicenseNumber.ToLower().Contains(searchLower))) ||
                         (p.VehiclesSellerDetails.Any(s => (s.FirstName != null && s.FirstName.ToLower().Contains(searchLower)) || (s.ElectronicNationalIdNumber != null && s.ElectronicNationalIdNumber.Contains(searchLower)))) ||
                         (p.VehiclesBuyerDetails.Any(b => (b.FirstName != null && b.FirstName.ToLower().Contains(searchLower)) || (b.ElectronicNationalIdNumber != null && b.ElectronicNationalIdNumber.Contains(searchLower))))
                     );
@@ -119,6 +121,9 @@ namespace WebAPIBackend.Controllers.Vehicles
                         p.FilePath,
                         p.VehicleHand,
                         p.iscomplete,
+                        p.CompanyId,
+                        CompanyTitle = _context.CompanyDetails.Where(c => c.Id == p.CompanyId).Select(c => c.Title).FirstOrDefault(),
+                        CompanyLicenseNumber = _context.CompanyDetails.Where(c => c.Id == p.CompanyId).SelectMany(c => c.LicenseDetails).Where(l => l.Status == true).OrderByDescending(l => l.Id).Select(l => l.LicenseNumber).FirstOrDefault(),
                         SellerName = p.VehiclesSellerDetails.Select(s => s.FirstName).FirstOrDefault(),
                         BuyerName = p.VehiclesBuyerDetails.Select(b => b.FirstName).FirstOrDefault(),
                     })

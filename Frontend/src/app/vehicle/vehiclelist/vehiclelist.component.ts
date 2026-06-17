@@ -88,13 +88,16 @@ export class VehiclelistComponent extends BaseComponent {
   }
 
   filterProperties(properties: VehiclesDetailsList[], searchTerm: string): VehiclesDetailsList[] {
+    const term = searchTerm.toLowerCase();
     return properties.filter(property =>
-      (property.permitNo && property.permitNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (property.pilateNo && property.pilateNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (property.shasiNo && property.shasiNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (property.enginNo && property.enginNo.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (property.buyerName && property.buyerName.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (property.sellerName && property.sellerName.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+      (property.permitNo && property.permitNo.toLowerCase().includes(term)) ||
+      (property.pilateNo && property.pilateNo.toLowerCase().includes(term)) ||
+      (property.shasiNo && property.shasiNo.toLowerCase().includes(term)) ||
+      (property.enginNo && property.enginNo.toLowerCase().includes(term)) ||
+      (property.companyTitle && property.companyTitle.toLowerCase().includes(term)) ||
+      (property.companyLicenseNumber && property.companyLicenseNumber.toLowerCase().includes(term)) ||
+      (property.buyerName && property.buyerName.toString().toLowerCase().includes(term)) ||
+      (property.sellerName && property.sellerName.toString().toLowerCase().includes(term))
     );
   }
   onPrint(id:any):void{

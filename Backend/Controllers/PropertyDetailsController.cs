@@ -170,6 +170,7 @@ namespace WebAPIBackend.Controllers
                 propertyQuery = propertyQuery.Where(p =>
                     (p.Pnumber != null && p.Pnumber.ToLower().Contains(searchLower)) ||
                     (p.Company != null && p.Company.Title.ToLower().Contains(searchLower)) ||
+                    (p.Company != null && p.Company.LicenseDetails.Any(l => l.LicenseNumber != null && l.LicenseNumber.ToLower().Contains(searchLower))) ||
                     (p.SellerDetails.Any(s => (s.FirstName != null && s.FirstName.ToLower().Contains(searchLower)) || (s.ElectronicNationalIdNumber != null && s.ElectronicNationalIdNumber.Contains(searchLower)))) ||
                     (p.BuyerDetails.Any(b => (b.FirstName != null && b.FirstName.ToLower().Contains(searchLower)) || (b.ElectronicNationalIdNumber != null && b.ElectronicNationalIdNumber.Contains(searchLower))))
                 );
@@ -210,7 +211,14 @@ namespace WebAPIBackend.Controllers
                              BuyerElectronicNationalIdNumber = (p.BuyerDetails != null && p.BuyerDetails.Any()) ? p.BuyerDetails.First().ElectronicNationalIdNumber : null,
                              p.CreatedBy,
                              p.CompanyId,
-                             CompanyTitle = p.Company != null ? p.Company.Title : null
+                             CompanyTitle = p.Company != null ? p.Company.Title : null,
+                             CompanyLicenseNumber = p.Company != null
+                                 ? p.Company.LicenseDetails
+                                     .Where(l => l.Status == true)
+                                     .OrderByDescending(l => l.Id)
+                                     .Select(l => l.LicenseNumber)
+                                     .FirstOrDefault()
+                                 : null
                          })
                          .Skip((page - 1) * pageSize)
                          .Take(pageSize)

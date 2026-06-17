@@ -72,6 +72,7 @@ export interface PropertyDetails {
     createdBy?: string;
     companyId?: number;
     companyTitle?: string;
+    companyLicenseNumber?: string;
 
   }
 
@@ -96,6 +97,9 @@ export interface PropertyDetails {
     iscomplete:boolean;
     buyerName:string;
     sellerName:string;
+    companyId?: number;
+    companyTitle?: string;
+    companyLicenseNumber?: string;
 
   }
  

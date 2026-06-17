@@ -25,7 +25,7 @@
           <div class="flex gap-2">
             <div class="relative flex-1">
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#bec9c2]"><i class="fas fa-search text-xs"></i></span>
-              <input type="text" class="form-input pl-9" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="شماره مسلسل، نام رهنما، نام فروشنده/مشتری، نمبر تذکره">
+              <input type="text" class="form-input pl-9" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="شماره مسلسل، نام رهنما، نمبر جواز دفتر، نام فروشنده/مشتری، نمبر تذکره">
             </div>
             <button class="btn-primary" type="button" (click)="onSearch()">جستجو</button>
           </div>
@@ -71,6 +71,7 @@
             <tr class="text-center">
               <th class="px-4 py-4 text-xs font-bold text-[#6f7973]">#</th>
               <th class="px-4 py-4 text-xs font-bold text-[#6f7973]">نام رهنما</th>
+              <th class="px-4 py-4 text-xs font-bold text-[#6f7973]">نمبر جواز دفتر</th>
               <th class="px-4 py-4 text-xs font-bold text-[#6f7973]">نوع ملکیت</th>
               <th class="px-4 py-4 text-xs font-bold text-[#6f7973]">نوعیت معامله</th>
               <th class="px-4 py-4 text-xs font-bold text-[#6f7973]">فروشنده</th>
@@ -84,6 +85,9 @@
               <td class="px-4 py-3 text-sm text-[#bec9c2] font-medium">{{ (page - 1) * tableSize + i + 1 }}</td>
               <td class="px-4 py-3 text-sm" [ngClass]="property.companyTitle ? 'text-[#191c1e]' : 'text-[#bec9c2]'">
                 {{ property.companyTitle ? property.companyTitle : 'نامشخص' }}
+              </td>
+              <td class="px-4 py-3 text-sm" [ngClass]="property.companyLicenseNumber ? 'text-[#191c1e]' : 'text-[#bec9c2]'">
+                {{ property.companyLicenseNumber ? property.companyLicenseNumber : 'نامشخص' }}
               </td>
               <td class="px-4 py-3 text-sm text-[#191c1e]">{{ property.propertyTypeText }}</td>
               <td class="px-4 py-3 text-sm" [ngClass]="property.transactionTypeText && property.transactionTypeText !== 'نامشخص' ? 'text-[#191c1e]' : 'text-[#bec9c2]'">
