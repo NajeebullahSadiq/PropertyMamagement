@@ -181,7 +181,7 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
             case 'inspection':
                 return 6;
             default:
-                return 8;
+                return 9;
         }
     }
 

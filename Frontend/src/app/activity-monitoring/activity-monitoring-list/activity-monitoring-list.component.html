@@ -526,6 +526,7 @@
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">تاریخ ثبت</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">نمبر جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">شهرت دارنده جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">عنوان رهنمایی معاملات</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">ثبت کننده</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">عملیات</th>
             </tr>
@@ -649,6 +650,7 @@
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.reportRegistrationDateFormatted || (item.reportRegistrationDate | calendarDate) || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.licenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e] font-semibold">{{ item.licenseHolderName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.companyTitle || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#6f7973]">{{ item.createdBy || '-' }}</td>
                 <td class="px-4 py-3">
                   <div class="flex justify-center gap-2">

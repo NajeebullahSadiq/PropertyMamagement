@@ -119,7 +119,7 @@ export class PetitionWriterMonitoringService {
     }
 
     // Check for duplicate license number
-    checkDuplicateLicense(licenseNumber: string, excludeId?: number, sectionType?: string, status?: string): Observable<{ count: number }> {
+    checkDuplicateLicense(licenseNumber: string, excludeId?: number, sectionType?: string, status?: string): Observable<{ count: number; details?: { violationType: string; date: string }[] }> {
         let params = new HttpParams().set('licenseNumber', licenseNumber);
         if (excludeId) {
             params = params.set('excludeId', excludeId.toString());
@@ -130,6 +130,6 @@ export class PetitionWriterMonitoringService {
         if (status) {
             params = params.set('status', status);
         }
-        return this.http.get<{ count: number }>(`${this.baseUrl}/check-duplicate-license`, { params });
+        return this.http.get<{ count: number; details?: { violationType: string; date: string }[] }>(`${this.baseUrl}/check-duplicate-license`, { params });
     }
 }

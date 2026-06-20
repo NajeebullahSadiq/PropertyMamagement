@@ -378,7 +378,8 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
         {
             var query = _context.ActivityMonitoringRecords
                 .AsNoTracking()
-                .Where(x => x.Status == true);
+                .Where(x => x.Status == true)
+                .OrderByDescending(x => x.CreatedAt);
 
             if (!string.IsNullOrWhiteSpace(startDate))
             {

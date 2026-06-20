@@ -324,7 +324,8 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
         {
             var query = _context.PetitionWriterMonitoringRecords
                 .AsNoTracking()
-                .Where(x => x.Status == true);
+                .Where(x => x.Status == true)
+                .OrderByDescending(x => x.CreatedAt);
 
             if (!string.IsNullOrWhiteSpace(startDate))
             {

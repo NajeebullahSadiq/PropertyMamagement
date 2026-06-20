@@ -368,9 +368,15 @@ export class PetitionWriterMonitoringFormComponent extends BaseComponent impleme
             this.service.checkDuplicateLicense(formValue.petitionWriterLicenseNumber, excludeId ?? undefined, 'violations', formValue.activityStatus).subscribe({
                 next: (licenseResult) => {
                     if (licenseResult.count > 0) {
+                        let detailsHtml = '';
+                        if (licenseResult.details && licenseResult.details.length > 0) {
+                            licenseResult.details.forEach((d: { violationType: string; date: string }) => {
+                                detailsHtml += `\nنوعیت تخلف: ${d.violationType || '-'} | تاریخ: ${d.date || '-'}`;
+                            });
+                        }
                         const dialogData: ConfirmationDialogData = {
                             title: 'هشدار',
-                            message: `نمبر جواز "${formValue.petitionWriterLicenseNumber}" با وضعیت "${statusLabel}" قبلاً ${licenseResult.count} بار ثبت شده است. آیا می‌خواهید ادامه دهید؟`,
+                            message: `نمبر جواز "${formValue.petitionWriterLicenseNumber}" با وضعیت "${statusLabel}" قبلاً ${licenseResult.count} بار ثبت شده است:${detailsHtml}\n\nآیا می‌خواهید ادامه دهید؟`,
                             icon: 'fa-exclamation-triangle',
                             confirmText: 'بله، ادامه دهید',
                             cancelText: 'انصراف'

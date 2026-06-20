@@ -119,6 +119,8 @@ export class PropertydetailslistComponent extends BaseComponent {
         return 'هبه';
       case 'inheritance':
         return 'ارث';
+      case 'revocable sale':
+        return 'بیع جایزی';
       default:
         // If it's already in Dari, return as is, otherwise return the value
         return value;

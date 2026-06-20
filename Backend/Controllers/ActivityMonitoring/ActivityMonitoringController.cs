@@ -84,6 +84,9 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                         x.SerialNumber!.Contains(search) ||
                         x.LicenseNumber!.Contains(search) ||
                         x.LicenseHolderName!.Contains(search) ||
+                        x.CompanyTitle!.Contains(search) ||
+                        x.ComplainantName!.Contains(search) ||
+                        x.ComplaintSubject!.Contains(search) ||
                         x.District!.Contains(search));
                 }
 
@@ -606,7 +609,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
 
         /// <summary>
         /// Check for duplicate license number
-        /// Returns count of existing records with the same LicenseNumber
+        /// Returns count and (for violations) details of existing records with the same LicenseNumber
         /// Optional: sectionType filter (defaults to "complaints"), status filter for violations
         /// </summary>
         [HttpGet("check-duplicate-license")]
@@ -616,10 +619,11 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
             {
                 if (string.IsNullOrWhiteSpace(licenseNumber))
                 {
-                    return Ok(new { count = 0 });
+                    return Ok(new { count = 0, details = new object[0] });
                 }
 
                 var effectiveSectionType = sectionType ?? "complaints";
+                var calendar = CalendarType.HijriShamsi;
 
                 var query = _context.ActivityMonitoringRecords
                     .AsNoTracking()
@@ -636,9 +640,23 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     query = query.Where(x => x.Id != excludeId.Value);
                 }
 
-                var count = await query.CountAsync();
+                var records = await query.ToListAsync();
+                var count = records.Count;
 
-                return Ok(new { count });
+                List<object> details = new();
+                foreach (var record in records)
+                {
+                    string dateStr = record.ReportRegistrationDate.HasValue
+                        ? DateConversionHelper.FormatDateOnly(record.ReportRegistrationDate, calendar)
+                        : "-";
+                    details.Add(new
+                    {
+                        record.ViolationType,
+                        date = dateStr
+                    });
+                }
+
+                return Ok(new { count, details });
             }
             catch (Exception ex)
             {
