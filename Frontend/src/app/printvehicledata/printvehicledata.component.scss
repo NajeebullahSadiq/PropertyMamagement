@@ -215,10 +215,8 @@ hr {
   width: 210mm !important;
   max-width: 210mm !important;
   min-height: 297mm !important;
-  padding: 5mm !important;
+  padding: 0 !important;
   margin: 20px auto !important;
-  font-size: 10pt !important;
-  font-weight: bold !important;
   box-sizing: border-box !important;
   background: white !important;
   box-shadow: 0 0 10px rgba(0,0,0,0.1) !important;
@@ -226,56 +224,18 @@ hr {
   display: block !important;
   position: relative !important;
   
-  * {
-    font-weight: bold !important;
-  }
-  
-  table {
-    font-size: 10pt !important;
-    font-weight: bold !important;
-  }
-  
-  td, th {
-    padding: 1mm 2mm !important;
-    font-weight: bold !important;
-    font-size: 9pt !important;
-  }
-  
-  h3 {
-    font-size: 11pt !important;
-    font-weight: bold !important;
-  }
-  
-  .company-header {
-    margin-bottom: 3mm !important;
-    
-    p {
-      font-size: 11pt !important;
-    }
-    
-    table {
-      font-size: 10pt !important;
-      
-      td {
-        font-size: 9pt !important;
-      }
-    }
-  }
-  
-  .vehicle-section,
-  .seller-section,
-  .buyer-section,
-  .witnesses-section,
-  .description-section {
-    margin-bottom: 3mm !important;
-  }
-  
-  img[alt="Owner"],
+  img[alt="Seller"],
   img[alt="Buyer"] {
-    width: 10mm !important;
-    height: 12mm !important;
+    width: 6mm !important;
+    height: 8mm !important;
     object-fit: cover !important;
-    border: 1px solid #333 !important;
+  }
+  
+  img[alt="کد کیو آر"] {
+    width: 12mm !important;
+    height: 12mm !important;
+    object-fit: contain !important;
+    filter: grayscale(100%) !important;
   }
 }
 
@@ -312,15 +272,24 @@ hr {
 /* ============================================
    PRINT STYLES
    ============================================ */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
 @media print {
+  :host {
+    display: block !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
   .print-options-overlay,
   .no-print {
     display: none !important;
-  }
-  
-  @page {
-    size: A4 portrait;
-    margin: 0 !important;
   }
   
   html {
@@ -332,7 +301,11 @@ hr {
     margin: 0 !important;
     padding: 0 !important;
     width: 210mm !important;
-    height: auto !important;
+    height: 297mm !important;
+    overflow: hidden !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -354,62 +327,28 @@ hr {
 
   /* New design container print */
   .new-design-container {
-    width: 100% !important;
+    width: 210mm !important;
     max-width: none !important;
-    margin: 0 !important;
-    padding: 5mm !important;
+    height: 297mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
     box-shadow: none !important;
+    overflow: hidden !important;
     page-break-after: avoid !important;
-    font-size: 10pt !important;
-    font-weight: bold !important;
+    page-break-inside: avoid !important;
     
-    * {
-      font-weight: bold !important;
-    }
-    
-    table {
-      font-size: 10pt !important;
-    }
-    
-    td, th {
-      padding: 1mm 2mm !important;
-      font-size: 9pt !important;
-    }
-    
-    h3 {
-      font-size: 11pt !important;
-    }
-    
-    .company-header {
-      margin-bottom: 3mm !important;
-      
-      p {
-        font-size: 11pt !important;
-      }
-      
-      table {
-        font-size: 10pt !important;
-        
-        td {
-          font-size: 9pt !important;
-        }
-      }
-    }
-    
-    .vehicle-section,
-    .seller-section,
-    .buyer-section,
-    .witnesses-section,
-    .description-section {
-      margin-bottom: 3mm !important;
-    }
-    
-    img[alt="Owner"],
+    img[alt="Seller"],
     img[alt="Buyer"] {
-      width: 10mm !important;
-      height: 12mm !important;
+      width: 6mm !important;
+      height: 8mm !important;
       object-fit: cover !important;
-      border: 1px solid #333 !important;
+    }
+    
+    img[alt="کد کیو آر"] {
+      width: 12mm !important;
+      height: 12mm !important;
+      object-fit: contain !important;
+      filter: grayscale(100%) !important;
     }
   }
   
