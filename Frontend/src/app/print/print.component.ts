@@ -44,8 +44,8 @@ export class PrintComponent extends BaseComponent implements OnInit {
   isUploading: boolean = false;
 
   // Old design data toggle
-  showOldDesignData: boolean = true;
-  showOldDesignBackground: boolean = true;
+  showOldDesignData: boolean = false;
+  showOldDesignBackground: boolean = false;
 
   constructor(
     public service: AuthService,

@@ -33,8 +33,8 @@ export class PrintvehicledataComponent extends BaseComponent implements OnInit {
   printMode: 'new-design' | 'old-design' | 'upload-docts' = 'new-design';
 
   // Old design data toggle
-  showOldDesignData: boolean = true;
-  showOldDesignBackground: boolean = true;
+  showOldDesignData: boolean = false;
+  showOldDesignBackground: boolean = false;
 
   // Upload properties
   uploadSetaNumber: string = '';
