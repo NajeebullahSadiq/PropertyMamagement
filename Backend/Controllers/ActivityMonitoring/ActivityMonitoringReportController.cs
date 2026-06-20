@@ -86,7 +86,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
-                var records = await query.ToListAsync();
+                var records = await query.OrderByDescending(x => x.CreatedAt).ToListAsync();
 
                 var annualReportRecords = records.Where(x => x.SectionType == "annualReport").ToList();
                 var complaintsRecords = records.Where(x => x.SectionType == "complaints").ToList();
@@ -126,6 +126,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
                 var records = await query
                     .Where(x => x.SectionType == "annualReport")
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
 
                 var summary = BuildAnnualReportSummary(records, calendar);
@@ -173,6 +174,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
                 var records = await query
                     .Where(x => x.SectionType == "complaints")
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
 
                 var summary = BuildComplaintsSummary(records, calendar);
@@ -217,6 +219,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
                 var records = await query
                     .Where(x => x.SectionType == "violations")
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
 
                 var summary = BuildViolationsSummary(records, calendar);
@@ -263,6 +266,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
                 var records = await query
                     .Where(x => x.SectionType == "inspection")
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
 
                 var summary = BuildInspectionSummary(records, calendar);
@@ -308,7 +312,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
                     query = query.Where(x => x.SectionType == sectionType);
                 }
 
-                var records = await query.ToListAsync();
+                var records = await query.OrderByDescending(x => x.CreatedAt).ToListAsync();
 
                 // Resolve user names
                 var userNameCache = new Dictionary<string, string>();
@@ -378,8 +382,7 @@ namespace WebAPIBackend.Controllers.ActivityMonitoring
         {
             var query = _context.ActivityMonitoringRecords
                 .AsNoTracking()
-                .Where(x => x.Status == true)
-                .OrderByDescending(x => x.CreatedAt);
+                .Where(x => x.Status == true);
 
             if (!string.IsNullOrWhiteSpace(startDate))
             {

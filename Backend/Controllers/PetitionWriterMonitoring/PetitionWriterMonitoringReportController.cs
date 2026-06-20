@@ -86,7 +86,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
             {
                 var calendar = DateConversionHelper.ParseCalendarType(calendarType);
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
-                var records = await query.ToListAsync();
+                var records = await query.OrderByDescending(x => x.CreatedAt).ToListAsync();
 
                 var complaintsRecords = records.Where(x => x.SectionType == "complaints").ToList();
                 var violationsRecords = records.Where(x => x.SectionType == "violations").ToList();
@@ -124,6 +124,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
                 var records = await query
                     .Where(x => x.SectionType == "complaints")
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
 
                 var summary = BuildComplaintsSummary(records);
@@ -173,6 +174,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
 
                 var records = await query
                     .Where(x => x.SectionType == "violations")
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
 
                 var summary = BuildViolationsSummary(records);
@@ -217,6 +219,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                 var query = BuildBaseQuery(startDate, endDate, createdBy, calendar);
                 var records = await query
                     .Where(x => x.SectionType == "monitoring")
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
 
                 var summary = BuildMonitoringSummary(records);
@@ -262,7 +265,7 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
                     query = query.Where(x => x.SectionType == sectionType);
                 }
 
-                var records = await query.ToListAsync();
+                var records = await query.OrderByDescending(x => x.CreatedAt).ToListAsync();
 
                 var userNameCache = new Dictionary<string, string>();
                 var resolvedRecords = new List<object>();
@@ -322,10 +325,9 @@ namespace WebAPIBackend.Controllers.PetitionWriterMonitoring
         private IQueryable<PetitionWriterMonitoringRecord> BuildBaseQuery(
             string? startDate, string? endDate, string? createdBy, CalendarType calendar)
         {
-            var query = _context.PetitionWriterMonitoringRecords
+            IQueryable<PetitionWriterMonitoringRecord> query = _context.PetitionWriterMonitoringRecords
                 .AsNoTracking()
-                .Where(x => x.Status == true)
-                .OrderByDescending(x => x.CreatedAt);
+                .Where(x => x.Status == true);
 
             if (!string.IsNullOrWhiteSpace(startDate))
             {
