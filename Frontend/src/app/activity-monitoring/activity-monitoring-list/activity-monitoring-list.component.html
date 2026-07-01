@@ -317,6 +317,7 @@
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">نمبر مسلسل</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">نمبر جواز</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">شهرت دارنده جواز</th>
+                  <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">عنوان رهنمایی معاملات</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">شهرت عارض</th>
                   <th class="px-3 py-3 text-right font-bold text-[#3f4944] border-b border-[#bec9c2]">موضوع شکایت</th>
                   <th class="px-3 py-3 text-center font-bold text-[#3f4944] border-b border-[#bec9c2]">تاریخ ثبت</th>
@@ -328,6 +329,7 @@
                   <td class="px-3 py-2 text-[#6f7973]">{{ row.serialNumber || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.licenseNumber || '-' }}</td>
                   <td class="px-3 py-2 font-medium text-[#191c1e]">{{ row.licenseHolderName || '-' }}</td>
+                  <td class="px-3 py-2 text-[#55615a]">{{ row.companyTitle || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.complainantName || '-' }}</td>
                   <td class="px-3 py-2 text-[#55615a]">{{ row.complaintSubject || '-' }}</td>
                   <td class="px-3 py-2 text-center text-[#55615a]">{{ (row.reportRegistrationDate | calendarDate) || '-' }}</td>
@@ -486,6 +488,7 @@
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">نمبر مسلسل</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">نمبر جواز</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">شهرت دارنده جواز</th>
+              <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">عنوان رهنمایی معاملات</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">شهرت عارض</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">موضوع شکایت</th>
               <th class="px-4 py-4 text-sm font-bold text-[#3f4944]">تاریخ ثبت</th>
@@ -564,6 +567,7 @@
                 <td class="px-4 py-3 text-sm text-[#6f7973] font-medium">{{ item.serialNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.licenseNumber || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#191c1e] font-semibold">{{ item.licenseHolderName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.companyTitle || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.complainantName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.complaintSubject || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-[#55615a]">{{ item.reportRegistrationDateFormatted || (item.reportRegistrationDate | calendarDate) || '-' }}</td>

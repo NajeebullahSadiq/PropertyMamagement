@@ -175,7 +175,7 @@ export class ActivityMonitoringListComponent extends BaseComponent implements On
             case 'annualReport':
                 return 7;
             case 'complaints':
-                return 11;
+                return 8;
             case 'violations':
                 return 8;
             case 'inspection':

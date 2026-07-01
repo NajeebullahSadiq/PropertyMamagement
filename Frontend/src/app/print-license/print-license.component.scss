@@ -784,6 +784,16 @@
   width: 100%;
 }
 
+.fit-text-line {
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.personal-info {
+  overflow: hidden;
+}
+
 .authorization-text {
   text-align: justify;
   text-align-last: center;

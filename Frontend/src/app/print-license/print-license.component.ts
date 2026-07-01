@@ -181,19 +181,19 @@ export class PrintLicenseComponent extends BaseComponent implements OnInit {
     this.selectedLanguage = language;
     this.showLanguageSelector = false;
     
-    // Wait for images to load before printing
+    // Wait for layout and text fitting before printing
     setTimeout(() => {
-      // Store original title and set empty to hide from print header
+      window.dispatchEvent(new Event('resize'));
+
       const originalTitle = document.title;
       document.title = ' ';
       
       window.print();
       
-      // Restore original title after print dialog
       setTimeout(() => {
         document.title = originalTitle;
       }, 100);
-    }, 500);
+    }, 600);
   }
 
   printPage(): void {

@@ -33,6 +33,7 @@ import {
 
 // Numeric Input Directive for Dari/Pashto number support
 import { NumericInputDirective } from './directives/numeric-input.directive';
+import { FitTextToLineDirective } from './directives/fit-text-to-line.directive';
 
 // Dialog components moved from AuthModule for global availability
 import { ChangepasswordComponent } from '../auth/changepassword/changepassword.component';
@@ -63,6 +64,7 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     IsAdminDirective,
     // Numeric Input Directive
     NumericInputDirective,
+    FitTextToLineDirective,
     // Dialog components
     ChangepasswordComponent,
     ResetpasswordComponent,
@@ -100,6 +102,7 @@ import { LockuserComponent } from '../auth/lockuser/lockuser.component';
     IsAdminDirective,
     // Numeric Input Directive
     NumericInputDirective,
+    FitTextToLineDirective,
     // Export dialog components so they can be used anywhere
     ChangepasswordComponent,
     ResetpasswordComponent,
