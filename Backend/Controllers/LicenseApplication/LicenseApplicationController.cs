@@ -115,6 +115,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             };
         }
 
+        private async Task<bool> ValidateLocationExistsAsync(int? locationId)
         {
             if (!locationId.HasValue) return true;
             return await _context.Locations.AsNoTracking().AnyAsync(l => l.Id == locationId.Value);
@@ -829,7 +830,7 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     return BadRequest("نمبر الکترونیکی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
                 }
 
-                if (await HasDuplicateApplicantAsync(request)))
+                if (await HasDuplicateApplicantAsync(request))
                 {
                     return BadRequest("متقاضی با این مشخصات قبلاً در سیستم ثبت شده است.");
                 }
