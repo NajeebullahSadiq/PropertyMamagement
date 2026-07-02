@@ -98,10 +98,43 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             return await query.AnyAsync(x => x.RequestSerialNumber == normalizedSerial);
         }
 
-        private async Task<bool> ValidateLocationExistsAsync(int? locationId)
+        private static string? GetLicenseApplicationUniqueViolationMessage(PostgresException pg)
+        {
+            if (pg.SqlState != PostgresErrorCodes.UniqueViolation)
+            {
+                return null;
+            }
+
+            return pg.ConstraintName?.ToUpperInvariant() switch
+            {
+                "IX_LICENSEAPPLICATIONS_REQUESTSERIALNUMBER" =>
+                    "نمبر عریضه قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.",
+                "IX_LICENSEAPPLICATIONS_APPLICANTELECTRONICNUMBER" =>
+                    "نمبر الکترونیکی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.",
+                _ => null
+            };
+        }
+
         {
             if (!locationId.HasValue) return true;
             return await _context.Locations.AsNoTracking().AnyAsync(l => l.Id == locationId.Value);
+        }
+
+        private async Task<bool> HasDuplicateApplicantElectronicNumberAsync(string? applicantElectronicNumber, int? excludeId = null)
+        {
+            var normalizedNumber = NormalizeApplicantField(applicantElectronicNumber);
+            if (string.IsNullOrWhiteSpace(normalizedNumber)) return false;
+
+            var query = _context.LicenseApplications
+                .AsNoTracking()
+                .Where(x => x.Status == true);
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(x => x.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync(x => x.ApplicantElectronicNumber == normalizedNumber);
         }
 
         private async Task<bool> HasDuplicateApplicantAsync(LicenseApplicationData request, int? excludeId = null)
@@ -213,6 +246,26 @@ namespace WebAPIBackend.Controllers.LicenseApplication
             try
             {
                 var isDuplicate = await HasDuplicateRequestSerialNumberAsync(serialNumber, excludeId);
+                return Ok(new { isDuplicate });
+            }
+            catch (Exception ex)
+            {
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
+            }
+        }
+
+        /// <summary>
+        /// Check if an applicant electronic number already exists
+        /// </summary>
+        [HttpGet("check-applicant-electronic-number")]
+        public async Task<IActionResult> CheckApplicantElectronicNumber(
+            [FromQuery] string electronicNumber,
+            [FromQuery] int? excludeId = null)
+        {
+            try
+            {
+                var isDuplicate = await HasDuplicateApplicantElectronicNumberAsync(electronicNumber, excludeId);
                 return Ok(new { isDuplicate });
             }
             catch (Exception ex)
@@ -771,7 +824,12 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                     return BadRequest("نمبر عریضه قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
                 }
 
-                if (await HasDuplicateApplicantAsync(request))
+                if (await HasDuplicateApplicantElectronicNumberAsync(request.ApplicantElectronicNumber))
+                {
+                    return BadRequest("نمبر الکترونیکی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
+                }
+
+                if (await HasDuplicateApplicantAsync(request)))
                 {
                     return BadRequest("متقاضی با این مشخصات قبلاً در سیستم ثبت شده است.");
                 }
@@ -820,12 +878,16 @@ namespace WebAPIBackend.Controllers.LicenseApplication
 
                 return Ok(new { id = entity.Id, message = "درخواست موفقانه ثبت شد" });
             }
-            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg &&
-                                              pg.SqlState == PostgresErrorCodes.UniqueViolation &&
-                                              string.Equals(pg.ConstraintName, "IX_LicenseApplications_RequestSerialNumber", StringComparison.OrdinalIgnoreCase))
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg)
             {
-                // If DB uniqueness is violated (race condition or stale index), return a friendly message instead of 500.
-                return Conflict("نمبر عریضه قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
+                var message = GetLicenseApplicationUniqueViolationMessage(pg);
+                if (message != null)
+                {
+                    return Conflict(message);
+                }
+
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
             catch (Exception ex)
             {
@@ -860,6 +922,11 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 if (await HasDuplicateRequestSerialNumberAsync(request.RequestSerialNumber, id))
                 {
                     return BadRequest("نمبر عریضه قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
+                }
+
+                if (await HasDuplicateApplicantElectronicNumberAsync(request.ApplicantElectronicNumber, id))
+                {
+                    return BadRequest("نمبر الکترونیکی قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
                 }
 
                 if (await HasDuplicateApplicantAsync(request, id))
@@ -904,6 +971,17 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 await _context.SaveChangesAsync();
 
                 return Ok(new { id = entity.Id, message = "درخواست موفقانه تغییر یافت" });
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg)
+            {
+                var message = GetLicenseApplicationUniqueViolationMessage(pg);
+                if (message != null)
+                {
+                    return Conflict(message);
+                }
+
+                var innerMessage = ex.InnerException != null ? $" Inner exception: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Internal server error: {ex.Message}{innerMessage}");
             }
             catch (Exception ex)
             {

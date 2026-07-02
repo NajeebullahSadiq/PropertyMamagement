@@ -37,11 +37,13 @@ namespace WebAPIBackend.Infrastructure.Migrations.LicenseApplication
                 maxLength: 50,
                 nullable: true);
 
-            // Create unique index for ApplicantElectronicNumber (partial index - only for non-null values)
+            // Create unique index for ApplicantElectronicNumber (active records only, when not null)
             migrationBuilder.Sql(@"
-                CREATE UNIQUE INDEX ""IX_LicenseApplications_ApplicantElectronicNumber"" 
-                ON org.""LicenseApplications"" (""ApplicantElectronicNumber"") 
-                WHERE ""ApplicantElectronicNumber"" IS NOT NULL AND ""ApplicantElectronicNumber"" != '';
+                CREATE UNIQUE INDEX ""IX_LicenseApplications_ApplicantElectronicNumber""
+                ON org.""LicenseApplications"" (""ApplicantElectronicNumber"")
+                WHERE ""Status"" = true
+                  AND ""ApplicantElectronicNumber"" IS NOT NULL
+                  AND ""ApplicantElectronicNumber"" <> '';
             ");
 
             // Rename ApplicantName column comment to reflect it's now just the name

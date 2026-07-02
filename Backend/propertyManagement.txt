@@ -194,5 +194,6 @@ sudo -u postgres psql -d PRMIS -f Scripts/20260702_UpdateLicenseApplicationReque
 
 
 
+
 sudo systemctl restart prmis-backend
 echo "Vehicle electronic ID columns fixed!"

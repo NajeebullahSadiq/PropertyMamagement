@@ -361,6 +361,9 @@ namespace WebAPIBackend.Configuration
                 entity.HasIndex(e => e.RequestSerialNumber)
                     .IsUnique()
                     .HasFilter("\"Status\" = true");
+                entity.HasIndex(e => e.ApplicantElectronicNumber)
+                    .IsUnique()
+                    .HasFilter("\"Status\" = true AND \"ApplicantElectronicNumber\" IS NOT NULL AND \"ApplicantElectronicNumber\" <> ''");
                 entity.HasIndex(e => e.ApplicantName);
                 entity.HasIndex(e => e.ProposedGuideName);
 
