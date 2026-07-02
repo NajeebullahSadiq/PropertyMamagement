@@ -42,8 +42,10 @@ CREATE TABLE IF NOT EXISTS org."LicenseApplications" (
 );
 
 -- Indexes for LicenseApplications
-CREATE UNIQUE INDEX IF NOT EXISTS "IX_LicenseApplications_RequestSerialNumber" 
-    ON org."LicenseApplications" ("RequestSerialNumber");
+-- NOTE: Delete is soft (Status=false), so uniqueness must only apply to active records.
+CREATE UNIQUE INDEX IF NOT EXISTS "IX_LicenseApplications_RequestSerialNumber"
+    ON org."LicenseApplications" ("RequestSerialNumber")
+    WHERE "Status" = TRUE;
 CREATE INDEX IF NOT EXISTS "IX_LicenseApplications_ApplicantName" 
     ON org."LicenseApplications" ("ApplicantName");
 CREATE INDEX IF NOT EXISTS "IX_LicenseApplications_ProposedGuideName" 

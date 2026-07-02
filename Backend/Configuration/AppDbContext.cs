@@ -357,7 +357,10 @@ namespace WebAPIBackend.Configuration
                 entity.Property(e => e.PermanentVillage).HasMaxLength(500);
                 entity.Property(e => e.CurrentVillage).HasMaxLength(500);
 
-                entity.HasIndex(e => e.RequestSerialNumber).IsUnique();
+                // Soft delete uses Status=false, so uniqueness must only apply to active records.
+                entity.HasIndex(e => e.RequestSerialNumber)
+                    .IsUnique()
+                    .HasFilter("\"Status\" = true");
                 entity.HasIndex(e => e.ApplicantName);
                 entity.HasIndex(e => e.ProposedGuideName);
 

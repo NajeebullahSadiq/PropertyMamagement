@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using WebAPI.Models;
 using WebAPIBackend.Configuration;
 using WebAPIBackend.Helpers;
@@ -818,6 +819,13 @@ namespace WebAPIBackend.Controllers.LicenseApplication
                 await _context.SaveChangesAsync();
 
                 return Ok(new { id = entity.Id, message = "درخواست موفقانه ثبت شد" });
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg &&
+                                              pg.SqlState == PostgresErrorCodes.UniqueViolation &&
+                                              string.Equals(pg.ConstraintName, "IX_LicenseApplications_RequestSerialNumber", StringComparison.OrdinalIgnoreCase))
+            {
+                // If DB uniqueness is violated (race condition or stale index), return a friendly message instead of 500.
+                return Conflict("نمبر عریضه قبلاً در سیستم ثبت شده است. لطفاً نمبر دیگری وارد کنید.");
             }
             catch (Exception ex)
             {

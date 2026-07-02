@@ -190,6 +190,7 @@ sudo -u postgres psql -d PRMIS -f Scripts/ActivityMonitoring_Add_TaxAmount.sql
 sudo -u postgres psql -d PRMIS -f Scripts/20260506_UpdatePetitionWriterLicenseUniqueIndex.sql
 sudo -u postgres psql -d PRMIS -f Scripts/20260506_DropUQ_PetitionWriterLicenses_LicenseNumber.sql
 sudo -u postgres psql -d PRMIS -f Scripts/add_transfer_location_date.sql
+sudo -u postgres psql -d PRMIS -f Scripts/20260702_UpdateLicenseApplicationRequestSerialUniqueIndex.sql
 
 
 
